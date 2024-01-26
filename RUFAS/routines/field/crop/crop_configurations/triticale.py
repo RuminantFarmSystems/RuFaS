@@ -65,9 +65,23 @@ class TriticaleGrain(Triticale):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=1.786
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=12.053
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=3.774
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=61.218
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=4.422
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=14.121
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=8.014
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=2.084
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0192848
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00348
+    yield_phosphorus_fraction: float, default=0.00348
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -80,6 +94,13 @@ class TriticaleGrain(Triticale):
     min_harvest_index: float = 0.2
     dry_matter_percentage: float = 88.374
     lignin_dry_matter_percentage: float = 1.786
+    crude_protein_percent: float = 12.053
+    non_protein_nitrogen: float = 3.774
+    starch: float = 61.218
+    adf: float = 4.422
+    ndf: float = 14.121
+    sugar: float = 8.014
+    ash: float = 2.084
     yield_nitrogen_fraction: float = 0.0192848
     yield_phosphorus_fraction: float = 0.00348
 
@@ -99,9 +120,23 @@ class TriticaleSilage(Triticale):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=4.313
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=17.784
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=11.876
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=1.486
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=34.78
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=52.202
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=7.548
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=12.449
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0284544
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00409
+    yield_phosphorus_fraction: float, default=0.00409
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -114,6 +149,13 @@ class TriticaleSilage(Triticale):
     min_harvest_index: float = 0.7
     dry_matter_percentage: float = 33.281
     lignin_dry_matter_percentage: float = 4.313
+    crude_protein_percent: float = 17.784
+    non_protein_nitrogen: float = 11.876
+    starch: float = 1.486
+    adf: float = 34.78
+    ndf: float = 52.202
+    sugar: float = 7.548
+    ash: float = 12.449
     yield_nitrogen_fraction: float = 0.0284544
     yield_phosphorus_fraction: float = 0.00409
 
@@ -133,9 +175,23 @@ class TriticaleBaleage(TriticaleSilage):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=4.313
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=17.784
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=11.876
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=1.486
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=34.78
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=52.202
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=7.548
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=12.449
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0284544
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00409
+    yield_phosphorus_fraction: float, default=0.00409
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -164,9 +220,23 @@ class TriticaleHay(Triticale):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=4.844
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=10.329
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=4.831
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=3.061
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=38.257
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=59.959
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=14.015
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=8.485
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0165264
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00236
+    yield_phosphorus_fraction: float, default=0.00236
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -179,5 +249,12 @@ class TriticaleHay(Triticale):
     min_harvest_index: float = 0.65
     dry_matter_percentage: float = 91.019
     lignin_dry_matter_percentage: float = 4.844
+    crude_protein_percent: float = 10.329
+    non_protein_nitrogen: float = 4.831
+    starch: float = 3.061
+    adf: float = 38.257
+    ndf: float = 59.959
+    sugar: float = 14.015
+    ash: float = 8.485
     yield_nitrogen_fraction: float = 0.0165264
     yield_phosphorus_fraction: float = 0.00236
