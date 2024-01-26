@@ -46,6 +46,32 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
-                                        "path": Path('input/metadata/default_metadata.json')},
+# METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+#                                         "path": Path('input/metadata/default_metadata.json')},
+#                                       ]  
+
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "MW0",
+                                        "path": Path('input/metadata/MW0_metadata.json')},
+                                       {"prefix": "MW1",
+                                        "path": Path('input/metadata/MW1_metadata.json')},
+                                       {"prefix": "MW2",
+                                        "path": Path('input/metadata/MW2_metadata.json')},
+                                       {"prefix": "MW3",
+                                        "path": Path('input/metadata/MW3_metadata.json')},
+                                       {"prefix": "NE0",
+                                        "path": Path('input/metadata/NE0_metadata.json')},
+                                       {"prefix": "NE1",
+                                        "path": Path('input/metadata/NE1_metadata.json')},  
+                                       {"prefix": "NE2",
+                                        "path": Path('input/metadata/NE2_metadata.json')},
+                                       {"prefix": "NE3",
+                                        "path": Path('input/metadata/NE3_metadata.json')},
+                                       {"prefix": "W0",
+                                        "path": Path('input/metadata/W0_metadata.json')},
+                                       {"prefix": "W1",
+                                        "path": Path('input/metadata/W1_metadata.json')},  
+                                       {"prefix": "W2",
+                                        "path": Path('input/metadata/W2_metadata.json')},
+                                       {"prefix": "W3",
+                                        "path": Path('input/metadata/W3_metadata.json')},       
                                        ]
