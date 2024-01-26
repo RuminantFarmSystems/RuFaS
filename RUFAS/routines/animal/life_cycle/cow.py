@@ -730,7 +730,12 @@ class Cow(HeiferIII):
 
     def execute_ed_protocol(self, sim_day: int) -> None:
         """
-        Execute the estrus detection protocol.
+        Execute the estrus detection protocol. This method is used in the ED and ED-TAI protocols.
+
+        Notes
+        -----
+        When the number of days in milk is less than the voluntary waiting period, the cow is in the fresh state.
+        After the voluntary waiting period, depending on the current state of the cow, different actions are taken.
 
         Parameters
         ----------
@@ -742,6 +747,7 @@ class Cow(HeiferIII):
             self._repeat_estrus_simulation_before_vwp(sim_day)
 
         elif self.days_in_milk > self.get_voluntary_waiting_period():
+            # For cows entering the herd but no estrus day has been set
             if (self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
                     and self.days_born > self.estrus_day):
                 self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
@@ -752,6 +758,7 @@ class Cow(HeiferIII):
                 self._log_repro_states(sim_day)
 
             if self.days_born == self.estrus_day:
+                # Used in PGFatPD resynch program
                 if self._repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
                     self._repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
                     self._handle_estrus_detection(
@@ -770,6 +777,7 @@ class Cow(HeiferIII):
                         on_estrus_not_detected=self._simulate_full_estrus_cycle
                     )
 
+                # Used in the initial ED portion of the ED-TAI protocol
                 elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
                     self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
                     self._handle_estrus_detection(
