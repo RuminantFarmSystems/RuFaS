@@ -2,6 +2,8 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List, Any
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
@@ -14,6 +16,11 @@ class PlantCategory(Enum):
     COOL_ANNUAL = "cool_annual"
     PERENNIAL = "perennial"
     TREE = "tree"
+
+
+# This is an arbitrary values to be used until a generalized and appropriate solution can be found for setting
+# species-specific dry matter digestibility amounts.
+DEFAULT_DRY_MATTER_DIGESTIBILITY: float = 40.0
 
 
 @dataclass(kw_only=True)
@@ -44,6 +51,8 @@ class CropData:
     This "database" is actually a PDF with tables for broad groupings of paramters. Therefore, the
     attributes in this class are grouped in line with those tables, for ease of entering the data.
 
+    The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
+
     """
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
@@ -68,6 +77,13 @@ class CropData:
     """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
     is_alive: bool = True
     """is the crop currently alive in the field?"""
+
+    crop_category: CropCategory = CropCategory.SMALL_GRAIN
+    """Broad category into which this crop type falls."""
+    crop_type: CropType = CropType.GRAIN
+    """Sub type of this crop."""
+    storage_type: StorageType = StorageType.DRY
+    """The method of storage that will be used for this crop when harvested."""
 
     # Management variables
     planting_year: int = 0
@@ -353,15 +369,23 @@ class CropData:
     """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
     (unitless; [0, 1])"""
     dry_matter_percentage: float = 85.689
-    """
-    Percentage of fresh yield that is dry matter (unitless).
-    Note: this value is the default for Sorghum harvested as a grain.
-    """
+    """Percentage of fresh yield that is dry matter (unitless)."""
     lignin_dry_matter_percentage: float = 1.518
-    """
-    Percentage of dry matter yield that is lignin (unitless).
-    Note: this value is the default for Sorghum harvested as a grain.
-    """
+    """Percentage of dry matter yield that is lignin (unitless)."""
+    crude_protein_percent: float = 12.481
+    """Percentage of dry matter mass that is dietary crude protein (unitless)."""
+    non_protein_nitrogen: float = 2.518
+    """Percentage of dry matter mass that is non-protein nitrogen (unitless)."""
+    starch: float = 72.586
+    """Percentage of dry matter mass that is starch (unitless)."""
+    adf: float = 3.934
+    """Percentage of dry matter mass that is acid detergent fiber (unitless)."""
+    ndf: float = 6.134
+    """Percentage of dry matter mass that is neutral detergent fiber (unitless)."""
+    sugar: float = 2.235
+    """Percentage of dry matter mass that is labile carbohydrate (unitless)."""
+    ash: float = 2.496
+    """Percentage of dry matter mass that is ash (unitless)."""
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     optimal_phosphorus_fraction: float = 0.073

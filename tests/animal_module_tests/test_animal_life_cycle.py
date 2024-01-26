@@ -14,6 +14,7 @@ from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
+from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -843,7 +844,16 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert life_cycle_manager.parity_culling_stats_range[parity] == 1
 
     assert life_cycle_manager.cow_herd_exit_num == 1
+    assert life_cycle_manager.sold_cow_num == 1
     assert life_cycle_manager.avg_cow_culling_age == approx(100.0)
+
+    # modify cow for death cull
+    mock_cow.cull_reason = DEATH_CULL
+    # Act
+    life_cycle_manager._cull_cow(mock_cow)
+    # assert sold remains 1, exits is now 2
+    assert life_cycle_manager.sold_cow_num == 1
+    assert life_cycle_manager.cow_herd_exit_num == 2
 
 
 def test_handle_cow_body_weight_and_parity(mocker: MockerFixture,
@@ -1031,6 +1041,7 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     # Arrange
     sim_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
+    life_cycle_manager.sold_calves = []
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
@@ -1046,9 +1057,13 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     mock_calf.days_born = calf_days_born = 6
     mock_calf.culled = is_calf_culled
     mock_calf.sold = is_calf_sold
+    mock_calf.sold_at_day = 0
     patch_for_mock_calf = mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
                                        return_value=mock_calf)
     calves_born = []
+
+    mock_input_manager = InputManager()
+    patch_im_getdata = mocker.patch.object(mock_input_manager, 'get_data', return_value='HO')
 
     # Act
     life_cycle_manager._handle_new_born(sim_day, mock_cow, calves_born)
@@ -1057,6 +1072,7 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert mock_cow.p_animal == expected_cow_p_animal
     assert mock_cow.p_gest_for_calf == approx(0.0)
     assert mock_cow.calf_birth_weight == approx(0.0)
+    patch_im_getdata.assert_called_once_with("animal.herd_information.breed")
     patch_for_mock_calf.assert_called_once_with({
         'id': calf_id,
         'breed': 'HO',
@@ -1071,6 +1087,9 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         assert calves_born[0] == mock_calf
     if is_calf_sold:
         assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
+        assert len(life_cycle_manager.sold_calves) == 1
+        assert life_cycle_manager.sold_calves[0] == mock_calf
+        assert mock_calf.sold_at_day == sim_day
 
 
 @pytest.mark.parametrize('cow_calves', [1, 2, 3, 4])

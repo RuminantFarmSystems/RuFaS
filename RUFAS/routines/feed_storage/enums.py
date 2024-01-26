@@ -33,35 +33,35 @@ class CropType(Enum):
     Attributes
     ----------
     WHEAT : str
-        Type of Small Grain.
+        Represents a type of Small Grain.
     RYE : str
-        Type of Small Grain.
+        Represents a type of Small Grain.
     OAT : str
-        Type of Small Grain.
+        Represents a type of Small Grain.
     RICE : str
-        Type of Small Grain.
+        Represents a type of Small Grain.
     HIGH_MOISTURE : str
-        Type of Corn.
+        Represents a type of Corn.
     SILAGE : str
-        Type of Corn.
+        Represents a type of Corn.
     WHOLE_PLANT : str
-        Type of Corn.
+        Represents a type of Corn.
     GRAIN : str
-        Type of Corn or Soy.
+        Represents a type of Corn or Soy.
     FORAGE : str
-        Type of Soy.
+        Represents a type of Soy.
     ALFALFA : str
-        Type of Alfalfa.
+        Represents a type of Alfalfa.
     RYEGRASS : str
-        Type of Grass.
+        Represents a type of Grass.
     ORCHARDGRASS : str
-        Type of Grass.
+        Represents a type of Grass.
     FINE_FESCUE : str
-        Type of Grass.
+        Represents a type of Grass.
     TALL_FESCUE : str
-        Type of Grass.
+        Represents a type of Grass.
     MEADOW_FESCUE : str
-        Type of Grass.
+        Represents a type of Grass.
     """
 
     WHEAT = "Wheat"
