@@ -366,7 +366,7 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when a cow is eligible to be bred during estrus",
+              "description": "Voluntary Waiting Period (days) -- When the cow's days in milk has reached this day, monitoring for estrus will begin. Used only in the ED and ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
               "default": 50,
               "minimum": 0
             },
@@ -376,6 +376,16 @@
               "default": 0.026,
               "minimum": 0,
               "maximum": 0.1
+            },
+            "decrease_conception_rate_in_rebreeding": {
+              "type": "bool",
+              "description": "Decrease Conception Rate in Rebreeding -- whether or not to decrease the conception rate in rebreeding (default is false)",
+              "default": false
+            },
+            "decrease_conception_rate_by_parity": {
+              "type": "bool",
+              "description": "Decrease Conception Rate by Parity -- whether or not to decrease the conception rate by parity (default is false)",
+              "default": false
             },
             "avg_gestation_len": {
               "type": "number",
@@ -445,51 +455,54 @@
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The fraction of in-heat cows that would be detected in the ED (Estrus Detection) protocol, including during the estrus detection portion of ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The fraction of cows with estrus detected that would conceive in the ED (Estrus Detection) protocol, including during the estrus detection portion of ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "presynch_protocol": {
+              "presynch_program": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
+                "description": "The presynch program (1st breeding) for cow in the TAI protocol. Currently, this is only supported in TAI protocol. When other protocols such as ED or ED-TAI are used, this value will be ignored, and it is recommended to set it to None.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|PreSynch|G6G|N/A)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|None)$"
               },
-              "resynch_protocol": {
-                "type": "string",
-                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
+              "presynch_program_start_day": {
+                "type": "number",
+                "description": "The presynch program start day is the day of the first hormone injection in a presynch program used in the TAI protocol. When a presynch program is followed by an OvSynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. The durations of the 3 options - PreSynch, Double OvSynch, and G6G, are 25, 16, and 8 days, respectively. Because the presynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
+                "default": 50,
+                "minimum": 0
               },
-              "repro_sub_protocol": {
+              "ovsynch_program": {
                 "type": "string",
-                "description": "Sub-protocol for cow reproductive program. This ONLY applies to the TAI repro protocol.",
-                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
+                "description": "The OvSynch program to be used for cows in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|None)$",
                 "default": "OvSynch 56"
               },
-              "repro_sub_properties": {
-                "type": "object",
-                "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6). This ONLY applies to the TAI repro protocol.",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "tai_program_start_day": {
-                  "type": "number",
-                  "description": "TAI program start day for TAI and ED-TAI repro protocols.",
-                  "minimum": 0,
-                  "default": 70
-                }
+              "ovsynch_program_start_day": {
+                "type": "number",
+                "description": "When set properly, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. Because the OvSynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
+                "minimum": 0,
+                "default": 70
+              },
+              "ovsynch_program_conception_rate": {
+                "type": "number",
+                "description": "The conception rate for the OvSynch program used in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "resynch_program": {
+                "type": "string",
+                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None.",
+                "default": "TAIafterPD",
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
               }
             }
           },
