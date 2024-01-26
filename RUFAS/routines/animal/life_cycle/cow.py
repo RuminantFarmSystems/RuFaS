@@ -849,7 +849,7 @@ class Cow(HeiferIII):
             The estrus conception rate.
         """
 
-        return im.get_data('animal.animal_config.farm_level.repro.cows.estrus_conception_rate')
+        return im.get_data('animal.animal_config.farm_level.repro.cows.ED_conception_rate')
 
     def _simulate_full_estrus_cycle(self, sim_day: int) -> None:
         """

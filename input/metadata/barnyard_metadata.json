@@ -467,7 +467,7 @@
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_conception_rate": {
+              "ED_conception_rate": {
                 "type": "number",
                 "description": "The fraction of cows with estrus detected that would conceive in the ED (Estrus Detection) protocol, including during the estrus detection portion of ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
@@ -507,7 +507,7 @@
               },
               "resynch_program": {
                 "type": "string",
-                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None.",
+                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None. If PGFatPD is chosen, the values for estrus detection rate and conception rate to that detected estrus following PGF are determined by estrus_detection_rate and ED_conception_rate. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the ovsynch_program_conception_rate.",
                 "default": "TAIafterPD",
                 "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
               }
