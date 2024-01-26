@@ -442,8 +442,8 @@ class GasEmissionsCalculator:
             cls,
             num_animals: int,
             barn_area_per_animal: float,
-            manure_total_ammoniacal_nitrogen: float,
-            manure: float,
+            urine_total_ammoniacal_nitrogen: float,
+            urine: float,
             temp: float,
             pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
             hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
@@ -466,8 +466,8 @@ class GasEmissionsCalculator:
             :math:`total\\_barn\\_area` is the total barn area in :math:`m^2`, calculated as
             :math:`num\\_animals \\times barn\\_area\\_per\\_animal`,
 
-            :math:`TAN` is the total ammoniacal nitrogen in manure in kg, calculated as
-            :math:`manure\\_total\\_ammoniacal\\_nitrogen  / total\\_barn\\_area`,
+            :math:`TAN` is the total ammoniacal nitrogen in urine in kg, calculated as
+            :math:`urine\\_total\\_ammoniacal\\_nitrogen  / total\\_barn\\_area`,
 
             :math:`c` is the number of seconds in a day (86400 s),
 
@@ -475,8 +475,8 @@ class GasEmissionsCalculator:
 
             :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
 
-            :math:`M` is the manure per area of exposed surface in kg/:math:`m^2`, calculated as
-            :math:`manure / total\\_barn\\_area`,
+            :math:`M` is the urine per area of exposed surface in kg/:math:`m^2`, calculated as
+            :math:`urine / total\\_barn\\_area`,
 
             :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
 
@@ -540,9 +540,9 @@ class GasEmissionsCalculator:
             Number of animals in the barn (unitless).
         barn_area_per_animal : float
             Barn area per animal based on housing type (:math:`m^2`).
-        manure_total_ammoniacal_nitrogen : float
+        urine_total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in manure (kg).
-        manure : float
+        urine : float
             Amount of manure produced by animals in the barn (kg).
         temp : float
             Current barn temperature (:math:`^{\\circ}C`).
@@ -570,30 +570,30 @@ class GasEmissionsCalculator:
         if barn_area_per_animal < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        if manure_total_ammoniacal_nitrogen < 0:
+        if urine_total_ammoniacal_nitrogen < 0:
             raise ValueError(
                 "Manure total ammoniacal nitrogen must be greater than or equal to 0."
             )
 
-        if manure < 0:
+        if urine < 0:
             raise ValueError("Manure must be greater than or equal to 0.")
 
         # If any of the aforementioned values is 0, then the result will be 0.
         if (
                 num_animals == 0
                 or barn_area_per_animal == 0
-                or manure_total_ammoniacal_nitrogen == 0
-                or manure == 0
+                or urine_total_ammoniacal_nitrogen == 0
+                or urine == 0
         ):
             return 0.0
 
         total_barn_area = num_animals * barn_area_per_animal
-        total_ammoniacal_nitrogen = manure_total_ammoniacal_nitrogen / total_barn_area
+        total_ammoniacal_nitrogen = urine_total_ammoniacal_nitrogen / total_barn_area
         manure_density = ManureConstants.SLURRY_MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
         temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
         ammonia_barn_resistance = cls._ammonia_barn_resistance(temp, hsc)
-        manure_per_area = manure / total_barn_area  # kg/m^2
+        manure_per_area = urine / total_barn_area  # kg/m^2
         equilibrium_coefficient = cls._equilibrium_coefficient(temperature_kelvin, pH)
         ammonia_loss = (
                                total_ammoniacal_nitrogen * seconds_per_day * manure_density
