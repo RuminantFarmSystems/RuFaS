@@ -55,7 +55,7 @@
 				},
 				"cows": {
 					"estrus_detection_rate": 0.65,
-					"estrus_conception_rate": 0.6,
+					"ED_conception_rate": 0.6,
 					"presynch_program": "Double OvSynch",
 					"presynch_program_start_day": 50,
           			"ovsynch_program": "OvSynch 56",
