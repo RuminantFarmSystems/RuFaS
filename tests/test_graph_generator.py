@@ -145,8 +145,8 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
 def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
-    graph_generator._save_graph = MagicMock(return_value="graph path")
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
+    graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
@@ -169,8 +169,8 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
-    graph_generator._save_graph = MagicMock(side_effect=Exception)
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
+    graph_generator._save_graph = MagicMock(side_effect=Exception)
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
