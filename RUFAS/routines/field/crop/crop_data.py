@@ -38,16 +38,9 @@ class PlantCategory(Enum):
     TREE = "tree"
 
 
-DEFAULT_CROP_QUALITIES = {
-    "dry_matter_digestibility": 40.0,
-    "crude_protein_percent": 15.0,
-    "non_protein_nitrogen": 13.0,
-    "starch": 5.0,
-    "adf": 10.0,
-    "ndf": 6.0,
-    "sugar": 10.0,
-    "ash": 2.0
-}
+# This is an arbitrary values to be used until a generalized and appropriate solution can be found for setting
+# species-specific dry matter digestibility amounts.
+DEFAULT_DRY_MATTER_DIGESTIBILITY: float = 40.0
 
 
 @dataclass(kw_only=True)
@@ -362,6 +355,8 @@ class CropData:
         now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
         no information about how this value can be measured or calculated.
 
+    The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
+
     """
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
@@ -529,6 +524,21 @@ class CropData:
     harvest_efficiency: float = 1.0
     dry_matter_percentage: float = 85.689
     lignin_dry_matter_percentage: float = 1.518
+    """Percentage of dry matter yield that is lignin (unitless)."""
+    crude_protein_percent: float = 12.481
+    """Percentage of dry matter mass that is dietary crude protein (unitless)."""
+    non_protein_nitrogen: float = 2.518
+    """Percentage of dry matter mass that is non-protein nitrogen (unitless)."""
+    starch: float = 72.586
+    """Percentage of dry matter mass that is starch (unitless)."""
+    adf: float = 3.934
+    """Percentage of dry matter mass that is acid detergent fiber (unitless)."""
+    ndf: float = 6.134
+    """Percentage of dry matter mass that is neutral detergent fiber (unitless)."""
+    sugar: float = 2.235
+    """Percentage of dry matter mass that is labile carbohydrate (unitless)."""
+    ash: float = 2.496
+    """Percentage of dry matter mass that is ash (unitless)."""
     dry_down_fraction: float = 0.2
     optimal_phosphorus_fraction: float = 0.073
     user_harvest_index: Optional[float] = None
