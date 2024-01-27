@@ -43,7 +43,7 @@ class BiomassAllocation:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def allocate_biomass(self, light: float):
+    def allocate_biomass(self, light: float) -> None:
         """
         Allocate a plant's accumulated biomass during the day's growth.
 
@@ -59,7 +59,7 @@ class BiomassAllocation:
         self.photosynthesize(light)
         self.partition_biomass()
 
-    def photosynthesize(self, light: float):
+    def photosynthesize(self, light: float) -> None:
         """
         Convert the day's incoming light energy into plant biomass.
 
@@ -79,7 +79,7 @@ class BiomassAllocation:
                                                                        self.data.biomass_growth_max)
         self.data.biomass += self.data.biomass_growth
 
-    def partition_biomass(self):
+    def partition_biomass(self) -> None:
         """
         Partition the accumulated biomass into above ground and below ground portions.
 
