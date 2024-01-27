@@ -134,6 +134,22 @@ class SchemaGenerator:
 
     @staticmethod
     def setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        """
+        Creates an input schema for a boolean input.
+
+        Parameters
+        ----------
+        title : str
+            The name of the variable for which this schema is being created.
+        input_properties : dict[str, Any]
+            The properties of the input variable.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the input schema for this variable.
+
+        """
         schema = {
             "title": title,
             "type": "boolean",
