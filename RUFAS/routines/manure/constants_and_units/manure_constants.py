@@ -56,3 +56,8 @@ class ManureConstants:
     The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
     Default is set to 0.5.
     """
+
+    METHANE_TO_VOLATILE_SOLIDS_FACTOR = 3
+    """
+    The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3. 
+    """
