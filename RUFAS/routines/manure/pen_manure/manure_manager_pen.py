@@ -59,8 +59,8 @@ class ManureManagerPen:
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
         self.num_lactating_cows = self.count_lactating_cows(
-            pen.animal_combination, pen.animals_in_pen
-        )
+            pen.animal_combination, pen.animals_in_pen)
+        self.num_stalls = pen.num_stalls
 
     @classmethod
     def count_lactating_cows(
@@ -106,7 +106,8 @@ class ManureManagerPen:
 
         barn_area = barn_area_by_pen_type.get(self.pen_type, default)
 
+
         if "Cow" in self.classes_in_pen:
-            return barn_area.has_cows
+            return barn_area.has_cows*self.num_stalls
         else:
-            return barn_area.no_cows
+            return barn_area.no_cows*self.num_stalls

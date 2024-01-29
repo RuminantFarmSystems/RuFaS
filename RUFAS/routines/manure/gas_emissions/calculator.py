@@ -441,7 +441,7 @@ class GasEmissionsCalculator:
     def housing_ammonia_emission(
             cls,
             num_animals: int,
-            barn_area_per_animal: float,
+            barn_area: float,
             urine_total_ammoniacal_nitrogen: float,
             urine: float,
             temp: float,
@@ -538,8 +538,8 @@ class GasEmissionsCalculator:
         ----------
         num_animals : int
             Number of animals in the barn (unitless).
-        barn_area_per_animal : float
-            Barn area per animal based on housing type (:math:`m^2`).
+        barn_area : float
+            Barn area based on housing type and number of stalls(:math:`m^2`).
         urine_total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in manure (kg).
         urine : float
@@ -567,7 +567,7 @@ class GasEmissionsCalculator:
         if num_animals < 0:
             raise ValueError("Number of animals must be greater than or equal to 0.")
 
-        if barn_area_per_animal < 0:
+        if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
         if urine_total_ammoniacal_nitrogen < 0:
@@ -581,13 +581,13 @@ class GasEmissionsCalculator:
         # If any of the aforementioned values is 0, then the result will be 0.
         if (
                 num_animals == 0
-                or barn_area_per_animal == 0
+                or barn_area == 0
                 or urine_total_ammoniacal_nitrogen == 0
                 or urine == 0
         ):
             return 0.0
 
-        total_barn_area = num_animals * barn_area_per_animal
+        total_barn_area = barn_area
         total_ammoniacal_nitrogen = urine_total_ammoniacal_nitrogen / total_barn_area
         manure_density = ManureConstants.SLURRY_MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
