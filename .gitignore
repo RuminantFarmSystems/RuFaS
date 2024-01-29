@@ -35,7 +35,6 @@ output/graphics/*
 !output/output_filters/
 output/output_filters/*
 !output/output_filters/report_example.json
-!output/output_filters/graph_milk_fat_and_protein.json
 
 # ignore project files
 *.sublime-project
