@@ -5,6 +5,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -12,6 +13,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "slurry storage outdoor"
     },
     {
@@ -19,6 +21,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "screw press",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "slurry storage outdoor"
     },
     {
@@ -26,6 +29,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -33,6 +37,7 @@
       "bedding_type": "sand",
       "manure_handler": "flush system",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -40,6 +45,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic digestion and lagoon"
     },
     {
@@ -47,13 +53,15 @@
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic digestion and lagoon"
     },
     {
       "scenario_id": 7,
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
-      "manure_separator": "rotary screen",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "rotary screen",
       "manure_treatment": "anaerobic digestion and lagoon with separator"
     },
     {
@@ -61,6 +69,7 @@
       "bedding_type": "CBPB sawdust",
       "manure_handler": "tillage",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "compost bedded pack barn"
     },
     {
@@ -68,7 +77,16 @@
       "bedding_type": "none",
       "manure_handler": "harrowing",
       "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
       "manure_treatment": "open lots"
+    },
+    {
+      "scenario_id": 10,
+      "bedding_type": "none",
+      "manure_handler": "flush system",
+      "manure_separator": "screw press",
+      "manure_separator_after_digestion": "rotary screen",
+      "manure_treatment": "anaerobic digestion and lagoon with separator"
     }
   ],
   "bedding_configs": [
