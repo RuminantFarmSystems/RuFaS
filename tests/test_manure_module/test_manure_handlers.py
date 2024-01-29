@@ -323,6 +323,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
     mock_manure.urea = urea = 20.0
     mock_manure.manure_mass = manure_mass = 22.0
+    mock_manure.urine = urine = 22.0
     mock_manure.nitrogen = N = 23.0
     mock_manure.total_solids = TS = 24.0
     mock_manure.degradable_volatile_solids = VSd = 25.0
@@ -388,8 +389,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     patch_for_calc_housing_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
         barn_area_per_animal=barn_area_from_pen_type,
-        manure_total_ammoniacal_nitrogen=TAN,
-        manure=manure_mass,
+        urine_total_ammoniacal_nitrogen=TAN,
+        urine=urine,
         temp=current_day_avg_tempC
     )
     patch_for_calc_housing_methane_emission.assert_called_once_with(
