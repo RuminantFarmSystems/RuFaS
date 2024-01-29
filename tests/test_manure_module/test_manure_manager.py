@@ -125,6 +125,7 @@ def test_configure_manure_manager_components(manure_separator: str,
     mock_manure_manager_pen.bedding_type = bedding_type = 'test_bedding_type'
     mock_manure_manager_pen.manure_handler = manure_handler = 'test_manure_handler'
     mock_manure_manager_pen.manure_separator = manure_separator
+    mock_manure_manager_pen.manure_separator_after_digestion = manure_separator
     mock_manure_manager_pen.manure_treatment = manure_treatment = 'test_manure_treatment'
     patch_for_manure_manager_pen_init = mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManagerPen',
@@ -195,6 +196,7 @@ def test_configure_manure_manager_components(manure_separator: str,
     manure_manager.manure_handlers = {}
     manure_manager.reception_pits = {}
     manure_manager.manure_separators = {}
+    manure_manager.manure_separators_after_digestion = {}
     manure_manager.manure_treatments = {}
     manure_manager.weather = mock_weather
     manure_manager.time = mock_time
@@ -230,8 +232,8 @@ def test_configure_manure_manager_components(manure_separator: str,
         assert manure_manager.manure_separators[pen_id] is None
     else:
         mock_manure_manager_config_handler.get_custom_manure_separator_config \
-            .assert_called_once_with(manure_separator)
-        patch_for_manure_separator_factory_get_instance.assert_called_once_with(
+            .assert_called_with(manure_separator)
+        patch_for_manure_separator_factory_get_instance.assert_called_with(
             manure_separator_type_name=manure_separator,
             custom_manure_separator_config=mock_custom_manure_separator_config,
         )
@@ -403,6 +405,9 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     mock_manure_separator = mocker.MagicMock()
     manure_manager.manure_separators = {pen_id: mock_manure_separator}
 
+    mock_manure_separator_after_digestion = mocker.MagicMock()
+    manure_manager.manure_separators_after_digestion = {pen_id: mock_manure_separator_after_digestion}
+
     mock_manure_treatment = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_accumulated_output = mocker.MagicMock()
@@ -414,12 +419,16 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     mock_manure_treatment.anaerobic_digestion_daily_output = mock_anaerobic_digestion_daily_output
 
     mock_manure_separator_daily_output = mocker.MagicMock()
-    mock_manure_treatment.manure_separator_daily_output = mock_manure_separator_daily_output
+    mock_manure_separator.daily_update.return_value = mock_manure_separator_daily_output
+
+    mock_manure_separator_after_digestion_daily_output = mocker.MagicMock()
+    mock_manure_treatment.manure_separator_after_digestion_daily_output = \
+        mock_manure_separator_after_digestion_daily_output
 
     manure_manager.manure_treatments = {pen_id: mock_manure_treatment}
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_separator_after_digestion_daily_output, \
         manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_manager._handle_daily_update_for_compound_anaerobic_manure_treatment(
             simulation_day=simulation_day,
@@ -435,10 +444,12 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
         pen=mock_manure_manager_pen,
         sim_day=simulation_day,
         manure_separator=mock_manure_separator,
+        manure_separator_after_digestion=mock_manure_separator_after_digestion
     )
     assert manure_treatment_daily_output == mock_manure_treatment_daily_output
     assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
     assert manure_separator_daily_output == mock_manure_separator_daily_output
+    assert manure_separator_after_digestion_daily_output == mock_manure_separator_after_digestion_daily_output
     assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
 
 
@@ -475,6 +486,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output_2 = mocker.MagicMock()
+    mock_manure_separator_after_digestion_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output_2 = mocker.MagicMock()
     mock_manure_treatment_accumulated_output = mocker.MagicMock()
@@ -485,6 +497,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         '_handle_daily_update_for_compound_anaerobic_manure_treatment',
         return_value=(mock_anaerobic_digestion_daily_output,
                       mock_manure_separator_daily_output,
+                      mock_manure_separator_after_digestion_daily_output,
                       mock_manure_treatment_daily_output,
                       mock_manure_treatment_accumulated_output),
     )
@@ -513,7 +526,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     )
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_separator_after_digestion_daily_output, \
         manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_manager._pen_daily_update_for_separator_and_treatment(
             simulation_day=simulation_day,
@@ -533,6 +546,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         )
         assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
         assert manure_separator_daily_output == mock_manure_separator_daily_output
+        assert manure_separator_after_digestion_daily_output == mock_manure_separator_after_digestion_daily_output
         assert manure_treatment_daily_output == mock_manure_treatment_daily_output
         assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
     else:
@@ -581,6 +595,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
 
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output = mocker.MagicMock()
+    mock_manure_separator_after_digestion_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_accumulated_output = mocker.MagicMock()
     patch_for_pen_daily_update_for_separator_and_treatment = mocker.patch(
@@ -588,6 +603,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         '_pen_daily_update_for_separator_and_treatment',
         return_value=(mock_anaerobic_digestion_daily_output,
                       mock_manure_separator_daily_output,
+                      mock_manure_separator_after_digestion_daily_output,
                       mock_manure_treatment_daily_output,
                       mock_manure_treatment_accumulated_output),
     )
@@ -599,6 +615,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         'manure_handler_daily_output': mock_manure_handler_daily_output,
         'reception_pit_daily_output': mock_reception_pit_daily_output,
         'manure_separator_daily_output': mock_manure_separator_daily_output,
+        'manure_separator_after_digestion_daily_output': mock_manure_separator_after_digestion_daily_output,
         'manure_treatment_daily_output': mock_manure_treatment_daily_output,
         'manure_treatment_accumulated_output': mock_manure_treatment_accumulated_output,
         'anaerobic_digestion_daily_output': mock_anaerobic_digestion_daily_output
