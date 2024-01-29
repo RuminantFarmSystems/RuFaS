@@ -73,7 +73,7 @@ class ManureTreatmentFactory:
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
             ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
             ManureTreatmentType.OPEN_LOTS: OpenLots,
         }

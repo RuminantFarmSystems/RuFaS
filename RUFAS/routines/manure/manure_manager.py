@@ -106,6 +106,7 @@ class ManureManager:
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, ReceptionPit] = {}
         self.manure_separators: Dict[int, Optional[BaseManureSeparator]] = {}
+        self.manure_separators_after_digestion: Dict[int, Optional[BaseManureSeparator]] = {}
         self.manure_treatments: Dict[int, BaseManureTreatment] = {}
         self.weather = weather
         self.time = time
@@ -133,6 +134,7 @@ class ManureManager:
                 'manure_handler_daily_output': ManureHandlerDailyOutput,
                 'reception_pit_daily_output': ReceptionPitDailyOutput,
                 'manure_separator_daily_output': ManureSeparatorDailyOutput,
+                'manure_separator_after_digestion_daily_output': ManureSeparatorDailyOutput,
                 'manure_treatment_daily_output': ManureTreatmentDailyOutput,
                 'manure_treatment_accumulated_output': ManureTreatmentDailyOutput,
                 'anaerobic_digestion_daily_output': ManureTreatmentDailyOutput
@@ -190,6 +192,17 @@ class ManureManager:
                 )
                 self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
                     manure_separator_type_name=mm_pen.manure_separator,
+                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
+                )
+
+            if mm_pen.manure_separator_after_digestion.lower() == "none":
+                self.manure_separators_after_digestion[mm_pen.id] = None
+            else:
+                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
+                    mm_pen.manure_separator_after_digestion
+                )
+                self.manure_separators_after_digestion[mm_pen.id] = ManureSeparatorFactory.get_instance(
+                    manure_separator_type_name=mm_pen.manure_separator_after_digestion,
                     custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
                 )
 
@@ -263,7 +276,7 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
             ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
             ManureTreatmentType.SEPARATED_SOLIDS_STORAGE: ManureType.SOLID,
@@ -452,8 +465,9 @@ class ManureManager:
 
         anaerobic_digestion_daily_output = results[0]
         manure_separator_daily_output = results[1]
-        manure_treatment_daily_output = results[2]
-        manure_treatment_accumulated_output = results[3]
+        manure_separator_after_digestion_daily_output = results[2]
+        manure_treatment_daily_output = results[3]
+        manure_treatment_accumulated_output = results[4]
 
         if anaerobic_digestion_daily_output:
             anaerobic_digestion_daily_output_prefix = {
@@ -476,6 +490,18 @@ class ManureManager:
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 manure_separator_daily_output,
                 class_and_function_info_maps | manure_separator_daily_output_prefix,
+                excluded_fields,
+            )
+
+        if manure_separator_after_digestion_daily_output:
+            manure_separator_after_digestion_daily_output_prefix = {
+                "prefix": (manure_separator_after_digestion_daily_output.__class__.__name__
+                           + "_Pen_" + str(mm_pen.id)
+                           + "_" + mm_pen.animal_combination.name)
+            }
+            ManureModuleOutputManagerHelper.add_dataclass_object(
+                manure_separator_after_digestion_daily_output,
+                class_and_function_info_maps | manure_separator_after_digestion_daily_output_prefix,
                 excluded_fields,
             )
 
@@ -509,6 +535,7 @@ class ManureManager:
             "manure_handler_daily_output": manure_handler_daily_output,
             "reception_pit_daily_output": reception_pit_daily_output,
             "manure_separator_daily_output": manure_separator_daily_output,
+            "manure_separator_after_digestion_daily_output": manure_separator_after_digestion_daily_output,
             "manure_treatment_daily_output": manure_treatment_daily_output,
             "manure_treatment_accumulated_output": manure_treatment_accumulated_output,
             "anaerobic_digestion_daily_output": anaerobic_digestion_daily_output,
@@ -554,8 +581,9 @@ class ManureManager:
             )
             anaerobic_digestion_daily_output = results[0]
             manure_separator_daily_output = results[1]
-            manure_treatment_daily_output = results[2]
-            manure_treatment_accumulated_output = results[3]
+            manure_separator_after_digestion_daily_output = results[2]
+            manure_treatment_daily_output = results[3]
+            manure_treatment_accumulated_output = results[4]
         else:
             results = self._handle_daily_update_for_simple_manure_treatment(
                 simulation_day=simulation_day,
@@ -566,10 +594,12 @@ class ManureManager:
             manure_separator_daily_output = results[0]  # type: ignore
             manure_treatment_daily_output = results[1]  # type: ignore
             manure_treatment_accumulated_output = results[2]  # type: ignore
+            manure_separator_after_digestion_daily_output = None
 
         return (
             anaerobic_digestion_daily_output,
             manure_separator_daily_output,
+            manure_separator_after_digestion_daily_output,
             manure_treatment_daily_output,
             manure_treatment_accumulated_output,
         )
@@ -594,7 +624,7 @@ class ManureManager:
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_name)
         compound_anaerobic_manure_treatment_types = [
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ]
         return manure_treatment_type in compound_anaerobic_manure_treatment_types
 
@@ -606,6 +636,7 @@ class ManureManager:
             reception_pit_daily_output: ReceptionPitDailyOutput,
     ) -> Tuple[
         ManureTreatmentDailyOutput,
+        Optional[ManureSeparatorDailyOutput],
         Optional[ManureSeparatorDailyOutput],
         ManureTreatmentDailyOutput,
         ManureTreatmentDailyOutput,
@@ -633,6 +664,13 @@ class ManureManager:
             the accumulated output of the anaerobic lagoon.
 
         """
+        manure_separator_daily_output = (
+            self.manure_separators[pen.id].daily_update(
+                manure_separator_daily_input=reception_pit_daily_output
+            )
+            if self.manure_separators[pen.id]
+            else None
+        )
         # Currently, calling the daily_update on the treatment only returns one final output
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
@@ -640,6 +678,7 @@ class ManureManager:
             pen=pen,
             sim_day=simulation_day,
             manure_separator=self.manure_separators[pen.id],
+            manure_separator_after_digestion=self.manure_separators_after_digestion[pen.id],
         )
 
         # To retrieve the following three intermediate results,
@@ -648,9 +687,9 @@ class ManureManager:
             AnaerobicDigestionAndLagoon, self.manure_treatments[pen.id]
         ).anaerobic_digestion_daily_output
 
-        manure_separator_daily_output = self.manure_treatments[
+        manure_separator_after_digestion_daily_output = self.manure_treatments[
             pen.id
-        ].manure_separator_daily_output
+        ].manure_separator_after_digestion_daily_output
 
         manure_treatment_accumulated_output = self.manure_treatments[
             pen.id
@@ -659,6 +698,7 @@ class ManureManager:
         return (
             anaerobic_digestion_daily_output,
             manure_separator_daily_output,
+            manure_separator_after_digestion_daily_output,
             manure_treatment_daily_output,
             manure_treatment_accumulated_output,
         )

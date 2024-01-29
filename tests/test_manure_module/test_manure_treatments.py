@@ -608,7 +608,7 @@ def test_anaerobic_lagoon_default_config() -> None:
                 ),
         ),
         (
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
                 (
                         DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
                         DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
@@ -654,7 +654,7 @@ def test_default_manure_treatment_config_factory_get_instance(
         ),
         (
                 "anaerobic digestion and lagoon with split",
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ),
         ("slurry_storage_underfloor", ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR),
         ("slurry_storage_outdoor", ManureTreatmentType.SLURRY_STORAGE_OUTDOOR),
@@ -665,8 +665,8 @@ def test_default_manure_treatment_config_factory_get_instance(
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
         ),
         (
-                "anaerobic_digestion_and_lagoon_with_split",
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                "anaerobic_digestion_and_lagoon_with_separator",
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ),
         ("compost bedded pack barn", ManureTreatmentType.COMPOST_BEDDED_PACK_BARN),
         ("open lots", ManureTreatmentType.OPEN_LOTS),
