@@ -45,7 +45,7 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
-      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "path": "input/data/EEE/full_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -275,7 +275,7 @@
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
             "default": "TAI",
             "pattern": "^(TAI|ED|SynchED)$"
           },
@@ -535,7 +535,7 @@
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol",
+                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
                 "pattern": "^(Double OvSynch|PreSynch|G6G)$"
               },
@@ -2140,15 +2140,63 @@
         "type": "number",
         "minimum": 1000
       },
-      "108": {
+      "1": {
         "type": "number",
         "minimum": 0.0
       },
-      "107": {
+      "2": {
         "type": "number",
         "minimum": 0.0
       },
-      "110": {
+      "4": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "5": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "6": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "7": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "8": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "9": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "11": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "12": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "13": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "14": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "15": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "16": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "17": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2156,7 +2204,87 @@
         "type": "number",
         "minimum": 0.0
       },
+      "19": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "20": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "21": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "22": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "24": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "25": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "28": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "30": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "31": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "32": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "33": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "34": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "36": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "37": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "38": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "39": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "40": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "41": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "42": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "43": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2164,7 +2292,15 @@
         "type": "number",
         "minimum": 0.0
       },
-      "51": {
+      "46": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "47": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "49": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2172,27 +2308,119 @@
         "type": "number",
         "minimum": 0.0
       },
+      "51": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "52": {
         "type": "number",
         "minimum": 0.0
       },
-      "95": {
+      "53": {
         "type": "number",
         "minimum": 0.0
       },
-      "94": {
+      "54": {
         "type": "number",
         "minimum": 0.0
       },
-      "100": {
+      "55": {
         "type": "number",
         "minimum": 0.0
       },
-      "104": {
+      "56": {
         "type": "number",
         "minimum": 0.0
       },
-      "176": {
+      "58": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "59": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "60": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "61": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "62": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "63": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "64": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "65": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "66": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "67": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "72": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "76": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "77": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "78": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "79": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "80": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "81": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "82": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "83": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "87": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "88": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "89": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "90": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2200,7 +2428,319 @@
         "type": "number",
         "minimum": 0.0
       },
-      "301": {
+      "92": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "93": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "96": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "97": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "98": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "99": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "102": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "103": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "105": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "106": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "109": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "111": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "112": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "114": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "115": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "118": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "119": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "120": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "121": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "123": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "124": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "125": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "129": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "135": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "144": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "153": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "163": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "164": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "165": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "166": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "167": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "169": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "170": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "171": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "172": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "181": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "182": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "183": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "184": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "187": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "193": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "194": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "195": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "197": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "198": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "200": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "201": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "202": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "209": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "210": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "211": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "229": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "230": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "231": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "232": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "233": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "234": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "235": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "236": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "237": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "238": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "239": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "240": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "241": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "242": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "243": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "244": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "245": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "246": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "247": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "248": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "251": {
         "type": "number",
         "minimum": 0.0
       },
@@ -3126,7 +3666,7 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
           },
           "manure_handler": {
             "type": "string",
@@ -3153,7 +3693,7 @@
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
+              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
             },
             "bedding_mass_per_day": {
               "type": "number"
