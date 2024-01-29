@@ -252,12 +252,12 @@
       "anaerobic_digestion_temperature_celsius": 37.5
     },
     {
-      "manure_treatment_type": "composted bedded pack barn",
+      "manure_treatment_type": "compost bedded pack barn",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
       "phosphorus_removal_efficiency_for_treatment": 0.1,
-      "potassium_removal_efficiency_for_treatment": 0.2,
+      "potassium_removal_efficiency_for_treatment": 0.1,
       "volatile_solids_removal_efficiency_for_treatment": 0.0
     },
     {
@@ -265,8 +265,8 @@
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-      "phosphorus_removal_efficiency_for_treatment": 0.3,
-      "potassium_removal_efficiency_for_treatment": 0.4,
+      "phosphorus_removal_efficiency_for_treatment": 0.1,
+      "potassium_removal_efficiency_for_treatment": 0.1,
       "volatile_solids_removal_efficiency_for_treatment": 0.0
     }
   ]
