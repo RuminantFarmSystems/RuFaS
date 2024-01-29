@@ -35,6 +35,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         liquid_manure_daily_volume: Same as total_daily_manure_volume. Used for satisfying the
         LiquidManurePortionProtocol.
         tempC: Temperature of the current day, C.
+        num_animals: number of animals in the pen each day
 
     """
 
@@ -64,6 +65,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_daily_volume: float = field(init=False)
 
     tempC: float = 0.0
+    num_animals: int =-1
 
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""

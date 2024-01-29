@@ -161,6 +161,7 @@ class BaseManureHandler:
                 )
             ),
             tempC=self._get_current_day_average_temperature_in_celsius(),
+            num_animals= pen.num_animals
         )
 
         return daily_output
