@@ -1472,7 +1472,8 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     'args',
     [
         ({"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 1,
-         "days_born": 1, "body_weight": 1.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0, "birth_weight": 2.0, "p_init": 1}),
+         "days_born": 1, "body_weight": 1.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+          "birth_weight": 2.0, "p_init": 1}),
         ({"id": 2, "breed": 1, "birth_date": 1, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
          "wean_weight": 1, "days_born": 1, "birth_weight": 2, "p_init": 1}),
     ]
@@ -1547,7 +1548,8 @@ def test_calf_init_values(mocker: MockerFixture, semen_type: str, conventional_s
 
     # act
     args = {"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 100,
-            "days_born": 10, "body_weight": 5.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0, "birth_weight": 2.0, "p_init": 1}
+            "days_born": 10, "body_weight": 5.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+            "birth_weight": 2.0, "p_init": 1}
     Calf.init_values(calf, args)
 
     # assert
