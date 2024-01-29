@@ -1,0 +1,11 @@
+{
+    "start_date": "2014:1",
+    "end_date": "2019:1",
+    "graphic_dir": "output/graphics/",
+    "output_dir": "output/",
+    "csv_dir": "output/CSVs",
+    "random_seed": 42,
+    "set_seed": false,
+    "simulate_animals": true,
+    "nutrient_standard": "NASEM"
+}
