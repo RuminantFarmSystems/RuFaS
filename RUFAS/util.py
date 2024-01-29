@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -379,3 +380,35 @@ class Utility:
             f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
         )
         return datetime.datetime.now().strftime(timestamp_format_string)
+
+    @staticmethod
+    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+        """
+        Returns a filtered data pool based on either inclusion or exclusion.
+
+        Parameters
+        ----------
+        data_pool : Dict[str, Any]
+            The pool to be filtered.
+        filter_patterns : List[str]
+            A list of patterns by which to filter the pool.
+        filter_by_exclusion : bool
+            A flag indicating whether the data pool should be filtered by exclusion
+            or inclusion.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The filtered data pool.
+        """
+        if filter_by_exclusion:
+            return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if not any(re.search(pattern, key) for pattern in filter_patterns)
+            }
+        return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if any(re.search(pattern, key) for pattern in filter_patterns)
+            }
