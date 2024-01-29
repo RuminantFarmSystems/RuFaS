@@ -5,7 +5,7 @@ from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.field.crop.crop_management import CropManagement
-from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_CROP_QUALITIES
+from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_DRY_MATTER_DIGESTIBILITY
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from math import exp
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -309,15 +309,15 @@ def test_store_harvested_crop(
         storage_time=mock_time,
         fresh_mass=expected_fresh_mass,
         dry_matter_percentage=mock_alfalfa_silage_data.dry_matter_percentage,
-        dry_matter_digestibility=DEFAULT_CROP_QUALITIES.get("dry_matter_digestibility"),
-        crude_protein_percent=DEFAULT_CROP_QUALITIES.get("crude_protein_percent"),
-        non_protein_nitrogen=DEFAULT_CROP_QUALITIES.get("non_protein_nitrogen"),
-        starch=DEFAULT_CROP_QUALITIES.get("starch"),
-        adf=DEFAULT_CROP_QUALITIES.get("adf"),
-        ndf=DEFAULT_CROP_QUALITIES.get("ndf"),
-        sugar=DEFAULT_CROP_QUALITIES.get("sugar"),
+        dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
+        crude_protein_percent=mock_alfalfa_silage_data.crude_protein_percent,
+        non_protein_nitrogen=mock_alfalfa_silage_data.non_protein_nitrogen,
+        starch=mock_alfalfa_silage_data.starch,
+        adf=mock_alfalfa_silage_data.adf,
+        ndf=mock_alfalfa_silage_data.ndf,
+        sugar=mock_alfalfa_silage_data.sugar,
         lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
-        ash=DEFAULT_CROP_QUALITIES.get("ash"),
+        ash=mock_alfalfa_silage_data.ash,
     )
 
     with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
@@ -348,13 +348,13 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
     crop_manager._record_yield(field_name, field_size, year, day)
 
-    expected_info_map = {"prefix": f"field='{field_name}'", "field_size": field_size,
+    expected_info_map = {"suffix": f"field='{field_name}'", "field_size": field_size,
                          "species": f"'{species}'"}
     expected_value = {"crop": crop_manager.data.name, "wet_yield": mass, "dry_yield": dry_mass, "nitrogen": nitrogen,
                       "phosphorus": phosphorus, "planting_date": {"year": 1995, "day": 100},
                       "harvest_date": {"year": year, "day": day}}
 
-    actual = om.variables_pool[f"field='{field_name}'.harvest_yield"]
+    actual = om.variables_pool[f"CropManagement._record_yield.harvest_yield.field='{field_name}'"]
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_value)
 

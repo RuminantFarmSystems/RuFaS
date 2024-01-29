@@ -141,24 +141,69 @@ class GraphGenerator:
             Generic exception raised by utility functions.
         """
         try:
+            graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
+            all_logs = log_pool + graph_filter_validation_logs
 
-            found_errors = any("error" in log for log in log_pool)
+            found_errors = any("error" in log for log in all_logs)
             if found_errors:
-                return log_pool
+                return all_logs
 
             fig, _ = plt.subplots()
             self._draw_graph(
                 graph_details["type"], prepared_data, prepared_data.keys()
             )
+            legend = graph_details.get("legend")
+            if not legend:
+                graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(
                 graph_details, filter_file_name, graphics_dir
             )
 
-            return log_pool
-        except Exception as e:
-            raise e
+            return all_logs
+        except Exception:
+            raise
+
+    def _validate_graph_filter(self, graph_details: Dict[str, str | List[str]]
+                               ) -> List[Dict[str, str | Dict[str, str]]]:
+        """
+        Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
+        Parameters
+        ----------
+        graph_details : Dict[str, str | List[str]]
+            A dictionary containing details/metadata about the graph.
+        Returns
+        -------
+        List[Dict[str, str | Dict[str, str]]]
+            The logs, warnings, and errors to be reported to OutputManager.
+        """
+        required_graph_filter_keys = ["type", "filters"]
+        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
+        graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_graph_filter.__name__,
+        }
+        for required_key in required_graph_filter_keys:
+            if required_key not in graph_details.keys():
+                graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
+                                                     "message": f"Required key '{required_key}' not in your graph "
+                                                     "filter file.",
+                                                     "info_map": info_map})
+        if graph_filter_validation_logs:
+            return graph_filter_validation_logs
+
+        optional_graph_details_keys = [key for key in graph_details.keys() if key not in required_graph_filter_keys]
+        for filter_key in optional_graph_details_keys:
+            if filter_key not in optional_graph_filter_keys:
+                graph_filter_validation_logs.append({"warning": f"Can't plot data for {filter_key}",
+                                                     "message": f"Invalid filter file key '{filter_key}' does not match"
+                                                     "any optional keys. "
+                                                     f"Please see Graph Generator wiki for a list of valid filter"
+                                                     "keys.",
+                                                     "info_map": info_map})
+        return graph_filter_validation_logs
 
     def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
                            graph_details: Dict[str, str | List[str]],
@@ -186,8 +231,9 @@ class GraphGenerator:
         }
         selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
-        log_pool: List[Dict[str, str] | Dict[str, str]] = []
+        log_pool: List[Dict[str, str | Dict[str, str]]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
+        filter_by_exclusion = graph_details.get("filter_by_exclusion", False)
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
@@ -196,25 +242,29 @@ class GraphGenerator:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": f"No selected variables for {key}.",
                                      "info_map": info_map})
-                    break
+                    continue
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                for selected_variable in selected_variables:
-                    is_variable_in_data = selected_variable in data_dict
-                    if not is_variable_in_data:
-                        log_pool.append({"warning": f"{selected_variable} not a valid key in provided data",
-                                         "message": f"{selected_variable} won't be graphed.",
-                                         "info_map": info_map})
-                    else:
-                        prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                        log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
-                                         "message": f"Data for {selected_variable} added to prepared_pool.",
-                                         "info_map": info_map})
-                data_dict_has_zero_selected_vars = all(selected_variable not in data_dict for
-                                                       selected_variable in selected_variables)
-                if data_dict_has_zero_selected_vars:
+                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
+                if not filtered_data:
                     log_pool.append({"error": f"Can't plot {title} data set",
-                                     "message": "No filter-file variables found in data provided.",
+                                     "message": "No variables found in data provided.",
                                      "info_map": info_map})
+                    continue
+                non_int_float_keys = [
+                    key for key, value in filtered_data.items()
+                    if not (isinstance(value, (int, float)) or
+                            (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value)))
+                            ]
+                for key in non_int_float_keys:
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": f"{key} key contains data that is non-numerical and can't be graphed.",
+                                     "info_map": info_map})
+                else:
+                    for filtered_key, filtered_value in filtered_data.items():
+                        if filtered_key in prepared_pool:
+                            prepared_pool[filtered_key].extend(filtered_value)
+                        else:
+                            prepared_pool[filtered_key] = filtered_value
             else:
                 prepared_pool[key] = values
                 log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
