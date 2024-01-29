@@ -1,0 +1,169 @@
+{
+    "calf_feeds": [
+      202, 
+      216
+    ],
+    "growing_feeds": [
+      51,
+      91
+    ],
+    "close_up_feeds": [
+      31,
+      195,
+      51,
+      110,
+      301
+    ],
+    "lac_cow_feeds": [
+      51,
+      170,
+      110,
+      240,
+      31,
+      46
+    ],
+    "purchased_feeds": [
+      {
+        "purchased_feed": 202,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 216,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 51,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 91,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 31,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 195,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 110,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 301,
+        "purchased_feed_cost": 1.0
+      },
+      {
+        "purchased_feed": 170,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 240,
+        "purchased_feed_cost": 1.0
+      },
+      {
+        "purchased_feed": 46,
+        "purchased_feed_cost": 0.5
+      }
+    ],
+    "farm_grown_feeds": [
+    ],
+    "storage_options": [
+      {
+        "storage_type": "bunker",
+        "moisture": "direct_cut",
+        "additive": "preservative",
+        "packing_density": 14,
+        "inoculation": "heterofermentative",
+        "bunk_type": "open_floor",
+        "ventilation": true,
+        "removal_rate": 6,
+        "initial_dry_matter": 0
+      },
+      {
+        "storage_type": "bunker",
+        "moisture": "direct_cut",
+        "additive": "preservative",
+        "packing_density": 14,
+        "inoculation": "heterofermentative",
+        "bunk_type": "open_floor",
+        "ventilation": true,
+        "removal_rate": 6,
+        "initial_dry_matter": 0
+      }
+    ],
+    "user_defined_ration_percentages": {
+      "calf": [
+        {
+          "feed_type": 216,
+          "ration_percentage": 0
+        },
+        {
+          "feed_type": 216,
+          "ration_percentage": 150
+        }
+      ],
+      "growing": [
+        {
+          "feed_type": 51,
+          "ration_percentage": 24.7
+        },
+        {
+          "feed_type": 91,
+          "ration_percentage": 75.3
+        }
+      ],
+      "close_up": [
+        {
+          "feed_type": 31,
+          "ration_percentage": 4.6
+        },
+        {
+          "feed_type": 195,
+          "ration_percentage": 22.8
+        },
+        {
+          "feed_type": 51,
+          "ration_percentage": 19.5
+        },
+        {
+          "feed_type": 110,
+          "ration_percentage": 48.0
+        },
+        {
+          "feed_type": 301,
+          "ration_percentage": 5.1
+        }
+      ],
+      "lac_cow": [
+        {
+          "feed_type": 51,
+          "ration_percentage": 27.8 
+        },
+        {
+          "feed_type": 170,
+          "ration_percentage": 9.8
+        },
+        {
+          "feed_type": 110,
+          "ration_percentage": 31.5
+        },
+        {
+          "feed_type": 240,
+          "ration_percentage": 4.2
+        },
+        {
+          "feed_type": 31,
+          "ration_percentage": 5.6
+        },
+        {
+          "feed_type": 46,
+          "ration_percentage": 21.1
+        }
+      ],
+      "tolerance": 0.1,
+      "milk_reduction_maximum": 0.0
+    }
+  }
