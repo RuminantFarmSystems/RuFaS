@@ -124,7 +124,7 @@ class BaseManureHandler:
             num_animals=pen.num_animals,
             barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
             urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
-            urine = pen.manure.urine,  # kg
+            urine=pen.manure.urine,  # kg
             temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
