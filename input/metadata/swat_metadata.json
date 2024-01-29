@@ -3778,28 +3778,44 @@
               "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
             },
             "total_solids_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Total Solids Removal Efficiency -- The fraction of total solids removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "volatile_solids_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Volatile Solids Removal Efficiency -- The fraction of volatile solids removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Nitrogen Removal Efficiency -- The fraction of nitrogen removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Total Ammoniacal Nitrogen Removal Efficiency -- The fraction of total ammoniacal nitrogen removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "phosphorus_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Phosphorus Removal Efficiency -- The fraction of phosphorus removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "potassium_removal_efficiency_for_treatment": {
-              "type": "number"
+              "type": "number",
+              "description": "Potassium Removal Efficiency -- The fraction of potassium removed from the manure during treatment. Range: 0.0 - 1.0.",
+              "default": 0.0
             },
             "storage_time_period": {
-              "type": "number"
+              "type": "number",
+              "description": "Storage Time Period -- The number of days that manure is stored in the manure storage structure before it is applied to the land application area.",
+              "default": 0
             },
             "freeboard_input": {
-              "type": "number"
+              "type": "number",
+              "description": "Freeboard Input -- The empty storage space above the manure in the treatment system.",
+              "default": 0.0
             }
           }
         }

@@ -256,8 +256,8 @@
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-      "phosphorus_removal_efficiency_for_treatment": 0.1,
-      "potassium_removal_efficiency_for_treatment": 0.1,
+      "phosphorus_removal_efficiency_for_treatment": 0.01,
+      "potassium_removal_efficiency_for_treatment": 0.01,
       "volatile_solids_removal_efficiency_for_treatment": 0.0
     },
     {
@@ -265,8 +265,8 @@
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-      "phosphorus_removal_efficiency_for_treatment": 0.1,
-      "potassium_removal_efficiency_for_treatment": 0.1,
+      "phosphorus_removal_efficiency_for_treatment": 0.01,
+      "potassium_removal_efficiency_for_treatment": 0.01,
       "volatile_solids_removal_efficiency_for_treatment": 0.0
     }
   ]
