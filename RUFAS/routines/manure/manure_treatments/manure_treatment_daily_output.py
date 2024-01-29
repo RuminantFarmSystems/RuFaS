@@ -26,6 +26,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         storage_methane: Amount of methane produced the manure treatment process, kg.
         storage_ammonia: Amount of ammonia produced the manure treatment process, kg.
         storage_nitrous_oxide: Amount of nitrous oxide produced the manure treatment process, kg.
+        storage_nitrogen_leached: Amount of nitrogen lost through leaching during manure treatment process, kg.
         sludge_manure_total_solids: Total amount of solids in the sludge manure, kg.
         sludge_manure_total_volatile_solids: Total amount of volatile solids in the sludge manure, kg.
         sludge_manure_nitrogen: Amount of nitrogen in the sludge manure, kg.
@@ -75,6 +76,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     storage_methane: float = 0.0
     storage_ammonia: float = 0.0
     storage_nitrous_oxide: float = 0.0
+    storage_nitrogen_leached: float = 0.0
 
     sludge_manure_total_solids: float = 0.0
     sludge_manure_total_volatile_solids: float = 0.0

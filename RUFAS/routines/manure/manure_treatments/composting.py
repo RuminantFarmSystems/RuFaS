@@ -110,16 +110,23 @@ class Composting(BaseManureTreatment):
 
         remaining_manure_total_solids = manure_total_solids - daily_dry_matter_loss
         remaining_manure_mass = remaining_manure_total_solids / 0.12
-
-        total_Nitrogen_mass = self._calculate_total_nitrogen_mass()
-        organic_Nitrogen_mass = self._calculate_organic_nitrogen_mass()
-        inorganic_Nitrogen_mass = self._calculate_inorganic_nitrogen_mass()
-        ammoniacal_nitrogen_mass = self._calculate_ammoniacal_nitrogen_mass()
+        Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
+        Nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
+        Nitrogen_loss_to_direct_N2O_emission = self._calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission()
+        total_Nitrogen_mass = self._calculate_total_nitrogen_mass(Nitrogen_loss_to_ammonia_emission,
+                                                                  Nitrogen_loss_to_leaching,
+                                                                  Nitrogen_loss_to_direct_N2O_emission)
+        organic_Nitrogen_mass = self._calculate_organic_nitrogen_mass(total_Nitrogen_mass)
+        inorganic_Nitrogen_mass = self._calculate_inorganic_nitrogen_mass(total_Nitrogen_mass)
+        ammoniacal_nitrogen_mass = self._calculate_ammoniacal_nitrogen_mass(inorganic_Nitrogen_mass)
 
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
             storage_methane=methane_emission,
+            storage_ammonia = Nitrogen_loss_to_ammonia_emission,
+            storage_nitrogen_leached = Nitrogen_loss_to_leaching,
+            storage_nitrous_oxide= Nitrogen_loss_to_direct_N2O_emission,
             solid_manure_carbon_decomposition=carbon_decomposition,
             solid_manure_total_solids=remaining_manure_total_solids,
             solid_manure_daily_mass=remaining_manure_mass,
@@ -315,59 +322,56 @@ class Composting(BaseManureTreatment):
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44 / 28
 
-    def _calculate_total_nitrogen_mass(self) -> float:
+    def _calculate_total_nitrogen_mass(self, Nitrogen_loss_to_ammonia_emission,
+                                       Nitrogen_loss_to_leaching, Nitrogen_loss_to_direct_N2O_emission) -> float:
         """
-        This function calculates the total mass of Nitrogen in the manure-bedding mix of the current year.
+        This function calculates the total mass of Nitrogen in the manure-bedding mix of the current day.
 
         Returns
         -------
         float
-            The total mass of Nitrogen in the manure-bedding mix of the current year, kg.
+            The total mass of Nitrogen in the manure-bedding mix of the current day, kg.
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
-        Nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
-        Nitrogen_loss_to_direct_N2O_emission = self._calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission()
+
 
         return \
             N_prior_t - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
             Nitrogen_loss_to_direct_N2O_emission
 
-    def _calculate_organic_nitrogen_mass(self) -> float:
+    def _calculate_organic_nitrogen_mass(self,total_Nitrogen_mass) -> float:
         """
-        This function calculates the mass of organic Nitrogen in the manure-bedding mix of the current year.
+        This function calculates the mass of organic Nitrogen in the manure-bedding mix of the current day.
 
         Returns
         -------
         float
-            The mass of organic Nitrogen in the manure-bedding mix of the current year, kg.
+            The mass of organic Nitrogen in the manure-bedding mix of the current day, kg.
         """
-        total_Nitrogen_mass = self._calculate_total_nitrogen_mass()
 
         return total_Nitrogen_mass * 0.952
 
-    def _calculate_inorganic_nitrogen_mass(self) -> float:
+    def _calculate_inorganic_nitrogen_mass(self,total_Nitrogen_mass) -> float:
         """
-        This function calculates the mass of inorganic Nitrogen in the manure-bedding mix of the current year.
+        This function calculates the mass of inorganic Nitrogen in the manure-bedding mix of the current day.
 
         Returns
         -------
         float
-            The mass of inorganic Nitrogen in the manure-bedding mix of the current year, kg.
+            The mass of inorganic Nitrogen in the manure-bedding mix of the current day, kg.
         """
-        total_Nitrogen_mass = self._calculate_total_nitrogen_mass()
+
 
         return total_Nitrogen_mass * 0.048
 
-    def _calculate_ammoniacal_nitrogen_mass(self) -> float:
+    def _calculate_ammoniacal_nitrogen_mass(self,inorganic_Nitrogen_mass) -> float:
         """
-        This function calculates the mass of ammonium in the manure-bedding mix of the current year.
+        This function calculates the mass of ammonium in the manure-bedding mix of the current day.
 
         Returns
         -------
         float
-            The mass of ammonium in the manure-bedding mix of the current year, kg.
+            The mass of ammonium in the manure-bedding mix of the current day, kg.
         """
-        inorganic_Nitrogen_mass = self._calculate_inorganic_nitrogen_mass()
 
         return inorganic_Nitrogen_mass * 0.5
