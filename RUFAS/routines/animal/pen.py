@@ -66,6 +66,9 @@ class Pen:
     manure_separator : string
         The type of manure separator that processes manure excreted in the pen.
 
+    manure_separator_after_digestion : string
+        The type of manure separator that processes manure from the pen after it's been in a digestor.
+
     manure_storage : string
         The type of manure storage receptacle that stores manure excreted in the pen.
 
@@ -168,36 +171,38 @@ class Pen:
 
     def __init__(self, pen_id: int, pen_name: str, vertical_dist_to_milking_parlor: float,
                  horizontal_dist_to_milking_parlor: float, number_of_stalls: int, housing_type: str, bedding_type: str,
-                 pen_type: str, manure_handling: str, manure_separator: str, manure_storage: str,
-                 animal_combination: AnimalCombination, max_stocking_density: float) -> None:
+                 pen_type: str, manure_handling: str, manure_separator: str, manure_separator_after_digestion: str,
+                 manure_storage: str, animal_combination: AnimalCombination, max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
         Parameters
         ----------
-            pen_id: int
+            pen_id : int
                 the unique id number of the pen
-            vertical_dist_to_milking_parlor: float
+            vertical_dist_to_milking_parlor : float
                 vertical distance to milking parlor, km
             horizontal_dist_to_milking_parlor: float
                 horizontal distance to milking parlor, km
-            number_of_stalls: int
+            number_of_stalls : int
                 number of stalls in the pen
-            housing_type: str
+            housing_type : str
                 housing type of the pen
-            bedding_type: str
+            bedding_type : str
                 bedding type of the pen
-            pen_type: str
+            pen_type : str
                 freestall or tiestall
-            manure_handling: str
+            manure_handling : str
                 the manure handling method used to clean the pen
-            manure_separator: str
+            manure_separator : str
                 the manure separator that processes manure excreted in this pen
-            manure_storage: str
+            manure_separator_after_digestion : str
+                the second manure separator that processes manure excreted in this pen post-digestor
+            manure_storage : str
                 the manure storage receptacle that stores manure excreted in this pen
-            animal_combination: AnimalCombination
+            animal_combination : AnimalCombination
                 the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
-            max_stocking_density: float
+            max_stocking_density : float
                 maximum stocking density allowed for pen
         """
         self.id = pen_id
@@ -214,6 +219,7 @@ class Pen:
 
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
+        self.manure_separator_after_digestion = manure_separator_after_digestion
         self.manure_storage = manure_storage
         self.avg_p_intake = 0.0
         self.avg_p_req = 0.0
