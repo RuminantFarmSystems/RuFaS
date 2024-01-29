@@ -87,7 +87,7 @@ def test_manure_treatment_daily_output() -> None:
         "solid_manure_nitrogen": 22.0,
         "solid_manure_inorganic_nitrogen": 23.0,
         "solid_manure_organic_nitrogen": 24.0,
-        "solid_manure_inorganic_nitrogen_ammonium": 25.0,
+        "solid_manure_total_ammoniacal_nitrogen": 25.0,
         "solid_manure_phosphorus": 26.0,
         "solid_manure_water_extractable_inorganic_phosphorus": 27.0,
         "solid_manure_water_extractable_organic_phosphorus": 28.0,
@@ -161,7 +161,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=22.0,
         solid_manure_inorganic_nitrogen=23.0,
         solid_manure_organic_nitrogen=24.0,
-        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_total_ammoniacal_nitrogen=25.0,
         solid_manure_phosphorus=26.0,
         solid_manure_water_extractable_inorganic_phosphorus=27.0,
         solid_manure_water_extractable_organic_phosphorus=28.0,
@@ -203,7 +203,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=119.0,
         solid_manure_inorganic_nitrogen=120.0,
         solid_manure_organic_nitrogen=121.0,
-        solid_manure_inorganic_nitrogen_ammonium=122.0,
+        solid_manure_total_ammoniacal_nitrogen=122.0,
         solid_manure_phosphorus=123.0,
         solid_manure_water_extractable_inorganic_phosphorus=124.0,
         solid_manure_water_extractable_organic_phosphorus=125.0,
@@ -250,7 +250,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=141.0,
         solid_manure_inorganic_nitrogen=143.0,
         solid_manure_organic_nitrogen=145.0,
-        solid_manure_inorganic_nitrogen_ammonium=147.0,
+        solid_manure_total_ammoniacal_nitrogen=147.0,
         solid_manure_phosphorus=149.0,
         solid_manure_water_extractable_inorganic_phosphorus=151.0,
         solid_manure_water_extractable_organic_phosphorus=153.0,
@@ -322,7 +322,7 @@ def test_manure_treatment_daily_output_clone() -> None:
         solid_manure_nitrogen=22.0,
         solid_manure_inorganic_nitrogen=23.0,
         solid_manure_organic_nitrogen=24.0,
-        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_total_ammoniacal_nitrogen=25.0,
         solid_manure_phosphorus=26.0,
         solid_manure_water_extractable_inorganic_phosphorus=27.0,
         solid_manure_water_extractable_organic_phosphorus=28.0,
@@ -3559,7 +3559,7 @@ def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> No
     assert result.solid_manure_nitrogen == expected_manure_nitrogen
     assert result.solid_manure_organic_nitrogen == expected_manure_organic_nitrogen
     assert result.solid_manure_inorganic_nitrogen == expected_manure_inorganic_nitrogen
-    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_manure_inorganic_nitrogen_ammonium
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_manure_inorganic_nitrogen_ammonium
     assert result.solid_manure_daily_mass == expected_solid_manure_daily_mass
     assert result.solid_manure_potassium == expected_manure_potassium
     assert result.solid_manure_phosphorus == expected_manure_phosphorus
@@ -3796,7 +3796,7 @@ def test_open_lots_daily_update_helper(mocker: MockFixture) -> None:
     assert result.solid_manure_nitrogen == expected_manure_nitrogen
     assert result.solid_manure_organic_nitrogen == expected_manure_organic_nitrogen
     assert result.solid_manure_inorganic_nitrogen == expected_manure_inorganic_nitrogen
-    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_manure_inorganic_nitrogen_ammonium
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_manure_inorganic_nitrogen_ammonium
     assert result.solid_manure_daily_mass == expected_solid_manure_daily_mass
     assert result.solid_manure_potassium == expected_manure_potassium
     assert result.solid_manure_phosphorus == expected_manure_phosphorus
@@ -3825,6 +3825,7 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "passive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_total_volatile_solids = 5
@@ -3832,9 +3833,6 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     daily_input_mock.liquid_manure_phosphorus = 15
     daily_input_mock.liquid_manure_potassium = 18
 
-    mocker.patch("RUFAS.routines.manure.manure_treatments.composting"
-                 ".Composting.__init__",
-                 return_value=None)
     methane_emission = 0.5
     carbon_decomposition = 0.25
     dry_matter_loss = 1
@@ -3859,8 +3857,9 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     mock_calculate_inorganic_Nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting."
                                                           "Composting._calculate_inorganic_nitrogen_mass",
                                                           return_value=expected_inorganic_Nitrogen_mass)
-    mock_calculate_ammonium_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
-                                                "_calculate_ammonium_mass", return_value=expected_ammonia_mass)
+    mock_calculate_ammoniacal_nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting."
+                                                           "Composting._calculate_ammoniacal_nitrogen_mass",
+                                                           return_value=expected_ammonia_mass)
 
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
@@ -3878,7 +3877,7 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     mock_calculate_total_Nitrogen_mass.assert_called_once()
     mock_calculate_organic_Nitrogen_mass.assert_called_once()
     mock_calculate_inorganic_Nitrogen_mass.assert_called_once()
-    mock_calculate_ammonium_mass.assert_called_once()
+    mock_calculate_ammoniacal_nitrogen_mass.assert_called_once()
 
     mock_accumulate_daily_output.assert_called_once_with(result)
 
@@ -3892,7 +3891,7 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     assert result.solid_manure_nitrogen == expected_total_Nitrogen_mass
     assert result.solid_manure_inorganic_nitrogen == expected_inorganic_Nitrogen_mass
     assert result.solid_manure_organic_nitrogen == expected_organic_Nitrogen_mass
-    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_ammonia_mass
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_ammonia_mass
 
 
 def test_composting_calc_methane_emission(mocker: MockFixture) -> None:
@@ -4288,17 +4287,6 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
 
-    mock_calculate_Nitrogen_loss_to_leaching = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_nitrogen_loss_to_leaching",
-        return_value=Nitrogen_loss_to_leaching)
-    mock_calc_ammonia_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting.calc_ammonia_emission",
-        return_value=Nitrogen_loss_to_ammonia_emission)
-    mock_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting."
-        "_calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission",
-        return_value=Nitrogen_loss_to_direct_N2O_emission)
-
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
@@ -4306,13 +4294,13 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
         daily_input_mock.liquid_manure_nitrogen - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
         Nitrogen_loss_to_direct_N2O_emission
 
-    result = composting._calculate_total_nitrogen_mass()
+    result = composting._calculate_total_nitrogen_mass(
+        Nitrogen_loss_to_leaching=Nitrogen_loss_to_leaching,
+        Nitrogen_loss_to_ammonia_emission=Nitrogen_loss_to_ammonia_emission,
+        Nitrogen_loss_to_direct_N2O_emission=Nitrogen_loss_to_direct_N2O_emission
+    )
 
     assert result == expected_result
-
-    mock_calculate_Nitrogen_loss_to_leaching.assert_called_once()
-    mock_calc_ammonia_emission.assert_called_once()
-    mock_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission.assert_called_once()
 
 
 def test_composting_calculate_organic_Nitrogen_mass(mocker: MockFixture) -> None:
@@ -4331,20 +4319,14 @@ def test_composting_calculate_organic_Nitrogen_mass(mocker: MockFixture) -> None
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
 
-    mock_calculate_calculate_total_Nitrogen_mass = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_total_nitrogen_mass",
-        return_value=total_Nitrogen_mass)
-
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
     expected_result = total_Nitrogen_mass * 0.952
 
-    result = composting._calculate_organic_nitrogen_mass()
+    result = composting._calculate_organic_nitrogen_mass(total_Nitrogen_mass=total_Nitrogen_mass)
 
     assert result == expected_result
-
-    mock_calculate_calculate_total_Nitrogen_mass.assert_called_once()
 
 
 def test_composting_calculate_inorganic_Nitrogen_mass(mocker: MockFixture) -> None:
@@ -4363,25 +4345,19 @@ def test_composting_calculate_inorganic_Nitrogen_mass(mocker: MockFixture) -> No
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
 
-    mock_calculate_calculate_total_Nitrogen_mass = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_total_nitrogen_mass",
-        return_value=total_Nitrogen_mass)
-
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
     expected_result = total_Nitrogen_mass * 0.048
 
-    result = composting._calculate_inorganic_nitrogen_mass()
+    result = composting._calculate_inorganic_nitrogen_mass(total_Nitrogen_mass=total_Nitrogen_mass)
 
     assert result == expected_result
 
-    mock_calculate_calculate_total_Nitrogen_mass.assert_called_once()
 
-
-def test_composting_calculate_ammonium_mass(mocker: MockFixture) -> None:
+def test_composting_calculate_ammoniacal_nitrogen_mass(mocker: MockFixture) -> None:
     """
-    Unit test for _calculate_ammonium_mass() in Composting class in composting.py
+    Unit test for _calculate_ammoniacal_nitrogen_mass() in Composting class in composting.py
     """
     inorganic_Nitrogen_mass = 0.15859775999999998
 
@@ -4395,17 +4371,11 @@ def test_composting_calculate_ammonium_mass(mocker: MockFixture) -> None:
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
 
-    mock_calculate_inorganic_Nitrogen_mass = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_inorganic_nitrogen_mass",
-        return_value=inorganic_Nitrogen_mass)
-
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
     expected_result = inorganic_Nitrogen_mass * 0.5
 
-    result = composting._calculate_ammonium_mass()
+    result = composting._calculate_ammoniacal_nitrogen_mass(inorganic_Nitrogen_mass=inorganic_Nitrogen_mass)
 
     assert result == expected_result
-
-    mock_calculate_inorganic_Nitrogen_mass.assert_called_once()
