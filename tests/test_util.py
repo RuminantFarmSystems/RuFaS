@@ -1,5 +1,4 @@
 import re
-
 import pytest
 from pytest import approx, raises
 
@@ -224,3 +223,15 @@ def test_get_timestamp() -> None:
     assert re.match(
         timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False)
     )
+
+
+@pytest.mark.parametrize("data_pool, filter_patterns, filter_by_exclusion, expected_result", [
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], False, {"var1": 1, "var2": 2}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], True, {"var3": 3}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], False, {}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], True, {"var1": 1, "var2": 2, "var3": 3}),
+    ({}, ["var1"], False, {}),
+    ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
+])
+def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
+    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
