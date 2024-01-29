@@ -25,7 +25,9 @@
 			"repro_cull_time": 300,
 			"do_not_breed_time": 300,
 			"cull_milk_production": 22,
-			"cow_times_milked_per_day": 1
+			"cow_times_milked_per_day": 1,
+			"milk_fat_percent": 3.6,
+	    	"milk_protein_percent": 3.2
 		},
 		"farm_level": {
 			"calf": {
