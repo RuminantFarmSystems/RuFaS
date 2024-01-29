@@ -119,7 +119,6 @@ class LifeCycleManager:
         self.vwp_cow_num = 0
         self.milking_cow_num = 0
         self.dry_cow_num = 0
-        self.dnb_cow_num = 0
 
         self.dry_cow_percent = 0.0
         self.milking_cow_percent = 0.0
@@ -390,7 +389,6 @@ class LifeCycleManager:
         self.vwp_cow_num = 0
         self.milking_cow_num = 0
         self.dry_cow_num = 0
-        self.dnb_cow_num = 0
 
         self.preg_cow_percent = 0.0
         self.dry_cow_percent = 0.0
@@ -947,8 +945,6 @@ class LifeCycleManager:
             self.preg_cow_num, self.avg_days_in_preg = Utility.calc_average(
                 self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg
             )
-        if cow.do_not_breed:
-            self.dnb_cow_num += 1
 
     def _handle_cow_calves(
         self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num
