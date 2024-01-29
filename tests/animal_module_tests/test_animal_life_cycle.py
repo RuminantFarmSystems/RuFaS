@@ -26,8 +26,6 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from typing import Tuple
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
 
 @fixture
