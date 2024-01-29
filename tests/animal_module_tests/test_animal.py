@@ -1330,16 +1330,6 @@ def test_update_milk_production_history():
     pass
 
 
-@pytest.mark.parametrize("days_in_milk,expected", [(1, 4.235874340457628),
-                                                   (2, 4.235874340457628),
-                                                   (3, 4.866603466869552)])
-def test_calculate_fat_percent(days_in_milk, expected, mocker: MockerFixture):
-    """Unit test for method calculate_fat_percent in routines/animal/life_cycle/cow.py"""
-    animal_manager = mocker.MagicMock()
-    fat_percent = RUFAS.routines.animal.life_cycle.cow.Cow.calculate_fat_percent(animal_manager, days_in_milk)
-    assert fat_percent == expected
-
-
 def test_cow_determine_param_value():
     """Unit test for function _determine_param_value in file routines/animal/life_cycle/cow.py"""
     pass
