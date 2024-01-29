@@ -1261,6 +1261,7 @@ class Cow(HeiferIII):
                     self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
+     
 
     @property
     def get_avg_estrus_cycle(self):

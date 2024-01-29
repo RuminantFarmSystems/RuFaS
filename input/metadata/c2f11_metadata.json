@@ -1,0 +1,2919 @@
+{
+  "files": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration Information",
+      "path": "input/data/config/c2f11_config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/c2f11_animal.json",
+      "type": "json",
+      "properties": "animal_properties"
+    },
+    "animal_population": {
+      "title": "Animal population data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/animal_population.json",
+      "type": "json",
+      "properties": "animal_population_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "input/data/EEE/default_costs.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "input/data/EEE/default_emissions.csv",
+      "type": "csv",
+      "properties": "emissions_properties"
+    },
+    "purchased_feeds_emissions": {
+      "title": "Emissions from purchased feeds",
+      "description": "Specifies how much emissions are associated with purchased feed types.",
+      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Those cows need to eat!",
+      "path": "input/data/feed/c2f11_feed.json",
+      "type": "json",
+      "properties": "feed_properties"
+    },
+    "NRC_Comp": {
+      "title": "NRC Comp data",
+      "description": "Nutrients!",
+      "path": "input/data/feed/NRC_comp.csv",
+      "type": "csv",
+      "properties": "NRC_Comp_properties"
+    },
+    "NASEM_Comp": {
+      "title": "NASEM Comp data",
+      "description": "Nutrients!",
+      "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
+      "type": "csv",
+      "properties": "NASEM_Comp_properties"
+    },
+    "manure_management": {
+      "title": "Manure data",
+      "description": "You thought it's a waste, but those crops need to eat as well",
+      "path": "input/data/manure/c2f11_manure_management.json",
+      "type": "json",
+      "properties": "manure_management_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Let's turn on the AC",
+      "path": "input/data/weather/c2f11_weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    },
+    "feed_quality": {
+      "title": "Feed Quality",
+      "description": "Hows the feed!",
+      "path": "input/data/feed/feed_quality.csv",
+      "type": "csv",
+      "properties": "feed_quality_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Bring the feed!",
+      "path": "input/data/feed/user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
+    }
+  },
+  "properties": {
+    "config_properties": {
+      "start_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will start.",
+        "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+        "default": "2009:1"
+      },
+      "end_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will end.",
+        "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+        "default": "2009:100"
+      },
+      "random_seed": {
+        "type": "number",
+        "description": "The random seed",
+        "minimum": 0,
+        "default": 42
+      },
+      "set_seed": {
+        "type": "bool",
+        "description": "Whether or not to set random seed",
+        "default": true
+      },
+      "simulate_animals": {
+        "type": "bool",
+        "description": "Whether or not to simulate animals during the simulation",
+        "default": true
+      },
+      "nutrient_standard": {
+        "type": "string",
+        "default": "NASEM",
+        "pattern": "^(NASEM|NRC)$",
+        "description": "The nutrient standard to use for feed."
+      },
+      "FIPS_county_code": {
+        "type": "number",
+        "minimum": 1000,
+        "maximum": 56045,
+        "default": null,
+        "description": "Unique 5-digit code that represents a specific U.S. county."
+      }
+    },
+    "animal_properties": {
+      "herd_information": {
+        "type": "object",
+        "description": "Herd Demographics",
+        "calf_num": {
+          "type": "number",
+          "description": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)",
+          "default": 8,
+          "minimum": 0
+        },
+        "heiferI_num": {
+          "type": "number",
+          "description": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding",
+          "default": 44,
+          "minimum": 0
+        },
+        "heiferII_num": {
+          "type": "number",
+          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy",
+          "default": 38,
+          "minimum": 0
+        },
+        "heiferIII_num_springers": {
+          "type": "number",
+          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers",
+          "default": 5,
+          "minimum": 0
+        },
+        "cow_num": {
+          "type": "number",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
+          "default": 100,
+          "minimum": 0
+        },
+        "herd_num": {
+          "type": "number",
+          "description": "Herd Number (head) -- The target number of dry and lactating cows on farm.",
+          "default": 100,
+          "minimum": 0
+        },
+        "replace_num": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 0
+        },
+        "breed": {
+          "type": "string",
+          "default": "HO",
+          "pattern": "(HO|JE)",
+          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+        }
+      },
+      "herd_initialization": {
+        "type": "object",
+        "description": "Animal generation related inputs",
+        "initial_animal_num": {
+          "type": "number",
+          "description": "The initial number of animals for the simulation starting with to generate the herd",
+          "minimum": 0,
+          "default": 10000
+        },
+        "simulation_days": {
+          "type": "number",
+          "description": "The number of days to simulate for generating the herd",
+          "minimum": 0,
+          "default": 5000
+        }
+      },
+      "animal_config": {
+        "type": "object",
+        "description": "Animal Configuration",
+        "management_decisions": {
+          "type": "object",
+          "description": "General Management",
+          "breeding_start_day_h": {
+            "type": "number",
+            "description": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding (days)",
+            "default": 380,
+            "minimum": 0
+          },
+          "heifer_repro_method": {
+            "type": "string",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
+            "default": "TAI",
+            "pattern": "^(TAI|ED|SynchED)$"
+          },
+          "cow_repro_method": {
+            "type": "string",
+            "description": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI",
+            "default": "TAI",
+            "pattern": "^(TAI|ED|ED-TAI)$"
+          },
+          "semen_type": {
+            "type": "string",
+            "default": "conventional",
+            "pattern": "^(sexed|conventional)$",
+            "description": "The semen type that makes up a majority of the farm's breedings"
+          },
+          "days_in_preg_when_dry": {
+            "type": "number",
+            "description": "Days In Pregnancy When Dry (days) -- The average day in pregnancy when a cow is dried off (default is 218)",
+            "default": 218,
+            "minimum": 0
+          },
+          "heifer_repro_cull_time": {
+            "type": "number",
+            "description": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 500)",
+            "default": 500,
+            "minimum": 0
+          },
+          "do_not_breed_time": {
+            "type": "number",
+            "description": "Do Not Breed Time (days) -- The breeding period (days) for cows before reproductive programs stop if they fail to get pregnant (days)",
+            "default": 185,
+            "minimum": 0
+          },
+          "cull_milk_production": {
+            "type": "number",
+            "description": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 30 kg/d)",
+            "default": 30,
+            "minimum": 0
+          },
+          "cow_times_milked_per_day": {
+            "type": "number",
+            "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
+            "default": 3,
+            "minimum": 0
+          }
+        },
+        "farm_level": {
+          "type": "object",
+          "description": "Farm Level Management",
+          "calf": {
+            "type": "object",
+            "description": "Calf Management",
+            "male_calf_rate_sexed_semen": {
+              "type": "number",
+              "description": "Male Calf Rate - Sexed Semen -- The rate of male calves when using sexed semen (default is 0.1)",
+              "default": 0.1,
+              "minimum": 0,
+              "maximum": 1
+            },
+            "male_calf_rate_conventional_semen": {
+              "type": "number",
+              "description": "Male Calf Rate - Conventional Semen -- The rate of male calves when using conventional semen (default is 0.53)",
+              "default": 0.53,
+              "minimum": 0,
+              "maximum": 1
+            },
+            "keep_female_calf_rate": {
+              "type": "number",
+              "description": "Female Calf Rate -- The rate female calves are kept and raised on-farm (default is 1)",
+              "default": 1,
+              "minimum": 0,
+              "maximum": 1
+            },
+            "wean_day": {
+              "type": "number",
+              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60",
+              "default": 60,
+              "minimum": 0
+            },
+            "wean_length": {
+              "type": "number",
+              "description": "Wean Length (days) -- Days weaning (default is 7)",
+              "default": 7,
+              "minimum": 0
+            },
+            "milk_type": {
+              "type": "string",
+              "default": "whole",
+              "pattern": "^(whole|replacer)$",
+              "description": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
+            }
+          },
+          "repro": {
+            "type": "object",
+            "description": "Repro Management",
+            "voluntary_waiting_period": {
+              "type": "number",
+              "description": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cow, it is days after parturition when the 1st hormonal injection is made in TAI programs. If 'ED' or 'ED-TAI' is chosen for cow, it is days after parturition when estrus is started to be monitored.",
+              "default": 50,
+              "minimum": 0
+            },
+            "conception_rate_decrease": {
+              "type": "number",
+              "description": "Conception Rate Decrease -- the decrease of the conception rate for later breeding (default is 0.026)",
+              "default": 0.026,
+              "minimum": 0,
+              "maximum": 0.1
+            },
+            "avg_gestation_len": {
+              "type": "number",
+              "description": "Average Gestation Length (days) -- average length of gestations (default is 278)",
+              "default": 278,
+              "minimum": 0
+            },
+            "std_gestation_len": {
+              "type": "number",
+              "description": "Gestation Length Standard Deviation (days) -- standard deviation of gestation length (default is 6)",
+              "default": 6,
+              "minimum": 0
+            },
+            "prefresh_day": {
+              "type": "number",
+              "description": "Prefresh Day (days) -- length of period of the transition before calving (default is 30)",
+              "default": 30,
+              "minimum": 0
+            },
+            "calving_interval": {
+              "type": "number",
+              "description": "Calving Interval (days) -- current average calving interval (days), used for initial bodyweight adjustment and other calculations",
+              "default": 400,
+              "minimum": 0
+            },
+            "heifers": {
+              "type": "object",
+              "estrus_detection_rate": {
+                "type": "number",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "estrus_conception_rate": {
+                "type": "number",
+                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.4,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "repro_sub_protocol": {
+                "type": "string",
+                "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+                "default": "5dCG2P"
+              },
+              "repro_sub_properties": {
+                "type": "object",
+                "conception_rate": {
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                  "default": 0.6,
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "estrus_detection_rate": {
+                  "type": "number",
+                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                  "default": 0.7,
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            "cows": {
+              "type": "object",
+              "estrus_detection_rate": {
+                "type": "number",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "estrus_conception_rate": {
+                "type": "number",
+                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "presynch_protocol": {
+                "type": "string",
+                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "default": "Double OvSynch",
+                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+              },
+              "resynch_protocol": {
+                "type": "string",
+                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "default": "TAIafterPD",
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+              },
+              "repro_sub_protocol": {
+                "type": "string",
+                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+              },
+              "repro_sub_properties": {
+                "type": "object",
+                "conception_rate": {
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                  "default": 0.5,
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "tai_program_start_day": {
+                  "type": "number",
+                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                  "minimum": 0,
+                  "default": 70
+                }
+              }
+            },
+            "cow_repro_programs": {
+              "type": "object",
+              "description": "Cow Reproductive programs",
+              "estrus_detection_rate": {
+                "type": "number",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "estrus_service_rate": {
+                "type": "number",
+                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
+                "default": 1,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "ed_conception_rate": {
+                "type": "number",
+                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "cow_presynch_protocol": {
+                "type": "string",
+                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "default": "Double OvSynch",
+                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+              },
+              "cow_TAI_protocol": {
+                "type": "string",
+                "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
+                "default": "OvSynch 56",
+                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+              },
+              "ovsynch56_conception_rate": {
+                "type": "number",
+                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "ovsynch48_conception_rate": {
+                "type": "number",
+                "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.6
+              },
+              "cosynch72_conception_rate": {
+                "type": "number",
+                "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.6
+              },
+              "cosynch5d_conception_rate": {
+                "type": "number",
+                "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.6
+              },
+              "cow_resynch_protocol": {
+                "type": "string",
+                "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "default": "TAIafterPD",
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+              },
+              "tai_program_start_day": {
+                "type": "number",
+                "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                "minimum": 0,
+                "default": 72
+              }
+            }
+          },
+          "bodyweight": {
+            "type": "object",
+            "description": "Bodyweight",
+            "birth_weight_avg_ho": {
+              "type": "number",
+              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 43.9)",
+              "default": 43.9,
+              "minimum": 0
+            },
+            "birth_weight_std_ho": {
+              "type": "number",
+              "description": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Holstein cows (default is 1)",
+              "default": 1,
+              "minimum": 0
+            },
+            "birth_weight_avg_je": {
+              "type": "number",
+              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35)",
+              "default": 35,
+              "minimum": 0
+            },
+            "birth_weight_std_je": {
+              "type": "number",
+              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 1)",
+              "default": 1,
+              "minimum": 0
+            },
+            "target_heifer_preg_day": {
+              "type": "number",
+              "description": "Target Heifer Pregnancy Day (days) -- The target pregnant age in days for heifers - for adjusting heifer body weight (default is 420)",
+              "default": 420,
+              "minimum": 0
+            },
+            "mature_body_weight_avg": {
+              "type": "number",
+              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 740.1)",
+              "default": 740.1,
+              "minimum": 0
+            },
+            "mature_body_weight_std": {
+              "type": "number",
+              "description": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows (default is 73.5)",
+              "default": 73.5,
+              "minimum": 0
+            }
+          }
+        },
+        "from_literature": {
+          "type": "object",
+          "description": "From Literature",
+          "repro": {
+            "type": "object",
+            "description": "Literature Repro Values",
+            "preg_check_day_1": {
+              "type": "number",
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
+              "default": 32,
+              "minimum": 1
+            },
+            "preg_loss_rate_1": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
+              "default": 0.02,
+              "minimum": 0,
+              "maximum": 1
+            },
+            "preg_check_day_2": {
+              "type": "number",
+              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the animal is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
+              "default": 60,
+              "minimum": 0
+            },
+            "preg_loss_rate_2": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
+              "default": 0.096,
+              "minimum": 0,
+              "maximum": 0.1
+            },
+            "preg_check_day_3": {
+              "type": "number",
+              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the animal is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
+              "default": 200,
+              "minimum": 0
+            },
+            "preg_loss_rate_3": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
+              "default": 0.017,
+              "minimum": 0,
+              "maximum": 0.1
+            },
+            "avg_estrus_cycle_return": {
+              "type": "number",
+              "description": "Average days between calving and first estrus after calving (default is 23).",
+              "minimum": 1,
+              "default": 23
+            },
+            "std_estrus_cycle_return": {
+              "type": "number",
+              "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
+              "minimum": 1,
+              "default": 6
+            },
+            "avg_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "minimum": 1,
+              "default": 2.5
+            },
+            "avg_estrus_cycle_cow": {
+              "type": "number",
+              "description": "Average length of estrus cycle for cows (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_cow": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for cows (default is 4).",
+              "minimum": 1,
+              "default": 4
+            },
+            "avg_estrus_cycle_after_pgf": {
+              "type": "number",
+              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 5).",
+              "minimum": 1,
+              "default": 5
+            },
+            "std_estrus_cycle_after_pgf": {
+              "type": "number",
+              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 2).",
+              "minimum": 1,
+              "default": 2
+            }
+          },
+          "milking": {
+            "type": "object",
+            "description": "",
+            "wood_l": {
+              "type": "array",
+              "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
+              "properties": {
+                "type": "array",
+                "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level,",
+                "properties": {
+                  "type": "number",
+                  "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
+                  "minimum": 0
+                }
+              }
+            },
+            "wood_m": {
+              "type": "array",
+              "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
+              "properties": {
+                "type": "array",
+                "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
+                "properties": {
+                  "type": "number",
+                  "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
+                  "minimum": 0
+                }
+              }
+            },
+            "wood_n": {
+              "type": "array",
+              "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
+              "properties": {
+                "type": "array",
+                "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
+                "properties": {
+                  "type": "number",
+                  "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
+                  "minimum": 0
+                }
+              }
+            },
+            "wood_l_std": {
+              "type": "array",
+              "description": "Standard deviation of parameter l ",
+              "properties": {
+                "type": "array",
+                "description": "Standard deviation of parameter l ",
+                "properties": {
+                  "type": "number",
+                  "description": "Standard deviation of parameter l ",
+                  "minimum": 0
+                }
+              }
+            },
+            "wood_m_std": {
+              "type": "array",
+              "description": "Standard deviation of parameter m",
+              "properties": {
+                "type": "array",
+                "description": "Standard deviation of parameter m",
+                "properties": {
+                  "type": "number",
+                  "description": "Standard deviation of parameter m",
+                  "minimum": 0
+                }
+              }
+            },
+            "wood_n_std": {
+              "type": "array",
+              "description": "Standard deviation of parameter n",
+              "properties": {
+                "type": "array",
+                "description": "Standard deviation of parameter n",
+                "properties": {
+                  "type": "number",
+                  "description": "Standard deviation of parameter n",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "culling": {
+            "type": "object",
+            "description": "",
+            "parity_death_prob": {
+              "type": "array",
+              "description": "Death rate for first, second, third, and later lactations",
+              "properties": {
+                "type": "number",
+                "description": "Death rate for first, second, third, and later lactations",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "parity_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for first, second, third, and later lactations",
+              "properties": {
+                "type": "number",
+                "description": "Culling rate for first, second, third, and later lactations",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "mastitis_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for mastitis",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "udder_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for udder reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "feet_leg_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for feet and leg reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "unknown_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for unknown reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "disease_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for disease",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "injury_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for injury",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "death_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for death",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "cull_day_count": {
+              "type": "array",
+              "description": "Culling day count",
+              "properties": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "life_cycle": {
+            "type": "object",
+            "description": "",
+            "still_birth_rate": {
+              "type": "number",
+              "description": "Stillbirth rate",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      },
+      "methane_mitigation": {
+        "type": "object",
+        "description": "Methane Mitigation",
+        "methane_mitigation_method": {
+          "type": "string",
+          "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
+          "default": "None",
+          "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        },
+        "methane_mitigation_additive_amount": {
+          "type": "number",
+          "default": 0
+        },
+        "3-NOP_additive_amount": {
+          "type": "number",
+          "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive (mg/kg DMI)",
+          "minimum": 40,
+          "maximum": 100,
+          "default": 70
+        },
+        "monensin_additive_amount": {
+          "type": "number",
+          "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive (mg/kg DMI)",
+          "minimum": 20,
+          "maximum": 36,
+          "default": 24
+        },
+        "essential_oils_additive_amount": {
+          "type": "number",
+          "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive (mg/kg DMI)",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0
+        },
+        "seaweed_additive_amount": {
+          "type": "number",
+          "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of the seaweed mitigation additive (mg/kg DMI)",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0
+        }
+      },
+      "housing": {
+        "type": "string",
+        "description": "Housing -- The type of housing management for the herd.",
+        "default": "barn",
+        "pattern": "^(barn|3-pasture|drylot)$"
+      },
+      "pasture_concentrate": {
+        "description": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      },
+      "methane_model": {
+        "description": "Methane Model -- The method used to estimate enteric methane emissions.",
+        "type": "string",
+        "default": "IPCC",
+        "pattern": "^(Mills|3-Mutian|IPCC)$"
+      },
+      "ration": {
+        "type": "object",
+        "description": "Ration",
+        "user_input": {
+          "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+          "type": "bool",
+          "default": false
+        },
+        "formulation_interval": {
+          "description": "Formulation Interval -- The length of time in days between when the diets are reformulated.",
+          "type": "number",
+          "minimum": 1,
+          "default": 30
+        }
+      },
+      "pen_information": {
+        "type": "array",
+        "description": "Pen Information.",
+        "properties": {
+          "type": "object",
+          "id": {
+            "description": "Pen ID -- The index of the pen.",
+            "type": "number"
+          },
+          "pen_name": {
+            "description": "Pen Name -- The name or identifier of a given pen.",
+            "type": "string"
+          },
+          "animal_combination": {
+            "description": "Animal Combination -- The valid combinations of animal types that can be in a pen.",
+            "type": "string",
+            "pattern": "^(CALF|GROWING|CLOSE_UP|LAC_COW)$"
+          },
+          "vertical_dist_to_milking_parlor": {
+            "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor.",
+            "type": "number",
+            "minimum": 0,
+            "default": 0.1
+          },
+          "horizontal_dist_to_milking_parlor": {
+            "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor.",
+            "type": "number",
+            "minimum": 0,
+            "default": 1.6
+          },
+          "number_of_stalls": {
+            "description": "Number of Stalls -- The number of stalls in the pen.",
+            "type": "number",
+            "minimum": 0,
+            "default": 1000
+          },
+          "housing_type": {
+            "description": "Housing Type -- The type of barn the pen is in.",
+            "type": "string",
+            "pattern": "^(open air barn)$",
+            "default": "open air barn"
+          },
+          "pen_type": {
+            "description": "Pen Type -- The type of stalls the pen has.",
+            "type": "string",
+            "pattern": "^(freestall|tilestall|drylot)$",
+            "default": "freestall"
+          },
+          "max_stocking_density": {
+            "description": "Max Stocking Density -- The maximum ration between the number of animals in the pen and the number of stalls in the pen.",
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 2,
+            "default": 1.2
+          },
+          "manure_management_scenario_id": {
+            "description": "Manure Management Scenario ID -- The ID number of the manure management practices that are used for this pen.",
+            "type": "number",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      }
+    },
+    "animal_population_properties": {
+      "calves": {
+        "type": "array",
+        "description": "calves data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string",
+            "default": ""
+          }
+        }
+      },
+      "heiferIs": {
+        "type": "array",
+        "description": "heiferIs data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string"
+          }
+        }
+      },
+      "heiferIIs": {
+        "type": "array",
+        "description": "heiferIIs data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string"
+          },
+          "repro_program": {
+            "type": "string",
+            "description": "Heifer Reproduction Program",
+            "pattern": "^(TAI|ED)$"
+          },
+          "tai_method_h": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(md5CG2P|md5CGP)$"
+          },
+          "synch_ed_method_h": {
+            "type": "string",
+            "description": "Heifer SynchED Program",
+            "pattern": "^(2P|CP)$"
+          },
+          "estrus_count": {
+            "type": "number",
+            "description": "Estrus count.",
+            "minimum": 0
+          },
+          "estrus_day": {
+            "type": "number",
+            "description": "Estrus Day.",
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer TAI Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer SynchED Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "type": "number",
+            "description": "SynchED Program Estrus Day.",
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "type": "number",
+            "description": "SynchED Program Stop Day.",
+            "minimum": 0
+          },
+          "conception_rate": {
+            "type": "number",
+            "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "type": "number",
+            "description": "AI Day",
+            "minimum": 0
+          },
+          "abortion_day": {
+            "type": "number",
+            "description": "Abortion Day",
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "type": "number",
+            "description": "Days in Pregnancy",
+            "minimum": 0
+          },
+          "gestation_length": {
+            "type": "number",
+            "description": "Gestation Length",
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "type": "number",
+            "description": "Pregnancy Gestation for Calf",
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "type": "number",
+            "description": "Calf Birth weight.",
+            "minimum": 0
+          }
+        }
+      },
+      "heiferIIIs": {
+        "type": "array",
+        "description": "heiferIIIs data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string"
+          },
+          "repro_program": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(TAI|ED)$"
+          },
+          "tai_method_h": {
+            "type": "string",
+            "description": "Heifer Reproduction Program",
+            "pattern": "^(md5CG2P|md5CGP)$"
+          },
+          "synch_ed_method_h": {
+            "type": "string",
+            "description": "Heifer SynchED Program",
+            "pattern": "^(2P|CP)$"
+          },
+          "estrus_count": {
+            "type": "number",
+            "description": "Estrus count.",
+            "minimum": 0
+          },
+          "estrus_day": {
+            "type": "number",
+            "description": "Estrus Day.",
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer TAI Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer SynchED Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "type": "number",
+            "description": "SynchED Program Estrus Day.",
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "type": "number",
+            "description": "SynchED Program Stop Day.",
+            "minimum": 0
+          },
+          "conception_rate": {
+            "type": "number",
+            "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "type": "number",
+            "description": "AI Day",
+            "minimum": 0
+          },
+          "abortion_day": {
+            "type": "number",
+            "description": "Abortion Day",
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "type": "number",
+            "description": "Days in Pregnancy",
+            "minimum": 0
+          },
+          "gestation_length": {
+            "type": "number",
+            "description": "Gestation Length",
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "type": "number",
+            "description": "Pregnancy Gestation for Calf",
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "type": "number",
+            "description": "Calf Birth weight.",
+            "minimum": 0
+          }
+        }
+      },
+      "cows": {
+        "type": "array",
+        "description": "cows data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string"
+          },
+          "repro_program": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(TAI|ED)$"
+          },
+          "tai_method_h": {
+            "type": "string",
+            "description": "Heifer Reproduction Program",
+            "pattern": "^(md5CG2P|md5CGP)$"
+          },
+          "synch_ed_method_h": {
+            "type": "string",
+            "description": "Heifer SynchED Program",
+            "pattern": "^(2P|CP)$"
+          },
+          "estrus_count": {
+            "type": "number",
+            "description": "Estrus count.",
+            "minimum": 0
+          },
+          "estrus_day": {
+            "type": "number",
+            "description": "Estrus Day.",
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer TAI Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer SynchED Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "type": "number",
+            "description": "SynchED Program Estrus Day.",
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "type": "number",
+            "description": "SynchED Program Stop Day.",
+            "minimum": 0
+          },
+          "conception_rate": {
+            "type": "number",
+            "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "type": "number",
+            "description": "AI Day",
+            "minimum": 0
+          },
+          "abortion_day": {
+            "type": "number",
+            "description": "Abortion Day",
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "type": "number",
+            "description": "Days in Pregnancy",
+            "minimum": 0
+          },
+          "gestation_length": {
+            "type": "number",
+            "description": "Gestation Length",
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "type": "number",
+            "description": "Pregnancy Gestation for Calf",
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "type": "number",
+            "description": "Calf Birth weight.",
+            "minimum": 0
+          },
+          "presynch_method": {
+            "type": "string",
+            "description": "Cow PreSynch Protocol.",
+            "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+          },
+          "tai_method_c": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+          },
+          "resynch_method": {
+            "type": "string",
+            "description": "Cow ReSynch Protocol.",
+            "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+          },
+          "days_in_milk": {
+            "type": "number",
+            "description": "Days in Milk",
+            "minimum": 0
+          },
+          "parity": {
+            "type": "number",
+            "description": "Parity",
+            "minimum": 0
+          },
+          "calving_interval": {
+            "type": "number",
+            "description": "Calving Interval",
+            "minimum": 0
+          }
+        }
+      },
+      "replacement": {
+        "type": "array",
+        "description": "replacement cows data",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique integer identifier.",
+            "minimum": 1
+          },
+          "breed": {
+            "type": "string",
+            "description": "Breed.",
+            "pattern": "^(HO|JE)$"
+          },
+          "birth_date": {
+            "type": "number",
+            "description": "Birth date.",
+            "minimum": 0
+          },
+          "days_born": {
+            "type": "number",
+            "description": "Days born.",
+            "minimum": 0
+          },
+          "birth_weight": {
+            "type": "number",
+            "description": "Birth weight.",
+            "minimum": 0
+          },
+          "body_weight": {
+            "type": "number",
+            "description": "Body weight.",
+            "minimum": 0
+          },
+          "wean_weight": {
+            "type": "number",
+            "description": "Wean weight.",
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "type": "number",
+            "description": "Mature Body weight.",
+            "minimum": 0
+          },
+          "events": {
+            "type": "string"
+          },
+          "repro_program": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(TAI|ED)$"
+          },
+          "tai_method_h": {
+            "type": "string",
+            "description": "Heifer Reproduction Program",
+            "pattern": "^(md5CG2P|md5CGP)$"
+          },
+          "synch_ed_method_h": {
+            "type": "string",
+            "description": "Heifer SynchED Program",
+            "pattern": "^(2P|CP)$"
+          },
+          "estrus_count": {
+            "type": "number",
+            "description": "Estrus count.",
+            "minimum": 0
+          },
+          "estrus_day": {
+            "type": "number",
+            "description": "Estrus Day.",
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer TAI Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "type": "number",
+            "description": "Heifer SynchED Program Start Day.",
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "type": "number",
+            "description": "SynchED Program Estrus Day.",
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "type": "number",
+            "description": "SynchED Program Stop Day.",
+            "minimum": 0
+          },
+          "conception_rate": {
+            "type": "number",
+            "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "type": "number",
+            "description": "AI Day",
+            "minimum": 0
+          },
+          "abortion_day": {
+            "type": "number",
+            "description": "Abortion Day",
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "type": "number",
+            "description": "Days in Pregnancy",
+            "minimum": 0
+          },
+          "gestation_length": {
+            "type": "number",
+            "description": "Gestation Length",
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "type": "number",
+            "description": "Pregnancy Gestation for Calf",
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "type": "number",
+            "description": "Calf Birth weight.",
+            "minimum": 0
+          },
+          "presynch_method": {
+            "type": "string",
+            "description": "Cow PreSynch Protocol.",
+            "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+          },
+          "tai_method_c": {
+            "type": "string",
+            "description": "Reproduction Program",
+            "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+          },
+          "resynch_method": {
+            "type": "string",
+            "description": "Cow ReSynch Protocol.",
+            "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+          }
+        }
+      }
+    },
+    "economic_properties": {
+      "diesel_cost_gal": {
+        "description": "cost of diesel per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 5.00
+      },
+      "electricity_cost_kwh": {
+        "description": "cost of electricity per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.15
+      },
+      "natural_gas_cost_kwh": {
+        "description": "cost of natural gas per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.053
+      },
+      "water_cost_gal": {
+        "description": "cost of water per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.008
+      }
+    },
+    "emissions_properties": {
+      "alfalfa_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
+        "minimum": 0,
+        "default": 500
+      },
+      "corn_grain_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
+        "minimum": 0,
+        "default": 300
+      },
+      "corn_silage_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
+        "minimum": 0,
+        "default": 400
+      }
+    },
+    "feed_emissions_properties": {
+      "county_code": {
+        "type": "number",
+        "minimum": 1000
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "18": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "44": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "51": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "50": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "52": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "176": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "91": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "301": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "302": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "303": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "304": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "305": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "feed_properties": {
+      "calf_feeds": {
+        "type": "array",
+        "description": "Calf Feeds (raised off farm - 24 hrs of age).",
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 155
+        }
+      },
+      "growing_feeds": {
+        "type": "array",
+        "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "close_up_feeds": {
+        "type": "array",
+        "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "lac_cow_feeds": {
+        "type": "array",
+        "description": "Lactating Cow Feeds",
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "purchased_feeds": {
+        "type": "array",
+        "description": "Purchased Feeds.",
+        "properties": {
+          "type": "object",
+          "purchased_feed": {
+            "type": "number",
+            "description": "Purchased Feed",
+            "minimum": 1,
+            "maximum": 300
+          },
+          "purchased_feed_cost": {
+            "type": "number",
+            "description": "Cost of Feed (US dollars/kg DM)",
+            "minimum": 0
+          }
+        }
+      },
+      "farm_grown_feeds": {
+        "type": "array",
+        "description": "Farm-Grown Feeds",
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "storage_options": {
+        "type": "array",
+        "description": "Storage Options.",
+        "properties": {
+          "type": "object",
+          "storage_type": {
+            "type": "string",
+            "description": "Storage Type -- The type of storage unit used. This only applies to farm grown forage feeds",
+            "default": "Bunker Silo",
+            "pattern": "^(8' Diameter Bag|10' Diameter Bag|12' Diameter Bag|14' Diameter Bag|Upright Silo - Traditional|Upright Silo - Oxygen-Excluding|Bunker Silo|Pile|Wrapped Bale|Bale - Covered|Bale - Uncovered|Bin)$"
+          },
+          "moisture": {
+            "type": "string",
+            "description": "Moisture -- The management practices used that determine the dry matter content of the preserved feed.",
+            "default": "Wilted",
+            "pattern": "^(Direct Cut|Wilted|Baleage|Haylage|Moist Hay|Dry Hay)$"
+          },
+          "additive": {
+            "type": "string",
+            "description": "Additive -- Type of additive added to the forage material before ensiling.",
+            "pattern": "^(preservative|nutrient additive|absorbant)$",
+            "default": "preservative"
+          },
+          "package_density": {
+            "type": "number",
+            "description": "Package Density -- The density of ensiled feed material, kg DM /m3",
+            "minimum": 200,
+            "maximum": 800,
+            "default": 14
+          },
+          "inoculation": {
+            "type": "string",
+            "description": "Inoculation",
+            "pattern": "^(None|heterofermentative|homofermentative)$",
+            "default": "None"
+          },
+          "ventilation": {
+            "type": "bool",
+            "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
+            "default": true
+          },
+          "removal_rate": {
+            "type": "number",
+            "description": "Removal Rate -- Average rate of removal of material from the storage unit or silo described as the horizontal distance from the front of the storage. In units of meters.",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 0.5
+          },
+          "initial_dry_matter": {
+            "type": "number",
+            "description": "Initial Dry Matter -- The mass of feed dry matter in the storage unit at initiation of the simulation.",
+            "minimum": 0,
+            "maximum": 500000,
+            "default": 1000
+          }
+        }
+      },
+      "user_defined_ration_percentages": {
+        "type": "object",
+        "description": "User Defined Ration Percentages",
+        "calf": {
+          "type": "array",
+          "description": "Calf Feeds.",
+          "properties": {
+            "feed_type": {
+              "type": "number",
+              "description": "Calf Feed",
+              "minimum": 1,
+              "maximum": 300,
+              "default": 155
+            },
+            "ration_percentage": {
+              "type": "number",
+              "description": "Calf Ration Percentage",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "growing": {
+          "type": "array",
+          "description": "Growing Heifers Feeds.",
+          "properties": {
+            "feed_type": {
+              "type": "number",
+              "description": "Growing Heifers Feed",
+              "minimum": 1,
+              "maximum": 300,
+              "default": 1
+            },
+            "ration_percentage": {
+              "type": "number",
+              "description": "Growing Heifers Ration Percentage",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "close_up": {
+          "type": "array",
+          "description": "Close UP Feeds.",
+          "properties": {
+            "feed_type": {
+              "type": "number",
+              "description": "Close UP Feed",
+              "minimum": 1,
+              "maximum": 300,
+              "default": 1
+            },
+            "ration_percentage": {
+              "type": "number",
+              "description": "Close UP Ration Percentage",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "lac_cow": {
+          "type": "array",
+          "description": "Lactating Cow Feeds.",
+          "properties": {
+            "feed_type": {
+              "type": "number",
+              "description": "Lactating Cow Feed",
+              "minimum": 1,
+              "maximum": 300,
+              "default": 1
+            },
+            "ration_percentage": {
+              "type": "number",
+              "description": "Lactating Cow Ration Percentage",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "tolerance": {
+          "type": "number",
+          "description": "Tolerance -- Allowable +/- percentage variance in each of the defined percentage values.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "milk_reduction_maximum": {
+          "type": "number",
+          "description": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)",
+          "minimum": 0,
+          "maximum": 50
+        }
+      }
+    },
+    "user_feeds_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "Name": {
+        "type": "string",
+        "description": "A general common name for the feed as defined within RuFaS."
+      },
+      "feed_description": {
+        "type": "string",
+        "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name."
+      },
+      "feed_type": {
+        "type": "string",
+        "description": "The general type or category of the feed (group).",
+        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+      },
+      "units": {
+        "type": "string",
+        "description": "The unit of measurement used for the feed.",
+        "pattern": "(kg)"
+      }
+    },
+    "NRC_Comp_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "feed_type": {
+        "type": "string",
+        "description": "The general type or category of the feed.",
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No)$"
+      },
+      "DM": {
+        "type": "number",
+        "description": "Dry matter content of the feed (% DM).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "CP": {
+        "type": "number",
+        "description": "Crude protein content of the feed (% DM).",
+        "minimum": 0,
+        "maximum": 288
+      },
+      "NDICP": {
+        "type": "number",
+        "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+        "minimum": 0,
+        "maximum": 12,
+        "default": 0
+      },
+      "ADICP": {
+        "type": "number",
+        "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+        "minimum": 0,
+        "maximum": 8,
+        "default": 0
+      },
+      "EE": {
+        "type": "number",
+        "description": "Ether extract (% DM).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "NDF": {
+        "type": "number",
+        "description": "Neutral detergent fiber (% DM).",
+        "minimum": 0,
+        "maximum": 85,
+        "default": 0
+      },
+      "ADF": {
+        "type": "number",
+        "description": "Acid detergent fiber (% DM)",
+        "minimum": 0,
+        "maximum": 66,
+        "default": 0
+      },
+      "lignin": {
+        "type": "number",
+        "description": "Acid detergent lignin (% DM).",
+        "minimum": 0,
+        "maximum": 25,
+        "default": 0
+      },
+      "ash": {
+        "type": "number",
+        "description": "Ash contents (% DM) ",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "non_fiber_carb": {
+        "type": "number",
+        "description": "Non fiber carbohydrates (% DM).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "PAF": {
+        "type": "number",
+        "description": "Processing adjustment factor.",
+        "minimum": 0.87,
+        "maximum": 1.04,
+        "default": 0
+      },
+      "TDN": {
+        "type": "number",
+        "description": "Total digestible nutrients (% DM).",
+        "minimum": 0,
+        "maximum": 184,
+        "default": 0
+      },
+      "N_A": {
+        "type": "number",
+        "description": "Nitrogen Fraction A (% CP).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "N_B": {
+        "type": "number",
+        "description": "Nitrogen Fraction B (% CP).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "N_C": {
+        "type": "number",
+        "description": "Nitrogen Fraction C (% CP).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "Kd": {
+        "type": "number",
+        "description": "Feed degradation rate of B fraction (% h).",
+        "minimum": 0,
+        "maximum": 30,
+        "default": 0
+      },
+      "dRUP": {
+        "type": "number",
+        "description": "Digested rumen undegradable protein (% of RUP).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "calcium": {
+        "type": "number",
+        "description": "Calcium (% DM).",
+        "minimum": 0,
+        "maximum": 72,
+        "default": 0
+      },
+      "phosphorus": {
+        "type": "number",
+        "description": "Phosphorus (% DM).",
+        "minimum": 0,
+        "maximum": 32,
+        "default": 0
+      },
+      "magnesium": {
+        "type": "number",
+        "description": "Magnesium (% DM).",
+        "minimum": 0,
+        "maximum": 57,
+        "default": 0
+      },
+      "potassium": {
+        "type": "number",
+        "description": "Potassium (% DM).",
+        "minimum": 0,
+        "maximum": 57,
+        "default": 0
+      },
+      "sodium": {
+        "type": "number",
+        "description": "Sodium (% DM).",
+        "minimum": 0,
+        "maximum": 40,
+        "default": 0
+      },
+      "chlorine": {
+        "type": "number",
+        "description": "Chlorine (% DM).",
+        "minimum": 0,
+        "maximum": 67,
+        "default": 0
+      },
+      "sulfur": {
+        "type": "number",
+        "description": "Sulphur (% DM).",
+        "minimum": 0,
+        "maximum": 25,
+        "default": 0
+      },
+      "DE": {
+        "type": "number",
+        "description": "Digestible energy (Mcal/kg).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "is_fat": {
+        "type": "bool",
+        "description": "Identifier of fat type feed."
+      },
+      "is_wetforage": {
+        "type": "bool",
+        "description": "Identifier of wet forage type feed."
+      },
+      "units": {
+        "type": "string",
+        "description": ""
+      },
+      "starch": {
+        "type": "number",
+        "description": "Starch (%)",
+        "minimum": 0,
+        "maximum": 80,
+        "default": 0
+      },
+      "limit": {
+        "type": "number",
+        "description": ""
+      },
+      "lower_limit": {
+        "type": "number",
+        "description": ""
+      }
+    },
+    "NASEM_Comp_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "Name": {
+        "type": "string",
+        "description": "Feed Name"
+      },
+      "Fd_Category": {
+        "type": "string",
+        "description": "Feed Category.",
+        "pattern": "^(Animal Protein|By-Product\/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass\/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+      },
+      "feed_type": {
+        "type": "string",
+        "description": "The general type or category of the feed.",
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+      },
+      "DM": {
+        "type": "number",
+        "description": "Dry matter content of the feed (% DM).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "ash": {
+        "type": "number",
+        "description": "Ash contents (% DM) ",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "CP": {
+        "type": "number",
+        "description": "Crude protein content of the feed (% DM).",
+        "minimum": 0,
+        "maximum": 288
+      },
+      "N_A": {
+        "type": "number",
+        "description": "Nitrogen Fraction A (% CP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "N_B": {
+        "type": "number",
+        "description": "Nitrogen Fraction B (% CP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "N_C": {
+        "type": "number",
+        "description": "Nitrogen Fraction C (% CP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "Kd": {
+        "type": "number",
+        "description": "Feed degradation rate of B fraction (% h).",
+        "minimum": 0,
+        "maximum": 30
+      },
+      "RUP": {
+        "type": "number",
+        "description": "Rumen undegradable protein (% CP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "dRUP": {
+        "type": "number",
+        "description": "Digested rumen undegradable protein (% of RUP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "sol_prot": {
+        "type": "number",
+        "description": "Soluble protein (% CP).",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "ADICP": {
+        "type": "number",
+        "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+        "minimum": 0,
+        "maximum": 8,
+        "default": 0
+      },
+      "NDICP": {
+        "type": "number",
+        "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+        "minimum": 0,
+        "maximum": 12,
+        "default": 0
+      },
+      "ADF": {
+        "type": "number",
+        "description": "Acid detergent fiber (% DM)",
+        "minimum": 0,
+        "maximum": 66,
+        "default": 0
+      },
+      "NDF": {
+        "type": "number",
+        "description": "Neutral detergent fiber (% DM).",
+        "minimum": 0,
+        "maximum": 85,
+        "default": 0
+      },
+      "NDF48": {
+        "type": "number",
+        "description": "In vitro 48-hour digestibility (% NDF).",
+        "minimum": 0,
+        "maximum": 89,
+        "default": 0
+      },
+      "lignin": {
+        "type": "number",
+        "description": "Acid detergent lignin (% DM).",
+        "minimum": 0,
+        "maximum": 25,
+        "default": 0
+      },
+      "starch": {
+        "type": "number",
+        "description": "Starch (%).",
+        "minimum": 0,
+        "maximum": 80,
+        "default": 0
+      },
+      "WSC": {
+        "type": "number",
+        "description": "Water soluble carbohydrates (% DM).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "FA": {
+        "type": "number",
+        "description": "Fatty acids (% DM).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "EE": {
+        "type": "number",
+        "description": "Ether extract (% DM).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "DE_Base": {
+        "type": "number",
+        "description": "Digestible energy standard (Mcal/kg).",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      },
+      "calcium": {
+        "type": "number",
+        "description": "Calcium (% DM).",
+        "minimum": 0,
+        "maximum": 72,
+        "default": 0
+      },
+      "phosphorus": {
+        "type": "number",
+        "description": "Phosphorus (% DM).",
+        "minimum": 0,
+        "maximum": 32,
+        "default": 0
+      },
+      "magnesium": {
+        "type": "number",
+        "description": "Magnesium (% DM).",
+        "minimum": 0,
+        "maximum": 57,
+        "default": 0
+      },
+      "potassium": {
+        "type": "number",
+        "description": "Potassium (% DM).",
+        "minimum": 0,
+        "maximum": 57,
+        "default": 0
+      },
+      "sodium": {
+        "type": "number",
+        "description": "Sodium (% DM).",
+        "minimum": 0,
+        "maximum": 40,
+        "default": 0
+      },
+      "chlorine": {
+        "type": "number",
+        "description": "Chlorine (% DM).",
+        "minimum": 0,
+        "maximum": 67,
+        "default": 0
+      },
+      "sulfur": {
+        "type": "number",
+        "description": "Sulphur (% DM).",
+        "minimum": 0,
+        "maximum": 25,
+        "default": 0
+      },
+      "copper": {
+        "type": "number",
+        "description": ""
+      },
+      "iron": {
+        "type": "number",
+        "description": ""
+      },
+      "manganese": {
+        "type": "number",
+        "description": ""
+      },
+      "zinc": {
+        "type": "number",
+        "description": ""
+      },
+      "molibdenum": {
+        "type": "number",
+        "description": ""
+      },
+      "chromium": {
+        "type": "number",
+        "description": ""
+      },
+      "cobalt": {
+        "type": "number",
+        "description": ""
+      },
+      "iodine": {
+        "type": "number",
+        "description": ""
+      },
+      "selenium": {
+        "type": "number",
+        "description": ""
+      },
+      "arginine": {
+        "type": "number",
+        "description": ""
+      },
+      "histidine": {
+        "type": "number",
+        "description": ""
+      },
+      "isoleucine": {
+        "type": "number",
+        "description": ""
+      },
+      "leucine": {
+        "type": "number",
+        "description": ""
+      },
+      "lysine": {
+        "type": "number",
+        "description": ""
+      },
+      "methionine": {
+        "type": "number",
+        "description": ""
+      },
+      "phenylalanine": {
+        "type": "number",
+        "description": ""
+      },
+      "threonine": {
+        "type": "number",
+        "description": ""
+      },
+      "triptophan": {
+        "type": "number",
+        "description": ""
+      },
+      "valine": {
+        "type": "number",
+        "description": ""
+      },
+      "C120_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C140_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C160_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C161_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C180_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C181t_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C181c_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C182_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C183_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "otherFA_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "NPN_source": {
+        "type": "number",
+        "description": ""
+      },
+      "starch_digested": {
+        "type": "number",
+        "description": ""
+      },
+      "FA_dig": {
+        "type": "number",
+        "description": ""
+      },
+      "P_inorg": {
+        "type": "number",
+        "description": ""
+      },
+      "P_org": {
+        "type": "number",
+        "description": ""
+      },
+      "B_Carotene": {
+        "type": "number",
+        "description": ""
+      },
+      "biotin": {
+        "type": "number",
+        "description": ""
+      },
+      "choline": {
+        "type": "number",
+        "description": ""
+      },
+      "niacin": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_A": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_D": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_E": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_calcium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_phosphorus": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_sodium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_chloride": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_potassium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_copper": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_iron": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_magnesium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_manganesum": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_zinc": {
+        "type": "number",
+        "description": ""
+      },
+      "is_fat": {
+        "type": "bool",
+        "description": "Identifier of fat type feed."
+      },
+      "is_wetforage": {
+        "type": "bool",
+        "description": "Identifier of wet forage type feed."
+      },
+      "units": {
+        "type": "string",
+        "description": ""
+      },
+      "limit": {
+        "type": "number",
+        "description": ""
+      },
+      "lower_limit": {
+        "type": "number",
+        "description": ""
+      },
+      "TDN": {
+        "type": "number",
+        "description": ""
+      },
+      "DE": {
+        "type": "number",
+        "description": ""
+      }
+    },
+    "manure_management_properties": {
+      "manure_management_scenarios": {
+        "type": "array",
+        "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
+        "properties": {
+          "type": "object",
+          "scenario_id": {
+            "type": "number",
+            "description": "Scenario ID -- An identification number for livestock enclosures.",
+            "minimum": 0
+          },
+          "bedding_type": {
+            "type": "string",
+            "description": "Bedding Type -- The material used for bedding pack.",
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+          },
+          "manure_handler": {
+            "type": "string",
+            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
+          },
+          "manure_separator": {
+            "type": "string",
+            "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+          },
+          "manure_treatment_methods": {
+            "type": "string",
+            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+          }
+        }
+      },
+      "bedding_configs": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "properties": {
+            "bedding_type": {
+              "type": "string",
+              "description": "Bedding Type -- The material used for bedding pack.",
+              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+            },
+            "bedding_mass_per_day": {
+              "type": "number"
+            },
+            "bedding_density": {
+              "type": "number"
+            },
+            "bedding_dry_matter_content": {
+              "type": "number"
+            },
+            "bedding_cleaned_fraction": {
+              "type": "number"
+            },
+            "bedding_carbon_fraction": {
+              "type": "number"
+            },
+            "bedding_phosphorus_content": {
+              "type": "number"
+            },
+            "sand_removal_efficiency": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "manure_handler_configs": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "properties": {
+            "manure_handler_type": {
+              "type": "string",
+              "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+            },
+            "cleaning_water_use_rate": {
+              "type": "number"
+            },
+            "minutes_per_cleaning": {
+              "type": "number"
+            },
+            "cleanings_per_day": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "manure_separator_configs": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "properties": {
+            "manure_separator_type": {
+              "type": "string",
+              "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+              "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+            },
+            "percent_dry_solids": {
+              "type": "number"
+            },
+            "total_solids_removal_efficiency_for_separator": {
+              "type": "number"
+            },
+            "volatile_solids_removal_efficiency_for_separator": {
+              "type": "number"
+            },
+            "nitrogen_removal_efficiency_for_separator": {
+              "type": "number"
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
+              "type": "number"
+            },
+            "phosphorus_removal_efficiency_for_separator": {
+              "type": "number"
+            },
+            "potassium_removal_efficiency_for_separator": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "manure_treatment_configs": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "properties": {
+            "manure_treatment_type": {
+              "type": "string",
+              "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            },
+            "total_solids_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "volatile_solids_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "nitrogen_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "phosphorus_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "potassium_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "storage_time_period": {
+              "type": "number"
+            },
+            "freeboard_input": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "weather_properties": {
+      "year": {
+        "description": "Year.",
+        "type": "number",
+        "minimum": 1900
+      },
+      "jday": {
+        "description": "Julian day of the year.",
+        "type": "number",
+        "minimum": 0,
+        "maximum": 366
+      },
+      "precip": {
+        "description": "Amount of precipitation (mm H2O).",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      },
+      "high": {
+        "description": "The maximum air temperature of the day (°C).",
+        "type": "number",
+        "default": 21
+      },
+      "low": {
+        "description": "The minimum air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "avg": {
+        "description": "The average air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "Hday": {
+        "description": "The solar radiation of the day (MJ m^-2).",
+        "type": "number",
+        "default": 0
+      },
+      "irrigation": {
+        "description": "Irrigation (mm H2O).",
+        "type": "number",
+        "default": 0
+      }
+    },
+    "feed_quality_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "quality_id": {
+        "type": "number",
+        "description": "Quality ID",
+        "minimum": 1
+      },
+      "status": {
+        "type": "string",
+        "description": "Status",
+        "pattern": "(immature|mid-maturity|mature)"
+      },
+      "differentiating_nutrient": {
+        "type": "string",
+        "description": "Differentiating Nutrient",
+        "pattern": "(DM|NDF)"
+      },
+      "low_percent": {
+        "type": "number",
+        "description": "Low Percent",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "high_percent": {
+        "type": "number",
+        "description": "High Percent",
+        "minimum": 0,
+        "maximum": 100
+      }
+    }
+  },
+  "cross-validation": {}
+}
