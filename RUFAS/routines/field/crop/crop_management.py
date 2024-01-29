@@ -2,7 +2,7 @@ from math import exp
 from typing import Optional
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_CROP_QUALITIES
+from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_DRY_MATTER_DIGESTIBILITY
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
@@ -249,15 +249,15 @@ class CropManagement:
             storage_time=time,
             fresh_mass=self.data.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
-            dry_matter_digestibility=DEFAULT_CROP_QUALITIES.get("dry_matter_digestibility"),
-            crude_protein_percent=DEFAULT_CROP_QUALITIES.get("crude_protein_percent"),
-            non_protein_nitrogen=DEFAULT_CROP_QUALITIES.get("non_protein_nitrogen"),
-            starch=DEFAULT_CROP_QUALITIES.get("starch"),
-            adf=DEFAULT_CROP_QUALITIES.get("adf"),
-            ndf=DEFAULT_CROP_QUALITIES.get("ndf"),
-            sugar=DEFAULT_CROP_QUALITIES.get("sugar"),
+            dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
+            crude_protein_percent=self.data.crude_protein_percent,
+            non_protein_nitrogen=self.data.non_protein_nitrogen,
+            starch=self.data.starch,
+            adf=self.data.adf,
+            ndf=self.data.ndf,
+            sugar=self.data.sugar,
             lignin=self.data.lignin_dry_matter_percentage,
-            ash=DEFAULT_CROP_QUALITIES.get("ash"),
+            ash=self.data.ash,
         )
         feed_manager.receive_crop(harvested_crop, self.data.storage_type)
 
