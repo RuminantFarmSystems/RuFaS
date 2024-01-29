@@ -114,7 +114,7 @@ class Composting(BaseManureTreatment):
         total_Nitrogen_mass = self._calculate_total_nitrogen_mass()
         organic_Nitrogen_mass = self._calculate_organic_nitrogen_mass()
         inorganic_Nitrogen_mass = self._calculate_inorganic_nitrogen_mass()
-        ammonia_mass = self._calculate_ammonium_mass()
+        ammoniacal_nitrogen_mass = self._calculate_ammoniacal_nitrogen_mass()
 
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
@@ -128,7 +128,7 @@ class Composting(BaseManureTreatment):
             solid_manure_nitrogen=total_Nitrogen_mass,
             solid_manure_inorganic_nitrogen=inorganic_Nitrogen_mass,
             solid_manure_organic_nitrogen=organic_Nitrogen_mass,
-            solid_manure_inorganic_nitrogen_ammonium=ammonia_mass
+            solid_manure_total_ammoniacal_nitrogen=ammoniacal_nitrogen_mass
         )
 
         self._accumulate_daily_output(daily_output)
@@ -359,7 +359,7 @@ class Composting(BaseManureTreatment):
 
         return total_Nitrogen_mass * 0.048
 
-    def _calculate_ammonium_mass(self) -> float:
+    def _calculate_ammoniacal_nitrogen_mass(self) -> float:
         """
         This function calculates the mass of ammonium in the manure-bedding mix of the current year.
 

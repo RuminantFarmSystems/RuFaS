@@ -37,7 +37,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         solid_manure_nitrogen: Amount of nitrogen in the solid manure, kg.
         solid_manure_inorganic_nitrogen: Amount of inorganic nitrogen in the solid manure, kg.
         solid_manure_organic_nitrogen: Amount of organic nitrogen in the solid manure, kg.
-        solid_manure_inorganic_nitrogen_ammonium: Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
+        solid_manure_total_ammoniacal_nitrogen_ammonium: Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
         solid_manure_phosphorus: Amount of phosphorus in the solid manure, kg.
         solid_manure_water_extractable_inorganic_phosphorus: Amount of water extractable inorganic phosphorus
             in the solid manure, kg.
@@ -89,7 +89,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     solid_manure_nitrogen: float = 0.0
     solid_manure_inorganic_nitrogen: float = 0.0
     solid_manure_organic_nitrogen: float = 0.0
-    solid_manure_inorganic_nitrogen_ammonium: float = 0.0
+    solid_manure_total_ammoniacal_nitrogen: float = 0.0
 
     solid_manure_phosphorus: float = 0.0
     solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
