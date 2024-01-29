@@ -230,6 +230,8 @@ class AnimalManager:
             pen_data["bedding_type"] = manure_management_scenario["bedding_type"]
             pen_data["manure_handling"] = manure_management_scenario["manure_handler"]
             pen_data["manure_separator"] = manure_management_scenario["manure_separator"]
+            pen_data["manure_separator_after_digestion"] = \
+                manure_management_scenario.get("manure_separator_after_digestion")
             pen_data["manure_storage"] = manure_management_scenario["manure_treatment"]
 
             pen = Pen(**pen_data)

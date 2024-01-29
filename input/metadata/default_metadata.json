@@ -3119,6 +3119,11 @@
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
             "pattern": "^(screw press|rotary screen|none)$"
           },
+          "manure_separator_after_digestion": {
+            "type": "string",
+            "description": "Manure Separator Type Between Digestion and Treatment-- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+            "pattern": "^(screw press|rotary screen|none)$"
+          },
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",

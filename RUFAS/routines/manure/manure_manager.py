@@ -516,6 +516,7 @@ class ManureManager:
             pen: ManureManagerPen,
             manure_handler_daily_output: ManureHandlerDailyOutput,
             reception_pit_daily_output: ReceptionPitDailyOutput,
+            manure_separator_daily_output: Optional[BaseManureSeparator]
     ) -> Tuple[
         Optional[ManureTreatmentDailyOutput],
         Optional[ManureSeparatorDailyOutput],
@@ -536,6 +537,23 @@ class ManureManager:
             The daily output of the reception pit for the current day.
 
         """
+
+        pre_digestor_manure_separator_daily_output = (
+            self.manure_separators[pen.id].daily_update(
+                manure_separator_daily_input=reception_pit_daily_output
+            )
+            if self.manure_separators[pen.id]
+            else None
+        )
+
+        post_digestor_manure_separator_daily_output = (
+            self.manure_separators[pen.id].daily_update(
+                manure_separator_daily_input=reception_pit_daily_output
+            )
+            if self.manure_separators[pen.id]
+            else None
+        )
+
         anaerobic_digestion_daily_output = None
         if self._is_compound_anaerobic_manure_treatment(pen.manure_treatment):
             results = self._handle_daily_update_for_compound_anaerobic_manure_treatment(
@@ -543,9 +561,11 @@ class ManureManager:
                 pen=pen,
                 manure_handler_daily_output=manure_handler_daily_output,
                 reception_pit_daily_output=reception_pit_daily_output,
+                pre_digestor_manure_separator_daily_output=pre_digestor_manure_separator_daily_output,
+                post_digestor_manure_separator_daily_output=post_digestor_manure_separator_daily_output
             )
             anaerobic_digestion_daily_output = results[0]
-            manure_separator_daily_output = results[1]
+            pre_digestor_manure_separator_daily_output = results[1]
             manure_treatment_daily_output = results[2]
             manure_treatment_accumulated_output = results[3]
         else:
@@ -554,6 +574,7 @@ class ManureManager:
                 pen=pen,
                 manure_handler_daily_output=manure_handler_daily_output,
                 reception_pit_daily_output=reception_pit_daily_output,
+                manure_separator_daily_output=manure_separator_daily_output
             )
             manure_separator_daily_output = results[0]  # type: ignore
             manure_treatment_daily_output = results[1]  # type: ignore
@@ -597,8 +618,11 @@ class ManureManager:
             pen: ManureManagerPen,
             manure_handler_daily_output: ManureHandlerDailyOutput,
             reception_pit_daily_output: ReceptionPitDailyOutput,
+            pre_digestor_manure_separator_daily_output: Optional[BaseManureSeparator],
+            post_digestor_manure_separator_daily_output: Optional[BaseManureSeparator],
     ) -> Tuple[
         ManureTreatmentDailyOutput,
+        Optional[ManureSeparatorDailyOutput],
         Optional[ManureSeparatorDailyOutput],
         ManureTreatmentDailyOutput,
         ManureTreatmentDailyOutput,
@@ -629,7 +653,7 @@ class ManureManager:
         # Currently, calling the daily_update on the treatment only returns one final output
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
-            manure_treatment_daily_input=reception_pit_daily_output,
+            manure_treatment_daily_input=pre_digestor_manure_separator_daily_output or reception_pit_daily_output,
             pen=pen,
             sim_day=simulation_day,
             manure_separator=self.manure_separators[pen.id],
@@ -688,13 +712,6 @@ class ManureManager:
             The manure separator daily output and the manure treatment daily output.
 
         """
-        manure_separator_daily_output = (
-            self.manure_separators[pen.id].daily_update(
-                manure_separator_daily_input=reception_pit_daily_output
-            )
-            if self.manure_separators[pen.id]
-            else None
-        )
 
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,

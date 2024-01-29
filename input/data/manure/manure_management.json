@@ -53,7 +53,8 @@
       "scenario_id": 7,
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
-      "manure_separator": "rotary screen",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "rotary screen",
       "manure_treatment": "anaerobic digestion and lagoon with separator"
     },
     {
@@ -75,6 +76,7 @@
       "bedding_type": "none",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
+      "manure_separator_after_digestion": "screw press",
       "manure_treatment": "anaerobic digestion and lagoon with two separators"
     }
   ],

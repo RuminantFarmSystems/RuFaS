@@ -26,6 +26,7 @@ class ManureManagerPen:
         pen_type: The type of pen used for this pen.
         manure_handler: The type of manure handler used for this pen.
         manure_separator: The type of manure separator used for this pen.
+        manure_separator_after_digestion: The second type of manure separator used for manure from this pen.
         manure_treatment: The type of manure treatment(s) used for this pen.
         manure_density: The manure density used for calculating manure volume, kg/m^3.
         manure: The manure data extracted from the animal module and converted to usable
@@ -54,6 +55,7 @@ class ManureManagerPen:
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
+        self.manure_separator_after_digestion: str = pen.manure_separator_after_digestion
         self.manure_treatment: str = pen.manure_storage
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
