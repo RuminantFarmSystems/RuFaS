@@ -95,6 +95,20 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
         assert add_error.call_count == 1
 
 
+def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling unexpected errors in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("builtins.open", mock_open(read_data="valid_json"))
+    mocker.patch("RUFAS.input_manager.InputManager._load_data_from_json", side_effect=Exception("Unexpected error"))
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(Exception, match="Unexpected error"):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
+
+
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
