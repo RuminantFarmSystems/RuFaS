@@ -327,12 +327,27 @@ class AnimalModuleReporter:
             "daily_milk_production", life_cycle_manager.daily_milk_production, info_map
         )
         om.add_variable(
+            "dry_cows_daily_milk_production", life_cycle_manager.dry_cows_daily_milk_production, info_map
+        )
+        om.add_variable(
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
+        )
+        om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
         )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
             info_map,
+        )
+        om.add_variable(
+            "dry_cows_milk_protein_kg", life_cycle_manager.dry_cows_milk_protein_kg, info_map
         )
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, info_map)
