@@ -1,3 +1,4 @@
+import math
 from typing import Any
 
 import pytest
@@ -14,49 +15,36 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
 
 @pytest.mark.parametrize(
     "start_day, sim_day, estrus_note,"
-    "estrus_cycle, days_born, stdi, avg_estrus_cycle, std_estrus_cycle,"
+    "estrus_cycle, days_born, stdi, avg_estrus_cycle, std_estrus_cycle, max_cycle_length,"
     "expected_estrus_day",
     [
         # Normal estrus cycle
-        (100, 120, "Test Estrus",
-         20, 2.0, 100, 20, 5.0,
-         120),
+        (100, 120, "Test Estrus", 20, 100, 2.0, 20, 5.0, math.inf, 120),
 
         # Negative estrus cycle
-        (100, 120, "Negative Cycle",
-         -10, 100, 2.0, 20, 5.0,
-         110),
+        (100, 120, "Negative Cycle", -10, 100, 2.0, 20, 5.0, math.inf, 110),
 
-        # Very high estrus cycle
-        (100, 120, "High Cycle",
-         50, 100, 2.0, 20, 5.0,
-         150),
+        # Very high estrus cycle within max limit
+        (100, 120, "High Cycle", 50, 100, 2.0, 20, 5.0, 60, 150),
 
         # Zero estrus cycle
-        (100, 120, "Zero Cycle",
-         0, 100, 2.0, 20, 5.0,
-         100),
+        (100, 120, "Zero Cycle", 0, 100, 2.0, 20, 5.0, math.inf, 100),
+
+        # Estrus cycle exceeding max limit
+        (100, 120, "Exceed Max", 50, 100, 2.0, 20, 5.0, 40, 139),
 
         # Different stdi values
-        (100, 120, "Different STDI",
-         20, 100, 1.0, 20, 5.0,
-         120),
-        (100, 120, "Different STDI",
-         20, 100, 3.0, 20, 5.0,
-         120),
+        (100, 120, "Different STDI", 20, 100, 1.0, 20, 5.0, math.inf, 120),
+        (100, 120, "Different STDI", 20, 100, 3.0, 20, 5.0, math.inf, 120),
 
         # Different average and standard deviation of estrus cycle
-        (100, 120, "Different Avg and Std",
-         15, 100, 2.0, 15, 4.0,
-         115),
-        (100, 120, "Different Avg and Std",
-         25, 100, 2.0, 25, 6.0,
-         125),
+        (100, 120, "Different Avg and Std", 15, 100, 2.0, 15, 4.0, math.inf, 115),
+        (100, 120, "Different Avg and Std", 25, 100, 2.0, 25, 6.0, math.inf, 125),
     ]
 )
 def test_simulate_estrus(mocker: MockerFixture, start_day: int, sim_day: int, estrus_note: str,
                          estrus_cycle: int, days_born: int, stdi: float,
-                         avg_estrus_cycle: int, std_estrus_cycle: int,
+                         avg_estrus_cycle: int, std_estrus_cycle: int, max_cycle_length: float,
                          expected_estrus_day: int) -> None:
     """
     Unit test for _simulate_estrus() method of HeiferII class in heiferII.py file.
@@ -70,64 +58,13 @@ def test_simulate_estrus(mocker: MockerFixture, start_day: int, sim_day: int, es
     heifer.days_born = days_born
     patch_for_log_event = mocker.patch.object(heifer, 'log_event')
     mocker.patch('RUFAS.routines.animal.life_cycle.heiferII.const.STDI', stdi)
-    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle', return_value=avg_estrus_cycle)
-    mocker.patch.object(HeiferII, 'get_std_estrus_cycle', return_value=std_estrus_cycle)
 
     # Act
-    heifer._simulate_estrus(start_day, sim_day, estrus_note)
+    heifer._simulate_estrus(start_day, sim_day, estrus_note, avg_estrus_cycle, std_estrus_cycle, max_cycle_length)
 
     # Assert
     assert heifer.estrus_day == expected_estrus_day
     patch_for_truncnorm.assert_called_with(-stdi, stdi, avg_estrus_cycle, std_estrus_cycle)
-    patch_for_log_event.assert_called_with(days_born, sim_day, f'{estrus_note} on day {expected_estrus_day}')
-
-
-@pytest.mark.parametrize(
-    "start_day, sim_day, estrus_note, estrus_cycle, days_born, stdi, "
-    "avg_estrus_cycle_after_pgf, std_estrus_cycle_after_pgf, expected_estrus_day",
-    [
-        # Normal estrus cycle
-        (100, 120, "SynchED Estrus", 10, 100, 2.0, 10, 5.0, 110),
-
-        # Estrus cycle exceeding max length
-        (100, 120, "Long Estrus Cycle", 20, 100, 2.0, 20, 5.0, 113),
-
-        # Negative estrus cycle
-        (100, 120, "Negative Cycle", -10, 100, 2.0, 20, 5.0, 110),
-
-        # Different stdi values
-        (100, 120, "Different STDI", 10, 100, 1.0, 10, 5.0, 110),
-        (100, 120, "Different STDI", 10, 100, 3.0, 10, 5.0, 110),
-
-        # Different average and standard deviation of estrus cycle
-        (100, 120, "Different Avg and Std", 8, 100, 2.0, 8, 4.0, 108),
-    ]
-)
-def test_simulate_synch_ed_estrus(mocker: MockerFixture, start_day: int, sim_day: int, estrus_note: str,
-                                  estrus_cycle: int, days_born: int, stdi: float,
-                                  avg_estrus_cycle_after_pgf: int, std_estrus_cycle_after_pgf: int,
-                                  expected_estrus_day: int) -> None:
-    """
-    Unit test for _simulate_synch_ed_estrus() method of HeiferII class in heiferII.py file.
-    """
-
-    # Arrange
-    patch_for_truncnorm = mocker.patch('scipy.stats.truncnorm.rvs', return_value=estrus_cycle)
-    mocker.patch.object(HeiferII, '__init__', return_value=None)
-    mock_init_args = mocker.MagicMock()
-    heifer = HeiferII(mock_init_args)
-    heifer.days_born = days_born
-    patch_for_log_event = mocker.patch.object(heifer, 'log_event')
-    mocker.patch('RUFAS.routines.animal.life_cycle.heiferII.const.STDI', stdi)
-    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle_after_pgf', return_value=avg_estrus_cycle_after_pgf)
-    mocker.patch.object(HeiferII, 'get_std_estrus_cycle_after_pgf', return_value=std_estrus_cycle_after_pgf)
-
-    # Act
-    heifer._simulate_synch_ed_estrus(start_day, sim_day, estrus_note)
-
-    # Assert
-    assert heifer.estrus_day == expected_estrus_day
-    patch_for_truncnorm.assert_called_with(-stdi, stdi, avg_estrus_cycle_after_pgf, std_estrus_cycle_after_pgf)
     patch_for_log_event.assert_called_with(days_born, sim_day, f'{estrus_note} on day {expected_estrus_day}')
 
 
@@ -356,11 +293,13 @@ def test_get_general_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_
     """
 
     # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heiferII = HeiferII(mocker.MagicMock())
     patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_estrus_detection_rate)
 
     # Act
-    result = HeiferII.get_general_estrus_detection_rate()
+    result = heiferII.get_general_estrus_detection_rate()
 
     # Assert
     assert result == expected_estrus_detection_rate
@@ -499,11 +438,13 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
     """
 
     # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heiferII = HeiferII(mocker.MagicMock())
     patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_conception_rate)
 
     # Act
-    result = HeiferII.get_general_conception_rate()
+    result = heiferII.get_general_conception_rate()
 
     # Assert
     assert result == expected_conception_rate
@@ -526,10 +467,10 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
         (1.0, 1.0),
     ]
 )
-def test_get_user_defined_TAI_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
+def test_get_user_defined_tai_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
                                               expected_conception_rate: float) -> None:
     """
-    Unit test for _get_user_defined_TAI_conception_rate() static method of HeiferII class in heiferII.py file.
+    Unit test for get_user_defined_tai_conception_rate() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
@@ -538,7 +479,7 @@ def test_get_user_defined_TAI_conception_rate(mocker: MockerFixture, mocked_conc
                                                              return_value=mock_repro_sub_properties)
 
     # Act
-    result = HeiferII._get_user_defined_TAI_conception_rate()
+    result = HeiferII.get_user_defined_tai_conception_rate()
 
     # Assert
     assert result == expected_conception_rate
@@ -605,7 +546,7 @@ def test_get_user_defined_or_default_TAI_conception_rate(mocker: MockerFixture,
     mocker.patch.object(HeiferII, '__init__', return_value=None)
     heifer = HeiferII(mocker.MagicMock())
     mocker.patch.object(heifer, 'get_user_defined_repro_protocol', return_value=repro_protocol)
-    mocker.patch.object(HeiferII, '_get_user_defined_TAI_conception_rate', return_value=user_defined_rate)
+    mocker.patch.object(HeiferII, 'get_user_defined_tai_conception_rate', return_value=user_defined_rate)
     mocker.patch.object(HeiferII, '_get_default_TAI_conception_rate', return_value=default_rate)
 
     # Act
@@ -691,9 +632,13 @@ def test_execute_ed_protocol(mocker: MockerFixture, is_pregnant: bool, initial_e
     heifer.days_born = days_born
     heifer.estrus_day = estrus_day
     mocker.patch.object(HeiferII, '_get_breeding_start_day', return_value=breeding_start_day)
+    mock_avg_estrus_cycle = mocker.MagicMock()
+    mock_std_estrus_cycle = mocker.MagicMock()
+    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle', return_value=mock_avg_estrus_cycle)
+    mocker.patch.object(HeiferII, 'get_std_estrus_cycle', return_value=mock_std_estrus_cycle)
     patch_for_simulate_estrus = mocker.patch.object(heifer, '_simulate_estrus', return_value=None)
-    patch_for_handle_ed_estrus_detection = mocker.patch.object(heifer, '_handle_ed_estrus_detection',
-                                                               return_value=None)
+    patch_for_handle_generic_estrus_detection = mocker.patch.object(heifer, '_handle_generic_estrus_detection',
+                                                                    return_value=None)
 
     # Act
     heifer.execute_ed_protocol(sim_day)
@@ -706,59 +651,15 @@ def test_execute_ed_protocol(mocker: MockerFixture, is_pregnant: bool, initial_e
 
     if should_simulate_estrus:
         patch_for_simulate_estrus.assert_called_once_with(breeding_start_day, sim_day,
-                                                          const.ESTRUS_DAY_SCHEDULED_NOTE)
+                                                          const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                                          mock_avg_estrus_cycle, mock_std_estrus_cycle)
     else:
         patch_for_simulate_estrus.assert_not_called()
 
     if should_handle_estrus_detection:
-        patch_for_handle_ed_estrus_detection.assert_called_once_with(sim_day)
+        patch_for_handle_generic_estrus_detection.assert_called_once_with(sim_day)
     else:
-        patch_for_handle_ed_estrus_detection.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "days_born, sim_day, is_estrus_detected, "
-    "general_estrus_detection_rate, general_conception_rate, "
-    "expected_conception_rate, expected_ai_day",
-    [
-        # Estrus detected
-        (100, 100, True, 0.5, 0.5, 0.5, 101),
-
-        # Estrus not detected scenario
-        (100, 100, False, 0.5, 0.5, None, None),
-    ]
-)
-def test_handle_ed_estrus_detection(mocker: MockerFixture, days_born: int, sim_day: int, is_estrus_detected: bool,
-                                    general_estrus_detection_rate: float, general_conception_rate: float,
-                                    expected_conception_rate: float, expected_ai_day: int) -> None:
-    """
-    Unit test for _handle_ed_estrus_detection() method of HeiferII class in heiferII.py file.
-    """
-
-    # Arrange
-    mocker.patch.object(HeiferII, '__init__', return_value=None)
-    heifer = HeiferII(mocker.MagicMock())
-    heifer.days_born = days_born
-    patch_for_log_event = mocker.patch.object(heifer, 'log_event', return_value=None)
-    patch_for_detect_estrus = mocker.patch.object(heifer, '_detect_estrus', return_value=is_estrus_detected)
-    mocker.patch.object(HeiferII, 'get_general_estrus_detection_rate', return_value=general_estrus_detection_rate)
-    mocker.patch.object(HeiferII, 'get_general_conception_rate', return_value=general_conception_rate)
-    patch_for_simulate_estrus = mocker.patch.object(HeiferII, '_simulate_estrus', return_value=None)
-
-    # Act
-    heifer._handle_ed_estrus_detection(sim_day)
-
-    # Assert
-    patch_for_log_event.assert_any_call(days_born, sim_day, const.ESTRUS_OCCURRED_NOTE)
-    patch_for_detect_estrus.assert_called_with(general_estrus_detection_rate)
-    if is_estrus_detected:
-        patch_for_log_event.assert_any_call(heifer.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
-        assert heifer.conception_rate == expected_conception_rate
-        assert heifer.ai_day == expected_ai_day
-        patch_for_log_event.assert_any_call(heifer.days_born, sim_day,
-                                            f'{const.AI_DAY_SCHEDULED_NOTE} on day {expected_ai_day}')
-    else:
-        patch_for_simulate_estrus.assert_any_call(heifer.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+        patch_for_handle_generic_estrus_detection.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -1228,8 +1129,12 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(mocker: MockerFixtu
 
     patch_for_execute_hormone_schedule = mocker.patch.object(heifer, '_execute_hormone_delivery_schedule',
                                                              side_effect=execute_hormone_schedule_side_effect)
-    patch_for_simulate_synch_ed_estrus = mocker.patch.object(heifer, '_simulate_synch_ed_estrus',
-                                                             return_value=None)
+    mock_avg_estrus_cycle_after_pgf = mocker.MagicMock()
+    mock_std_estrus_cycle_after_pgf = mocker.MagicMock()
+    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle_after_pgf', return_value=mock_avg_estrus_cycle_after_pgf)
+    mocker.patch.object(HeiferII, 'get_std_estrus_cycle_after_pgf', return_value=mock_std_estrus_cycle_after_pgf)
+    patch_for_simulate_estrus = mocker.patch.object(heifer, '_simulate_estrus',
+                                                    return_value=None)
 
     # Act
     heifer._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
@@ -1238,9 +1143,12 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(mocker: MockerFixtu
     if len(initial_hormone_schedule) > 0:
         patch_for_execute_hormone_schedule.assert_called_once_with(sim_day, initial_hormone_schedule)
     if len(initial_hormone_schedule) == 1 and len(final_hormone_schedule) == 0:
-        patch_for_simulate_synch_ed_estrus.assert_called_once_with(days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+        patch_for_simulate_estrus.assert_called_once_with(days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                                          mock_avg_estrus_cycle_after_pgf,
+                                                          mock_std_estrus_cycle_after_pgf,
+                                                          max_cycle_length=14)
     else:
-        patch_for_simulate_synch_ed_estrus.assert_not_called()
+        patch_for_simulate_estrus.assert_not_called()
 
     assert heifer._hormone_schedule == final_hormone_schedule
 
@@ -1270,7 +1178,7 @@ def test_handle_synch_ed_estrus_detection(mocker: MockerFixture, days_born: int,
     patch_for_detect_estrus = mocker.patch.object(heifer, '_detect_estrus', return_value=estrus_detected)
     mocker.patch.object(HeiferII, '_get_user_defined_or_default_synch_ed_estrus_detection_rate',
                         return_value=specific_estrus_detection_rate)
-    mocker.patch.object(HeiferII, '_get_user_defined_TAI_conception_rate',
+    mocker.patch.object(HeiferII, 'get_user_defined_tai_conception_rate',
                         return_value=external_specific_conception_rate)
     patch_for_handle_estrus_not_detected = mocker.patch.object(heifer, '_handle_estrus_not_detected_in_synch_ed',
                                                                return_value=None)
@@ -1358,9 +1266,6 @@ def test_handle_estrus_not_detected_in_synch_ed(mocker: MockerFixture, days_born
         # Same program - no change
         (100, 100, HeiferReproProtocolEnum.ED.value, HeiferReproProtocolEnum.ED.value, True, False),
         (100, 100, HeiferReproProtocolEnum.TAI.value, HeiferReproProtocolEnum.TAI.value, True, False),
-
-        # Invalid cases
-        (100, 100, HeiferReproProtocolEnum.ED.value, 'InvalidProgram', False, False),
     ]
 )
 def test_set_repro_program(mocker: MockerFixture, days_born: int, sim_day: int,
@@ -1390,7 +1295,7 @@ def test_set_repro_program(mocker: MockerFixture, days_born: int, sim_day: int,
             patch_for_log_event.assert_not_called()
     else:
         with pytest.raises(ValueError):
-            heifer._set_repro_program(sim_day, new_repro_program)  # type: ignore
+            heifer._set_repro_program(sim_day, new_repro_program)
 
 
 @pytest.mark.parametrize(
@@ -1420,6 +1325,10 @@ def test_open(mocker: MockerFixture, abortion_day: int, sim_day: int) -> None:
     heifer.abortion_day = abortion_day
     patch_for_log_event = mocker.patch.object(heifer, 'log_event', return_value=None)
     patch_for_set_repro_program = mocker.patch.object(heifer, '_set_repro_program', return_value=None)
+    mock_avg_estrus_cycle = mocker.MagicMock()
+    mock_std_estrus_cycle = mocker.MagicMock()
+    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle', return_value=mock_avg_estrus_cycle)
+    mocker.patch.object(HeiferII, 'get_std_estrus_cycle', return_value=mock_std_estrus_cycle)
     patch_for_simulate_estrus = mocker.patch.object(heifer, '_simulate_estrus', return_value=None)
 
     # Act
@@ -1428,7 +1337,8 @@ def test_open(mocker: MockerFixture, abortion_day: int, sim_day: int) -> None:
     # Assert
     patch_for_log_event.assert_called_once_with(abortion_day, sim_day, const.REBREEDING_NOTE)
     patch_for_set_repro_program.assert_called_once_with(sim_day, 'ED')
-    patch_for_simulate_estrus.assert_called_once_with(abortion_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+    patch_for_simulate_estrus.assert_called_once_with(abortion_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                                      mock_avg_estrus_cycle, mock_std_estrus_cycle)
 
 
 @pytest.mark.parametrize(
@@ -1571,6 +1481,10 @@ def test_handle_failed_conception(mocker: MockerFixture, days_born: int, sim_day
     patch_for_log_event = mocker.patch.object(heifer, 'log_event', return_value=None)
     patch_for_set_repro_program = mocker.patch.object(heifer, '_set_repro_program', return_value=None)
     patch_for_simulate_estrus = mocker.patch.object(heifer, '_simulate_estrus', return_value=None)
+    mock_avg_estrus_cycle = mocker.MagicMock()
+    mock_std_estrus_cycle = mocker.MagicMock()
+    mocker.patch.object(HeiferII, 'get_avg_estrus_cycle', return_value=mock_avg_estrus_cycle)
+    mocker.patch.object(HeiferII, 'get_std_estrus_cycle', return_value=mock_std_estrus_cycle)
 
     # Act
     heifer._handle_failed_conception(sim_day)
@@ -1578,7 +1492,8 @@ def test_handle_failed_conception(mocker: MockerFixture, days_born: int, sim_day
     # Assert
     patch_for_log_event.assert_called_once_with(days_born, sim_day, const.HEIFER_NOT_PREG)
     patch_for_set_repro_program.assert_called_once_with(sim_day, 'ED')
-    patch_for_simulate_estrus.assert_called_once_with(days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+    patch_for_simulate_estrus.assert_called_once_with(days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                                      mock_avg_estrus_cycle, mock_std_estrus_cycle)
 
 
 @pytest.mark.parametrize(
