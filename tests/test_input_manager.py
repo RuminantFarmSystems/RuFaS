@@ -56,6 +56,21 @@ def input_manager_original_method_states(
     }
 
 
+def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for successfully loading properties in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    properties_data = {"key1": "value1", "key2": "value2"}
+    mocker.patch("builtins.open", mock_open(read_data=json.dumps(properties_data)))
+    mocker.patch("RUFAS.input_manager.InputManager._load_data_from_json", return_value=properties_data)
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        mock_input_manager._load_properties()
+        assert mock_input_manager._InputManager__metadata["properties"] == properties_data
+        assert add_log.call_count == 2
+
+
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
@@ -163,6 +178,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
+    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
 
 
 @pytest.mark.parametrize("input_data, metadata_properties, expected_result", [
