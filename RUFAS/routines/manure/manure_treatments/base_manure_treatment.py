@@ -62,7 +62,7 @@ class BaseManureTreatment(ABC):
             _manure_handler_daily_output: The daily output of the manure handler.
             _current_manure_treatment_daily_input: The current input data assigned based on the
                 input data passed into the daily_update() method.
-            _manure_separator: Only present in the digester - separator - lagoon scenario.
+            _manure_separator: Present in the separator - digester - separator - lagoon scenario.
             _manure_separator_daily_output: Only present in the digester - separator - lagoon scenario.
             _accumulated_output: Summation of all daily outputs.
 
