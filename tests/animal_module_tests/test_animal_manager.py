@@ -1056,9 +1056,21 @@ def test__get_lactating_cows():
     assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
 
 
-def test__group_pens_by_animal_combination():
+def test__group_pens_by_animal_combination(mocker: MockerFixture):
     """Unit test for function _group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_animal_manager.all_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens[0].animal_combination = 'combo_0'
+    mock_animal_manager.all_pens[1].animal_combination = 'combo_1'
+    expected = {'combo_0': [mock_pen_0],
+                'combo_1': [mock_pen_1]}
+    # Act
+    actual = mock_animal_manager._group_pens_by_animal_combination(mock_animal_manager.all_pens)
+    # Assert
+    assert actual == expected
 
 
 def test__calc_max_animal_spaces_per_pen():
