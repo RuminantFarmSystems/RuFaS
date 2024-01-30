@@ -58,9 +58,23 @@ class TallFescueSilage(TallFescue):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=5.616
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=13.422
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=6.440
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=1.936
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=38.971
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=62.067
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=7.29
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=8.078
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0229376
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00302
+    yield_phosphorus_fraction: float, default=0.00302
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -73,6 +87,13 @@ class TallFescueSilage(TallFescue):
     min_harvest_index: float = 0.4
     dry_matter_percentage: float = 39.612
     lignin_dry_matter_percentage: float = 5.616
+    crude_protein_percent: float = 13.422
+    non_protein_nitrogen: float = 6.440
+    starch: float = 1.936
+    adf: float = 38.971
+    ndf: float = 62.067
+    sugar: float = 7.29
+    ash: float = 8.078
     yield_nitrogen_fraction: float = 0.0229376
     yield_phosphorus_fraction: float = 0.00302
 
@@ -92,9 +113,23 @@ class TallFescueBaleage(TallFescueSilage):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=5.616
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=13.422
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=6.440
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=1.936
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=38.971
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=62.067
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=7.29
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=8.078
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0229376
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00302
+    yield_phosphorus_fraction: float, default=0.00302
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -123,9 +158,23 @@ class TallFescueHay(TallFescue):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=4.167
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=13.28
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=4.056
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=2.217
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=35.524
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=58.007
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=15.235
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=8.567
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.021248
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00281
+    yield_phosphorus_fraction: float, default=0.00281
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -138,5 +187,12 @@ class TallFescueHay(TallFescue):
     min_harvest_index: float = 0.37
     dry_matter_percentage: float = 88.331
     lignin_dry_matter_percentage: float = 4.167
+    crude_protein_percent: float = 13.28
+    non_protein_nitrogen: float = 4.056
+    starch: float = 2.217
+    adf: float = 35.524
+    ndf: float = 58.007
+    sugar: float = 15.235
+    ash: float = 8.567
     yield_nitrogen_fraction: float = 0.021248
     yield_phosphorus_fraction: float = 0.00281
