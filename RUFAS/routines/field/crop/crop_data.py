@@ -318,6 +318,20 @@ class CropData:
     lignin_dry_matter_percentage : float, default 1.518
         Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
         grain.
+    crude_protein_percent : float, default 12.481
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen : float, default 2.518
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch : float, default 72.586
+        Percentage of dry matter mass that is starch (unitless).
+    adf : float, default 3.934
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf : float, default 6.134
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar : float, default 2.235
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash : float, default 2.496
+        Percentage of dry matter mass that is ash (unitless).
     dry_down_fraction : float, default 0.2
         Proportion of plant biomass that is lost to dry-down (unitless; [0, 1]).
     optimal_phosphorus_fraction : float, default 0.073
@@ -524,21 +538,13 @@ class CropData:
     harvest_efficiency: float = 1.0
     dry_matter_percentage: float = 85.689
     lignin_dry_matter_percentage: float = 1.518
-    """Percentage of dry matter yield that is lignin (unitless)."""
     crude_protein_percent: float = 12.481
-    """Percentage of dry matter mass that is dietary crude protein (unitless)."""
     non_protein_nitrogen: float = 2.518
-    """Percentage of dry matter mass that is non-protein nitrogen (unitless)."""
     starch: float = 72.586
-    """Percentage of dry matter mass that is starch (unitless)."""
     adf: float = 3.934
-    """Percentage of dry matter mass that is acid detergent fiber (unitless)."""
     ndf: float = 6.134
-    """Percentage of dry matter mass that is neutral detergent fiber (unitless)."""
     sugar: float = 2.235
-    """Percentage of dry matter mass that is labile carbohydrate (unitless)."""
     ash: float = 2.496
-    """Percentage of dry matter mass that is ash (unitless)."""
     dry_down_fraction: float = 0.2
     optimal_phosphorus_fraction: float = 0.073
     user_harvest_index: Optional[float] = None
