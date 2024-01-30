@@ -1,46 +1,47 @@
 {
-	"herd_information": {
-		"calf_num": 8,
-		"heiferI_num": 44,
-		"heiferII_num": 38,
-		"heiferIII_num_springers": 5,
-		"cow_num": 100,
-		"replace_num": 500,
-		"herd_num": 100,
-		"herd_init": false,
-		"breed": "HO"
-	},
-	"herd_initialization": {
-		"initial_animal_num": 10000,
-		"simulation_days": 5000
-	},
-	"animal_config": {
-		"management_decisions": {
-			"breeding_start_day_h": 380,
-			"heifer_repro_method": "TAI",
-			"cow_repro_method": "ED-TAI",
-			"semen_type": "conventional",
-			"days_in_preg_when_dry": 218,
-			"heifer_repro_cull_time": 500,
-			"do_not_breed_time": 185,
-			"cull_milk_production": 30,
-			"cow_times_milked_per_day": 3
-		},
-		"farm_level": {
-			"calf": {
-				"male_calf_rate_sexed_semen": 0.1,
-				"male_calf_rate_conventional_semen": 0.53,
-				"keep_female_calf_rate": 1,
-				"wean_day": 60,
-				"wean_length": 7,
-				"milk_type": "whole"
-			},
-			"repro": {
-        "voluntary_waiting_period": 50,
+  "herd_information": {
+    "calf_num": 8,
+    "heiferI_num": 44,
+    "heiferII_num": 38,
+    "heiferIII_num_springers": 5,
+    "cow_num": 100,
+    "replace_num": 500,
+    "herd_num": 100,
+    "breed": "HO"
+  },
+  "herd_initialization": {
+    "initial_animal_num": 10000,
+    "simulation_days": 5000
+  },
+  "animal_config": {
+    "management_decisions": {
+      "breeding_start_day_h": 380,
+      "heifer_repro_method": "TAI",
+      "cow_repro_method": "TAI",
+      "semen_type": "conventional",
+      "days_in_preg_when_dry": 218,
+      "heifer_repro_cull_time": 500,
+      "do_not_breed_time": 185,
+      "cull_milk_production": 30,
+      "cow_times_milked_per_day": 3,
+	    "milk_fat_percent": 3.6,
+	    "milk_protein_percent": 3.2
+    },
+    "farm_level": {
+      "calf": {
+        "male_calf_rate_sexed_semen": 0.1,
+        "male_calf_rate_conventional_semen": 0.53,
+        "keep_female_calf_rate": 1,
+        "wean_day": 60,
+        "wean_length": 7,
+        "milk_type": "whole"
+      },
+      "repro": {
+        		"voluntary_waiting_period": 50,
 				"conception_rate_decrease": 0.026,
 				"decrease_conception_rate_in_rebreeding": false,
 				"decrease_conception_rate_by_parity": false,
-        "avg_gestation_len": 278,
+        		"avg_gestation_len": 278,
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
                 "calving_interval": 400,
