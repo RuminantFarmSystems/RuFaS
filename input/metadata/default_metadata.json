@@ -45,7 +45,7 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
-      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "path": "input/data/EEE/full_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -313,6 +313,18 @@
             "description": "Number of Milkings (per day) -- The average or most common number of times cows are milked per day (1, 2, or 3 times daily)",
             "default": 3,
             "minimum": 0
+          },
+          "milk_fat_percent": {
+            "type": "number",
+            "description": "Milk Fat Percent (percent) -- The average or most common milk fat percentage in cow milk",
+            "default": 3.5,
+            "minimum": 0
+          },
+          "milk_protein_percent": {
+            "type": "number",
+            "description": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk",
+            "default": 3.2,
+            "minimum": 0
           }
         },
         "farm_level": {
@@ -366,7 +378,7 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when a cow is eligible to be bred during estrus",
+              "description": "Voluntary Waiting Period (days) -- When the cow's days in milk has reached this day, monitoring for estrus and subsequent breeding, if found, will begin. Used only in the ED and ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
               "default": 50,
               "minimum": 0
             },
@@ -376,6 +388,16 @@
               "default": 0.026,
               "minimum": 0,
               "maximum": 0.1
+            },
+            "decrease_conception_rate_in_rebreeding": {
+              "type": "bool",
+              "description": "Decrease Conception Rate in Rebreeding -- whether or not to decrease the conception rate in rebreeding (default is false)",
+              "default": false
+            },
+            "decrease_conception_rate_by_parity": {
+              "type": "bool",
+              "description": "Decrease Conception Rate by Parity -- whether or not to decrease the conception rate by parity (default is false)",
+              "default": false
             },
             "avg_gestation_len": {
               "type": "number",
@@ -445,126 +467,54 @@
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The fraction of in-heat cows that would be detected in the ED (Estrus Detection) protocol, including during the estrus detection portion of ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_conception_rate": {
+              "ED_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The fraction of cows with estrus detected that would conceive in the ED (Estrus Detection) protocol, including during the estrus detection portion of ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "presynch_protocol": {
+              "presynch_program": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "The presynch program (1st breeding) for cow in the TAI protocol. Currently, this is only supported in TAI protocol. When other protocols such as ED or ED-TAI are used, this value will be ignored, and it is recommended to set it to None.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|None)$"
               },
-              "resynch_protocol": {
+              "presynch_program_start_day": {
+                "type": "number",
+                "description": "The presynch program start day is the day of the first hormone injection in a presynch program used in the TAI protocol. When a presynch program is followed by an OvSynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. The durations of the 3 options - PreSynch, Double OvSynch, and G6G, are 25, 16, and 8 days, respectively. Because the presynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
+                "default": 50,
+                "minimum": 0
+              },
+              "ovsynch_program": {
                 "type": "string",
-                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "description": "The OvSynch program to be used for cows in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|None)$",
+                "default": "OvSynch 56"
+              },
+              "ovsynch_program_start_day": {
+                "type": "number",
+                "description": "When set properly in the TAI protocol, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. When ED-TAI protocol is used and no estrus detected between the end of the voluntary waiting period and this OvSynch program start day, then the OvSynch program will start on this day. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
+                "minimum": 0,
+                "default": 70
+              },
+              "ovsynch_program_conception_rate": {
+                "type": "number",
+                "description": "The conception rate for the OvSynch program used in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "resynch_program": {
+                "type": "string",
+                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None. If PGFatPD is chosen, the values for estrus detection rate and conception rate to that detected estrus following PGF are determined by estrus_detection_rate and ED_conception_rate. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the ovsynch_program_conception_rate.",
                 "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
-              },
-              "repro_sub_protocol": {
-                "type": "string",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "repro_sub_properties": {
-                "type": "object",
-                "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "tai_program_start_day": {
-                  "type": "number",
-                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
-                  "minimum": 0,
-                  "default": 70
-                }
-              }
-            },
-            "cow_repro_programs": {
-              "type": "object",
-              "description": "Cow Reproduction Protocols",
-              "estrus_detection_rate": {
-                "type": "number",
-                "description": "Estrus Detection Rate (percent) -- The percentage of total animals in estrus that are detected in the ED (Estrus Detection) protocol",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "estrus_service_rate": {
-                "type": "number",
-                "description": "Estrus Service Rate (percent) -- The percentage of animals detected in estrus that then would be serviced in the ED (Estrus Detection) protocol",
-                "default": 1,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ed_conception_rate": {
-                "type": "number",
-                "description": "ED Conception Rate (percent) -- The percentage of serviced animals that become pregnant in the ED (Estrus Detection) protocol ",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "cow_presynch_protocol": {
-                "type": "string",
-                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
-                "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|PreSynch|G6G)$"
-              },
-              "cow_TAI_protocol": {
-                "type": "string",
-                "description": "Cow TAI (Timed Artificial Insemination) Protocol (select one) -- The timed AI (Timed Artificial Insemination) protocol for cows",
-                "default": "OvSynch 56",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "ovsynch56_conception_rate": {
-                "type": "number",
-                "description": "OvSynch56 Conception Rate (percent) -- The conception rate for cows in the OvSynch56 (pre-breeding GnRH shot given 56hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ovsynch48_conception_rate": {
-                "type": "number",
-                "description": "OvSynch48 Conception Rate (percent) -- The conception rate for cows in the OvSynch 48 (pre-breeding GnRH shot given 48hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch72_conception_rate": {
-                "type": "number",
-                "description": "CoSynch72 Conception Rate (percent) -- The conception rate for cows in the CoSynch 72 TAI (Timed Artificial Insemination) protocol",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch5d_conception_rate": {
-                "type": "number",
-                "description": "5d CoSynch Conception Rate (percent) -- The conception rate for cows in the 5d CoSynch TAI (Timed Artificial Insemination) protocol",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cow_resynch_protocol": {
-                "type": "string",
-                "description": "Cow Resynch Protocol (select one) -- Resynch protocol for cows before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) protocol",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
-              },
-              "tai_program_start_day": {
-                "type": "number",
-                "description": "TAI protocol start day for the Ovsynch portion of the ED-TAI protocol (day)",
-                "minimum": 0,
-                "default": 72
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
               }
             }
           },
@@ -2121,15 +2071,63 @@
         "type": "number",
         "minimum": 1000
       },
-      "108": {
+      "1": {
         "type": "number",
         "minimum": 0.0
       },
-      "107": {
+      "2": {
         "type": "number",
         "minimum": 0.0
       },
-      "110": {
+      "4": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "5": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "6": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "7": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "8": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "9": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "11": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "12": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "13": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "14": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "15": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "16": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "17": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2137,7 +2135,87 @@
         "type": "number",
         "minimum": 0.0
       },
+      "19": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "20": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "21": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "22": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "24": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "25": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "28": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "30": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "31": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "32": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "33": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "34": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "36": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "37": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "38": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "39": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "40": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "41": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "42": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "43": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2145,7 +2223,15 @@
         "type": "number",
         "minimum": 0.0
       },
-      "51": {
+      "46": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "47": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "49": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2153,27 +2239,119 @@
         "type": "number",
         "minimum": 0.0
       },
+      "51": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "52": {
         "type": "number",
         "minimum": 0.0
       },
-      "95": {
+      "53": {
         "type": "number",
         "minimum": 0.0
       },
-      "94": {
+      "54": {
         "type": "number",
         "minimum": 0.0
       },
-      "100": {
+      "55": {
         "type": "number",
         "minimum": 0.0
       },
-      "104": {
+      "56": {
         "type": "number",
         "minimum": 0.0
       },
-      "176": {
+      "58": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "59": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "60": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "61": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "62": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "63": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "64": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "65": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "66": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "67": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "72": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "76": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "77": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "78": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "79": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "80": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "81": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "82": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "83": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "87": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "88": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "89": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "90": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2181,7 +2359,319 @@
         "type": "number",
         "minimum": 0.0
       },
-      "301": {
+      "92": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "93": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "96": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "97": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "98": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "99": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "102": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "103": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "105": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "106": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "109": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "111": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "112": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "114": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "115": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "118": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "119": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "120": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "121": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "123": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "124": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "125": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "129": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "135": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "144": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "153": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "163": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "164": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "165": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "166": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "167": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "169": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "170": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "171": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "172": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "181": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "182": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "183": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "184": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "187": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "193": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "194": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "195": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "197": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "198": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "200": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "201": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "202": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "209": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "210": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "211": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "229": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "230": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "231": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "232": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "233": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "234": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "235": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "236": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "237": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "238": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "239": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "240": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "241": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "242": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "243": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "244": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "245": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "246": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "247": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "248": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "251": {
         "type": "number",
         "minimum": 0.0
       },
