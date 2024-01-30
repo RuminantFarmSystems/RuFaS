@@ -4,12 +4,27 @@ from typing import List, Optional
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based upon the 'Nitrogen Uptake" section (5:2.3.1) of of the SWAT model documentation
-"""
-
 
 class NitrogenIncorporation:
+    """
+    Manages nitrogen incorporation in crops.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        An instance of `CropData` containing crop specifications and attributes.
+        Defaults to a new instance of `CropData` if not provided.
+
+    Attributes
+    ----------
+    data : CropData
+        Reference to the provided `CropData` instance or a new default instance.
+
+    References
+    ----------
+    'Nitrogen Uptake' section (5:2.3.1) of the SWAT model.
+
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
