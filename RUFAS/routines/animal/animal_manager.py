@@ -1625,14 +1625,11 @@ class AnimalManager:
 
             self._record_animal_counts()
             self._record_culling_stats()
-            if self.simulation_day >= 365 and self.simulation_day % 100 == 0:
+            if time.is_last_day_of_simulation:
                 self._record_animal_events(self.cows)
                 self._record_animal_events(self.heiferIIs)
                 self._record_heiferIIs_conception_rate()
                 self._record_cows_conception_rate()
-
-            if time.is_last_day_of_simulation:
-                print()
 
             self.calc_p_rqmts()
             self.daily_p_update()

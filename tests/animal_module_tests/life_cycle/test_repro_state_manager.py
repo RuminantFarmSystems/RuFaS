@@ -186,6 +186,52 @@ def test_is_in_empty_state(
     assert manager.is_in_empty_state() is expected_result
 
 
+@pytest.mark.parametrize("initial_states, states_to_check, expected_result", [
+    # Test with no active states and checking an empty set
+    (None, set(), False),
+
+    # Test with no active states and checking a non-empty set
+    (None, {ReproStateEnum.PREGNANT}, False),
+
+    # Test with an active state, checking for that state
+    ({ReproStateEnum.PREGNANT}, {ReproStateEnum.PREGNANT}, True),
+
+    # Test with an active state, checking for a different state
+    ({ReproStateEnum.PREGNANT}, {ReproStateEnum.WAITING_FULL_ED_CYCLE}, False),
+
+    # Test with multiple active states, checking for one of them
+    ({ReproStateEnum.PREGNANT, ReproStateEnum.WAITING_FULL_ED_CYCLE}, {ReproStateEnum.PREGNANT}, True),
+
+    # Test with multiple active states, checking for a non-active state
+    ({ReproStateEnum.PREGNANT, ReproStateEnum.WAITING_FULL_ED_CYCLE}, {ReproStateEnum.FRESH}, False),
+
+    # Test with multiple active states, checking for multiple states including an active one
+    ({ReproStateEnum.PREGNANT, ReproStateEnum.WAITING_FULL_ED_CYCLE}, {ReproStateEnum.PREGNANT, ReproStateEnum.FRESH},
+     True),
+
+    # Test with multiple active states, checking for multiple states none of which are active
+    ({ReproStateEnum.PREGNANT, ReproStateEnum.WAITING_FULL_ED_CYCLE}, {ReproStateEnum.FRESH, ReproStateEnum.IN_OVSYNCH},
+     False),
+])
+def test_is_in_any(
+        initial_states: set[ReproStateEnum] | None,
+        states_to_check: set[ReproStateEnum],
+        expected_result: bool
+) -> None:
+    """
+    Test the is_in_any() method of the ReproStateManager class in repro_state_manager.py.
+    """
+
+    # Arrange
+    manager = ReproStateManager(initial_states=initial_states)
+
+    # Act
+    result = manager.is_in_any(states_to_check)
+
+    # Assert
+    assert result == expected_result
+
+
 @pytest.mark.parametrize("initial_states", [
     # Test with no states
     None,
