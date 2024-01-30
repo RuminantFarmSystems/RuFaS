@@ -70,9 +70,9 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def calc_ammonia_emission(
         self,
         num_animals: int,
-        barn_area: float,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
+        total_solids: float,
     ) -> Tuple[float, float]:
         """Calculates the ammonia emission from the underfloor slurry storage.
 
@@ -89,14 +89,12 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             in the treatment system after the ammonia emission is calculated, kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.ammonia_emission(
+        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=num_animals,
-            barn_area=barn_area,
-            total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-            / num_animals,
-            mass=accumulated_manure_volume
-            * ManureConstants.MANURE_DENSITY
-            / num_animals,
+            manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+            manure_volume=accumulated_manure_volume,
+            manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
+            total_solids=total_solids,
             temperature_celsius=self._get_current_day_average_temperature_celsius(),
         )
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
@@ -134,11 +132,11 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen,
         ) = self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
-            barn_area=self._current_pen.barn_area_from_pen_type,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=(
                 self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
             ),
+            total_solids=self._accumulated_output.liquid_manure_total_solids,
         )
         daily_output.storage_ammonia = ammonia_loss
         self._accumulated_output.storage_ammonia += ammonia_loss

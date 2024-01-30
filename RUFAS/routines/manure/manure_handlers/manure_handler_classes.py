@@ -128,6 +128,8 @@ class BaseManureHandler:
                 urine=pen.manure.urine,  # kg
                 temp=self._get_current_day_average_temperature_in_celsius(),
             )
+        else:
+            housing_ammonia_emission = 0.0
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
