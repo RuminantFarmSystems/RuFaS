@@ -1104,11 +1104,6 @@ def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
         pen.clear.assert_called_once()
 
 
-def test_calc_avg_nutrient_rqmts():
-    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
     pass
@@ -1121,8 +1116,6 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
 
     for pen in animal_manager_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
-
-    pass
 
 
 def test_record_pen_history():
