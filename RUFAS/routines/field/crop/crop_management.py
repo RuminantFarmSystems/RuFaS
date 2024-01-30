@@ -8,26 +8,32 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
-"""
-This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
-"""
-
 om = OutputManager()
 
 
 class CropManagement:
+    """
+    A class for managing crop operations based on crop data.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        The data class containing crop specifications and tracked attributes.
+        If not provided, default CropData will be used.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to `crop_data`, on which crop management operations will be conducted.
+
+    Notes
+    -----
+    This class is designed to handle various crop management operations using data provided by the `CropData` class.
+    It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
+
+    """
+
     def __init__(self, crop_data: Optional[CropData] = None):
-        """Create a crop management object from CropData
-
-        Parameters
-        ----------
-        crop_data: CropData
-            the data class containing crop specifications and tracked attributes
-
-        Attributes
-        ----------
-        data: a reference to crop_data, on which crop management operations will be conducted
-        """
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- Main Methods ----
@@ -73,13 +79,15 @@ class CropManagement:
 
     # ---- Sub Methods ----
     def kill(self) -> None:
-        """kills the plant, preventing it from growing, and converts all biomass to residue
+        """
+        Kills the plant, preventing it from growing further, and converts all biomass to residue.
 
-        Details:
-            Swat says that "a kill operation converts all biomass to residue"
+        Notes
+        -----
+        This operation is based on the SWAT model's guidelines, where a kill operation converts all biomass of
+        the plant to residue. It is typically executed after a harvest (when specified) or at the end of the
+        growing season for annual plants.
 
-            A kill operation is executed after a harvest (when specified), or at the end of the growing season for
-            annual plants.
         """
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
@@ -87,14 +95,18 @@ class CropManagement:
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
     def determine_harvest_index(self):
-        """sets the crop's harvest index
+        """
+        Sets the crop's harvest index based on various conditions.
 
-        SWAT References: 5:2.4, 5:3.3,
+        Notes
+        -----
+        If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise,
+        the harvest index is calculated based on the crop's accumulated heat fraction and the crop-specific optimal
+        harvest index. The method also adjusts the harvest index based on the crop's water deficiency.
 
-        Details:
-            If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise,
-            the harvest index is calculated from the crop's accumulated heat fraction, the crop-specific optimal
-            harvest index. It also adjusts the harvest index based on the crop's water deficiency.
+        References
+        ----------
+        SWAT 5:2.4, 5:3.3
         """
         if self.data.do_harvest_index_override:
             self.data.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
@@ -105,12 +117,15 @@ class CropManagement:
                                                                  self.data.min_harvest_index,
                                                                  self.data.water_deficiency)
 
-    def dry_down(self):
-        """adjusts crop biomass for water loss during dry-down process
+    def dry_down(self) -> None:
+        """
+        Adjusts crop biomass for water loss during the dry-down process.
 
-        Details:
-            If the crop remains uncut after maturity, this method reduces the crop's biomass based on
-            species-specific water content.
+        Notes
+        -----
+        This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
+        based on species-specific water content, simulating the natural dry-down process.
+
         """
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
         #   The dry down method is not currently used
@@ -397,38 +412,65 @@ class CropManagement:
     # ---- Helper Methods ----
     @staticmethod
     def _determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:
-        """calculates the potential harvest index for a plant on a given day
+        """
+        Calculates the potential harvest index for a plant on a given day.
 
-        Args:
-            heat_fraction: fraction of potential heat units accumulated to date
-            optimal_harvest_index: species-specific optimal harvest index for the plant at maturity under ideal
-                conditions
+        Parameters
+        ----------
+        heat_fraction : float
+            Fraction of potential heat units accumulated to date (unitless).
+        optimal_harvest_index : float
+            Species-specific optimal harvest index for the plant at maturity under ideal conditions (unitless).
 
-        SWAT Reference: 5:2.4.1
+        Returns
+        -------
+        float
+            Potential harvest index for the day (unitless).
 
-        Details: Harvest Index is the ratio of grain to total shoot dry matter
+        Notes
+        -----
+        The harvest index is the ratio of grain to total shoot dry matter. This calculation takes into
+        account the fraction of potential heat units accumulated to date and the species-specific optimal
+        harvest index for the plant at maturity under ideal conditions.
 
-        Returns: potential harvest index for the day (unitless)
+        References
+        ----------
+        SWAT documentation section 5:2.4.1
+
         """
         heat_percent = 100 * heat_fraction
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
     def _adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
-        """calculates the actual harvest index for a given day, adjusted for water deficiency
+        """
+        Calculates the actual harvest index for a given day, adjusted for water deficiency.
 
-        Args:
-            min_harvest_index: harvest index in drought conditions; minimum possible harvest index for the plant,
-                (unitless, must be positive)
-            harvest_index: potential harvest index for the day, (unitless, must be greater than min_harvest_index)
-            water_deficiency: water deficiency factor for the plant (unitless)
+        Parameters
+        ----------
+        min_harvest_index : float
+            Harvest index in drought conditions; minimum possible harvest index for the plant. Must be positive and
+            unitless.
+        harvest_index : float
+            Potential harvest index for the day. Must be greater than min_harvest_index and unitless.
+        water_deficiency : float
+            Water deficiency factor for the plant (unitless).
 
-        Details: values of min_harvest_index and harvest_index are input below their bounds, they are updated to
-        equal their lower bounds.
+        Returns
+        -------
+        float
+            Actual harvest index for the day, adjusted for water deficiency (unitless).
 
-        SWAT Reference: 5:3.3.1
+        Notes
+        -----
+        The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
+        index for the day, and the water deficiency factor of the plant. If values of min_harvest_index and
+        harvest_index are input below their bounds, they are updated to equal their lower bounds.
 
-        Returns: actual harvest index, adjusted for water deficiency (unitless)
+        References
+        ----------
+        SWAT 5:3.3.1
+
         """
         harvest_index = max(harvest_index, 0)
         harvest_index = max(harvest_index, min_harvest_index)
@@ -439,16 +481,30 @@ class CropManagement:
 
     @staticmethod
     def determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:
-        """Calculates maximum crop yield at harvest (in ideal conditions), when harvest index is > 1.
+        """
+        Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
+        greater than 1.
 
-        SWAT Reference: 5:2.4.3
+        Parameters
+        ----------
+        biomass : float
+            Total plant biomass, measured in kilograms (kg).
+        harvest_index : float
+            Harvest index for a given day, indicating the ratio of grain to total shoot dry matter.
 
-        Args:
-            biomass: total plant biomass  (kg)
-            harvest_index: harvest index for a given day
+        Returns
+        -------
+        float
+            Crop yield, measured in kilograms per hectare (kg/ha).
 
-        Details: Yield is calculated as a proportion of above ground biomass
+        Notes
+        -----
+        The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's
+        guidelines for crop yield calculation.
 
-        Returns: crop yield (kg/ha)
+        References
+        ----------
+        SWAT 5:2.4.3
+
         """
         return biomass * (1 - (1 / (1 + harvest_index)))
