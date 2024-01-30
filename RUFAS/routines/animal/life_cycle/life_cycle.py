@@ -126,10 +126,13 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.dry_cows_daily_milk_production = 0.0
         self.herd_milk_fat_kg = 0.0
         self.herd_milk_fat_percent = 0.0
+        self.dry_cows_milk_fat_kg = 0.0
         self.herd_milk_protein_kg = 0.0
         self.herd_milk_protein_percent = 0.0
+        self.dry_cows_milk_protein_kg = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -324,12 +327,15 @@ class LifeCycleManager:
         self.daily_milk_production = sum(
             cow.estimated_daily_milk_produced for cow in cows
         )
-        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows)
-        self.herd_milk_fat_percent = self.herd_milk_fat_kg / self.daily_milk_production
-        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows)
-        self.herd_milk_protein_percent = (
-            self.herd_milk_protein_kg / self.daily_milk_production
+        self.dry_cows_daily_milk_production = sum(
+            cow.estimated_daily_milk_produced for cow in cows if not cow.milking
         )
+        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
+        self.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
+        self.dry_cows_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if not cow.milking)
+        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
+        self.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
+        self.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
 
         return (
             animals_added,
