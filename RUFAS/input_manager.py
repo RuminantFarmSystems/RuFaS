@@ -48,6 +48,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
+        self._extract_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -76,6 +77,15 @@ class InputManager:
                 om.add_log("load_metadata_success", f"Successfully loaded metadata from {metadata_path}", info_map)
         except Exception as e:
             raise e
+
+    def _extract_properties(self) -> None:
+        try:
+            properties_path = self.__metadata["files"]["properties"]["path"]
+            self.__metadata["properties"] = self._load_data_from_json(properties_path)
+        except Exception as e:
+            raise Exception(f"Could not load properties. Details: {e}")
+        self.__properties_used = self.__metadata["files"]["properties"]
+        del self.__metadata["files"]["properties"]
 
     def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
         """
