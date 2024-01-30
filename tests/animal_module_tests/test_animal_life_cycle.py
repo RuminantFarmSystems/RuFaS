@@ -1498,7 +1498,6 @@ def test_init_calf(mocker: MockerFixture, args: dict) -> None:
                  new_callable=mocker.PropertyMock, return_value=animal_config)
     calf = Calf(args)
 
-    print(calf.birth_weight)
     assert calf.birth_weight == 2.0
     assert calf.animal_intake == 0
     assert calf.DBW == 0
