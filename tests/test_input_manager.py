@@ -71,6 +71,17 @@ def test_load_properties_success(mock_input_manager: InputManager, mocker: Mocke
         assert add_log.call_count == 2
 
 
+def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling FileNotFoundError in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=False)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/missing_properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(FileNotFoundError):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
+
+
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
