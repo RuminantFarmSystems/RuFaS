@@ -1014,7 +1014,7 @@ class Cow(HeiferIII):
 
         if self._should_set_up_hormone_delivery_for_ovsynch():
             self._set_up_hormone_schedule('cows', self.get_ovsynch_program(), self.days_born)
-            self._TAI_conception_rate = self.get_ovsynch_program_tai_conception_rate()
+            self._TAI_conception_rate = self.get_ovsynch_program_conception_rate()
             self.log_event(self.days_born, sim_day,
                            f'{const.OVSYNCH_PERIOD_START_NOTE}: {self.get_ovsynch_program()}')
 
@@ -1528,7 +1528,7 @@ class Cow(HeiferIII):
         self._set_up_hormone_schedule('cows',
                                       self.get_ovsynch_program(),
                                       hormone_schedule_start_day)
-        self._TAI_conception_rate = self.get_ovsynch_program_tai_conception_rate()
+        self._TAI_conception_rate = self.get_ovsynch_program_conception_rate()
         self.log_event(self.days_born, sim_day,
                        f'{const.SETTING_UP_OVSYNCH_PROGRAM_IN_ADVANCE_NOTE}: {self.get_ovsynch_program()}')
 
@@ -1553,7 +1553,8 @@ class Cow(HeiferIII):
         self._repro_state_manager.exit(ReproStateEnum.IN_OVSYNCH)
         self._hormone_schedule = {}
         self.log_event(self.days_born, sim_day,
-                       f'{const.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}: {self.get_ovsynch_program()}')
+                       f'{const.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}:'
+                       f' {self.get_ovsynch_program()}')
 
     def _set_repro_program(self, sim_day: int, repro_program: str) -> None:
         """
@@ -1853,7 +1854,7 @@ class Cow(HeiferIII):
 
         return im.get_data('animal.animal_config.farm_level.repro.cows.resynch_program')
 
-    def get_ovsynch_program_tai_conception_rate(self) -> float:
+    def get_ovsynch_program_conception_rate(self) -> float:
         """
         Get the conception rate for OvSynch programs used in the TAI and ED-TAI protocols.
 
