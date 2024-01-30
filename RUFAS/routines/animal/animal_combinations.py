@@ -9,5 +9,4 @@ class AnimalCombination(Enum):
     GROWING = 1  # heiferIs, heiferIIs
     CLOSE_UP = 2  # heiferIIIs, dry cows
     LAC_COW = 3  # lactating cows
-
     GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
