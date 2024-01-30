@@ -8,7 +8,27 @@ from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
 class PlantCategory(Enum):
-    """Enum of all plant types supported by RuFaS. Listed for supported plant types in SWAT Appendix A, table A-1"""
+    """
+    Enumeration of all plant types supported by RuFaS.
+
+    Attributes
+    ----------
+    WARM_ANNUAL_LEGUME : str
+        Represents warm climate annual legumes.
+    COOL_ANNUAL_LEGUME : str
+        Represents cool climate annual legumes.
+    PERENNIAL_LEGUME : str
+        Represents perennial legumes.
+    WARM_ANNUAL : str
+        Represents warm climate annual non-legume plants.
+    COOL_ANNUAL : str
+        Represents cool climate annual non-legume plants.
+    PERENNIAL : str
+        Represents perennial non-legume plants.
+    TREE : str
+        Represents tree-type plants.
+
+    """
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
@@ -26,409 +46,527 @@ DEFAULT_DRY_MATTER_DIGESTIBILITY: float = 40.0
 @dataclass(kw_only=True)
 class CropData:
     """
-    Data class containing crop variables.
+    Data class containing crop variables based on SWAT database.
 
-    Notes
-    -----
-    The kw_only=True argument of the @dataclass decorator specifies that this class' attributes can only be
-    initialized with values other than defaults by explicitly including the keyword (i.e, positional arguments are
-    disabled).
-    For example CropData() will initialize with the default light_extinction value (0.65),
-    CropData(light_extinction=0.7) will initialize with the vallue set to 0.7, but CropData(0.65) will not work.
-    The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
-    but will have its values set to different defaults.
-
-    This "Generic" crop uses the values for Grain Sorghum.
-
-    The species child classes (located in the directory `RUFAS/routines/field/crop/crop_configurations` provide default
-    configuration for the supported CropSpecies. Only values that differ from the default CropData need to be declared
-    by default in these species classes.
-
-    Users should be able also be able to modify specific variables by including them in the signature when calling
-    the species classes.
-
-    Attribute values are taken from the SWAT database: https://swat.tamu.edu/media/69419/Appendix-A.pdf
-    This "database" is actually a PDF with tables for broad groupings of paramters. Therefore, the
-    attributes in this class are grouped in line with those tables, for ease of entering the data.
+    Attributes
+    ----------
+    species : Optional[str]
+        The species of the crop.
+    name : Optional[str]
+        The name of this specific crop instance.
+    id : Optional[Any]
+        The unique identifier for this crop instance.
+    plant_code : Optional[str]
+        4-letter plant code (used by SWAT).
+    scientific_name : Optional[str]
+        Taxonomic name of the plant.
+    plant_category : Optional[PlantCategory]
+        Classification of the plant (Reference SWAT crop.dat file, IDC variable).
+    is_perennial : Optional[bool]
+        Indicates if this plant is perennial.
+    is_nitrogen_fixer : bool
+        Indicates if the plant is a nitrogen fixer.
+    priority : int
+        Crop's priority level for shared resources in a field with multiple crops.
+    field_proportion : float
+        Proportion of the field occupied by this crop.
+    is_alive : bool
+        Indicates if the crop is currently alive in the field.
+    crop_category : CropCategory
+        Broad category into which this crop type falls.
+    crop_type : CropType
+        Sub type of this crop.
+    storage_type : StorageType
+        Method of storage for this crop when harvested.
+    planting_year : int
+        Year of planting for this crop.
+    planting_day : int
+        Julian day of planting for this crop.
+    next_harvest_year : int
+        Year for the next harvest.
+    next_harvest_day : int
+        Julian day for the next harvest.
+    use_heat_scheduling : bool
+        If heat unit scheduling is used for harvesting.
+    harvest_heat_fraction : float
+        Fraction of potential heat units for optimal growth stage for harvest.
+    is_harvest_day : bool
+        If today is the harvest day for this plant.
+    next_harvest_operation : HarvestOperation
+        Specific harvest operation to be executed next.
+    minimum_temperature : float
+        Minimum temperature for plant growth (Celsius).
+    optimal_temperature : float
+        Ideal temperature for maximum plant growth (Celsius).
+    max_leaf_area_index : float
+        Maximum leaf area index for the plant (unitless).
+    first_heat_fraction_point : float
+        Fraction of growing season for the first point on leaf development curve (unitless).
+    first_leaf_fraction_point : float
+        Fraction of max leaf area index at first point on leaf development curve (unitless).
+    second_heat_fraction_point : float
+        Fraction of growing season for the second point on leaf development curve (unitless).
+    second_leaf_fraction_point : float
+        Fraction of max leaf area index at second point on leaf development curve (unitless).
+    senescent_heat_fraction : float
+        Fraction of potential heat units for plant senescence (unitless).
+    light_use_efficiency : float
+        Light use efficiency of the plant (dg/MJ).
+    minimum_cover_management_factor : float
+        Minimum cover and management factor for water erosion (unitless).
+    emergence_nitrogen_fraction : float
+        Nitrogen fraction of biomass at emergence (unitless).
+    half_mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at half-maturity (unitless).
+    mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at maturity (unitless).
+    emergence_phosphorus_fraction : float
+        Phosphorus fraction of biomass at emergence (unitless).
+    half_mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at half-maturity (unitless).
+    mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at maturity (unitless).
+    optimal_harvest_index : float
+        Optimal harvest index under ideal growth conditions (unitless).
+    min_harvest_index : float
+        Minimum harvest index under drought conditions (unitless).
+    yield_nitrogen_fraction : Optional[float]
+        Fraction of nitrogen in yield (unitless).
+    yield_phosphorus_fraction : Optional[float]
+        Fraction of phosphorus in yield (unitless).
+    light_extinction : float
+        Light extinction coefficient (unitless).
+    leaf_area_index : float
+        Leaf area index of the plant (unitless).
+    biomass : float
+        Total plant biomass (kg/ha).
+    growth_factor : float
+        Growth factor multiplier for the plant (unitless).
+    root_fraction : float
+        Proportion of biomass in roots (unitless).
+    usable_light : Optional[float]
+        Solar radiation captured for photosynthesis (MJ/m^2).
+    biomass_growth_max : Optional[float]
+        Upper limit of biomass accumulation for the day (kg/ha).
+    biomass_growth : Optional[float]
+        Biomass accumulated during the day (kg/ha).
+    previous_biomass : Optional[float]
+        Biomass accumulated on the previous day (kg/ha).
+    above_ground_biomass : float
+        Above ground plant biomass excluding roots (kg/ha).
+    root_biomass : Optional[float]
+        Biomass stored in roots (kg/ha).
+    nitrogen : float
+        Nitrogen stored in plant biomass (kg/ha).
+    optimal_nitrogen : float
+        Optimal amount of nitrogen for current growth stage (kg/ha).
+    phosphorus : float
+        Phosphorus stored in plant biomass (kg/ha).
+    optimal_phosphorus : float
+        Optimal amount of phosphorus for current growth stage (kg/ha).
+    water_stress : float
+        Water stress for the day (unitless).
+    temp_stress : Optional[float]
+        Temperature stress for the day (unitless).
+    nitrogen_stress : Optional[float]
+        Nitrogen stress for the day (unitless).
+    phosphorus_stress : Optional[float]
+        Phosphorus stress for the day (unitless).
+    maximum_temperature : float
+        Maximum temperature for plant growth (Celsius).
+    potential_heat_units : float
+        Total heat units required for maturity (unitless).
+    accumulated_heat_units : float
+        Heat units accumulated to date (unitless).
+    is_growing : bool
+        If the crop is currently growing.
+    is_dormant : bool
+        If the crop is currently dormant.
+    use_heat_unit_temperature : bool
+        If alternative heat unit method is used.
+    new_heat_units : Optional[float]
+        Heat units accumulated on the current day (Celsius*).
+    minimum_heat_unit_temperature : Optional[float]
+        Minimum temperature for heat unit calculations (Celsius).
+    maximum_heat_unit_temperature : Optional[float]
+        Maximum temperature for heat unit calculations (Celsius).
+    heat_unit_temperature : Optional[float]
+        Heat unit temperature for alternative method (Celsius).
+    max_canopy_height : float
+        Maximum canopy height for the plant (m).
+    _lai_shapes : Optional[float]
+        Shape coefficients for calculating leaf area index (unitless).
+    optimal_leaf_area_fraction : Optional[float]
+        Fraction of max leaf area index for current heat fraction (unitless).
+    canopy_height : Optional[float]
+        Current height of the plant (m).
+    leaf_area_added : Optional[float]
+        Leaf area index change during the day (unitless).
+    optimal_leaf_area_change : Optional[float]
+        Leaf area index added under ideal conditions (unitless).
+    previous_leaf_area_index : Optional[float]
+        Leaf area index on the previous day (unitless).
+    previous_optimal_leaf_area_fraction : Optional[float]
+        Optimal leaf area fraction on the previous day (unitless).
+    half_mature_heat_fraction : float
+        Fraction of potential heat units for half maturity (unitless).
+    mature_heat_fraction : float
+        Fraction of potential heat units for maturity (unitless).
+    near_mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass near maturity (unitless).
+    nitrogen_distro_param : float
+        Nitrogen uptake distribution parameter (unitless).
+    root_depth : float
+        Current depth of plant roots in soil (mm).
+    nitrogen_shapes : Optional[List[float]]
+        Shape coefficients for nitrogen uptake equations (unitless).
+    previous_nitrogen : Optional[float]
+        Nitrogen in biomass on the previous day (kg/ha).
+    optimal_nitrogen_fraction : Optional[float]
+        Optimal nitrogen proportion in biomass for current stage (unitless).
+    potential_nitrogen_uptake : Optional[float]
+        Potential nitrogen uptake under ideal conditions (kg/ha).
+    total_soil_layers : Optional[int]
+        Total number of layers in the soil profile (unitless).
+    accessible_soil_layers : Optional[int]
+        Number of soil layers accessible to plant roots (unitless).
+    accessible_depths : Optional[List[float]]
+        Soil layer boundaries accessible to plant (mm).
+    inaccessible_soil_layers : Optional[int]
+        Number of soil layers inaccessible to plant roots (unitless).
+    layer_nitrogen_potentials : Optional[float]
+        Potential nitrogen uptake from each soil layer (kg/ha).
+    unmet_nitrogen_demands : Optional[float]
+        Unmet nitrogen demands by overlaying soil layers (kg/ha).
+    nitrogen_requests : Optional[float]
+        Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]]
+        Actual nitrogen uptake from each soil layer (kg/ha).
+    total_nitrogen_uptake : Optional[float]
+        Total nitrogen uptake by the plant (kg/ha).
+    fixed_nitrogen : Optional[float]
+        Total nitrogen fixed by the plant (kg/ha).
+    nitrate_factor : Optional[float]
+        Soil nitrate factor (unitless).
+    fixation_stage_factor : Optional[float]
+        Growth stage factor for nitrogen-fixing symbiotes
+    near_mature_phosphorus_fraction : float, default 0.3
+        Expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless).
+    phosphorus_distro_param : float, default 10
+        Phosphorus uptake distribution parameter (unitless).
+    phosphorus_shapes : Optional[List[float]], default None
+        First and second shape coefficients for the nitrogen uptake equations (unitless).
+    previous_phosphorus : Optional[float], default None
+        Phosphorus value on the previous day (kg/ha).
+    total_phosphorus_uptake : Optional[float], default None
+        Total amount of phosphorus taken up by the plant (kg/ha).
+    potential_phosphorus_uptake : Optional[float], default None
+        Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
+    actual_phosphorus_uptakes : Optional[List[float]], default None
+        Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
+    max_root_depth : float, default 2000
+        Maximum depth of roots in the soil (mm).
+    cumulative_evaporation : float, default 0.0
+        Total water lost to evaporation by the plant during the growing season (mm).
+    cumulative_transpiration : float, default 0.0
+        Total water lost to transpiration by the plant during the growing season (mm).
+    cumulative_evapotranspiration : float, default 0.0
+        Total water lost to evapotranspiration by the plant during the growing season (mm).
+    cumulative_potential_evapotranspiration : float, default 0.0
+        Total expected maximum water loss by the plant during the growing season (mm).
+    water_deficiency : Optional[float], default None
+        Water deficiency factor for the plant (unitless).
+    max_transpiration : Optional[float], default None
+        Maximum transpiration on a given day (mm).
+    evapotranspiration_weighting_coefficient : float, default 1
+        Plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive. Used in SWAT
+        equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)
+    canopy_water : float, default 0
+        Amount of water currently held in the canopy (mm).
+    max_canopy_water_capacity : float, default 0.8
+        Maximum amount of water that can be trapped in the canopy on a given day when fully developed (mm).
+        References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
+        Note: this default is super arbitrary. It comes from the paper:
+            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated
+            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western
+            UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
+            which cites the following paper that I could not find:
+           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
+            Scientia Agricultura Sinica, 39(9), 1859–1864.'
+    water_distro_parameter : float, default 10
+        Water-use distribution parameter governing water-uptake from the soil (unitless).
+    potential_water_uptakes : Optional[List[float]], default None
+        The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
+    water_compensation_factor : float, default 0.01
+        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+        can be drawn from deeper layers.
+    unmet_water_demands : Optional[List[float]], default None
+        Cumulative water demands not met by all previous layers (mm).
+    actual_water_uptakes : Optional[List[float]], default None
+        The actual amount of water to be removed from the soil (mm).
+    water_uptake : float, default 0.0
+        Total amount of water the plant took from the soil on the current day (mm).
+    cumulative_water_uptake : float, default 0.0
+        Cumulative sum of water taken up by the plant over the course of its lifetime (mm).
+    harvest_efficiency : float, default 1.0
+        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
+        (unitless; [0, 1]).
+    dry_matter_percentage : float, default 85.689
+        Percentage of fresh yield that is dry matter (unitless). This value is the default for Sorghum harvested as a
+        grain.
+    lignin_dry_matter_percentage : float, default 1.518
+        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
+        grain.
+    crude_protein_percent : float, default 12.481
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen : float, default 2.518
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch : float, default 72.586
+        Percentage of dry matter mass that is starch (unitless).
+    adf : float, default 3.934
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf : float, default 6.134
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar : float, default 2.235
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash : float, default 2.496
+        Percentage of dry matter mass that is ash (unitless).
+    dry_down_fraction : float, default 0.2
+        Proportion of plant biomass that is lost to dry-down (unitless; [0, 1]).
+    optimal_phosphorus_fraction : float, default 0.073
+        Optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless).
+    user_harvest_index : Optional[float], default None
+        A user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered.
+    potential_harvest_index : Optional[float], default None
+        Potential harvest index for a given day (unitless).
+    harvest_index : Optional[float], default None
+        Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+        (unitless).
+    cut_biomass : Optional[float], default None
+        Total amount of the desired crop product (kg/ha).
+    wet_yield_collected : Optional[float], default None
+        Amount of the desired crop product to be removed from the field (kg/ha).
+    dry_matter_yield_collected : Optional[float], default None
+        Dry matter mass collected at harvest (kg/ha).
+    yield_residue : Optional[float], default None
+        Amount of dry matter residue created; unharvested yield (kg/ha).
+    yield_nitrogen : Optional[float], default None
+        Nitrogen contained in the harvested yield (kg/ha).
+    yield_phosphorus : Optional[float], default None
+        Phosphorus contained in the harvested yield (kg/ha).
+    residue_nitrogen : Optional[float], default None
+        Amount of nitrogen in the residue from this plant (kg/ha).
+    residue_phosphorus : Optional[float], default None
+        Amount of phosphorus in the residue from this plant (kg/ha).
+    dormancy_loss_fraction : Optional[float], default None
+        Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
+        goes dormant. Default 0.1 for perennials, 0.3 for trees.
+        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description
+    minimum_lai_during_dormancy : Optional[float], default 0.75
+        Minimum leaf area index for plants (perennials and trees only).
+        Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+        now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
+        no information about how this value can be measured or calculated.
 
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
     """
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
-    """the species of the crop"""
     name: Optional[str] = "default generic annual crop"
-    """the name of this specific crop instance"""
     id: Optional[Any] = None
-    """the unique identifier for this crop instance"""
     plant_code: Optional[str] = None
-    """4-letter plant code (used by SWAT)"""
     scientific_name: Optional[str] = None
-    """taxonomic name of the plant"""
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
-    """Classification of the plant (Reference SWAT crop.dat file, IDC variable"""
     is_perennial: Optional[bool] = False
-    """is this plant perennial?"""
     is_nitrogen_fixer: bool = False
-    """is the plant a nitrogen fixer?"""
     priority: int = 1
-    """this crop's priority level when accessing shared resources in a field containing multiple crops"""
     field_proportion: float = 1.0
-    """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
     is_alive: bool = True
-    """is the crop currently alive in the field?"""
 
     crop_category: CropCategory = CropCategory.SMALL_GRAIN
-    """Broad category into which this crop type falls."""
     crop_type: CropType = CropType.GRAIN
-    """Sub type of this crop."""
     storage_type: StorageType = StorageType.DRY
-    """The method of storage that will be used for this crop when harvested."""
 
     # Management variables
     planting_year: int = 0
-    """the year that this crop was planted"""
     planting_day: int = 100
-    """the (julian) day that this crop was planted"""
     next_harvest_year: int = 0
-    """the year in which this crop should be harvested next"""
     next_harvest_day: int = 250
-    """the (julian) day on which this crop should be harvested next"""
     use_heat_scheduling: bool = False
-    """Status indicating if heat unit scheduling will be used to determine harvesting instead of user-specified
-    harvest dates"""
     harvest_heat_fraction: float = 1.10
-    """the fraction of potential heat units that denotes the optimal growth stage for harvest"""
     is_harvest_day: bool = False
-    """Status indicating if today is the day on which harvest operations should occur for this plant"""
     next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST_KILL
-    """the specific harvest operation to be executed next for this plant"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
-    """minimum temperature below which plant growth cannot occur (Celsius)"""
     optimal_temperature: float = 25
-    """ideal temperature for maximum plant growth (Celsius)"""
 
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
-    """maximum leaf area index for the plant (unitless)"""
     first_heat_fraction_point: float = 0.15
-    """fraction of the growing season corresponding to the first point on the optimal leaf development
-    curve (unitless)"""
     first_leaf_fraction_point: float = 0.01
-    """fraction of max leaf area index corresponding to the first point on the optimal leaf development
-    curve (unitless)"""
     second_heat_fraction_point: float = 0.50
-    """fraction of the growing season corresponding to the second point on the optimal leaf development
-    curve (unitless)"""
     second_leaf_fraction_point: float = 0.95
-    """fraction of max leaf area index corresponding to the second point on the optimal leaf development
-        curve (unitless)"""
     senescent_heat_fraction: float = 0.9
-    """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
 
     # SWAT Table A-5
     light_use_efficiency: float = 30
-    """light use efficiency of the plant (dg/MJ)"""
     # light_use_decline_rate: float  # UNUSED (WAVP, $\Delta rue_{dcl}$)
     # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
     # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
 
     # SWAT Table A-6
     minimum_cover_management_factor: float = 0.2
-    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT
-        Reference: 4:1.1.11)
-    """
 
     # SWAT Table A-7
     emergence_nitrogen_fraction: float = 0.05
-    """expected fraction of plant biomass comprised of nitrogen for the plant at emergence (unitless)"""
     half_mature_nitrogen_fraction: float = 0.02
-    """expected fraction of plant biomass comprised of nitrogen for the plant at half-maturity (unitless)"""
     mature_nitrogen_fraction: float = 0.01
-    """expected fraction of plant biomass comprised of nitrogen for the plant at maturity (unitless)"""
     emergence_phosphorus_fraction: float = 0.005
-    """expected fraction of plant biomass comprised of phosphorus for the plant at emergence (unitless)"""
     half_mature_phosphorus_fraction: float = 0.003
-    """expected fraction of plant biomass comprised of phosphorus for the plant at half-maturity (unitless)"""
     mature_phosphorus_fraction: float = 0.002
-    """expected fraction of plant biomass comprised of phosphorus for the plant at maturity (unitless)"""
 
     # SWAT Table A-8
     optimal_harvest_index: float = 0.5
-    """expected species-specific optimal harvest index for the plant at maturity under ideal
-     growth conditions (unitless)"""
     min_harvest_index: float = 0.2
-    """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
-    allowed for the plant (unitless)"""
     yield_nitrogen_fraction: Optional[float] = 0.2
-    """crop-specific expected fraction of nitrogen in yield (unitless)"""
     yield_phosphorus_fraction: Optional[float] = 0.003
-    """crop-specific expected fraction of phosphorus in yield (unitless)"""
 
     # ---- biomass allocation
     light_extinction: float = 0.65
-    """the light extinction coefficient (unitless)"""
     leaf_area_index: float = 0.0
-    """leaf area index of the plant (unitless)"""
     biomass: float = 0
-    """total plant biomass (kg/ha)"""
     growth_factor: float = 1.0
-    """growth factor multiplier for the plant (unitless; [0, 1])"""
     root_fraction: float = 1 / 3
-    """proportion of plant biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
-    """solar radiation captured for photosynthesis during the day (MJ/m^2)"""
     biomass_growth_max: Optional[float] = None
-    """upper-limit of biomass accumulation for the day (kg/ha)"""
     biomass_growth: Optional[float] = None
-    """biomass accumulated by the plant during the day (kg/ha)"""
     previous_biomass: Optional[float] = None
-    """biomass accumulated by the plant on the previous day (kg/ha)"""
     above_ground_biomass: float = 0.1
-    """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = 0.0
-    """biomass stored in roots (kg/ha)"""
 
     # ---- growth constraints
     nitrogen: float = 35
-    """nitrogen stored in plant biomass (kg/ha)"""
     optimal_nitrogen: float = 100
-    """optimal amount of nitrogen stored in the plant for the current growth stage (kg/ha)"""
     phosphorus: float = 20
-    """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
-    """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
     water_stress: float = 0.0
-    """water stress for the day (unitless; [0, 1])"""
     temp_stress: Optional[float] = None
-    """temperature stress for the day (unitless; [0, 1])"""
     nitrogen_stress: Optional[float] = None
-    """nitrogen stress for the day (unitless; [0, 1])"""
     phosphorus_stress: Optional[float] = None
-    """phosphorus stress for the day (unitless; [0, 1])"""
 
     # ---- heat_units
     maximum_temperature: float = 38
-    """maximum temperature above which plant growth cannot occur (Celsius)"""
     potential_heat_units: float = 800
-    """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0
-    """total heat units accumulated to date (unitless)"""
     is_growing: bool = True
-    """is the crop currently growing?"""
     is_dormant: bool = False
-    """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
-    """should the alternative heat unit method be used?
-    Determines if heat unit temperature will be used for heat unit accumulation."""
     new_heat_units: Optional[float] = None
-    """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
     minimum_heat_unit_temperature: Optional[float] = None
-    """minimum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     maximum_heat_unit_temperature: Optional[float] = None
-    """maximum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     heat_unit_temperature: Optional[float] = None
-    """heat unit temperature used by alternative heat unit method (Celsius)"""
 
     # ---- leaf area index
-    max_canopy_height: float = 2.5  # m
-    """maximum canopy height for the plant (m)"""
+    max_canopy_height: float = 2.5
     _lai_shapes: Optional[float] = None
-    """shape coefficients used to calculate fraction of max leaf area index (unitless)."""
     optimal_leaf_area_fraction: Optional[float] = None
-    """fraction of the plant's maximum leaf area index corresponding to the current heat fraction (unitless)"""
     canopy_height: Optional[float] = None
-    """current height of the plant (m)"""
     leaf_area_added: Optional[float] = None
-    """leaf area index change during the day; corrected for growth constraints (unitless)"""
     optimal_leaf_area_change: Optional[float] = None
-    """leaf area index added under ideal conditions for the day; not corrected for growth constraints (unitless)"""
     previous_leaf_area_index: Optional[float] = None
-    """leaf area index on the previous day (unitless)"""
     previous_optimal_leaf_area_fraction: Optional[float] = None
-    """optimal leaf area fraction on the previous day (unitless)"""
 
     # ---- nitrogen incorporation
     half_mature_heat_fraction: float = 0.5
-    """expected fraction of potential heat units when the plant is half-way to maturity (unitless)"""
     mature_heat_fraction: float = 1.0
-    """fraction of potential heat units accumulated for the plant to date (unitless)"""
     near_mature_nitrogen_fraction: float = 0.02
-    """expected fraction of plant biomass comprised of nitrogen for the plant at near-maturity (unitless)"""
     nitrogen_distro_param: float = 10
-    """nitrogen uptake distribution parameter (unitless)"""
-    root_depth: float = 1  # arbitrary
-    """current depth of the plant roots in the soil (mm)"""
+    root_depth: float = 1
     nitrogen_shapes: Optional[List[float]] = None
-    """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_nitrogen: Optional[float] = None
-    """nitrogen stored in plant biomass on the previous day (kg/ha)"""
     optimal_nitrogen_fraction: Optional[float] = None
-    """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
     potential_nitrogen_uptake: Optional[float] = None
-    """potential nitrogen to be taken up by the plant under ideal circumstances for the current day (kg/ha)"""
     total_soil_layers: Optional[int] = None
-    """total number of layers in the soil profile (unitless)"""
     accessible_soil_layers: Optional[int] = None
-    """number of layers in the soil profile that the plant roots have access to (unitless)"""
     accessible_depths: Optional[List[float]] = None
-    """slice of soil layer boundaries to which the plant has access (mm)"""
     inaccessible_soil_layers: Optional[int] = None
-    """number of layers in the soil profile that the plant roots do not have access to (unitless)"""
     layer_nitrogen_potentials: Optional[float] = None
-    """potential nitrogen uptake from each soil layer (kg/ha)"""
     unmet_nitrogen_demands: Optional[float] = None
-    """plant nitrogen demands that remain unmet by the overlaying soil layers (kg/ha)"""
     nitrogen_requests: Optional[float] = None
-    """amount of nitrogen requested from each soil layer by the plant (kg/ha)"""
     actual_nitrogen_uptakes: Optional[List[float]] = None
-    """actual nitrogen to be taken up by the plant from each soil layer (kg/ha)"""
     total_nitrogen_uptake: Optional[float] = None
-    """total nitrogen to be taken up by the plant (kg/ha)"""
     fixed_nitrogen: Optional[float] = None
-    """total amount of nitrogen fixed by the plant (kg/ha)"""
     nitrate_factor: Optional[float] = None
-    """soil nitrate factor (unitless; [0, 1])"""
     fixation_stage_factor: Optional[float] = None
-    """growth stage factor of the nitrogen fixing symbiotes for the current plant growth stage (unitless)"""
 
     # --- phosphorus incorporation ----
     near_mature_phosphorus_fraction: float = 0.3
-    """expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless)"""
     phosphorus_distro_param: float = 10
-    """phosphorus uptake distribution parameter (unitless)"""
     phosphorus_shapes: Optional[List[float]] = None
-    """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_phosphorus: Optional[float] = None
-    """phosphorus value on the previous day (kg/ha)"""
     total_phosphorus_uptake: Optional[float] = None
-    """total amount of phosphorus taken up by the plant"""
     potential_phosphorus_uptake: Optional[float] = None
-    """potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha)"""
     actual_phosphorus_uptakes: Optional[List[float]] = None
-    """actual phosphorus to be taken up by the plant from each soil layer (kg/ha)"""
 
     # ---- root development
     max_root_depth: float = 2_000
-    """maximum depth of roots in the soil (mm)"""
 
     # ---- water dynamics
     cumulative_evaporation: float = 0.0
-    """total water lost to evaporation by the plant during the growing season (mm)"""
     cumulative_transpiration: float = 0.0
-    """total water lost to transpiration by the plant during the growing season (mm)"""
     cumulative_evapotranspiration: float = 0.0
-    """total water lost to evapotranspiration by the plant during the growing season (mm)"""
     cumulative_potential_evapotranspiration: float = 0.0
-    """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
-    """water deficiency factor for the plant (unitless)"""
     max_transpiration: Optional[float] = None
-    """maximum transpiration on a given day (mm)"""
     evapotranspiration_weighting_coefficient: float = 1
-    """plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive(?).
-        Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
     canopy_water: float = 0
-    """Amount of water currently held in the canopy (mm)"""
     max_canopy_water_capacity: float = 0.8
-    """Maximum amount of water that can be trapped in canopy on a given day when fully developed (mm).
-        References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
-        Note: this default is super arbitrary. It comes from the paper:
-            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated
-            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western
-            UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
-        which cites the following paper that I could not find:
-           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
-            Scientia Agricultura Sinica, 39(9), 1859–1864.'
-    """
 
     # ---- transpiration
     water_distro_parameter: float = 10
-    """water-use distribution parameter governing water-uptake from the soil. Defaults to 10 for all crops in SWAT
-    (unitless)."""
     potential_water_uptakes: Optional[List[float]] = None
-    """the maximum amount of water to be potentially taken up by a crop, from each soil layer (mm)"""
     water_compensation_factor: float = 0.01
-    """factor that determines the ability of a plant to draw water from deeper layers when demands are not met
-    (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
-    can be drawn from deeper layers."""
     unmet_water_demands: Optional[List[float]] = None
-    """cumulative water demands not met by all previous layers"""
     actual_water_uptakes: Optional[List[float]] = None
-    """the actual amount of water to be removed from the soil"""
     water_uptake: float = 0.0
-    """Total amount of water the plant took from the soil on the current day (mm). Note that SWAT considers the amount
-        of water taken up on any given day to be the actual amount of transpiration on that day."""
     cumulative_water_uptake: float = 0.0
-    """Cumulative sum of water taken up by the plant over the course of its lifetime (mm)."""
 
     # ---- yields
     harvest_efficiency: float = 1.0
-    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-    (unitless; [0, 1])"""
     dry_matter_percentage: float = 85.689
-    """Percentage of fresh yield that is dry matter (unitless)."""
     lignin_dry_matter_percentage: float = 1.518
-    """Percentage of dry matter yield that is lignin (unitless)."""
     crude_protein_percent: float = 12.481
-    """Percentage of dry matter mass that is dietary crude protein (unitless)."""
     non_protein_nitrogen: float = 2.518
-    """Percentage of dry matter mass that is non-protein nitrogen (unitless)."""
     starch: float = 72.586
-    """Percentage of dry matter mass that is starch (unitless)."""
     adf: float = 3.934
-    """Percentage of dry matter mass that is acid detergent fiber (unitless)."""
     ndf: float = 6.134
-    """Percentage of dry matter mass that is neutral detergent fiber (unitless)."""
     sugar: float = 2.235
-    """Percentage of dry matter mass that is labile carbohydrate (unitless)."""
     ash: float = 2.496
-    """Percentage of dry matter mass that is ash (unitless)."""
     dry_down_fraction: float = 0.2
-    """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     optimal_phosphorus_fraction: float = 0.073
-    """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
     user_harvest_index: Optional[float] = None
-    """a user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered"""
     potential_harvest_index: Optional[float] = None
-    """potential harvest index for a given day (unitless)"""
     harvest_index: Optional[float] = None
-    """harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
-    (unitless)"""
     cut_biomass: Optional[float] = None
-    """total amount of the desired crop product (kg/ha)"""
     wet_yield_collected: Optional[float] = None
-    """amount of the desired crop product to be removed from the field (kg/ha)"""
     dry_matter_yield_collected: Optional[float] = None
-    """Dry matter mass collected at harvest (kg / ha)."""
     yield_residue: Optional[float] = None
-    """Amount of dry matter residue created; unharvested yield (kg/ha)"""
     yield_nitrogen: Optional[float] = None
-    """nitrogen contained in the harvested yield (kg/ha)"""
     yield_phosphorus: Optional[float] = None
-    """phosphorus contained in the harvested yield (kg/ha)"""
     residue_nitrogen: Optional[float] = None
-    """amount of nitrogen in the residue from this plant (kg/ha)"""
     residue_phosphorus: Optional[float] = None
-    """amount of phosphorus in the residue from this plant (kg/ha)"""
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None
-    """Fraction of biomass the crop loses when it goes dormant. Default 0.1 for perennials, 0.3 for trees
-        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
     minimum_lai_during_dormancy: Optional[float] = 0.75
-    """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)
-
-    Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
-    now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
-    information about how this value can be measured or calculated.
-    """
 
     def __post_init__(self):
-        """Initialize all attributes with defaults that depend on other attributes"""
-
+        """
+        Initialize all attributes with defaults that depend on other attributes after the object has been initialized.
+        """
         # Set dormancy loss
         if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME:
             self.dormancy_loss_fraction = 0.1
@@ -460,23 +598,52 @@ class CropData:
 
     @property
     def in_growing_season(self) -> bool:
-        """Indicates if the plant is in its growing season.
+        """
+        Indicates if the plant is in its growing season.
+
+        Returns
+        -------
+        bool
+            True if the plant is in its growing season, False otherwise.
+
         """
         return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
     @property
     def do_harvest_index_override(self) -> bool:
-        """was a user-defined harvest index is given? This triggers a harvest index override"""
+        """
+        Checks if a user-defined harvest index is given, which triggers a harvest index override.
+
+        Returns
+        -------
+        bool
+            True if a user-defined harvest index is given, False otherwise.
+
+        """
         return self.user_harvest_index is not None
 
     @property
     def is_in_senescence(self) -> bool:
-        """check if the plant is in senescence"""
+        """
+        Check if the plant is in senescence.
+
+        Returns
+        -------
+        bool
+            True if the plant is in senescence, False otherwise.
+
+        """
         return self.heat_fraction > self.senescent_heat_fraction
 
     @property
     def water_canopy_storage_capacity(self) -> float:
-        """Maximum amount of water that can be held in the canopy (mm).
+        """
+        Calculate the maximum amount of water that can be held in the canopy.
+
+        Returns
+        -------
+        float
+            Maximum water storage capacity of the canopy, measured in millimeters (mm).
 
         References
         ----------
@@ -488,7 +655,12 @@ class CropData:
     @property
     def heat_fraction(self) -> float:
         """
-        Fraction of potential heat units accumulated.
+        Calculate the fraction of potential heat units accumulated by the plant.
+
+        Returns
+        -------
+        float
+            Fraction of potential heat units accumulated (unitless).
 
         References
         ----------
