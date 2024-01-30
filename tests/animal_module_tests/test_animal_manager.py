@@ -1242,9 +1242,23 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             assert animal.milk_production_reduction == 0.0
 
 
-def test_end_ration_interval():
+@pytest.mark.parametrize('simulation_day, formulation_interval, expected',
+                         [(5, 1, True),
+                          (0, 10, True),
+                          (101, 100, True),
+                          (301, 100, True),
+                          (2, 3, False),
+                          (30, 30, False)
+                          ])
+def test_end_ration_interval(simulation_day: int, formulation_interval: int,
+                             expected: bool, mocker: MockerFixture) -> None:
     """Unit test for function end_ration_interval in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.simulation_day = simulation_day
+    mock_animal_manager.formulation_interval = formulation_interval
+    actual = mock_animal_manager.end_ration_interval()
+    assert actual == expected
 
 
 def test_get_life_cycle_output():
