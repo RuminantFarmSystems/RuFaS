@@ -303,6 +303,14 @@ def animal_manager_with_mock_pens(animal_manager: AnimalManager,
     return animal_manager
 
 
+@pytest.fixture
+def cowlist():
+    cowlist = [MagicMock(),
+               MagicMock(),
+               MagicMock()]
+    return cowlist
+
+
 def test_get_animal_config():
     """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
     pass
@@ -1259,14 +1267,6 @@ def test_end_ration_interval(simulation_day: int, formulation_interval: int,
     mock_animal_manager.formulation_interval = formulation_interval
     actual = mock_animal_manager.end_ration_interval()
     assert actual == expected
-
-
-@pytest.fixture
-def cowlist():
-    cowlist = [MagicMock(),
-               MagicMock(),
-               MagicMock()]
-    return cowlist
 
 
 def test_sum_daily_milk(animal_manager, cowlist):
