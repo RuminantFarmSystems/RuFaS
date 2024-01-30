@@ -831,7 +831,7 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
                            'pen_type': 'dummy_pen_type', 'manure_handling': 'dummy_manure_handling',
-                           'manure_separator': 'dummy_manure_separator', 'manure_separator_after_digestion': 
+                           'manure_separator': 'dummy_manure_separator', 'manure_separator_after_digestion':
                            'dummy_manure_separator_after_digestion', 'manure_storage': 'dummy_manure_storage',
                            'animal_combination': 'dummy_animal_combination',
                            'max_stocking_density': 'dummy_max_stocking_density', 'id': pen_id,
