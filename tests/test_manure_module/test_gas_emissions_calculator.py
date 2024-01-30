@@ -427,7 +427,7 @@ def test_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
     hsc = 200.0
     r = sign_of_RMQ * 42.0
     patch_for_r_barn = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_barn_resistance",
+        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_resistance",
         return_value=r,
     )
     p = ManureConstants.MANURE_DENSITY
@@ -465,8 +465,8 @@ def test_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
         assert actual == 0.0
 
 
-def test_barn_resistance() -> None:
-    """Tests _barn_resistance() in calculator.py."""
+def test_ammonia_resistance() -> None:
+    """Tests _ammonia_resistance() in calculator.py."""
 
     # Arrange
     tempC = 15.0
@@ -474,7 +474,7 @@ def test_barn_resistance() -> None:
     expected = hsc * (1 - 0.027 * (20.0 - tempC))
 
     # Act
-    actual = GasEmissionsCalculator._ammonia_barn_resistance(tempC)
+    actual = GasEmissionsCalculator._ammonia_resistance(tempC, hsc)
 
     # Assert
     assert actual == expected

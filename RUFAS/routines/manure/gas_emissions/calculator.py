@@ -446,7 +446,7 @@ class GasEmissionsCalculator:
             urine: float,
             temp: float,
             pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
-            hsc=GasEmissionConstants.HOUSING_HSC,
+            housing_specific_constant=GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """
         Calculate housing ammonia emission.
@@ -592,12 +592,12 @@ class GasEmissionsCalculator:
         manure_density = ManureConstants.SLURRY_MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
         temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        ammonia_barn_resistance = cls._ammonia_barn_resistance(temp, hsc)
+        ammonia_resistance = cls._ammonia_resistance(temp, housing_specific_constant)
         manure_per_area = urine / total_barn_area  # kg/m^2
         equilibrium_coefficient = cls._equilibrium_coefficient(temperature_kelvin, pH)
         ammonia_loss = (
                                total_ammoniacal_nitrogen * seconds_per_day * manure_density
-                       ) / (ammonia_barn_resistance * manure_per_area * equilibrium_coefficient)
+                       ) / (ammonia_resistance * manure_per_area * equilibrium_coefficient)
         total_ammonia_loss = ammonia_loss * total_barn_area
         return max(0.0, total_ammonia_loss)
 
@@ -767,7 +767,7 @@ class GasEmissionsCalculator:
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
         total_manure_mass = manure_volume * manure_density
         housing_specific_constant = GasEmissionConstants.STORAGE_HSC
-        storage_area_resistance = cls._ammonia_barn_resistance(
+        storage_area_resistance = cls._ammonia_resistance(
             temp, housing_specific_constant
         )
         manure_mass_excluding_solids = total_manure_mass - total_solids
@@ -812,7 +812,7 @@ class GasEmissionsCalculator:
         pH = 7.5
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
-        r = cls._ammonia_barn_resistance(temperature_celsius, housing_specific_constant)
+        r = cls._ammonia_resistance(temperature_celsius, housing_specific_constant)
         M = mass / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._equilibrium_coefficient(tempK, pH)
         if r * M * Q > 0:
@@ -864,8 +864,8 @@ class GasEmissionsCalculator:
         )
 
     @classmethod
-    def _ammonia_barn_resistance(
-            cls, temp: float, hsc=GasEmissionConstants.HOUSING_HSC
+    def _ammonia_resistance(
+            cls, temp: float, hsc: float,
     ) -> float:
         """
         Calculate resistance of :math:`NH_3` transport to the atmosphere in a barn.
