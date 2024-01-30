@@ -1167,14 +1167,42 @@ def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> N
     assert actual == pytest.approx(expected)
 
 
-def test_calc_p_rqmts():
+def test_calc_p_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_p_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.call_p_rqmts = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.call_p_rqmts = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.calc_p_rqmts()
+    # Assert
+    mock_pen_0.call_p_rqmts.assert_called_once()
+    mock_pen_1.call_p_rqmts.assert_not_called()
 
 
-def test_daily_p_update():
+def test_daily_p_update(mocker: MagicMock) -> None:
     """Unit test for function daily_p_update in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.daily_p_update = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.daily_p_update = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.daily_p_update()
+    # Assert
+    mock_pen_0.daily_p_update.assert_called_once()
+    mock_pen_1.daily_p_update.assert_not_called()
 
 
 def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
