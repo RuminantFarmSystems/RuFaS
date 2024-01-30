@@ -1104,9 +1104,28 @@ def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
         pen.clear.assert_called_once()
 
 
-def test_calc_manure_excretion():
+def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
-    pass
+    mock_feed = MagicMock()
+    methane_model = 'methane_model_choice'
+
+    mock_pen_0 = MagicMock()
+    mock_pen_0.calc_manure = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.reset_manure = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mocked_pens = [mock_pen_0, mock_pen_1]
+
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = mocked_pens
+    # Act
+    mock_animal_manager.calc_manure_excretion(mock_feed, methane_model)
+    # Assert
+
+    mock_pen_0.calc_manure.assert_called_once_with(mock_feed, 'methane_model_choice')
+    mock_pen_1.reset_manure.assert_called_once()
 
 
 def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
