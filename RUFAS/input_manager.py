@@ -80,8 +80,24 @@ class InputManager:
             raise e
 
     def _load_properties(self) -> None:
+        """
+        Loads properties data from a specified JSON file and updates the metadata.
+
+        This method reads the properties file path from the metadata, checks if the file exists, and then loads the
+        properties into the metadata. The original properties data in the metadata is first copied to a separate
+        attribute for future reference and then removed from the metadata files section.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the properties file does not exist at the specified path.
+        json.JSONDecodeError
+            If there is an error in decoding the JSON file.
+        Exception
+            For any other unexpected errors during properties loading.
+        """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._extract_properties.__name__,
+                    "function": self._load_properties.__name__,
                     }
         try:
             properties_path = self.__metadata["files"]["properties"]["path"]
