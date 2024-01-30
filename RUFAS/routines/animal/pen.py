@@ -209,7 +209,7 @@ class Pen:
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
-        self._pen_type = pen_type
+        self.pen_type = pen_type
         self.pen_name = pen_name
 
         self.manure_handling = manure_handling

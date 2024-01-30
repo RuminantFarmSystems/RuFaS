@@ -21,7 +21,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     mock_pen.animal_combination = Pen.AnimalCombination.LAC_COW
 
     mock_pen.housing_type = expected_housing_type = "open air barn"
-    mock_pen._pen_type = expected_pen_type = "tiestall"
+    mock_pen.pen_type = expected_pen_type = "tiestall"
     mock_pen.bedding_type = expected_bedding_type = "sawdust"
 
     mock_pen.manure_handling = expected_manure_handler = "manual scraping"
@@ -73,9 +73,9 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     ],
 )
 def test_count_lactating_cows(
-    mocker: MockerFixture,
-    animal_combination: Pen.AnimalCombination,
-    expected_num_lactating_cows: int,
+        mocker: MockerFixture,
+        animal_combination: Pen.AnimalCombination,
+        expected_num_lactating_cows: int,
 ) -> None:
     """Unit test for function count_lactating_cows in file manure_manager_pen.py"""
 
@@ -93,31 +93,40 @@ def test_count_lactating_cows(
 
 
 @pytest.mark.parametrize(
-    "pen_type, has_cows, expected_area",
+    "pen_type, has_cows, expected_area, raises_error",
     [
-        ("tiestall", True, 1.2),
-        ("tiestall", False, 1.0),
-        ("bedded pack", True, 5.0),
-        ("bedded pack", False, 3.0),
-        ("freestall", True, 3.5),
-        ("freestall", False, 2.5),
-        ("dummy", True, 3.5),
-        ("dummy", False, 2.5),
+        ("freestall", True, 3.5, False),
+        ("freestall", False, 2.5, False),
+        ("tiestall", True, 1.2, False),
+        ("tiestall", False, 1.0, False),
+        ("compost bedded pack barn", True, 5.0, False),
+        ("compost bedded pack barn", False, 3.0, False),
+        ("open lot", True, 5.0, False),
+        ("open lot", False, 3.0, False),
+        ("dummy", True, None, True),
     ],
 )
 def test_barn_area_from_pen_type(
-    pen_type: str, has_cows: bool, expected_area: float, mocker: MockerFixture
-) -> None:
-    """Unit test for function barn_area_from_pen_type in file manure_manager_pen.py"""
+        pen_type: str,
+        has_cows: bool,
+        expected_area: float | None,
+        raises_error: bool,
+        mocker: MockerFixture
+):
+    """Unit test for barn_area_from_pen_type property in file manure_manager_pen.py"""
 
     # Arrange
     mocker.patch(
         "RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.__init__",
         return_value=None,
     )
-    mock_pen = ManureManagerPen(mocker.MagicMock(autospec=Pen))
+    mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
-    mock_pen.classes_in_pen = {"Cow"} if has_cows else {"Calf"}
+    mock_pen.classes_in_pen = {"Cow"} if has_cows else set()
 
-    # Assert
-    assert mock_pen.barn_area_from_pen_type == expected_area
+    # Act & Assert
+    if raises_error:
+        with pytest.raises(ValueError):
+            mock_pen.barn_area_from_pen_type
+    else:
+        assert mock_pen.barn_area_from_pen_type == expected_area

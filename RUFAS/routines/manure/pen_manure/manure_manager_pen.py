@@ -50,7 +50,7 @@ class ManureManagerPen:
         self.animal_combination: Pen.AnimalCombination = pen.animal_combination
 
         self.housing_type: str = pen.housing_type
-        self.pen_type: str = pen._pen_type
+        self.pen_type: str = pen.pen_type
         self.bedding_type: str = pen.bedding_type
 
         self.manure_handler: str = pen.manure_handling
@@ -86,25 +86,54 @@ class ManureManagerPen:
 
     @property
     def barn_area_from_pen_type(self) -> float:
-        """Calculates the barn area for this pen based on its housing type.
-
-        Returns:
-            Barn area, m^2/animal.
-
         """
+        Get the barn area based on the pen type and whether there are cows in the pen.
+
+        Notes
+        -----
+        The barn area is looked up from the following table:
+
+        +---------------------------+-------------------+-------------------+
+        | Pen Type                  | Has Cows          | No Cows           |
+        +===========================+===================+===================+
+        | Freestall                 | 3.5               | 2.5               |
+        +---------------------------+-------------------+-------------------+
+        | Tiestall                  | 1.2               | 1.0               |
+        +---------------------------+-------------------+-------------------+
+        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+        | Open Lot                  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+
+        Returns
+        -------
+        float
+            Barn area per animal (:math:`m^2/animal`).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall",
+            "compost bedded pack barn", or "open lot".
+        """
+
         BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
+        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
         tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
         bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
-        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
-        default = freestall
+        open_lot = BarnArea(has_cows=5.0, no_cows=3.0)
 
         barn_area_by_pen_type = {
-            "tiestall": tiestall,
-            "bedded pack": bedded_pack,
             "freestall": freestall,
+            "tiestall": tiestall,
+            "compost bedded pack barn": bedded_pack,
+            "open lot": open_lot,
         }
 
-        barn_area = barn_area_by_pen_type.get(self.pen_type, default)
+        if self.pen_type not in barn_area_by_pen_type:
+            raise ValueError(f"Invalid pen type: {self.pen_type}")
+
+        barn_area = barn_area_by_pen_type[self.pen_type]
 
         if "Cow" in self.classes_in_pen:
             return barn_area.has_cows
