@@ -42,43 +42,28 @@ class MetadataPaths(TypedDict):
         prefix. The second simulation will run immediately after with no extra input from the user and will
         use the ARL_metadata.json file and save its output files with the "ARL_scenario" prefix.
     """
+
     prefix: str
     path: Path
 
 
 METADATA_PATHS: List[MetadataPaths] = [
-                                       # {"prefix": "corn_alfalfa",
-                                       #  "path": Path('input/metadata/corn_alfalfa_eval_metadata.json')},
-                                       # {"prefix": "corn_grain_alfalfa",
-                                       #  "path": Path('input/metadata/corn_grain_alfalfa_eval_metadata.json')},
-                                       # {"prefix": "tall_fescue",
-                                       #  "path": Path('input/metadata/tall_fescue_eval_metadata.json')},
-                                       # {"prefix": "corn_winter_wheat",
-                                       #  "path": Path('input/metadata/corn_winter_wheat_metadata.json')},
-                                       # {"prefix": "corn_triticale",
-                                       #  "path": Path('input/metadata/corn_triticale_metadata.json')},
-                                       # {"prefix": "corn_cereal_rye",
-                                       #  "path": Path('input/metadata/corn_cereal_rye_metadata.json')},
-                                       # {"prefix": "soy_corn_grain",
-                                       #  "path": Path('input/metadata/corn_grain_soy_grain_metadata.json')},
-                                       # {"prefix": "con_corn_i",
-                                       #  "path": Path('input/metadata/con_corn_i_metadata.json')},
-                                       # {"prefix": "con_corn_ii",
-                                       #  "path": Path('input/metadata/con_corn_ii_metadata.json')},
-                                       # {"prefix": "con_corn_iii",
-                                       #  "path": Path('input/metadata/con_corn_iii_metadata.json')},
-                                       # {"prefix": "con_corn_iv",
-                                       #  "path": Path('input/metadata/con_corn_iv_metadata.json')},
-                                       # {"prefix": "con_corn_v",
-                                       #  "path": Path('input/metadata/con_corn_v_metadata.json')},
-                                       # {"prefix": "con_corn_vi",
-                                       #  "path": Path('input/metadata/con_corn_vi_metadata.json')},
-                                       {"prefix": "con_corn_vii",
-                                        "path": Path('input/metadata/con_corn_vii_metadata.json')},
-                                       # {"prefix": "con_corn_viii",
-                                       #  "path": Path('input/metadata/con_corn_viii_metadata.json')},
-                                       # {"prefix": "con_corn_ix",
-                                       #  "path": Path('input/metadata/con_corn_ix_metadata.json')},
-                                       # {"prefix": "con_corn_x",
-                                       #  "path": Path('input/metadata/con_corn_x_metadata.json')},
-                                       ]
+    # {"prefix": "corn_alfalfa", "path": Path("input/metadata/corn_alfalfa_eval_metadata.json")},
+    # {"prefix": "corn_grain_alfalfa", "path": Path("input/metadata/corn_grain_alfalfa_eval_metadata.json")},
+    # {"prefix": "tall_fescue", "path": Path("input/metadata/tall_fescue_eval_metadata.json")},
+    # {"prefix": "corn_winter_wheat", "path": Path("input/metadata/corn_winter_wheat_metadata.json")},
+    # {"prefix": "corn_triticale", "path": Path("input/metadata/corn_triticale_metadata.json")},
+    # {"prefix": "corn_cereal_rye", "path": Path("input/metadata/corn_cereal_rye_metadata.json")},
+    # {"prefix": "soy_corn_grain", "path": Path("input/metadata/corn_grain_soy_grain_metadata.json")},
+    # {"prefix": "con_corn_i", "path": Path("input/metadata/con_corn_i_metadata.json")},
+    # {"prefix": "con_corn_ii", "path": Path("input/metadata/con_corn_ii_metadata.json")},
+    # {"prefix": "con_corn_iii", "path": Path("input/metadata/con_corn_iii_metadata.json")},
+    # {"prefix": "con_corn_iv", "path": Path("input/metadata/con_corn_iv_metadata.json")},
+    # {"prefix": "con_corn_v", "path": Path("input/metadata/con_corn_v_metadata.json")},
+    # {"prefix": "con_corn_vi", "path": Path("input/metadata/con_corn_vi_metadata.json")},
+    {"prefix": "con_corn_vii", "path": Path("input/metadata/con_corn_vii_metadata.json")},
+    {"prefix": "corn_corn_7_extra", "path": Path("input/metadata/con_corn_7_extra_n_metadata.json")},
+    # {"prefix": "con_corn_viii", "path": Path("input/metadata/con_corn_viii_metadata.json")},
+    # {"prefix": "con_corn_ix", "path": Path("input/metadata/con_corn_ix_metadata.json")},
+    # {"prefix": "con_corn_x", "path": Path("input/metadata/con_corn_x_metadata.json")},
+]
