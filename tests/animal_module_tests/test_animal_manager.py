@@ -1261,16 +1261,6 @@ def test_end_ration_interval(simulation_day: int, formulation_interval: int,
     assert actual == expected
 
 
-def test_get_life_cycle_output():
-    """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_get_initialize_db_summary():
-    """Unit test for function get_initialize_db_summary in file routines/animal/animal_manager.py"""
-    pass
-
-
 @pytest.fixture
 def cowlist():
     cowlist = [MagicMock(),
