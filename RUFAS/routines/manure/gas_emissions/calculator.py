@@ -446,7 +446,7 @@ class GasEmissionsCalculator:
             urine: float,
             temp: float,
             pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
-            hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+            hsc=GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """
         Calculate housing ammonia emission.
@@ -551,7 +551,7 @@ class GasEmissionsCalculator:
                 :attr:`DEFAULT_PH_FOR_HOUSING_AMMONIA` in :class:`GasEmissionConstants`.
         hsc : float, optional
             Housing-specific constant (unitless). Default is set to 260 s/m. This value is listed as
-                :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in :class:`GasEmissionConstants`.
+                :attr:`HOUSING_HSC` in :class:`GasEmissionConstants`.
 
         Returns
         -------
@@ -766,7 +766,7 @@ class GasEmissionsCalculator:
         total_storage_area = num_animals * storage_area_per_animal
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
         total_manure_mass = manure_volume * manure_density
-        housing_specific_constant = GasEmissionConstants.LIQUID_MANURE_HSC
+        housing_specific_constant = GasEmissionConstants.STORAGE_HSC
         storage_area_resistance = cls._ammonia_barn_resistance(
             temp, housing_specific_constant
         )
@@ -785,51 +785,6 @@ class GasEmissionsCalculator:
         return max(0.0, total_ammonia_loss)
 
     @classmethod
-    def _housing_specific_constant(
-            cls, manure_mass: float, total_solids: float
-    ) -> float:
-        """
-        Calculate housing specific constant.
-
-        The housing-specific constant represents the resistance of ammonia transport to the atmosphere,
-        and its value depends on the type of manure being considered. The different types of manure
-        include solid and semi-solid manure, slurry manure, and liquid manure.
-
-        Parameters
-        ----------
-        manure_mass : float
-            Total manure mass (kg). Must be greater than or equal to 0.
-        total_solids : float
-            Total solids in manure (kg). Must be greater than or equal to 0.
-
-        Returns
-        -------
-        float
-            Housing specific constant, s/m.
-
-        Raises
-        ------
-        ValueError
-            If manure_mass or total_solids are less than 0.
-
-        """
-        if manure_mass < 0.0:
-            raise ValueError("Manure mass must be greater than or equal to 0.")
-        elif total_solids < 0.0:
-            raise ValueError("Total solids must be greater than or equal to 0.")
-        elif manure_mass == 0.0 or total_solids == 0.0:
-            return GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC
-
-        dry_matter = total_solids / manure_mass
-
-        if dry_matter >= GasEmissionConstants.SOLID_MANURE_THRESHOLD:
-            return GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC
-        elif dry_matter >= GasEmissionConstants.SLURRY_MANURE_THRESHOLD:
-            return GasEmissionConstants.SLURRY_MANURE_HSC
-        else:
-            return GasEmissionConstants.LIQUID_MANURE_HSC
-
-    @classmethod
     def ammonia_emission(
             cls,
             num_animals: int,
@@ -837,7 +792,7 @@ class GasEmissionsCalculator:
             total_ammoniacal_nitrogen: float,
             mass: float,
             temperature_celsius: float,
-            housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+            housing_specific_constant=GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """Calculates NH3 storage emissions.
 
@@ -878,7 +833,7 @@ class GasEmissionsCalculator:
             manure_total_ammoniacal_nitrogen: float,
             manure_mass: float,  # TODO: Decide to use volume or mass
             temperature_celsius: float,
-            housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+            housing_specific_constant=GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """Calculates ammonia storage emissions for manure treatments.
 
@@ -896,7 +851,7 @@ class GasEmissionsCalculator:
             Current temperature, C.
         housing_specific_constant : float, optional
             Housing specific constant, s/m.
-            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
+            The default is GasEmissionConstants.HOUSING_HSC.
 
         """
         return cls.ammonia_emission(
@@ -910,7 +865,7 @@ class GasEmissionsCalculator:
 
     @classmethod
     def _ammonia_barn_resistance(
-            cls, temp: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT
+            cls, temp: float, hsc=GasEmissionConstants.HOUSING_HSC
     ) -> float:
         """
         Calculate resistance of :math:`NH_3` transport to the atmosphere in a barn.
@@ -937,7 +892,7 @@ class GasEmissionsCalculator:
             Temperature in Celsius (:math:`^{\\circ}C`).
         hsc : float, optional
             Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as
-                :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in :class:`GasEmissionConstants`.
+                :attr:`HOUSING_HSC` in :class:`GasEmissionConstants`.
 
         Returns
         -------
