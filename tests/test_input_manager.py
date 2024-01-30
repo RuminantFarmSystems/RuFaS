@@ -82,6 +82,19 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
         assert add_error.call_count == 1
 
 
+def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling JSONDecodeError in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/invalid_json.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(json.JSONDecodeError):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
+
+
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
