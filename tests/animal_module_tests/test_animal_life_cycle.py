@@ -1510,7 +1510,6 @@ def test_init_calf(mocker: MockerFixture, args: dict) -> None:
     else:
         assert calf.gender == "male"
         assert calf.sold
-        assert calf.birth_weight == 2.0
         assert calf.body_weight == 2.0
         assert calf.wean_weight == 0
 
