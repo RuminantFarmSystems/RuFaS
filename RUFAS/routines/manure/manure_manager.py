@@ -415,8 +415,7 @@ class ManureManager:
         excluded_fields = ["pen_id", "simulation_day"]
 
         pen_manure_prefix = {
-            "prefix": ("AnimalModuleInputToManureModule_Pen_" + str(mm_pen.id)
-                       + "_" + mm_pen.animal_combination.name)
+            "prefix": f"AnimalModuleInputToManureModule_Pen_{mm_pen.id}_{mm_pen.animal_combination.name}"
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             mm_pen.manure,
@@ -429,9 +428,9 @@ class ManureManager:
         )
 
         manure_handler_daily_output_prefix = {
-            "prefix": (manure_handler_daily_output.__class__.__name__
-                       + "_Pen_" + str(mm_pen.id) + "_"
-                       + mm_pen.animal_combination.name)
+            "prefix": f"{manure_handler_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                      f"{mm_pen.animal_combination.name}"
+
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_handler_daily_output,
@@ -446,9 +445,9 @@ class ManureManager:
         )
 
         reception_pit_daily_output_prefix = {
-            "prefix": (reception_pit_daily_output.__class__.__name__
-                       + "_Pen_" + str(mm_pen.id)
-                       + "_" + mm_pen.animal_combination.name)
+            "prefix": f"{reception_pit_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                      f"{mm_pen.animal_combination.name}"
+
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             reception_pit_daily_output,
@@ -471,10 +470,9 @@ class ManureManager:
 
         if anaerobic_digestion_daily_output:
             anaerobic_digestion_daily_output_prefix = {
-                "prefix": ("AnaerobicDigestion_"
-                           + anaerobic_digestion_daily_output.__class__.__name__
-                           + "_Pen_" + str(mm_pen.id)
-                           + "_" + mm_pen.animal_combination.name)
+                "prefix": f"AnaerobicDigestion_{anaerobic_digestion_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                          f"{mm_pen.animal_combination.name}"
+
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 anaerobic_digestion_daily_output,
@@ -483,9 +481,9 @@ class ManureManager:
             )
         if manure_separator_daily_output:
             manure_separator_daily_output_prefix = {
-                "prefix": (manure_separator_daily_output.__class__.__name__
-                           + "_Pen_" + str(mm_pen.id)
-                           + "_" + mm_pen.animal_combination.name)
+                "prefix": f"{manure_separator_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                          f"{mm_pen.animal_combination.name}"
+
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 manure_separator_daily_output,
@@ -495,9 +493,8 @@ class ManureManager:
 
         if manure_separator_after_digestion_daily_output:
             manure_separator_after_digestion_daily_output_prefix = {
-                "prefix": (manure_separator_after_digestion_daily_output.__class__.__name__
-                           + "_Pen_" + str(mm_pen.id)
-                           + "_" + mm_pen.animal_combination.name)
+                "prefix": f"{manure_separator_after_digestion_daily_output.__class__.__name__}_Pen_{str(mm_pen.id)}"
+                          f"_{mm_pen.animal_combination.name}"
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 manure_separator_after_digestion_daily_output,
@@ -506,9 +503,9 @@ class ManureManager:
             )
 
         manure_treatment_daily_output_prefix = {
-            "prefix": (manure_treatment_daily_output.__class__.__name__
-                       + "_Pen_" + str(mm_pen.id)
-                       + "_" + mm_pen.animal_combination.name)
+            "prefix": f"{manure_treatment_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                      f"{mm_pen.animal_combination.name}"
+
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_treatment_daily_output,
@@ -517,10 +514,9 @@ class ManureManager:
         )
 
         accumulated_manure_treatment_output_prefix = {
-            "prefix": ("Accumulated_"
-                       + manure_treatment_daily_output.__class__.__name__
-                       + "_Pen_" + str(mm_pen.id)
-                       + "_" + mm_pen.animal_combination.name)
+            "prefix": f"Accumulated_{manure_treatment_daily_output.__class__.__name__}_Pen_{mm_pen.id}_"
+                      f"{mm_pen.animal_combination.name}"
+
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_treatment_accumulated_output,
