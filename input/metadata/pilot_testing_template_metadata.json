@@ -2,57 +2,50 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "The configuration file for the simulation.",
-      "path": "input/data/config/default_config.json",
+      "description": "Configuration Information",
+      "path": "input/data/config/pilot_testing_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "The configuration file for the animal module.",
-      "path": "input/data/animal/default_animal.json",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/CREATE FILE FROM TEMPLATE.json",
       "type": "json",
       "properties": "animal_properties"
     },
-    "animal_population": {
+"animal_population": {
       "title": "Animal population data",
-      "description": "The configuration file for the animal population parameters.",
+      "description": "Moo Moo!",
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
     },
-    "crop": {
-      "title": "Crop data",
-      "description": "The configuration file for crop rotation details.",
-      "path": "input/data/crop/default_rotation.json",
-      "type": "json",
-      "properties": "crop_schedule_properties"
-    },
-    "economy": {
+"economy": {
       "title": "Economy data",
-      "description": "The configuration file for the EEE module that is related to costs.",
+      "description": "Time is money!",
       "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
-      "description": "The configuration file for the EEE module that is related to emissions.",
+      "description": "Let's think about global warming",
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
     },
-    "purchased_feeds_emissions": {
+"purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
-      "path": "input/data/EEE/full_feeds_emissions.csv",
+      "path": "input/data/EEE/usable_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
     "feed": {
       "title": "Feed data",
-      "description": "The configuration file for the feed module.",
-      "path": "input/data/feed/default_feed.json",
+      "description": "Those cows need to eat!",
+      "path": "input/data/feed/CREATE FILE FROM TEMPLATE.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -72,70 +65,28 @@
     },
     "manure_management": {
       "title": "Manure data",
-      "description": "The configuration file for the manure module.",
-      "path": "input/data/manure/manure_management.json",
+      "description": "You thought it's a waste, but those crops need to eat as well",
+      "path": "input/data/manure/CREATE FILE FROM TEMPLATE.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
-      "title": "Soil data",
-      "description": "The first configuration file for the soil module.",
-      "path": "input/data/soil/default_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "The second configuration file for the soil module.",
-      "path": "input/data/soil/default_soil_2.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "fertilizer_schedule": {
-      "title": "Fertilizer schedule.",
-      "description": "The configuration file for the fertilizer schedule.",
-      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
-      "type": "json",
-      "properties": "fertilizer_schedule_properties"
-    },
-    "manure_schedule": {
-      "title": "Manure schedule.",
-      "description": "The configuration file for the manure schedule.",
-      "path": "input/data/manure_schedule/default_manure_schedule.json",
-      "type": "json",
-      "properties": "manure_schedule_properties"
-    },
-    "tillage_schedule": {
-      "title": "Tillage schedule.",
-      "description": "The configuration file for the tillage schedule.",
-      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
-      "type": "json",
-      "properties": "tillage_schedule_properties"
-    },
-    "field": {
-      "title": "Field specification",
-      "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/default_field.json",
-      "type": "json",
-      "properties": "field_properties"
-    },
     "weather": {
       "title": "Weather data",
-      "description": "The configuration file for the weather module.",
-      "path": "input/data/weather/barnyard_weather.csv",
+      "description": "Let's turn on the AC",
+      "path": "input/data/weather/ADD FARM-SPECIFIC WEATHER FILE.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
     "feed_quality": {
       "title": "Feed Quality",
-      "description": "The configuration file for the feed quality module.",
+      "description": "Hows the feed!",
       "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
     },
     "user_feeds": {
       "title": "User Feed",
-      "description": "The configuration file for user feed input.",
+      "description": "Bring the feed!",
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
@@ -176,7 +127,7 @@
         "default": "NASEM",
         "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
-      },
+},
       "FIPS_county_code": {
         "type": "number",
         "minimum": 1000,
@@ -191,43 +142,42 @@
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
-          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
+          "description": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)",
           "default": 8,
           "minimum": 0
         },
         "heiferI_num": {
           "type": "number",
-          "description": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred",
+          "description": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding",
           "default": 44,
           "minimum": 0
         },
         "heiferII_num": {
           "type": "number",
-          "description": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
+          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
+          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers",
           "default": 5,
           "minimum": 0
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
           "default": 100,
           "minimum": 0
         },
         "herd_num": {
           "type": "number",
-          "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
+          "description": "Herd Number (head) -- The target number of dry and lactating cows on farm.",
           "default": 100,
           "minimum": 0
         },
-        "replace_num": {
+                "replace_num": {
           "type": "number",
-          "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
           "default": 5000,
           "minimum": 0
         },
@@ -235,10 +185,10 @@
           "type": "string",
           "default": "HO",
           "pattern": "(HO|JE)",
-          "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
+          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
-      "herd_initialization": {
+"herd_initialization": {
         "type": "object",
         "description": "Animal generation related inputs",
         "initial_animal_num": {
@@ -262,55 +212,55 @@
           "description": "General Management",
           "breeding_start_day_h": {
             "type": "number",
-            "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
+            "description": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding (days)",
             "default": 380,
             "minimum": 0
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
             "default": "TAI",
             "pattern": "^(TAI|ED|SynchED)$"
           },
           "cow_repro_method": {
             "type": "string",
-            "description": "Cow Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI - Combination of ED and TAI",
+            "description": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI",
             "default": "TAI",
             "pattern": "^(TAI|ED|ED-TAI)$"
           },
           "semen_type": {
             "type": "string",
-            "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
-            "pattern": "^(sexed|conventional)$"
+            "pattern": "^(sexed|conventional)$",
+            "description": "The semen type that makes up a majority of the farm's breedings"
           },
           "days_in_preg_when_dry": {
             "type": "number",
-            "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
+            "description": "Days In Pregnancy When Dry (days) -- The average day in pregnancy when a cow is dried off (default is 218)",
             "default": 218,
             "minimum": 0
           },
           "heifer_repro_cull_time": {
             "type": "number",
-            "description": "Heifer Reproduction Cull Time (days) -- Days old when a heifer would be culled for failure to become pregnant",
+            "description": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 500)",
             "default": 500,
             "minimum": 0
           },
           "do_not_breed_time": {
             "type": "number",
-            "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
+            "description": "Do Not Breed Time (days) -- The breeding period (days) for cows before reproductive programs stop if they fail to get pregnant (days)",
             "default": 185,
             "minimum": 0
           },
           "cull_milk_production": {
             "type": "number",
-            "description": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below",
+            "description": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 30 kg/d)",
             "default": 30,
             "minimum": 0
           },
           "cow_times_milked_per_day": {
             "type": "number",
-            "description": "Number of Milkings (per day) -- The average or most common number of times cows are milked per day (1, 2, or 3 times daily)",
+            "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
             "default": 3,
             "minimum": 0
           }
@@ -323,34 +273,34 @@
             "description": "Calf Management",
             "male_calf_rate_sexed_semen": {
               "type": "number",
-              "description": "Male Calf Rate, Sexed Semen (percent) -- The rate of male calves when using sexed semen",
+              "description": "Male Calf Rate - Sexed Semen -- The rate of male calves when using sexed semen (default is 0.1)",
               "default": 0.1,
               "minimum": 0,
               "maximum": 1
             },
             "male_calf_rate_conventional_semen": {
               "type": "number",
-              "description": "Male Calf Rate, Conventional Semen (percent) -- The rate of male calves when using conventional semen",
+              "description": "Male Calf Rate - Conventional Semen -- The rate of male calves when using conventional semen (default is 0.53)",
               "default": 0.53,
               "minimum": 0,
               "maximum": 1
             },
             "keep_female_calf_rate": {
               "type": "number",
-              "description": "Female Calf Retention Rate (percent) -- The percentage of female calves kept and raised on-farm",
+              "description": "Female Calf Rate -- The rate female calves are kept and raised on-farm (default is 1)",
               "default": 1,
               "minimum": 0,
               "maximum": 1
             },
             "wean_day": {
               "type": "number",
-              "description": "Wean Day (days) -- The days of age at which calves are fully weaned from milk or milk replacer",
+              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60",
               "default": 60,
               "minimum": 0
             },
             "wean_length": {
               "type": "number",
-              "description": "Wean Length (days) -- Length of the weaning process",
+              "description": "Wean Length (days) -- Days weaning (default is 7)",
               "default": 7,
               "minimum": 0
             },
@@ -366,55 +316,54 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when a cow is eligible to be bred during estrus",
+              "description": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cow, it is days after parturition when the 1st hormonal injection is made in TAI programs. If 'ED' or 'ED-TAI' is chosen for cow, it is days after parturition when estrus is started to be monitored.",
               "default": 50,
               "minimum": 0
             },
             "conception_rate_decrease": {
               "type": "number",
-              "description": "Conception Rate Decrease (percent) -- The percent decrease in conception rate of each breeding after the first breeding",
+              "description": "Conception Rate Decrease -- the decrease of the conception rate for later breeding (default is 0.026)",
               "default": 0.026,
               "minimum": 0,
               "maximum": 0.1
             },
             "avg_gestation_len": {
               "type": "number",
-              "description": "Average Gestation Length (days) -- Average length of gestation",
+              "description": "Average Gestation Length (days) -- average length of gestations (default is 278)",
               "default": 278,
               "minimum": 0
             },
             "std_gestation_len": {
               "type": "number",
-              "description": "Gestation Length Standard Deviation (days) -- Standard deviation of gestation length",
+              "description": "Gestation Length Standard Deviation (days) -- standard deviation of gestation length (default is 6)",
               "default": 6,
               "minimum": 0
             },
             "prefresh_day": {
               "type": "number",
-              "description": "Prefresh Day -- days prior to calving at which pregnant animals enter the close-up period (i.e., the length of the close-up period)",
+              "description": "Prefresh Day (days) -- length of period of the transition before calving (default is 30)",
               "default": 30,
               "minimum": 0
             },
             "calving_interval": {
               "type": "number",
-              "description": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations",
+              "description": "Calving Interval (days) -- current average calving interval (days), used for initial bodyweight adjustment and other calculations",
               "default": 400,
               "minimum": 0
             },
             "heifers": {
               "type": "object",
-              "description": "Heifer Reproduction Protocols",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
-                "default": 0.9,
+                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.4,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -426,22 +375,22 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
-                  "default": 0.6,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "estrus_detection_rate": {
-                  "type": "number",
-                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "type": "number",
+                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "estrus_detection_rate": {
+                "type": "number",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                   "default": 0.7,
                   "minimum": 0,
                   "maximum": 1
                 }
               }
             },
-            "cows": {
+              "cows": {
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
@@ -476,11 +425,11 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
+                "type": "number",
+                "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                "default": 0.5,
+                "minimum": 0,
+                "maximum": 1
                 },
                 "tai_program_start_day": {
                   "type": "number",
@@ -492,77 +441,77 @@
             },
             "cow_repro_programs": {
               "type": "object",
-              "description": "Cow Reproduction Protocols",
+              "description": "Cow Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate (percent) -- The percentage of total animals in estrus that are detected in the ED (Estrus Detection) protocol",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_service_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate (percent) -- The percentage of animals detected in estrus that then would be serviced in the ED (Estrus Detection) protocol",
+                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
                 "default": 1,
                 "minimum": 0,
                 "maximum": 1
               },
               "ed_conception_rate": {
                 "type": "number",
-                "description": "ED Conception Rate (percent) -- The percentage of serviced animals that become pregnant in the ED (Estrus Detection) protocol ",
+                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|PreSynch|G6G)$"
+                "pattern": "^(Double OvSynch|Presynch|G6G)$"
               },
               "cow_TAI_protocol": {
                 "type": "string",
-                "description": "Cow TAI (Timed Artificial Insemination) Protocol (select one) -- The timed AI (Timed Artificial Insemination) protocol for cows",
+                "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
                 "default": "OvSynch 56",
                 "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
               },
               "ovsynch56_conception_rate": {
                 "type": "number",
-                "description": "OvSynch56 Conception Rate (percent) -- The conception rate for cows in the OvSynch56 (pre-breeding GnRH shot given 56hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
+                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "ovsynch48_conception_rate": {
                 "type": "number",
-                "description": "OvSynch48 Conception Rate (percent) -- The conception rate for cows in the OvSynch 48 (pre-breeding GnRH shot given 48hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
+                "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cosynch72_conception_rate": {
                 "type": "number",
-                "description": "CoSynch72 Conception Rate (percent) -- The conception rate for cows in the CoSynch 72 TAI (Timed Artificial Insemination) protocol",
+                "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cosynch5d_conception_rate": {
                 "type": "number",
-                "description": "5d CoSynch Conception Rate (percent) -- The conception rate for cows in the 5d CoSynch TAI (Timed Artificial Insemination) protocol",
+                "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cow_resynch_protocol": {
                 "type": "string",
-                "description": "Cow Resynch Protocol (select one) -- Resynch protocol for cows before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) protocol",
+                "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
                 "default": "TAIafterPD",
                 "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
               },
               "tai_program_start_day": {
                 "type": "number",
-                "description": "TAI protocol start day for the Ovsynch portion of the ED-TAI protocol (day)",
+                "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
                 "minimum": 0,
                 "default": 72
               }
@@ -573,43 +522,43 @@
             "description": "Bodyweight",
             "birth_weight_avg_ho": {
               "type": "number",
-              "description": "Average Holstein Birth Weight (kg/head)",
-              "default": 42.9,
+              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 43.9)",
+              "default": 43.9,
               "minimum": 0
             },
             "birth_weight_std_ho": {
               "type": "number",
-              "description": "Holstein Birth Weight Standard Deviation (kg/head)",
-              "default": 6,
+              "description": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Holstein cows (default is 1)",
+              "default": 1,
               "minimum": 0
             },
             "birth_weight_avg_je": {
               "type": "number",
-              "description": "Average Jersey Birth Weight (kg/head)",
-              "default": 25.2,
+              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35)",
+              "default": 35,
               "minimum": 0
             },
             "birth_weight_std_je": {
               "type": "number",
-              "description": "Jersey Birth Weight Standard Deviation (kg/head)",
-              "default": 4.4,
+              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 1)",
+              "default": 1,
               "minimum": 0
             },
             "target_heifer_preg_day": {
               "type": "number",
-              "description": "Target Heifer Pregnancy Day (days) -- The target age (in days) for heifers to become pregnant - for adjusting heifer body weight",
+              "description": "Target Heifer Pregnancy Day (days) -- The target pregnant age in days for heifers - for adjusting heifer body weight (default is 420)",
               "default": 420,
               "minimum": 0
             },
             "mature_body_weight_avg": {
               "type": "number",
-              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows",
+              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 740.1)",
               "default": 740.1,
               "minimum": 0
             },
             "mature_body_weight_std": {
               "type": "number",
-              "description": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows",
+              "description": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows (default is 73.5)",
               "default": 73.5,
               "minimum": 0
             }
@@ -623,88 +572,88 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Days, Check 1 (days) -- Days since last insemination at the 1st pregnancy check",
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
               "default": 32,
               "minimum": 1
             },
             "preg_loss_rate_1": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 1 (percent) -- The percentage of cows that abort their pregnancy before the 1st pregnancy check",
+              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
               "default": 0.02,
               "minimum": 0,
               "maximum": 1
             },
             "preg_check_day_2": {
               "type": "number",
-              "description": "Pregnancy Check Days, Check 2 (days) --  Days since last insemination at the second pregnancy check, for cows confirmed pregnant at 1st pregnancy check",
+              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the animal is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
               "default": 60,
               "minimum": 0
             },
             "preg_loss_rate_2": {
               "type": "number",
-              "description": "Pregnancy Loss Rate, Check 2 (percent) -- The percentage of cows that abort their pregnancy between the 1st and 2nd pregnancy checks",
+              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
               "default": 0.096,
               "minimum": 0,
               "maximum": 0.1
             },
             "preg_check_day_3": {
               "type": "number",
-              "description": "Pregnancy Check Day, Check 3 (days) -- Days since last insemination at the third pregnancy check, for cows confirmed pregnant at 2nd pregnancy check",
+              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the animal is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
               "default": 200,
               "minimum": 0
             },
             "preg_loss_rate_3": {
               "type": "number",
-              "description": "Pregnancy Loss Rate, Check 3 (percent) -- The percentage of cows that abort their pregnancy between the 2nd and 3rd pregnancy checks",
+              "description": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
               "default": 0.017,
               "minimum": 0,
               "maximum": 0.1
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": "Average Estrous Cycle Return (days) -- Average days between calving and first estrous cycle after calving",
+              "description": "Average days between calving and first estrus after calving (default is 23).",
               "minimum": 1,
               "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": "Estrous Cycle Return Standard Deviation (days)",
+              "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
               "minimum": 1,
               "default": 6
             },
             "avg_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Heifer Estrous Cycle Length (days) -- Average length of estrous cycle for heifers",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Heifer Estrous Cycle Length Standard Deviation (days)",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
               "minimum": 1,
               "default": 2.5
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": "Cow Estrous Cycle Length (days) -- Average length of estrous cycle for cows",
+              "description": "Average length of estrus cycle for cows (default is 21).",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": "Cow Estrous Cycle Length Standard Deviation (days)",
+              "description": "Standard deviation of the length of estrus cycle for cows (default is 4).",
               "minimum": 1,
               "default": 4
             },
             "avg_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Average Estrous Cycle days after PGF (days) -- Average days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol",
+              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 5).",
               "minimum": 1,
               "default": 5
             },
             "std_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Estrous Cycle days after PGF Standard Deviation (days) -- Standard deviation of days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol",
+              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 2).",
               "minimum": 1,
               "default": 2
             }
@@ -793,30 +742,30 @@
           },
           "culling": {
             "type": "object",
-            "description": "Probabilities for removal from the herd for specific reason",
+            "description": "",
             "parity_death_prob": {
               "type": "array",
-              "description": "Death Probability, by Parity",
+              "description": "Death rate for first, second, third, and later lactations",
               "properties": {
                 "type": "number",
-                "description": "Death Probability, by Parity Group -- The probability of death for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+                "description": "Death rate for first, second, third, and later lactations",
                 "minimum": 0,
                 "maximum": 1
               }
             },
             "parity_cull_prob": {
               "type": "array",
-              "description": "Cull Probability, by Parity",
+              "description": "Culling rate for first, second, third, and later lactations",
               "properties": {
                 "type": "number",
-                "description": "Cull Probability, by Parity -- The probability of culling for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+                "description": "Culling rate for first, second, third, and later lactations",
                 "minimum": 0,
                 "maximum": 1
               }
             },
             "mastitis_cull_prob": {
               "type": "array",
-              "description": "Culling probability for mastitis",
+              "description": "Culling rate for mastitis",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -825,7 +774,7 @@
             },
             "udder_cull_prob": {
               "type": "array",
-              "description": "Culling probability for udder reasons",
+              "description": "Culling rate for udder reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -834,7 +783,7 @@
             },
             "feet_leg_cull_prob": {
               "type": "array",
-              "description": "Culling probability for feet and leg reasons",
+              "description": "Culling rate for feet and leg reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -843,7 +792,7 @@
             },
             "unknown_cull_prob": {
               "type": "array",
-              "description": "Culling probability for unknown reasons",
+              "description": "Culling rate for unknown reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -852,7 +801,7 @@
             },
             "disease_cull_prob": {
               "type": "array",
-              "description": "Culling probability for disease",
+              "description": "Culling rate for disease",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -861,7 +810,7 @@
             },
             "injury_cull_prob": {
               "type": "array",
-              "description": "Culling probability for injury",
+              "description": "Culling rate for injury",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -870,7 +819,7 @@
             },
             "death_cull_prob": {
               "type": "array",
-              "description": "Culling probability for death",
+              "description": "Culling rate for death",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -891,10 +840,9 @@
             "description": "",
             "still_birth_rate": {
               "type": "number",
-              "description": "Rate of stillbirths (percent)",
+              "description": "Stillbirth rate",
               "minimum": 0,
-              "maximum": 1,
-              "default": 0.065
+              "maximum": 1
             }
           }
         }
@@ -904,7 +852,7 @@
         "description": "Methane Mitigation",
         "methane_mitigation_method": {
           "type": "string",
-          "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
+          "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
           "default": "None",
           "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
         },
@@ -914,28 +862,28 @@
         },
         "3-NOP_additive_amount": {
           "type": "number",
-          "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive",
+          "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive (mg/kg DMI)",
           "minimum": 40,
           "maximum": 100,
           "default": 70
         },
         "monensin_additive_amount": {
           "type": "number",
-          "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive",
+          "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive (mg/kg DMI)",
           "minimum": 20,
           "maximum": 36,
           "default": 24
         },
         "essential_oils_additive_amount": {
           "type": "number",
-          "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive",
+          "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive (mg/kg DMI)",
           "minimum": 0,
           "maximum": 100,
           "default": 0
         },
         "seaweed_additive_amount": {
           "type": "number",
-          "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of seaweed mitigation additive",
+          "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of the seaweed mitigation additive (mg/kg DMI)",
           "minimum": 0,
           "maximum": 100,
           "default": 0
@@ -943,21 +891,21 @@
       },
       "housing": {
         "type": "string",
-        "description": "Housing Type (select one) -- The type of housing management for the herd",
+        "description": "Housing -- The type of housing management for the herd.",
         "default": "barn",
-        "pattern": "^(barn|pasture|drylot)$"
+        "pattern": "^(barn|3-pasture|drylot)$"
       },
       "pasture_concentrate": {
-        "description": "Pasture Concentrate Fed (kg/head/day) -- Amount of concentrate provided to lactating cows each day if animals are housed on pasture",
+        "description": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)",
         "type": "number",
         "minimum": 0,
         "default": 0
       },
       "methane_model": {
-        "description": "Methane Model (select one) -- The method used to estimate enteric methane emissions for lactating cows",
+        "description": "Methane Model -- The method used to estimate enteric methane emissions.",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|Mutian|IPCC)$"
+        "pattern": "^(Mills|3-Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
@@ -968,7 +916,7 @@
           "default": false
         },
         "formulation_interval": {
-          "description": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated",
+          "description": "Formulation Interval -- The length of time in days between when the diets are reformulated.",
           "type": "number",
           "minimum": 1,
           "default": 30
@@ -976,61 +924,61 @@
       },
       "pen_information": {
         "type": "array",
-        "description": "Pen Information",
+        "description": "Pen Information.",
         "properties": {
           "type": "object",
           "id": {
-            "description": "Pen ID -- The index of the pen",
+            "description": "Pen ID -- The index of the pen.",
             "type": "number"
           },
           "pen_name": {
-            "description": "Pen Name -- The name or identifier of a given pen",
+            "description": "Pen Name -- The name or identifier of a given pen.",
             "type": "string"
           },
           "animal_combination": {
-            "description": "Animal Combination (select one) -- The valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows",
+            "description": "Animal Combination -- The valid combinations of animal types that can be in a pen.",
             "type": "string",
             "pattern": "^(CALF|GROWING|CLOSE_UP|LAC_COW)$"
           },
           "vertical_dist_to_milking_parlor": {
-            "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor",
+            "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor.",
             "type": "number",
             "minimum": 0,
             "default": 0.1
           },
           "horizontal_dist_to_milking_parlor": {
-            "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor",
+            "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor.",
             "type": "number",
             "minimum": 0,
-            "default": 10
+            "default": 1.6
           },
           "number_of_stalls": {
-            "description": "Number of Stalls -- The number of stalls in the pen",
+            "description": "Number of Stalls -- The number of stalls in the pen.",
             "type": "number",
             "minimum": 0,
             "default": 1000
           },
           "housing_type": {
-            "description": "Housing Type (select one) -- The type of barn the pen is in",
+            "description": "Housing Type -- The type of barn the pen is in.",
             "type": "string",
             "pattern": "^(open air barn)$",
             "default": "open air barn"
           },
           "pen_type": {
-            "description": "Pen Type select one) -- The type of stalls the pen has",
+            "description": "Pen Type -- The type of stalls the pen has.",
             "type": "string",
-            "pattern": "^{freestall|tiestall|drylot}$",
+            "pattern": "^(freestall|tilestall|drylot)$",
             "default": "freestall"
           },
           "max_stocking_density": {
-            "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
+            "description": "Max Stocking Density -- The maximum ration between the number of animals in the pen and the number of stalls in the pen.",
             "type": "number",
             "minimum": 0.5,
             "maximum": 2,
             "default": 1.2
           },
           "manure_management_scenario_id": {
-            "description": "Manure Management Scenario ID (number) -- The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)",
+            "description": "Manure Management Scenario ID -- The ID number of the manure management practices that are used for this pen.",
             "type": "number",
             "minimum": 0,
             "default": 0
@@ -1038,7 +986,7 @@
         }
       }
     },
-    "animal_population_properties": {
+"animal_population_properties": {
       "calves": {
         "type": "array",
         "description": "calves data",
@@ -1704,378 +1652,12 @@
         }
       }
     },
-    "crop_schedule_properties": {
-      "crop_schedules": {
-        "type": "array",
-        "description": "Array of all crop schedules to be executed over the run of the simulation.",
-        "minimum_length": 0,
-        "properties": {
-          "type": "object",
-          "description": "Contains all the properties necessary to create a CropSchedule object.",
-          "crop_species": {
-            "type": "string",
-            "description": "Name of the crop being grown.",
-            "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
-          },
-          "harvest_days": {
-            "type": "array",
-            "description": "Julian day(s) of year to harvest",
-            "minimum_length": 0,
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 366
-            }
-          },
-          "harvest_years": {
-            "type": "array",
-            "description": "Calendar years in which the harvesting occurs",
-            "minimum_length": 0,
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1
-            }
-          },
-          "harvest_operations": {
-            "type": "array",
-            "description": "Operation(s) with which this crop will be harvested.",
-            "minimum_length": 1,
-            "default": [
-              "harvest_kill"
-            ],
-            "properties": {
-              "type": "string",
-              "pattern": "^(harvest_kill|harvest_only|kill_only)$",
-              "default": "harvest"
-            }
-          },
-          "harvest_type": {
-            "type": "string",
-            "description": "Whether the crop uses scheduled harvests or optimal harvests",
-            "default": "scheduled",
-            "pattern": "^(scheduled|optimal)$"
-          },
-          "planting_days": {
-            "type": "array",
-            "description": "Julian day(s) of year to plant",
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 366
-            }
-          },
-          "planting_years": {
-            "type": "array",
-            "description": "Calendar years in which the planting occurs",
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1
-            }
-          },
-          "pattern_repeat": {
-            "type": "number",
-            "description": "Number of times that this crop schedule should be repeated.",
-            "minimum": 0,
-            "default": 0
-          },
-          "pattern_skip": {
-            "type": "number",
-            "description": "Number of years to be skipped between schedule repetitions.",
-            "minimum": 0,
-            "default": 0
-          }
-        }
-      }
-    },
-    "fertilizer_schedule_properties": {
-      "available_fertilizer_mixes": {
-        "type": "array",
-        "description": "All the available fertilizer mixes that are available besides the default ones.",
-        "minimum_length": 0,
-        "default": [],
-        "properties": {
-          "type": "object",
-          "description": "The name and nutrient breakdown of a single fertilizer mix.",
-          "name": {
-            "type": "string",
-            "description": "Name of the fertilizer mix."
-          },
-          "N": {
-            "type": "number",
-            "description": "Fraction of nitrogen contained in the fertilizer mix by mass.",
-            "minimum": 0.0,
-            "maximum": 1.0
-          },
-          "P": {
-            "type": "number",
-            "description": "Fraction of phosphorus contained in the fertilizer mix by mass.",
-            "minimum": 0.0,
-            "maximum": 1.0
-          },
-          "K": {
-            "type": "number",
-            "description": "Fraction of potassium contained in the fertilizer mix by mass.",
-            "minimum": 0.0,
-            "maximum": 1.0
-          }
-        }
-      },
-      "mix_names": {
-        "type": "array",
-        "description": "List of the mix names that will be used for the corresponding fertilizer application.",
-        "default": [],
-        "properties": {
-          "type": "string"
-        }
-      },
-      "years": {
-        "type": "array",
-        "description": "List of years in which fertilizer will be applied.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1
-        }
-      },
-      "days": {
-        "type": "array",
-        "description": "List of days on which fertilizer will be applied.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1,
-          "maximum": 366
-        }
-      },
-      "nitrogen_masses": {
-        "type": "array",
-        "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "phosphorus_masses": {
-        "type": "array",
-        "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "potassium_masses": {
-        "type": "array",
-        "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "application_depths": {
-        "type": "array",
-        "description": "List of depths at which the fertilizer is injected into the soil.\nUnits: mm.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "surface_remainder_fractions": {
-        "type": "array",
-        "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      },
-      "pattern_repeat": {
-        "type": "number",
-        "description": "Number of times that this fertilizer application schedule should be repeated.",
-        "minimum": 0,
-        "default": 0
-      },
-      "pattern_skip": {
-        "type": "number",
-        "description": "Number of years to be skipped between schedule repetitions.",
-        "minimum": 0,
-        "default": 0
-      }
-    },
-    "manure_schedule_properties": {
-      "years": {
-        "type": "array",
-        "description": "List of years in which manure will be applied.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1
-        }
-      },
-      "days": {
-        "type": "array",
-        "description": "List of days on which manure will be applied.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1,
-          "maximum": 366
-        }
-      },
-      "nitrogen_masses": {
-        "type": "array",
-        "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "phosphorus_masses": {
-        "type": "array",
-        "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "potassium_masses": {
-        "type": "array",
-        "description": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "coverage_fractions": {
-        "type": "array",
-        "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.01,
-          "maximum": 1.0
-        }
-      },
-      "application_depths": {
-        "type": "array",
-        "description": "List of depths at which the manure is injected into the soil.\nUnits: mm.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0
-        }
-      },
-      "surface_remainder_fractions": {
-        "type": "array",
-        "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      },
-      "manure_types": {
-        "type": "array",
-        "description": "The type of manure which will be requested for the application.",
-        "default": [],
-        "properties": {
-          "type": "string",
-          "pattern": "^(liquid|solid)$"
-        }
-      },
-      "pattern_repeat": {
-        "type": "number",
-        "description": "Number of times that this manure application schedule should be repeated.",
-        "minimum": 0,
-        "default": 0
-      },
-      "pattern_skip": {
-        "type": "number",
-        "description": "Number of years to be skipped between schedule repetitions.",
-        "minimum": 0,
-        "default": 0
-      }
-    },
-    "tillage_schedule_properties": {
-      "years": {
-        "type": "array",
-        "description": "List of years in which tillage will occur.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1
-        }
-      },
-      "days": {
-        "type": "array",
-        "description": "List of days on which tilling will occur.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 1,
-          "maximum": 366
-        }
-      },
-      "tillage_depths": {
-        "type": "array",
-        "description": "List of depths that the corresponding tillage applications reach.\nUnits: mm.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.1
-        }
-      },
-      "incorporation_fractions": {
-        "type": "array",
-        "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      },
-      "mixing_fractions": {
-        "type": "array",
-        "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
-        "default": [],
-        "properties": {
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
-        }
-      },
-      "pattern_repeat": {
-        "type": "number",
-        "description": "Number of times that this tillage schedule should be repeated.",
-        "minimum": 0,
-        "default": 0
-      },
-      "pattern_skip": {
-        "type": "number",
-        "description": "Number of years to be skipped between schedule repetitions.",
-        "minimum": 0,
-        "default": 0
-      }
-    },
-    "economic_properties": {
+"economic_properties": {
       "diesel_cost_gal": {
         "description": "cost of diesel per gallon",
         "type": "number",
         "minimum": 0,
-        "default": 5.0
+        "default": 5.00
       },
       "electricity_cost_kwh": {
         "description": "cost of electricity per kwh",
@@ -2116,352 +1698,12 @@
         "default": 400
       }
     },
-    "feed_emissions_properties": {
+"feed_emissions_properties": {
       "county_code": {
         "type": "number",
         "minimum": 1000
       },
-      "1": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "2": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "4": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "5": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "6": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "7": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "8": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "9": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "11": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "12": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "13": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "14": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "15": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "16": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "17": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "18": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "19": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "20": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "21": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "22": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "23": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "24": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "25": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "28": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "30": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "31": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "32": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "33": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "34": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "36": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "37": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "38": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "39": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "40": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "41": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "42": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "43": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "44": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "46": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "47": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "49": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "50": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "51": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "52": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "53": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "54": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "55": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "56": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "58": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "59": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "60": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "61": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "62": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "63": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "64": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "65": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "66": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "67": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "72": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "76": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "77": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "78": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "79": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "80": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "81": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "82": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "83": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "87": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "88": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "89": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "90": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "91": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "92": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "93": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "94": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "95": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "96": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "97": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "98": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "99": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "100": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "102": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "103": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "104": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "105": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "106": {
+      "108": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2469,259 +1711,59 @@
         "type": "number",
         "minimum": 0.0
       },
-      "108": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "109": {
-        "type": "number",
-        "minimum": 0.0
-      },
       "110": {
         "type": "number",
         "minimum": 0.0
       },
-      "111": {
+      "18": {
         "type": "number",
         "minimum": 0.0
       },
-      "112": {
+      "23": {
         "type": "number",
         "minimum": 0.0
       },
-      "114": {
+      "44": {
         "type": "number",
         "minimum": 0.0
       },
-      "115": {
+      "51": {
         "type": "number",
         "minimum": 0.0
       },
-      "118": {
+      "50": {
         "type": "number",
         "minimum": 0.0
       },
-      "119": {
+      "52": {
         "type": "number",
         "minimum": 0.0
       },
-      "120": {
+      "95": {
         "type": "number",
         "minimum": 0.0
       },
-      "121": {
+      "94": {
         "type": "number",
         "minimum": 0.0
       },
-      "123": {
+      "100": {
         "type": "number",
         "minimum": 0.0
       },
-      "124": {
+      "104": {
         "type": "number",
         "minimum": 0.0
       },
-      "125": {
+      "176": {
         "type": "number",
         "minimum": 0.0
       },
-      "129": {
+      "91": {
         "type": "number",
         "minimum": 0.0
       },
-      "135": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "144": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "153": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "163": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "164": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "165": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "166": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "167": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "169": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "170": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "171": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "172": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "181": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "182": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "183": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "184": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "187": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "193": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "194": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "195": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "197": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "198": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "200": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "201": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "202": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "209": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "210": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "211": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "229": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "230": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "231": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "232": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "233": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "234": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "235": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "236": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "237": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "238": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "239": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "240": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "241": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "242": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "243": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "244": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "245": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "246": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "247": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "248": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "251": {
+      "301": {
         "type": "number",
         "minimum": 0.0
       },
@@ -2951,7 +1993,7 @@
         },
         "milk_reduction_maximum": {
           "type": "number",
-          "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
+          "description": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)",
           "minimum": 0,
           "maximum": 50
         }
@@ -3625,7 +2667,7 @@
         "description": ""
       },
       "TDN": {
-        "type": "number",
+"type": "number",
         "description": ""
       },
       "DE": {
@@ -3647,22 +2689,22 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
           },
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
           },
           "manure_separator": {
             "type": "string",
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|rotary screen|none)$"
+            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
           },
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
           }
         }
       },
@@ -3674,7 +2716,7 @@
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
+              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
             },
             "bedding_mass_per_day": {
               "type": "number"
@@ -3708,7 +2750,7 @@
             "manure_handler_type": {
               "type": "string",
               "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
+              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
             },
             "cleaning_water_use_rate": {
               "type": "number"
@@ -3718,12 +2760,6 @@
             },
             "cleanings_per_day": {
               "type": "number"
-            },
-            "cleaning_water_recycle_fraction": {
-              "type": "number",
-              "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
-              "minimum": 0.0,
-              "maximum": 1.0
             }
           }
         }
@@ -3736,7 +2772,7 @@
             "manure_separator_type": {
               "type": "string",
               "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^(screw press|rotary screen|none)$"
+              "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
             },
             "percent_dry_solids": {
               "type": "number"
@@ -3770,287 +2806,34 @@
             "manure_treatment_type": {
               "type": "string",
               "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
             },
-            "last_compost_turning_or_addition": {
-              "type": "number",
-              "description": "The number of days since the last turning or addition event (day)",
-              "default": 1
+            "total_solids_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "volatile_solids_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "nitrogen_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "phosphorus_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "potassium_removal_efficiency_for_treatment": {
+              "type": "number"
+            },
+            "storage_time_period": {
+              "type": "number"
+            },
+            "freeboard_input": {
+              "type": "number"
             }
           }
         }
-      }
-    },
-    "soil_profile_properties": {
-      "second_moisture_condition_parameter": {
-        "type": "number",
-        "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
-        "minimum": 20,
-        "maximum": 99,
-        "default": 85
-      },
-      "average_subbasin_slope": {
-        "type": "number",
-        "description": "Slope of the field, measured as rise over run.\nUnits: meters / meters or unitless.\nReference: SWAT Input .HRU - HRU_SLP.",
-        "default": 0.05
-      },
-      "slope_length": {
-        "type": "number",
-        "description": "Length of the slope.\nUnits: meters.\nReference: SWAT Input .HRU - SLSUBBSN.",
-        "minimum": 0,
-        "default": 50
-      },
-      "manning_roughness_coefficient": {
-        "type": "number",
-        "description": "Manning's \"n\" value for overland flow.\nUnitless.\nReference: SWAT Input .HRU - OV_N.",
-        "minimum": 0.001,
-        "default": 0.4
-      },
-      "support_practice_factor": {
-        "type": "number",
-        "description": "Ratio of soil loss with a specific support practice based on slope characteristics.This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.\nUnitless.\nReference: SWAT Input .MGT - USLE_P.",
-        "default": 0.08
-      },
-      "albedo": {
-        "type": "number",
-        "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.\nUnitless.\nReference: SWAT Input .SOL - SOL_ALB",
-        "minimum": 0.0,
-        "maximum": 1.0,
-        "default": 0.16
-      },
-      "initial_residue": {
-        "type": "number",
-        "description": "Amount of residue present on the soil surface at the start of the simulation.\nUnits: kg / ha.",
-        "minimum": 0.0,
-        "default": 0.0
-      },
-      "soil_evaporation_compensation_coefficient": {
-        "type": "number",
-        "description": "Modifies depth distribution used to meet soil evaporative demand.\nUnitless.\nReference: SWAT Input .HRU, .BSN - ESCO",
-        "minimum": 0.01,
-        "maximum": 1.0,
-        "default": 0.95
-      },
-      "soil_layers": {
-        "type": "array",
-        "description": "The soil layers that this profile contains. Each element of the array should be a `soil_layer` object.",
-        "minimum_length": 1,
-        "properties": {
-          "type": "object",
-          "description": "This represents a single soil layer.",
-          "bottom_depth": {
-            "type": "number",
-            "description": "Bottom depth of this soil layer.\nUnits: mm.",
-            "minimum": 20
-          },
-          "soil_water_concentration": {
-            "type": "number",
-            "description": "Concentration of water in this layer at the beginning of the simulation.\nUnits: mm water / mm soil.",
-            "minimum": 0.0,
-            "maximum": 0.95,
-            "default": 0.25
-          },
-          "wilting_point_water_concentration": {
-            "type": "number",
-            "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
-            "minimum": 0.0,
-            "maximum": 0.95,
-            "default": 0.2
-          },
-          "field_capacity_water_concentration": {
-            "type": "number",
-            "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
-            "minimum": 0.0,
-            "maximum": 0.95,
-            "default": 0.3
-          },
-          "saturation_point_water_concentration": {
-            "type": "number",
-            "description": "Concentration of water in a layer when it has become saturated.\nUnits: mm water / mm soil.",
-            "minimum": 0.0,
-            "maximum": 0.95,
-            "default": 0.5
-          },
-          "saturated_hydraulic_conductivity": {
-            "type": "number",
-            "description": "Measure of ease of water movement through the soil.\nUnits: mm / hour.\nReference: SWAT Input .SOL - SOL_K.",
-            "minimum": 0.01,
-            "default": 9.5
-          },
-          "initial_temperature": {
-            "type": "number",
-            "description": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius.",
-            "default": 15.05
-          },
-          "bulk_density": {
-            "type": "number",
-            "description": "Ratio of mass of solid particles to total volume of soil.\nUnits: Megagrams / cubic meter or grams / cubic centimeter.",
-            "minimum": 1.1,
-            "maximum": 1.9,
-            "default": 1.4
-          },
-          "percent_organic_carbon_content": {
-            "type": "number",
-            "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
-            "minimum": 0.0,
-            "maximum": 100.0,
-            "default": 1.2
-          },
-          "percent_clay_content": {
-            "type": "number",
-            "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
-            "minimum": 0.0,
-            "maximum": 100.0,
-            "default": 22.5
-          },
-          "percent_silt_content": {
-            "type": "number",
-            "description": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
-            "minimum": 0.0,
-            "maximum": 100.0,
-            "default": 62.5
-          },
-          "percent_sand_content": {
-            "type": "number",
-            "description": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
-            "minimum": 0.0,
-            "maximum": 100.0,
-            "default": 12.5
-          },
-          "percent_rock_content": {
-            "type": "number",
-            "description": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
-            "minimum": 0.0,
-            "maximum": 100.0,
-            "default": 1.3
-          },
-          "initial_labile_inorganic_phosphorus_concentration": {
-            "type": "number",
-            "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
-            "minimum": 0.0,
-            "default": null
-          },
-          "initial_fresh_organic_phosphorus_concentration": {
-            "type": "number",
-            "description": "Concentration of fresh organic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
-            "minimum": 0.0,
-            "default": 0.0
-          },
-          "initial_soil_nitrate_concentration": {
-            "type": "number",
-            "description": "Concentration of nitrate in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
-            "minimum": 0.0,
-            "default": null
-          },
-          "initial_soil_ammonium_concentration": {
-            "type": "number",
-            "description": "Concentration of ammonium in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
-            "minimum": 0.0,
-            "default": null
-          },
-          "humus_mineralization_rate_factor": {
-            "type": "number",
-            "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
-            "minimum": 0.0,
-            "default": 0.0003
-          },
-          "ammonium_volatilization_cation_exchange_factor": {
-            "type": "number",
-            "description": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5.",
-            "minimum": 0.01,
-            "default": 0.45
-          },
-          "denitrification_rate_coefficient": {
-            "type": "number",
-            "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
-            "minimum": 0.0,
-            "maximum": 3.0,
-            "default": 0.01
-          },
-          "denitrification_threshold_water_content": {
-            "type": "number",
-            "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
-            "minimum": 0.0,
-            "default": 1.3
-          },
-          "residue_fresh_organic_mineralization_rate": {
-            "type": "number",
-            "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
-            "minimum": 0.0,
-            "default": 0.05
-          }
-        }
-      }
-    },
-    "field_properties": {
-      "soil_specification": {
-        "type": "string",
-        "description": "Name of the metadata blob that contains the data for this field's soil specification."
-      },
-      "crop_specification": {
-        "type": "string",
-        "description": "Name of the metadata blob that contains the data for this field's crop schedule specification."
-      },
-      "fertilizer_management_specification": {
-        "type": "string",
-        "description": "Name of the metadata blob that contains the data for this field's fertilizer application schedule specification."
-      },
-      "manure_management_specification": {
-        "type": "string",
-        "description": "Name of the metadata blob that contains the data for this field's manure application schedule specification."
-      },
-      "tillage_management_specification": {
-        "type": "string",
-        "description": "Name of the metadata blob that contains the data for this field's tillage application schedule specification."
-      },
-      "field_size": {
-        "type": "number",
-        "description": "Size of the field.",
-        "units": "ha",
-        "minimum": 0.0
-      },
-      "absolute_latitude": {
-        "type": "number",
-        "description": "The absolute latitude of the center of this field.\nUnits: degrees.",
-        "minimum": 0.0,
-        "maximum": 90.0,
-        "default": 43.5
-      },
-      "longitude": {
-        "type": "number",
-        "description": "The longitude of the center of this field.\nUnits: degrees.",
-        "minimum": -180.0,
-        "maximum": 180.0,
-        "default": -89.4
-      },
-      "minimum_daylength": {
-        "type": "number",
-        "description": "Length of the shortest day of the year for watershed the field is located in.\nUnits: hours.",
-        "minimum": 0.0,
-        "maximum": 24.0,
-        "default": 9.0
-      },
-      "seasonal_high_water_table": {
-        "type": "bool",
-        "description": "True if the HRU that contains the field has a high seasonal water table, false otherwise.\nUnitless.\nReference: SWAT Theoretical documentation section 2:3.2, SWAT Input .HRU - IWATABLE.",
-        "default": false
-      },
-      "watering_amount_in_liters": {
-        "type": "number",
-        "description": "Amount of water to be applied as irrigation at the end of a specified interval.\nUnits: liters.",
-        "minimum": 0.0,
-        "default": 0.0
-      },
-      "watering_interval": {
-        "type": "number",
-        "description": "Number of days that make up the irrigation interval.\nUnits: days.",
-        "minimum": 0,
-        "default": 0
-      },
-      "supplement_manure_nutrient_deficiencies": {
-        "type": "bool",
-        "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
-        "default": false
       }
     },
     "weather_properties": {
@@ -4134,3 +2917,4 @@
   },
   "cross-validation": {}
 }
+

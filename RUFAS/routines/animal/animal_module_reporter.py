@@ -166,7 +166,7 @@ class AnimalModuleReporter:
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal["status"]
+            del ration_per_animal['status']
             del ration_per_animal["objective"]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0
@@ -440,6 +440,7 @@ class AnimalModuleReporter:
             om.add_variable("animal_id", animal.id, info_map)
             om.add_variable("animal_type", animal.__class__.__name__, info_map)
             om.add_variable("body_weight", animal.body_weight, info_map)
+            om.add_variable("sold_day", animal.sold_at_day, info_map)
 
             if hasattr(animal, "sold_at_day"):
                 om.add_variable("sold_day", animal.sold_at_day, info_map)
