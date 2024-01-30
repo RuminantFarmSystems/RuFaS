@@ -91,7 +91,7 @@ class Cow(HeiferIII):
         self.BCS = 3.5  # body condition score
         self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
         self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
-        self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
+        self.mPrt = 0.0
 
         self.DVD = 0  # daily vertical distance, km
         self.DHD = 0  # daily horizontal distance, km
@@ -311,24 +311,6 @@ class Cow(HeiferIII):
             milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
             self.latest_milk_production_305days = np.sum(milk_history)
 
-    def calculate_fat_percent(self, days_in_milk: int):
-        """
-        Calculates fat percent of milk.
-
-        Note that this equation produces 0.0 if days_in_milk is set to one,
-        so we've implemented a minimum days_in_milk value of 2.
-
-        Parameters
-        ----------
-        days_in_milk : int
-            Number of days in milk.
-        """
-        if days_in_milk == 1:
-            days_in_milk = 2
-        fat_percent = 12.86 * days_in_milk ** (-1.081) * math.exp(
-            0.0926 * (math.log(days_in_milk)) ** 2) * (math.log(days_in_milk) ** 1.107)
-        return fat_percent
-
     @staticmethod
     def determine_param_value(mean, std):
         """
@@ -365,6 +347,12 @@ class Cow(HeiferIII):
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
             self.latest_milk_production_305days = 0.0
+            self.fat_percent = 0.0
+            self.milk_fat_kg = 0.0
+            self.milk_protein_kg = 0.0
+            self.lactose_milk = 0.0
+            self.CP_milk = 0.0
+            self.mPrt = 0.0
             return 0, 0, 0
 
         if self.milking:
@@ -384,7 +372,7 @@ class Cow(HeiferIII):
             self.estimated_daily_milk_produced = max(0.0, estimated_daily_milk_produced)
             self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
             self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
-            self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
+            self.mPrt = self.get_user_defined_milk_protein_percent()
         else:
             self.estimated_daily_milk_produced = 0.0
             self.lactose_milk = 0.0
@@ -394,12 +382,12 @@ class Cow(HeiferIII):
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
-            self.fat_percent = self.calculate_fat_percent(self.days_in_milk)
+            self.fat_percent = self.get_user_defined_milk_fat_percent()
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
                 0.15 * self.fat_percent * estimated_daily_milk_produced
-            self.milk_fat_kg = self.fat_percent * estimated_daily_milk_produced
-            self.milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced
+            self.milk_fat_kg = (self.fat_percent / 100) * self.estimated_daily_milk_produced
+            self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
             daily_fat_correct_milk_production = 0.0
@@ -415,6 +403,30 @@ class Cow(HeiferIII):
 
         return self.estimated_daily_milk_produced, self.fat_percent, \
             daily_fat_correct_milk_production
+
+    def get_user_defined_milk_fat_percent(self) -> float:
+        """
+        Return the user-defined milk fat percent for the cow.
+
+        Returns
+        -------
+        float
+            The user-defined milk fat percent for the cow.
+        """
+
+        return im.get_data('animal.animal_config.management_decisions.milk_fat_percent')
+
+    def get_user_defined_milk_protein_percent(self) -> float:
+        """
+        Return the user-defined milk protein percent for the cow.
+
+        Returns
+        -------
+        float
+            The user-defined milk protein percent for the cow.
+        """
+
+        return im.get_data('animal.animal_config.management_decisions.milk_protein_percent')
 
     def calc_manure_excretion(self, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
                               ME_intake):

@@ -155,6 +155,9 @@ class GraphGenerator:
             self._draw_graph(
                 graph_details["type"], prepared_data, prepared_data.keys()
             )
+            legend = graph_details.get("legend")
+            if not legend:
+                graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(
                 graph_details, filter_file_name, graphics_dir
@@ -232,6 +235,7 @@ class GraphGenerator:
         title = graph_details.get("title")
         log_pool: List[Dict[str, str | Dict[str, str]]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
+        filter_by_exclusion = graph_details.get("filter_by_exclusion", False)
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
@@ -240,25 +244,29 @@ class GraphGenerator:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": f"No selected variables for {key}.",
                                      "info_map": info_map})
-                    break
+                    continue
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                for selected_variable in selected_variables:
-                    is_variable_in_data = selected_variable in data_dict
-                    if not is_variable_in_data:
-                        log_pool.append({"warning": f"{selected_variable} not a valid key in provided data",
-                                         "message": f"{selected_variable} won't be graphed.",
-                                         "info_map": info_map})
-                    else:
-                        prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                        log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
-                                         "message": f"Data for {selected_variable} added to prepared_pool.",
-                                         "info_map": info_map})
-                data_dict_has_zero_selected_vars = all(selected_variable not in data_dict for
-                                                       selected_variable in selected_variables)
-                if data_dict_has_zero_selected_vars:
+                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
+                if not filtered_data:
                     log_pool.append({"error": f"Can't plot {title} data set",
-                                     "message": "No filter-file variables found in data provided.",
+                                     "message": "No variables found in data provided.",
                                      "info_map": info_map})
+                    continue
+                non_int_float_keys = [
+                    key for key, value in filtered_data.items()
+                    if not (isinstance(value, (int, float)) or
+                            (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value)))
+                            ]
+                for key in non_int_float_keys:
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": f"{key} key contains data that is non-numerical and can't be graphed.",
+                                     "info_map": info_map})
+                else:
+                    for filtered_key, filtered_value in filtered_data.items():
+                        if filtered_key in prepared_pool:
+                            prepared_pool[filtered_key].extend(filtered_value)
+                        else:
+                            prepared_pool[filtered_key] = filtered_value
             else:
                 prepared_pool[key] = values
                 log_pool.append({"log": f"Successfully added {title} data to prepared_pool",

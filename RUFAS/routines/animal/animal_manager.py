@@ -1634,13 +1634,8 @@ class AnimalManager:
             if time.is_last_day_of_simulation:
                 print()
 
-            manure_excretions_output_data = {}
-            for pen in self.all_pens:
-                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
             self.calc_p_rqmts()
             self.daily_p_update()
-            AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
-
             self._update_phosphorus_concentrations()
             self.record_pen_history()
 
@@ -1656,6 +1651,11 @@ class AnimalManager:
                     if pen.animal_combination.name == "LAC_COW":
                         for animal in pen.animals_in_pen:
                             animal.update_milk_production_history(self.simulation_day)
+
+            manure_excretions_output_data = {}
+            for pen in self.all_pens:
+                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+            AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             AnimalModuleReporter.report_daily_reports(self)

@@ -887,7 +887,7 @@ def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lact
         (lazy_fixture("cow_a"), (11.12, 65.11, 0.204)),
         (lazy_fixture("cow_b"), (12.59, 48.52, 0.204)),
         (lazy_fixture("heifer_a"), (5.9, 0, 0)),
-        (lazy_fixture("heifer_b"), (6.3, 77.71, 10.25)),
+        (lazy_fixture("heifer_b"), (6.3, 77.71, 10.05)),
     ],
 )
 def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
@@ -1328,16 +1328,6 @@ def test_update():
 def test_update_milk_production_history():
     """Unit test for function update_milk_production_history in file routines/animal/life_cycle/cow.py"""
     pass
-
-
-@pytest.mark.parametrize("days_in_milk,expected", [(1, 4.235874340457628),
-                                                   (2, 4.235874340457628),
-                                                   (3, 4.866603466869552)])
-def test_calculate_fat_percent(days_in_milk, expected, mocker: MockerFixture):
-    """Unit test for method calculate_fat_percent in routines/animal/life_cycle/cow.py"""
-    animal_manager = mocker.MagicMock()
-    fat_percent = RUFAS.routines.animal.life_cycle.cow.Cow.calculate_fat_percent(animal_manager, days_in_milk)
-    assert fat_percent == expected
 
 
 def test_cow_determine_param_value():
