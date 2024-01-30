@@ -766,9 +766,7 @@ class GasEmissionsCalculator:
         total_storage_area = num_animals * storage_area_per_animal
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
         total_manure_mass = manure_volume * manure_density
-        housing_specific_constant = cls._housing_specific_constant(
-            total_manure_mass, total_solids
-        )
+        housing_specific_constant = GasEmissionConstants.LIQUID_MANURE_HSC
         storage_area_resistance = cls._ammonia_barn_resistance(
             temp, housing_specific_constant
         )
