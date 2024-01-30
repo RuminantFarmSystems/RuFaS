@@ -1882,3 +1882,21 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture):
                                                   animal_manager.methane_mitigation_method,
                                                   animal_manager.methane_mitigation_additive_amount,
                                                   manure_excretions_output_data)
+
+
+@pytest.mark.parametrize('num_animals, max_spaces, expected',
+                         [(100, 99, 1),
+                          (99, 100, -1),
+                          (100, 100, 0),
+                          (42, 100, -58),
+                          ])
+def test__calc_animal_space_shortage(num_animals: int, max_spaces: int, expected: int, mocker: MockerFixture) -> None:
+    """test for """
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager._calc_max_animal_spaces_per_pen = MagicMock(return_value=max_spaces)
+    mock_animal_manager.all_pens = [MagicMock()]
+    mock_animal_manager.all_pens[0].num_stalls = max_spaces
+    mock_animal_manager.all_pens[0].max_stocking_density = 1
+    actual = mock_animal_manager._calc_animal_space_shortage(num_animals, mock_animal_manager.all_pens)
+    assert actual == expected
