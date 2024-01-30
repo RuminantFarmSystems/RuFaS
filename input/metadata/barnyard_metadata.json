@@ -385,7 +385,7 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- When the cow's days in milk has reached this day, monitoring for estrus will begin. Used only in the ED and ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
+              "description": "Voluntary Waiting Period (days) -- When the cow's days in milk has reached this day, monitoring for estrus and subsequent breeding, if found, will begin. Used only in the ED and ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0.",
               "default": 50,
               "minimum": 0
             },
@@ -506,7 +506,7 @@
               },
               "ovsynch_program_start_day": {
                 "type": "number",
-                "description": "When set properly, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. Because the OvSynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
+                "description": "When set properly in the TAI protocol, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. When ED-TAI protocol is used and no estrus detected between the end of the voluntary waiting period and this OvSynch program start day, then the OvSynch program will start on this day. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "minimum": 0,
                 "default": 70
               },
