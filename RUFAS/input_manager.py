@@ -29,6 +29,7 @@ class InputManager:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
+        self.__properties_used: Dict[str, Any] = {}
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
