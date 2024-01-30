@@ -10,9 +10,6 @@ class AnimalEvents:
     events : dict[int, list[str]]
         A dictionary containing the events indexed by the animal's age in days. The values
         are lists of descriptions for the events on that day.
-    _memo : set[str]
-        A set containing the descriptions of all events that have been looked up in the
-        events dictionary. This is used to speed up the re-lookup of events.
     """
 
     def __init__(self) -> None:
@@ -20,7 +17,6 @@ class AnimalEvents:
         Initialize a new AnimalEvents object.
         """
         self.events: dict[int, list[str]] = {}
-        self._memo: set[str] = set()
 
     def init_from_string(self, events_str: str) -> None:
         """
