@@ -51,7 +51,8 @@ def input_manager_original_method_states(
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
-        "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool
+        "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
+        "_load_properties": mock_input_manager._load_properties,
     }
 
 
@@ -147,6 +148,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
     mock_input_manager._populate_pool = MagicMock(return_value=True)
+    mock_input_manager._load_properties = MagicMock()
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -155,6 +157,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
 
     mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
     mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
+    mock_input_manager._load_properties.assert_called_once()
 
     # Restore original methods
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
