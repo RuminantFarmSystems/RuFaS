@@ -1,0 +1,81 @@
+{   "calf_feeds": [155, 157],
+    "growing_feeds": [19,51, 81, 111, 131],
+    "close_up_feeds": [81,111, 131, 152, 158],
+    "lac_cow_feeds": [19, 25, 27, 81, 118, 152, 158],
+
+   "purchased_feeds": [
+    {
+      "purchased_feed": 19,
+      "purchased_feed_cost": 0.42
+    },
+    {
+      "purchased_feed": 25,
+      "purchased_feed_cost": 0.15
+    },
+    {
+      "purchased_feed": 27,
+      "purchased_feed_cost": 0.27
+    },
+    {
+      "purchased_feed": 51,
+      "purchased_feed_cost": 0.08
+    },
+    {
+      "purchased_feed": 81,
+      "purchased_feed_cost": 0.22
+    },
+    {
+      "purchased_feed": 111,
+      "purchased_feed_cost": 0.06
+    },
+    {
+      "purchased_feed": 131,
+      "purchased_feed_cost": 0.01
+    },
+    {
+      "purchased_feed": 118,
+      "purchased_feed_cost": 0.42
+    },
+    {
+      "purchased_feed": 152,
+      "purchased_feed_cost": 0.62
+    },
+    {
+      "purchased_feed": 158,
+      "purchased_feed_cost": 0.17
+    },
+    {
+      "purchased_feed": 155,
+      "purchased_feed_cost": 0.82
+    },
+    {
+      "purchased_feed": 157,
+      "purchased_feed_cost": 0.44
+    }
+   ],
+    "farm_grown_feeds": [1],
+    "feed_database": "input/databases/feeds.sqlite",
+    "feeds_table": "user_feeds",
+    "feed_quality_table": "feed_quality",
+    "nutrient_table": "nutrients",
+    "storage_options": [
+        {   "storage_type": "bunker",
+            "moisture": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        }
+    ],
+    "user_defined_ration_percentages": {
+        "calf": [],
+        "growing": [],
+        "close_up": [],
+        "lac_cow": [],
+        "tolerance": 0.1,
+        "milk_reduction_maximum": 0.50
+    }
+}

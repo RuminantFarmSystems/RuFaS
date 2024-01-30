@@ -10,54 +10,93 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 
 @dataclass
 class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
-    """Daily output of a manure treatment.
+    """
+    Daily output of a manure treatment.
 
-    Attributes:
-        pen_id: ID of the pen that this output is associated with.
-        simulation_day: Number of days into the simulation.
-        liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen, kg.
-        liquid_manure_nitrogen: Amount of nitrogen in manure, kg.
-        liquid_manure_total_solids: Total amount of solids from the manure and the bedding, kg.
-        liquid_manure_total_volatile_solids: Total amount of volatile solids, kg.
-        liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
-        liquid_manure_potassium: Amount of potassium in manure, kg.
-        daily_final_manure_volume: Final manure volume after treatment, m^3.
-        liquid_manure_daily_volume: Daily volume of manure, m^3.
-        storage_methane: Amount of methane produced the manure treatment process, kg.
-        storage_ammonia: Amount of ammonia produced the manure treatment process, kg.
-        storage_nitrous_oxide: Amount of nitrous oxide produced the manure treatment process, kg.
-        storage_nitrogen_leached: Amount of nitrogen lost through leaching during manure treatment process, kg.
-        sludge_manure_total_solids: Total amount of solids in the sludge manure, kg.
-        sludge_manure_total_volatile_solids: Total amount of volatile solids in the sludge manure, kg.
-        sludge_manure_nitrogen: Amount of nitrogen in the sludge manure, kg.
-        sludge_manure_phosphorus: Amount of phosphorus in the sludge manure, kg.
-        sludge_manure_potassium: Amount of potassium in the sludge manure, kg.
-        sludge_manure_daily_volume: Daily volume of sludge manure, m^3.
-        solid_manure_total_solids: Total amount of solids in the solid manure, kg.
-        solid_manure_total_volatile_solids: Total amount of volatile solids in the solid manure, kg.
-        solid_manure_nitrogen: Amount of nitrogen in the solid manure, kg.
-        solid_manure_inorganic_nitrogen: Amount of inorganic nitrogen in the solid manure, kg.
-        solid_manure_organic_nitrogen: Amount of organic nitrogen in the solid manure, kg.
-        solid_manure_total_ammoniacal_nitrogen_ammonium: Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
-        solid_manure_phosphorus: Amount of phosphorus in the solid manure, kg.
-        solid_manure_water_extractable_inorganic_phosphorus: Amount of water extractable inorganic phosphorus
-            in the solid manure, kg.
-        solid_manure_water_extractable_organic_phosphorus: Amount of water extractable organic phosphorus
-            in the solid manure, kg.
-        solid_manure_non_water_extractable_inorganic_phosphorus: Amount of non-water extractable inorganic phosphorus
-            in the solid manure, kg.
-        solid_manure_non_water_extractable_organic_phosphorus: Amount of non-water extractable organic phosphorus
-            in the solid manure, kg.
-        solid_manure_potassium: Amount of potassium in the solid manure, kg.
-        solid_manure_daily_mass: Daily mass of solid manure, kg.
-        biogas: Amount of biogas produced, m^3.
-        biogas_energy_content: Energy content of biogas, MJ/m^3.
-        methane_generation_volume: Amount of methane generated, m^3.
-        heating_input_energy: Amount of energy input to the heating system, MJ.
-        evaporated_water: Amount of water evaporated, m^3.
-        minimum_digester_volume: Minimum digester volume, m^3.
-        top_cover_volume: Volume of the top cover, m^3.
-        solid_manure_carbon_decomposition: Carbon decomposition, kg.
+    Attribute
+    ---------
+    pen_id: int
+        ID of the pen that this output is associated with.
+    simulation_day: int
+        Number of days into the simulation.
+    liquid_manure_total_ammoniacal_nitrogen: float
+        Total ammoniacal nitrogen, kg.
+    liquid_manure_nitrogen: float
+        Amount of nitrogen in manure, kg.
+    liquid_manure_total_solids: float
+        Total amount of solids from the manure and the bedding, kg.
+    liquid_manure_total_volatile_solids: float
+        Total amount of volatile solids, kg.
+    liquid_manure_phosphorus: float
+        Amount of phosphorus excreted in manure, kg.
+    liquid_manure_potassium: float
+        Amount of potassium in manure, kg.
+    daily_final_manure_volume: float
+        Final manure volume after treatment, m^3.
+    liquid_manure_daily_volume: float
+        Daily volume of manure, m^3.
+    storage_methane: float
+        Amount of methane produced by the manure treatment process, kg.
+    storage_ammonia: float
+        Amount of ammonia produced by the manure treatment process, kg.
+    storage_nitrous_oxide: float
+        Amount of nitrous oxide produced by the manure treatment process, kg.
+    storage_nitrogen_leached: float
+        Amount of nitrogen lost through leaching during the manure treatment process, kg.
+    sludge_manure_total_solids: float
+        Total amount of solids in the sludge manure, kg.
+    sludge_manure_total_volatile_solids: float
+        Total amount of volatile solids in the sludge manure, kg.
+    sludge_manure_nitrogen: float
+        Amount of nitrogen in the sludge manure, kg.
+    sludge_manure_phosphorus: float
+        Amount of phosphorus in the sludge manure, kg.
+    sludge_manure_potassium: float
+        Amount of potassium in the sludge manure, kg.
+    sludge_manure_daily_volume: float
+        Daily volume of sludge manure, m^3.
+    solid_manure_total_solids: float
+        Total amount of solids in the solid manure, kg.
+    solid_manure_total_volatile_solids: float
+        Total amount of volatile solids in the solid manure, kg.
+    solid_manure_nitrogen: float
+        Amount of nitrogen in the solid manure, kg.
+    solid_manure_inorganic_nitrogen: float
+        Amount of inorganic nitrogen in the solid manure, kg.
+    solid_manure_organic_nitrogen: float
+        Amount of organic nitrogen in the solid manure, kg.
+    solid_manure_total_ammoniacal_nitrogen_ammonium: float
+        Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
+    solid_manure_phosphorus: float
+        Amount of phosphorus in the solid manure, kg.
+    solid_manure_water_extractable_inorganic_phosphorus: float
+        Amount of water-extractable inorganic phosphorus in the solid manure, kg.
+    solid_manure_water_extractable_organic_phosphorus: float
+        Amount of water-extractable organic phosphorus in the solid manure, kg.
+    solid_manure_non_water_extractable_inorganic_phosphorus: float
+        Amount of non-water-extractable inorganic phosphorus in the solid manure, kg.
+    solid_manure_non_water_extractable_organic_phosphorus: float
+        Amount of non-water-extractable organic phosphorus in the solid manure, kg.
+    solid_manure_potassium: float
+        Amount of potassium in the solid manure, kg.
+    solid_manure_daily_mass: float
+        Daily mass of solid manure, kg.
+    biogas: float
+        Amount of biogas produced, m^3.
+    biogas_energy_content: float
+        Energy content of biogas, MJ/m^3.
+    methane_generation_volume: float
+        Amount of methane generated, m^3.
+    heating_input_energy: float
+        Amount of energy input to the heating system, MJ.
+    evaporated_water: float
+        Amount of water evaporated, m^3.
+    minimum_digester_volume: float
+        Minimum digester volume, m^3.
+    top_cover_volume: float
+        Volume of the top cover, m^3.
+    solid_manure_carbon_decomposition: float
+        Carbon decomposition, kg.
     """
 
     pen_id: int = -1

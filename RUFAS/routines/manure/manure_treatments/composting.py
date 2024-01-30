@@ -79,6 +79,7 @@ class Composting(BaseManureTreatment):
     _calculate_ammonium_mass() -> float:
         Computes the mass of ammonium in the manure-bedding mix for the current year.
     """
+
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """
         Initializes a new instance of the Composting class, setting up the necessary parameters for
@@ -124,9 +125,9 @@ class Composting(BaseManureTreatment):
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
             storage_methane=methane_emission,
-            storage_ammonia = Nitrogen_loss_to_ammonia_emission,
-            storage_nitrogen_leached = Nitrogen_loss_to_leaching,
-            storage_nitrous_oxide= Nitrogen_loss_to_direct_N2O_emission,
+            storage_ammonia=Nitrogen_loss_to_ammonia_emission,
+            storage_nitrogen_leached=Nitrogen_loss_to_leaching,
+            storage_nitrous_oxide=Nitrogen_loss_to_direct_N2O_emission,
             solid_manure_carbon_decomposition=carbon_decomposition,
             solid_manure_total_solids=remaining_manure_total_solids,
             solid_manure_daily_mass=remaining_manure_mass,
@@ -200,7 +201,7 @@ class Composting(BaseManureTreatment):
         float
             The max microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants.\
+        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants. \
             DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         decomposition_temperature = GasEmissionConstants.DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
 
@@ -216,7 +217,7 @@ class Composting(BaseManureTreatment):
         float
             The slow microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants.\
+        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants. \
             DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         compost_pile_pack_temperature = self._get_current_day_average_temperature_celsius()
 
@@ -334,12 +335,12 @@ class Composting(BaseManureTreatment):
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
 
-
         return \
             N_prior_t - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
             Nitrogen_loss_to_direct_N2O_emission
 
-    def _calculate_organic_nitrogen_mass(self,total_Nitrogen_mass) -> float:
+    @staticmethod
+    def _calculate_organic_nitrogen_mass(total_Nitrogen_mass) -> float:
         """
         This function calculates the mass of organic Nitrogen in the manure-bedding mix of the current day.
 
@@ -351,7 +352,8 @@ class Composting(BaseManureTreatment):
 
         return total_Nitrogen_mass * 0.952
 
-    def _calculate_inorganic_nitrogen_mass(self,total_Nitrogen_mass) -> float:
+    @staticmethod
+    def _calculate_inorganic_nitrogen_mass(total_Nitrogen_mass) -> float:
         """
         This function calculates the mass of inorganic Nitrogen in the manure-bedding mix of the current day.
 
@@ -361,10 +363,10 @@ class Composting(BaseManureTreatment):
             The mass of inorganic Nitrogen in the manure-bedding mix of the current day, kg.
         """
 
-
         return total_Nitrogen_mass * 0.048
 
-    def _calculate_ammoniacal_nitrogen_mass(self,inorganic_Nitrogen_mass) -> float:
+    @staticmethod
+    def _calculate_ammoniacal_nitrogen_mass(inorganic_Nitrogen_mass) -> float:
         """
         This function calculates the mass of ammonium in the manure-bedding mix of the current day.
 
