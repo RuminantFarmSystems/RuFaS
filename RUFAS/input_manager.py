@@ -49,7 +49,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        self._extract_properties()
+        self._load_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -79,7 +79,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _extract_properties(self) -> None:
+    def _load_properties(self) -> None:
         info_map = {"class": self.__class__.__name__,
                     "function": self._extract_properties.__name__,
                     }
