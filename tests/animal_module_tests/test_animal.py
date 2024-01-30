@@ -1480,11 +1480,6 @@ def test__open():
     pass
 
 
-def test__adjust_conception():
-    """Unit test for function _adjust_conception in file routines/animal/life_cycle/cow.py"""
-    pass
-
-
 def test__preg_update():
     """Unit test for function _preg_update in file routines/animal/life_cycle/cow.py"""
     pass
