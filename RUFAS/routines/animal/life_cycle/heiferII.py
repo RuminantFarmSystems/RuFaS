@@ -377,9 +377,9 @@ class HeiferII(HeiferI):
             elif self.is_pregnant:
                 self.days_in_preg += 1
                 self.preg_update(sim_day)
-
             # prior to calving, heifer move to replacement group (heiferIII)
-            if self.days_in_preg == self.gestation_length - AnimalBase.config["prefresh_day"]:
+            if self.days_in_preg != 0 and self.days_in_preg >= self.gestation_length -\
+                    AnimalBase.config["prefresh_day"]:
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.log_event(self.days_born, sim_day, const.HEIFERII_TO_III)
