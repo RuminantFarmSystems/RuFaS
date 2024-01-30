@@ -29,12 +29,14 @@ def pen() -> Pen:
     pen_type = 'freestall'
     manure_handling = "manual_scraping"
     manure_separator = "sedimentation"
+    manure_separator_after_digestion = "screw_press"
     manure_storage = "storage_pit"
     animal_combination = Pen.AnimalCombination.CALF
     max_stocking_density = 1.2
 
     pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
-              manure_handling, manure_separator, manure_storage, animal_combination, max_stocking_density)
+              manure_handling, manure_separator, manure_separator_after_digestion, manure_storage, animal_combination,
+              max_stocking_density)
 
     return pen
 
