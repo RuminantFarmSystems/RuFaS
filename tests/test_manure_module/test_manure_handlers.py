@@ -338,6 +338,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_pen.num_lactating_cows = 100
     mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 101.0
     mock_pen.manure = mock_manure
+    mock_pen.pen_type = "freestall"
 
     mock_bedding = mocker.MagicMock(autospec=BaseBedding)
     mock_bedding.calc_total_bedding_volume.return_value = total_bedding_volume = 30.0
