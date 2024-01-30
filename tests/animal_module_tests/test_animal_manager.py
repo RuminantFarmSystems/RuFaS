@@ -1123,7 +1123,6 @@ def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     # Act
     mock_animal_manager.calc_manure_excretion(mock_feed, methane_model)
     # Assert
-
     mock_pen_0.calc_manure.assert_called_once_with(mock_feed, 'methane_model_choice')
     mock_pen_1.reset_manure.assert_called_once()
 
@@ -1137,9 +1136,23 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
         pen.calc_avg_growth.assert_called_once()
 
 
-def test_record_pen_history():
+def test_record_pen_history(mocker: MockerFixture) -> None:
     """Unit test for function record_pen_history in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.calves = MagicMock()
+    mock_animal_manager.heiferIs = MagicMock()
+    mock_animal_manager.heiferIIs = MagicMock()
+    mock_animal_manager.heiferIIIs = MagicMock()
+    mock_animal_manager.cows = MagicMock()
+    mock_animal_manager.gather_pen_history = MagicMock()
+    mock_animal_manager.record_pen_history()
+    mock_animal_manager.gather_pen_history.assert_has_calls([call(mock_animal_manager.calves),
+                                                             call(mock_animal_manager.heiferIs),
+                                                             call(mock_animal_manager.heiferIIs),
+                                                             call(mock_animal_manager.heiferIIIs),
+                                                             call(mock_animal_manager.cows)])
+    assert 5 == mock_animal_manager.gather_pen_history.call_count
 
 
 def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> None:
