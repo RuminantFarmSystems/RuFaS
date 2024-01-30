@@ -1073,9 +1073,27 @@ def test__group_pens_by_animal_combination(mocker: MockerFixture):
     assert actual == expected
 
 
-def test__calc_max_animal_spaces_per_pen():
-    """Unit test for function _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
-    pass
+@pytest.mark.parametrize(
+    'num_stalls, max_stocking_density, expected',
+    [(1, 1, 1),
+     (1, 2, 2),
+     (0, 1, 0),
+     (1, 0, 0),
+     (100, 1, 100),
+     (-1, 1, ValueError),
+     (1, -1, ValueError)]
+)
+def test__calc_max_animal_spaces_per_pen(num_stalls: float, max_stocking_density: float, expected: float) -> None:
+    """Unit test for fun
+    ction _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
+    if expected is ValueError:
+        with pytest.raises(ValueError,
+                           match='The number of stalls and maximum stocking density must be greater than or equal to 0.'
+                           ):
+            AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+    else:
+        actual = AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        assert actual == expected
 
 
 def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
