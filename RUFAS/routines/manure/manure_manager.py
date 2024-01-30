@@ -674,7 +674,7 @@ class ManureManager:
         # Currently, calling the daily_update on the treatment only returns one final output
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
-            manure_treatment_daily_input=reception_pit_daily_output,
+            manure_treatment_daily_input=manure_separator_daily_output or reception_pit_daily_output,
             pen=pen,
             sim_day=simulation_day,
             manure_separator=self.manure_separators[pen.id],

@@ -440,7 +440,7 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     # Assert
     mock_manure_treatment.daily_update.assert_called_once_with(
         manure_handler_daily_output=mock_manure_handler_daily_output,
-        manure_treatment_daily_input=mock_reception_pit_daily_output,
+        manure_treatment_daily_input=mock_manure_separator_daily_output,
         pen=mock_manure_manager_pen,
         sim_day=simulation_day,
         manure_separator=mock_manure_separator,
