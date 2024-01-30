@@ -470,7 +470,7 @@ def test_barn_resistance() -> None:
 
     # Arrange
     tempC = 15.0
-    hsc = GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT
+    hsc = GasEmissionConstants.HOUSING_HSC
     expected = hsc * (1 - 0.027 * (20.0 - tempC))
 
     # Act
@@ -1069,47 +1069,6 @@ def test_storage_ammonia_emission(
             pH,
         )
         assert actual == pytest.approx(expected)
-
-
-@pytest.mark.parametrize(
-    "manure_mass, total_solids, expected, error_message",
-    [
-        # Test when manure_mass and total_solids are 0
-        (0.0, 0.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
-        # Test when dry matter >= SOLID_MANURE_THRESHOLD
-        (100.0, 10.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
-        # Test when dry matter >= SLURRY_MANURE_THRESHOLD
-        (100.0, 7.0, GasEmissionConstants.SLURRY_MANURE_HSC, None),
-        # Test when dry matter < SLURRY_MANURE_THRESHOLD (i.e., liquid manure)
-        (100.0, 4.9, GasEmissionConstants.LIQUID_MANURE_HSC, None),
-        # Test when manure_mass < 0
-        (-1.0, 20.0, ValueError, "Manure mass must be greater than or equal to 0."),
-        # Test when total_solids < 0
-        (10.0, -1.0, ValueError, "Total solids must be greater than or equal to 0."),
-    ],
-)
-def test_housing_specific_constant(
-        manure_mass: float,
-        total_solids: float,
-        expected: float | Exception,
-        error_message: str | None,
-) -> None:
-    """
-    Unit test for _housing_specific_constant() method in calculator.py.
-
-    This test verifies that the method correctly calculates the housing-specific constant given
-    the total manure mass and total solids in manure.
-
-    """
-    # Act and assert
-    if isinstance(expected, type) and issubclass(expected, Exception):
-        with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator._housing_specific_constant(manure_mass, total_solids)
-    else:
-        actual = GasEmissionsCalculator._housing_specific_constant(
-            manure_mass, total_solids
-        )
-        assert actual == expected
 
 
 @pytest.mark.parametrize(

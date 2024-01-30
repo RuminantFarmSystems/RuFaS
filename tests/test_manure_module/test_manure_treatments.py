@@ -1169,7 +1169,7 @@ def test_slurry_storage_daily_update_helper(
 
     mock_pen = mocker.MagicMock()
     mock_pen.num_animals = num_animals = 100
-    mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 1000.0
+    mock_pen.barn_area_from_pen_type = 1000.0
     slurry_storage._current_pen = mock_pen
 
     initial_manure_treatment_daily_output = ManureTreatmentDailyOutput()
@@ -1225,9 +1225,9 @@ def test_slurry_storage_daily_update_helper(
     if slurry_storage_treatment_type_name == "slurry storage underfloor":
         patch_for_calc_ammonia_emission.assert_called_once_with(
             num_animals=num_animals,
-            barn_area=barn_area_from_pen_type,
             accumulated_manure_volume=final_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
+            total_solids=slurry_storage._accumulated_output.liquid_manure_total_solids,
         )
     elif slurry_storage_treatment_type_name == "slurry storage outdoor":
         patch_for_calc_ammonia_emission.assert_called_once_with(
@@ -1317,7 +1317,6 @@ def test_slurry_storage_calc_ammonia_emission(
     )
 
     num_animals = 100
-    barn_area = 1000.0
     accumulated_manure_volume = 200.0
     accumulated_manure_total_ammoniacal_nitrogen = 20.0
     temperature_celsius = 20.0
@@ -1330,7 +1329,7 @@ def test_slurry_storage_calc_ammonia_emission(
     if slurry_storage_treatment_type_name == "slurry storage underfloor":
         patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
             "RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor."
-            "GasEmissionsCalculator.ammonia_emission",
+            "GasEmissionsCalculator.storage_ammonia_emission",
             return_value=expected_ammonia_loss,
         )
     elif slurry_storage_treatment_type_name == "slurry storage outdoor":
@@ -1350,9 +1349,9 @@ def test_slurry_storage_calc_ammonia_emission(
             actual_new_accumulated_manure_total_ammoniacal_nitrogen,
         ) = slurry_storage.calc_ammonia_emission(
             num_animals=num_animals,
-            barn_area=barn_area,
             accumulated_manure_volume=accumulated_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+            total_solids=slurry_storage._accumulated_output.liquid_manure_total_solids
         )
     elif slurry_storage_treatment_type_name == "slurry storage outdoor":
         (
@@ -1370,10 +1369,11 @@ def test_slurry_storage_calc_ammonia_emission(
     if slurry_storage_treatment_type_name == "slurry storage underfloor":
         patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
             num_animals=num_animals,
-            barn_area=barn_area,
-            total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-            mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+            manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+            manure_volume=accumulated_manure_volume,
+            manure_density=ManureConstants.MANURE_DENSITY,
             temperature_celsius=temperature_celsius,
+            total_solids=slurry_storage._accumulated_output.liquid_manure_total_solids,
         )
     elif slurry_storage_treatment_type_name == "slurry storage outdoor":
         patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
