@@ -97,9 +97,8 @@ class GrowthConstraints:
         if min_temp < air_temp <= optimal_temp:
             stress = 1 - exp(numerator / (air_temp - min_temp)**2)
 
-        elif optimal_temp < air_temp <= double_diff:
-            stress = 1 - exp(numerator / (double_diff - min_temp)**2)
-
+        elif optimal_temp < air_temp < double_diff:
+            stress = 1 - exp(numerator / (double_diff - air_temp)**2)
         else:
             stress = 1
 
