@@ -1472,7 +1472,8 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     'args',
     [
         ({"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 1,
-         "days_born": 1, "body_weight": 1.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0, "birth_weight": 2.0, "p_init": 1}),
+         "days_born": 1, "body_weight": 1.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+          "birth_weight": 2.0, "p_init": 1}),
         ({"id": 2, "breed": 1, "birth_date": 1, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
          "wean_weight": 1, "days_born": 1, "birth_weight": 2, "p_init": 1}),
     ]
@@ -1497,7 +1498,6 @@ def test_init_calf(mocker: MockerFixture, args: dict) -> None:
                  new_callable=mocker.PropertyMock, return_value=animal_config)
     calf = Calf(args)
 
-    print(calf.birth_weight)
     assert calf.birth_weight == 2.0
     assert calf.animal_intake == 0
     assert calf.DBW == 0
@@ -1510,7 +1510,6 @@ def test_init_calf(mocker: MockerFixture, args: dict) -> None:
     else:
         assert calf.gender == "male"
         assert calf.sold
-        assert calf.birth_weight == 2.0
         assert calf.body_weight == 2.0
         assert calf.wean_weight == 0
 
@@ -1547,7 +1546,8 @@ def test_calf_init_values(mocker: MockerFixture, semen_type: str, conventional_s
 
     # act
     args = {"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 100,
-            "days_born": 10, "body_weight": 5.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0, "birth_weight": 2.0, "p_init": 1}
+            "days_born": 10, "body_weight": 5.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+            "birth_weight": 2.0, "p_init": 1}
     Calf.init_values(calf, args)
 
     # assert
@@ -1683,12 +1683,10 @@ def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> No
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_config)
     calf.update_body_weight_history = mocker.MagicMock()
-    calf.get_non_preg_bw_change = mocker.MagicMock()
     calf.days_born = days_born
 
     # act
     sim_day = 2
-    weaned = False
     weaned = Calf.update(calf, sim_day)
     prev_weight = calf.body_weight
     calf.days_born += 1
