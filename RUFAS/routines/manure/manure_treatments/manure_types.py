@@ -5,7 +5,7 @@ class ManureType(Enum):
     """
     This is an Enum class that represents different types of manure.
 
-    Attributes
+    Attribute
     ----------
     LIQUID : str
         Represents liquid manure.
