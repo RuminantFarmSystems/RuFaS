@@ -51,8 +51,62 @@ def input_manager_original_method_states(
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
-        "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool
+        "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
+        "_load_properties": mock_input_manager._load_properties,
     }
+
+
+def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for successfully loading properties in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    properties_data = {"key1": "value1", "key2": "value2"}
+    mocker.patch("builtins.open", mock_open(read_data=json.dumps(properties_data)))
+    mocker.patch("RUFAS.input_manager.InputManager._load_data_from_json", return_value=properties_data)
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        mock_input_manager._load_properties()
+        assert mock_input_manager._InputManager__metadata["properties"] == properties_data
+        assert add_log.call_count == 2
+
+
+def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling FileNotFoundError in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=False)
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/missing_properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(FileNotFoundError):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
+
+
+def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling JSONDecodeError in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/invalid_json.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(json.JSONDecodeError):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
+
+
+def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Unit test for handling unexpected errors in _load_properties method."""
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("builtins.open", mock_open(read_data="valid_json"))
+    mocker.patch("RUFAS.input_manager.InputManager._load_data_from_json", side_effect=Exception("Unexpected error"))
+
+    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(Exception, match="Unexpected error"):
+            mock_input_manager._load_properties()
+        assert add_error.call_count == 1
 
 
 def test_load_metadata(mock_input_manager: InputManager) -> None:
@@ -147,6 +201,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
     mock_input_manager._populate_pool = MagicMock(return_value=True)
+    mock_input_manager._load_properties = MagicMock()
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -155,11 +210,13 @@ def test_start_data_processing(mock_input_manager: InputManager,
 
     mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
     mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
+    mock_input_manager._load_properties.assert_called_once()
 
     # Restore original methods
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
+    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
 
 
 @pytest.mark.parametrize("input_data, metadata_properties, expected_result", [
