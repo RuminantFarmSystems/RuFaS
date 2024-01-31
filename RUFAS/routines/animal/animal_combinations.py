@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class AnimalCombination(Enum):
+
     """
     Enumeration that represents the valid combinations of animals in a pen.
     Attributes
@@ -17,6 +18,7 @@ class AnimalCombination(Enum):
     GROWING_AND_CLOSE_UP: int
         Represents a pen with all heifers and dry cows only
     """
+
     CALF = 0  # calves
     GROWING = 1  # heiferIs, heiferIIs
     CLOSE_UP = 2  # heiferIIIs, dry cows
