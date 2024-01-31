@@ -3917,9 +3917,9 @@ def test_composting_calc_methane_emission(mocker: MockFixture) -> None:
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
-    expected_result = (daily_input_mock.liquid_manure_total_volatile_solids * 365) * \
-                      (GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 *
-                       methane_conversion_factor)
+    expected_result = daily_input_mock.liquid_manure_total_volatile_solids * (GasEmissionConstants.
+                                                                              ACHIEVABLE_METHANE_EMISSION * 0.67 *
+                                                                              methane_conversion_factor)
 
     result = composting.calc_methane_emission()
 

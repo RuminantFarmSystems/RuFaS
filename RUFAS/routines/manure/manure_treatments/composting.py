@@ -110,7 +110,7 @@ class Composting(BaseManureTreatment):
                                                                 carbon_decomposition=carbon_decomposition)
 
         remaining_manure_total_solids = manure_total_solids - daily_dry_matter_loss
-        remaining_manure_volatile_solids = manure_volatile_solids- methane_emission
+        remaining_manure_volatile_solids = manure_volatile_solids - methane_emission
         remaining_manure_mass = remaining_manure_total_solids / 0.12
         Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
         Nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
@@ -131,7 +131,7 @@ class Composting(BaseManureTreatment):
             storage_nitrous_oxide=Nitrogen_loss_to_direct_N2O_emission,
             solid_manure_carbon_decomposition=carbon_decomposition,
             solid_manure_total_solids=remaining_manure_total_solids,
-            solid_manure_total_volatile_solids = remaining_manure_volatile_solids,
+            solid_manure_total_volatile_solids=remaining_manure_volatile_solids,
             solid_manure_daily_mass=remaining_manure_mass,
             solid_manure_phosphorus=daily_input.liquid_manure_phosphorus,
             solid_manure_potassium=daily_input.liquid_manure_potassium,
