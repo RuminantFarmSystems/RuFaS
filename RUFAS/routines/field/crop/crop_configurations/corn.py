@@ -25,21 +25,21 @@ class Corn(CropData):
 
     potential_heat_units: float = 1150
 
-    max_leaf_area_index: float = 3.0
+    max_leaf_area_index: float = 6.0
     first_heat_fraction_point: float = 0.15
-    first_leaf_fraction_point: float = 0.05
+    first_leaf_fraction_point: float = 0.15
     second_heat_fraction_point: float = 0.50
     second_leaf_fraction_point: float = 0.95
     senescent_heat_fraction: float = 0.90
 
-    light_use_efficiency: float = 39.0
+    light_use_efficiency: float = 40.0
 
-    emergence_nitrogen_fraction: float = 0.0470
-    half_mature_nitrogen_fraction: float = 0.0177
-    mature_nitrogen_fraction: float = 0.0138
-    emergence_phosphorus_fraction: float = 0.0048
-    half_mature_phosphorus_fraction: float = 0.0018
-    mature_phosphorus_fraction: float = 0.0014
+    emergence_nitrogen_fraction: float = 0.044
+    half_mature_nitrogen_fraction: float = 0.0164
+    mature_nitrogen_fraction: float = 0.0128
+    emergence_phosphorus_fraction: float = 0.0062
+    half_mature_phosphorus_fraction: float = 0.0023
+    mature_phosphorus_fraction: float = 0.0018
 
     max_root_depth: float = 2_000
 
@@ -141,10 +141,8 @@ class CornSilage(Corn):
     crop_type: CropType = CropType.SILAGE
     storage_type: StorageType = StorageType.BUNKER
 
-    max_leaf_area_index: float = 4.0
-
     optimal_harvest_index: float = 0.90
-    min_harvest_index: float = 0.68
+    min_harvest_index: float = 0.9
     dry_matter_percentage: float = 35.361
     lignin_dry_matter_percentage: float = 3.054
     crude_protein_percent: float = 7.707
