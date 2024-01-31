@@ -119,7 +119,6 @@ class LifeCycleManager:
         self.vwp_cow_num = 0
         self.milking_cow_num = 0
         self.dry_cow_num = 0
-        self.dnb_cow_num = 0 
 
         self.dry_cow_percent = 0.0
         self.milking_cow_percent = 0.0
@@ -127,10 +126,13 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.dry_cows_daily_milk_production = 0.0
         self.herd_milk_fat_kg = 0.0
         self.herd_milk_fat_percent = 0.0
+        self.dry_cows_milk_fat_kg = 0.0
         self.herd_milk_protein_kg = 0.0
         self.herd_milk_protein_percent = 0.0
+        self.dry_cows_milk_protein_kg = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -325,12 +327,15 @@ class LifeCycleManager:
         self.daily_milk_production = sum(
             cow.estimated_daily_milk_produced for cow in cows
         )
-        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows)
-        self.herd_milk_fat_percent = self.herd_milk_fat_kg / self.daily_milk_production
-        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows)
-        self.herd_milk_protein_percent = (
-            self.herd_milk_protein_kg / self.daily_milk_production
+        self.dry_cows_daily_milk_production = sum(
+            cow.estimated_daily_milk_produced for cow in cows if not cow.milking
         )
+        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
+        self.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
+        self.dry_cows_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if not cow.milking)
+        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
+        self.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
+        self.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
 
         return (
             animals_added,
@@ -384,7 +389,6 @@ class LifeCycleManager:
         self.vwp_cow_num = 0
         self.milking_cow_num = 0
         self.dry_cow_num = 0
-        self.dnb_cow_num = 0
 
         self.preg_cow_percent = 0.0
         self.dry_cow_percent = 0.0
@@ -728,18 +732,16 @@ class LifeCycleManager:
 
         """
         args = heiferIII.get_heiferIII_values()
-        args.update(
-            {
-                "body_weight_history": heiferIII.body_weight_history,
-                "pen_history": heiferIII.pen_history,
-                "conceptus_weight": heiferIII.conceptus_weight,
-                "calf_birth_weight": heiferIII.calf_birth_weight,
-            }
-        )
-        args.update(repro_program=AnimalBase.config["cow_repro_method"])
-        args.update(presynch_method=AnimalBase.config["cows"]["presynch_protocol"])
-        args.update(tai_method_c=AnimalBase.config["cows"]["repro_sub_protocol"])
-        args.update(resynch_method=AnimalBase.config["cows"]["resynch_protocol"])
+        args.update({
+            'body_weight_history': heiferIII.body_weight_history,
+            'pen_history': heiferIII.pen_history,
+            'conceptus_weight': heiferIII.conceptus_weight,
+            'calf_birth_weight': heiferIII.calf_birth_weight
+        })
+        args.update(repro_program=AnimalBase.config['cow_repro_method'])
+        args.update(presynch_method=AnimalBase.config['cows']['presynch_program'])
+        args.update(tai_method_c=AnimalBase.config['cows']['ovsynch_program'])
+        args.update(resynch_method=AnimalBase.config['cows']['resynch_program'])
         new_cow = Cow(args)
         if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
@@ -923,7 +925,7 @@ class LifeCycleManager:
                 self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk
             )
 
-            if cow.days_in_milk < self.animal_config["voluntary_waiting_period"]:
+            if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
                 self.vwp_cow_num += 1
         else:
             self.dry_cow_num += 1
@@ -941,8 +943,6 @@ class LifeCycleManager:
             self.preg_cow_num, self.avg_days_in_preg = Utility.calc_average(
                 self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg
             )
-        if cow.do_not_breed: 
-            self.dnb_cow_num += 1
 
     def _handle_cow_calves(
         self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num

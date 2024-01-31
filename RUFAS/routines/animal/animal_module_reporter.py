@@ -166,7 +166,7 @@ class AnimalModuleReporter:
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal['status']
+            del ration_per_animal["status"]
             del ration_per_animal["objective"]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0
@@ -327,12 +327,27 @@ class AnimalModuleReporter:
             "daily_milk_production", life_cycle_manager.daily_milk_production, info_map
         )
         om.add_variable(
+            "dry_cows_daily_milk_production", life_cycle_manager.dry_cows_daily_milk_production, info_map
+        )
+        om.add_variable(
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
+        )
+        om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
         )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
             info_map,
+        )
+        om.add_variable(
+            "dry_cows_milk_protein_kg", life_cycle_manager.dry_cows_milk_protein_kg, info_map
         )
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, info_map)
@@ -440,7 +455,6 @@ class AnimalModuleReporter:
             om.add_variable("animal_id", animal.id, info_map)
             om.add_variable("animal_type", animal.__class__.__name__, info_map)
             om.add_variable("body_weight", animal.body_weight, info_map)
-            om.add_variable("sold_day", animal.sold_at_day, info_map)
 
             if hasattr(animal, "sold_at_day"):
                 om.add_variable("sold_day", animal.sold_at_day, info_map)
