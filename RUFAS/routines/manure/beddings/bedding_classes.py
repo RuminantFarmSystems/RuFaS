@@ -356,7 +356,7 @@ class DefaultBeddingConfigFactory:
     these predefined configurations based on the bedding type.
 
     """
-
+    # TODO: Use correct values for straw bedding. Issue #1116
     # Predefined configuration for Sawdust Bedding
     SAWDUST_BEDDING_CONFIG = BeddingConfig(
         bedding_mass_per_day=1.97,

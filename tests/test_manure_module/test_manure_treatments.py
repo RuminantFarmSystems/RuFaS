@@ -611,7 +611,7 @@ def test_anaerobic_lagoon_default_config() -> None:
                 ),
         ),
         (
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
                 (
                         DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
                         DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
@@ -656,8 +656,8 @@ def test_default_manure_treatment_config_factory_get_instance(
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
         ),
         (
-                "anaerobic digestion and lagoon with split",
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                "anaerobic digestion and lagoon with separator",
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ),
         ("slurry_storage_underfloor", ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR),
         ("slurry_storage_outdoor", ManureTreatmentType.SLURRY_STORAGE_OUTDOOR),
@@ -668,8 +668,8 @@ def test_default_manure_treatment_config_factory_get_instance(
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
         ),
         (
-                "anaerobic_digestion_and_lagoon_with_split",
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+                "anaerobic_digestion_and_lagoon_with_separator",
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ),
         ("compost bedded pack barn", ManureTreatmentType.COMPOST_BEDDED_PACK_BARN),
         ("open lots", ManureTreatmentType.OPEN_LOTS),
@@ -821,9 +821,9 @@ def test_manure_treatment_factory_get_instance(
     assert manure_treatment._current_manure_treatment_daily_input is None
     assert manure_treatment._manure_separator is None
     assert manure_treatment._manure_separator_daily_output is None
+    assert manure_treatment._manure_separator_after_digestion is None
+    assert manure_treatment._manure_separator_after_digestion_daily_output is None
     assert manure_treatment._accumulated_output == ManureTreatmentDailyOutput()
-
-    assert manure_treatment.manure_separator_daily_output is None
 
 
 # Test BaseManureTreatment
@@ -838,7 +838,7 @@ def test_manure_treatment_factory_get_instance(
         "anaerobic digestion",
         "anaerobic lagoon",
         "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with split",
+        "anaerobic digestion and lagoon with separator",
         "compost bedded pack barn",
         "open lots",
     ],
@@ -858,6 +858,7 @@ def test_initialize_private_attributes_during_update(
     manure_handler_daily_output = mocker.MagicMock()
     manure_treatment_daily_input = mocker.MagicMock()
     manure_separator = mocker.MagicMock()
+    manure_separator_after_digestion = mocker.MagicMock()
 
     # Act
     manure_treatment._initialize_private_attributes_during_update(
@@ -866,6 +867,7 @@ def test_initialize_private_attributes_during_update(
         manure_handler_daily_output=manure_handler_daily_output,
         manure_treatment_daily_input=manure_treatment_daily_input,
         manure_separator=manure_separator,
+        manure_separator_after_digestion=manure_separator_after_digestion,
     )
 
     # Assert
@@ -991,7 +993,7 @@ def test_initialize_daily_output_during_update(
         "anaerobic digestion",
         "anaerobic lagoon",
         "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with split",
+        "anaerobic digestion and lagoon with separator",
         "compost bedded pack barn",
         "open lots",
     ],
@@ -1042,7 +1044,7 @@ def test_get_current_day_temperature_and_rainfall(
         "anaerobic digestion",
         "anaerobic lagoon",
         "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with split",
+        "anaerobic digestion and lagoon with separator",
         "compost bedded pack barn",
         "open lots",
     ],
@@ -1086,7 +1088,7 @@ def test_accumulate_daily_output(
         "anaerobic digestion",
         "anaerobic lagoon",
         "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with split",
+        "anaerobic digestion and lagoon with separator",
         "compost bedded pack barn",
         "open lots",
     ],
@@ -1100,6 +1102,7 @@ def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> N
     mock_pen = mocker.MagicMock()
     simulation_day = 10
     mock_manure_separator = mocker.MagicMock()
+    mock_manure_separator_after_digestion = mocker.MagicMock()
 
     manure_treatment = ManureTreatmentFactory.get_instance(
         manure_treatment_type_name=manure_treatment_type_name,
@@ -1123,6 +1126,7 @@ def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> N
         pen=mock_pen,
         sim_day=simulation_day,
         manure_separator=mock_manure_separator,
+        manure_separator_after_digestion=mock_manure_separator_after_digestion
     )
 
     # Assert
@@ -1132,6 +1136,7 @@ def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> N
         mock_manure_handler_daily_output,
         mock_manure_treatment_daily_input,
         mock_manure_separator,
+        mock_manure_separator_after_digestion,
     )
     patch_for_daily_update_helper.assert_called_once()
     assert actual_manure_treatment_daily_output == expected_manure_treatment_daily_output
@@ -3274,14 +3279,14 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(
     )
 
     if manure_separator_exists:
-        mock_manure_separator = mocker.MagicMock()
-        mock_manure_separator.daily_update.return_value = (
-            mock_manure_separator_daily_output
+        mock_manure_separator_after_digestion = mocker.MagicMock()
+        mock_manure_separator_after_digestion.daily_update.return_value = (
+            mock_manure_separator_after_digestion_daily_output
         ) = mocker.MagicMock()
     else:
-        mock_manure_separator = None
-        mock_manure_separator_daily_output = None
-    anaerobic_digestion_and_lagoon._manure_separator = mock_manure_separator
+        mock_manure_separator_after_digestion = None
+        mock_manure_separator_after_digestion_daily_output = None
+    anaerobic_digestion_and_lagoon._manure_separator_after_digestion = mock_manure_separator_after_digestion
 
     mock_anaerobic_lagoon = mocker.MagicMock()
     mock_anaerobic_lagoon.daily_update.return_value = (
@@ -3308,18 +3313,18 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(
     )
 
     if manure_separator_exists:
-        mock_manure_separator.daily_update.assert_called_once_with(
+        mock_manure_separator_after_digestion.daily_update.assert_called_once_with(
             manure_separator_daily_input=mock_anaerobic_digestion_daily_output
         )
     assert (
-            anaerobic_digestion_and_lagoon._manure_separator_daily_output
-            == mock_manure_separator_daily_output
+            anaerobic_digestion_and_lagoon._manure_separator_after_digestion_daily_output
+            == mock_manure_separator_after_digestion_daily_output
     )
 
     if manure_separator_exists:
         mock_anaerobic_lagoon.daily_update.assert_called_once_with(
             manure_handler_daily_output=mock_manure_handler_daily_output,
-            manure_treatment_daily_input=mock_manure_separator_daily_output,
+            manure_treatment_daily_input=mock_manure_separator_after_digestion_daily_output,
             pen=mock_current_pen,
             sim_day=mock_sim_day,
         )

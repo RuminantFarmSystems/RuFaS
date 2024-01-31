@@ -180,7 +180,7 @@ class DefaultManureTreatmentConfigFactory:
                 cls.ANAEROBIC_DIGESTION_CONFIG,
                 cls.ANAEROBIC_LAGOON_CONFIG,
             ),
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: (
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: (
                 cls.ANAEROBIC_DIGESTION_CONFIG,
                 cls.ANAEROBIC_LAGOON_CONFIG,
             ),
