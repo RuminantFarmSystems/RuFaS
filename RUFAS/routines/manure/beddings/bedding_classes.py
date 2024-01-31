@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -17,7 +15,7 @@ class BeddingType(DefaultEnum):
     This class, derived from the `DefaultEnum` base class, provides a set of predefined constants
     that represent different types of bedding such as sawdust, straw, and sand. The default type is sand.
 
-    Attributes
+    Attribute
     ----------
     SAWDUST : str
         Represent the 'sawdust' type of bedding.
@@ -29,6 +27,8 @@ class BeddingType(DefaultEnum):
         Represent the 'straw' type of bedding.
     SAND : str
         Represent the 'sand' type of bedding.
+    NONE : str
+        Represent no bedding.
     DEFAULT : str
         The default type of bedding is 'sand' if none is specified.
 
@@ -39,7 +39,47 @@ class BeddingType(DefaultEnum):
     MANURE_SOLIDS = "manure solids"
     STRAW = "straw"
     SAND = "sand"
+    NONE = "none"
     DEFAULT = SAND
+
+
+@dataclass
+class BeddingConfig:
+    bedding_mass_per_day: float
+    """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
+
+    bedding_density: float
+    """Density of the bedding (:math:`kg/m^3`)."""
+
+    bedding_dry_matter_content: float
+    """
+    Dry matter content in the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
+    bedding_cleaned_fraction: float
+    """
+    Fraction of bedding that is removed from the barn (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
+    bedding_carbon_fraction: float
+    """
+    Fraction of bedding that is composed of carbon (unitless).
+    Value should be in the range :math:`[0.0 - 1.0]`.
+    """
+
+    bedding_phosphorus_content: float
+    """Quantity of phosphorus in the bedding (kg)."""
+
+    bedding_type: BeddingType
+    """Type of bedding."""
+
+    sand_removal_efficiency: float
+    """
+    Efficiency of removing sand from the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
 
 
 class BaseBedding(ABC):
@@ -65,6 +105,17 @@ class BaseBedding(ABC):
         Quantity of phosphorus in the bedding (kg).
     bedding_type : str
         Type of bedding as a string.
+
+    Methods
+    -------
+    calc_total_bedding_washed(num_animals: int) -> float
+        Calculates total amount of bedding washed away.
+    calc_total_bedding_mass(num_animals: int) -> float
+        Calculates total amount of bedding needed.
+    calc_total_bedding_volume(num_animals: int) -> float
+        Calculates total volume of bedding needed.
+    calc_total_bedding_dry_solids(num_animals: int) -> float
+        Calculates total dry solids in the bedding.
 
     """
 
@@ -154,7 +205,7 @@ class BaseBedding(ABC):
 
         """
         return (
-            self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
+            self.calc_total_bedding_mass(num_animals) * self.bedding_dry_matter_content
         )
 
 
@@ -273,43 +324,28 @@ class SandBedding(BaseBedding):
         return bedding_mass * (1 - self.sand_removal_efficiency)
 
 
-@dataclass
-class BeddingConfig:
-    bedding_mass_per_day: float
-    """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
-
-    bedding_density: float
-    """Density of the bedding (:math:`kg/m^3`)."""
-
-    bedding_dry_matter_content: float
+class NoBedding(BaseBedding):
     """
-    Dry matter content in the bedding (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
+    A concrete class representing no bedding.
+
+    Notes
+    -----
+    Because this class represents no bedding, it overrides inherited methods to simply return 0.0, to avoid possible
+    division-by-zero errors.
+
     """
 
-    bedding_cleaned_fraction: float
-    """
-    Fraction of bedding that is removed from the barn (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
+    def calc_total_bedding_washed(self, num_animals: int) -> float:
+        return 0.0
 
-    bedding_carbon_fraction: float
-    """
-    Fraction of bedding that is composed of carbon (unitless).
-    Value should be in the range :math:`[0.0 - 1.0]`.
-    """
+    def calc_total_bedding_mass(self, num_animals: int) -> float:
+        return 0.0
 
-    bedding_phosphorus_content: float
-    """Quantity of phosphorus in the bedding (kg)."""
+    def calc_total_bedding_volume(self, num_animals: int) -> float:
+        return 0.0
 
-    bedding_type: BeddingType
-    """Type of bedding."""
-
-    sand_removal_efficiency: float
-    """
-    Efficiency of removing sand from the bedding (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
+    def calc_total_bedding_dry_solids(self, num_animals: int) -> float:
+        return 0.0
 
 
 class DefaultBeddingConfigFactory:
@@ -382,6 +418,18 @@ class DefaultBeddingConfigFactory:
         sand_removal_efficiency=1.0,
     )
 
+    # Predefined configuration for no bedding
+    NONE_BEDDING_CONFIG = BeddingConfig(
+        bedding_mass_per_day=0.0,
+        bedding_density=0.0,
+        bedding_dry_matter_content=0.0,
+        bedding_cleaned_fraction=0.0,
+        bedding_carbon_fraction=0.0,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.NONE,
+        sand_removal_efficiency=0.0,
+    )
+
     @classmethod
     def get_instance(cls, bedding_type: BeddingType) -> BeddingConfig:
         """
@@ -409,6 +457,7 @@ class DefaultBeddingConfigFactory:
             BeddingType.MANURE_SOLIDS: cls.MANURE_SOLIDS_BEDDING_CONFIG,
             BeddingType.STRAW: cls.STRAW_BEDDING_CONFIG,
             BeddingType.SAND: cls.SAND_BEDDING_CONFIG,
+            BeddingType.NONE: cls.NONE_BEDDING_CONFIG,
         }
 
         if bedding_type not in bedding_config_by_type:
@@ -462,6 +511,7 @@ class BeddingFactory:
             BeddingType.MANURE_SOLIDS: ManureSolidsBedding,
             BeddingType.STRAW: StrawBedding,
             BeddingType.SAND: SandBedding,
+            BeddingType.NONE: NoBedding,
         }
 
         bedding_type = BeddingType.get_type(bedding_type_name)

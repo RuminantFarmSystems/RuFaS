@@ -57,9 +57,23 @@ class CornGrain(Corn):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=1.37
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=8.514
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=1.880
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=70.367
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=3.551
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=9.761
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=2.884
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=1.504
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00309
+    yield_phosphorus_fraction: float, default=0.00309
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
@@ -73,6 +87,13 @@ class CornGrain(Corn):
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 86.0907
     lignin_dry_matter_percentage: float = 1.37
+    crude_protein_percent: float = 8.514
+    non_protein_nitrogen: float = 1.880
+    starch: float = 70.367
+    adf: float = 3.551
+    ndf: float = 9.761
+    sugar: float = 2.884
+    ash: float = 1.504
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00309
 
@@ -92,9 +113,23 @@ class CornSilage(Corn):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=3.054
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=7.707
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=3.996
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=32.867
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=24.332
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=40.931
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=2.971
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=3.843
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00232
+    yield_phosphorus_fraction: float, default=0.00232
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -108,5 +143,12 @@ class CornSilage(Corn):
     min_harvest_index: float = 0.68
     dry_matter_percentage: float = 35.361
     lignin_dry_matter_percentage: float = 3.054
+    crude_protein_percent: float = 7.707
+    non_protein_nitrogen: float = 3.996
+    starch: float = 32.867
+    adf: float = 24.332
+    ndf: float = 40.931
+    sugar: float = 2.971
+    ash: float = 3.843
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00232

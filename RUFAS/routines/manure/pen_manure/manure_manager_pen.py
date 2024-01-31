@@ -48,6 +48,7 @@ class ManureManagerPen:
         self.animals_in_pen = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[str] = pen.classes_in_pen
+        self.animal_combination: Pen.AnimalCombination = pen.animal_combination
 
         self.housing_type: str = pen.housing_type
         self.pen_type: str = pen._pen_type
@@ -63,9 +64,7 @@ class ManureManagerPen:
         )
 
     @classmethod
-    def count_lactating_cows(
-        cls, animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]
-    ) -> int:
+    def count_lactating_cows(animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:

@@ -2,6 +2,7 @@
 # calf
 WEAN_DAY = "wean day"
 STILL_BIRTH = "still birth happened"
+NUM_CALVES_BORN_NOTE = "number of calves born so far"
 
 # reproduction
 INSEMINATED_W_BASE = "inseminated with "
@@ -29,8 +30,12 @@ ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
+ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE = "estrus occurred before the end of the voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
+SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
+ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE = "estrus not detected between VWP and OvSynch start day"
+NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE = "No ED instituted before OvSynch in ED-TAI"
+CANCEL_ESTRUS_DETECTION_NOTE = "canceled estrus detection"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
@@ -40,9 +45,22 @@ INJECT_PGF = "inject PGF"
 INJECT_CIDR = "inject CIDR"
 
 # presynch protocols
+PRESYNCH_PERIOD_START = "Presynch period started"
+PRESYNCH_PERIOD_END = "Presynch period ended"
 PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
+OVSYNCH_PERIOD_START_NOTE = "OvSynch period started"
+OVSYNCH_PERIOD_END_NOTE = "OvSynch period ended"
+
+# ReSynch protocols
+SETTING_UP_OVSYNCH_PROGRAM_IN_ADVANCE_NOTE = "setting up OvSynch program in advance"
+DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE = "discontinued OvSynch program"
+DECREASE_CONCEPTION_RATE = "decrease OvSynch program conception rate"
+
+# Conception outcomes
+SUCCESSFUL_CONCEPTION = "successful conception"
+FAILED_CONCEPTION = "failed conception"
 
 # pregnancy
 HEIFER_PREG = "heifer pregnant"
@@ -81,3 +99,8 @@ UNKNOWN_CULL = "culled for unknown"
 STDI = 2
 
 # DEFAULTS
+# The number of days to start a TAI program before the first preg check, used in TAIbeforePD resynch protocol
+DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI = 6
+
+# Maximum estrus cycle length when a PGF injection is given after a failed preg check, used in PGFatPD resynch protocol
+MAX_ESTRUS_CYCLE_LENGTH_PGF_AT_PREG_CHECK = 7
