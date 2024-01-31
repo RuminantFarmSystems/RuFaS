@@ -62,7 +62,7 @@ class BaseManureTreatment(ABC):
             _manure_handler_daily_output: The daily output of the manure handler.
             _current_manure_treatment_daily_input: The current input data assigned based on the
                 input data passed into the daily_update() method.
-            _manure_separator: Only present in the digester - separator - lagoon scenario.
+            _manure_separator: Present in the separator - digester - separator - lagoon scenario.
             _manure_separator_daily_output: Only present in the digester - separator - lagoon scenario.
             _accumulated_output: Summation of all daily outputs.
 
@@ -79,6 +79,8 @@ class BaseManureTreatment(ABC):
         ] = None
         self._manure_separator: Optional[BaseManureSeparator] = None
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
+        self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
+        self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
@@ -92,7 +94,7 @@ class BaseManureTreatment(ABC):
         return self._accumulated_output
 
     @property
-    def manure_separator_daily_output(self) -> Optional[ManureSeparatorDailyOutput]:
+    def manure_separator_after_digestion_daily_output(self) -> Optional[ManureSeparatorDailyOutput]:
         """Returns the daily output of the intervening separator in the digester - separator - lagoon scenario.
 
         Returns:
@@ -100,7 +102,7 @@ class BaseManureTreatment(ABC):
             the intervening separator in the digester - separator - lagoon scenario.
 
         """
-        return self._manure_separator_daily_output
+        return self._manure_separator_after_digestion_daily_output
 
     def _initialize_private_attributes_during_update(
         self,
@@ -109,6 +111,7 @@ class BaseManureTreatment(ABC):
         manure_handler_daily_output: ManureHandlerDailyOutput,
         manure_treatment_daily_input: LiquidManurePortionProtocol,
         manure_separator: BaseManureSeparator,
+        manure_separator_after_digestion: BaseManureSeparator,
     ) -> None:
         """Initializes the private attributes of the class.
 
@@ -118,6 +121,7 @@ class BaseManureTreatment(ABC):
             manure_handler_daily_output: The daily output of the manure handler.
             manure_treatment_daily_input: The daily input of the manure treatment.
             manure_separator: The manure separator.
+            manure_separator_after_digestion: The manure separator between the digestor and lagoon.
 
         """
         self._sim_day = sim_day
@@ -125,6 +129,7 @@ class BaseManureTreatment(ABC):
         self._manure_handler_daily_output = manure_handler_daily_output
         self._current_manure_treatment_daily_input = manure_treatment_daily_input
         self._manure_separator = manure_separator
+        self._manure_separator_after_digestion = manure_separator_after_digestion
 
     def _initialize_daily_output_during_update(
         self, manure_treatment_daily_input: LiquidManurePortionProtocol
@@ -206,6 +211,7 @@ class BaseManureTreatment(ABC):
         pen: ManureManagerPen,
         sim_day: int,
         manure_separator: Optional[BaseManureSeparator] = None,
+        manure_separator_after_digestion: Optional[BaseManureSeparator] = None,
     ) -> ManureTreatmentDailyOutput:
         """Calculates the daily output of the manure treatment.
 
@@ -217,6 +223,8 @@ class BaseManureTreatment(ABC):
             pen: A ManureManagerPen object.
             sim_day: The current simulation day.
             manure_separator: A optional BaseManureSeparator object meant to be used in the special
+                case of digester-separator-lagoon configuration triple.
+            manure_separator_after_digestion: An optional BaseManureSeparator object meant to be used in the special
                 case of digester-separator-lagoon configuration triple.
 
         Returns:
@@ -230,6 +238,7 @@ class BaseManureTreatment(ABC):
             manure_handler_daily_output,
             manure_treatment_daily_input,
             manure_separator,
+            manure_separator_after_digestion,
         )
         if pen.num_animals == 0:
             daily_output = ManureTreatmentDailyOutput()

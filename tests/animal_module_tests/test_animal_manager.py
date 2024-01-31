@@ -178,57 +178,89 @@ def mock_manure_management_scenarios() -> List[Dict[str, Union[str, int]]]:
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
-            "manure_treatment": "slurry storage underfloor"
-        },
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "anaerobic lagoon"
+            },
         {
             "scenario_id": 1,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "slurry storage outdoor"
-        },
+            },
         {
             "scenario_id": 2,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "screw press",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "slurry storage outdoor"
-        },
+            },
         {
             "scenario_id": 3,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
-            "manure_separator": "none",
+            "manure_separator": "rotary screen",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic lagoon"
-        },
+            },
         {
             "scenario_id": 4,
             "bedding_type": "sand",
             "manure_handler": "flush system",
-            "manure_separator": "sand lane",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic lagoon"
-        },
+            },
         {
             "scenario_id": 5,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic digestion and lagoon"
-        },
+            },
         {
             "scenario_id": 6,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
             "manure_separator": "rotary screen",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic digestion and lagoon"
-        },
+            },
         {
             "scenario_id": 7,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
-            "manure_separator": "rotary screen",
-            "manure_treatment": "anaerobic digestion and lagoon with split"
-        }
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon with separator"
+            },
+        {
+            "scenario_id": 8,
+            "bedding_type": "CBPB sawdust",
+            "manure_handler": "tillage",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "compost bedded pack barn"
+            },
+        {
+            "scenario_id": 9,
+            "bedding_type": "none",
+            "manure_handler": "harrowing",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "open lots"
+            },
+        {
+            "scenario_id": 10,
+            "bedding_type": "none",
+            "manure_handler": "flush system",
+            "manure_separator": "screw press",
+            "manure_separator_after_digestion": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon with separator"
+            }
     ]
 
 
@@ -799,7 +831,8 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
                            'pen_type': 'dummy_pen_type', 'manure_handling': 'dummy_manure_handling',
-                           'manure_separator': 'dummy_manure_separator', 'manure_storage': 'dummy_manure_storage',
+                           'manure_separator': 'dummy_manure_separator', 'manure_separator_after_digestion':
+                           'dummy_manure_separator_after_digestion', 'manure_storage': 'dummy_manure_storage',
                            'animal_combination': 'dummy_animal_combination',
                            'max_stocking_density': 'dummy_max_stocking_density', 'id': pen_id,
                            'number_of_stalls': num_stalls}
@@ -810,8 +843,9 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                     dummy_pen_info_dict['number_of_stalls'],
                     dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
                     dummy_pen_info_dict['pen_type'], dummy_pen_info_dict['manure_handling'],
-                    dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
-                    dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
+                    dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_separator_after_digestion'],
+                    dummy_pen_info_dict['manure_storage'], dummy_pen_info_dict['animal_combination'],
+                    dummy_pen_info_dict['max_stocking_density'])
 
     dummy_pen.animals_in_pen = animal_list
     dummy_pen.stocking_density = len(animal_list) / num_stalls
