@@ -1509,7 +1509,6 @@ def test_set_nutrient_rqmts(mocker: MockerFixture) -> None:
                                   days_born=heiferI.days_born)
     nutrient_conc = {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}
     HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc, 0.0, 0.0)
-    animal_req.assert_called()
     animal_req.assert_called_with(body_weight=heiferI.body_weight,
                                   mature_body_weight=heiferI.mature_body_weight,
                                   day_of_pregnancy=None,
