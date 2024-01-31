@@ -1683,7 +1683,6 @@ def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> No
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_config)
     calf.update_body_weight_history = mocker.MagicMock()
-    calf.get_non_preg_bw_change = mocker.MagicMock()
     calf.days_born = days_born
 
     # act
