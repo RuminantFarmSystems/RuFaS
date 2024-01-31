@@ -209,10 +209,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             total_volatile_solids=accumulated_liquid_manure_total_solids,
             temp=temperature_celsius,
         )
-        new_accumulated_liquid_manure_total_solids = max(
-            accumulated_liquid_manure_total_solids - methane_loss, 0.0
-        )
-        return methane_loss, new_accumulated_liquid_manure_total_solids
+        return methane_loss
 
     def calc_ammonia_emission(
         self,
@@ -249,10 +246,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             total_solids=accumulated_manure_total_solids,
             temp=self._get_current_day_average_temperature_celsius(),
         )
-        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
-            accumulated_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
-        )
-        return ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen
+
+        return ammonia_loss
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Returns the daily output of the outdoor slurry storage treatment system.
@@ -267,22 +262,11 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         self._accumulate_daily_output(daily_output)
 
-        (
-            methane_loss,
-            new_accumulated_liquid_manure_total_solids,
-        ) = self.calc_methane_emission(
+        methane_loss= self.calc_methane_emission(
             self._accumulated_output.liquid_manure_total_solids
         )
-        daily_output.storage_methane = methane_loss
-        self._accumulated_output.storage_methane += methane_loss
-        self._accumulated_output.liquid_manure_total_solids = (
-            new_accumulated_liquid_manure_total_solids
-        )
 
-        (
-            ammonia_loss,
-            new_accumulated_liquid_manure_total_ammoniacal_nitrogen,
-        ) = self.calc_ammonia_emission(
+        ammonia_loss= self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=(
@@ -290,9 +274,22 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             ),
             accumulated_manure_total_solids=self._accumulated_output.liquid_manure_total_solids
         )
-        daily_output.storage_ammonia = ammonia_loss
-        self._accumulated_output.storage_ammonia += ammonia_loss
 
+        daily_output.storage_methane = methane_loss
+        daily_output.storage_ammonia = ammonia_loss
+
+        self._accumulated_output.storage_ammonia += ammonia_loss
+        self._accumulated_output.storage_methane += methane_loss
+
+        new_accumulated_liquid_manure_total_solids = max(
+            self._accumulated_output.liquid_manure_total_solids - methane_loss, 0.0
+        )
+        self._accumulated_output.liquid_manure_total_solids = (
+            new_accumulated_liquid_manure_total_solids
+        )
+        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
+           self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
+        )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
