@@ -38,7 +38,7 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
-      "path": "input/data/EEE/cohort1_feeds_emissions.csv",
+      "path": "input/data/EEE/full_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -263,6 +263,18 @@
             "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
             "default": 3,
             "minimum": 0
+},
+          "milk_fat_percent": {
+            "type": "number",
+            "description": "Milk Fat Percent (percent) -- The average or most common milk fat percentage in cow milk",
+            "default": 3.5,
+            "minimum": 0
+          },
+          "milk_protein_percent": {
+            "type": "number",
+            "description": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk",
+            "default": 3.2,
+            "minimum": 0
           }
         },
         "farm_level": {
@@ -326,6 +338,16 @@
               "default": 0.026,
               "minimum": 0,
               "maximum": 0.1
+            },
+"decrease_conception_rate_in_rebreeding": {
+              "type": "bool",
+              "description": "Decrease Conception Rate in Rebreeding -- whether or not to decrease the conception rate in rebreeding (default is false)",
+              "default": false
+            },
+            "decrease_conception_rate_by_parity": {
+              "type": "bool",
+              "description": "Decrease Conception Rate by Parity -- whether or not to decrease the conception rate by parity (default is false)",
+              "default": false
             },
             "avg_gestation_len": {
               "type": "number",
@@ -399,122 +421,50 @@
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_conception_rate": {
+              "ED_conception_rate": {
                 "type": "number",
                 "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "presynch_protocol": {
+              "presynch_program": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "The presynch program (1st breeding) for cow in the TAI protocol. Currently, this is only supported in TAI protocol. When other protocols such as ED or ED-TAI are used, this value will be ignored, and it is recommended to set it to None.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|None)$"
               },
-              "resynch_protocol": {
+              "presynch_program_start_day": {
+                "type": "number",
+                "description": "The presynch program start day is the day of the first hormone injection in a presynch program used in the TAI protocol. When a presynch program is followed by an OvSynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. The durations of the 3 options - PreSynch, Double OvSynch, and G6G, are 25, 16, and 8 days, respectively. Because the presynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
+                "default": 50,
+                "minimum": 0
+              },
+              "ovsynch_program": {
                 "type": "string",
-                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+                "description": "The OvSynch program to be used for cows in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|None)$",
+                "default": "OvSynch 56"
               },
-              "repro_sub_protocol": {
-                "type": "string",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "repro_sub_properties": {
-                "type": "object",
-                "conception_rate": {
+              "ovsynch_program_start_day": {
                   "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "tai_program_start_day": {
-                  "type": "number",
-                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                  "description": "When set properly in the TAI protocol, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. When ED-TAI protocol is used and no estrus detected between the end of the voluntary waiting period and this OvSynch program start day, then the OvSynch program will start on this day. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                   "minimum": 0,
                   "default": 70
-                }
-              }
-            },
-            "cow_repro_programs": {
-              "type": "object",
-              "description": "Cow Reproductive programs",
-              "estrus_detection_rate": {
+                            },
+            "ovsynch_program_conception_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The conception rate for the OvSynch program used in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_service_rate": {
-                "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
-                "default": 1,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ed_conception_rate": {
-                "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "cow_presynch_protocol": {
+              "resynch_program": {
                 "type": "string",
-                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
-                "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
-              },
-              "cow_TAI_protocol": {
-                "type": "string",
-                "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
-                "default": "OvSynch 56",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "ovsynch56_conception_rate": {
-                "type": "number",
-                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ovsynch48_conception_rate": {
-                "type": "number",
-                "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch72_conception_rate": {
-                "type": "number",
-                "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch5d_conception_rate": {
-                "type": "number",
-                "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cow_resynch_protocol": {
-                "type": "string",
-                "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None. If PGFatPD is chosen, the values for estrus detection rate and conception rate to that detected estrus following PGF are determined by estrus_detection_rate and ED_conception_rate. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the ovsynch_program_conception_rate.",
                 "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
-              },
-              "tai_program_start_day": {
-                "type": "number",
-                "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
-                "minimum": 0,
-                "default": 72
-              }
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
+                            }
             }
           },
           "bodyweight": {
@@ -1703,31 +1653,63 @@
         "type": "number",
         "minimum": 1000
       },
-      "4":{
+      "1": {
         "type": "number",
         "minimum": 0.0
       },
-      "25":{
+      "2": {
         "type": "number",
         "minimum": 0.0
       },
-      "31":{
+      "4": {
         "type": "number",
         "minimum": 0.0
       },
-      "36":{
+      "5": {
         "type": "number",
         "minimum": 0.0
       },
-      "108": {
+      "6": {
         "type": "number",
         "minimum": 0.0
       },
-      "107": {
+      "7": {
         "type": "number",
         "minimum": 0.0
       },
-      "110": {
+      "8": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "9": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "11": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "12": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "13": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "14": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "15": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "16": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "17": {
         "type": "number",
         "minimum": 0.0
       },
@@ -1735,7 +1717,87 @@
         "type": "number",
         "minimum": 0.0
       },
+"19": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "20": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "21": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "22": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+"24": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "25": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "28": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "30": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "31": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "32": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "33": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "34": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "36": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "37": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "38": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "39": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "40": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "41": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "42": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "43": {
         "type": "number",
         "minimum": 0.0
       },
@@ -1743,7 +1805,19 @@
         "type": "number",
         "minimum": 0.0
       },
-      "50":{
+      "46": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "47": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "49": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "50": {
         "type": "number",
         "minimum": 0.0
       },
@@ -1755,87 +1829,111 @@
         "type": "number",
         "minimum": 0.0
       },
+"53": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "54": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "55": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "56": {
+        "type": "number",
+        "minimum": 0.0
+      },
       "58": {
         "type": "number",
         "minimum": 0.0
       },
-      "60":{
+      "59": {
         "type": "number",
         "minimum": 0.0
       },
-      "66":{
+      "60": {
         "type": "number",
         "minimum": 0.0
       },
-      "79":{
+      "61": {
         "type": "number",
         "minimum": 0.0
       },
-      "95": {
+      "62": {
         "type": "number",
         "minimum": 0.0
       },
-      "94": {
+      "63": {
         "type": "number",
         "minimum": 0.0
       },
-      "97":{
+      "64": {
         "type": "number",
         "minimum": 0.0
       },
-      "104": {
+      "65": {
         "type": "number",
         "minimum": 0.0
       },
-      "119":{
+      "66": {
         "type": "number",
         "minimum": 0.0
       },
-      "120":{
+      "67": {
         "type": "number",
         "minimum": 0.0
       },
-      "144":{
+      "72": {
         "type": "number",
         "minimum": 0.0
       },
-      "154":{
+      "76": {
         "type": "number",
         "minimum": 0.0
       },
-      "155":{
+      "77": {
         "type": "number",
         "minimum": 0.0
       },
-      "163":{
+      "78": {
         "type": "number",
         "minimum": 0.0
       },
-      "167":{
+      "79": {
         "type": "number",
         "minimum": 0.0
       },
-      "200":{
+      "80": {
         "type": "number",
         "minimum": 0.0
       },
-      "216":{
+      "81": {
         "type": "number",
         "minimum": 0.0
       },
-      "230":{
+      "82": {
         "type": "number",
         "minimum": 0.0
       },
-      "233":{
+      "83": {
         "type": "number",
         "minimum": 0.0
       },
-      "236":{
+      "87": {
         "type": "number",
         "minimum": 0.0
       },
-      "248":{
+      "88": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "89": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "90": {
         "type": "number",
         "minimum": 0.0
       },
@@ -1843,7 +1941,319 @@
         "type": "number",
         "minimum": 0.0
       },
-      "301": {
+      "92": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "93": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "96": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "97": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "98": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "99": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "102": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "103": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "105": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "106": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "109": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "111": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "112": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "114": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "115": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "118": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "119": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "120": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "121": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "123": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "124": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "125": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "129": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "135": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "144": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "153": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "163": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "164": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "165": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "166": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "167": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "169": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "170": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "171": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "172": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "181": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "182": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "183": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "184": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "187": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "193": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "194": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "195": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "197": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "198": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "200": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "201": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "202": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "209": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "210": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "211": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "229": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "230": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "231": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "232": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "233": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "234": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "235": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "236": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "237": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "238": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "239": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "240": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "241": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "242": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "243": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "244": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "245": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "246": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "247": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "248": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "251": {
         "type": "number",
         "minimum": 0.0
       },
@@ -1860,11 +2270,7 @@
         "minimum": 0.0
       },
       "305": {
-        "type": "number",
-        "minimum": 0.0
-      },
-      "306":{
-        "type": "number",
+                "type": "number",
         "minimum": 0.0
       }
     },
@@ -2773,22 +3179,22 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
           },
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
           },
           "manure_separator": {
             "type": "string",
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+            "pattern": "^(screw press|rotary screen|none)$"
           },
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
           }
         }
       },
@@ -2800,7 +3206,7 @@
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
             },
             "bedding_mass_per_day": {
               "type": "number"
@@ -2834,7 +3240,7 @@
             "manure_handler_type": {
               "type": "string",
               "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+              "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
             },
             "cleaning_water_use_rate": {
               "type": "number"
@@ -2844,6 +3250,12 @@
             },
             "cleanings_per_day": {
               "type": "number"
+},
+            "cleaning_water_recycle_fraction": {
+              "type": "number",
+              "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+              "minimum": 0.0,
+              "maximum": 1.0
             }
           }
         }
@@ -2856,7 +3268,7 @@
             "manure_separator_type": {
               "type": "string",
               "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+              "pattern": "^(screw press|rotary screen|none)$"
             },
             "percent_dry_solids": {
               "type": "number"
@@ -2890,7 +3302,7 @@
             "manure_treatment_type": {
               "type": "string",
               "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
             },
             "total_solids_removal_efficiency_for_treatment": {
               "type": "number"
