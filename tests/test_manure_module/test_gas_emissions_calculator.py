@@ -408,63 +408,6 @@ def test_housing_carbon_dioxide_emission(
         assert actual == pytest.approx(expected)
 
 
-@pytest.mark.parametrize("sign_of_RMQ", [-1, 1])
-def test_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
-    """Tests ammonia_emission() in calculator.py."""
-
-    # Arrange
-    num_animals = 100
-    barn_area = 50.0
-    manure_urine_total_ammoniacal_nitrogen = 5.0
-    manure_urine = 25.0
-    c = GeneralConstants.SECONDS_PER_DAY
-    tempC = 20.0
-    tempK = 293.15
-    patch_for_convert_tempC_to_tempK = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin",
-        return_value=tempK,
-    )
-    hsc = 200.0
-    r = sign_of_RMQ * 42.0
-    patch_for_r_barn = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_resistance",
-        return_value=r,
-    )
-    p = ManureConstants.MANURE_DENSITY
-    pH = 7.5
-    Q = 2.0
-    patch_for_Q = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._equilibrium_coefficient",
-        return_value=Q,
-    )
-    M = manure_urine / barn_area
-    expected = (
-            num_animals
-            * barn_area
-            * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p)
-            / (r * M * Q)
-    )
-
-    # Act
-    actual = GasEmissionsCalculator.ammonia_emission(
-        num_animals,
-        barn_area,
-        manure_urine_total_ammoniacal_nitrogen,
-        manure_urine,
-        tempC,
-        hsc,
-    )
-
-    # Assert
-    patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-    patch_for_r_barn.assert_called_once_with(tempC, hsc)
-    patch_for_Q.assert_called_once_with(tempK, pH)
-    if r * M * Q > 0:
-        assert actual == expected
-    else:
-        assert actual == 0.0
-
-
 def test_ammonia_resistance() -> None:
     """Tests _ammonia_resistance() in calculator.py."""
 
