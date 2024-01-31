@@ -2750,7 +2750,7 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined percentage values.",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
         "minimum": 0,
         "maximum": 1
       },
@@ -2808,20 +2808,20 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 100
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP -- Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 100,
       "default": 0
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP - Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 100,
       "default": 0
     },
     "EE": {
@@ -2835,21 +2835,21 @@
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "ash": {
@@ -2869,15 +2869,15 @@
     "PAF": {
       "type": "number",
       "description": "Processing adjustment factor.",
-      "minimum": 0.87,
+      "minimum": 0,
       "maximum": 1.04,
-      "default": 0
+      "default": 0.87
     },
     "TDN": {
       "type": "number",
       "description": "Total digestible nutrients (% DM).",
       "minimum": 0,
-      "maximum": 184,
+      "maximum": 100,
       "default": 0
     },
     "N_A": {
@@ -2905,7 +2905,7 @@
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
       "minimum": 0,
-      "maximum": 30,
+      "maximum": 100,
       "default": 0
     },
     "dRUP": {
@@ -2919,49 +2919,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "DE": {
@@ -2985,9 +2985,9 @@
     },
     "starch": {
       "type": "number",
-      "description": "Starch (%)",
+      "description": "Starch (% DM)",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "limit": {
@@ -3035,7 +3035,7 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 100
     },
     "N_A": {
       "type": "number",
@@ -3059,7 +3059,7 @@
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
       "minimum": 0,
-      "maximum": 30
+      "maximum": 100
     },
     "RUP": {
       "type": "number",
@@ -3081,51 +3081,51 @@
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP (% DM) -- Acid detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 100,
       "default": 0
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP (% DM) -- Neutral detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 100,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "NDF": {
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "NDF48": {
       "type": "number",
       "description": "In vitro 48-hour digestibility (% NDF).",
       "minimum": 0,
-      "maximum": 89,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "starch": {
       "type": "number",
       "description": "Starch (%).",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "WSC": {
@@ -3160,49 +3160,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "copper": {
