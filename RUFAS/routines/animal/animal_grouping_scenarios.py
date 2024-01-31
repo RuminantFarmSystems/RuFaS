@@ -7,46 +7,46 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 class AnimalGroupingScenario(Enum):
     """
     The different scenarios for grouping animals on a farm.
-    Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal types/subtypes] }
+    Each scenario is a dictionary of the form: { AnimalCombination: [List of animal types/subtypes] }
 
 
     """
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
-        Pen.AnimalCombination.CALF: [AnimalType.CALF],
-        Pen.AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
-        Pen.AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.CALF: [AnimalType.CALF],
+        AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
+        AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
 
     CALF__GROWING_AND_CLOSE_UP__LACCOW = {
-        Pen.AnimalCombination.CALF: [AnimalType.CALF],
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [AnimalType.HEIFER_I, AnimalType.HEIFER_II,
-                                                     AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.CALF: [AnimalType.CALF],
+        AnimalCombination.GROWING_AND_CLOSE_UP: [AnimalType.HEIFER_I, AnimalType.HEIFER_II,
+                                                 AnimalType.HEIFER_III, AnimalType.DRY_COW],
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
 
-    def __init__(self, value: Dict[Pen.AnimalCombination, List[str]]):
+    def __init__(self, value: Dict[AnimalCombination, List[str]]):
         """
         Initialize the AnimalGroupingScenario.
 
         Parameters
         ----------
-        value : Dict[Pen.AnimalCombination, List[str]]
+        value : Dict[AnimalCombination, List[str]]
             The value of the AnimalGroupingScenario.
 
         """
 
         self._value_ = value
 
-        self._animal_combination_by_animal_type: Dict[AnimalType, Pen.AnimalCombination] = {}
+        self._animal_combination_by_animal_type: Dict[AnimalType, AnimalCombination] = {}
         for animal_combination, animal_types in self.value.items():
             for animal_type in animal_types:
                 self._animal_combination_by_animal_type[animal_type] = animal_combination
@@ -173,7 +173,7 @@ class AnimalGroupingScenario(Enum):
             Cow: self._get_cow_type
         }[type(animal)](animal)  # type: ignore
 
-    def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> Pen.AnimalCombination:
+    def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalCombination:
         """
         Find the animal combination that the given animal belongs to.
 
@@ -184,7 +184,7 @@ class AnimalGroupingScenario(Enum):
 
         Returns
         -------
-        Pen.AnimalCombination
+        AnimalCombination
             The animal combination that the given animal belongs to.
 
         """

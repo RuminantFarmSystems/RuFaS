@@ -76,7 +76,8 @@ class RationManager:
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
                 }
-                sim_day = pen.animals_in_pen[0].body_weight_history[-1].simulation_day
+                animal_list = list(pen.animals_in_pen.values())
+                sim_day = animal_list[0].body_weight_history[-1].simulation_day
                 fail_summary = {
                     "simulation day": sim_day,
                     "reattempt number": num_reattempts,
@@ -108,7 +109,7 @@ class RationManager:
         float
             Average running milk
         """
-        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in pen.animals_in_pen)
+        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in list(pen.animals_in_pen.values()))
         starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
         return starting_milk_average
 
@@ -128,7 +129,7 @@ class RationManager:
 
         """
         running_total_milk = 0.0
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             if animal.estimated_daily_milk_produced - reduction > 1.0:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
@@ -247,8 +248,9 @@ class RationManager:
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
+            animal_list = list(pen.animals_in_pen.values())
             fail_summary = {
-                "simulation day": pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
+                "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
                 "reattempt number": num_reattempts,
                 "constraints_failed_dict": constraints_failed_list,
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
@@ -296,7 +298,7 @@ class RationManager:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
                     fail_summary = {
-                        "simulation day": pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
+                        "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
                         "reattempt number": num_reattempts,
                         "constraints_failed_dict": constraints_failed_list,
                         "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
@@ -407,7 +409,6 @@ class RationReporter:
 
     @classmethod
     def report_ration_supply(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
-
         """
         Nutrient and energy supply of a formulated ration
         Different from the report_ration method, since this takes into account digestibility and other factors
@@ -859,11 +860,11 @@ class RationReporter:
             if Kp[counter] > -feed_item_info["Kd"]:
                 RDP_list.append(
                     (
-                            feed_item_info["Kd"]
-                            / (feed_item_info["Kd"] + Kp[counter])
-                            * (feed_item_info["N_B"] / 100)
-                            * feed_item_info["CP"]
-                            + (feed_item_info["N_A"] / 100) * feed_item_info["CP"]
+                        feed_item_info["Kd"]
+                        / (feed_item_info["Kd"] + Kp[counter])
+                        * (feed_item_info["N_B"] / 100)
+                        * feed_item_info["CP"]
+                        + (feed_item_info["N_A"] / 100) * feed_item_info["CP"]
                     )
                 )
             else:

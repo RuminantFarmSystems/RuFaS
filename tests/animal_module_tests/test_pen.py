@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 @pytest.fixture
@@ -31,7 +32,7 @@ def pen() -> Pen:
     manure_separator = "sedimentation"
     manure_separator_after_digestion = "screw_press"
     manure_storage = "storage_pit"
-    animal_combination = Pen.AnimalCombination.CALF
+    animal_combination = AnimalCombination.CALF
     max_stocking_density = 1.2
 
     pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
@@ -66,7 +67,9 @@ def mock_animal_list_combined(mock_animal_list, mock_animal_list_ii) -> List[Mag
 
 @pytest.fixture
 def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
-    pen.animals_in_pen = mock_animal_list
+    for animal in mock_animal_list:
+        pen.animals_in_pen[animal.id] = animal
+    # pen.animals_in_pen = mock_animal_list
 
     return pen
 
@@ -112,8 +115,8 @@ def test_add_new_animals(pen_to_test: Pen, mock_animal_list,
     """Unit test for function add_new_animals in file routines/animal/pen.py"""
 
     pen_to_test.add_new_animals(new_animals)
-
-    assert pen_to_test.animals_in_pen == expected_animals_in_pen
+    pen_values = list(pen_to_test.animals_in_pen.values())
+    assert pen_values == expected_animals_in_pen
 
 
 @pytest.mark.parametrize('pen_to_test, expected_pen_populated',
@@ -142,13 +145,13 @@ def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: fl
 
 @pytest.mark.parametrize('animal_combination ',
                          [
-                             Pen.AnimalCombination.CALF,
-                             Pen.AnimalCombination.GROWING,
-                             Pen.AnimalCombination.LAC_COW,
-                             Pen.AnimalCombination.CLOSE_UP,
-                             Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
+                             AnimalCombination.CALF,
+                             AnimalCombination.GROWING,
+                             AnimalCombination.LAC_COW,
+                             AnimalCombination.CLOSE_UP,
+                             AnimalCombination.GROWING_AND_CLOSE_UP,
                          ])
-def test_update_animal_combination(pen: Pen, animal_combination: Pen.AnimalCombination):
+def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination):
     """Unit test for function update_animal_combination in file routines/animal/pen.py"""
     pen.update_animal_combination(animal_combination)
 
@@ -263,7 +266,9 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
                          ])
 def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
-    pen.animals_in_pen = pen_animals
+    for animal in pen_animals:
+        pen.animals_in_pen[animal.id] = animal
+    # pen.animals_in_pen = pen_animals
     pen.populated = pen_populated
     pen.calc_avg_growth()
 
@@ -293,30 +298,30 @@ def test_set_up_new_animal():
 
 def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
-    calves = [MagicMock()]
+    calves = {0: MagicMock()}
     pen.animals_in_pen = calves
     pen.populated = True
     pen.avg_p_animal = 1.0
 
     pen.clear()
 
-    assert pen.animals_in_pen == []
+    assert pen.animals_in_pen == {}
     assert pen.populated is False
     assert pen.avg_p_animal == 0
 
 
-def feed_allocations() -> Dict[Pen.AnimalCombination, Set[int]]:
+def feed_allocations() -> Dict[AnimalCombination, Set[int]]:
     calf = {155, 156, 157}
     growing = {2, 51, 86, 136}
     close_up = {2, 26, 86, 118, 136, 139}
     lac_cow = {26, 86, 103, 118, 136, 139}
 
     return {
-        Pen.AnimalCombination.CALF: calf,
-        Pen.AnimalCombination.GROWING: growing,
-        Pen.AnimalCombination.CLOSE_UP: close_up,
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: growing | close_up,
-        Pen.AnimalCombination.LAC_COW: lac_cow,
+        AnimalCombination.CALF: calf,
+        AnimalCombination.GROWING: growing,
+        AnimalCombination.CLOSE_UP: close_up,
+        AnimalCombination.GROWING_AND_CLOSE_UP: growing | close_up,
+        AnimalCombination.LAC_COW: lac_cow,
     }
 
 
@@ -327,7 +332,7 @@ def dict_to_tuple_list(d: Dict) -> List[Tuple]:
 @pytest.mark.parametrize('test_animal_combination, expected_feed_allocation',
                          dict_to_tuple_list(feed_allocations()))
 def test_subset_class_feeds(pen: Pen,
-                            test_animal_combination: Pen.AnimalCombination,
+                            test_animal_combination: AnimalCombination,
                             expected_feed_allocation: Set[int]) -> None:
     """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
 
@@ -455,36 +460,36 @@ def test_calc_animal_manure_excretion(mocker: MockerFixture,
     [
         # Existing Prefix
         (
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure'}},
-                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure'}},
+            'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # New Prefix
         (
-                {},
-                'new_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'new_prefix': {'prefix': 'new_prefix', 'manure': 'default_manure_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {},
+            'new_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'new_prefix': {'prefix': 'new_prefix', 'manure': 'default_manure_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # Multiple Existing Prefixes
         (
-                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1'},
-                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
-                'prefix1', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1_animal_manure_excretion'},
-                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
-                'initial_manure_animal_manure_excretion'
+            {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1'},
+             'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+            'prefix1', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1_animal_manure_excretion'},
+             'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # Empty Manure for Specific Prefix
         (
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': ''}},
-                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': '_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': ''}},
+            'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': '_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         )
     ]
 )
@@ -529,39 +534,46 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
         )
 
 
+def many_animals() -> dict[int, MagicMock]:
+    animals = {}
+    for i in range(1000):
+        animals[i] = MagicMock(spec=Calf)
+    return animals
+
+
 @pytest.mark.parametrize(
     'is_populated, animals_in_pen, mock_pen_manure',
     [
         # Testing with two distinct animal types and two manure properties
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI)], {'property1': 'value1', 'property2': 'value2'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI)}, {'property1': 'value1', 'property2': 'value2'}),
 
         # Testing with three distinct animal types (Calf, HeiferI, and Cow) and a single manure property
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)], {'property3': 'value3'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI), 2: MagicMock(spec=Cow)}, {'property3': 'value3'}),
 
         # Testing with an empty pen and no manure properties
-        (False, [], {}),
+        (False, {}, {}),
 
         # Testing with an empty pen but with one manure property
-        (False, [], {'property4': 'value4'}),
+        (False, {}, {'property4': 'value4'}),
 
         # Testing with empty manure dictionary but populated pen
-        (True, [MagicMock(spec=Calf)], {}),
+        (True, {0: MagicMock(spec=Calf)}, {}),
 
         # Testing with a single animal type in pen
-        (True, [MagicMock(spec=Calf)], {'property1': 'value1'}),
+        (True, {0: MagicMock(spec=Calf)}, {'property1': 'value1'}),
 
         # Testing with mixed animal types in the pen
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)],
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI), 2: MagicMock(spec=Cow)},
          {'property1': 'value1', 'property2': 'value2'}),
 
         # Testing with multiple similar animals in the pen
-        (True, [MagicMock(spec=Calf), MagicMock(spec=Calf)], {'property1': 'value1'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=Calf)}, {'property1': 'value1'}),
 
         # Testing with null or None values within manure properties
-        (True, [MagicMock(spec=Calf)], {'property1': None}),
+        (True, {0: MagicMock(spec=Calf)}, {'property1': None}),
 
         # Testing with a large number of animals
-        (True, [MagicMock(spec=Calf)] * 1000, {'property1': 'value1'})
+        (True, many_animals(), {'property1': 'value1'})
     ]
 )
 def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
@@ -582,7 +594,7 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
     pen.id = 'mock_pen_id'
     pen.manure = mock_pen_manure
     type(pen).is_populated = mocker.PropertyMock(return_value=is_populated)
-    for animal in animals_in_pen:
+    for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
     feed = MagicMock(spec='Feed')
@@ -611,7 +623,7 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
 
     if is_populated:
         patch_for_get_default_animal_manure_excretions.assert_called_once()
-        for animal in animals_in_pen:
+        for animal in list(animals_in_pen.values()):
             patch_for_calc_animal_manure_excretion.assert_has_calls([
                 mocker.call(animal, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount)
             ])
