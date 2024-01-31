@@ -10,7 +10,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 
 
