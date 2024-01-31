@@ -151,7 +151,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
     graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
-    graph_details = {"type": "plot", "variables": ["var1", "var2"]}
+    graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
@@ -229,95 +229,100 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
 
 
 @pytest.mark.parametrize(
-    "filtered_pool,graph_details,expected_result",
+    "filtered_pool,graph_details,expected_util_convert_list_return,expected_util_filter_pool,expected_result",
     [
         (
             {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
             {"variables": [], "title": "Test_1"},
-            ({'variable1': [1, 2, 3], 'variable2': [4, 5, 6]},
-             [{'log': 'Successfully added Test_1 data to prepared_pool',
-              'message': 'Data for variable1 added.',
-               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}},
-              {'log': 'Successfully added Test_1 data to prepared_pool',
-               'message': 'Data for variable2 added.',
-               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}]),
+            None,
+            None,
+            ({"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+             [{"log": "Successfully added Test_1 data to prepared_pool",
+               "message": "Data for variable1 added.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
+              {"log": "Successfully added Test_1 data to prepared_pool",
+               "message": "Data for variable2 added.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}]),
         ),
         (
             {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
             {"variables": ["custom_var1", "custom_var2"], "title": "Test_2"},
-            ({'variable1': [1, 2, 3], 'variable2': [4, 5, 6]},
-             [{'log': 'Successfully added Test_2 data to prepared_pool',
-               'message': 'Data for variable1 added.',
-               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}},
-              {'log': 'Successfully added Test_2 data to prepared_pool',
-               'message': 'Data for variable2 added.',
-               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}])
+            None,
+            None,
+            ({"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+             [{"log": "Successfully added Test_2 data to prepared_pool",
+               "message": "Data for variable1 added.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
+              {"log": "Successfully added Test_2 data to prepared_pool",
+               "message": "Data for variable2 added.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}])
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
              "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
             {"variables": [], "title": "Test_3"},
+            None,
+            None,
             ({},
              [{'error': "Can't plot Test_3 data set",
                'message': 'No selected variables for variable1.',
+               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}},
+              {'error': "Can't plot Test_3 data set",
+               'message': 'No selected variables for variable2.',
                'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}]),
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
-             "variable2": {"values": [{"a": 5, "b": 6, "c": 25}, {"a": 7, "b": 8, "c": 25}]}},
+             "variable2": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]}},
             {"variables": ["a", "b"], "title": "Test_4"},
-            ({"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
-             [{"log": "Successfully added Test_4 data to prepared_pool",
-               "message": "Data for a added to prepared_pool.",
-               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
-              {"log": "Successfully added Test_4 data to prepared_pool",
-               "message": "Data for b added to prepared_pool.",
-               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
-                {"log": "Successfully added Test_4 data to prepared_pool",
-                 "message": "Data for a added to prepared_pool.",
-                 "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
-                 {"log": "Successfully added Test_4 data to prepared_pool",
-                  "message": "Data for b added to prepared_pool.",
-                  "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}]),
+            [{"a": [1, 3], "b": [2, 4], "c": [25, 25]}, {"a": [5, 7], "b": [6, 8], "c": [25, 25]}],
+            [{"a": [1, 3], "b": [2, 4]}, {"a": [5, 7], "b": [6, 8]}],
+            ({"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]}, []),
         ),
         (
-            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
             {"variables": ["c", "d"], "title": "Test_5"},
-            ({}, [{"warning": "c not a valid key in provided data",
-                   "message": "c won't be graphed.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}},
-                  {"warning": "d not a valid key in provided data",
-                   "message": "d won't be graphed.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}},
-                  {"error": "Can't plot Test_5 data set",
-                   "message": "No filter-file variables found in data provided.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}},
-                  {"warning": "c not a valid key in provided data",
-                   "message": "c won't be graphed.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}},
-                  {"warning": "d not a valid key in provided data",
-                   "message": "d won't be graphed.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}},
-                  {"error": "Can't plot Test_5 data set",
-                   "message": "No filter-file variables found in data provided.",
-                   "info_map": {"class": "GraphGenerator",
-                                "function": "_prepare_plot_data"}}])
+            [{"a": [1, 3], "b": [2, 4]}],
+            [None],
+            ({},
+             [{'error': "Can't plot Test_5 data set",
+               'message': 'No variables found in data provided.',
+               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}]),
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]}},
+            {"variables": ["a", "b"], "title": "Test_6"},
+            [{"a": [1, 3], "b": [2, "ungraphable string"]}],
+            [{"a": [1, 3], "b": [2, "ungraphable string"]}],
+            ({'a': [1, 3],
+              'b': [2, 'ungraphable string']},
+             [{'error': "Can't plot Test_6 data set",
+               'message': "b key contains data that is non-numerical and can't be graphed.",
+               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}]),
         )
     ],
 )
-def test_prepare_plot_data(graph_generator: GraphGenerator,
-                           filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
-                           graph_details: Dict[str, str | List[str]],
-                           expected_result: Dict[str, List[int | float]],
-                           ) -> None:
-    result = graph_generator._prepare_plot_data(filtered_pool, graph_details)
-    assert result == expected_result
+@patch('RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists')
+@patch('RUFAS.util.Utility.filter_pool')
+def test_prepare_plot_data_logic(mock_filter_pool, mock_convert_list,
+                                 filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
+                                 graph_details: Dict[str, str | List[str]],
+                                 expected_util_convert_list_return: Dict[str, List[int | float]],
+                                 expected_util_filter_pool: Dict[str, List[int | float]],
+                                 expected_result: Dict[str, List[int | float]]) -> None:
+    # Arrange
+    filtered_pool = filtered_pool
+    graph_details = graph_details
+    mock_graph_generator = GraphGenerator()
+    mock_convert_list.side_effect = expected_util_convert_list_return
+    mock_filter_pool.side_effect = expected_util_filter_pool
+
+    # Act
+    prepared_pool, log_pool = mock_graph_generator._prepare_plot_data(filtered_pool, graph_details)
+
+    # Assert
+    assert prepared_pool == expected_result[0]
+    assert log_pool == expected_result[1]
 
 
 @pytest.mark.parametrize(
