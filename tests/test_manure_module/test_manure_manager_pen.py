@@ -20,7 +20,6 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     ]
     mock_pen.animals_in_pen = {}
     Pen.add_new_animals(mock_pen, animals)
-    print(len(mock_pen.animals_in_pen))
     mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
     mock_pen.animal_combination = AnimalCombination.LAC_COW
 
