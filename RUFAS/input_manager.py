@@ -507,7 +507,26 @@ class InputManager:
 
     def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
                               properties_blob_key: str) -> bool:
-        """Validates an input data element of type array."""
+        """
+        Validates an input data element of type array.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            The properties used to evaluate whether array data is valid or not.
+        var_name : str
+            Name of the variable being validated.
+        input_data_value : list
+            Value of the variable being validated.
+        properties_blob_key : str
+            String used to indicate where the properties for this variable is located.
+
+        Returns
+        -------
+        bool
+            True if the array is valid, otherwise false.
+
+        """
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
@@ -537,6 +556,51 @@ class InputManager:
                 warning_message = f"Variable: '{var_name}' has length: {len(input_data_value)}, greater than " \
                                   f"maximum length: {maximum_length}. {properties_violation_message}"
                 om.add_warning(warning_name, warning_message, info_map)
+                return False
+
+        element_properties = variable_properties.get("properties")
+        if element_properties:
+            elements_valid = self._validate_array_elements(
+                element_properties,
+                var_name,
+                input_data_value,
+                properties_blob_key
+            )
+            return False if not elements_valid else True
+
+        return True
+
+    def _validate_array_elements(
+            self,
+            element_properties: Dict[str, Any],
+            var_name: str,
+            input_data_value: list,
+            properties_blob_key: str
+    ) -> bool:
+        """
+        Validates each element contained in an array.
+
+        Parameters
+        ----------
+        element_properties : Dict[str, Any]
+            The properties used to evaluate whether an element in the array are valid or not.
+        var_name : str
+            Name of the variable being validated.
+        input_data_value : list
+            Value of the variable being validated.
+        properties_blob_key : str
+            String used to indicate where the properties for this variable is located.
+
+        Returns
+        -------
+        bool
+            True if all elements in the array are valid, otherwise false.
+
+        """
+        for index, element in enumerate(input_data_value):
+            element_name = f"{var_name}[{index}]"
+            is_valid = self._validate_input_type_dynamic(element_properties, element_name, element, properties_blob_key)
+            if not is_valid:
                 return False
         return True
 

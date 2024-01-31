@@ -38,6 +38,7 @@ def input_manager_original_method_states(
         "_populate_pool": mock_input_manager._populate_pool,
         "_validate_dict_element": mock_input_manager._validate_dict_element,
         "_array_type_validator": mock_input_manager._array_type_validator,
+        "_validate_array_elements": mock_input_manager._validate_array_elements,
         "_num_type_validator": mock_input_manager._num_type_validator,
         "_string_type_validator": mock_input_manager._string_type_validator,
         "_bool_type_validator": mock_input_manager._bool_type_validator,
@@ -967,23 +968,27 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
 
 
 @pytest.mark.parametrize(
-    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
+    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count, element_validation_call_count',
     [
-        ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10}, False, 1),
-        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1),
-        ([], {"minimum_length": 5}, False, 1),
-        (None, {"minimum_length": 3, "maximum_length": 6}, False, 1),
-        ("[1, 2, 3]", {"minimum_length": 1}, False, 1)
+        ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10, "properties": {"k": "v"}}, False, 1, 0),
+        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0, 0),
+        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5, "properties": {"k": "v"}}, True, 0, 1),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1, 0),
+        ([], {"minimum_length": 5, "properties": {"k": "v"}}, False, 1, 0),
+        (None, {"minimum_length": 3, "maximum_length": 6, "properties": {"k": "v"}}, False, 1, 0),
+        ("[1, 2, 3]", {"minimum_length": 1}, False, 1, 0)
     ]
 )
 def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
-                              expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
+                              expected_warning_call_count: int, element_validation_call_count: int,
+                              mock_input_manager: InputManager,
+                              input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Unit test for function _array_type_validator in file input_manager.py"""
     dummy_var_name = "dummy_array"
     dummy_properties_key = "dummy_variable_properties"
+
+    mock_input_manager._validate_array_elements = MagicMock(return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value,
@@ -991,6 +996,9 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
+    assert mock_input_manager._validate_array_elements.call_count == element_validation_call_count
+
+    mock_input_manager._validate_array_elements = input_manager_original_method_states["_validate_array_elements"]
 
 
 @pytest.mark.parametrize(
