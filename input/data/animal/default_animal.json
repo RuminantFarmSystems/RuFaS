@@ -37,33 +37,33 @@
         "milk_type": "whole"
       },
       "repro": {
-              "voluntary_waiting_period": 50,
-              "conception_rate_decrease": 0.026,
-              "decrease_conception_rate_in_rebreeding": false,
-              "decrease_conception_rate_by_parity": false,
-              "avg_gestation_len": 278,
-              "std_gestation_len": 6,
-              "prefresh_day": 30,
-              "calving_interval": 400,
-              "heifers": {
-                  "estrus_detection_rate": 0.6,
-                  "estrus_conception_rate": 0.4,
-                  "repro_sub_protocol": "5dCG2P",
-                  "repro_sub_properties": {
-                      "conception_rate": 0.6,
-                      "estrus_detection_rate": 0.7
-                  }
-              },
-              "cows": {
-                  "estrus_detection_rate": 0.65,
-                  "ED_conception_rate": 0.6,
-                  "presynch_program": "Double OvSynch",
-                  "presynch_program_start_day": 50,
-                  "ovsynch_program": "OvSynch 56",
-                  "ovsynch_program_start_day": 66,
-                  "ovsynch_program_conception_rate": 0.7,
-                  "resynch_program": "TAIafterPD"
-              }
+        "voluntary_waiting_period": 50,
+        "conception_rate_decrease": 0.026,
+        "decrease_conception_rate_in_rebreeding": false,
+        "decrease_conception_rate_by_parity": false,
+        "avg_gestation_len": 278,
+        "std_gestation_len": 6,
+        "prefresh_day": 30,
+        "calving_interval": 400,
+        "heifers": {
+            "estrus_detection_rate": 0.6,
+            "estrus_conception_rate": 0.4,
+            "repro_sub_protocol": "5dCG2P",
+            "repro_sub_properties": {
+                "conception_rate": 0.6,
+                "estrus_detection_rate": 0.7
+            }
+        },
+        "cows": {
+            "estrus_detection_rate": 0.65,
+            "ED_conception_rate": 0.6,
+            "presynch_program": "Double OvSynch",
+            "presynch_program_start_day": 50,
+            "ovsynch_program": "OvSynch 56",
+            "ovsynch_program_start_day": 66,
+            "ovsynch_program_conception_rate": 0.7,
+            "resynch_program": "TAIafterPD"
+        }
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -182,6 +182,18 @@
 			"pen_type": "tiestall",
 			"max_stocking_density": 1.2,
 			"manure_management_scenario_id": 4
-		}
+		},
+    {
+      "id": 4,
+      "pen_name": "",
+      "animal_combination": "LAC_COW",
+      "vertical_dist_to_milking_parlor": 0.1,
+      "horizontal_dist_to_milking_parlor": 1.6,
+      "number_of_stalls": 1000,
+      "housing_type": "open air barn",
+      "pen_type": "tiestall",
+      "max_stocking_density": 1.2,
+      "manure_management_scenario_id": 10
+    }
 	]
 }
