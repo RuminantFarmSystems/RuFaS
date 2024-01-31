@@ -185,7 +185,7 @@ class BaseManureTreatment(ABC):
                 * self.config.total_solids_removal_efficiency_for_treatment
             )
             / 1000.0
-        )  # TODO: Make 1000.0 a constant
+        )  # TODO: Make 1000.0 a constant - Issue #1120
 
         return ManureTreatmentDailyOutput(
             simulation_day=simulation_day,
