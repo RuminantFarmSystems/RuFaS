@@ -2,140 +2,140 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "The configuration file for the simulation.",
+      "description": "Configuration file for general simulation parameters, e.g. start and end dates.",
       "path": "input/data/config/default_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "The configuration file for the animal module.",
+      "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
       "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "animal_population": {
       "title": "Animal population data",
-      "description": "The configuration file for the animal population parameters.",
+      "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
     },
     "crop": {
       "title": "Crop data",
-      "description": "The configuration file for crop rotation details.",
+      "description": "Crop selection and detailed rotation schedules.",
       "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
-      "description": "The configuration file for the EEE module that is related to costs.",
+      "description": "Energy prices used in the EEE module.",
       "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
-      "description": "The configuration file for the EEE module that is related to emissions.",
+      "description": "Tillage emission values used in the EEE module.",
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
     },
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
-      "description": "Specifies how much emissions are associated with purchased feed types.",
+      "description": "Purchased feeds emission values used in the EEE module.",
       "path": "input/data/EEE/full_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
     "feed": {
       "title": "Feed data",
-      "description": "The configuration file for the feed module.",
+      "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
       "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
-      "description": "Nutrients!",
+      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
       "path": "input/data/feed/NRC_comp.csv",
       "type": "csv",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
-      "description": "Nutrients!",
+      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
       "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
       "title": "Manure data",
-      "description": "The configuration file for the manure module.",
+      "description": "Manure management decisions, including bedding, separator, and treatment information.",
       "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "soil_1": {
       "title": "Soil data",
-      "description": "The first configuration file for the soil module.",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
       "path": "input/data/soil/default_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "soil_2": {
-      "title": "Soil data",
-      "description": "The second configuration file for the soil module.",
+      "title": "Soil data #TODO does this need a unique name for the future?",
+      "description": "Characteristic soil information, including composition, slope, and layer details # TODO when is this used?",
       "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "The configuration file for the fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
       "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "The configuration file for the manure schedule.",
+      "description": "Manure application schedule used for fields? Historical and future?",
       "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "The configuration file for the tillage schedule.",
+      "description": "Tillage schedule applied - historical and future?",
       "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
-      "description": "Contains overall field properties and references to specification files.",
+      "description": "Field characteristics including size, location, watering interval, etc. Also includes references to specification files.",
       "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
-      "description": "The configuration file for the weather module.",
+      "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
       "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
     "feed_quality": {
       "title": "Feed Quality",
-      "description": "The configuration file for the feed quality module.",
+      "description": "Deprecated quality data, to be removed during Feed refactor.",
       "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
     },
     "user_feeds": {
       "title": "User Feed",
-      "description": "The configuration file for user feed input.",
+      "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
