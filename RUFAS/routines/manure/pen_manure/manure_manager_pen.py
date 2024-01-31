@@ -64,7 +64,7 @@ class ManureManagerPen:
         )
 
     @classmethod
-    def count_lactating_cows(animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
+    def count_lactating_cows(animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:
