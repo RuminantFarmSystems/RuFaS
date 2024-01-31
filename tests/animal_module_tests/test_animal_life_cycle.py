@@ -1694,7 +1694,6 @@ def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> No
     calf.days_born += 1
     calf.update_body_weight_history.assert_called()
     assert calf.daily_growth == calf.body_weight - prev_weight
-
     if calf.days_born == wean_day:
         assert weaned
         assert calf.wean_weight == calf.body_weight
