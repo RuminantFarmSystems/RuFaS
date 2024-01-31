@@ -1512,98 +1512,98 @@
     }
   },
   "crop_schedule_properties": {
-      "crop_schedules": {
-        "type": "array",
-        "description": "Array of all crop schedules to be executed over the run of the simulation.",
-        "minimum_length": 0,
-        "properties": {
-          "type": "object",
-          "description": "Contains all the properties necessary to create a CropSchedule object.",
-          "crop_species": {
-            "type": "string",
-            "description": "Name of the crop being grown.",
-            "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
-          },
-          "harvest_days": {
-            "type": "array",
-            "description": "Julian day(s) of year to harvest",
-            "minimum_length": 0,
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 366
-            }
-          },
-          "harvest_years": {
-            "type": "array",
-            "description": "Calendar years in which the harvesting occurs",
-            "minimum_length": 0,
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1
-            }
-          },
-          "harvest_operations": {
-            "type": "array",
-            "description": "Operation(s) with which this crop will be harvested.",
-            "minimum_length": 1,
-            "default": [
-              "harvest_kill"
-            ],
-            "properties": {
-              "type": "string",
-              "pattern": "^(harvest_kill|harvest_only|kill_only)$",
-              "default": "harvest"
-            }
-          },
-          "harvest_type": {
-            "type": "string",
-            "description": "Whether the crop uses scheduled harvests or optimal harvests",
-            "default": "scheduled",
-            "pattern": "^(scheduled|optimal)$"
-          },
-          "planting_days": {
-            "type": "array",
-            "description": "Julian day(s) of year to plant",
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 366
-            }
-          },
-          "planting_years": {
-            "type": "array",
-            "description": "Calendar years in which the planting occurs",
-            "default": [],
-            "properties": {
-              "type": "number",
-              "minimum": 1
-            }
-          },
-          "pattern_repeat": {
+    "crop_schedules": {
+      "type": "array",
+      "description": "Array of all crop schedules to be executed over the run of the simulation.",
+      "minimum_length": 0,
+      "properties": {
+        "type": "object",
+        "description": "Contains all the properties necessary to create a CropSchedule object.",
+        "crop_species": {
+          "type": "string",
+          "description": "Name of the crop being grown.",
+          "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
+        },
+        "harvest_days": {
+          "type": "array",
+          "description": "Julian day(s) of year to harvest",
+          "minimum_length": 0,
+          "default": [],
+          "properties": {
             "type": "number",
-            "description": "Number of times that this crop schedule should be repeated.",
-            "minimum": 0,
-            "default": 0
-          },
-          "planting_skip": {
-            "type": "number",
-            "description": "Number of years to be skipped between planting schedule repetitions.",
-            "minimum": 0,
-            "default": 0
-          },
-          "harvesting_skip": {
-            "type": "number",
-            "description": "Number of years to be skipped between harvest schedule repetitions.",
-            "minimum": 0,
-            "default": 0
+            "minimum": 1,
+            "maximum": 366
           }
+        },
+        "harvest_years": {
+          "type": "array",
+          "description": "Calendar years in which the harvesting occurs",
+          "minimum_length": 0,
+          "default": [],
+          "properties": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "harvest_operations": {
+          "type": "array",
+          "description": "Operation(s) with which this crop will be harvested.",
+          "minimum_length": 1,
+          "default": [
+            "harvest_kill"
+          ],
+          "properties": {
+            "type": "string",
+            "pattern": "^(harvest_kill|harvest_only|kill_only)$",
+            "default": "harvest_kill"
+          }
+        },
+        "harvest_type": {
+          "type": "string",
+          "description": "Whether the crop uses scheduled harvests or optimal harvests",
+          "default": "scheduled",
+          "pattern": "^(scheduled|optimal)$"
+        },
+        "planting_days": {
+          "type": "array",
+          "description": "Julian day(s) of year to plant",
+          "default": [],
+          "properties": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 366
+          }
+        },
+        "planting_years": {
+          "type": "array",
+          "description": "Calendar years in which the planting occurs",
+          "default": [],
+          "properties": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "pattern_repeat": {
+          "type": "number",
+          "description": "Number of times that this crop schedule should be repeated.",
+          "minimum": 0,
+          "default": 0
+        },
+        "planting_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between planting schedule repetitions.",
+          "minimum": 0,
+          "default": 0
+        },
+        "harvesting_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between harvest schedule repetitions.",
+          "minimum": 0,
+          "default": 0
         }
       }
-    },
+    }
+  },
   "fertilizer_schedule_properties": {
     "available_fertilizer_mixes": {
       "type": "array",
