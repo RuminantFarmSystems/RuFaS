@@ -87,6 +87,30 @@
       "manure_separator": "screw press",
       "manure_separator_after_digestion": "rotary screen",
       "manure_treatment": "anaerobic digestion and lagoon with separator"
+    },
+    {
+      "scenario_id": 11,
+      "bedding_type": "sawdust",
+      "manure_handler": "alley scraper",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
+      "manure_treatment": "composting"
+    },
+    {
+      "scenario_id": 12,
+      "bedding_type": "straw",
+      "manure_handler": "manual scraping",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
+      "manure_treatment": "composting"
+    },
+    {
+      "scenario_id": 13,
+      "bedding_type": "straw",
+      "manure_handler": "alley scraper",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
+      "manure_treatment": "composting"
     }
   ],
   "bedding_configs": [
@@ -268,6 +292,10 @@
       "sludge_accumulation_volume_fraction": 0.00251,
       "storage_time_period": 365,
       "freeboard_input": 0.3048
+    },
+    {
+      "manure_treatment_type": "composting",
+      "composting_type": "intensive windrow"
     }
   ]
 }

@@ -1,4 +1,5 @@
 import dataclasses
+import math
 from typing import Type
 from typing import Union
 
@@ -8,6 +9,7 @@ from pytest import approx
 from pytest_mock import MockFixture
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
@@ -23,6 +25,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
 from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
     CompostBeddedPackBarn,
 )
+from RUFAS.routines.manure.manure_treatments.composting import Composting
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
     DefaultManureTreatmentConfigFactory,
 )
@@ -84,7 +87,7 @@ def test_manure_treatment_daily_output() -> None:
         "solid_manure_nitrogen": 22.0,
         "solid_manure_inorganic_nitrogen": 23.0,
         "solid_manure_organic_nitrogen": 24.0,
-        "solid_manure_inorganic_nitrogen_ammonium": 25.0,
+        "solid_manure_total_ammoniacal_nitrogen": 25.0,
         "solid_manure_phosphorus": 26.0,
         "solid_manure_water_extractable_inorganic_phosphorus": 27.0,
         "solid_manure_water_extractable_organic_phosphorus": 28.0,
@@ -158,7 +161,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=22.0,
         solid_manure_inorganic_nitrogen=23.0,
         solid_manure_organic_nitrogen=24.0,
-        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_total_ammoniacal_nitrogen=25.0,
         solid_manure_phosphorus=26.0,
         solid_manure_water_extractable_inorganic_phosphorus=27.0,
         solid_manure_water_extractable_organic_phosphorus=28.0,
@@ -200,7 +203,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=119.0,
         solid_manure_inorganic_nitrogen=120.0,
         solid_manure_organic_nitrogen=121.0,
-        solid_manure_inorganic_nitrogen_ammonium=122.0,
+        solid_manure_total_ammoniacal_nitrogen=122.0,
         solid_manure_phosphorus=123.0,
         solid_manure_water_extractable_inorganic_phosphorus=124.0,
         solid_manure_water_extractable_organic_phosphorus=125.0,
@@ -247,7 +250,7 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_nitrogen=141.0,
         solid_manure_inorganic_nitrogen=143.0,
         solid_manure_organic_nitrogen=145.0,
-        solid_manure_inorganic_nitrogen_ammonium=147.0,
+        solid_manure_total_ammoniacal_nitrogen=147.0,
         solid_manure_phosphorus=149.0,
         solid_manure_water_extractable_inorganic_phosphorus=151.0,
         solid_manure_water_extractable_organic_phosphorus=153.0,
@@ -319,7 +322,7 @@ def test_manure_treatment_daily_output_clone() -> None:
         solid_manure_nitrogen=22.0,
         solid_manure_inorganic_nitrogen=23.0,
         solid_manure_organic_nitrogen=24.0,
-        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_total_ammoniacal_nitrogen=25.0,
         solid_manure_phosphorus=26.0,
         solid_manure_water_extractable_inorganic_phosphorus=27.0,
         solid_manure_water_extractable_organic_phosphorus=28.0,
@@ -3561,7 +3564,7 @@ def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> No
     assert result.solid_manure_nitrogen == expected_manure_nitrogen
     assert result.solid_manure_organic_nitrogen == expected_manure_organic_nitrogen
     assert result.solid_manure_inorganic_nitrogen == expected_manure_inorganic_nitrogen
-    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_manure_inorganic_nitrogen_ammonium
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_manure_inorganic_nitrogen_ammonium
     assert result.solid_manure_daily_mass == expected_solid_manure_daily_mass
     assert result.solid_manure_potassium == expected_manure_potassium
     assert result.solid_manure_phosphorus == expected_manure_phosphorus
@@ -3798,7 +3801,7 @@ def test_open_lots_daily_update_helper(mocker: MockFixture) -> None:
     assert result.solid_manure_nitrogen == expected_manure_nitrogen
     assert result.solid_manure_organic_nitrogen == expected_manure_organic_nitrogen
     assert result.solid_manure_inorganic_nitrogen == expected_manure_inorganic_nitrogen
-    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_manure_inorganic_nitrogen_ammonium
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_manure_inorganic_nitrogen_ammonium
     assert result.solid_manure_daily_mass == expected_solid_manure_daily_mass
     assert result.solid_manure_potassium == expected_manure_potassium
     assert result.solid_manure_phosphorus == expected_manure_phosphorus
@@ -3811,3 +3814,573 @@ def test_open_lots_daily_update_helper(mocker: MockFixture) -> None:
     assert result.storage_methane == expected_storage_methane
     assert result.storage_ammonia == nitrogen_loss_from_ammonia_emission
     assert result.storage_nitrous_oxide == nitrogen_loss_from_nitrous_oxide_emission
+
+
+def test_composting_daily_update_helper(mocker: MockFixture) -> None:
+    """
+    Unit test for _daily_update_helper() with annual update in Composting class in composting.py
+    """
+    expected_total_Nitrogen_mass = 10
+    expected_inorganic_Nitrogen_mass = 0.5
+    expected_organic_Nitrogen_mass = 9.5
+    expected_ammonia_mass = 0.25
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "passive windrow"
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_total_volatile_solids = 5
+    daily_input_mock.liquid_manure_total_solids = 10
+    daily_input_mock.liquid_manure_phosphorus = 15
+    daily_input_mock.liquid_manure_potassium = 18
+
+    methane_emission = 0.5
+    carbon_decomposition = 0.25
+    dry_matter_loss = 1
+
+    mock_calc_methane_emission = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
+                                              "calc_methane_emission", return_value=methane_emission)
+    mock_calculate_carbon_decomposition = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
+                                                       "_calculate_carbon_decomposition",
+                                                       return_value=carbon_decomposition)
+    mock_calculate_dry_matter_loss = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
+                                                  "_calculate_dry_matter_loss", return_value=dry_matter_loss)
+
+    remaining_manure_total_solids = daily_input_mock.liquid_manure_total_solids - dry_matter_loss
+    remaining_manure_mass = remaining_manure_total_solids / 0.12
+
+    mock_calculate_total_Nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
+                                                      "_calculate_total_nitrogen_mass",
+                                                      return_value=expected_total_Nitrogen_mass)
+    mock_calculate_organic_Nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
+                                                        "_calculate_organic_nitrogen_mass",
+                                                        return_value=expected_organic_Nitrogen_mass)
+    mock_calculate_inorganic_Nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting."
+                                                          "Composting._calculate_inorganic_nitrogen_mass",
+                                                          return_value=expected_inorganic_Nitrogen_mass)
+    mock_calculate_ammoniacal_nitrogen_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting."
+                                                           "Composting._calculate_ammoniacal_nitrogen_mass",
+                                                           return_value=expected_ammonia_mass)
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+    composting.time = time_mock
+
+    mock_accumulate_daily_output = mocker.patch.object(composting, '_accumulate_daily_output')
+
+    result = composting._daily_update_helper()
+
+    mock_calc_methane_emission.assert_called_once_with(
+        volatile_solid=daily_input_mock.liquid_manure_total_volatile_solids)
+    mock_calculate_carbon_decomposition.assert_called_once_with(total_solid=daily_input_mock.liquid_manure_total_solids)
+    mock_calculate_dry_matter_loss.assert_called_once_with(methane_emission=methane_emission,
+                                                           carbon_decomposition=carbon_decomposition)
+    mock_calculate_total_Nitrogen_mass.assert_called_once()
+    mock_calculate_organic_Nitrogen_mass.assert_called_once()
+    mock_calculate_inorganic_Nitrogen_mass.assert_called_once()
+    mock_calculate_ammoniacal_nitrogen_mass.assert_called_once()
+
+    mock_accumulate_daily_output.assert_called_once_with(result)
+
+    assert isinstance(result, ManureTreatmentDailyOutput)
+    assert result.storage_methane == methane_emission
+    assert result.solid_manure_carbon_decomposition == carbon_decomposition
+    assert result.solid_manure_total_solids == remaining_manure_total_solids
+    assert result.solid_manure_daily_mass == remaining_manure_mass
+    assert result.solid_manure_phosphorus == daily_input_mock.liquid_manure_phosphorus
+    assert result.solid_manure_potassium == daily_input_mock.liquid_manure_potassium
+    assert result.solid_manure_nitrogen == expected_total_Nitrogen_mass
+    assert result.solid_manure_inorganic_nitrogen == expected_inorganic_Nitrogen_mass
+    assert result.solid_manure_organic_nitrogen == expected_organic_Nitrogen_mass
+    assert result.solid_manure_total_ammoniacal_nitrogen == expected_ammonia_mass
+
+
+def test_composting_calc_methane_emission(mocker: MockFixture) -> None:
+    """
+    Unit test for calc_methane_emission() in Composting class in composting.py
+    """
+    methane_conversion_factor = 0.005
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_total_volatile_solids = 5
+    daily_input_mock.liquid_manure_total_solids = 10
+
+    mock_calculate_methane_conversion_factor = mocker.patch("RUFAS.routines.manure.manure_treatments.composting."
+                                                            "Composting._calculate_methane_conversion_factor",
+                                                            return_value=methane_conversion_factor)
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = daily_input_mock.liquid_manure_total_volatile_solids * (GasEmissionConstants.
+                                                                              ACHIEVABLE_METHANE_EMISSION * 0.67 *
+                                                                              methane_conversion_factor)
+
+    result = composting.calc_methane_emission()
+
+    mock_calculate_methane_conversion_factor.assert_called_once()
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    'composting_type, fraction_nitrogen_lost_to_ammonia_emission',
+    [
+        ("intensive windrow", 0.5),
+        ("passive windrow", 0.45),
+        ("static pile", 0.5)
+    ]
+)
+def test_composting_calc_ammonia_emission(composting_type: str,
+                                          fraction_nitrogen_lost_to_ammonia_emission: float,
+                                          mocker: MockFixture) -> None:
+    """
+    Unit test for calc_ammonia_emission() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = composting_type
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = daily_input_mock.liquid_manure_nitrogen * fraction_nitrogen_lost_to_ammonia_emission
+
+    result = composting.calc_ammonia_emission()
+
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    'composting_type, temperature, conversion_factor',
+    [
+        ("intensive windrow", 0.0, 0.005),
+        ("intensive windrow", 15.0, 0.01),
+        ("intensive windrow", 20.0, 0.01),
+        ("intensive windrow", 25.0, 0.01),
+        ("intensive windrow", 30.0, 0.015),
+        ("passive windrow", 0.0, 0.005),
+        ("passive windrow", 15.0, 0.01),
+        ("passive windrow", 20.0, 0.01),
+        ("passive windrow", 25.0, 0.01),
+        ("passive windrow", 30.0, 0.015),
+        ("static pile", 0.0, 0.005),
+        ("static pile", 15.0, 0.005),
+        ("static pile", 20.0, 0.005),
+        ("static pile", 25.0, 0.005),
+        ("static pile", 30.0, 0.005),
+    ]
+)
+def test_composting_calculate_methane_conversion_factor(composting_type: str,
+                                                        temperature: float,
+                                                        conversion_factor: float,
+                                                        mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_methane_conversion_factor() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = composting_type
+
+    daily_input_mock = mocker.MagicMock()
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+    mock_get_current_day_average_temperature_celsius = mocker.patch.object(
+        composting, '_get_current_day_average_temperature_celsius', return_value=temperature)
+
+    expected_result = conversion_factor
+
+    result = composting._calculate_methane_conversion_factor()
+
+    if composting_type == 'static pile':
+        mock_get_current_day_average_temperature_celsius.assert_not_called()
+    else:
+        mock_get_current_day_average_temperature_celsius.assert_called_once()
+
+    assert result == expected_result
+
+
+def test_composting_calculate_max_microbial_decomposition_rate(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_max_microbial_decomposition_rate() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_total_volatile_solids = 5
+    daily_input_mock.liquid_manure_total_solids = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = GasEmissionConstants.DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
+            1.066 ** (GasEmissionConstants.DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10) - 1.21 **
+            (GasEmissionConstants.DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50))
+
+    result = composting._calculate_max_microbial_decomposition_rate()
+
+    assert result == expected_result
+
+
+def test_composting_calculate_slow_microbial_decomposition_rate(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_slow_microbial_decomposition_rate() in Composting class in composting.py
+    """
+    current_day_average_temperature_celsius = 25
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_total_volatile_solids = 5
+    daily_input_mock.liquid_manure_total_solids = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+    mock_get_current_day_average_temperature_celsius = mocker.patch.object(
+        composting, '_get_current_day_average_temperature_celsius',
+        return_value=current_day_average_temperature_celsius)
+
+    expected_result = GasEmissionConstants.DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
+            1.066 ** (current_day_average_temperature_celsius - 10) - 1.21 **
+            (current_day_average_temperature_celsius - 50))
+
+    result = composting._calculate_slow_microbial_decomposition_rate()
+
+    mock_get_current_day_average_temperature_celsius.assert_called_once()
+    assert result == expected_result
+
+
+def test_composting_calculate_carbon_decomposition_rate(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_carbon_decomposition_rate() in Composting class in composting.py
+    """
+    max_microbial_decomposition_rate = 0.04194649573556496
+    slow_microbial_decomposition_rate = 0.006161489562939452
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.last_compost_turning_or_addition = 1
+
+    daily_input_mock = mocker.MagicMock()
+
+    mock_calculate_max_microbial_decomposition_rate = mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_max_microbial_decomposition_rate",
+        return_value=max_microbial_decomposition_rate)
+    mock_calculate_slow_microbial_decomposition_rate = mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_slow_microbial_decomposition_rate",
+        return_value=slow_microbial_decomposition_rate)
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = (max_microbial_decomposition_rate - slow_microbial_decomposition_rate) * \
+                      (math.e ** (GasEmissionConstants.DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT *
+                                  (manure_treatment_config_mock.last_compost_turning_or_addition -
+                                   ManureConstants.DEFAULT_LAG_TIME))) * slow_microbial_decomposition_rate
+
+    result = composting._calculate_carbon_decomposition_rate()
+
+    assert result == expected_result
+
+    mock_calculate_max_microbial_decomposition_rate.assert_called_once()
+    mock_calculate_slow_microbial_decomposition_rate.assert_called_once()
+
+
+def test_calculate_anaerobic_coefficient(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_anaerobic_coefficient() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = (GasEmissionConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN /
+                       (GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT +
+                        GasEmissionConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)) * \
+                      ((GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT +
+                        GasEmissionConstants.DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN) /
+                       GasEmissionConstants.DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+
+    result = composting._calculate_anaerobic_coefficient()
+
+    assert result == expected_result
+
+
+def test_composting_calculate_carbon_decomposition(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_carbon_decomposition() in Composting class in composting.py
+    """
+    total_solid = 10
+
+    carbon_decomposition_rate = 0.00019950664502308568
+    anaerobic_coefficient = 0.9962406015037594
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+
+    manure_handler_daily_output_mock = mocker.MagicMock()
+    manure_handler_daily_output_mock.total_bedding_mass = 50
+
+    mock_calculate_carbon_decomposition_rate = mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_carbon_decomposition_rate",
+        return_value=carbon_decomposition_rate)
+    mock_calculate_anaerobic_coefficient = mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_anaerobic_coefficient",
+        return_value=anaerobic_coefficient)
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+    composting._manure_handler_daily_output = manure_handler_daily_output_mock
+
+    expected_result = (total_solid * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE +
+                       manure_handler_daily_output_mock.total_bedding_mass *
+                       ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+                       ) * carbon_decomposition_rate * GasEmissionConstants.\
+        DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION * anaerobic_coefficient
+
+    result = composting._calculate_carbon_decomposition(total_solid=total_solid)
+
+    assert result == expected_result
+
+    mock_calculate_carbon_decomposition_rate.assert_called_once()
+    mock_calculate_anaerobic_coefficient.assert_called_once()
+
+
+def test_composting_calculate_dry_matter_loss() -> None:
+    """
+    Unit test for _calculate_dry_matter_loss() in Composting class in composting.py
+    """
+    methane_emission: float = 5.0
+    carbon_decomposition: float = 2.5
+
+    expected = 2 * carbon_decomposition + methane_emission
+    result = Composting._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
+
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    'composting_type, fraction_nitrogen_lost_to_leaching',
+    [
+        ("intensive windrow", 0.06),
+        ("passive windrow", 0.04),
+        ("static pile", 0.06)
+    ]
+)
+def test_composting_calculate_Nitrogen_loss_to_leaching(composting_type: str,
+                                                        fraction_nitrogen_lost_to_leaching: float,
+                                                        mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_nitrogen_loss_to_leaching() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = composting_type
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = daily_input_mock.liquid_manure_nitrogen * fraction_nitrogen_lost_to_leaching
+
+    result = composting._calculate_nitrogen_loss_to_leaching()
+
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    'composting_type, fraction_nitrogen_lost_to_direct_N2O_emission',
+    [
+        ("intensive windrow", 0.06),
+        ("passive windrow", 0.04),
+        ("static pile", 0.06)
+    ]
+)
+def test_composting_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission(
+        composting_type: str, fraction_nitrogen_lost_to_direct_N2O_emission: float, mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission() in Composting class in composting.py
+    """
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = composting_type
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = daily_input_mock.liquid_manure_nitrogen * fraction_nitrogen_lost_to_direct_N2O_emission * 44 / 28
+
+    result = composting._calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission()
+
+    assert result == expected_result
+
+
+def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_total_nitrogen_mass() in Composting class in composting.py
+    """
+    Nitrogen_loss_to_leaching = 0.5
+    Nitrogen_loss_to_ammonia_emission = 5.0
+    Nitrogen_loss_to_direct_N2O_emission = 0.9428571428571428
+
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = \
+        daily_input_mock.liquid_manure_nitrogen - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
+        Nitrogen_loss_to_direct_N2O_emission
+
+    result = composting._calculate_total_nitrogen_mass(
+        Nitrogen_loss_to_leaching=Nitrogen_loss_to_leaching,
+        Nitrogen_loss_to_ammonia_emission=Nitrogen_loss_to_ammonia_emission,
+        Nitrogen_loss_to_direct_N2O_emission=Nitrogen_loss_to_direct_N2O_emission
+    )
+
+    assert result == expected_result
+
+
+def test_composting_calculate_organic_Nitrogen_mass(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_organic_nitrogen_mass() in Composting class in composting.py
+    """
+    total_Nitrogen_mass = 3.4707142857142856
+
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = total_Nitrogen_mass * 0.952
+
+    result = composting._calculate_organic_nitrogen_mass(total_Nitrogen_mass=total_Nitrogen_mass)
+
+    assert result == expected_result
+
+
+def test_composting_calculate_inorganic_Nitrogen_mass(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_inorganic_nitrogen_mass() in Composting class in composting.py
+    """
+    total_Nitrogen_mass = 3.3041199999999997
+
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = total_Nitrogen_mass * 0.048
+
+    result = composting._calculate_inorganic_nitrogen_mass(total_Nitrogen_mass=total_Nitrogen_mass)
+
+    assert result == expected_result
+
+
+def test_composting_calculate_ammoniacal_nitrogen_mass(mocker: MockFixture) -> None:
+    """
+    Unit test for _calculate_ammoniacal_nitrogen_mass() in Composting class in composting.py
+    """
+    inorganic_Nitrogen_mass = 0.15859775999999998
+
+    # Arrange
+    weather_mock = mocker.MagicMock()
+
+    time_mock = mocker.MagicMock()
+
+    manure_treatment_config_mock = mocker.MagicMock()
+
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 10
+
+    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
+    composting._current_manure_treatment_daily_input = daily_input_mock
+
+    expected_result = inorganic_Nitrogen_mass * 0.5
+
+    result = composting._calculate_ammoniacal_nitrogen_mass(inorganic_Nitrogen_mass=inorganic_Nitrogen_mass)
+
+    assert result == expected_result
