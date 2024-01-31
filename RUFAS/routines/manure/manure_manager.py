@@ -493,7 +493,7 @@ class ManureManager:
 
         if manure_separator_after_digestion_daily_output:
             manure_separator_after_digestion_daily_output_prefix = {
-                "prefix": f"{manure_separator_after_digestion_daily_output.__class__.__name__}_Pen_{str(mm_pen.id)}"
+                "prefix": f"ManureSeparatorAfterDigestionDailyOutput_Pen_{str(mm_pen.id)}"
                           f"_{mm_pen.animal_combination.name}"
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
