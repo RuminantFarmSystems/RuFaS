@@ -330,7 +330,6 @@ class InputManager:
     def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str]) \
             -> None:
         caller_function = self._get_caller_function()
-        print(caller_function)
         is_initialization = caller_function == self._populate_pool.__name__
 
         if is_initialization:
@@ -1035,6 +1034,17 @@ class InputManager:
                            f"metadata.")
         return True
 
+    def _update_nested_dict(self, current_level_dict: Dict[str, Any], element_hierarchy: List[str], value: Any) -> None:
+        if len(element_hierarchy) == 1:
+            current_level_dict[element_hierarchy[0]] = value
+        else:
+            key = element_hierarchy[0]
+            if key not in current_level_dict:
+                current_level_dict[key] = {}
+            self._update_nested_dict(current_level_dict=current_level_dict[key],
+                                     element_hierarchy=element_hierarchy[1:],
+                                     value=value)
+
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
                               eager_termination: bool, is_variable_dict: bool) -> bool:
         """
@@ -1078,8 +1088,12 @@ class InputManager:
 
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
-            metadata_properties = reduce(lambda d, k: d[k], element_hierarchy,
+            metadata_properties = reduce(lambda d, k: d[k], element_hierarchy[1:],
                                          self.__metadata["properties"][properties_blob_key])
+            wrapped_data = {}
+            self._update_nested_dict(wrapped_data, element_hierarchy[1:], data)
+            data = wrapped_data
+
         else:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
@@ -1096,13 +1110,16 @@ class InputManager:
                                f"{variable_name} is not modifiable during runtime.",
                                info_map)
 
+        variable_properties_to_ignore = ["type", "description", "modifiability"]
         for metadata_property in metadata_properties.keys():
+            if metadata_property in variable_properties_to_ignore:
+                continue
             element_counter_and_validity = {
                 "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
                 "is_valid": True}
             if is_variable_dict:
                 element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=element_hierarchy,
+                    element_hierarchy=element_hierarchy[1:] + [metadata_property],
                     properties_blob_key=properties_blob_key,
                     input_data=data,
                     eager_termination=eager_termination,
@@ -1121,7 +1138,8 @@ class InputManager:
                 element_counter[key] += element_counter_and_validity[key]
 
             if element_counter_and_validity["is_valid"]:
-                validated_data[metadata_property] = data[metadata_property]
+                validated_data_value = reduce(lambda d, k: d[k], element_hierarchy[1:] + [metadata_property], data)
+                validated_data[metadata_property] = validated_data_value
 
         om.add_log(f"Validation count for variable {variable_name}: total items",
                    f"{element_counter['total_elements']=}", info_map)
@@ -1133,12 +1151,16 @@ class InputManager:
                    f"{element_counter['invalid_elements']=}", info_map)
 
         if validated_data:
-            if variable_name in self.__pool.keys():
+            if element_hierarchy[0] in self.__pool.keys():
                 om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in "
                                                                 f"InputManager pool, overwriting the old value.",
                                info_map)
-
-            self.__pool[variable_name] = validated_data
+            if len(element_hierarchy) > 1:
+                self._update_nested_dict(current_level_dict=self.__pool,
+                                         element_hierarchy=element_hierarchy,
+                                         value=validated_data)
+            else:
+                self.__pool[variable_name] = validated_data
 
         if element_counter['invalid_elements'] > 0:
             om.add_error("Invalid variable",
