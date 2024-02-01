@@ -642,7 +642,6 @@
           "feet_leg_cull_prob": {
             "type": "array",
             "description": "Culling probability for feet and leg reasons",
-            "default": [0.5],
             "properties": {
               "type": "number",
               "minimum": 0,
