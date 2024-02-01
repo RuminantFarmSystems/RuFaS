@@ -1,3 +1,5 @@
+import pdb
+
 from copy import deepcopy
 from functools import reduce
 import json
@@ -224,7 +226,7 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
+                    element_counter_and_validity, _ = self._validate_dict_element([metadata_property], properties_blob_key,
                                                                                filtered_input_data, eager_termination,
                                                                                element_counter_and_validity)
                 if file_type == "csv":
@@ -407,7 +409,7 @@ class InputManager:
 
     def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
-                               element_counter_and_validity: Dict[str, int | bool], ) -> dict:
+                               element_counter_and_validity: Dict[str, int | bool], ) -> tuple[dict, bool]:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -434,11 +436,11 @@ class InputManager:
 
         Returns
         -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
+        tuple[dict, bool]
+            The first element of the tuple returned is a dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean which is True if all data checked
+            is valid, False otherwise. The second element is a boolean indicating if the individual element checked by
+            this method was valid.
 
         """
         info_map = {"class": self.__class__.__name__,
@@ -460,12 +462,15 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
-                                                                               input_data, eager_termination,
-                                                                               element_counter_and_validity)
-                    is_child_valid = element_counter_and_validity["is_valid"]
+                    element_counter_and_validity, is_child_valid = self._validate_dict_element(
+                        element_hierarchy,
+                        properties_blob_key,
+                        input_data,
+                        eager_termination,
+                        element_counter_and_validity,
+                    )
                     if eager_termination and not is_child_valid:
-                        return element_counter_and_validity
+                        return element_counter_and_validity, is_child_valid
                     element_path = ".".join(element_hierarchy)
                     children_status[element_path] = is_child_valid
                     if not is_child_valid:
@@ -476,7 +481,7 @@ class InputManager:
             is_valid = false_counter == 0
             element_counter_and_validity["is_valid"] = is_valid
 
-            return element_counter_and_validity
+            return element_counter_and_validity, is_valid
         else:
             var_name = element_hierarchy[-1]
 
@@ -493,7 +498,7 @@ class InputManager:
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
-                return element_counter_and_validity
+                return element_counter_and_validity, is_valid
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data, properties_blob_key)
                 if is_fixed:
@@ -503,7 +508,7 @@ class InputManager:
                                    f"Variable: '{var_name}' was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
-                return element_counter_and_validity
+                return element_counter_and_validity, is_valid
 
     def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
                               properties_blob_key: str) -> bool:
@@ -597,6 +602,20 @@ class InputManager:
             True if all elements in the array are valid, otherwise false.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self.__class__._validate_array_elements.__name__}
+
+        if "type" not in element_properties:
+            error_name = f"Input {var_name} does not have a type specified"
+            error_message = f"Unable to validate input {var_name}"
+            om.add_error(error_name, error_message, info_map)
+            raise KeyError(f"{error_name}. {error_message}.")
+
+        if element_properties["type"] == "object":
+            warning_name = f"Input {var_name} is an array of objects"
+            warning_message = f"Unable to properly validate input {var_name}. Assuming all objects contained are valid"
+            om.add_warning(warning_name, warning_message, info_map)
+            return True
+
         for index, element in enumerate(input_data_value):
             element_name = f"{var_name}[{index}]"
             is_valid = self._validate_input_type_dynamic(element_properties, element_name, element, properties_blob_key)
@@ -1060,7 +1079,7 @@ class InputManager:
                 "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
                 "is_valid": True}
             if is_variable_dict:
-                element_counter_and_validity = self._validate_dict_element(
+                element_counter_and_validity, _ = self._validate_dict_element(
                     element_hierarchy=[metadata_property],
                     properties_blob_key=properties_blob_key,
                     input_data=data,
