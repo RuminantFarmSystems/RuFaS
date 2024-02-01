@@ -223,13 +223,13 @@ class LeafAreaIndex:
         Parameters
         ----------
         leaf_area_fraction : float
-            Optimal leaf area fraction for the day (uniteless).
+            Optimal leaf area fraction for the day (unitless).
         previous_leaf_area_fraction : float
-            Previous day's optimal leaf area fraction (uniteless).
+            Previous day's optimal leaf area fraction (unitless).
         max_leaf_area_index : float
-            The maximum leaf area index achievable by the plant (uniteless).
+            The maximum leaf area index achievable by the plant (unitless).
         previous_leaf_area_index : float
-            The previous day's leaf area index (uniteless).
+            The previous day's leaf area index (unitless).
 
         Returns
         -------
