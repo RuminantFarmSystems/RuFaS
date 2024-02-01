@@ -12,9 +12,20 @@ repeated over a specified number of years, with specified breaks in between repe
 
 class CropSchedule(Schedule):
 
-    def __init__(self, name: str, crop_reference: str, planting_years: List[int], planting_days: List[int],
-                 harvest_years: List[int], harvest_days: List[int], harvest_operations: List[str],
-                 use_heat_scheduling: bool = False, pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(
+            self,
+            name: str,
+            crop_reference: str,
+            planting_years: List[int],
+            planting_days: List[int],
+            harvest_years: List[int],
+            harvest_days: List[int],
+            harvest_operations: List[str],
+            use_heat_scheduling: bool = False,
+            planting_skip: int = 0,
+            harvesting_skip: int = 0,
+            pattern_repeat: int = 0
+    ):
         """
         Creates a CropSchedule instance based on user input.
 
@@ -36,22 +47,26 @@ class CropSchedule(Schedule):
             Operation(s) with which a crop is harvested.
         use_heat_scheduling : bool, default=False
             Variable indicating if heat scheduling should be used to determine when crop is harvested.
-        pattern_skip : int, default=0
-            Number of years to skip between cycles.
+        planting_skip : int, default=0
+            Number of years to skip between planting cycles.
+        harvesting_skip : int, default=0
+            Number of years to skip between harvesting cycles.
         pattern_repeat : int, default=0
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
         """
-        super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
+        super().__init__(name, planting_years, planting_days, planting_skip, pattern_repeat)
 
         self.crop_reference = crop_reference
         self.planting_years = self.years
         self.planting_days = self.days
+        self.planting_skip = planting_skip
 
         self._validate_planting_parameters()
 
         self.harvest_years = harvest_years
         self.harvest_days = self._elongate_list(harvest_days, len(harvest_years))
+        self.harvesting_skip = harvesting_skip
 
         harvest_operations_enum_list = [HarvestOperation(operation) for operation in harvest_operations]
 
@@ -145,11 +160,7 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = self._repeat_pattern(
-            self.planting_years,
-            self.pattern_skip + self.planting_skip,
-            self.pattern_repeat
-        )
+        all_planting_years = self._repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
         all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 
@@ -175,7 +186,7 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        all_harvesting_years = self._repeat_pattern(self.harvest_years, self.pattern_skip, self.pattern_repeat)
+        all_harvesting_years = self._repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
         all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
         all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)
         all_harvesting_dates = list(zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations))
