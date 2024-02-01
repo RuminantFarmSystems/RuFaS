@@ -24,7 +24,7 @@ class LeafAreaIndex:
 
     def grow_canopy(self) -> None:
         """
-        main leaf area index function
+        Main leaf area index function.
 
         """
         self.data._lai_shapes = self._determine_lai_shapes(self.data.first_heat_fraction_point,
