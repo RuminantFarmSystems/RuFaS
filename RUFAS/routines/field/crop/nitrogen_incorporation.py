@@ -298,6 +298,11 @@ class NitrogenIncorporation:
         ----------
         SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
+        Raises
+        ------
+        ValueError
+            half_mature_heat_fraction equals mature_heat_fraction.
+
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
@@ -345,6 +350,23 @@ class NitrogenIncorporation:
         float
             The logarithmic term of the nitrogen shape coefficients, crucial for calculating the shape coefficients
             used in nitrogen uptake modeling (unitless).
+
+        Raises
+        ------
+        ValueError
+            If any of the nitrogen or heat fractions are outside the range of 0 to 1.
+        ValueError
+            If `emergence_nitrogen_fraction` is equivalent to `mature_nitrogen_fraction`.
+        ValueError
+            If `nitrogen_fraction` is equivalent to `emergence_nitrogen_fraction` or `mature_nitrogen_fraction`.
+        ValueError
+            If `nitrogen_fraction` is greater than or equal to `emergence_nitrogen_fraction`.
+        ValueError
+            If `nitrogen_fraction` is 0.
+        ValueError
+            If `heat_fraction` is 0.
+        ValueError
+            If the calculated denominator is greater than 1.
 
         References
         ----------
@@ -493,6 +515,11 @@ class NitrogenIncorporation:
             only the first layer is accessible (i.e., layer_bounds[:1]), and a return of 2 means the first and second
             layers are accessible (i.e., layer_bounds[:2]).
 
+        Raises
+        ------
+        ValueError
+            Negative root depth is provided.
+
         Notes
         -----
         This method assumes that if there are no roots (root depth of 0), then none of the soil layers are accessible
@@ -534,6 +561,13 @@ class NitrogenIncorporation:
         List[float]
             A list of potential nitrogen uptake values from each layer, with the uptake from inaccessible layers set to
             zero.
+
+        Raises
+        ------
+        ValueError
+            If the boundaries are not in ascending order (deeper layers should follow shallower ones).
+        ValueError
+            If there are duplicate depths, indicating multiple soil layers at the same depth.
 
         References
         ----------
