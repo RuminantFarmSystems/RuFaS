@@ -1549,11 +1549,13 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
-          "default": ["harvest_kill"],
+          "default": [
+            "harvest_kill"
+          ],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
-            "default": "harvest"
+            "default": "harvest_kill"
           }
         },
         "harvest_type": {
@@ -1587,9 +1589,15 @@
           "minimum": 0,
           "default": 0
         },
-        "pattern_skip": {
+        "planting_skip": {
           "type": "number",
-          "description": "Number of years to be skipped between schedule repetitions.",
+          "description": "Number of years to be skipped between planting schedule repetitions.",
+          "minimum": 0,
+          "default": 0
+        },
+        "harvesting_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between harvest schedule repetitions.",
           "minimum": 0,
           "default": 0
         }
