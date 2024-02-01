@@ -6,6 +6,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 om = OutputManager()
 
@@ -68,7 +69,7 @@ class AnimalModuleReporter:
             "function": "milking_update",
         }
 
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             milk_data_update = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update[
@@ -137,7 +138,7 @@ class AnimalModuleReporter:
                 ration_per_animal,
                 info_map,
             )
-            if pen.animal_combination != pen.AnimalCombination.CALF:
+            if pen.animal_combination != AnimalCombination.CALF:
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
                     feed.available_feeds,
@@ -327,12 +328,27 @@ class AnimalModuleReporter:
             "daily_milk_production", life_cycle_manager.daily_milk_production, info_map
         )
         om.add_variable(
+            "dry_cows_daily_milk_production", life_cycle_manager.dry_cows_daily_milk_production, info_map
+        )
+        om.add_variable(
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
+        )
+        om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
         )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
             info_map,
+        )
+        om.add_variable(
+            "dry_cows_milk_protein_kg", life_cycle_manager.dry_cows_milk_protein_kg, info_map
         )
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, info_map)

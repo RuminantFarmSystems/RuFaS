@@ -4,21 +4,21 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 def test_constructor() -> None:
     """Unit test for constructor in file routines/animal/animal_grouping_scenarios.py"""
     grouping_scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
     expected_values = {
-        Pen.AnimalCombination.CALF: [AnimalType.CALF],
-        Pen.AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
-        Pen.AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.CALF: [AnimalType.CALF],
+        AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
+        AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
     inverted_dict = {v: k for k, lst in expected_values.items() for v in lst}
     assert grouping_scenario._value_ == expected_values
@@ -82,10 +82,10 @@ def test_find_animal_combination() -> None:
     """Unit test for find_animal_combination() in file routines/animal/animal_grouping_scenarios.py"""
     scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
     data = [
-        (Calf, Pen.AnimalCombination.CALF),
-        (HeiferI, Pen.AnimalCombination.GROWING),
-        (HeiferII, Pen.AnimalCombination.GROWING),
-        (HeiferIII, Pen.AnimalCombination.CLOSE_UP),
+        (Calf, AnimalCombination.CALF),
+        (HeiferI, AnimalCombination.GROWING),
+        (HeiferII, AnimalCombination.GROWING),
+        (HeiferIII, AnimalCombination.CLOSE_UP),
     ]
     for animal, expected_combination in data:
         with patch('builtins.type', return_value=animal):
