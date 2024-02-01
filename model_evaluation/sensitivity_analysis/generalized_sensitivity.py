@@ -116,7 +116,8 @@ class SensitivityAnalysis:
         parameters. The resulting array should be a matrix with :math:`N \\times K` dimensions where :math:`K` columns
         correspond to outputs of the model for a given parameter set. Each row of the results should represent the
         output for parameter values in the corresponding row of `X`. See
-        `ProblemSpec.evaluate() <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
+        `ProblemSpec.evaluate()
+        <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
         and `Wrapping and existing model <https://salib.readthedocs.io/en/latest/user_guide/wrappers.html>`_ for more
         examples on how to wrap existing functions.
         """

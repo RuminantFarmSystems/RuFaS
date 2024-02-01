@@ -798,6 +798,7 @@ class RationOptimizer:
         CP_list = self.triple_values_in_list(available_feeds['CP'])
         dRUP_list = self.triple_values_in_list(available_feeds['dRUP'])
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+        # GitHub Issue # 793
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             feed_limit_list = self.triple_values_in_list(available_feeds['lactating_cow_limit'])
             lactating = True

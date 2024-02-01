@@ -44,7 +44,6 @@ class Config:
         self.set_seed = data["set_seed"]
         self.seed = data["random_seed"]
 
-        # TODO: remove conditional once all json files have simulate_animals field
         self.simulate_animals = (
             data["simulate_animals"] if "simulate_animals" in data else True
         )
