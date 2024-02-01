@@ -43,10 +43,30 @@ class CropSpecies(Enum):
 
 
 class CropSpeciesDataFactory:
+    """
+    Creates a species data object from a CropSpecies enum
+
+    """
     @staticmethod
     def create_species_data(species: CropSpecies = CropSpecies("corn_grain"), **kwargs) -> CropData:
-        """Create a species data object from a CropSpecies enum, with species defaults and the optional ability to
-        modify additional attributes."""
+        """
+        Creates a species data object from a CropSpecies enum, with species defaults and the optional ability to modify
+        additional attributes.
+
+        Parameters
+        ----------
+        species : CropSpecies
+            An enum value representing the crop species, defaults to CropSpecies("corn_grain").
+        **kwargs
+            Additional keyword arguments for setting or overriding attributes in the `CropData` object.
+
+        Returns
+        -------
+        CropData
+            A `CropData` object initialized with species-specific defaults and any modifications specified through
+            kwargs.
+
+        """
         species_by_type = {
             CropSpecies.ALFALFA_HAY: AlfalfaHay,
             CropSpecies.ALFALFA_SILAGE: AlfalfaSilage,
