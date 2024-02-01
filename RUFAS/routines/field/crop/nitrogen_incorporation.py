@@ -30,14 +30,22 @@ class NitrogenIncorporation:
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
-        """main nitrogen incorporation function - runs all nitrogen processes and stores nitrogen as biomass
+        """
+        Main nitrogen incorporation function that runs all nitrogen processes and stores nitrogen as biomass.
 
-        Args:
-            soil_data: the SoilData object that tracks soil properties
+        Parameters
+        ----------
+        soil_data : SoilData
+            The SoilData object that tracks soil properties and nitrogen content.
 
-        Details: calling this function will execute all nitrogen incorporation routines. It determines the amount of
-        nitrogen desired by the plant, extracts nitrogen from the accessible soil profile, and tries to fix nitrogen
-        for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
+        Notes
+        -----
+        Calling this function executes all nitrogen incorporation routines. It calculates the amount of nitrogen
+        the plant desires based on its current growth stage and the available nitrogen in the soil. The function
+        then extracts nitrogen from the accessible soil profile. If there's any unmet nitrogen demand, the plant
+        may attempt to fix atmospheric nitrogen. The nitrogen from both extraction and fixation is then added to
+        the plant's biomass, contributing to its growth.
+
         """
         layer_depths = soil_data.get_vectorized_layer_attribute('bottom_depth')
         layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
@@ -74,15 +82,22 @@ class NitrogenIncorporation:
             self.data.total_nitrogen_uptake, self.data.nitrogen, self.data.fixed_nitrogen
         )
 
-    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]):
-        """conducts steps necessary to uptake nitrogen from soil
+    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
+        """
+        Conducts steps necessary to uptake nitrogen from soil.
 
-        Args:
-            layer_nitrates: nitrates contained in each soil layer; updated in place
-            layer_depths: the lowest depth of each soil layer.
+        Parameters
+        ----------
+        layer_nitrates : List[float]
+            Nitrates contained in each soil layer; updated in place.
+        layer_depths : List[float]
+            The lowest depth of each soil layer.
 
-        Details: after the actual nitrogen uptake is calculated for each accessible soil layer, that amount is removed
+        Notes
+        -----
+        After the actual nitrogen uptake is calculated for each accessible soil layer, that amount is removed
         from the layer_nitrates list given as input to the function.
+
         """
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
@@ -102,17 +117,26 @@ class NitrogenIncorporation:
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
-        """copies the current nitrogen value to previous_nitrogen (for use between time steps)"""
+        """
+        copies the current nitrogen value to previous_nitrogen (for use between time steps)
+
+        """
         self.data.previous_nitrogen = self.data.nitrogen
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
-        """evaluates the accessibility of layers in the soil profile by plant roots
+        """
+        Evaluates the accessibility of layers in the soil profile by plant roots.
 
-        Args:
-            depths: the maximum depth of each soil layer
+        Parameters
+        ----------
+        depths : List[float]
+            The maximum depth of each soil layer.
 
-        Details: gets the total number of soil layers, the deepest layer accessible to the roots,
-        and the number of layers that remain inaccessible to the plant.
+        Notes
+        -----
+        This method determines the total number of soil layers, identifies the deepest layer accessible to the roots,
+        and calculates the number of layers that remain inaccessible to the plant.
+
         """
         self.data.total_soil_layers = len(depths)
         self.data.accessible_soil_layers = self.determine_deepest_accessible_layer(
@@ -120,32 +144,53 @@ class NitrogenIncorporation:
         self.data.inaccessible_soil_layers = max(len(depths) - self.data.accessible_soil_layers, 0)
 
     def access_layers(self, layer_list: List[float]) -> List[float]:
-        """utility function that removes any inaccessible layers from a list
+        """
+        Utility function that removes any inaccessible layers from a list.
 
-        Args:
-            layer_list: a list containing a value for each layer of the soil profile
+        This method filters the input list to include only the layers of the soil profile that are accessible
+        to the plant's roots, based on the plant's root depth and the soil layer depths.
 
-        Returns: a trimmed resource list with an element for each soil layer that is accessible to the plant's roots
+        Parameters
+        ----------
+        layer_list : List[float]
+            A list containing a value for each layer of the soil profile.
+
+        Returns
+        -------
+        List[float]
+            A trimmed list with an element for each soil layer that is accessible to the plant's roots.
+
         """
         return layer_list[0:self.data.accessible_soil_layers]
 
     def extend_nitrate_uptakes_to_full_profile(self) -> None:
-        """determines the actual nitrogen uptakes for the full soil profile, not just accessible layers
+        """
+        Determines the actual nitrogen uptakes for the full soil profile, not just the accessible layers.
 
-        Details: zeros are appended to the list of nitrogen uptakes for each inaccessible soil layer
+        Notes
+        -----
+        Zeros are appended to the list of nitrogen uptakes for each inaccessible soil layer, indicating no nitrogen
+        uptake from those layers.
+
         """
         if self.data.inaccessible_soil_layers > 0:
             self.data.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
 
     def extract_nitrogen_from_soil_layers(self, layer_nitrates: List[float]) -> None:
-        """extracts nitrogen from the soil profile by layer.
+        """
+        Extracts nitrogen from the soil profile by layer.
 
-        Args:
-            layer_nitrates: a list of nitrates in each layer of the soil profile, from which nitrates will be extracted
-            by the plant.
+        Parameters
+        ----------
+        layer_nitrates : List[float]
+            A list of nitrates (in units such as kg/ha) present in each layer of the soil profile, from which nitrates
+            will be extracted by the plant.
 
-        Details: the layer_nitrates list is updated in place. Actual nitrogen uptake values are subtracted from
-        each layer
+        Notes
+        -----
+        The `layer_nitrates` list is updated in place. Actual nitrogen uptake values, calculated by another method,
+        are subtracted from the nitrate content of each corresponding soil layer.
+
         """
         layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.data.actual_nitrogen_uptakes)]
 
@@ -154,14 +199,24 @@ class NitrogenIncorporation:
         self.data.total_nitrogen_uptake = sum(self.data.actual_nitrogen_uptakes)
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
-        """tries to fix nitrogen
+        """
+        Attempts to fix nitrogen if the plant is capable of nitrogen fixation.
 
-        Args:
-            total_accessible_nitrates: the total nitrates accessible to roots
-            soil_water_factor: the soil water factor
+        Parameters
+        ----------
+        total_accessible_nitrates : float
+            The total amount of nitrates accessible to the plant's roots (kg/ha).
+        soil_water_factor : float
+            A factor representing the availability of water in the soil, affecting the plant's ability to fix nitrogen
+            (unitless).
 
-        Details: If the plant is a nitrogen fixer, it will fix nitrogen. Otherwise, it will hurt itself in its confusion
-        (not really - nothing happens)
+        Notes
+        -----
+        If the plant species is a nitrogen fixer, this method simulates the fixation of atmospheric nitrogen, enhancing
+        the nitrogen content available to the plant. If the plant is not a nitrogen fixer, no action is taken, and the
+        method does not affect the plant or soil properties. The humorous note implies that non-nitrogen fixing plants
+        do not adversely affect themselves when this method is called.
+
         """
         if self.data.is_nitrogen_fixer:
             self.update_fixation_attributes(total_accessible_nitrates)
@@ -170,9 +225,14 @@ class NitrogenIncorporation:
             self.data.fixed_nitrogen = 0
 
     def update_fixation_attributes(self, total_accessible_nitrates: float) -> None:
-        """updates attributes necessary for nitrogen fixation
-        Args:
-            total_accessible_nitrates: the total nitrates accessible to roots
+        """
+        Updates attributes necessary for nitrogen fixation.
+
+        Parameters
+        ----------
+        total_accessible_nitrates : float
+            The total nitrates accessible to the plant's roots.
+
         """
         self.data.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
         self.data.fixation_stage_factor = self._determine_fixation_stage_factor(
@@ -180,7 +240,16 @@ class NitrogenIncorporation:
         )
 
     def fix_nitrogen(self, water_factor: float) -> None:
-        """fix nitrogen, based on any remaining demand not met by actual uptake"""
+        """
+        Fixes nitrogen, based on any remaining demand not met by actual uptake.
+
+        Parameters
+        ----------
+        water_factor : float
+            A factor representing the availability of water in the soil, affecting the efficiency of nitrogen fixation
+            (unitless).
+
+        """
         unmet_demand = self.data.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
         if unmet_demand > 0:
             self.data.fixed_nitrogen = self._determine_fixed_nitrogen(
