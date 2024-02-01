@@ -138,10 +138,6 @@ class InputManager:
 
         Raises
         ------
-        FileNotFoundError
-            If the JSON file does not exist at the specified path.
-        json.JSONDecodeError
-            If there is an error in decoding the JSON file.
         Exception
             For any other unexpected errors during JSON file loading.
         """
@@ -154,14 +150,7 @@ class InputManager:
                 data = json.load(json_file)
                 om.add_log("load_data_successful", f"Successfully loaded data from {file_path}.", info_map)
                 return data
-        except FileNotFoundError as fnfe:
-            om.add_error("json_file_not_found", str(fnfe), info_map)
-            raise
-        except json.JSONDecodeError as jde:
-            om.add_error("load_json_error", str(jde), info_map)
-            raise
-        except Exception as e:
-            om.add_error("load_json_file_error", f"Unexpected error: {e}", info_map)
+        except Exception:
             raise
 
     def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
