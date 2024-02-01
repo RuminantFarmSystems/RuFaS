@@ -850,6 +850,7 @@
       "type": "array",
       "description": "calves data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -900,6 +901,7 @@
       "type": "array",
       "description": "heiferIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -949,6 +951,7 @@
       "type": "array",
       "description": "heiferIIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1079,6 +1082,7 @@
       "type": "array",
       "description": "heiferIIIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1209,6 +1213,7 @@
       "type": "array",
       "description": "cows data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1369,6 +1374,7 @@
       "type": "array",
       "description": "replacement cows data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
