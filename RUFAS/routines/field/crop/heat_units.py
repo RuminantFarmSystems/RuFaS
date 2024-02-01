@@ -116,7 +116,7 @@ class HeatUnits:
 
     def add_heat_units(self) -> None:
         """
-        add newly acquired heat units to accumulated heat units
+        Add newly acquired heat units to accumulated heat units.
         """
         self.data.accumulated_heat_units += self.data.new_heat_units
 
