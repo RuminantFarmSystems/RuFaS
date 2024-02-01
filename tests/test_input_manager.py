@@ -1956,27 +1956,32 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize("data,expected_keys", [
-    ({
-         "key_1": {"properties": "properties_1"},
-         "key_2": {"properties": "properties_2"},
-         "key_3": {"properties": "target_properties"},
-         "key_4": {"properties": "target_properties"},
-         "key_5": {"properties": "target_properties"},
-     }, ["key_3", "key_4", "key_5"]
+    (
+            {
+                "key_1": {"properties": "properties_1"},
+                "key_2": {"properties": "properties_2"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "target_properties"},
+                "key_5": {"properties": "target_properties"},
+            }, ["key_3", "key_4", "key_5"]
     ),
-    ({
-         "key_1": {"properties": "target_properties"},
-         "key_2": {"properties": "value"},
-         "key_3": {"properties": "target_properties"},
-         "key_4": {"properties": "properties_4"},
-         "key_5": {"properties": "properties_5"}
-     }, ["key_1", "key_3"]
+    (
+            {
+                "key_1": {"properties": "target_properties"},
+                "key_2": {"properties": "value"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "properties_4"},
+                "key_5": {"properties": "properties_5"}
+            },
+            ["key_1", "key_3"]
     ),
-    ({
-         "key_1": {"properties": "value"},
-         "key_2": {"properties": "value"},
-         "key_3": {"properties": "value"}
-     }, []
+    (
+            {
+                "key_1": {"properties": "value"},
+                "key_2": {"properties": "value"},
+                "key_3": {"properties": "value"}
+            },
+            []
     ),
     ({}, [])
 ])
