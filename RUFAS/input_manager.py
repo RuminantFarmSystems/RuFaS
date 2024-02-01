@@ -224,13 +224,9 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element(
-                        [metadata_property],
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
+                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
+                                                                               filtered_input_data, eager_termination,
+                                                                               element_counter_and_validity)
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_tabular_element(metadata_property,
                                                                                   properties_blob_key,
@@ -438,11 +434,10 @@ class InputManager:
 
         Returns
         -------
-        tuple[dict, bool]
-            The first element of the tuple returned is a dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean which is True if all data checked
-            is valid, False otherwise. The second element is a boolean indicating if the individual element checked by
-            this method was valid.
+        dict
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
 
         """
         info_map = {"class": self.__class__.__name__,
@@ -465,13 +460,9 @@ class InputManager:
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
                     previous_invalid_count = element_counter_and_validity["invalid_elements"]
-                    element_counter_and_validity = self._validate_dict_element(
-                        element_hierarchy,
-                        properties_blob_key,
-                        input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
+                    element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
+                                                                               input_data, eager_termination,
+                                                                               element_counter_and_validity)
                     is_child_valid = previous_invalid_count == element_counter_and_validity["invalid_elements"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
