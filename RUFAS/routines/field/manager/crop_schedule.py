@@ -81,8 +81,6 @@ class CropSchedule(Schedule):
 
         self._validate_pattern_parameters()
 
-        self.planting_skip = self.harvest_years[-1] - self.planting_years[-1]
-
     def _validate_planting_parameters(self) -> None:
         """
         Checks fields that dictate planting for correctness, otherwise raises errors.

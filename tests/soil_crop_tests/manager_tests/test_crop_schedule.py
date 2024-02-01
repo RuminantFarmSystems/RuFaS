@@ -39,6 +39,7 @@ def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], pl
     assert crop_schedule.harvest_operations == expected.get("harvest_ops")
     assert crop_schedule.heat_scheduled == heat_sched
     assert crop_schedule.pattern_skip == plant_skip
+    print(f"{crop_schedule.planting_skip} {plant_skip}")
     assert crop_schedule.planting_skip == plant_skip
     assert crop_schedule.harvesting_skip == harvest_skip
     assert crop_schedule.pattern_repeat == pat_repeat
