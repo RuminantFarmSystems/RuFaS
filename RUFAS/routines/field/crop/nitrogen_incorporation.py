@@ -266,24 +266,38 @@ class NitrogenIncorporation:
     def determine_nutrient_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
                                             emergence_nutrient_fraction: float, half_mature_nutrient_fraction: float,
                                             mature_nutrient_fraction: float) -> List[float]:
-        # pseudocode: C.5.A.1, C.5.A.2
         """
-        Description: calculates the shape coefficients for the nitrogen fraction equation
+        Calculates the shape coefficients for the nitrogen fraction equation.
 
-        Args:
-            half_mature_heat_fraction: PHU fraction at half-maturity
-            mature_heat_fraction: PHU fraction at full-maturity
-            emergence_nutrient_fraction: nitrogen fraction at emergence
-            half_mature_nutrient_fraction: nitrogen fraction at half-maturity
-            mature_nutrient_fraction: nitrogen fraction *at* maturity
+        Parameters
+        ----------
+        half_mature_heat_fraction : float
+            PHU (Potential Heat Units) fraction at half-maturity.
+        mature_heat_fraction : float
+            PHU fraction at full maturity.
+        emergence_nutrient_fraction : float
+            Nitrogen fraction at emergence.
+        half_mature_nutrient_fraction : float
+            Nitrogen fraction at half-maturity.
+        mature_nutrient_fraction : float
+            Nitrogen fraction at maturity.
 
-        SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
+        Returns
+        -------
+        List[float]
+            A list containing the first and second shape coefficients, respectively.
 
-        Returns: list of the first and second shape coefficients, respectively
+        Notes
+        -----
+        SWAT assumes that the difference between the nutrient fraction near maturity and the nutrient fraction at
+        maturity in the crop is equal to 0.00001 (as per SWAT theoretical documentation pages 331 and 336, top
+        paragraphs of both). Therefore, the near mature nutrient fraction is adjusted to meet that assumption in this
+        calculation.
 
-        Notes: SWAT assumes that the fraction of nutrients near maturity minus the fraction of nutrients at maturity in
-            the crop is equal to 0.00001 (see theoretical documentation pages 331 and 336, top paragraphs of both), so
-            the near mature nutrient fraction is set to meet that assumption here.
+        References
+        ----------
+        SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
+
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
@@ -313,17 +327,29 @@ class NitrogenIncorporation:
     def _determine_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrogen_fraction: float,
                              emergence_nitrogen_fraction: float) -> float:  # pseudocode: C.5.A.1, C.5.A.2
         """
-        Description: calculate the log component of shape coefficient formulae
+        Calculate the logarithmic component of the shape coefficient formulae for nitrogen uptake.
 
-        Args:
-            heat_fraction: PHU fraction of interest
-            nitrogen_fraction: nitrogen fraction of interest
-            mature_nitrogen_fraction: nitrogen fraction at maturity
-            emergence_nitrogen_fraction: nitrogen fraction at emergence
+        Parameters
+        ----------
+        heat_fraction : float
+            PHU (Potential Heat Units) fraction of interest.
+        nitrogen_fraction : float
+            Nitrogen fraction of interest at a specific point in the growth cycle.
+        mature_nitrogen_fraction : float
+            Nitrogen fraction at maturity, indicating the nitrogen level when the plant is fully matured.
+        emergence_nitrogen_fraction : float
+            Nitrogen fraction at emergence, indicating the initial nitrogen level when the plant emerges.
 
-        SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
+        Returns
+        -------
+        float
+            The logarithmic term of the nitrogen shape coefficients, crucial for calculating the shape coefficients
+            used in nitrogen uptake modeling (unitless).
 
-        Returns: the log term of nitrogen shape coefficients
+        References
+        ----------
+        SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
+
         """
         # throw an error if any parameters do not satisfy [0-1]
         if nitrogen_fraction < 0 or nitrogen_fraction > 1 or heat_fraction < 0 or heat_fraction > 1 or \
@@ -363,19 +389,32 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_optimal_nutrient_fraction(heat_fraction: float, emergence_nutrient_fraction: float,
                                             mature_nutrient_fraction: float, shape1: float,
-                                            shape2: float) -> float:  # pseudocode: C.5.B.1
+                                            shape2: float) -> float:
         """
-        Description: calculates the optimal fraction of nitrogen in the plant biomass on a given day
+        Calculates the optimal fraction of nitrogen in the plant biomass on a given day.
 
+        Parameters
+        ----------
+        heat_fraction : float
+            Fraction of total potential heat units (PHU fraction) accumulated to date.
+        emergence_nutrient_fraction : float
+            Expected fraction of plant biomass comprised of nitrogen at plant emergence.
+        mature_nutrient_fraction : float
+            Nitrogen fraction at maturity.
+        shape1 : float
+            First nitrogen uptake shape parameter.
+        shape2 : float
+            Second nitrogen uptake shape parameter.
+
+        Returns
+        -------
+        float
+            The calculated optimal nitrogen fraction in the plant biomass for the given day.
+
+        References
+        ----------
         SWAT Reference: Equations 5:2.3.1, 5:2.3.19
 
-        Args:
-            heat_fraction: fraction of total potential heat units (PHU fraction) accumulated to date
-            emergence_nutrient_fraction: expected fraction of plant biomass comprised of nitrogen (nitrogen fraction) at
-                plant emergence
-            mature_nutrient_fraction: nitrogen fraction at maturity
-            shape1: first nitrogen uptake shape parameter
-            shape2: second nitrogen uptake shape parameter
         """
         ndiff = emergence_nutrient_fraction - mature_nutrient_fraction
         e_term = exp(shape1 + (shape2 * heat_fraction))
@@ -384,15 +423,25 @@ class NitrogenIncorporation:
 
     @staticmethod
     def determine_optimal_nutrient(fraction: float, whole: float) -> float:  # pseudocode: C.5.B.2
-        """calculate mass of a constituent from the fractional mass of the whole
+        """
+        Calculate the mass of a nutrient as a constituent from the fractional mass of the whole.
 
-        Args:
-          fraction: proportion of the whole made up of the constituent
-          whole: total mass of the whole
+        Parameters
+        ----------
+        fraction : float
+            Proportion of the whole made up of the nutrient (unitless).
+        whole : float
+            Total mass of the whole in which the nutrient is a part (kg/ha).
 
-        SWAT Reference: Equations 5:2.3.4, 5:2.3.22
+        Returns
+        -------
+        float
+            Mass of the nutrient as a constituent of the whole (kg/ha).
 
-        Returns: mass of the constituent
+        References
+        ----------
+        SWAT 5:2.3.4, 5:2.3.22
+
         """
         return fraction * whole
 
@@ -400,39 +449,54 @@ class NitrogenIncorporation:
     def determine_potential_nutrient_uptake(demand: float, nutrient_start: float, mature_nutrient_fraction: float,
                                             max_growth: float) -> float:  # pseudocode: C.5.B.3
         """
-        Description: calculates potential nitrogen uptake for the day
+        Calculates the potential nitrogen uptake for the day.
 
-        Args:
-            demand: maximum/optimal nitrogen uptake of the plant on a given day
-            nutrient_start: nitrogen biomass at the end of the previous day
-            mature_nutrient_fraction: nitrogen fraction at maturity
-            max_growth: maximum potential biomass the plant can gain on a given day
+        Parameters
+        ----------
+        demand : float
+            The maximum or optimal nitrogen uptake of the plant on a given day (kg/ha).
+        nutrient_start : float
+            Nitrogen biomass at the end of the previous day (kg/ha).
+        mature_nutrient_fraction : float
+            Nitrogen fraction at plant maturity (unitless).
+        max_growth : float
+            Maximum potential biomass the plant can gain on a given day (kg/ha).
 
-        SWAT Reference: Equations 5:2.3.5, 5:2.3.23
+        Returns
+        -------
+        float
+            The potential nitrogen uptake for the day (kg/ha).
 
-        Returns: the potential nitrogen uptake for the day
+        References
+        ----------
+        SWAT 5:2.3.5, 5:2.3.23
+
         """
         return min(demand - nutrient_start, 4 * mature_nutrient_fraction * max_growth)
 
     @staticmethod
     def determine_deepest_accessible_layer(root_depth: float, layer_bounds: List[float]) -> int:
         """
-        Description:
-            Determines the deepest soil layer that is accessible to roots.
+        Determines the deepest soil layer that is accessible to roots.
 
-        Args:
-            root_depth: the root depth of a plant
-            layer_bounds: the depths of the lower boundaries of each soil layer
+        Parameters
+        ----------
+        root_depth : float
+            The root depth of the plant, indicating how deep the roots extend into the soil (mm).
+        layer_bounds : List[float]
+            A list containing the depths (in centimeters or meters) of the lower boundaries of each soil layer.
 
-        Returns:
-            an integer indicating the deepest soil layer that the roots can access
+        Returns
+        -------
+        int
+            An integer indicating the deepest soil layer that the roots can access. For example, a return of 1 means
+            only the first layer is accessible (i.e., layer_bounds[:1]), and a return of 2 means the first and second
+            layers are accessible (i.e., layer_bounds[:2]).
 
-            example: return of 1 means only the first layer is accessible (i.e., accessible_depths[:1]) and a return of
-            2 means the first and second layers are accessible (i.e., accessible_depths[:2])
-
-        Notes:
-            This method assumes that if there are no roots, then none of the soil layers are accessible for nutrient
-            uptake by the crop.
+        Notes
+        -----
+        This method assumes that if there are no roots (root depth of 0), then none of the soil layers are accessible
+        for nutrient uptake by the crop.
 
         """
         if root_depth < 0.0:
@@ -447,17 +511,34 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_layer_nutrient_uptake_potential(layer_bounds: List[float], total_demand: float, root_depth: float,
                                                   nutrient_distribution_parameter: float) -> List[float]:
-        # pseudocode: C.5.C.2, C.5.C.3
         """
-        Description: calculates potential nitrogen uptake from each soil layer
+        Calculates the potential nitrogen uptake from each soil layer based on plant demand and root depth.
 
-        Args:
-            layer_bounds: list of lower boundaries for each soil layer, in ascending order (i.e., increasing depths)
-            total_demand: total nitrogen demand of the plant
-            root_depth: current depth of the plant roots
-            nutrient_distribution_parameter: nitrogen uptake distribution parameter
+        Parameters
+        ----------
+        layer_bounds : List[float]
+            A list of lower boundaries for each soil layer, in ascending order (i.e., increasing depths). Each entry
+            represents the depth to the bottom of the layer.
+        total_demand : float
+            The total nitrogen demand of the plant, indicating how much nitrogen the plant needs to meet its growth
+            requirements (kg/ha).
+        root_depth : float
+            The current depth of the plant's roots, determining which soil layers are accessible for nitrogen uptake
+            (mm).
+        nutrient_distribution_parameter : float
+            A parameter that influences the distribution of nitrogen uptake across the accessible soil layers, affecting
+            how uptake is allocated among the layers (unitless).
 
-        Returns: a list of potential nitrogen uptake from each layer
+        Returns
+        -------
+        List[float]
+            A list of potential nitrogen uptake values from each layer, with the uptake from inaccessible layers set to
+            zero.
+
+        References
+        ----------
+            pseudocode: C.5.C.2, C.5.C.3
+
         """
         # check that boundaries are in ascending order
         sorted_boundaries = layer_bounds.copy()
@@ -480,17 +561,29 @@ class NitrogenIncorporation:
     def _determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float,
                                             nitrogen_distribution_parameter: float) -> float:  # pseudocode: C.5.C.1
         """
-        Description: calculates potential nitrogen uptake from the soil surface to a specified depth
+        Calculates the potential nitrogen uptake from the soil surface to a specified depth.
 
-        Args:
-            demand: the current nitrogen demand
-            depth: the depth to which nitrogen uptake is calculated
-            root_depth: the current root depth
-            nitrogen_distribution_parameter: the nitrogen uptake distribution parameter
+        Parameters
+        ----------
+        demand : float
+            The current nitrogen demand of the plant (kg/ha).
+        depth : float
+            The depth (in the same units as root_depth, typically centimeters or meters) to which nitrogen uptake is
+            calculated (mm).
+        root_depth : float
+            The current depth of the plant's roots (mm).
+        nitrogen_distribution_parameter : float
+            The nitrogen uptake distribution parameter affecting how uptake is allocated with depth.
 
-        SWAT Reference: Equations 5:2.3.6, 5:2.3.24
+        Returns
+        -------
+        float
+            The potential amount of nitrogen that can be taken up from the soil surface to the specified depth (kg/ha).
 
-        Returns: the potential amount of nitrogen taken up
+        References
+        ----------
+        SWAT 5:2.3.6, 5:2.3.24
+
         """
         # error checks
         if nitrogen_distribution_parameter == 0:
@@ -505,15 +598,26 @@ class NitrogenIncorporation:
 
     @staticmethod
     def determine_layer_nutrient_demands(uptake_potentials: List[float],
-                                         nutrient_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
+                                         nutrient_availabilities: List[float]) -> List[float]:
         """
-        Description: calculates demand for a nutrient of the plant from each soil layer
+        Calculates the demand for a nutrient from each soil layer.
 
-        Args:
-            uptake_potentials: maximum uptake of the nutrient by the plant from each soil layer
-            nutrient_availabilities: available amount of the nutrient in each soil layer
+        Parameters
+        ----------
+        uptake_potentials : List[float]
+            Maximum uptake of the nutrient by the plant from each soil layer.
+        nutrient_availabilities : List[float]
+            Available amount of the nutrient in each soil layer.
 
-        Returns: a list of demands for the nutrient from each soil layer
+        Returns
+        -------
+        List[float]
+            Demands for the nutrient from each soil layer.
+
+        References
+        ----------
+        pseudocode: C.5.C.5
+
         """
         layer_delta = [desired - available for desired, available in zip(uptake_potentials, nutrient_availabilities)]
         layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))]  # cumulative sum, starting at 0
@@ -523,16 +627,26 @@ class NitrogenIncorporation:
     def determine_layer_nutrient_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
                                         layer_nutrient: List[float]) -> List[float]:  # pseudocode: C.5.C.4
         """
-        Description: calculates nutrient amount uptaken from each soil layer
+        Calculates nutrient amount uptaken from each soil layer.
 
-        Args:
-            layer_demands: list of demands from each soil layer not met by the above layers, for the nutrient
-            layer_uptake_potentials: list of maximum uptake of the nutrient from each soil layer
-            layer_nutrient: list of nutrient amounts present in each soil layer
+        Parameters
+        ----------
+        layer_demands : List[float]
+            List of demands for the nutrient from each soil layer not met by the above layers.
+        layer_uptake_potentials : List[float]
+            List of maximum potential uptake of the nutrient from each soil layer.
+        layer_nutrient : List[float]
+            List of nutrient amounts available in each soil layer.
 
-        SWAT Reference: 5:2.3.1, 5:2.3.2 (see paragraphs below equations 5:2.3.8 and 5:2.3.26)
+        Returns
+        -------
+        List[float]
+            Amount of nutrient mass taken up from each soil layer.
 
-        Returns: a list of nitrogen mass taken up from each soil layer
+        References
+        ----------
+        SWAT 5:2.3.1, 5:2.3.2 (see paragraphs below equations 5:2.3.8 and 5:2.3.26)
+
         """
         # ensure all list inputs are the same length
         if len(layer_uptake_potentials) != len(layer_demands) or len(layer_uptake_potentials) != len(layer_nutrient):
@@ -544,15 +658,23 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_layer_extracted_resource(requests: List[float], sources: List[float]) -> List[float]:
         """
-        Description: calculates the amount of a resource actually extracted from each layer of the soil
+        Calculates the amount of a resource actually extracted from each layer of the soil.
 
-        Args:
-            requests: desired amount of the resource from each layer
-            sources: the pool of available resources in each layer
+        Parameters
+        ----------
+        requests : List[float]
+            Desired amount of the resource from each layer.
+        sources : List[float]
+            The pool of available resources in each layer.
 
-        SWAT Reference: Equations 5:2.3.8, 5:2.3.26
+        Returns
+        -------
+        List[float]
+            The actual amounts of a resource extracted from the soil layers.
 
-        Returns: The actual amounts of a resource to be extracted from the soil layers
+        References
+        ----------
+        SWAT 5:2.3.8, 5:2.3.26
 
         """
         if len(requests) != len(sources):
@@ -562,15 +684,24 @@ class NitrogenIncorporation:
     @staticmethod
     def _determine_extracted_resource(request: float, source: float) -> float:
         """
-        Description: calculates the amount of a resource that can be drawn from a source, based on a request
+        Calculates the amount of a resource that can be drawn from a source, based on a request.
 
-        Args:
-            request: requested amount of the resource
-            source: amount of the resource available at the source
+        Parameters
+        ----------
+        request : float
+            Requested amount of the resource (kg/ha).
+        source : float
+            Amount of the resource available at the source (kg/ha).
 
-        SWAT Reference: Equations 5:2.3.8, 5:2.3.26
+        Returns
+        -------
+        float
+            The amount of the resource to be extracted, considering the request and source availability (kg/ha).
 
-        Returns: the amount of the resource to be extracted
+        References
+        ----------
+        SWAT 5:2.3.8, 5:2.3.26
+
         """
         return min(request, max(0.0, source))
 
