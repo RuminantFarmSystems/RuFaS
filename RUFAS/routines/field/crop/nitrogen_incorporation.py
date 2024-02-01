@@ -743,17 +743,28 @@ class NitrogenIncorporation:
     @staticmethod
     def _determine_fixation_stage_factor(heat_fraction: float) -> float:
         """
-        Description: calculates fixation symbiotic growth stage factor
+        Calculates the fixation symbiotic growth stage factor.
 
-        Args:
-            heat_fraction: the accumulated fraction of potential heat units
+        Parameters
+        ----------
+        heat_fraction : float
+            The accumulated fraction of potential heat units (PHU).
 
-        SWAT Reference: Equations 2:2.3.10 - 2:2.3.14
+        Returns
+        -------
+        float
+            The growth stage factor for symbiotic organisms involved in nitrogen fixation (unitless).
 
-        Returns: growth stage factor
+        Notes
+        -----
+        The symbiotic organisms that fix nitrogen exist at different densities depending upon the age of the plant. This
+        growth stage factor reflects the density and activity level of these symbiotic organisms relative to the plant's
+        growth stage.
 
-        Details: the symbiotic organisms that fix nitrogen exist at different densities depending upon the age of the
-            plant. The growth stage factor exemplifies that relationship.
+        References
+        ----------
+        SWAT 2:2.3.10 - 2:2.3.14
+
         """
         # piece-wise function:
         if heat_fraction <= 0.15:
@@ -775,17 +786,28 @@ class NitrogenIncorporation:
     def _determine_fixed_nitrogen(demand: float, stage_factor: float, water_factor: float,
                                   nitrate_factor: float) -> float:
         """
-        Description: calculate the amount of nitrogen fixed by a plant
+        Calculates the amount of nitrogen fixed by a plant.
 
-        Args:
-            demand: nitrogen demand not met by uptake from soil
-            stage_factor: growth stage factor [0, 1]
-            water_factor: soil water factor [0, 1]
-            nitrate_factor: soil nitrate factor [0, 1]
+        Parameters
+        ----------
+        demand : float
+            Nitrogen demand not met by uptake from soil (kg/ha).
+        stage_factor : float
+            Growth stage factor, ranging from 0 to 1 (unitless).
+        water_factor : float
+            Soil water factor, ranging from 0 to 1 (unitless).
+        nitrate_factor : float
+            Soil nitrate factor, ranging from 0 to 1 (unitless).
 
-        SWAT Reference: Equation 5:2.3.9
+        Returns
+        -------
+        float
+            The amount of nitrogen added to plant biomass through fixation, capped at the demand (kg/ha).
 
-        Returns: the amount of nitrogen added to plant biomass through fixation, capped at demand.
+        References
+        ----------
+        SWAT 5:2.3.9
+
         """
         if not 0 <= stage_factor <= 1:
             raise ValueError("stage_factor must be between 0 and 1")
@@ -800,13 +822,21 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_stored_nutrient(uptake: float, previous: float, fixed: float) -> float:  # C.5.E.1
         """
-        Description: calculates mass of the nutrient stored in plant material after the current day's growth cycle
+        Calculates the mass of the nutrient stored in plant material after the current day's growth cycle.
 
-        Args:
-            uptake: the mass of the nutrient taken up by the plant on the current day
-            previous: the nutrient mass stored in the plant at the end of the previous day
-            fixed: the mass of nutrient fixed by the plant on the current day (only applies to nitrogen)
+        Parameters
+        ----------
+        uptake : float
+            The mass of the nutrient taken up by the plant on the current day (kg/ha).
+        previous : float
+            The nutrient mass stored in the plant at the end of the previous day (kg/ha).
+        fixed : float
+            The mass of nutrient fixed by the plant on the current day, applicable only to nitrogen (kg/ha).
 
-        Returns: the total mass of the nutrient in the plant at the end of current day
+        Returns
+        -------
+        float
+            The total mass of the nutrient in the plant at the end of the current day (kg/ha).
+
         """
         return previous + uptake + fixed
