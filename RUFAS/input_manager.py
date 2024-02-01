@@ -1,8 +1,7 @@
-# !/usr/bin/env python3
-
 from copy import deepcopy
 from functools import reduce
 import json
+import os
 import re
 
 import pandas as pd
@@ -30,6 +29,7 @@ class InputManager:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
+        self.__properties_used: Dict[str, Any] = {}
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
@@ -50,6 +50,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
+        self._load_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -78,6 +79,48 @@ class InputManager:
                 om.add_log("load_metadata_success", f"Successfully loaded metadata from {metadata_path}", info_map)
         except Exception as e:
             raise e
+
+    def _load_properties(self) -> None:
+        """
+        Loads properties data from a specified JSON file and updates the metadata.
+
+        This method reads the properties file path from the metadata, checks if the file exists, and then loads the
+        properties into the metadata. The original properties data in the metadata is first copied to a separate
+        attribute for future reference and then removed from the metadata files section.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the properties file does not exist at the specified path.
+        json.JSONDecodeError
+            If there is an error in decoding the JSON file.
+        Exception
+            For any other unexpected errors during properties loading.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_properties.__name__,
+                    }
+        try:
+            properties_path = self.__metadata["files"]["properties"]["path"]
+            om.add_log("load_properties_attempt", f"Attempting to load properties from {properties_path}", info_map)
+            if not os.path.exists(properties_path):
+                raise FileNotFoundError(f"Properties file not found at {properties_path}")
+
+            self.__properties_used = self.__metadata["files"]["properties"]
+            del self.__metadata["files"]["properties"]
+
+            self.__metadata["properties"] = self._load_data_from_json(properties_path)
+            om.add_log("load_properties_success", f"Successfully loaded properties from {properties_path}", info_map)
+
+        except FileNotFoundError as fnfe:
+            om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            raise
+        except json.JSONDecodeError as jde:
+            om.add_error("load_properties_json_error", str(jde), info_map)
+            raise
+        except Exception as e:
+            om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            raise
 
     def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
         """
