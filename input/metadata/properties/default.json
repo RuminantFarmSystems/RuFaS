@@ -850,6 +850,7 @@
       "type": "array",
       "description": "calves data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -900,6 +901,7 @@
       "type": "array",
       "description": "heiferIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -949,6 +951,7 @@
       "type": "array",
       "description": "heiferIIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1079,6 +1082,7 @@
       "type": "array",
       "description": "heiferIIIs data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1209,6 +1213,7 @@
       "type": "array",
       "description": "cows data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -1369,6 +1374,7 @@
       "type": "array",
       "description": "replacement cows data",
       "properties": {
+        "type": "object",
         "id": {
           "type": "number",
           "description": "Unique integer identifier.",
@@ -2676,6 +2682,7 @@
         "type": "array",
         "description": "Calf Feeds.",
         "properties": {
+          "type": "object",
           "feed_type": {
             "type": "number",
             "description": "Calf Feed",
@@ -2695,6 +2702,7 @@
         "type": "array",
         "description": "Growing Heifers Feeds.",
         "properties": {
+          "type": "object",
           "feed_type": {
             "type": "number",
             "description": "Growing Heifers Feed",
@@ -2714,6 +2722,7 @@
         "type": "array",
         "description": "Close UP Feeds.",
         "properties": {
+          "type": "object",
           "feed_type": {
             "type": "number",
             "description": "Close UP Feed",
@@ -2733,6 +2742,7 @@
         "type": "array",
         "description": "Lactating Cow Feeds.",
         "properties": {
+          "type": "object",
           "feed_type": {
             "type": "number",
             "description": "Lactating Cow Feed",
@@ -3464,7 +3474,7 @@
           "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
           "pattern": "^(screw press|rotary screen|none)$"
         },
-        "manure_treatment_methods": {
+        "manure_treatment": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
           "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
@@ -3475,33 +3485,31 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "bedding_type": {
-            "type": "string",
-            "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
-          },
-          "bedding_mass_per_day": {
-            "type": "number"
-          },
-          "bedding_density": {
-            "type": "number"
-          },
-          "bedding_dry_matter_content": {
-            "type": "number"
-          },
-          "bedding_cleaned_fraction": {
-            "type": "number"
-          },
-          "bedding_carbon_fraction": {
-            "type": "number"
-          },
-          "bedding_phosphorus_content": {
-            "type": "number"
-          },
-          "sand_removal_efficiency": {
-            "type": "number"
-          }
+        "bedding_type": {
+          "type": "string",
+          "description": "Bedding Type -- The material used for bedding pack.",
+          "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
+        },
+        "bedding_mass_per_day": {
+          "type": "number"
+        },
+        "bedding_density": {
+          "type": "number"
+        },
+        "bedding_dry_matter_content": {
+          "type": "number"
+        },
+        "bedding_cleaned_fraction": {
+          "type": "number"
+        },
+        "bedding_carbon_fraction": {
+          "type": "number"
+        },
+        "bedding_phosphorus_content": {
+          "type": "number"
+        },
+        "sand_removal_efficiency": {
+          "type": "number"
         }
       }
     },
@@ -3509,27 +3517,28 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "manure_handler_type": {
-            "type": "string",
-            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
-          },
-          "cleaning_water_use_rate": {
-            "type": "number"
-          },
-          "minutes_per_cleaning": {
-            "type": "number"
-          },
-          "cleanings_per_day": {
-            "type": "number"
-          },
-          "cleaning_water_recycle_fraction": {
-            "type": "number",
-            "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
-            "minimum": 0.0,
-            "maximum": 1.0
-          }
+        "manure_handler_type": {
+          "type": "string",
+          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+          "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
+        },
+        "cleaning_water_use_rate": {
+          "type": "number",
+          "default": 0.0
+        },
+        "minutes_per_cleaning": {
+          "type": "number",
+          "default": 0.0
+        },
+        "cleanings_per_day": {
+          "type": "number",
+          "default": 0
+        },
+        "cleaning_water_recycle_fraction": {
+          "type": "number",
+          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     },
@@ -3537,33 +3546,31 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "manure_separator_type": {
-            "type": "string",
-            "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|rotary screen|none)$"
-          },
-          "percent_dry_solids": {
-            "type": "number"
-          },
-          "total_solids_removal_efficiency_for_separator": {
-            "type": "number"
-          },
-          "volatile_solids_removal_efficiency_for_separator": {
-            "type": "number"
-          },
-          "nitrogen_removal_efficiency_for_separator": {
-            "type": "number"
-          },
-          "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-            "type": "number"
-          },
-          "phosphorus_removal_efficiency_for_separator": {
-            "type": "number"
-          },
-          "potassium_removal_efficiency_for_separator": {
-            "type": "number"
-          }
+        "manure_separator_type": {
+          "type": "string",
+          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+          "pattern": "^(screw press|rotary screen|none)$"
+        },
+        "percent_dry_solids": {
+          "type": "number"
+        },
+        "total_solids_removal_efficiency_for_separator": {
+          "type": "number"
+        },
+        "volatile_solids_removal_efficiency_for_separator": {
+          "type": "number"
+        },
+        "nitrogen_removal_efficiency_for_separator": {
+          "type": "number"
+        },
+        "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
+          "type": "number"
+        },
+        "phosphorus_removal_efficiency_for_separator": {
+          "type": "number"
+        },
+        "potassium_removal_efficiency_for_separator": {
+          "type": "number"
         }
       }
     },
@@ -3571,36 +3578,42 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "manure_treatment_type": {
-            "type": "string",
-            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
-          },
-          "total_solids_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "volatile_solids_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "nitrogen_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "phosphorus_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "potassium_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "storage_time_period": {
-            "type": "number"
-          },
-          "freeboard_input": {
-            "type": "number"
-          }
+        "manure_treatment_type": {
+          "type": "string",
+          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+        },
+        "total_solids_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "volatile_solids_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "nitrogen_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "phosphorus_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "potassium_removal_efficiency_for_treatment": {
+          "type": "number",
+          "default": 0.0
+        },
+        "storage_time_period": {
+          "type": "number",
+          "default": 0
+        },
+        "freeboard_input": {
+          "type": "number",
+          "default": 0.0
         }
       }
     }
