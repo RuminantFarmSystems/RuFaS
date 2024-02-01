@@ -118,7 +118,7 @@ class NitrogenIncorporation:
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
         """
-        copies the current nitrogen value to previous_nitrogen (for use between time steps)
+        Copies the current nitrogen value to previous_nitrogen (for use between time steps).
 
         """
         self.data.previous_nitrogen = self.data.nitrogen
