@@ -150,8 +150,8 @@ class InputManager:
                 data = json.load(json_file)
                 om.add_log("load_data_successful", f"Successfully loaded data from {file_path}.", info_map)
                 return data
-        except Exception:
-            raise
+        except Exception as e:
+            raise e
 
     def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
         """
