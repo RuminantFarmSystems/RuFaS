@@ -20,13 +20,21 @@ class LogVerbosity(Enum):
     """
     The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
 
+    Attributes
+    ----------
+    NONE : str
+        Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    ERRORS : str
+        Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+    WARNINGS : str
+        Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+    LOGS : str
+        Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+
     Notes
     -----
     NONE is the default setting.
-    Selecting NONE will tell OutputManager not to print out anything during a simulation.
-    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
-    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
-    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+
     """
 
     NONE = "none"

@@ -15,7 +15,32 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 
 
 class ManureSeparatorType(DefaultEnum):
-    """Enumerates the different types of manure separators."""
+    """Enumerates the different types of manure separators.
+
+    Attributes
+    ----------
+    ROTARY_SCREEN : str
+        The rotary screen method of manure separation.
+    SCREW_PRESS : str
+        The screw press method of manure separation.
+    BELT_PRESS : str
+        The belt press method of manure separation.
+    DECANTING_CENTRIFUGE : str
+        The decanting centrifuge method of manure separation.
+    MOVING_DISC_PRESS : str
+        The moving disc press method of manure separation.
+    SLOPE_SCREEN : str
+        The slope screen method of manure separation.
+    MECHANICAL_SAND_SEPARATOR : str
+        The mechanical sand separator method of sand-manure separation.
+    SAND_LANE_MANURE_SEPARATION : str
+        The sand lane method of sand-manure separation.
+
+    Notes
+    -----
+    The default organic separator is ROTARY_SCREEN.
+    The default sand lane separation method is SAND_LANE_MANURE_SEPARATION.
+    """
 
     ROTARY_SCREEN = "rotary screen"
     SCREW_PRESS = "screw press"
