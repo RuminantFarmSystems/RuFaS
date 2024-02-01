@@ -9,7 +9,8 @@
             "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled",
             "pattern_repeat": 4,
-            "pattern_skip": 2
+            "planting_skip": 2,
+            "harvesting_skip": 2
         },
         {
             "crop_species": "soybean_grain",
@@ -20,7 +21,8 @@
             "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled",
             "pattern_repeat": 4,
-            "pattern_skip": 3
+            "planting_skip": 3,
+            "harvesting_skip": 3
         }
     ]
 }
