@@ -86,8 +86,8 @@ class Utility:
 
         Raises
         ------
-        InvalidJSONFileError: If the json file at the given path does not
-                conform with the format required
+        InvalidJSONFileError:
+            If the json file at the given path does not conform with the format required.
 
         Returns
         -------

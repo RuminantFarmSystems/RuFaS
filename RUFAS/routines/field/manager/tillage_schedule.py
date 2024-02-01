@@ -54,15 +54,10 @@ class TillageSchedule(Schedule):
         ------
         ValueError
             If not all tilling years are valid.
-        ValueError
             If not all tilling days are valid.
-        ValueError
             If not all tillage depths are valid.
-        ValueError
             If not all incorporation fractions are valid.
-        ValueError
             If not all mixing fractions are valid.
-        ValueError
             If number of years, days, depths, and incorporation and mixing fractions are not equal.
 
         """

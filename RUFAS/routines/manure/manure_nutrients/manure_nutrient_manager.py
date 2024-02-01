@@ -166,7 +166,8 @@ class ManureNutrientManager:
         Raises
         ------
         ValueError
-            If the request for nutrient is negative, or if the nutrient composition is not in the range [0, 1].
+            If the request for nutrient is negative.
+            If the nutrient composition is not in the range [0, 1].
 
         """
         if request_nutrient < 0.0:

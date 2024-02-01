@@ -1019,6 +1019,11 @@ class HeiferII(HeiferI):
         Returns
         -------
         None
+
+        Raises
+        ------
+        Exception
+            If there is no hormone delivery schedule for the animal category.
         """
 
         self._hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
@@ -1116,6 +1121,11 @@ class HeiferII(HeiferI):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            If the reproduction program is not valid.
         """
 
         if repro_program not in [HeiferReproProtocolEnum.ED.value,

@@ -66,6 +66,11 @@ class HarvestedCrop:
     def __post_init__(self):
         """
         Validates that the type of the crop is consistent with its category.
+
+        Raises
+        ------
+        ValueError
+            If the crop type is not valid for the crop category.
         """
         category_to_type = {
             CropCategory.SMALL_GRAIN: [

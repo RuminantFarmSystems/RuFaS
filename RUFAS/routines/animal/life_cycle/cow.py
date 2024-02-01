@@ -622,21 +622,34 @@ class Cow(HeiferIII):
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
     def update(self, sim_day, calving_interval):  # noqa
-        """
-        Update cow status from the moment of calving, parity+1,
+        """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
-        Args:
-            sim_day: simulation day
-            calving_interval: the calving interval used for the daily update
-        Returns:
-            estimated_daily_milk_produced: estimated daily milk production
-                from the lactation curve
-            fat_percent: calculated with days in milk, for temporary use
-            daily_fat_correct_milk_production: calculated form estimated milk
-                production and fat percent, for temporary use
-            cull_stage: True if a cow is culled, false if it stays in the herd
-            new_born: True if a calf is born
+        Parameters
+        ----------
+        sim_day : int
+            The simulation day.
+        calving_interval : int
+            The size of the calving interval in days.
+
+        Returns
+        -------
+        float
+            estimated daily milk production from the lactation curve.
+        float
+            fat_percent calculated with days in milk, for temporary use.
+        float
+            daily_fat_correct_milk_production calculated form estimated milk
+            production and fat percent, for temporary use.
+        bool
+            cull_stage which is True if a cow is culled, False if it stays in the herd.
+        bool
+            new_born status which is True if a calf is born.
+
+        Raises
+        ------
+        ValueError
+            If reproduction program not in list of current reproduction programs.
         """
         if self.culled:
             return None

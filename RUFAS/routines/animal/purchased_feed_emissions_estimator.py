@@ -81,6 +81,22 @@ class PurchasedFeedEmissionsEstimator:
         return emissions_per_feed_id
 
     def _get_county_code(self) -> int:
+        """Gets the FIPS county code.
+
+        Returns
+        -------
+        int
+            FIPS county code.
+
+        Raises
+        ------
+        ValueError
+            If the location is not found.
+        ValueError
+            If the return value from the FCC's API is null.
+        requests.exceptions.RequestException
+            If the max attempts to reach FCC's API was reached and all attempts failed.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._get_county_code.__name__

@@ -360,7 +360,7 @@ class OutputManager(object):
         Raises
         ------
         Exception
-            If an error occurs while saving to the file
+            If an error occurs while saving to the file.
 
         Notes
         -----
@@ -496,7 +496,7 @@ class OutputManager(object):
         Raises
         ------
         Exception
-            If an error occurs while saving to the file
+            If an error occurs while saving to the file.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1059,8 +1059,10 @@ class OutputManager(object):
 
         Raises
         ------
-        Exception
-            If an error occurs while opening or reading the user-provided file path.
+        FileNotFoundError
+            If the variables pool file does not exist at the specified path.
+        json.JSONDecodeError
+            If there is an error in decoding the JSON file.
         """
         info_map = {
             "class": self.__class__.__name__,

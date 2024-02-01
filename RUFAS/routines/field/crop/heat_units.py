@@ -86,13 +86,20 @@ class HeatUnits:
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
                                             min_air_temperature: float = None,
                                             max_air_temperature: float = None):
-        """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
-        use_heat_unit_temperature attribute"""
+        """Raises errors if inputs given for absorb_heat_units don't make sense with the value of the
+        use_heat_unit_temperature attribute.
+
+        Raises
+        ------
+        ValueError
+            If min_air_temperature or max_air_temperature are not provided when use_heat_unit_temperature is True.
+            If mean_air_temperature is not provided when use_heat_unit_temperature is False.
+        """
         if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
             raise ValueError("min_air_temperature and max_air_temperature must be provided" +
                              " when use_heat_unit_temperature is True")
         if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
-            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
+            raise ValueError("mean_air_temperature must be provided when use_heat_unit_temperature is False")
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:

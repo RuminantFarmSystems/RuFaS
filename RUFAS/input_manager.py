@@ -135,6 +135,15 @@ class InputManager:
         -------
         Dict[str, Any]
             The data dictionary loaded from the json file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the JSON file does not exist at the specified path.
+        json.JSONDecodeError
+            If there is an error in decoding the JSON file.
+        Exception
+            For any other unexpected errors during JSON file loading.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_json.__name__,
@@ -145,8 +154,15 @@ class InputManager:
                 data = json.load(json_file)
                 om.add_log("load_data_successful", f"Successfully loaded data from {file_path}.", info_map)
                 return data
+        except FileNotFoundError as fnfe:
+            om.add_error("json_file_not_found", str(fnfe), info_map)
+            raise
+        except json.JSONDecodeError as jde:
+            om.add_error("load_json_error", str(jde), info_map)
+            raise
         except Exception as e:
-            raise e
+            om.add_error("load_json_file_error", f"Unexpected error: {e}", info_map)
+            raise
 
     def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
         """
@@ -161,6 +177,13 @@ class InputManager:
         -------
         Dict[str, Any]
             The data dictionary loaded from the json file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the CSV file does not exist at the specified path.
+        Exception
+            For any other unexpected errors during CSV file loading.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_csv.__name__,
@@ -175,8 +198,12 @@ class InputManager:
                                f"Successfully loaded data from {file_path}.",
                                info_map)
                 return data_dict
+        except FileNotFoundError as fnfe:
+            om.add_error("csv_file_not_found", str(fnfe), info_map)
+            raise
         except Exception as e:
-            raise e
+            om.add_error("load_csv_file_error", f"Unexpected error: {e}", info_map)
+            raise
 
     def _populate_pool(self, eager_termination: bool) -> bool:
         """
@@ -194,6 +221,11 @@ class InputManager:
         -------
         bool
             True if data is valid, otherwise False.
+
+        Raises
+        ------
+        KeyError
+            If faulty data type found in data blob key.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._populate_pool.__name__,
@@ -307,7 +339,8 @@ class InputManager:
         Raises
         ------
         KeyError
-            If an invalid type is provided in the variable_properties or if "type" key is missing.
+            If an invalid type is provided in the variable_properties.
+            If "type" key is missing.
 
         Notes
         ------
@@ -439,6 +472,12 @@ class InputManager:
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
 
+        Raises
+        ------
+        KeyError
+            If properties_blob_key not found in input data.
+            If metadata properties for variable is missing the "type" field.
+            If variable metadata is checking for is not found in input data.
 
         """
         info_map = {"class": self.__class__.__name__,

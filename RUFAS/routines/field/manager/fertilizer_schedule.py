@@ -71,17 +71,11 @@ class FertilizerSchedule(Schedule):
         ------
         ValueError
             If not all fertilizer application years are valid.
-        ValueError
             If not all fertilizer application days are valid.
-        ValueError
             If not all fertilizer nitrogen masses are valid.
-        ValueError
             If not all fertilizer phosphorus masses are valid.
-        ValueError
             If not all fertilizer application depths are valid.
-        ValueError
             If not all fertilizer surface retention fractions are valid.
-        ValueError
             If not all fertilizer application parameters have the same length.
 
         """
