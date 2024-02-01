@@ -1079,7 +1079,7 @@ class InputManager:
                 "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
                 "is_valid": True}
             if is_variable_dict:
-                element_counter_and_validity, _ = self._validate_dict_element(
+                element_counter_and_validity = self._validate_dict_element(
                     element_hierarchy=[metadata_property],
                     properties_blob_key=properties_blob_key,
                     input_data=data,
