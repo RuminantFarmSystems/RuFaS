@@ -1,5 +1,3 @@
-import pdb
-
 from copy import deepcopy
 from functools import reduce
 import json
@@ -226,9 +224,13 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity, _ = self._validate_dict_element([metadata_property], properties_blob_key,
-                                                                               filtered_input_data, eager_termination,
-                                                                               element_counter_and_validity)
+                    element_counter_and_validity, _ = self._validate_dict_element(
+                        [metadata_property],
+                        properties_blob_key,
+                        filtered_input_data,
+                        eager_termination,
+                        element_counter_and_validity,
+                    )
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_tabular_element(metadata_property,
                                                                                   properties_blob_key,
