@@ -34,7 +34,7 @@ class HeatUnits:
 
         Parameters
         ----------
-        mean_air_temperature : float
+        mean_air_temperature : Optional[float]
             Average air temperature for the day (°C).
         min_air_temperature : Optional[float]
             Minimum air temperature for the day (°C).
