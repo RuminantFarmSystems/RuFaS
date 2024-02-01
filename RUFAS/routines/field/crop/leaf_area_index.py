@@ -127,6 +127,13 @@ class LeafAreaIndex:
         ----------
         SWAT 5:2.1.14
 
+        Raises
+        ------
+        ValueError
+            Max_canopy_height is provided.
+        ValueError
+            optimal_leaf_area_fraction is not a valid fraction.
+
         """
         if max_canopy_height < 0:
             raise ValueError("max_canopy_height must be greater than 0")

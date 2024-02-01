@@ -137,6 +137,14 @@ class HeatUnits:
         max_air_temperature : Optional[float], optional
             Maximum air temperature for the day (°C).
 
+        Raises
+        ------
+        ValueError
+            If `use_heat_unit_temperature` is True, both `min_air_temperature` and `max_air_temperature` must be
+            provided.
+        ValueError
+            If `use_heat_unit_temperature` is False, `mean_air_temperature` must be provided.
+
         """
         if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
             raise ValueError("min_air_temperature and max_air_temperature must be provided" +
