@@ -283,7 +283,7 @@ class InputManager:
         return variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED or variable_modifiability. \
             REQUIRED_AND_UNLOCKED
 
-    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str])\
+    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str]) \
             -> None:
         caller_function = self._get_caller_function()
         print(caller_function)
@@ -1032,14 +1032,33 @@ class InputManager:
                            "total_elements": 0, "fixed_elements": 0}
         validated_data = {}
 
-        metadata_properties = self.__metadata["properties"][properties_blob_key]
+        element_hierarchy = variable_name.split(".")
+        if len(element_hierarchy) > 1:
+            metadata_properties = reduce(lambda d, k: d[k], element_hierarchy,
+                                         self.__metadata["properties"][properties_blob_key])
+        else:
+            metadata_properties = self.__metadata["properties"][properties_blob_key]
+
+        runtime_modifiability = self._is_modifiable_during_runtime(variable_properties=metadata_properties)
+        if runtime_modifiability == Modifiability.REQUIRED_AND_LOCKED:
+            if eager_termination:
+                om.add_error("IM Runtime Modification",
+                             f"{variable_name} is not modifiable during runtime.",
+                             info_map)
+                raise PermissionError("IM Runtime Modification Error: "
+                                      f"{variable_name} is not modifiable during runtime.")
+            else:
+                om.add_warning("IM Runtime Modification",
+                               f"{variable_name} is not modifiable during runtime.",
+                               info_map)
+
         for metadata_property in metadata_properties.keys():
             element_counter_and_validity = {
                 "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
                 "is_valid": True}
             if is_variable_dict:
                 element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=[metadata_property],
+                    element_hierarchy=element_hierarchy,
                     properties_blob_key=properties_blob_key,
                     input_data=data,
                     eager_termination=eager_termination,
