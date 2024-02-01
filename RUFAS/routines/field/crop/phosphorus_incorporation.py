@@ -15,18 +15,49 @@ called directly.
 
 
 class PhosphorusIncorporation:
+    """
+    A class for managing phosphorus incorporation in crops.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        An instance of `CropData` containing crop specifications and attributes. If not provided, a default
+        `CropData` instance is initialized with default values.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to the `crop_data` object, used for accessing and updating information related to phosphorus
+        uptake and incorporation.
+
+    References
+    ----------
+    'Phosphorus Uptake' section (5:2.3.2) of the SWAT.
+
+    Notes
+    -----
+    Since much of the functionality is similar to nitrogen (5:2.3.2), many of the static Nitrogen functions are
+    called directly.
+
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
-        """main phosphorus incorporation function - runs all phosphorus processes and stores phosphorus as biomass
+        """
+        Main phosphorus incorporation function - runs all phosphorus processes and stores phosphorus as biomass.
 
-        Args:
-            soil_data: the SoilData object that tracks soil properties
+        Parameters
+        ----------
+        soil_data : SoilData
+            The SoilData object that tracks soil properties.
 
-        Details: calling this function will execute all phosphorus incorporation routines. It determines the amount of
-        phosphorus desired by the plant, extracts phosphorus from the accessible soil profile. Phosphorus is then
-        added to plant biomass.
+        Notes
+        -----
+        Calling this function will execute all phosphorus incorporation routines. It determines the amount of
+        phosphorus desired by the plant and extracts phosphorus from the accessible soil profile. The extracted
+        phosphorus is then added to plant biomass.
+
         """
         layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
         layer_phosphates = soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")
