@@ -330,4 +330,3 @@ if __name__ == '__main__':
     sens2.problem.heatmap()
     sens2.problem.plot()
     pyplot.show()
-
