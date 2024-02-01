@@ -279,7 +279,8 @@ class FieldManager:
                                         harvest_operations=rotation.get("harvest_operations"),
                                         use_heat_scheduling=heat_scheduled_harvest,
                                         pattern_repeat=rotation.get("pattern_repeat"),
-                                        pattern_skip=rotation.get("pattern_skip"))
+                                        planting_skip=rotation.get("planting_skip"),
+                                        harvesting_skip=rotation.get("harvesting_skip"))
             schedules.append(new_schedule)
         return schedules
 

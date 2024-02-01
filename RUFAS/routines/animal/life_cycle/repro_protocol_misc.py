@@ -84,3 +84,6 @@ class InternalReproSettings:
             }
         }
     }
+
+    COW_REPRO_PROTOCOLS = {
+    }

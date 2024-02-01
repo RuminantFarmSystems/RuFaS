@@ -9,6 +9,7 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 def test_get_dry_cows(mocker: MockerFixture) -> None:
@@ -56,11 +57,11 @@ def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
     # Arrange
     pens: List[Pen] = []
     animal_combinations = [
-        Pen.AnimalCombination.CALF,
-        Pen.AnimalCombination.GROWING,
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
-        Pen.AnimalCombination.LAC_COW,
-        Pen.AnimalCombination.CLOSE_UP,
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+        AnimalCombination.LAC_COW,
+        AnimalCombination.CLOSE_UP,
     ]
     num_groups = len(animal_combinations)
     num_pens_per_group = 3
@@ -145,13 +146,13 @@ def test_calc_animal_space_shortage(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     'animal_combination',
     [
-        Pen.AnimalCombination.CALF,
-        Pen.AnimalCombination.GROWING,
-        Pen.AnimalCombination.CLOSE_UP,
-        Pen.AnimalCombination.LAC_COW
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.CLOSE_UP,
+        AnimalCombination.LAC_COW
     ]
 )
-def test_create_default_pen(animal_combination: Pen.AnimalCombination,
+def test_create_default_pen(animal_combination: AnimalCombination,
                             mocker: MockerFixture) -> None:
     """Unit test for function _create_default_pen() in file animal_manager.py"""
     # Arrange
@@ -194,13 +195,13 @@ def test_create_default_pen(animal_combination: Pen.AnimalCombination,
 @pytest.mark.parametrize(
     'animal_combination',
     [
-        Pen.AnimalCombination.CALF,
-        Pen.AnimalCombination.GROWING,
-        Pen.AnimalCombination.CLOSE_UP,
-        Pen.AnimalCombination.LAC_COW
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.CLOSE_UP,
+        AnimalCombination.LAC_COW
     ]
 )
-def test_create_default_pens_for_potential_space_shortage(animal_combination: Pen.AnimalCombination,
+def test_create_default_pens_for_potential_space_shortage(animal_combination: AnimalCombination,
                                                           mocker: MockerFixture) -> None:
     """Unit test for function _create_default_pens_for_potential_space_shortage() in file animal_manager.py"""
     # Arrange
@@ -332,7 +333,7 @@ def test_execute_allocation_plan(num_animals: int, allocation_plan: List[int],
                                  mocker: MockerFixture) -> None:
     """Unit test for function execute_allocation_plan() in file my_module.py."""
     # Arrange
-    animal_combination = Pen.AnimalCombination.LAC_COW
+    animal_combination = AnimalCombination.LAC_COW
     animals = []
     for i in range(num_animals):
         animal = mocker.MagicMock()
@@ -462,10 +463,10 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     lac_cows = [mocker.MagicMock() for _ in range(num_lac_cows)]
     cows = dry_cows + lac_cows
     animals_by_combination = {
-        Pen.AnimalCombination.CALF: calves,
-        Pen.AnimalCombination.GROWING: heiferIs + heiferIIs,
-        Pen.AnimalCombination.CLOSE_UP: heiferIIIs + dry_cows,
-        Pen.AnimalCombination.LAC_COW: lac_cows
+        AnimalCombination.CALF: calves,
+        AnimalCombination.GROWING: heiferIs + heiferIIs,
+        AnimalCombination.CLOSE_UP: heiferIIIs + dry_cows,
+        AnimalCombination.LAC_COW: lac_cows
     }
     for animal_combination in animals_by_combination:
         mock_pen = mocker.MagicMock()
@@ -521,13 +522,13 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
 
     animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination = mocker.MagicMock(
         'animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
-        side_effect=lambda animal: Pen.AnimalCombination.CALF
+        side_effect=lambda animal: AnimalCombination.CALF
         if animal in calves
-        else Pen.AnimalCombination.GROWING
+        else AnimalCombination.GROWING
         if animal in heiferIs + heiferIIs
-        else Pen.AnimalCombination.CLOSE_UP
+        else AnimalCombination.CLOSE_UP
         if animal in heiferIIIs + dry_cows
-        else Pen.AnimalCombination.LAC_COW)
+        else AnimalCombination.LAC_COW)
 
     # Act
     animal_manager.allocate_animals_to_pens()
@@ -536,7 +537,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
 
     assert animal_manager.all_pens[-(num_new_default_pens * len(animals_by_combination)):] == \
-           dummy_new_default_pens * len(animals_by_combination)
+        dummy_new_default_pens * len(animals_by_combination)
     for animal_combination in animals_by_combination:
         assert pens_by_animal_combination[animal_combination][-num_new_default_pens:] == dummy_new_default_pens
 
@@ -558,7 +559,7 @@ def test_set_animal_grouping_scenario(mocker: MockerFixture):
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        )
+    )
     # act
     animal_manager.set_animal_grouping_scenario(scenario)
 

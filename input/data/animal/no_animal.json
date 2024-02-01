@@ -1,48 +1,51 @@
 {
-	"herd_information": {
-		"calf_num": 0,
-		"heiferI_num": 0,
-		"heiferII_num": 0,
-		"heiferIII_num_springers": 0,
-		"cow_num": 0,
-		"replace_num": 0,
-		"herd_num": 0,
-		"breed": "HO"
-	},
-      "herd_initialization": {
-        "initial_animal_num": 10000,
-        "simulation_days": 5000
+  "herd_information": {
+    "calf_num": 0,
+    "heiferI_num": 0,
+    "heiferII_num": 0,
+    "heiferIII_num_springers": 0,
+    "cow_num": 0,
+    "replace_num": 0,
+    "herd_num": 0,
+    "breed": "HO"
+  },
+  "herd_initialization": {
+    "initial_animal_num": 10000,
+    "simulation_days": 5000
+  },
+  "animal_config": {
+    "management_decisions": {
+      "breeding_start_day_h": 380,
+      "heifer_repro_method": "TAI",
+      "cow_repro_method": "TAI",
+      "semen_type": "conventional",
+      "days_in_preg_when_dry": 218,
+      "heifer_repro_cull_time": 500,
+      "do_not_breed_time": 185,
+      "cull_milk_production": 30,
+      "cow_times_milked_per_day": 3,
+	    "milk_fat_percent": 3.6,
+	    "milk_protein_percent": 3.2
+    },
+    "farm_level": {
+      "calf": {
+        "male_calf_rate_sexed_semen": 0.1,
+        "male_calf_rate_conventional_semen": 0.53,
+        "keep_female_calf_rate": 1,
+        "wean_day": 60,
+        "wean_length": 7,
+        "milk_type": "whole"
       },
-	"animal_config": {
-		"management_decisions": {
-			"breeding_start_day_h": 380,
-			"heifer_repro_method": "TAI",
-			"cow_repro_method": "TAI",
-			"semen_type": "conventional",
-			"days_in_preg_when_dry": 218,
-			"heifer_repro_cull_time": 500,
-			"do_not_breed_time" : 185,
-			"cull_milk_production": 30,
-			"cow_times_milked_per_day": 3,
-			"energy_and_nutrient_calculation_method": "NASEM"
-		},
-		"farm_level": {
-			"calf": {
-				"male_calf_rate_sexed_semen": 0.1,
-				"male_calf_rate_conventional_semen": 0.53,
-				"keep_female_calf_rate": 1,
-				"wean_day": 60,
-				"wean_length": 7,
-				"milk_type": "whole"
-			},
-			"repro": {
-                "voluntary_waiting_period": 50,
+      "repro": {
+        		"voluntary_waiting_period": 50,
 				"conception_rate_decrease": 0.026,
-                "avg_gestation_len": 278,
+				"decrease_conception_rate_in_rebreeding": false,
+				"decrease_conception_rate_by_parity": false,
+        		"avg_gestation_len": 278,
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
                 "calving_interval": 400,
-                "heifers": {
+				"heifers": {
 					"estrus_detection_rate": 0.6,
 					"estrus_conception_rate": 0.4,
 					"repro_sub_protocol": "5dCG2P",
@@ -52,29 +55,15 @@
 					}
 				},
 				"cows": {
-					"estrus_detection_rate": 0.6,
-					"estrus_conception_rate": 0.6,
-					"presynch_protocol": "Double OvSynch",
-                    "resynch_protocol": "TAIafterPD",
-                    "repro_sub_protocol": "OvSynch 56",
-					"repro_sub_properties": {
-						"conception_rate": 0.5,
-						"tai_program_start_day": 70
-					}
-				},
-                "cow_repro_programs": {
-                    "estrus_detection_rate": 0.6,
-                    "estrus_service_rate": 1,
-                    "ed_conception_rate": 0.6,
-                    "cow_presynch_protocol": "Double OvSynch",
-                    "cow_TAI_protocol": "OvSynch 56",
-                    "ovsynch56_conception_rate": 0.6,
-                    "ovsynch48_conception_rate": 0.6,
-					"cosynch72_conception_rate": 0.6,
-                    "cosynch5d_conception_rate": 0.6,
-                    "cow_resynch_protocol": "TAIafterPD",
-                    "tai_program_start_day": 72
-                }
+					"estrus_detection_rate": 0.65,
+					"ED_conception_rate": 0.6,
+					"presynch_program": "Double OvSynch",
+					"presynch_program_start_day": 50,
+          			"ovsynch_program": "OvSynch 56",
+					"ovsynch_program_start_day": 66,
+					"ovsynch_program_conception_rate": 0.7,
+          			"resynch_program": "TAIafterPD"
+				}
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -84,7 +73,7 @@
 				"target_heifer_preg_day": 420,
 				"mature_body_weight_avg": 740.1,
         		"mature_body_weight_std": 73.5
-			}		
+			}
 		},
 		"from_literature": {
 			"repro": {
@@ -94,6 +83,7 @@
 				"preg_loss_rate_2": 0.096,
 				"preg_check_day_3": 200,
 				"preg_loss_rate_3": 0.017,
+
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
 				"avg_estrus_cycle_heifer": 21,
