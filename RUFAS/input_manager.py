@@ -565,17 +565,13 @@ class InputManager:
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
 
-        element_properties = variable_properties.get("properties")
-        if element_properties:
-            elements_valid = self._validate_array_elements(
-                element_properties,
-                var_name,
-                input_data_value,
-                properties_blob_key
-            )
-            return False if not elements_valid else True
-
-        return True
+        elements_valid = self._validate_array_elements(
+            variable_properties["properties"],
+            var_name,
+            input_data_value,
+            properties_blob_key
+        )
+        return elements_valid
 
     def _validate_array_elements(
             self,

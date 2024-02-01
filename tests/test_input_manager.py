@@ -384,7 +384,7 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
         ({"type": "string", "dummy_property": "dummy_value"}, "dummy_value"),
         ({"type": "number", "dummy_property": 10}, 10),
         ({"type": "bool", "dummy_property": True}, True),
-        ({"type": "array", "dummy_property": []}, []),
+        ({"type": "array", "dummy_property": [], "properties": {"type": "number"}}, []),
     ]
 )
 def test_validate_input_type_dynamic_valid_data(mock_input_manager: InputManager,
@@ -455,8 +455,9 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
             "property_map_key1": {
                 "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
-                "element3": {"type": "array",
-                             "minimum_length": 1, "maximum_length": 5},
+                "element3": {
+                    "type": "array", "minimum_length": 1, "maximum_length": 5, "properties": {"type": "number"}
+                },
                 "element4": {"type": "object",
                              "description": "dummy_description",
                              "nested_element1": {
@@ -493,7 +494,10 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                                  "nested_sub_element2": {
                                      "type": "array",
                                      "minimum_length": 1,
-                                     "maximum_length": 5
+                                     "maximum_length": 5,
+                                     "properties": {
+                                         "type": "number"
+                                     }
                                  },
                              }
                              },
@@ -681,7 +685,7 @@ def test_validate_json_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
 
 
-def test_validate_json_element_array_type(mock_input_manager: InputManager,
+def test_validate_dict_element_array_type(mock_input_manager: InputManager,
                                           mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
                                           input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for array type input_data for _validate_dict_element in file input_manager.py"""
@@ -971,10 +975,11 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
     'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count, element_validation_call_count',
     [
         ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10, "properties": {"k": "v"}}, False, 1, 0),
-        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0, 0),
+        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10, "properties": {"k": "v"}}, True, 0, 1),
         ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5, "properties": {"k": "v"}}, True, 0, 1),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10, "properties": {"k": "v"}}, True, 0, 1),
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1, 0),
+        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5, "maximum_length": 10, "properties": {"k": "v"}}, False, 0, 1),
         ([], {"minimum_length": 5, "properties": {"k": "v"}}, False, 1, 0),
         (None, {"minimum_length": 3, "maximum_length": 6, "properties": {"k": "v"}}, False, 1, 0),
         ("[1, 2, 3]", {"minimum_length": 1}, False, 1, 0)
@@ -988,7 +993,7 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
     dummy_var_name = "dummy_array"
     dummy_properties_key = "dummy_variable_properties"
 
-    mock_input_manager._validate_array_elements = MagicMock(return_value=True)
+    mock_input_manager._validate_array_elements = MagicMock(return_value=expected_result)
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value,
