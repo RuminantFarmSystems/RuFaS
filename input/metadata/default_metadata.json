@@ -2,7 +2,7 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "Configuration file for general simulation parameters, e.g. start and end dates.",
+      "description": "Configuration file for general simulation parameters.",
       "path": "input/data/config/default_config.json",
       "type": "json",
       "properties": "config_properties"
@@ -37,7 +37,7 @@
     },
     "emission": {
       "title": "Emissions data",
-      "description": "Tillage emission values used in the EEE module.",
+      "description": "General emission values used in the EEE module.",
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
@@ -72,7 +72,7 @@
     },
     "manure_management": {
       "title": "Manure data",
-      "description": "Manure management decisions, including bedding, separator, and treatment information.",
+      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
       "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
@@ -85,8 +85,8 @@
       "properties": "soil_profile_properties"
     },
     "soil_2": {
-      "title": "Soil data #TODO does this need a unique name for the future?",
-      "description": "Characteristic soil information, including composition, slope, and layer details # TODO when is this used?",
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
       "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
@@ -100,21 +100,21 @@
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Manure application schedule used for fields? Historical and future?",
+      "description": "Specifies manure applications to a field.",
       "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Tillage schedule applied - historical and future?",
+      "description": "Schedule of tillage applications for a field.",
       "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
-      "description": "Field characteristics including size, location, watering interval, etc. Also includes references to specification files.",
+      "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
