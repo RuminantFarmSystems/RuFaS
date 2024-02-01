@@ -2099,12 +2099,12 @@ def test_add_variable_to_pool_valid(variable_name: str,
                                     input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
-                                                                          "valid_elements": 1,
-                                                                          "total_elements": 1,
-                                                                          "invalid_elements": 0,
-                                                                          "is_valid": True
-                                                                          }, True)
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 0,
+                                                                         "is_valid": True
+                                                                         }
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -2172,12 +2172,12 @@ def test_add_variable_to_pool_invalid(variable_name: str,
                                       input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
-                                                                          "valid_elements": 1,
-                                                                          "total_elements": 1,
-                                                                          "invalid_elements": 1,
-                                                                          "is_valid": False
-                                                                          }, False)
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 1,
+                                                                         "is_valid": False
+                                                                         }
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -2245,12 +2245,12 @@ def test_add_variable_to_pool_eager_termination(variable_name: str,
                                                 input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
-                                                                          "valid_elements": 1,
-                                                                          "total_elements": 1,
-                                                                          "invalid_elements": 1,
-                                                                          "is_valid": False
-                                                                          }, True)
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 1,
+                                                                         "is_valid": False
+                                                                         }
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
