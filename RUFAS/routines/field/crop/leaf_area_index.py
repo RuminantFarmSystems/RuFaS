@@ -89,7 +89,7 @@ class LeafAreaIndex:
 
         References
         ----------
-        SWAT :3.2.2
+        SWAT 5:3.2.2
 
         """
         self.data.leaf_area_added = min(self.data.optimal_leaf_area_change * sqrt(self.data.growth_factor),
