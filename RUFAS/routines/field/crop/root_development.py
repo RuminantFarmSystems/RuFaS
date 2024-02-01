@@ -7,16 +7,33 @@ This module is based upon the "Root Development" section of the SWAT model (5.2.
 
 
 class RootDevelopment:
+    """
+    Manages the development of crop roots based on the "Root Development" section of the SWAT model (5.2.1.3).
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        An instance of `CropData` containing specific crop parameters and states. If not provided, a default
+        instance with generic crop parameters is created.
+
+    Attributes
+    ----------
+    data : CropData
+        Stores and provides access to crop-related data influencing root development, including parameters
+        like root depth, growth rates, and environmental conditions affecting root expansion.
+
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         # data reference
         self.data = crop_data or CropData()  # defaults if not given
 
     def develop_roots(self) -> None:
-        """main root development function
+        """main root development function that updates the root_fraction and root_depth attributes.
 
-        Details: updates the root_fraction and root_depth attributes.
-            The latter is updated differently depending upon whether the plant
-            is perennial.
+        Notes
+        -----
+        root_depth attributes are updated differently depending upon whether the plant is perennial.
+
         """
         # update root fraction
         self.data.root_fraction = self._determine_root_fraction(self.data.heat_fraction)
@@ -29,15 +46,24 @@ class RootDevelopment:
 
     @staticmethod
     def _determine_root_fraction(heat_fraction: float) -> float:
-        """calculates root fraction, as a function of plant maturity
+        """
+        Calculates root fraction, as a function of plant maturity.
 
-        Args:
-            heat_fraction: the proportion of potential heat units accumulated
-                to date; a proxy for maturity
+        Parameters
+        ----------
+        heat_fraction : float
+            The proportion of potential heat units accumulated to date; a proxy for maturity (unitless).
 
-        SWAT Reference: 5:2.1.21
+        Returns
+        -------
+        float
+            The fraction of a plant's biomass comprised of roots, typically ranging from 0.4 to 0.2 as the plant
+            matures (unitless).
 
-        Returns: the fraction of a plant's biomass comprised of roots [0.4-0.2]
+        References
+        ----------
+        SWAT 5:2.1.21
+
         """
         heat_fraction = max(heat_fraction, 0)  # bound to zero
         if heat_fraction >= 2:  # leads to fraction < 0
@@ -47,15 +73,25 @@ class RootDevelopment:
 
     @staticmethod
     def _determine_root_depth(max_depth: float, heat_fraction: float) -> float:
-        """calculates a plant's root depth on a given day
+        """
+        Calculates a plant's root depth on a given day.
 
-        Args:
-            max_depth: maximum possible root depth (mm)
-            heat_fraction: fraction of potential heat units
+        Parameters
+        ----------
+        max_depth : float
+            Maximum possible root depth in millimeters (mm).
+        heat_fraction : float
+            Fraction of potential heat units accumulated, indicating the stage of plant growth (unitless).
 
-        SWAT Reference: 5:2.1.23, 24
+        Returns
+        -------
+        float
+            Root depth in millimeters for the given day (mm).
 
-        Returns: root depth (mm)
+        References
+        ----------
+        SWAT 5:2.1.23, 24
+
         """
         if heat_fraction <= 0.4:
             return 2.5 * heat_fraction * max_depth
