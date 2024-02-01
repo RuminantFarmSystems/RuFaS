@@ -224,7 +224,7 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity, _ = self._validate_dict_element(
+                    element_counter_and_validity = self._validate_dict_element(
                         [metadata_property],
                         properties_blob_key,
                         filtered_input_data,
@@ -411,7 +411,7 @@ class InputManager:
 
     def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
-                               element_counter_and_validity: Dict[str, int | bool], ) -> tuple[dict, bool]:
+                               element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -464,15 +464,17 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity, is_child_valid = self._validate_dict_element(
+                    previous_invalid_count = element_counter_and_validity["invalid_elements"]
+                    element_counter_and_validity = self._validate_dict_element(
                         element_hierarchy,
                         properties_blob_key,
                         input_data,
                         eager_termination,
                         element_counter_and_validity,
                     )
+                    is_child_valid = previous_invalid_count == element_counter_and_validity["invalid_elements"]
                     if eager_termination and not is_child_valid:
-                        return element_counter_and_validity, is_child_valid
+                        return element_counter_and_validity
                     element_path = ".".join(element_hierarchy)
                     children_status[element_path] = is_child_valid
                     if not is_child_valid:
@@ -483,7 +485,7 @@ class InputManager:
             is_valid = false_counter == 0
             element_counter_and_validity["is_valid"] = is_valid
 
-            return element_counter_and_validity, is_valid
+            return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
 
@@ -500,7 +502,7 @@ class InputManager:
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
-                return element_counter_and_validity, is_valid
+                return element_counter_and_validity
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data, properties_blob_key)
                 if is_fixed:
@@ -510,7 +512,7 @@ class InputManager:
                                    f"Variable: '{var_name}' was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
-                return element_counter_and_validity, is_valid
+                return element_counter_and_validity
 
     def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
                               properties_blob_key: str) -> bool:
