@@ -264,12 +264,12 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
     mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
     mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 0,
                                                                          "is_valid": True
-                                                                         }
+                                                                         }, True)
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -300,12 +300,12 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
     mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 1,
                                                                          "is_valid": False
-                                                                         }
+                                                                         }, False)
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -337,12 +337,12 @@ def test_populate_pool_eager_termination(mock_input_manager: InputManager, mock_
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
     mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 0,
                                                                          "is_valid": False
-                                                                         }
+                                                                         }, False)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -516,7 +516,7 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
                                          "invalid_elements": 0, "is_valid": True}
 
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -610,7 +610,7 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
                                          "invalid_elements": 0, "is_valid": True}
 
     input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._validate_dict_element(["element1"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element1"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -622,7 +622,7 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
     input_data = {"element1": "invalid_value"}
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
-    result = mock_input_manager._validate_dict_element(["element1"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element1"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -635,7 +635,7 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._validate_dict_element(["element8"], "property_map_key1", input_data, False,
+        result, _ = mock_input_manager._validate_dict_element(["element8"], "property_map_key1", input_data, False,
                                                            mock_element_counter_and_validity)
 
         assert add_warning.call_count == 3
@@ -657,7 +657,7 @@ def test_validate_json_element_number_type(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -669,7 +669,7 @@ def test_validate_json_element_number_type(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element2": 500}
-    result = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element2"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -690,7 +690,7 @@ def test_validate_json_element_array_type(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._validate_dict_element(["element3"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element3"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -702,7 +702,7 @@ def test_validate_json_element_array_type(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element3": [1, 2, 3, 6, 7, 8, 10]}
-    result = mock_input_manager._validate_dict_element(["element3"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element3"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -723,7 +723,7 @@ def test_validate_json_element_valid_object_type(mock_input_manager: InputManage
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -744,7 +744,7 @@ def test_validate_json_element_invalid_object_type(mock_input_manager: InputMana
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element4": {"nested_element1": "value1", "nested_element2": 500}}
-    result = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -756,7 +756,7 @@ def test_validate_json_element_invalid_object_type(mock_input_manager: InputMana
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element4": {"nested_element1": "value123456789value123456789", "nested_element2": 123}}
-    result = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element4"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -779,7 +779,7 @@ def test_validate_element_valid_nested_object_type(mock_input_manager: InputMana
                                          "invalid_elements": 0, "is_valid": True}
     input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
                                "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": [1, 2, 3]}}}
-    result = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
@@ -803,7 +803,7 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
                                "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": []}}}
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
-    result = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -817,7 +817,7 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
     input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
                                "nested_element3": {"nested_sub_element1": "invalid_cows",
                                                    "nested_sub_element2": [1, 2, 3]}}}
-    result = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
+    result, _ = mock_input_manager._validate_dict_element(["element5"], "property_map_key1", input_data, True,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
@@ -2094,12 +2094,12 @@ def test_add_variable_to_pool_valid(variable_name: str,
                                     input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 0,
                                                                          "is_valid": True
-                                                                         }
+                                                                         }, True)
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -2167,12 +2167,12 @@ def test_add_variable_to_pool_invalid(variable_name: str,
                                       input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 1,
                                                                          "is_valid": False
-                                                                         }
+                                                                         }, False)
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
@@ -2240,12 +2240,12 @@ def test_add_variable_to_pool_eager_termination(variable_name: str,
                                                 input_manager_original_method_states: Dict[str, Callable]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
     mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: ({"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
                                                                          "invalid_elements": 1,
                                                                          "is_valid": False
-                                                                         }
+                                                                         }, True)
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                             "valid_elements": 1,
                                                                             "total_elements": 1,
