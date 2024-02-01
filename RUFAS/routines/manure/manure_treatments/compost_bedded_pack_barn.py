@@ -185,7 +185,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             solid_manure_nitrogen=manure_nitrogen,
             solid_manure_inorganic_nitrogen=manure_inorganic_nitrogen,
             solid_manure_organic_nitrogen=manure_organic_nitrogen,
-            solid_manure_inorganic_nitrogen_ammonium=manure_inorganic_nitrogen_ammonium,
+            solid_manure_total_ammoniacal_nitrogen=manure_inorganic_nitrogen_ammonium,
             solid_manure_phosphorus=manure_phosphorus,
             solid_manure_potassium=manure_potassium,
             solid_manure_water_extractable_inorganic_phosphorus=water_extractable_inorganic_phosphorus,
