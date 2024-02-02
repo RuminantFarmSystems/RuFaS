@@ -355,17 +355,11 @@ class NitrogenIncorporation:
         ------
         ValueError
             If any of the nitrogen or heat fractions are outside the range of 0 to 1.
-        ValueError
             If `emergence_nitrogen_fraction` is equivalent to `mature_nitrogen_fraction`.
-        ValueError
             If `nitrogen_fraction` is equivalent to `emergence_nitrogen_fraction` or `mature_nitrogen_fraction`.
-        ValueError
             If `nitrogen_fraction` is greater than or equal to `emergence_nitrogen_fraction`.
-        ValueError
             If `nitrogen_fraction` is 0.
-        ValueError
             If `heat_fraction` is 0.
-        ValueError
             If the calculated denominator is greater than 1.
 
         References
@@ -566,7 +560,6 @@ class NitrogenIncorporation:
         ------
         ValueError
             If the boundaries are not in ascending order (deeper layers should follow shallower ones).
-        ValueError
             If there are duplicate depths, indicating multiple soil layers at the same depth.
 
         References

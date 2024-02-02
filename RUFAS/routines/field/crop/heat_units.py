@@ -140,7 +140,8 @@ class HeatUnits:
         Raises
         ------
         ValueError
-            If `use_heat_unit_temperature` is True and both `min_air_temperature` and `max_air_temperature` are not provided.
+            If `use_heat_unit_temperature` is True and both `min_air_temperature` and `max_air_temperature` are not
+            provided.
             If `use_heat_unit_temperature` is False and `mean_air_temperature` is not provided.
 
         """

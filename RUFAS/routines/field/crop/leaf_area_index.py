@@ -130,9 +130,8 @@ class LeafAreaIndex:
         Raises
         ------
         ValueError
-            Max_canopy_height is provided.
-        ValueError
-            optimal_leaf_area_fraction is not a valid fraction.
+            If negative Max_canopy_height is provided.
+            If optimal_leaf_area_fraction is negative or greater than 1.
 
         """
         if max_canopy_height < 0:
