@@ -36,6 +36,7 @@ output/graphics/*
 output/output_filters/*
 !output/output_filters/report_example.json
 !output/output_filters/csv_daily_nitrogen_loss_from_nitrous_oxide_emission_kg_N_per_day.txt
+!output/output_filters/csv_manure_treatment_liquid_manure_nitrogen.txt
 
 # ignore project files
 *.sublime-project

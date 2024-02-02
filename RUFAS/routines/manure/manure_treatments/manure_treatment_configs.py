@@ -94,7 +94,7 @@ class ManureTreatmentConfig:
 
     composting_type: str = "intensive windrow"
     last_compost_turning_or_addition: int = 1
-    manure_cover: str = ManureCoverEnum.NOT_APPLICABLE.value
+    manure_cover: str = ManureCoverEnum.NO_COVER.value
 
 
 class DefaultManureTreatmentConfigFactory:
