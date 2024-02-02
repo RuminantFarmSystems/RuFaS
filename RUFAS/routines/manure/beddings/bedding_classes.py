@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -17,7 +15,7 @@ class BeddingType(DefaultEnum):
     This class, derived from the `DefaultEnum` base class, provides a set of predefined constants
     that represent different types of bedding such as sawdust, straw, and sand. The default type is sand.
 
-    Attributes
+    Attribute
     ----------
     SAWDUST : str
         Represent the 'sawdust' type of bedding.
@@ -43,6 +41,45 @@ class BeddingType(DefaultEnum):
     SAND = "sand"
     NONE = "none"
     DEFAULT = SAND
+
+
+@dataclass
+class BeddingConfig:
+    bedding_mass_per_day: float
+    """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
+
+    bedding_density: float
+    """Density of the bedding (:math:`kg/m^3`)."""
+
+    bedding_dry_matter_content: float
+    """
+    Dry matter content in the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
+    bedding_cleaned_fraction: float
+    """
+    Fraction of bedding that is removed from the barn (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
+    bedding_carbon_fraction: float
+    """
+    Fraction of bedding that is composed of carbon (unitless).
+    Value should be in the range :math:`[0.0 - 1.0]`.
+    """
+
+    bedding_phosphorus_content: float
+    """Quantity of phosphorus in the bedding (kg)."""
+
+    bedding_type: BeddingType
+    """Type of bedding."""
+
+    sand_removal_efficiency: float
+    """
+    Efficiency of removing sand from the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
 
 
 class BaseBedding(ABC):
@@ -311,45 +348,6 @@ class NoBedding(BaseBedding):
         return 0.0
 
 
-@dataclass
-class BeddingConfig:
-    bedding_mass_per_day: float
-    """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
-
-    bedding_density: float
-    """Density of the bedding (:math:`kg/m^3`)."""
-
-    bedding_dry_matter_content: float
-    """
-    Dry matter content in the bedding (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
-
-    bedding_cleaned_fraction: float
-    """
-    Fraction of bedding that is removed from the barn (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
-
-    bedding_carbon_fraction: float
-    """
-    Fraction of bedding that is composed of carbon (unitless).
-    Value should be in the range :math:`[0.0 - 1.0]`.
-    """
-
-    bedding_phosphorus_content: float
-    """Quantity of phosphorus in the bedding (kg)."""
-
-    bedding_type: BeddingType
-    """Type of bedding."""
-
-    sand_removal_efficiency: float
-    """
-    Efficiency of removing sand from the bedding (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
-
-
 class DefaultBeddingConfigFactory:
     """
     Factory class for creating default bedding configurations.
@@ -358,7 +356,7 @@ class DefaultBeddingConfigFactory:
     these predefined configurations based on the bedding type.
 
     """
-
+    # TODO: Use correct values for straw bedding. Issue #1116
     # Predefined configuration for Sawdust Bedding
     SAWDUST_BEDDING_CONFIG = BeddingConfig(
         bedding_mass_per_day=1.97,

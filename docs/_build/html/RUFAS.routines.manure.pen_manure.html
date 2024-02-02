@@ -120,7 +120,7 @@ some relevant information from the  original Pen class and then adds some
 extra attributes that can be used in the gas emissions equations.</p>
 <dl>
 <dt>Attributes</dt><dd><p>id: Pen id.
-animals_in_pen: A list of animal objects in this pen.
+animals_in_pen: >The dictionary of all animals in this pen with animal ids as the key and animal objects as the value.
 num_animals: The number of animals in this pen.
 num_lactating_cows: The number of lactating cows in this pen.
 classes_in_pen: Set of unique animal classes in this pen.
@@ -153,7 +153,7 @@ manure: The manure data extracted from the animal module and converted to usable
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">count_lactating_cows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">animal_combination:</span> <span class="pre">~RUFAS.routines.animal.pen.Pen.AnimalCombination,</span> <span class="pre">animals_in_pen:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.animal.life_cycle.animal_base.AnimalBase'&gt;]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">count_lactating_cows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">animal_combination:</span> <span class="pre">~RUFAS.routines.animal.pen.AnimalCombination,</span> <span class="pre">animals_in_pen:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.animal.life_cycle.animal_base.AnimalBase'&gt;]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows" title="Link to this definition"></a></dt>
 <dd><p>Counts the number of lactating cows in the pen.</p>
 <dl>
 <dt>Args:</dt><dd><dl class="simple">
