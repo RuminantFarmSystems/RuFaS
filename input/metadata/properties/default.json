@@ -824,9 +824,9 @@
           "default": "open air barn"
         },
         "pen_type": {
-          "description": "Pen Type select one) -- The type of stalls the pen has",
           "type": "string",
-          "pattern": "^{freestall|tiestall|drylot}$",
+          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
+          "pattern": "^{freestall|tiestall|open lot|compost bedded pack barn}$",
           "default": "freestall"
         },
         "max_stocking_density": {
