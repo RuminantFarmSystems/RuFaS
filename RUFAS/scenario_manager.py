@@ -42,7 +42,6 @@ class MetadataPaths(TypedDict):
         prefix. The second simulation will run immediately after with no extra input from the user and will
         use the ARL_metadata.json file and save its output files with the "ARL_scenario" prefix.
     """
-
     prefix: str
     path: Path
 
