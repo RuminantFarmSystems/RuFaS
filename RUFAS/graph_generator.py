@@ -150,6 +150,8 @@ class GraphGenerator:
                 return all_logs
 
             fig, _ = plt.subplots()
+            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"]
+                             if k in filtered_pool.keys()}
             self._draw_graph(
                 graph_details["type"], prepared_data, prepared_data.keys()
             )

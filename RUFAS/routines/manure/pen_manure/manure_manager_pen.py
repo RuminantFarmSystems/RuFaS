@@ -5,6 +5,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 class ManureManagerPen:
@@ -15,7 +16,7 @@ class ManureManagerPen:
 
     Attributes
         id: Pen id.
-        animals_in_pen: A list of animal objects in this pen.
+        animals_in_pen: A dictionary of animal ids as the key and animal objects as the value in this pen
         num_animals: The number of animals in this pen.
         num_lactating_cows: The number of lactating cows in this pen.
         classes_in_pen: Set of unique animal classes in this pen.
@@ -26,6 +27,7 @@ class ManureManagerPen:
         pen_type: The type of pen used for this pen.
         manure_handler: The type of manure handler used for this pen.
         manure_separator: The type of manure separator used for this pen.
+        manure_separator_after_digestion: The second manure separator used on manure generated from this pen.
         manure_treatment: The type of manure treatment(s) used for this pen.
         manure_density: The manure density used for calculating manure volume, kg/m^3.
         manure: The manure data extracted from the animal module and converted to usable
@@ -44,7 +46,7 @@ class ManureManagerPen:
 
         """
         self.id: int = pen.id
-        self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
+        self.animals_in_pen = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[str] = pen.classes_in_pen
         self.animal_combination: Pen.AnimalCombination = pen.animal_combination
@@ -55,17 +57,16 @@ class ManureManagerPen:
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
+        self.manure_separator_after_digestion: str = pen.manure_separator_after_digestion
         self.manure_treatment: str = pen.manure_storage
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
         self.num_lactating_cows = self.count_lactating_cows(
-            pen.animal_combination, pen.animals_in_pen
+            pen.animal_combination, list(pen.animals_in_pen.values())
         )
 
     @classmethod
-    def count_lactating_cows(
-            cls, animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]
-    ) -> int:
+    def count_lactating_cows(cls, animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:
@@ -78,7 +79,7 @@ class ManureManagerPen:
 
         """
         num_lac_cows = 0
-        if animal_combination is Pen.AnimalCombination.LAC_COW:
+        if animal_combination is AnimalCombination.LAC_COW:
             for animal in animals_in_pen:
                 if type(animal) is Cow:
                     num_lac_cows += 1

@@ -35,7 +35,7 @@ class UserDefinedRationManager(object):
 
         Parameters
         ----------
-        animal_combination : Pen.AnimalCombination
+        animal_combination : AnimalCombination
             AnimalCombination in the given pen
 
         Returns
