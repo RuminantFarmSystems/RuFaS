@@ -132,6 +132,13 @@
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "path": "input/metadata/properties/default.json",
+      "type": "json",
+      "properties": "NA"
     }
   },
   "cross-validation": {}
