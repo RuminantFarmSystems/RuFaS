@@ -5,7 +5,6 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
-      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic digestion and lagoon"
     },
     {
@@ -13,7 +12,6 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
-      "manure_separator_after_digestion": "none",
       "manure_treatment": "slurry storage outdoor"
     },
     {
@@ -21,15 +19,13 @@
       "bedding_type": "sand",
       "manure_handler": "flush system",
       "manure_separator": "none",
-      "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic digestion and lagoon"
     },
     {
       "scenario_id": 3,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "rotary screen",
-      "manure_separator_after_digestion": "none",
+      "manure_separator": "none",
       "manure_treatment": "slurry storage outdoor"
     }
   ],
@@ -83,16 +79,6 @@
       "bedding_carbon_fraction": 0.0,
       "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 1.0
-    },
-    {
-      "bedding_type": "none",
-      "bedding_mass_per_day": 0.0,
-      "bedding_density": 0.0,
-      "bedding_dry_matter_content": 0.0,
-      "bedding_cleaned_fraction": 0.0,
-      "bedding_carbon_fraction": 0.0,
-      "bedding_phosphorus_content": 0.0,
-      "sand_removal_efficiency": 0.0
     }
   ],
   "manure_handler_configs": [
@@ -212,10 +198,6 @@
       "sludge_accumulation_volume_fraction": 0.00251,
       "storage_time_period": 365,
       "freeboard_input": 0.3048
-    },
-    {
-      "manure_treatment_type": "composting",
-      "composting_type": "intensive windrow"
     }
   ]
 }
