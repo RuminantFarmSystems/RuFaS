@@ -43,8 +43,9 @@ class HeatUnits:
 
         Notes
         -----
-        If the attribute `use_heat_unit_temperature` is False, both `min_air_temperature` and `max_air_temperature` are
-        optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
+        If the attribute `use_heat_unit_temperature` in CropData is False, both `min_air_temperature` and
+        `max_air_temperature` are optional. Otherwise, they are used to determine heat unit accumulation rather than
+        average air temperature.
 
         References
         ----------
