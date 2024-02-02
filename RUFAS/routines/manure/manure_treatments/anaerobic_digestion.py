@@ -11,6 +11,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
@@ -73,6 +74,16 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
         self._accumulate_daily_output(daily_output)
+
+        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+            manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
+            manure_cover=self.config.manure_cover,
+            manure_nitrogen__kg_N_per_day=daily_output.liquid_manure_nitrogen
+        )
+        daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
+        self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
+        self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
+
         return daily_output
 
     def _calc_anaerobic_digestion_daily_output(

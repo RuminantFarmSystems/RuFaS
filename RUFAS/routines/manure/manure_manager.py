@@ -206,6 +206,9 @@ class ManureManager:
                     custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
                 )
 
+            if mm_pen.manure_treatment == "slurry storage underfloor":
+                print()
+
             custom_manure_treatment_config = (
                 self.manure_manager_config_handler.get_custom_manure_treatment_config(
                     mm_pen.manure_treatment

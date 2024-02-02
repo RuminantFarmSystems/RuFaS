@@ -1,5 +1,8 @@
 from typing import Dict
+
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 class GasEmissionConstants:
@@ -259,3 +262,26 @@ class GasEmissionConstants:
         CompostingType.PASSIVE_WINDROW: 0.04,
         CompostingType.INTENSIVE_WINDROW: 0.06
     }
+
+    NITROUS_OXIDE_EMISSION_FACTOR__KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (
+        Dict)[ManureTreatmentType, Dict[str, float]] = {
+        ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0
+        },
+        ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0
+        },
+        ManureTreatmentType.ANAEROBIC_LAGOON: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0
+        },
+        ManureTreatmentType.ANAEROBIC_DIGESTION: {
+            ManureCoverEnum.NOT_APPLICABLE.value: 0.0006
+        }
+    }
+    """
+    Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage
+    systems.
+    """

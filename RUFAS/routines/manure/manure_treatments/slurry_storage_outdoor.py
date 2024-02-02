@@ -17,6 +17,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -292,5 +293,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
+
+        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
+            manure_cover=self.config.manure_cover,
+            manure_nitrogen__kg_N_per_day=daily_output.liquid_manure_nitrogen
+        )
+        daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
+        self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
+        self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
 
         return daily_output

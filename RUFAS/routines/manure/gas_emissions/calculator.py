@@ -1685,3 +1685,28 @@ class GasEmissionsCalculator:
                 + GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
                 + GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
         )
+
+    @staticmethod
+    def empirical_nitrogen_loss_from_nitrous_oxide_emission(
+            emission_factor__kg_nitrous_oxide_N_per_kg_manure_N: float,
+            manure_nitrogen__kg_N_per_day: float
+    ) -> float:
+        """
+        Calculate the daily empirical nitrogen loss from nitrous oxide emission from a manure treatment
+        and storage system (kg :math:`N_2O`-N/day).
+
+        Parameters
+        ----------
+        emission_factor__kg_nitrous_oxide_N_per_kg_manure_N : float
+            The emission factor for nitrous oxide based on the type of manure treatment and storage system
+            and whether the manure is covered or not (kg :math:`N_2O`-N/kg manure N).
+        manure_nitrogen__kg_N_per_day: float
+            The amount of manure nitrogen that enters the manure treatment system each day (kg N/day).
+
+        Returns
+        -------
+        float
+            The empirical nitrogen loss from nitrous oxide emission (kg :math:`N_2O`-N/day).
+        """
+
+        return emission_factor__kg_nitrous_oxide_N_per_kg_manure_N * manure_nitrogen__kg_N_per_day

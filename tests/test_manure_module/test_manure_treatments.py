@@ -2153,6 +2153,10 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
         anaerobic_lagoon, "_update_ammonia_emission"
     )
 
+    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch.object(
+        anaerobic_lagoon, "_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission"
+    )
+
     precipitation_volume = 10.0
     patch_for_precipitation_volume_property = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon."
@@ -2888,6 +2892,9 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
     )
     patch_for_accumulate_daily_output = mocker.patch.object(
         anaerobic_digestion, "_accumulate_daily_output"
+    )
+    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch.object(
+        anaerobic_digestion, "_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission"
     )
 
     # Act

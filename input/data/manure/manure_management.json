@@ -22,7 +22,7 @@
       "manure_handler": "manual scraping",
       "manure_separator": "screw press",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "slurry storage outdoor"
+      "manure_treatment": "slurry storage underfloor"
     },
     {
       "scenario_id": 3,
@@ -234,7 +234,8 @@
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.45,
       "phosphorus_removal_efficiency_for_treatment": 0.05,
       "potassium_removal_efficiency_for_treatment": 0.05,
-      "storage_time_period": 120
+      "storage_time_period": 120,
+      "manure_cover": "cover"
     },
     {
       "manure_treatment_type": "slurry storage outdoor",
@@ -245,7 +246,8 @@
       "phosphorus_removal_efficiency_for_treatment": 0.05,
       "potassium_removal_efficiency_for_treatment": 0.05,
       "storage_time_period": 120,
-      "freeboard_input": 0.3048
+      "freeboard_input": 0.3048,
+      "manure_cover": "cover"
     },
     {
       "manure_treatment_type": "anaerobic lagoon",
@@ -259,7 +261,8 @@
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
       "storage_time_period": 365,
-      "freeboard_input": 0.3048
+      "freeboard_input": 0.3048,
+      "manure_cover": "cover"
     },
     {
       "manure_treatment_type": "anaerobic digestion",
@@ -277,10 +280,11 @@
       "methane_generation_ratio": 0.65,
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
-      "anaerobic_digestion_temperature_celsius": 37.5
+      "anaerobic_digestion_temperature_celsius": 37.5,
+      "manure_cover": "N/A"
     },
     {
-      "manure_treatment_type": "composted bedded pack barn",
+      "manure_treatment_type": "compost bedded pack barn",
       "total_solids_removal_efficiency_for_treatment": 0.45,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
