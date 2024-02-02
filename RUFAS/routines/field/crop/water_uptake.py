@@ -334,7 +334,7 @@ class WaterUptake:
 
         References
         ----------
-        SWAT Equation: 5:2.2.1
+        SWAT 5:2.2.1
 
         """
         # TODO: Note that this method is identical to NitrogenIncorporation._determine_nitrogen_uptake_to_depth()
