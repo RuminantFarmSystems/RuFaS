@@ -2184,6 +2184,7 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     patch_for_adjust_accumulated_output.assert_called_once_with(mock_daily_output)
     patch_for_update_methane_emission.assert_called_once_with(mock_daily_output)
     patch_for_update_ammonia_emission.assert_called_once_with(mock_daily_output)
+    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
     assert patch_for_precipitation_volume_property.call_count == 1
 
     assert result == mock_daily_output
@@ -2911,6 +2912,7 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
         daily_output_with_sludge_output
     )
     patch_for_accumulate_daily_output.assert_called_once_with(complete_daily_output)
+    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
     assert actual_daily_output == complete_daily_output
 
 
