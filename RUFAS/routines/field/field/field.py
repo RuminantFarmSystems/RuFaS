@@ -452,8 +452,7 @@ class Field:
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
                                            manure_type=requested_manure_type)
 
-        # manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
-        manure_supplied = self._construct_evaluation_manure_application(nutrient_request)
+        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             supplied_nitrogen = manure_supplied.nitrogen
