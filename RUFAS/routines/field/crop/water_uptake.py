@@ -12,6 +12,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 class WaterUptake:
     """
     This module is responsible for all water uptake routines for a crop in a day.
+
     Parameters
     ----------
     crop_data : Optional[CropData], optional
