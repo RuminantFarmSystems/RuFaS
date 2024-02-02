@@ -301,7 +301,7 @@ class NitrogenIncorporation:
         Raises
         ------
         ValueError
-            half_mature_heat_fraction equals mature_heat_fraction.
+            If half_mature_heat_fraction equals mature_heat_fraction.
 
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
