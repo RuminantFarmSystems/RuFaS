@@ -571,7 +571,7 @@ class NitrogenIncorporation:
 
         References
         ----------
-            pseudocode: C.5.C.2, C.5.C.3
+        pseudocode: C.5.C.2, C.5.C.3
 
         """
         # check that boundaries are in ascending order
