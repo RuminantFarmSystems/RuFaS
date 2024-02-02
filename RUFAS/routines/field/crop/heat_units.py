@@ -140,10 +140,8 @@ class HeatUnits:
         Raises
         ------
         ValueError
-            If `use_heat_unit_temperature` is True, both `min_air_temperature` and `max_air_temperature` must be
-            provided.
-        ValueError
-            If `use_heat_unit_temperature` is False, `mean_air_temperature` must be provided.
+            If `use_heat_unit_temperature` is True and both `min_air_temperature` and `max_air_temperature` are not provided.
+            If `use_heat_unit_temperature` is False and `mean_air_temperature` is not provided.
 
         """
         if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
