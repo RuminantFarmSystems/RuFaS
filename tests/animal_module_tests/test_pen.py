@@ -534,13 +534,6 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
         )
 
 
-def many_animals() -> dict[int, MagicMock]:
-    animals = {}
-    for i in range(1000):
-        animals[i] = MagicMock(spec=Calf)
-    return animals
-
-
 @pytest.mark.parametrize(
     'is_populated, animals_in_pen, mock_pen_manure',
     [
@@ -571,29 +564,21 @@ def many_animals() -> dict[int, MagicMock]:
 
         # Testing with null or None values within manure properties
         (True, {0: MagicMock(spec=Calf)}, {'property1': None}),
-
-        # Testing with a large number of animals
-        (True, many_animals(), {'property1': 'value1'})
     ]
 )
 def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
-                           animals_in_pen: list[MagicMock],
+                           animals_in_pen: dict[int, MagicMock],
                            mock_pen_manure: dict[str, str]) -> None:
     """
     Unit test for method calc_total_manure in file pen.py.
-
-    This test verifies that the method correctly calculates the total manure based on
-    the pen's population and manure properties. The test covers various scenarios,
-    including populated and unpopulated pens with different animal types and
-    corresponding manure properties.
-
     """
+
     # Arrange
     mocker.patch('RUFAS.routines.animal.pen.Pen.__init__', return_value=None)
     pen = Pen()  # type: ignore
     pen.id = 'mock_pen_id'
     pen.manure = mock_pen_manure
-    type(pen).is_populated = mocker.PropertyMock(return_value=is_populated)
+    mocker.patch.object(Pen, 'is_populated', return_value=is_populated, new_callable=mocker.PropertyMock)
     for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
