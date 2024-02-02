@@ -349,7 +349,7 @@ class CropData:
         Amount of the desired crop product to be removed from the field (kg/ha).
     dry_matter_yield_collected : Optional[float], default None
         Dry matter mass collected at harvest (kg/ha).
-    yield_residue : Optional[float], default None
+    yield_residue : float, default 0.0
         Amount of dry matter residue created; unharvested yield (kg/ha).
     yield_nitrogen : Optional[float], default None
         Nitrogen contained in the harvested yield (kg/ha).
@@ -553,7 +553,7 @@ class CropData:
     cut_biomass: Optional[float] = None
     wet_yield_collected: Optional[float] = None
     dry_matter_yield_collected: Optional[float] = None
-    yield_residue: Optional[float] = None
+    yield_residue: float = 0.0
     yield_nitrogen: Optional[float] = None
     yield_phosphorus: Optional[float] = None
     residue_nitrogen: float = 0.0
