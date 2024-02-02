@@ -533,21 +533,14 @@ def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture):
     mock_animal_manager.animal_to_pen_id_map = {}
     mock_animal_manager.all_pens[0].id = 0
     mock_animal_manager.all_pens[1].id = 1
-    i = 10
+    i = 0
     for pen in mock_animal_manager.all_pens:
-        pen.animals_in_pen = [MagicMock(), MagicMock()]
-        for animal in pen.animals_in_pen:
-            animal.id = i
-            i += 1
-    i = 10
-    for pen in mock_animal_manager.all_pens:
-        for animal in pen.animals_in_pen:
-            assert animal.id == i
-            i += 1
+        pen.animals_in_pen = {1+i: 100, 2+i: 200}
+        i += 4
     # act
     mock_animal_manager.fully_update_animal_to_pen_id_map()
     # assert
-    assert mock_animal_manager.animal_to_pen_id_map == {10: 0, 11: 0, 12: 1, 13: 1}
+    assert mock_animal_manager.animal_to_pen_id_map == {1: 0, 2: 0, 5: 1, 6: 1}
 
 
 def pens_test_data_dict() -> List[dict[Any]]:
