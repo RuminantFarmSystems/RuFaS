@@ -66,6 +66,11 @@ class CropSpeciesDataFactory:
             A `CropData` object initialized with species-specific defaults and any modifications specified through
             kwargs.
 
+        Raises
+        ------
+        AttributeError
+            If the attribute provided does not belong to a valid attribute of CropData.
+
         """
         species_by_type = {
             CropSpecies.ALFALFA_HAY: AlfalfaHay,

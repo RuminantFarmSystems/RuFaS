@@ -51,7 +51,7 @@ class WaterDynamics:
 
         References
         ----------
-        SWAT Theoretical documentation section 2:2.3.1
+        SWAT 2:2.3.1
 
         Notes
         -----
@@ -70,7 +70,8 @@ class WaterDynamics:
             return amount_evaporated
 
     def set_maximum_transpiration(self, potential_evapotranspiration_adjusted: float) -> None:
-        """Sets the maximum transpiration based on the adjusted potential evapotranspiration of this day.
+        """
+        Sets the maximum transpiration based on the adjusted potential evapotranspiration of this day.
 
         Parameters
         ----------
@@ -79,7 +80,7 @@ class WaterDynamics:
 
         References
         ----------
-        SWAT Theoretical documentation section 2:2.3.2
+        SWAT 2:2.3.2
 
         """
         self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
@@ -87,17 +88,25 @@ class WaterDynamics:
 
     @staticmethod
     def _determine_maximum_transpiration(leaf_area_index, potential_evapotranspiration_adjusted: float) -> float:
-        """calculates the maximum transpiration for a given day
+        """
+        Calculates the maximum transpiration for a given day.
 
-        Args:
-            leaf_area_index: leaf area index of plant, unitless
-            potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
-                the canopy in mm
+        Parameters
+        ----------
+        leaf_area_index : float
+            Leaf area index of the plant (unitless).
+        potential_evapotranspiration_adjusted : float
+            Potential evapotranspiration adjusted for evaporation of free water from the canopy (mm).
 
-        Returns:
-            maximum transpiration in mm
+        Returns
+        -------
+        float
+            Maximum transpiration (mm).
 
-        SWAT Reference: 2:2.3.5, 6
+        References
+        ----------
+        SWAT 2:2.3.5, 6
+
         """
         if leaf_area_index <= 3:  # 2:2.3.5
             return (potential_evapotranspiration_adjusted * leaf_area_index) / 3
@@ -108,15 +117,22 @@ class WaterDynamics:
     def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
         # TODO: belongs in Soil class? - GitHub Issue #303
         """
-        Description: calculate the annual evapotranspiration #TODO: why is this 'annual' routine executed every day?
+        Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day?
 
-        Args:
-            evaporation: evaporation
-            transpiration: transpiration
+        Parameters
+        ----------
+        evaporation : float
+            Evaporation (mm).
+        transpiration : float
+            Transpiration (mm).
 
-        Returns: total evapotranspiration
+        Returns
+        -------
+        float
+            Total evapotranspiration (mm).
 
         TODO: find where SWAT has this equation (if it does, if not make note of assumption)
+
         """
         return evaporation + transpiration
 
@@ -124,15 +140,24 @@ class WaterDynamics:
     def _determine_water_deficiency(cumulative_evapotranspiration: float,
                                     cumulative_potential_evapotranspiration: float) -> float:
         """
-        Description: calculate water deficiency factor
+        Calculate water deficiency factor.
 
-        SWAT Reference: 5:3.3.2
+        Parameters
+        ----------
+        cumulative_evapotranspiration : float
+            Annual evapotranspiration (mm).
+        cumulative_potential_evapotranspiration : float
+            Maximum annual evapotranspiration (mm).
 
-        Args:
-            cumulative_evapotranspiration: annual evapotranspiration
-            cumulative_potential_evapotranspiration: maximum annual evapotranspiration
+        Returns
+        -------
+        float
+            Water deficiency factor (unitless).
 
-        Returns: water deficiency factor
+        References
+        ----------
+        SWAT 5:3.3.2
+
         """
         if cumulative_potential_evapotranspiration != 0:
             return 100 * (cumulative_evapotranspiration / cumulative_potential_evapotranspiration)
