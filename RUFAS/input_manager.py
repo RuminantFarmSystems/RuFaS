@@ -187,12 +187,8 @@ class InputManager:
                                f"Successfully loaded data from {file_path}.",
                                info_map)
                 return data_dict
-        except FileNotFoundError as fnfe:
-            om.add_error("csv_file_not_found", str(fnfe), info_map)
-            raise
         except Exception as e:
-            om.add_error("load_csv_file_error", f"Unexpected error: {e}", info_map)
-            raise
+            raise e
 
     def _populate_pool(self, eager_termination: bool) -> bool:
         """
