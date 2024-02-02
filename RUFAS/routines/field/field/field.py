@@ -1,5 +1,4 @@
 import math
-
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
@@ -19,7 +18,6 @@ from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.time import Time
 from copy import copy
 
@@ -388,20 +386,6 @@ class Field:
                  "potassium": potassium_mass, "application_depth": application_depth,
                  "surface_remainder_fraction": surface_remainder_fraction, "year": year, "day": day}
         om.add_variable("fertilizer_application", value, info_map)
-
-    @staticmethod
-    def _construct_evaluation_manure_application(nutrient_request: NutrientRequest) -> NutrientRequestResults:
-        dry_matter_fraction = 0.05
-        total_manure_mass = nutrient_request.nitrogen * 479.999_883
-        dry_matter_amount = total_manure_mass * dry_matter_fraction
-        evaluation_request = NutrientRequestResults(
-            nitrogen=nutrient_request.nitrogen,
-            phosphorus=nutrient_request.phosphorus,
-            total_manure_mass=total_manure_mass,
-            dry_matter=dry_matter_amount,
-            dry_matter_fraction=dry_matter_fraction
-        )
-        return evaluation_request
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float,
                                     requested_manure_type: ManureType, field_coverage: float,
