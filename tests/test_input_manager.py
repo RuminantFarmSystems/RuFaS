@@ -916,8 +916,8 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
 
         assert add_error.call_count == 0
         handle_missing_data.assert_called_once_with(variable_properties={
-                "type": "string"
-            },
+            "type": "string"
+        },
             var_name="secondary_key")
         fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
 
@@ -1954,22 +1954,19 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
          "key_3": {"properties": "target_properties"},
          "key_4": {"properties": "target_properties"},
          "key_5": {"properties": "target_properties"},
-     }, ["key_3", "key_4", "key_5"]
-    ),
+     }, ["key_3", "key_4", "key_5"]),
     ({
          "key_1": {"properties": "target_properties"},
          "key_2": {"properties": "value"},
          "key_3": {"properties": "target_properties"},
          "key_4": {"properties": "properties_4"},
          "key_5": {"properties": "properties_5"}
-     }, ["key_1", "key_3"]
-    ),
+     }, ["key_1", "key_3"]),
     ({
          "key_1": {"properties": "value"},
          "key_2": {"properties": "value"},
          "key_3": {"properties": "value"}
-     }, []
-    ),
+     }, []),
     ({}, [])
 ])
 def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], expected_keys: list[str],
