@@ -17,20 +17,35 @@ ADDRESS_TO_INPUTS = "files"
 
 class Modifiability(Enum):
     """
-    This is an Enum class that represents different types of manure.
+    Enum class representing the modifiability status of a variable.
 
-    Attribute
-    ---------
+    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
+    initialization and if it can be modified during runtime.
+
+    Attributes
+    ----------
     REQUIRED_AND_LOCKED : str
-        Variable is required to have a value upon initialization, and it cannot be modified during runtime.
+        Indicates the variable must be initialized with a value and cannot be modified thereafter.
     REQUIRED_AND_UNLOCKED : str
-        Variable is required to have a value upon initialization, and it can also be modified during runtime.
-    NOT_REQUIRED_AND_UNLOCKED: str
-        Variable is not required to have a value upon initialization, and it can be modified during runtime.
+        Indicates the variable must be initialized with a value but can be modified during runtime.
+    NOT_REQUIRED_AND_UNLOCKED : str
+        Indicates the variable does not need to be initialized with a value and can be modified during runtime.
     """
     REQUIRED_AND_LOCKED: str = "required and locked"
     REQUIRED_AND_UNLOCKED: str = "required and unlocked"
     NOT_REQUIRED_AND_UNLOCKED: str = "not required and unlocked"
+
+    @classmethod
+    def values(cls):
+        """
+        Provides a list of the string values of the enum members.
+
+        Returns
+        -------
+        List[str]
+            A list containing the string values of the enum members.
+        """
+        return list(map(lambda c: c.value, cls))
 
 
 class InputManager:
@@ -300,16 +315,71 @@ class InputManager:
 
         return filtered_input_data
 
-    @staticmethod
-    def _get_variable_modifiability(variable_properties: Dict[str, Any]) -> Modifiability:
+    def _get_variable_modifiability(self, variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+        """
+        Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+        value.
+
+        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
+        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
+        its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable for which the modifiability status is being determined. Used for error logging.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, containing the desired 'modifiability' property.
+
+        Returns
+        -------
+        Modifiability
+            An enum member representing the variable's modifiability status.
+
+        Raises
+        ------
+        KeyError
+            If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
+            message includes the invalid modifiability value and suggests valid values.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._get_variable_modifiability.__name__,
+                    }
+
         if "modifiability" in variable_properties.keys() and variable_properties["modifiability"]:
-            return Modifiability.__getitem__('_'.join(variable_properties["modifiability"].strip().upper().split()))
+            try:
+                return Modifiability.__getitem__('_'.join(variable_properties["modifiability"].strip().upper().split()))
+            except KeyError:
+                om.add_error("Unknown modifiability entry",
+                             f"Unknown modifiability value of {variable_properties['modifiability']} for variable "
+                             f"{variable_name}. Modifiability must be one of {Modifiability.values()}",
+                             info_map)
+                raise KeyError(f"Unknown modifiability value of {variable_properties['modifiability']} for variable "
+                               f"{variable_name}. Modifiability must be one of {Modifiability.values()}")
         else:
             return Modifiability.__getitem__("NOT_REQUIRED_AND_UNLOCKED")
 
-    @staticmethod
-    def _get_caller_function():
-        """Returns the name of the function that called the current function."""
+    def _get_caller_function(self) -> str:
+        """
+        Retrieves the name of the function that called the current function within the call stack.
+
+        This function examines the call stack to find the current function's name and then identifies the name of the
+        function that called it. This is achieved by navigating the call stack frames and extracting the function names,
+        ensuring to remove any duplicates to preserve the actual call sequence.
+
+        Returns
+        -------
+        str
+            The name of the function that called the current function.
+
+        Notes
+        -----
+        - The function uses the `inspect` module to access the current and previous frames in the call stack.
+        - It is designed to work within a single thread; behavior in multi-threaded environments may be unpredictable.
+        - Special care is taken to handle the call stack in a way that avoids creating references that could prevent
+          garbage collection of stack frames.
+        """
         current_function = inspect.currentframe().f_back.f_back.f_code.co_name
 
         call_stack = inspect.stack()
@@ -317,24 +387,113 @@ class InputManager:
 
         return call_stack_functions[call_stack_functions.index(current_function) + 1]
 
-    def _is_input_required_upon_initialization(self, variable_properties: Dict[str, Any]) -> bool:
-        variable_modifiability = self._get_variable_modifiability(variable_properties)
+    def _is_input_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+        """
+        Determines whether a variable requires an input value upon initialization based on its modifiability status.
+
+        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
+        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
+        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
+        must be initialized with a value.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable being evaluated for its initialization requirements.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, which should include its modifiability status among
+            others.
+
+        Returns
+        -------
+        bool
+            True if the variable's modifiability status necessitates an input value upon initialization,
+            False otherwise.
+
+        Notes
+        -----
+        - The determination is based solely on the modifiability status of the variable. Other factors that might affect
+          initialization requirements are not considered by this function.
+        - This function depends on the 'Modifiability' enum and the '_get_variable_modifiability' method to function
+          correctly. Any changes to these components may affect the behavior of this function.
+        """
+        variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
+                                                                  variable_properties=variable_properties)
         return variable_modifiability == Modifiability.REQUIRED_AND_LOCKED or variable_modifiability. \
             REQUIRED_AND_UNLOCKED
 
-    def _is_modifiable_during_runtime(self, variable_properties: Dict[str, Any]) -> bool:
-        variable_modifiability = self._get_variable_modifiability(variable_properties)
+    def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+        """
+        Checks if a variable can be modified during runtime based on its modifiability status.
+
+        This function determines the modifiability status of a variable using the '_get_variable_modifiability' method.
+        It assesses whether the variable, identified by 'variable_name' and described by 'variable_properties', is
+        allowed to be modified after initialization. A variable is considered modifiable during runtime if its
+        modifiability status is either 'REQUIRED_AND_UNLOCKED' or 'NOT_REQUIRED_AND_UNLOCKED'.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to check for runtime modifiability.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, including details that determine its modifiability.
+
+        Returns
+        -------
+        bool
+            True if the variable is allowed to be modified during runtime, False otherwise.
+
+        Notes
+        -----
+        - The function relies on the 'Modifiability' enum and the '_get_variable_modifiability' method. Changes to these
+          components may impact the function's behavior.
+        - This function does not consider other aspects of the variable that might affect its ability to be modified at
+          runtime, focusing solely on its declared modifiability status.
+        """
+        variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
+                                                                  variable_properties=variable_properties)
         return variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED or variable_modifiability. \
             REQUIRED_AND_UNLOCKED
 
     def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str]) \
             -> None:
+        """
+        Handles missing data for a variable, logging errors or warnings based on the context of initialization or
+        runtime updates.
+
+        This function determines if it's being called during the initialization phase and checks if the missing variable
+        data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
+        raises a KeyError. If not, it logs a warning.
+
+        For missing data during runtime updates, it logs an error and raises a KeyError, assuming the data is necessary
+        for the update.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            Properties of the variable, potentially including its modifiability status.
+        var_name : str
+            The name of the variable with missing data.
+        info_map : Dict[str, str]
+            Contextual information for logging purposes.
+
+        Raises
+        ------
+        KeyError
+            Raised if the missing data is deemed necessary, either during initialization or for a runtime update.
+
+        Notes
+        -----
+        - Relies on the caller function's name to determine if it's called during initialization, making the function
+          sensitive to naming conventions of the initialization method.
+        """
         caller_function = self._get_caller_function()
         is_initialization = caller_function == self._populate_pool.__name__
 
         if is_initialization:
             is_input_required_upon_initialization = self._is_input_required_upon_initialization(
-                variable_properties)
+                variable_name=var_name,
+                variable_properties=variable_properties)
             if is_input_required_upon_initialization:
                 om.add_error("Validation: key not found in input data -- input required upon initialization",
                              f"Key {var_name} not found in input data. Input value is required for this "
@@ -1034,16 +1193,60 @@ class InputManager:
                            f"metadata.")
         return True
 
-    def _update_nested_dict(self, current_level_dict: Dict[str, Any], element_hierarchy: List[str], value: Any) -> None:
-        if len(element_hierarchy) == 1:
-            current_level_dict[element_hierarchy[0]] = value
-        else:
-            key = element_hierarchy[0]
-            if key not in current_level_dict:
-                current_level_dict[key] = {}
-            self._update_nested_dict(current_level_dict=current_level_dict[key],
-                                     element_hierarchy=element_hierarchy[1:],
-                                     value=value)
+    def _set_nested_value(self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any) -> \
+            Dict[str, Any]:
+        """
+        Sets a given value within a nested dictionary structure at a specified hierarchical level and returns the
+        updated dictionary.
+
+        Notes
+        -----
+        This function iteratively traverses through the levels of a nested dictionary, guided by a list of keys
+        (element_hierarchy). At each level, it checks for the existence of the key. If a key is missing, a new nested
+        dictionary is created at that key. The function sets the given value at the final key in the hierarchy.
+
+        While this function modifies the input dictionary in place, it also returns the modified dictionary for
+        convenience and chaining operations.
+
+        Parameters
+        ----------
+        nested_dict : Dict[str, Any]
+            The nested dictionary to be updated. This should be the top-level dictionary if the hierarchy spans multiple
+            levels.
+        element_hierarchy : List[str]
+            A list of strings representing the keys that define the path through the nested dictionary to the location
+            where the value should be set. Each element in the list corresponds to one level in the nested structure.
+        value : Any
+            The value to be set at the specified location within the nested dictionary structure.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The updated nested dictionary after setting the specified value.
+
+        Examples
+        --------
+        >>> nested_dictionary = {'a': {'b': {'c': 1}}}
+        >>> updated_dict = self._set_nested_value(nested_dictionary, ['a', 'b', 'd'], 2)
+        >>> print(updated_dict)
+        {'a': {'b': {'c': 1, 'd': 2}}}
+
+        Note
+        ----
+        Be cautious of the in-place modification of the input dictionary, which may lead to unintended side effects.
+
+        In other words, this function operates through the side effect of altering the state of `nested_dict` outside
+        its local scope. This behavior of in-place modification of the input dictionary introduces potential unintended
+        changes.
+        """
+        current_dict_level = nested_dict
+        for key in element_hierarchy[:-1]:
+            if key not in current_dict_level.keys():
+                current_dict_level[key] = {}
+            current_dict_level = current_dict_level[key]
+
+        current_dict_level[element_hierarchy[-1]] = value
+        return nested_dict
 
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
                               eager_termination: bool, is_variable_dict: bool) -> bool:
@@ -1052,9 +1255,11 @@ class InputManager:
 
         Notes
         -----
-        This function processes and validates the input data for a variable based on
-        its metadata properties. It then adds the validated data to a pool. The function
-        also provides an option for eager termination in case of invalid data.
+        This function processes and validates the input data for a variable based on its metadata properties,
+        attempting to fix any invalid elements. If all elements are valid or successfully fixed, the data is added
+        to a pool. The function supports eager termination, which can halt the process early if invalid data is
+        encountered or if a non-modifiable variable is attempted to be modified during runtime.
+
 
         Parameters
         ----------
@@ -1076,6 +1281,8 @@ class InputManager:
 
         Raises
         -------
+        PermissionError
+            If eager_termination is True and the variable is not modifiable during runtime.
         ValueError
             If eager_termination is True and the variable failed validation.
         """
@@ -1090,14 +1297,13 @@ class InputManager:
         if len(element_hierarchy) > 1:
             metadata_properties = reduce(lambda d, k: d[k], element_hierarchy[1:],
                                          self.__metadata["properties"][properties_blob_key])
-            wrapped_data = {}
-            self._update_nested_dict(wrapped_data, element_hierarchy[1:], data)
-            data = wrapped_data
+            data = self._set_nested_value({}, element_hierarchy[1:], data)
 
         else:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        runtime_modifiability = self._is_modifiable_during_runtime(variable_properties=metadata_properties)
+        runtime_modifiability = self._is_modifiable_during_runtime(variable_name=variable_name,
+                                                                   variable_properties=metadata_properties)
         if runtime_modifiability == Modifiability.REQUIRED_AND_LOCKED:
             if eager_termination:
                 om.add_error("IM Runtime Modification",
@@ -1156,9 +1362,9 @@ class InputManager:
                                                                 f"InputManager pool, overwriting the old value.",
                                info_map)
             if len(element_hierarchy) > 1:
-                self._update_nested_dict(current_level_dict=self.__pool,
-                                         element_hierarchy=element_hierarchy,
-                                         value=validated_data)
+                self.__pool = self._set_nested_value(nested_dict=self.__pool,
+                                                     element_hierarchy=element_hierarchy,
+                                                     value=validated_data)
             else:
                 self.__pool[variable_name] = validated_data
 
