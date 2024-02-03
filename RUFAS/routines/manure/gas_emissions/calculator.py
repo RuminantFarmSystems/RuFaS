@@ -761,20 +761,20 @@ class GasEmissionsCalculator:
 
         total_storage_area = num_animals * storage_area_per_animal
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        total_manure_mass = manure_volume * manure_density
+        total_manure_mass_per_m2 =(manure_volume * manure_density)/total_storage_area
+        manure_total_ammoniacal_nitrogen_per_m2 = manure_total_ammoniacal_nitrogen/total_storage_area
         housing_specific_constant = GasEmissionConstants.STORAGE_HSC
         storage_area_resistance = cls._ammonia_resistance(
             temp, housing_specific_constant
         )
-        manure_mass_excluding_solids = total_manure_mass
         equilibrium_coefficient = cls._equilibrium_coefficient(temp_kelvin, pH)
         ammonia_loss = (
-                               manure_total_ammoniacal_nitrogen
+                               manure_total_ammoniacal_nitrogen_per_m2
                                * GeneralConstants.SECONDS_PER_DAY
                                * manure_density
                        ) / (
                                storage_area_resistance
-                               * manure_mass_excluding_solids
+                               * total_manure_mass_per_m2
                                * equilibrium_coefficient
                        )
         total_ammonia_loss = ammonia_loss * total_storage_area
