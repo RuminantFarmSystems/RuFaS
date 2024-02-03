@@ -263,7 +263,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         methane_loss= self.calc_methane_emission(
             self._accumulated_output.liquid_manure_total_solids
         )
-
+        print('accum TAN is', self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen)
         ammonia_loss= self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
@@ -271,7 +271,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
             ),
         )
-
+        print('ammonia loss is ', ammonia_loss)
         daily_output.storage_ammonia = ammonia_loss
         daily_output.storage_methane = methane_loss
 

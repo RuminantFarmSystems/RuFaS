@@ -745,7 +745,6 @@ class GasEmissionsCalculator:
             raise ValueError("Manure volume must be greater than or equal to 0.")
 
 
-
         # If any of the input parameters is 0, then the result will be 0.
         if any(
                 param == 0
