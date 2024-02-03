@@ -3548,23 +3548,35 @@
       }
     },
     "is_fat": {
-      "type": "bool",
-      "description": "Identifier of fat type feed."
+      "type": "array",
+      "description": "Identifier of fat type feed.",
+      "properties": {
+        "type": "bool"
+      }
     },
     "is_wetforage": {
-      "type": "bool",
-      "description": "Identifier of wet forage type feed."
+      "type": "array",
+      "description": "Identifier of wet forage type feed.",
+      "properties": {
+        "type": "bool"
+      }
     },
     "units": {
-      "type": "string",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "string"
+      } 
     },
     "starch": {
-      "type": "number",
+      "type": "array",
       "description": "Starch (%)",
-      "minimum": 0,
-      "maximum": 80,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 80,
+        "default": 0
+      }
     },
     "limit": {
       "type": "number",
