@@ -1248,7 +1248,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,     # noqa
                               eager_termination: bool, is_variable_dict: bool) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
