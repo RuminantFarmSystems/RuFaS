@@ -32,10 +32,18 @@ def input_manager_original_method_states(
     return {
         "start_data_processing": mock_input_manager.start_data_processing,
         "_load_metadata": mock_input_manager._load_metadata,
+        "_load_properties": mock_input_manager._load_properties,
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
-        "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_populate_pool": mock_input_manager._populate_pool,
+        "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
+        "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
+        "_get_caller_function": mock_input_manager._get_caller_function,
+        "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
+        "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "_handle_missing_data": mock_input_manager._handle_missing_data,
+        "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
+        "_validate_tabular_element": mock_input_manager._validate_tabular_element,
         "_validate_dict_element": mock_input_manager._validate_dict_element,
         "_array_type_validator": mock_input_manager._array_type_validator,
         "_num_type_validator": mock_input_manager._num_type_validator,
@@ -45,14 +53,12 @@ def input_manager_original_method_states(
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
         "get_data_keys_by_properties": mock_input_manager.get_data_keys_by_properties,
-        "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
-        "_validate_tabular_element": mock_input_manager._validate_tabular_element,
         "flush_pool": mock_input_manager.flush_pool,
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
+        "_set_nested_value": mock_input_manager._set_nested_value,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
-        "_load_properties": mock_input_manager._load_properties,
     }
 
 
@@ -902,13 +908,20 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
                                          "invalid_elements": 0, "is_valid": True}
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error, \
+            patch.object(mock_input_manager, "_handle_missing_data", new_callable=MagicMock,
+                         return_value=None) as handle_missing_data, \
             patch.object(mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False) as fix_data:
         mock_input_manager._validate_dict_element(element_hierarchy, properties_blob_key, input_data,
                                                   eager_termination, mock_element_counter_and_validity)
 
-        assert add_error.call_count == 1
+        assert add_error.call_count == 0
+        handle_missing_data.assert_called_once_with(variable_properties={
+                "type": "string"
+            },
+            var_name="secondary_key")
         fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
 
+    mock_input_manager._handle_missing_data = input_manager_original_method_states["_handle_missing_data"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
 
 
@@ -1936,27 +1949,27 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
 
 @pytest.mark.parametrize("data,expected_keys", [
     ({
-        "key_1": {"properties": "properties_1"},
-        "key_2": {"properties": "properties_2"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "target_properties"},
-        "key_5": {"properties": "target_properties"},
+         "key_1": {"properties": "properties_1"},
+         "key_2": {"properties": "properties_2"},
+         "key_3": {"properties": "target_properties"},
+         "key_4": {"properties": "target_properties"},
+         "key_5": {"properties": "target_properties"},
      }, ["key_3", "key_4", "key_5"]
-     ),
+    ),
     ({
-        "key_1": {"properties": "target_properties"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "properties_4"},
-        "key_5": {"properties": "properties_5"}
+         "key_1": {"properties": "target_properties"},
+         "key_2": {"properties": "value"},
+         "key_3": {"properties": "target_properties"},
+         "key_4": {"properties": "properties_4"},
+         "key_5": {"properties": "properties_5"}
      }, ["key_1", "key_3"]
-     ),
+    ),
     ({
-        "key_1": {"properties": "value"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "value"}
+         "key_1": {"properties": "value"},
+         "key_2": {"properties": "value"},
+         "key_3": {"properties": "value"}
      }, []
-     ),
+    ),
     ({}, [])
 ])
 def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], expected_keys: list[str],
