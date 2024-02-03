@@ -126,8 +126,6 @@ class OpenLots(BaseManureTreatment):
         """
 
         daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(daily_input)
-
 
         total_nitrogen_loss = GasEmissionsCalculator.total_nitrogen_loss_from_open_lots(
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,

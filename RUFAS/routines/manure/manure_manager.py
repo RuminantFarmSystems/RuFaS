@@ -316,9 +316,9 @@ class ManureManager:
         liquid_manure_nitrogen = max(manure_treatment_daily_output.liquid_manure_nitrogen, 0.0)
         liquid_manure_phosphorus = max(manure_treatment_daily_output.liquid_manure_phosphorus, 0.0)
         liquid_manure_potassium = max(manure_treatment_daily_output.liquid_manure_potassium, 0.0)
-        liquid_manure_total_solids = max(manure_treatment_daily_output.liquid_manure_total_solids, 0.0)
         liquid_total_manure_mass = max((manure_treatment_daily_output.liquid_manure_daily_volume *
                                         self._get_manure_density_by_type(ManureType.LIQUID)), 0.0)
+        liquid_manure_total_solids = max(liquid_total_manure_mass*ManureConstants.LIQUID_MANURE_SOLIDS_FRACTION,0)
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
                 nitrogen=liquid_manure_nitrogen,

@@ -70,7 +70,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         num_animals: int,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
-        total_solids: float,
     ) -> Tuple[float, float]:
         """Calculates the ammonia emission from the underfloor slurry storage.
 
@@ -92,7 +91,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            total_solids=total_solids,
             temp=self._get_current_day_average_temperature_celsius(),
         )
 
@@ -118,13 +116,22 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             accumulated_manure_total_ammoniacal_nitrogen=(
                 self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
             ),
-            total_solids=self._accumulated_output.liquid_manure_total_solids,
         )
 
 
         daily_output.storage_methane = methane_loss
         daily_output.storage_ammonia = ammonia_loss
+        new_daily_output_liquid_manure_total_solids = max(
+            daily_output.liquid_manure_total_solids - methane_loss, 0.0
+        )
+        daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
 
+        new_daily_output_liquid_manure_total_ammoniacal_nitrogen = max(
+            daily_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
+        )
+        daily_output.liquid_manure_total_ammoniacal_nitrogen = new_daily_output_liquid_manure_total_ammoniacal_nitrogen
+
+        self._accumulated_output.storage_ammonia += ammonia_loss
         self._accumulated_output.storage_methane += methane_loss
 
         new_accumulated_liquid_manure_total_solids = max(
@@ -133,7 +140,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_solids = (
             new_accumulated_liquid_manure_total_solids
         )
-        self._accumulated_output.storage_ammonia += ammonia_loss
+
         new_accumulated_liquid_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
         )

@@ -45,23 +45,14 @@ class AnaerobicLagoon(BaseManureTreatment):
         None
             Update the `storage_methane` attribute of the daily output object.
 
-            Update the `storage_methane` and `liquid_manure_total_volatile_solids` attributes of the accumulated
-            output object.
-
         """
-        volatile_solids_factor = 3
         methane_emission = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-            total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
+            total_volatile_solids= self.accumulated_output.liquid_manure_total_volatile_solids,
             temp=self._get_current_day_average_temperature_celsius(),
         )
         methane_emission = max(methane_emission, 0.0)
         daily_output.storage_methane = methane_emission
 
-
-        new_liquid_manure_total_volatile_solids = (
-            daily_output.liquid_manure_total_volatile_solids
-            - methane_emission * volatile_solids_factor
-        )
 
     def _update_ammonia_emission(
         self, daily_output: ManureTreatmentDailyOutput
@@ -93,7 +84,6 @@ class AnaerobicLagoon(BaseManureTreatment):
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
             manure_volume=daily_output.daily_final_manure_volume,
             manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
-            total_solids=daily_output.liquid_manure_total_solids,
             temp=self._get_current_day_average_temperature_celsius(),
         )
         daily_output.storage_ammonia = storage_ammonia_emission
@@ -119,17 +109,24 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
         self._accumulated_precipitation_volume += self.precipitation_volume
 
-        self._update_methane_emission(daily_output)
-        self._accumulated_output.storage_methane += (daily_output.storage_methane)
-        self._accumulated_output.liquid_manure_total_volatile_solids -= (daily_output.storage_methane *
-                                                     ManureConstants.METHANE_TO_VOLATILE_SOLIDS_FACTOR)
         self._update_ammonia_emission(daily_output)
+        self._update_methane_emission(daily_output)
+
         self._accumulated_output.storage_ammonia += daily_output.storage_ammonia
-        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen -= daily_output.storage_ammonia
-        self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_ammonia
-        self._accumulated_output.liquid_manure_total_solids -= (daily_output.storage_methane *
-                                                     ManureConstants.METHANE_TO_VOLATILE_SOLIDS_FACTOR +
-                                                                daily_output.storage_ammonia)
+        self._accumulated_output.storage_methane += (daily_output.storage_methane)
+
+        new_accumulated_liquid_manure_total_solids = max(
+            self._accumulated_output.liquid_manure_total_solids - daily_output.storage_methane, 0.0
+        )
+        self._accumulated_output.liquid_manure_total_solids = (
+            new_accumulated_liquid_manure_total_solids
+        )
+        new_accumulated_liquid_total_ammoniacal_nitrogen = max(
+            self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - daily_output.storage_ammonia, 0.0
+        )
+        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
+            new_accumulated_liquid_total_ammoniacal_nitrogen
+        )
 
         return daily_output
 
@@ -196,7 +193,6 @@ class AnaerobicLagoon(BaseManureTreatment):
             new_accumulated_output = (
                 self._accumulated_output + manure_treatment_daily_output
             )
-            new_accumulated_output.daily_final_manure_volume -= self.flushing_volume
             return new_accumulated_output
 
     @property

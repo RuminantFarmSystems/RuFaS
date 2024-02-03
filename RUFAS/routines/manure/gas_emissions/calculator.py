@@ -608,7 +608,6 @@ class GasEmissionsCalculator:
             manure_total_ammoniacal_nitrogen: float,
             manure_volume: float,
             manure_density: float,
-            total_solids: float,
             temp: float,
             storage_area_per_animal=GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
             pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
@@ -744,10 +743,8 @@ class GasEmissionsCalculator:
             )
         if manure_volume < 0:
             raise ValueError("Manure volume must be greater than or equal to 0.")
-        if manure_density < 0:
-            raise ValueError("Manure density must be greater than or equal to 0.")
-        if total_solids < 0:
-            raise ValueError("Total solids must be greater than or equal to 0.")
+
+
 
         # If any of the input parameters is 0, then the result will be 0.
         if any(
@@ -758,7 +755,6 @@ class GasEmissionsCalculator:
                     manure_total_ammoniacal_nitrogen,
                     manure_volume,
                     manure_density,
-                    total_solids,
                 ]
         ):
             return 0.0
@@ -770,7 +766,7 @@ class GasEmissionsCalculator:
         storage_area_resistance = cls._ammonia_resistance(
             temp, housing_specific_constant
         )
-        manure_mass_excluding_solids = total_manure_mass - total_solids
+        manure_mass_excluding_solids = total_manure_mass
         equilibrium_coefficient = cls._equilibrium_coefficient(temp_kelvin, pH)
         ammonia_loss = (
                                manure_total_ammoniacal_nitrogen
