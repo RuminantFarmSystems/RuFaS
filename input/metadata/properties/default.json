@@ -4762,9 +4762,9 @@
       "description": "Amount of precipitation (mm H2O).",
       "type":"array",
       "properties": {
-      "type": "number",
-      "minimum": 0,
-      "default": 0
+        "type": "number",
+        "minimum": 0,
+        "default": 0
       }
     },
     "high": {
