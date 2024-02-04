@@ -3260,34 +3260,49 @@
   },
   "user_feeds_properties": {
     "rufas_id": {
-      "type": "number",
+      "type": "array",
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "minimum": 1
+      "properties": {
+        "type": "number",
+        "minimum": 1
+      }
     },
     "Name": {
-      "type": "string",
-      "description": "A general common name for the feed as defined within RuFaS."
+      "type": "array",
+      "description": "A general common name for the feed as defined within RuFaS.",
+      "properties": {
+        "type": "string"
+      }
     },
     "feed_description": {
-      "type": "string",
-      "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name."
+      "type": "array",
+      "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
+      "properties": {
+        "type": "string"
+      }
     },
     "feed_type": {
-      "type": "string",
+      "type": "array",
       "description": "The general type or category of the feed (group).",
-      "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+      "properties": {
+        "type": "string",
+        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+      }
     },
     "units": {
-      "type": "string",
+      "type": "array",
       "description": "The unit of measurement used for the feed.",
-      "pattern": "(kg)"
+      "properties": {
+        "type": "string",
+        "pattern": "(kg)"
+      }
     }
   },
   "NRC_Comp_properties": {
     "rufas_id": {
       "type": "array",
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "properties" {
+      "properties": {
         "type": "number",
         "minimum": 1
       }
