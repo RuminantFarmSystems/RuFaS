@@ -126,6 +126,11 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         )
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
 
+        new_daily_output_liquid_manure_nitrogen = max(
+            daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0
+        )
+        daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
+
         new_daily_output_liquid_manure_total_ammoniacal_nitrogen = max(
             daily_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
         )
@@ -134,6 +139,12 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self._accumulated_output.storage_ammonia += ammonia_loss
         self._accumulated_output.storage_methane += methane_loss
 
+        new_accumulated_liquid_manure_nitrogen = max(
+            self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
+        )
+        self._accumulated_output.liquid_manure_nitrogen = (
+            new_accumulated_liquid_manure_nitrogen
+        )
         new_accumulated_liquid_manure_total_solids = max(
             self._accumulated_output.liquid_manure_total_solids - methane_loss, 0.0
         )
