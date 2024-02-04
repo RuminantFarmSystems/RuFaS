@@ -419,8 +419,8 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return variable_modifiability == Modifiability.REQUIRED_AND_LOCKED or variable_modifiability. \
-            REQUIRED_AND_UNLOCKED
+        return (variable_modifiability == Modifiability.REQUIRED_AND_LOCKED) or \
+               (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
 
     def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
@@ -452,8 +452,8 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED or variable_modifiability. \
-            REQUIRED_AND_UNLOCKED
+        return (variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED) or \
+               (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
 
     def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
             -> None:
@@ -625,8 +625,7 @@ class InputManager:
                                      self.__metadata["properties"][properties_blob_key])
         if var_name not in input_data.keys():
             self._handle_missing_data(variable_properties=variable_properties,
-                                      var_name=var_name,
-                                      info_map=info_map)
+                                      var_name=var_name)
             variable = None
         else:
             variable = input_data[var_name]
@@ -729,9 +728,11 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                print(info_map)
                 self._handle_missing_data(variable_properties=variable_properties,
                                           var_name=var_name)
+                input_data = self._set_nested_value(nested_dict=input_data,
+                                                    element_hierarchy=element_hierarchy,
+                                                    value=None)
                 input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value,

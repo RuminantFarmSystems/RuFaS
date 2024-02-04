@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
+from RUFAS.input_manager import InputManager, Modifiability
 
 
 @pytest.fixture
@@ -2513,3 +2513,56 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
         mock_input_manager._metadata_properties_exist = \
             input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+
+
+@pytest.mark.parametrize('variable_name, variable_properties, expected_modifiability', [
+    ("var1", {"type": "string", "modifiability": "required and locked"}, Modifiability.REQUIRED_AND_LOCKED),
+    ("var2", {"type": "number", "modifiability": "required and unlocked"}, Modifiability.REQUIRED_AND_UNLOCKED),
+    ("var3", {"type": "bool", "modifiability": "not required and unlocked"}, Modifiability.NOT_REQUIRED_AND_UNLOCKED),
+    ("var4", {"type": "object"}, Modifiability.NOT_REQUIRED_AND_UNLOCKED)
+])
+def test_get_variable_modifiability(variable_name: str,
+                                    variable_properties: Dict[str, Any],
+                                    expected_modifiability: Modifiability,
+                                    mock_input_manager: InputManager,
+                                    input_manager_original_method_states: Dict[str, Callable]
+                                    ) -> None:
+    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+        actual_modifiability = mock_input_manager._get_variable_modifiability(variable_name=variable_name,
+                                                                              variable_properties=variable_properties)
+
+        mock_om_add_error.assert_not_called()
+        assert actual_modifiability == expected_modifiability
+
+
+@pytest.mark.parametrize('variable_name, variable_properties', [
+    ("var1", {"type": "string", "modifiability": "a"}),
+    ("var2", {"type": "number", "modifiability": "b"}),
+    ("var3", {"type": "bool", "modifiability": "c"}),
+    ("var4", {"type": "object", "modifiability": "d"})
+])
+def test_get_variable_modifiability_key_error(variable_name: str,
+                                              variable_properties: Dict[str, Any],
+                                              mock_input_manager: InputManager,
+                                              input_manager_original_method_states: Dict[str, Callable]
+                                              ) -> None:
+    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+        with pytest.raises(KeyError):
+            actual_modifiability = mock_input_manager._get_variable_modifiability(
+                variable_name=variable_name,
+                variable_properties=variable_properties)
+
+            mock_om_add_error.assert_called_once()
+            assert actual_modifiability is None
+
+
+# def test_get_caller_function(mock_input_manager) -> None:
+#     mock_stack = patch('RUFAS.input_manager.inspect.stack')
+#     mock_frame = MagicMock()
+#     mock_frame.function = 'known_caller_function'
+#     mock_stack.return_value = [MagicMock(), MagicMock(), mock_frame]
+#
+#     # Call _get_caller_function and capture the result
+#     caller_name = mock_input_manager._get_caller_function()
+#
+#     print(caller_name)
