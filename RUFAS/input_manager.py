@@ -245,7 +245,6 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
-                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 input_data = data_loader(file_path)
             except KeyError:
@@ -258,16 +257,10 @@ class InputManager:
             for metadata_property in metadata_properties.keys():
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
-                if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
-                                                                               filtered_input_data, eager_termination,
-                                                                               element_counter_and_validity)
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(metadata_property,
-                                                                                  properties_blob_key,
-                                                                                  filtered_input_data,
-                                                                                  eager_termination,
-                                                                                  element_counter_and_validity)
+
+                element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
+                                                                           filtered_input_data, eager_termination,
+                                                                           element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
