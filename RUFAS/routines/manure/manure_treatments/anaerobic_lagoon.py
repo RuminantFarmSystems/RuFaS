@@ -73,12 +73,6 @@ class AnaerobicLagoon(BaseManureTreatment):
             Update the `storage_ammonia` attribute of the accumulated output object.
 
         """
-        #manure_total_ammoniacal_nitrogen = max(
-        #    daily_output.liquid_manure_total_ammoniacal_nitrogen
-        #    + self._current_pen.manure.urine_total_ammoniacal_nitrogen
-         #   - self._manure_handler_daily_output.housing_ammonia,
-         #   0.0,
-       #)
         storage_ammonia_emission = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
