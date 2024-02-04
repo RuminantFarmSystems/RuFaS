@@ -3618,9 +3618,12 @@
       }
     },
     "feed_type": {
-      "type": "string",
+      "type": "array",
       "description": "The general type or category of the feed.",
-      "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+      "properties":{
+        "type": "string",
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+      }
     },
     "DM": {
       "type": "array",
@@ -3685,10 +3688,13 @@
       }
     },
     "RUP": {
-      "type": "number",
+      "type": "array",
       "description": "Rumen undegradable protein (% CP).",
-      "minimum": 0,
-      "maximum": 100
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      }
     },
     "dRUP": {
       "type": "array",
@@ -3700,10 +3706,13 @@
       }
     },
     "sol_prot": {
-      "type": "number",
+      "type": "array",
       "description": "Soluble protein (% CP).",
-      "minimum": 0,
-      "maximum": 100
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      }
     },
     "ADICP": {
       "type": "array",
@@ -3746,11 +3755,14 @@
       }
     },
     "NDF48": {
-      "type": "number",
+      "type": "array",
       "description": "In vitro 48-hour digestibility (% NDF).",
-      "minimum": 0,
-      "maximum": 89,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 89,
+        "default": 0
+      }
     },
     "lignin": {
       "type": "array",
@@ -3773,18 +3785,24 @@
       }
     },
     "WSC": {
-      "type": "number",
+      "type": "array",
       "description": "Water soluble carbohydrates (% DM).",
-      "minimum": 0,
-      "maximum": 100,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      }
     },
     "FA": {
-      "type": "number",
+      "type": "array",
       "description": "Fatty acids (% DM).",
-      "minimum": 0,
-      "maximum": 100,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      }
     },
     "EE": {
       "type": "array",
@@ -3797,11 +3815,14 @@
       }
     },
     "DE_Base": {
-      "type": "number",
+      "type": "array",
       "description": "Digestible energy standard (Mcal/kg).",
-      "minimum": 0,
-      "maximum": 100,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0
+      }
     },
     "calcium": {
       "type": "array",
@@ -3874,208 +3895,361 @@
       }
     },
     "copper": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "iron": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "manganese": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "zinc": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "molibdenum": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "chromium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "cobalt": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "iodine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "selenium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "arginine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "histidine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "isoleucine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "leucine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "lysine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "methionine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "phenylalanine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "threonine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "triptophan": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "valine": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C120_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C140_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C160_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C161_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C180_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C181t_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C181c_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C182_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "C183_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "otherFA_FA": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "NPN_source": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "starch_digested": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "FA_dig": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "P_inorg": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "P_org": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "B_Carotene": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "biotin": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "choline": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "niacin": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Vit_A": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Vit_D": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Vit_E": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_calcium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_phosphorus": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_sodium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_chloride": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_potassium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_copper": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_iron": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_magnesium": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_manganesum": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "Abs_zinc": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "is_fat": {
       "type": "array",
@@ -4099,12 +4273,18 @@
       } 
     },
     "limit": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "lower_limit": {
-      "type": "number",
-      "description": ""
+      "type": "array",
+      "description": "",
+      "properties": {
+        "type": "number"
+      }
     },
     "TDN": {
       "type": "array",
@@ -4119,7 +4299,7 @@
       "properties": {
         "type": "number"
       }
-    },
+    }
   },
   "manure_management_properties": {
     "manure_management_scenarios": {
