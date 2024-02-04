@@ -1583,9 +1583,11 @@ def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture) -> None:
         "nutrient_standard": nutrient_standard
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
-    weight = HeiferI.get_non_preg_bw_change(heiferI)
-    calc_weight = 0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight  # divisor == 1
-    assert weight == calc_weight
+    
+    actual_weight = HeiferI.get_non_preg_bw_change(heiferI)
+    
+    expected_weight = 0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight  # divisor == 1
+    assert actual_weight == expected_weight
 
 
 def test_heiferI_get_heiferI_values(mocker: MockerFixture) -> None:
