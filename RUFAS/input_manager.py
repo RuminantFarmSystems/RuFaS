@@ -492,7 +492,6 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": caller_function
         }
-
         if is_initialization:
             is_input_required_upon_initialization = self._is_input_required_upon_initialization(
                 variable_name=var_name,
@@ -626,7 +625,11 @@ class InputManager:
         if var_name not in input_data.keys():
             self._handle_missing_data(variable_properties=variable_properties,
                                       var_name=var_name)
-            variable = None
+            return {"fixed_elements": 0,
+                    "total_elements": 0,
+                    "valid_elements": 0,
+                    "invalid_elements": 0,
+                    "is_valid": False}
         else:
             variable = input_data[var_name]
 
