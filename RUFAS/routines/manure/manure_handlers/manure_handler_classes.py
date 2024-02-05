@@ -164,6 +164,7 @@ class BaseManureHandler:
                 )
             ),
             tempC=self._get_current_day_average_temperature_in_celsius(),
+            num_animals=pen.num_animals
         )
 
         return daily_output
@@ -247,7 +248,7 @@ class Harrowing(BaseManureHandler):
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
 
-    Attributes
+    Attribute
     ----------
     cleaning_water_use_rate : float
         Amount of cleaning water used per animal per day, L.
