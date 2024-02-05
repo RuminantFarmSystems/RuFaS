@@ -18,6 +18,7 @@ class AnimalCombination(Enum):
         Represents a pen with lactating cows only.
     GROWING_AND_CLOSE_UP: int
         Represents a pen with all heifers and dry cows only.
+
     """
 
     CALF = 0  # calves

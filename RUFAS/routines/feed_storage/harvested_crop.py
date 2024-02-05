@@ -71,6 +71,7 @@ class HarvestedCrop:
         ------
         ValueError
             If the crop type is not valid for the crop category.
+
         """
         category_to_type = {
             CropCategory.SMALL_GRAIN: [

@@ -19,6 +19,7 @@ class AnimalType(Enum):
         A cow in the stage of their lactation cycle where milk production ceases prior to calving.
     LAC_COW : str
         A lactating cow.
+
     """
 
     CALF = 'Calf'

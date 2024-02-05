@@ -162,6 +162,7 @@ class Snow:
         ------
         ValueError
             If the snow_content is < 0.0.
+
         """
         if self.soil_data.snow_content < 0.0:
             raise ValueError("Snow Content should not be a negative number.")

@@ -30,6 +30,7 @@ class ManureTreatmentType(DefaultEnum):
     Notes
     -----
     The DEFAULT manure treatmenet type is SLURRY_STORAGE_UNDERFLOOR
+
     """
 
     SLURRY_STORAGE_UNDERFLOOR = "slurry storage underfloor"

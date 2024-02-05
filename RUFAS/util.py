@@ -74,7 +74,9 @@ class Utility:
             return Path(__file__).resolve().parents[1]
 
     @staticmethod
-    def read_json_file(file_path: Path):
+    def read_json_file(
+        file_path: Path
+    ) -> Dict[Any, Any]:
         """
         Description:
             Reads and interprets the JSON file at the given path. Compiles the
@@ -86,12 +88,13 @@ class Utility:
 
         Raises
         ------
-        InvalidJSONFileError:
+        InvalidJSONFileError
             If the json file at the given path does not conform with the format required.
 
         Returns
         -------
-        data: the data read from the json file
+        Dict[Any, Any]
+            The data read from the json file.
 
         """
 

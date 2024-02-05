@@ -140,6 +140,7 @@ class InputManager:
         ------
         Exception
             For any other unexpected errors during JSON file loading.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_json.__name__,
@@ -173,6 +174,7 @@ class InputManager:
             If the CSV file does not exist at the specified path.
         Exception
             For any other unexpected errors during CSV file loading.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_csv.__name__,
@@ -211,6 +213,7 @@ class InputManager:
         ------
         KeyError
             If faulty data type found in data blob key.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._populate_pool.__name__,

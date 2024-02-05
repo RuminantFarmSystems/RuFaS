@@ -40,6 +40,7 @@ class ManureSeparatorType(DefaultEnum):
     -----
     The default organic separator is ROTARY_SCREEN.
     The default sand lane separation method is SAND_LANE_MANURE_SEPARATION.
+
     """
 
     ROTARY_SCREEN = "rotary screen"

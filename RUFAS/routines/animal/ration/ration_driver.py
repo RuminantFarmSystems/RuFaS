@@ -1011,6 +1011,7 @@ class AvailableFeeds:
         ------
         KeyError
             If the feed id is not found in the feed id list.
+
         """
         # An explanation of code seen below can be found in Basecamp with the following path:
         # RuFaS > Docs & Files > Animal Module > Ration Driver Logic

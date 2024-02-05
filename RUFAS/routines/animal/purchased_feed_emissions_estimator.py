@@ -96,6 +96,7 @@ class PurchasedFeedEmissionsEstimator:
             If the return value from the FCC's API is null.
         requests.exceptions.RequestException
             If the max attempts to reach FCC's API was reached and all attempts failed.
+
         """
         info_map = {
             "class": self.__class__.__name__,

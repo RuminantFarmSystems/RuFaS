@@ -650,6 +650,7 @@ class Cow(HeiferIII):
         ------
         ValueError
             If reproduction program not in list of current reproduction programs.
+
         """
         if self.culled:
             return None
