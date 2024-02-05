@@ -122,7 +122,6 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         daily_input = self._current_manure_treatment_daily_input
 
-
         total_nitrogen_loss = (
             GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
                 daily_nitrogen_input=daily_input.liquid_manure_nitrogen,

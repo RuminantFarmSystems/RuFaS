@@ -67,9 +67,9 @@ class ManureConstants:
 
     METHANE_TO_VOLATILE_SOLIDS_FACTOR = 3
     """
-    The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3. 
+    The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3.
     """
-  
+
     LIQUID_MANURE_SOLIDS_FRACTION = 0.05
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed

@@ -118,7 +118,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             ),
         )
 
-
         daily_output.storage_methane = methane_loss
         daily_output.storage_ammonia = ammonia_loss
         new_daily_output_liquid_manure_total_solids = max(

@@ -107,8 +107,6 @@ class ManureManagerPen:
 
         barn_area = barn_area_by_pen_type.get(self.pen_type, default)
 
-
         if "Cow" in self.classes_in_pen:
             return barn_area.has_cows*self.num_stalls
-        else:
-            return barn_area.no_cows*self.num_stalls
+        return barn_area.no_cows*self.num_stalls

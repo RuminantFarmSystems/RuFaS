@@ -744,7 +744,6 @@ class GasEmissionsCalculator:
         if manure_volume < 0:
             raise ValueError("Manure volume must be greater than or equal to 0.")
 
-
         # If any of the input parameters is 0, then the result will be 0.
         if any(
                 param == 0
@@ -760,7 +759,7 @@ class GasEmissionsCalculator:
 
         total_storage_area = num_animals * storage_area_per_animal
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        total_manure_mass =(manure_volume * manure_density)/total_storage_area
+        total_manure_mass = (manure_volume * manure_density)/total_storage_area
         manure_total_ammoniacal_nitrogen_per_area = manure_total_ammoniacal_nitrogen/total_storage_area
         storage_area_resistance = GasEmissionConstants.STORAGE_HSC
         equilibrium_coefficient = cls._equilibrium_coefficient(temp_kelvin, pH)
