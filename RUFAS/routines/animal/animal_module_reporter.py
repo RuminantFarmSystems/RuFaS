@@ -23,8 +23,9 @@ class AnimalModuleReporter:
 
         """
         info_map = {
-            "class": "AnimalManager",
-            "function": "daily_updates",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_animal_population.__name__,
+            "data_origin": [("AnimalManager", "daily_updates")],
         }
         om.add_variable("sim_day", animal_manager.simulation_day, info_map)
         om.add_variable(
@@ -65,8 +66,9 @@ class AnimalModuleReporter:
 
         """
         info_map = {
-            "class": "Cow",
-            "function": "milking_update",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_milk.__name__,
+            "data_origin": [("Cow", "milking_update")],
         }
 
         for animal in list(pen.animals_in_pen.values()):
@@ -115,6 +117,7 @@ class AnimalModuleReporter:
             info_map = {
                 "class": "AnimalManager",
                 "function": "_calc_ration_at_interval",
+                "data_origin": [("AnimalManager", "_calc_ration_at_interval")],
                 "number_animals_in_pen": len(pen.animals_in_pen),
                 "simulation_day": simulation_day,
             }
@@ -162,8 +165,9 @@ class AnimalModuleReporter:
 
         """
         info_map = {
-            "class": "AnimalModuleReporter",
-            "function": "report_daily_ration",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_ration.__name__,
+            "data_origin": [("AnimalModuleReporter", "report_daily_ration")],
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
@@ -210,6 +214,7 @@ class AnimalModuleReporter:
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
+            "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
         }
         daily_feed_emissions = animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(
             ration_total
@@ -237,6 +242,7 @@ class AnimalModuleReporter:
                 info_map = {
                     "class": "AnimalManager",
                     "function": "daily_updates",
+                    "data_origin": [("AnimalManager", "daily_updates")],
                 }
                 om.add_variable(
                     f'{output_data_dict["prefix"]}_{str(manure_property)}',
@@ -254,8 +260,9 @@ class AnimalModuleReporter:
             Current pen.
         """
         info_map = {
-            "class": "pen",
-            "function": "calc_manure",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_pen_manure.__name__,
+            "data_origin": [("Pen", "calc_manure")],
             "pen_id": pen.id,
             "pen_animal_combination": pen.animal_combination._name_,
         }
@@ -270,7 +277,11 @@ class AnimalModuleReporter:
         pen : Pen
             Current pen.
         """
-        info_map = {"class": "pen", "function": "calc_total_manure"}
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_pen_manure_properties.__name__,
+            "data_origin": [("Pen", "calc_total_manure")]
+        }
         for manure_property, manure_value in pen.manure.items():
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
@@ -288,7 +299,11 @@ class AnimalModuleReporter:
         sim_day : int
             Day of simulation.
         """
-        info_map = {"class": "LifeCycleManager", "function": "daily_update"}
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_life_cycle_manager_data.__name__,
+            "data_origin": [("LifeCycleManager", "daily_update")],
+        }
         om.add_variable(
             "sold_heiferIII_oversupply_num",
             life_cycle_manager.sold_heiferIII_oversupply_num,
@@ -449,8 +464,8 @@ class AnimalModuleReporter:
         )
 
         info_map = {
-            "class": "AnimalModuleReporter",
-            "function": "report_sold_animal_information",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_sold_animal_information.__name__,
         }
         for animal in sold_animals:
             om.add_variable("animal_id", animal.id, info_map)
@@ -495,7 +510,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": "AnimalModuleReporter",
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.__name__,
         }
 
@@ -539,8 +554,9 @@ class AnimalModuleReporter:
 
         """
         info_map = {
-            "class": "cow",
-            "function": "update_milk_production_history",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_305d_milk.__name__,
+            "data_origin": [("Cow", "update_milk_production_history")]
         }
         milk_history_list = [
             cow.latest_milk_production_305days
