@@ -254,7 +254,8 @@ class AnimalRequirements:
             Dictionary of lists of animal requirements for all animals
 
         """
-        for animal in pen.animals_in_pen:
+        for animal_id in pen.animals_in_pen:
+            animal = pen.animals_in_pen[animal_id]
             animal_type = animal_grouping_scenario.get_animal_type(animal)
             if animal_type in [AnimalType.HEIFER_I]:
                 req = self.calc_rqmts(
@@ -353,7 +354,8 @@ class AnimalRequirements:
             Dictionary of lists of animal requirements for all animals in pen
 
         """
-        for animal in pen.animals_in_pen:
+        for animal_id in pen.animals_in_pen:
+            animal = pen.animals_in_pen[animal_id]
             animal_type = animal_grouping_scenario.get_animal_type(animal)
             if animal_type in [AnimalType.LAC_COW]:
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)

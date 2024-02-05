@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Dict
 from typing import Optional
 from typing import Tuple
@@ -16,6 +14,7 @@ from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLa
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
     BaseManureTreatment,
 )
+from RUFAS.routines.manure.manure_treatments.composting import Composting
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
     DefaultManureTreatmentConfigFactory,
 )
@@ -73,9 +72,10 @@ class ManureTreatmentFactory:
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
             ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
             ManureTreatmentType.OPEN_LOTS: OpenLots,
+            ManureTreatmentType.COMPOSTING: Composting
         }
 
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)

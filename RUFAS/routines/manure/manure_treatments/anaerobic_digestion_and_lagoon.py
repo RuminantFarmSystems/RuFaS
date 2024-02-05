@@ -73,18 +73,18 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             self._create_anaerobic_digestion_daily_output()
         )
 
-        self._manure_separator_daily_output = (
-            self._manure_separator.daily_update(
+        self._manure_separator_after_digestion_daily_output = (
+            self._manure_separator_after_digestion.daily_update(
                 manure_separator_daily_input=self.anaerobic_digestion_daily_output,
             )
-            if self._manure_separator
+            if self._manure_separator_after_digestion
             else None
         )
 
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
             manure_handler_daily_output=self._manure_handler_daily_output,
             manure_treatment_daily_input=(
-                self._manure_separator_daily_output
+                self._manure_separator_after_digestion_daily_output
                 or self.anaerobic_digestion_daily_output
             ),
             pen=self._current_pen,

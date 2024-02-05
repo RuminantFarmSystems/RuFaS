@@ -151,7 +151,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             average_temperature_celsius: Average daily temperature, C.
 
         """
-        return max(average_temperature_celsius, 4.0)  # TODO: Use constants instead
+        return max(average_temperature_celsius, 4.0)  # TODO: Use constants instead - Issue #1120
 
     @classmethod
     def _calc_manure_heat_capacity(
@@ -167,7 +167,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             Heat capacity of manure, kJ /kg /C.
 
         """
-        # TODO: Name the constants if you can
+        # TODO: Name the constants if you can - Issue #1120
         return (
             0.68298
             + 0.025662 * average_temperature_celsius

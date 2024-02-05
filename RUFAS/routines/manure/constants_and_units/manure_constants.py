@@ -33,6 +33,9 @@ class ManureConstants:
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE = 0.5
     """Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5."""
 
+    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING = 0.35
+    """Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35."""
+
     EFFECTIVE_MICROBIAL_DECOMP_RATE = 2.37e-3
     """The effectiveness of microbial decomposition rate (unitless)."""
 
@@ -57,10 +60,16 @@ class ManureConstants:
     Default is set to 0.5.
     """
 
+    COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR = 0.01
+    """
+    The constant factor for indirect N2O emissions lost due to leaching and NH3.
+    """
+
     METHANE_TO_VOLATILE_SOLIDS_FACTOR = 3
     """
     The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3. 
     """
+  
     LIQUID_MANURE_SOLIDS_FRACTION = 0.05
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed
