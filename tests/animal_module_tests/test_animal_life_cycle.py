@@ -1655,7 +1655,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
     assert heiferI.body_weight == 1134.0
     heiferI.update_body_weight_history.assert_called()
     heiferI.get_non_preg_bw_change.assert_called()
-=======
+
 @pytest.mark.parametrize(
     'args',
     [
