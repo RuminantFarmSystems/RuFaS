@@ -33,12 +33,12 @@ class Config:
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
-        self.start_full_date = data["start_date"].split(":")
-        self.end_full_date = data["end_date"].split(":")
-        self.start_year = int(self.start_full_date[0])
-        self.end_year = int(self.end_full_date[0])
-        self.start_day = int(self.start_full_date[1])
-        self.end_day = int(self.end_full_date[1])
+        self.start_full_date: list[str] = data["start_date"].split(":")
+        self.end_full_date: list[str] = data["end_date"].split(":")
+        self.start_year: int = int(self.start_full_date[0])
+        self.end_year: int = int(self.end_full_date[0])
+        self.start_day: int = int(self.start_full_date[1])
+        self.end_day: int = int(self.end_full_date[1])
 
         # set seed attributes
         self.set_seed = data["set_seed"]
@@ -52,12 +52,12 @@ class Config:
         year_length = 365
         leap_year_length = 366
 
-        self.w_start_year = self.start_year
-        self.w_start_day = self.start_day
-        self.w_end_year = self.end_year
-        self.w_end_day = self.end_day
+        self.w_start_year: int = self.start_year
+        self.w_start_day: int = self.start_day
+        self.w_end_year: int = self.end_year
+        self.w_end_day: int = self.end_day
 
-        self.years = []
+        self.years: list[list[int]] = []
 
         for year in range(self.start_year, self.end_year + 1):
             if year == self.start_year == self.end_year:

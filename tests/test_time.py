@@ -9,35 +9,81 @@ from RUFAS.time import Time
 def mock_config() -> Config:
     config = MagicMock(Config)
     setattr(config, "start_year", 1999)
-    setattr(config, "years", [[1]])
+    setattr(config, "years", [[None, 2, 3], [1]])
     setattr(config, "leap_year_length", 366)
     setattr(config, "year_length", 365)
     return config
 
 
-def test_time_initialization() -> None:
+def test_time_initialization(mock_config: Config) -> None:
     """Tests that Time instances are created correctly."""
-    pass
+    time = Time(mock_config)
+    assert time.start_year == 1999 and time.calendar_year == 1999
+    assert time.leap_year_length == 366
+    assert time.year_length == 365
+    assert time.day == 2
+    assert time.index == 0
+    assert time.year == 1
+    assert time.years == [[None, 2, 3], [1]]
 
 
-def test_to_str() -> None:
+def test_to_str(mock_config: Config) -> None:
     """Tests that string representations are correctly created for Time instances."""
-    pass
+    time = Time(mock_config)
+    assert time.to_str() == "Year: 1 Day: 2"
 
 
-def test_advance() -> None:
+def test_advance(mock_config: Config) -> None:
     """Tests that Time instances are advanced correctly."""
-    pass
+    time = Time(mock_config)
+    time.advance()
+    assert time.index == 1
+    assert time.day == 3
+    assert time.year == 1
+    assert time.calendar_year == 1999
+
+    # second round of advance, move to a new year
+    time.advance()
+    assert time.index == 2
+    assert time.day == 4
+    assert time.year == 1
+    assert time.calendar_year == 1999
+
+    time.advance()
+    assert time.index == 3
+    assert time.day == 1
+    assert time.year == 2
+    assert time.calendar_year == 2000
 
 
-def test_end_year() -> None:
+def test_end_year(mock_config: Config) -> None:
     """Tests that Time instances correctly determine if it is the end of a year."""
-    pass
+    time = Time(mock_config)
+    assert not time.end_year()
+    time.advance()
+    assert not time.end_year()
+    time.advance()
+    assert time.end_year()
 
 
-def test_end_simulation() -> None:
+def test_end_simulation(mock_config: Config) -> None:
     """Tests that Time instances correctly determine if the simulation has ended."""
-    pass
+    # case when year is less than the length of years list
+    time = Time(mock_config)
+    assert not time.end_simulation()
+
+    # case years equals
+    time.advance()
+    assert not time.end_simulation()
+    time.advance()
+    assert not time.end_simulation()
+
+    # case when year out of range
+    time.advance()
+    assert not time.end_simulation()
+
+    time.advance()
+    assert time.end_simulation()
 
 
 def test_record_time(mock_config: Config) -> None:
@@ -48,6 +94,10 @@ def test_record_time(mock_config: Config) -> None:
         assert add_var.call_count == 3
 
 
-def test_is_last_day_of_simulation() -> None:
+def test_is_last_day_of_simulation(mock_config: Config) -> None:
     """Tests that Time instances correctly determine if current day is last day of a simulation."""
-    pass
+    time = Time(mock_config)
+    time.advance()
+    time.advance()
+    time.advance()
+    assert time.is_last_day_of_simulation

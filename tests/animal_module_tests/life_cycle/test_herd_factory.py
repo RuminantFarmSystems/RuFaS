@@ -369,6 +369,16 @@ def test_heiferIII_update_cow_stage_true_day_less_than_3000(heiferIII_num: int,
     mock_cow_init = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.__init__",
                                  return_value=None)
 
+    mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.AnimalBase.config",
+                 return_value={
+                     'cow_repro_method': None,
+                     'cows': {
+                         'presynch_protocol': None,
+                         'repro_sub_protocol': None,
+                         'resynch_protocol': None
+                     }
+                 })
+
     mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.heiferIIIs = mock_heiferIIIs
     mock_pre_animal_population.cows = []
@@ -407,6 +417,16 @@ def test_heiferIII_update_cow_stage_true_day_greater_than_3000(heiferIII_num: in
         return_value={})
     mock_cow_init = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.__init__",
                                  return_value=None)
+
+    mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.AnimalBase.config",
+                 return_value={
+                     'cow_repro_method': None,
+                     'cows': {
+                         'presynch_protocol': None,
+                         'repro_sub_protocol': None,
+                         'resynch_protocol': None
+                     }
+                 })
 
     mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.heiferIIIs = mock_heiferIIIs

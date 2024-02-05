@@ -75,9 +75,6 @@ class AnimalModuleConstants:
     MILK_LACTOSE = 4.85
     """Milk lactose content, percentage."""
 
-    MILK_TRUE_PROTEIN = 3.5
-    """Milk true protein content, percentage."""
-
     DMI_CONSTRAINT_PERCENT = 0.20
     """The +/- percentage of DMI estimated allowed for ration formulation"""
 

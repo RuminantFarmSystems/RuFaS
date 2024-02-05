@@ -11,7 +11,7 @@
       2012
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "optimal"
@@ -25,7 +25,8 @@
       2012
     ],
     "pattern_repeat": 0,
-    "pattern_skip": 0
+    "planting_skip": 0,
+    "harvesting_skip": 0
   },
   {
     "crop_species": "corn_grain",
@@ -36,7 +37,7 @@
       2013
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "scheduled"
@@ -48,7 +49,8 @@
       2013
     ],
     "pattern_repeat": 0,
-    "pattern_skip": 0
+    "planting_skip": 0,
+    "harvesting_skip": 0
   }
 ]
 }

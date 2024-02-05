@@ -3,8 +3,10 @@ import numpy as np
 import sys
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 om = OutputManager()
 
@@ -48,6 +50,7 @@ class AnimalModuleReporter:
             len([cow for cow in animal_manager.cows if not cow.is_lactating]),
             info_map,
         )
+        om.add_variable("num_cows_total", len(animal_manager.cows), info_map)
 
     def report_milk(pen, simulation_day: int) -> None:
         """
@@ -66,7 +69,7 @@ class AnimalModuleReporter:
             "function": "milking_update",
         }
 
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             milk_data_update = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update[
@@ -135,7 +138,7 @@ class AnimalModuleReporter:
                 ration_per_animal,
                 info_map,
             )
-            if pen.animal_combination != pen.AnimalCombination.CALF:
+            if pen.animal_combination != AnimalCombination.CALF:
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
                     feed.available_feeds,
@@ -275,6 +278,7 @@ class AnimalModuleReporter:
                 info_map=info_map,
             )
 
+    @staticmethod
     def report_life_cycle_manager_data(life_cycle_manager, sim_day: int) -> None:
         """
         Adds daily life cycle data to output manager.
@@ -300,6 +304,9 @@ class AnimalModuleReporter:
             "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, info_map
         )
         om.add_variable(
+            "sold_cow_num", life_cycle_manager.sold_cow_num, info_map
+        )
+        om.add_variable(
             "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, info_map
         )
         om.add_variable(
@@ -321,12 +328,27 @@ class AnimalModuleReporter:
             "daily_milk_production", life_cycle_manager.daily_milk_production, info_map
         )
         om.add_variable(
+            "dry_cows_daily_milk_production", life_cycle_manager.dry_cows_daily_milk_production, info_map
+        )
+        om.add_variable(
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
+        )
+        om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
         )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
             info_map,
+        )
+        om.add_variable(
+            "dry_cows_milk_protein_kg", life_cycle_manager.dry_cows_milk_protein_kg, info_map
         )
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, info_map)
@@ -407,6 +429,7 @@ class AnimalModuleReporter:
             "cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map
         )
 
+    @staticmethod
     def report_sold_animal_information(animal_manager) -> None:
         """
         Adds a dictionary of sold animal information to the output manager.
@@ -418,9 +441,11 @@ class AnimalModuleReporter:
 
         """
         sold_animals = (
-            animal_manager.life_cycle_manager.sold_heiferIIs
-            + animal_manager.life_cycle_manager.sold_heiferIIIs
-            + animal_manager.life_cycle_manager.sold_and_died_cows
+                animal_manager.life_cycle_manager.sold_calves
+                + animal_manager.life_cycle_manager.sold_heiferIIs
+                + animal_manager.life_cycle_manager.sold_heiferIIIs
+                + list(filter(lambda cow: cow.cull_reason != animal_constants.DEATH_CULL,
+                              animal_manager.life_cycle_manager.sold_and_died_cows))
         )
 
         info_map = {
@@ -431,6 +456,11 @@ class AnimalModuleReporter:
             om.add_variable("animal_id", animal.id, info_map)
             om.add_variable("animal_type", animal.__class__.__name__, info_map)
             om.add_variable("body_weight", animal.body_weight, info_map)
+
+            if hasattr(animal, "sold_at_day"):
+                om.add_variable("sold_day", animal.sold_at_day, info_map)
+            else:
+                om.add_variable("sold_day", "NA", info_map)
 
             if hasattr(animal, "cull_reason"):
                 om.add_variable("cull_reason", animal.cull_reason, info_map)
@@ -447,16 +477,17 @@ class AnimalModuleReporter:
             else:
                 om.add_variable("parity", "NA", info_map)
 
+    @staticmethod
     def report_sold_animal_information_sort_by_sell_day(
-        sold_animals, report_name: str, total_days: int
+            sold_animals, report_name: str, total_days: int
     ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of Class AnimalManager.
+        sold_animals : list[object]
+            List of sold animals.
         report_name : str
             The string to be appended to the variable being reported to the OM.
         total_days : int
@@ -484,7 +515,7 @@ class AnimalModuleReporter:
 
         om.add_variable(f"{report_name}_first_sell_event", sold_at_day_min, info_map)
         om.add_variable(f"{report_name}_last_sell_event", sold_at_day_max, info_map)
-        for day in range(total_days):
+        for day in range(1, total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(
@@ -546,6 +577,7 @@ class AnimalModuleReporter:
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
+    @staticmethod
     def report_end_of_simulation(animal_manager, total_days: int) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -559,6 +591,11 @@ class AnimalModuleReporter:
         """
         AnimalModuleReporter.report_sold_animal_information(animal_manager)
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+            animal_manager.life_cycle_manager.sold_calves,
+            "sold_calves",
+            total_days,
+        )
+        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
             animal_manager.life_cycle_manager.sold_heiferIIs, "heiferII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -567,5 +604,10 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
             animal_manager.life_cycle_manager.sold_and_died_cows,
             "sold_and_died_cows",
+            total_days,
+        )
+        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+            animal_manager.life_cycle_manager.sold_cows,
+            "sold_cows",
             total_days,
         )

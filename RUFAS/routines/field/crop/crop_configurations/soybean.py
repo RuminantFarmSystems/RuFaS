@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -15,6 +17,9 @@ class Soybean(CropData):
     scientific_name: str = "Glycine max"
     plant_category: PlantCategory = PlantCategory("warm_annual_legume")
     is_nitrogen_fixer: bool = True
+
+    crop_category: CropCategory = CropCategory.SOY
+    storage_type: StorageType = StorageType.DRY
 
     minimum_temperature: float = 10.0
     optimal_temperature: float = 25.0
@@ -53,19 +58,42 @@ class SoybeanGrain(Soybean):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=1.516
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=39.98
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=16.826
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=4.17
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=6.992
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=11.883
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=9.0
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=5.31
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.063968
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00654
+    yield_phosphorus_fraction: float, default=0.00654
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
     species: str = "soybean_grain"
     name: str = "soybean grain"
 
+    crop_type: CropType = CropType.GRAIN
+
     optimal_harvest_index: float = 0.35
     min_harvest_index: float = 0.26
     dry_matter_percentage: float = 89.105
     lignin_dry_matter_percentage: float = 1.516
+    crude_protein_percent: float = 39.98
+    non_protein_nitrogen: float = 16.826
+    starch: float = 4.17
+    adf: float = 6.992
+    ndf: float = 11.883
+    sugar: float = 9.0
+    ash: float = 5.31
     yield_nitrogen_fraction: float = 0.063968
     yield_phosphorus_fraction: float = 0.00654
 
@@ -85,18 +113,41 @@ class SoybeanHay(Soybean):
         Percentage of harvested crop biomass that is dry matter (unitless).
     lignin_dry_matter_percentage: float, default=7.227
         Percentage of dry matter yield that is lignin (unitless).
+    crude_protein_percent: float, default=20.083
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen: float, default=7.41
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch: float, default=5.732
+        Percentage of dry matter mass that is starch (unitless).
+    adf: float, default=31.3
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf: float, default=40.278
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar: float, default=7.784
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash: float, default=9.045
+        Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0321328
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0028
+    yield_phosphorus_fraction: float, default=0.0028
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
     species: str = "soybean_hay"
     name: str = "soybean hay"
 
+    crop_type: CropType = CropType.FORAGE
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.54
     dry_matter_percentage: float = 91.578
     lignin_dry_matter_percentage: float = 7.227
+    crude_protein_percent: float = 20.083
+    non_protein_nitrogen: float = 7.41
+    starch: float = 5.732
+    adf: float = 31.3
+    ndf: float = 40.278
+    sugar: float = 7.784
+    ash: float = 9.045
     yield_nitrogen_fraction: float = 0.0321328
     yield_phosphorus_fraction: float = 0.0028

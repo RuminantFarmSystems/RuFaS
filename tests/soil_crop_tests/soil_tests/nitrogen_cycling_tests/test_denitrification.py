@@ -25,8 +25,8 @@ def test_calculate_denitrification_amount(nitrates: float, denitrification_rate:
 
 
 def test_denitrify() -> None:
-    """Tests that the main routine correctly gets the amount of nitrates nitrified and removes it from the nitrate
-        pool.
+    """
+    Tests that the main routine correctly gets the amount of nitrates nitrified and removes it from the nitrate pool.
 
     Notes
     -----
@@ -45,6 +45,7 @@ def test_denitrify() -> None:
         incorp.data.set_vectorized_layer_attribute("denitrification_threshold_water_content", [0.5, 1.3, 0.5, 0.5])
         incorp.data.set_vectorized_layer_attribute("denitrification_rate_coefficient", [1.5] * 4)
         incorp.data.set_vectorized_layer_attribute("soil_overall_carbon_fraction", [0.65] * 4)
+        incorp.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.11] * 4)
         incorp._calculate_denitrification_amount = MagicMock(return_value=15)
 
         incorp.denitrify()
@@ -53,6 +54,8 @@ def test_denitrify() -> None:
         incorp._calculate_denitrification_amount.assert_has_calls(nitrification_amount_calls)
         for index in [0, 2, 3]:
             assert incorp.data.soil_layers[index].nitrate_content == 20
-            assert incorp.data.soil_layers[index].annual_denitrified_nitrogen_total == 15
+            assert incorp.data.soil_layers[index].nitrous_oxide_emissions == 15
+            assert incorp.data.soil_layers[index].annual_nitrous_oxide_emissions_total == 15
         assert incorp.data.soil_layers[1].nitrate_content == 35
-        assert incorp.data.soil_layers[1].annual_denitrified_nitrogen_total == 0
+        assert incorp.data.soil_layers[1].nitrous_oxide_emissions == 0.0
+        assert incorp.data.soil_layers[1].annual_nitrous_oxide_emissions_total == 0

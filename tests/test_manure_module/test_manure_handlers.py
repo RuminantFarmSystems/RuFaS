@@ -116,13 +116,15 @@ def test_manure_handler_config() -> None:
     minutes_per_cleaning = 10
     cleanings_per_day = 3
     daily_tillage_frequency = 1
+    cleaning_water_recycle_fraction = 0.1
 
     # Act
     manure_handler_config = ManureHandlerConfig(
         cleaning_water_use_rate=cleaning_water_use_rate,
         minutes_per_cleaning=minutes_per_cleaning,
         cleanings_per_day=cleanings_per_day,
-        daily_tillage_frequency=daily_tillage_frequency
+        daily_tillage_frequency=daily_tillage_frequency,
+        cleaning_water_recycle_fraction=cleaning_water_recycle_fraction
     )
 
     # Assert
@@ -130,6 +132,7 @@ def test_manure_handler_config() -> None:
     assert manure_handler_config.minutes_per_cleaning == minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == daily_tillage_frequency
+    assert manure_handler_config.cleaning_water_recycle_fraction == approx(cleaning_water_recycle_fraction)
 
 
 # Test DefaultManureHandlerConfigFactory
@@ -138,20 +141,21 @@ def test_manure_handler_config() -> None:
 @pytest.mark.parametrize(
     'manure_handler_type, expected_cleaning_water_use_rate, '
     'expected_minutes_per_cleaning, expected_cleanings_per_day, '
-    'expected_daily_tillage_frequency',
+    'expected_daily_tillage_frequency, expected_cleaning_water_recycle_fraction',
     [
-        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0),
-        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0),
-        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0),
-        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1),
-        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0)
+        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0, 0.8),
+        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0, 0.1),
+        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0, 0.1),
+        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1, 0.0),
+        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0, 0.0)
     ]
 )
 def test_default_manure_handler_config_factory_get_instance(manure_handler_type: ManureHandlerType,
                                                             expected_cleaning_water_use_rate: float,
                                                             expected_minutes_per_cleaning: int,
                                                             expected_cleanings_per_day: int,
-                                                            expected_daily_tillage_frequency: int
+                                                            expected_daily_tillage_frequency: int,
+                                                            expected_cleaning_water_recycle_fraction: float,
                                                             ) -> None:
     """Unit test for get_instance() of class DefaultManureHandlerConfigFactory"""
 
@@ -163,6 +167,7 @@ def test_default_manure_handler_config_factory_get_instance(manure_handler_type:
     assert manure_handler_config.minutes_per_cleaning == expected_minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == expected_cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == expected_daily_tillage_frequency
+    assert manure_handler_config.cleaning_water_recycle_fraction == approx(expected_cleaning_water_recycle_fraction)
 
 
 # Test ManureHandlerType
@@ -264,9 +269,12 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     # Arrange
     num_animals = 100
     cleaning_water_use_rate = 20.0
-    expected_cleaning_water_volume_in_main_barn = num_animals * cleaning_water_use_rate
+    cleaning_water_recycle_fraction = 0.75
+    expected_cleaning_water_volume_in_main_barn = (num_animals * cleaning_water_use_rate *
+                                                   (1-cleaning_water_recycle_fraction))
     mock_manure_handler_config = mocker.MagicMock(auto_spec=ManureHandlerConfig)
     mock_manure_handler_config.cleaning_water_use_rate = cleaning_water_use_rate
+    mock_manure_handler_config.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
     mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
                                             time=mocker.MagicMock(),
                                             manure_handler_config=mock_manure_handler_config)
@@ -418,3 +426,48 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS)
     assert manure_handler_daily_output.tempC == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 4
+
+
+def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:
+    """
+    Unit test for daily_update() of class BaseManureHandler in file manure_handler_classes.py
+
+    This test verifies that the daily update returns a default ManureHandlerDailyOutput object
+    if there are no animals in the pen.
+    """
+    mock_manure = mocker.MagicMock(autospec=PenManure)
+    mock_pen = mocker.MagicMock(autospec=ManureManagerPen)
+    mock_pen.num_animals = 0
+    mock_pen.manure = mock_manure
+
+    mock_bedding = mocker.MagicMock(autospec=BaseBedding)
+
+    mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
+                                            time=mocker.MagicMock(),
+                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
+
+    manure_handler_daily_output = mock_manure_handler.daily_update(
+        pen=mock_pen,
+        bedding=mock_bedding,
+        sim_day=-1
+    )
+
+    assert manure_handler_daily_output.simulation_day == -1
+    assert manure_handler_daily_output.pen_id == -1
+    assert manure_handler_daily_output.manure_urea == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (approx(0.0))
+    assert manure_handler_daily_output.liquid_manure_nitrogen == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_solids == approx(0.0)
+    assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_phosphorus == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_potassium == approx(0.0)
+    assert manure_handler_daily_output.housing_methane == approx(0.0)
+    assert manure_handler_daily_output.housing_carbon_dioxide == approx(0.0)
+    assert manure_handler_daily_output.housing_ammonia == approx(0.0)
+    assert manure_handler_daily_output.manure_volume == approx(0.0)
+    assert manure_handler_daily_output.cleaning_water_volume == approx(0.0)
+    assert manure_handler_daily_output.total_bedding_volume == approx(0.0)
+    assert manure_handler_daily_output.total_bedding_mass == approx(0.0)
+    assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(0.0)
+    assert manure_handler_daily_output.tempC == approx(0.0)

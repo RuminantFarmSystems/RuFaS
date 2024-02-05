@@ -7,13 +7,14 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from .routines.feed_storage.feed_manager import FeedManager
 
 im = InputManager()
 om = OutputManager()
 
 
 class State:
-    def __init__(self, config: Config, weather: Weather, time: Time):
+    def __init__(self, config: Config, weather: Weather, time: Time, feed_manager: FeedManager):
         """
         Description:
             Contains information about the current state of the farm.
@@ -45,7 +46,7 @@ class State:
         self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager)
+        self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=feed_manager)
 
     def annual_reset(self):
         """

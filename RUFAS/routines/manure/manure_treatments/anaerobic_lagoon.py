@@ -63,7 +63,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             manure_treatment_daily_input.liquid_manure_total_volatile_solids
             * 0.03
             / ManureConstants.MANURE_DENSITY
-        )  # TODO: Use constants instead
+        )  # TODO: Use constants instead - Issue #1120
         return new_daily_output
 
     def _update_methane_emission(

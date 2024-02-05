@@ -3,6 +3,8 @@ from unittest.mock import MagicMock
 
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, TillageEvent, ManureEvent, \
     FertilizerEvent
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 @pytest.mark.parametrize("year,day,current_year,current_day,expected", [
@@ -87,7 +89,7 @@ def test_harvest_event_equality(harvest_event1, harvest_event2, expected: bool) 
 
 
 @pytest.mark.parametrize("harvest_event,expected", [
-    (HarvestEvent(crop_reference="corn", year=1, day=20), hash((1, 20, "corn", "default")))
+    (HarvestEvent(crop_reference="corn", year=1, day=20), hash((1, 20, "corn", HarvestOperation.HARVEST_KILL)))
 ])
 def test_harvest_event_hash(harvest_event: HarvestEvent, expected: float) -> None:
     """Tests that hash returns correctly for HarvestEvent objects."""
@@ -121,32 +123,32 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
 
 
 @pytest.mark.parametrize("manure_event1,manure_event2,expected", [
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75),
-     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), True),
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75),
-     ManureEvent(year=1, day=65, nitrogen_mass=3.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), False),
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=6.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75),
-     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), False),
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75),
-     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), False),
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30, application_depth=5.4,
-                 surface_remainder_fraction=0.75),
-     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), False),
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30, application_depth=7.4,
-                 surface_remainder_fraction=0.35),
-     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75), False),
-    (2, ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                    surface_remainder_fraction=0.75), False),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, manure_type=ManureType.LIQUID,
+                 field_coverage=1.30, application_depth=7.4, surface_remainder_fraction=0.75),
+     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), True),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75),
+     ManureEvent(year=1, day=65, nitrogen_mass=3.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=6.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75),
+     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75),
+     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30,
+                 manure_type=ManureType.LIQUID, application_depth=5.4, surface_remainder_fraction=0.75),
+     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=2.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.35),
+     ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                 manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
+    (2, ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30,
+                    manure_type=ManureType.LIQUID, application_depth=7.4, surface_remainder_fraction=0.75), False),
 ])
 def test_manure_event_equality(manure_event1, manure_event2, expected: bool) -> None:
     """Tests that equality is tested correctly between ManureEvent objects."""
@@ -155,9 +157,9 @@ def test_manure_event_equality(manure_event1, manure_event2, expected: bool) -> 
 
 
 @pytest.mark.parametrize("manure_event,expected", [
-    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, field_coverage=1.30, application_depth=7.4,
-                 surface_remainder_fraction=0.75),
-     hash((1, 65, 9.24, 7.7, 1.30, 7.4, 0.75)))
+    (ManureEvent(year=1, day=65, nitrogen_mass=9.24, phosphorus_mass=7.7, manure_type=ManureType.LIQUID,
+                 field_coverage=1.30, application_depth=7.4, surface_remainder_fraction=0.75),
+     hash((1, 65, 9.24, 7.7, ManureType.LIQUID, 1.30, 7.4, 0.75)))
 ])
 def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
     """Tests that hash returns correctly for ManureEvent objects."""

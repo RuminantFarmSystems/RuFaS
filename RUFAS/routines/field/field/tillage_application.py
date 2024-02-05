@@ -256,7 +256,7 @@ class TillageApplication:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_tillage.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": {self.field_data.field_size}}
         value = {"tillage_depth": tillage_depth, "incorporation_fraction": incorporation_fraction,
                  "mixing_fraction": mixing_fraction}

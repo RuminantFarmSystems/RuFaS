@@ -4,7 +4,7 @@ matplotlib
 mock
 numpy
 pandas
-pytest
+pytest==7.4.4
 pytest-mock
 scipy
 pytest-lazy-fixture

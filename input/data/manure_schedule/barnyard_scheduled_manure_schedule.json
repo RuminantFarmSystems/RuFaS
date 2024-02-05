@@ -21,6 +21,9 @@
     "surface_remainder_fractions": [
         1.0
     ],
+    "manure_types": [
+        "liquid"
+    ],
     "pattern_repeat": 8,
     "pattern_skip": 0
 }

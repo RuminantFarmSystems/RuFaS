@@ -100,6 +100,29 @@ def test_main(
             )
 
 
+def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
+    """Test to check the handling of exceptions in the main function"""
+    # Arrange
+    mock_run_rufas = mocker.patch("main.run_rufas")
+    mock_parse_gnu_args = mocker.patch("main.parse_gnu_args")
+    mock_parse_gnu_args.return_value = mocker.MagicMock()
+    mock_run_rufas.side_effect = RuntimeError("Test Error")
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_output_manager.add_error.return_value = None
+    mock_output_manager.dump_all_nondata_pools.return_value = None
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+
+    # Act
+    main()
+
+    # Assert
+    mock_output_manager.add_error.assert_called_once()
+    mock_output_manager.dump_all_nondata_pools.assert_called_once()
+    captured = capsys.readouterr()
+    expected_message = "Unexpected early termination of the simulation. Please see logs for details."
+    assert expected_message in captured.out
+
+
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, load_pool, vars_file_path, init_herd, save_animals, save_animals_dir, "

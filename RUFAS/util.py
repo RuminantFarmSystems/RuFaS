@@ -1,4 +1,6 @@
+import datetime
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -349,3 +351,64 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
+
+    @staticmethod
+    def get_timestamp(include_millis: bool = False) -> str:
+        """
+        Produces the current system time as a timestamp string.
+
+        Parameters
+        ----------
+        include_millis : bool
+            If True, adds milliseconds to the timestamp.
+
+        Returns
+        -------
+        str
+            The current time's timestamp string.
+
+        Example
+        --------
+        >>> Utility.get_timestamp(include_millis=True)
+        28-Jun-2023_Wed_15-48-21.406585
+        >>> Utility.get_timestamp(include_millis=False)
+        28-Jun-2023_Wed_15-48-21
+        """
+
+        base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
+        timestamp_format_string: str = (
+            f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
+        )
+        return datetime.datetime.now().strftime(timestamp_format_string)
+
+    @staticmethod
+    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+        """
+        Returns a filtered data pool based on either inclusion or exclusion.
+
+        Parameters
+        ----------
+        data_pool : Dict[str, Any]
+            The pool to be filtered.
+        filter_patterns : List[str]
+            A list of patterns by which to filter the pool.
+        filter_by_exclusion : bool
+            A flag indicating whether the data pool should be filtered by exclusion
+            or inclusion.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The filtered data pool.
+        """
+        if filter_by_exclusion:
+            return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if not any(re.search(pattern, key) for pattern in filter_patterns)
+            }
+        return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if any(re.search(pattern, key) for pattern in filter_patterns)
+            }

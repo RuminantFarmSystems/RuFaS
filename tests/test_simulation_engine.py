@@ -144,6 +144,11 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         "RUFAS.simulation_engine.Time", return_value=mock_time
     )
 
+    mock_feed_manager = mocker.MagicMock()
+    patch_for_feed_manager = mocker.patch(
+        "RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager
+    )
+
     mock_state = mocker.MagicMock()
     patch_for_state = mocker.patch(
         "RUFAS.simulation_engine.State", return_value=mock_state
@@ -163,7 +168,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_config.assert_called_once_with(config_data)
     patch_for_weather.assert_called_once_with({}, mock_config)
     patch_for_time.assert_called_once_with(mock_config)
-    patch_for_state.assert_called_once_with(mock_config, mock_weather, mock_time)
+    patch_for_feed_manager.assert_called_once()
+    patch_for_state.assert_called_once_with(mock_config, mock_weather, mock_time, mock_feed_manager)
 
 
 @pytest.mark.parametrize(

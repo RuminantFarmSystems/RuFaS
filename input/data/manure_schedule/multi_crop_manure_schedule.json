@@ -7,6 +7,8 @@
     "coverage_fractions": [0.1, 0.1,0.1, 0.1, 0.1,0.1,0.1,0.1,0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
     "application_depths": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0 ,150.0, 150.0, 150.0 ,150.0, 150.0, 150.0 ,150.0, 150.0, 150.0,150.0, 150.0, 150.0,150.0, 150.0, 150.0 ],
     "surface_remainder_fractions": [0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,0.80, 0.80, 0.80,0.80, 0.80, 0.80,0.80, 0.80, 0.80,0.80, 0.80, 0.80],
+    "manure_types": ["liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid",
+    "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid"],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }
