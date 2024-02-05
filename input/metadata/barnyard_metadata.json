@@ -133,13 +133,6 @@
       "type": "csv",
       "properties": "weather_properties"
     },
-    "feed_quality": {
-      "title": "Feed Quality",
-      "description": "The configuration file for the feed quality module.",
-      "path": "input/data/feed/feed_quality.csv",
-      "type": "csv",
-      "properties": "feed_quality_properties"
-    },
     "user_feeds": {
       "title": "User Feed",
       "description": "The configuration file for user feed input.",

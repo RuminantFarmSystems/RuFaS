@@ -3928,39 +3928,5 @@
       "type": "number",
       "default": 0
     }
-  },
-  "feed_quality_properties": {
-    "rufas_id": {
-      "type": "number",
-      "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "minimum": 1
-    },
-    "quality_id": {
-      "type": "number",
-      "description": "Quality ID",
-      "minimum": 1
-    },
-    "status": {
-      "type": "string",
-      "description": "Status",
-      "pattern": "(immature|mid-maturity|mature)"
-    },
-    "differentiating_nutrient": {
-      "type": "string",
-      "description": "Differentiating Nutrient",
-      "pattern": "(DM|NDF)"
-    },
-    "low_percent": {
-      "type": "number",
-      "description": "Low Percent",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "high_percent": {
-      "type": "number",
-      "description": "High Percent",
-      "minimum": 0,
-      "maximum": 100
-    }
   }
 }
