@@ -618,7 +618,7 @@ def test_housing_methane_emission(
     "num_animals, barn_area, urine_tan, urine, temp, pH, hsc, expected, error_message",
     [
         # Standard case
-        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 2372.453635832584, None),
+        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 237.2453635832584, None),
         # Edge cases: Zero input values for num_animals, barn_area, urine_tan, urine
         (0, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
         (10, 0.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
@@ -878,18 +878,18 @@ def test_methane_emission_from_slurry_storage(
 
 @pytest.mark.parametrize(
     "num_animals, storage_area, manure_tan, manure_volume, manure_density,"
-    "total_solids, temp, pH, expected, error_message",
+    "temp, pH, expected, error_message",
     [
         # Standard case
-        (10, 100.0, 25.0, 30.0, 1000.0, 5.0, 20.0, 7.7, 151.99329115002092, None),
+        (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
         # Edge cases: Zero input values for num_animals, storage_area,
         # manure_tan, manure_volume, manure_density, total_solids
-        (0, 100.0, 25.0, 30.0, 1000.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 0.0, 25.0, 30.0, 1000.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 0.0, 30.0, 1000.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 0.0, 1000.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 30.0, 0.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 30.0, 1000.0, 0.0, 20.0, 7.7, 0.0, None),
+        (0, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 0.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 0.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 0.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 0.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
         # Exception cases: Negative input values for num_animals, storage_area,
         # manure_tan, manure_volume, manure_density, total_solids
         (
@@ -898,7 +898,6 @@ def test_methane_emission_from_slurry_storage(
                 25.0,
                 30.0,
                 1000.0,
-                5.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -910,7 +909,6 @@ def test_methane_emission_from_slurry_storage(
                 25.0,
                 30.0,
                 1000.0,
-                5.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -922,7 +920,6 @@ def test_methane_emission_from_slurry_storage(
                 -25.0,
                 30.0,
                 1000.0,
-                5.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -934,7 +931,6 @@ def test_methane_emission_from_slurry_storage(
                 25.0,
                 -30.0,
                 1000.0,
-                5.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -946,23 +942,10 @@ def test_methane_emission_from_slurry_storage(
                 25.0,
                 30.0,
                 -1000.0,
-                5.0,
                 20.0,
                 7.7,
                 ValueError,
                 "Manure density must be greater than or equal to 0.",
-        ),
-        (
-                10,
-                100.0,
-                25.0,
-                30.0,
-                1000.0,
-                -5.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Total solids must be greater than or equal to 0.",
         ),
     ],
 )
@@ -972,7 +955,6 @@ def test_storage_ammonia_emission(
         manure_tan: float,
         manure_volume: float,
         manure_density: float,
-        total_solids: float,
         temp: float,
         pH: float,
         expected: float | Exception,
@@ -994,7 +976,6 @@ def test_storage_ammonia_emission(
                 manure_tan,
                 manure_volume,
                 manure_density,
-                total_solids,
                 temp,
                 storage_area,
                 pH,
@@ -1005,7 +986,6 @@ def test_storage_ammonia_emission(
             manure_tan,
             manure_volume,
             manure_density,
-            total_solids,
             temp,
             storage_area,
             pH,

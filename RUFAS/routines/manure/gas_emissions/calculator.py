@@ -734,15 +734,13 @@ class GasEmissionsCalculator:
         if num_animals < 0:
             raise ValueError("Number of animals must be greater than or equal to 0.")
         if storage_area_per_animal < 0:
-            raise ValueError(
-                "Storage area per animal must be greater than or equal to 0."
-            )
+            raise ValueError("Storage area per animal must be greater than or equal to 0.")
         if manure_total_ammoniacal_nitrogen < 0:
-            raise ValueError(
-                "Manure total ammoniacal nitrogen must be greater than or equal to 0."
-            )
+            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.")
         if manure_volume < 0:
             raise ValueError("Manure volume must be greater than or equal to 0.")
+        if manure_density < 0:
+            raise ValueError("Manure density must be greater than or equal to 0.")
 
         # If any of the input parameters is 0, then the result will be 0.
         if any(
