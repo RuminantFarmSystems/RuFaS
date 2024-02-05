@@ -389,7 +389,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     # Assert
     patch_for_calc_housing_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
-        barn_area_per_animal=barn_area_from_pen_type,
+        barn_area=barn_area_from_pen_type,
         urine_total_ammoniacal_nitrogen=TAN,
         urine=urine,
         temp=current_day_avg_tempC

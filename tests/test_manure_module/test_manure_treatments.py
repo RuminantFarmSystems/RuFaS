@@ -967,11 +967,6 @@ def test_initialize_daily_output_during_update(
         ),
         daily_final_manure_volume=(
                 liquid_manure_daily_volume
-                - (
-                        liquid_manure_total_solids
-                        * total_solids_removal_efficiency_for_treatment
-                )
-                / 1000.0
         ),
     )
 
@@ -1163,13 +1158,14 @@ def test_slurry_storage_daily_update_helper(
         time=mocker.MagicMock,
     )
     mock_accumulated_output: ManureTreatmentDailyOutput = mocker.MagicMock()
+    mock_accumulated_output.liquid_manure_nitrogen = 30.0
     mock_accumulated_output.liquid_manure_total_solids = (
         liquid_manure_total_solids
-    ) = 30.0
+    ) = 40.0
     mock_accumulated_output.daily_final_manure_volume = final_manure_volume = 30.0
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
         liquid_manure_total_ammoniacal_nitrogen
-    ) = 40.0
+    ) = 110.0
     slurry_storage._accumulated_output = mock_accumulated_output
     patch_for_accumulate_daily_output = mocker.patch.object(
         slurry_storage, "_accumulate_daily_output"
@@ -1195,10 +1191,7 @@ def test_slurry_storage_daily_update_helper(
     patch_for_calc_methane_emission = mocker.patch.object(
         slurry_storage,
         "calc_methane_emission",
-        return_value=[
-            expected_methane_loss,
-            expected_new_accumulated_liquid_manure_total_solids,
-        ],
+        return_value=expected_methane_loss,
     )
 
     expected_ammonia_loss = 50.0
@@ -1206,10 +1199,7 @@ def test_slurry_storage_daily_update_helper(
     patch_for_calc_ammonia_emission = mocker.patch.object(
         slurry_storage,
         "calc_ammonia_emission",
-        return_value=[
-            expected_ammonia_loss,
-            expected_new_accumulated_liquid_manure_total_ammoniacal_nitrogen,
-        ],
+        return_value=expected_ammonia_loss
     )
 
     # Act
@@ -1235,14 +1225,12 @@ def test_slurry_storage_daily_update_helper(
             num_animals=num_animals,
             accumulated_manure_volume=final_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-            total_solids=slurry_storage._accumulated_output.liquid_manure_total_solids,
         )
     elif slurry_storage_treatment_type_name == "slurry storage outdoor":
         patch_for_calc_ammonia_emission.assert_called_once_with(
             num_animals=num_animals,
             accumulated_manure_volume=final_manure_volume,
             accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-            accumulated_manure_total_solids=slurry_storage._accumulated_output.liquid_manure_total_solids
         )
     assert (
             slurry_storage._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
@@ -1286,11 +1274,12 @@ def test_slurry_storage_calc_methane_emission(
     )
 
     # Act
-    (
-        actual_methane_loss,
-        actual_new_accumulated_liquid_manure_total_solids,
-    ) = slurry_storage.calc_methane_emission(
+    actual_methane_loss = slurry_storage.calc_methane_emission(
         accumulated_liquid_manure_total_solids=accumulated_liquid_manure_total_solids
+    )
+
+    actual_new_accumulated_liquid_manure_total_solids = max(
+        accumulated_liquid_manure_total_solids - actual_methane_loss, 0.0
     )
 
     # Assert
