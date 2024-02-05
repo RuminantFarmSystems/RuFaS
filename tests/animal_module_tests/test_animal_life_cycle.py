@@ -1524,12 +1524,14 @@ def test_heiferI_calc_manure_excretion(mocker: MockerFixture) -> None:
     heiferI.mature_body_weight = 1200.0
     heiferI.daily_growth = 1.0
     heiferI.days_born = 300
+    heiferI.ration_formulation = mocker.MagicMock()
     feed = mocker.MagicMock(autospec=Feed)
     mock_numI = (mocker.MagicMock(autospec=int), mocker.MagicMock(autospec=int))
-    # man_calc = mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.manure_calculations', return_value=(None, None))
-    # man_calc.assert_called_once()
     heiferI.calc_base_manure.return_value = mock_numI
+    man_calc = mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.manure_calculations', return_value=(None, None))
     HeiferI.calc_manure_excretion(heiferI, feed, "methane_model")
+    man_calc.assert_called_with(heiferI.ration_formulation, feed, heiferI.body_weight,
+                                mock_numI[1], mock_numI[0], "methane_model")
     heiferI.calc_base_manure.assert_called()
 
 
