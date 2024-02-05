@@ -115,8 +115,8 @@ class AnimalModuleReporter:
             ration_report["nutrient_conc"] = nutrient_conc
 
             info_map = {
-                "class": "AnimalManager",
-                "function": "_calc_ration_at_interval",
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_ration_interval_data.__name__,
                 "data_origin": [("AnimalManager", "_calc_ration_at_interval")],
                 "number_animals_in_pen": len(pen.animals_in_pen),
                 "simulation_day": simulation_day,
@@ -240,8 +240,8 @@ class AnimalModuleReporter:
         for output_data_dict in manure_excretions_output_data.values():
             for manure_property, manure_value in output_data_dict["manure"].items():
                 info_map = {
-                    "class": "AnimalManager",
-                    "function": "daily_updates",
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_animal_module_manure.__name__,
                     "data_origin": [("AnimalManager", "daily_updates")],
                 }
                 om.add_variable(

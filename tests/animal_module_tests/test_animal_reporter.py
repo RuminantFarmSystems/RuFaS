@@ -199,25 +199,25 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
     AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture, feed, 1)
 
     for i in range(1, 2):
-        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_nutrient_amount_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["ration_nutrient_amount"]]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"
+        ]["values"] == [test_data["ration_nutrient_amount"]]
 
-        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.MEdiet_pen_{i}_combo{i}"]["values"] == [
-            test_data["MEdiet"]
-        ]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"
+        ]["values"] == [test_data["MEdiet"]]
 
-        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.avg_rqmts_pen_{i}_combo{i}"]["values"] == [
-            test_data["avg_nutrient_rqmts"]
-        ]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"
+        ]["values"] == [test_data["avg_nutrient_rqmts"]]
 
-        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_per_animal_for_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["formatted_ration"]]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"
+        ]["values"] == [test_data["formatted_ration"]]
 
-        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_supply_report_for_pen_{i}_combo{i}"][
-            "values"
-        ] == ["ration_supply_report"]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_ration_interval_data.ration_supply_report_for_pen_{i}_combo{i}"
+        ]["values"] == ["ration_supply_report"]
 
 
 def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
@@ -256,7 +256,9 @@ def test_report_animal_module_manure():
     AnimalModuleReporter.report_animal_module_manure(test_dict)
 
     for i in range(1, 2):
-        assert om.variables_pool[f"AnimalManager.daily_updates.dummy_property{i}"]["values"] == [100 * i]
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_animal_module_manure.dummy_property{i}"
+        ]["values"] == [100 * i]
 
 
 def test_report_pen_manure(mocker: MockerFixture):
