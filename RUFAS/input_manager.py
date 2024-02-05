@@ -1248,7 +1248,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,     # noqa
+    def _add_variable_to_pool(self, variable_name: str, input_data: Dict[str, Any], properties_blob_key: str,  # noqa
                               eager_termination: bool, is_variable_dict: bool) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1265,7 +1265,7 @@ class InputManager:
         ----------
         variable_name : str
             The name of the variable to be added to the pool.
-        data : Dict[str, Any]
+        input_data : Dict[str, Any]
             The data associated with the variable that needs validation and addition to the pool.
         properties_blob_key : str
             The key in the metadata properties against which the data is validated.
@@ -1295,16 +1295,19 @@ class InputManager:
 
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
+            data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+
+            element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
             metadata_properties = reduce(lambda d, k: d[k], element_hierarchy[1:],
                                          self.__metadata["properties"][properties_blob_key])
-            data = self._set_nested_value({}, element_hierarchy[1:], data)
 
         else:
+            data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        runtime_modifiability = self._is_modifiable_during_runtime(variable_name=variable_name,
-                                                                   variable_properties=metadata_properties)
-        if runtime_modifiability == Modifiability.REQUIRED_AND_LOCKED:
+        is_modifiable_during_runtime = self._is_modifiable_during_runtime(variable_name=variable_name,
+                                                                          variable_properties=metadata_properties)
+        if not is_modifiable_during_runtime:
             if eager_termination:
                 om.add_error("IM Runtime Modification",
                              f"{variable_name} is not modifiable during runtime.",
@@ -1431,7 +1434,7 @@ class InputManager:
         if metadata_properties_exist:
             add_variable_success = self._add_variable_to_pool(
                 variable_name=variable_name,
-                data=data,
+                input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
                 is_variable_dict=True)
@@ -1488,7 +1491,7 @@ class InputManager:
         if metadata_properties_exist:
             add_variable_success = self._add_variable_to_pool(
                 variable_name=variable_name,
-                data=data,
+                input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
                 is_variable_dict=False)
