@@ -3,16 +3,30 @@ from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the "Dormancy" section of SWAT (5:1.2)
-"""
-
 
 class Dormancy:
+    """
+    A class for managing crop dormancy operations.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        A `CropData` object containing specifications and attributes for a crop.
+        If not provided, a default `CropData` object is used.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to the `crop_data` object on which dormancy operations will be conducted.
+
+    Notes
+    -----
+    This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
+    based on species-specific water content, simulating the natural dry-down process.
+
+    """
+
     def __init__(self, crop_data: Optional[CropData] = None):
-        """Sets data field to a crop data object on which Dormancy operations will be conducted.
-            Initialized with defaults if none given.
-        """
         self.data = crop_data or CropData
 
     def enter_dormancy(self, soil_data: SoilData) -> None:
@@ -23,6 +37,17 @@ class Dormancy:
         ----------
         soil_data : SoilData
             SoilData instance of the soil profile that this crop is growing in.
+        Methods
+        -------
+        enter_dormancy(soil_data: SoilData) -> None
+            Performs the transition of a crop from active to dormant. Warm Annuals and Warm Annual Legumes do not
+            experience dormancy. Only Trees and Perennials experience biomass loss when entering dormancy.
+
+        find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float
+            Calculates the threshold daylength for dormancy based on minimum daylength and dormancy threshold.
+
+        find_dormancy_threshold(abs_latitude: float) -> float
+            Calculates the dormancy threshold based on the absolute latitude value.
 
         Notes
         -----
@@ -47,7 +72,6 @@ class Dormancy:
 
         self.data.is_dormant = True
         if self.data.plant_category == PlantCategory.TREE or self.data.is_perennial:
-
             residue = (self.data.biomass * self.data.dormancy_loss_fraction * (self.data.dry_matter_percentage / 100))
             nitrogen = residue * self.data.yield_nitrogen_fraction
             soil_data.crop_yield_nitrogen = nitrogen
