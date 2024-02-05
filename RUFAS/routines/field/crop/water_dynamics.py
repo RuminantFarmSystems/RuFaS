@@ -5,6 +5,22 @@ from RUFAS.routines.field.crop.crop_data import CropData
 # TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
 
 class WaterDynamics:
+    """
+    Manages water dynamics related to crop growth, including water uptake, transpiration, and evaporation.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        An instance of `CropData` containing crop specifications and states relevant to water dynamics.
+        If not provided, a default instance with generic parameters is used.
+
+    Attributes
+    ----------
+    data : CropData
+        Reference to the `CropData` instance used to access and modify water-related parameters and states
+        for the crop.
+
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 

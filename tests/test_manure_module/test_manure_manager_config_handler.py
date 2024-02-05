@@ -404,7 +404,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
     )
     assert actual_manure_treatment_configs[
-        ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT
+        ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
     ] == (
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION],
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
