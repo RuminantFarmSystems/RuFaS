@@ -582,8 +582,9 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
 )
 def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                           property: str, input_data: Dict[str, List[Any]], total_elements: int, is_valid: bool,
-                                           valid_elements: int, invalid_elements: int, fixed_elements: int,
+                                           property: str, input_data: Dict[str, List[Any]], total_elements: int,
+                                           is_valid: bool, valid_elements: int, invalid_elements: int,
+                                           fixed_elements: int,
                                            input_manager_original_method_states: Dict[str, Callable],
                                            eager_termination: bool,
                                            ) -> None:
