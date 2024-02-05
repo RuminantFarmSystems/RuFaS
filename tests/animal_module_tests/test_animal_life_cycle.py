@@ -8,6 +8,7 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockerFixture
 
+
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
@@ -29,7 +30,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.feed.feed import Feed
+
 
 @fixture
 def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
@@ -1488,6 +1489,7 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_cow_culling_age == approx(0.0)
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
 
+
 @pytest.mark.parametrize('temp, nutrient_conc, ndf, tdn, met_energy, prev_DMI, net_energy',
                          [(20, {'dm': 0.0, 'NDF': 4.5, 'TDN': 7.8}, 0.3, 0.7, 0.0, 0.0, 1.0),
                           (30, {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}, 0.045, 0.078, 0.0, 0.0, 1.0),
@@ -1655,6 +1657,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
     assert heiferI.body_weight == 1134.0
     heiferI.update_body_weight_history.assert_called()
     heiferI.get_non_preg_bw_change.assert_called()
+
 
 @pytest.mark.parametrize(
     'args',
