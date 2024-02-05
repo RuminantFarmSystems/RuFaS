@@ -1495,7 +1495,8 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
                           (30, {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}, 0.045, 0.078, 0.0, 0.0, 1.0),
                           (30, {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}, 0.045, 0.078, 10.0, 20.0, 0.32)
                           ])
-def test_set_nutrient_rqmts(mocker: MockerFixture, temp: int, nutrient_conc, ndf, tdn, met_energy, prev_DMI, net_energy) -> None:
+def test_set_nutrient_rqmts(mocker: MockerFixture, temp: int, nutrient_conc, ndf, tdn,
+                            met_energy, prev_DMI, net_energy) -> None:
     """Unit tests for the function set_nutrient_rqmts in file routines/animal/life_cycle/heiferI.py."""
     heiferI = mocker.MagicMock(autospec=HeiferI)
     mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
