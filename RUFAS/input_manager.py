@@ -412,8 +412,8 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return variable_modifiability == Modifiability.REQUIRED_AND_LOCKED or variable_modifiability. \
-            REQUIRED_AND_UNLOCKED
+        return (variable_modifiability == Modifiability.REQUIRED_AND_LOCKED) or \
+               (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
 
     def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
@@ -445,10 +445,10 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED or variable_modifiability. \
-            REQUIRED_AND_UNLOCKED
+        return (variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED) or \
+               (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
 
-    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str]) \
+    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
             -> None:
         """
         Handles missing data for a variable, logging errors or warnings based on the context of initialization or
@@ -467,8 +467,6 @@ class InputManager:
             Properties of the variable, potentially including its modifiability status.
         var_name : str
             The name of the variable with missing data.
-        info_map : Dict[str, str]
-            Contextual information for logging purposes.
 
         Raises
         ------
@@ -483,6 +481,10 @@ class InputManager:
         caller_function = self._get_caller_function()
         is_initialization = caller_function == self._populate_pool.__name__
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": caller_function
+        }
         if is_initialization:
             is_input_required_upon_initialization = self._is_input_required_upon_initialization(
                 variable_name=var_name,
@@ -615,9 +617,12 @@ class InputManager:
                                      self.__metadata["properties"][properties_blob_key])
         if var_name not in input_data.keys():
             self._handle_missing_data(variable_properties=variable_properties,
-                                      var_name=var_name,
-                                      info_map=info_map)
-            variable = None
+                                      var_name=var_name)
+            return {"fixed_elements": 0,
+                    "total_elements": 0,
+                    "valid_elements": 0,
+                    "invalid_elements": 0,
+                    "is_valid": False}
         else:
             variable = input_data[var_name]
 
@@ -720,8 +725,10 @@ class InputManager:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
                 self._handle_missing_data(variable_properties=variable_properties,
-                                          var_name=var_name,
-                                          info_map=info_map)
+                                          var_name=var_name)
+                input_data = self._set_nested_value(nested_dict=input_data,
+                                                    element_hierarchy=element_hierarchy,
+                                                    value=None)
                 input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
@@ -1241,7 +1248,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,     # noqa
                               eager_termination: bool, is_variable_dict: bool) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
