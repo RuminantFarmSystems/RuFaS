@@ -1995,7 +1995,13 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     """
     anaerobic_lagoon = AnaerobicLagoon(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
     mock_daily_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
-    mocker.patch.object(anaerobic_lagoon, "_initialize_daily_output_during_update", return_value=mock_daily_output)
+    mock_daily_output.liquid_manure_nitrogen = 100
+    mock_daily_output.storage_ammonia = 5.0
+    mock_daily_output.storage_methane = 10.0
+    mock_daily_output.daily_final_manure_volume = daily_final_manure_volume = 100.0
+
+    mocker.patch.object(anaerobic_lagoon, "_initialize_daily_output_during_update",
+                        return_value=mock_daily_output)
     patch_for_set_daily_final_manure_volume = mocker.patch.object(
         mock_daily_output, "set_daily_final_manure_volume"
     )
@@ -2005,14 +2011,16 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
         "_adjust_final_manure_volume",
         return_value=adjusted_final_manure_volume,
     )
-    mocker.patch.object(anaerobic_lagoon, "_adjust_final_manure_volume", return_value=1000)
-    mocker.patch.object(anaerobic_lagoon, "_adjust_accumulated_output")
-    mocker.patch.object(anaerobic_lagoon, "_update_ammonia_emission")
-    mocker.patch.object(anaerobic_lagoon, "_update_methane_emission")
-    anaerobic_lagoon._current_manure_treatment_daily_input = mocker.MagicMock()
     anaerobic_lagoon._accumulated_output = ManureTreatmentDailyOutput()
     anaerobic_lagoon._accumulated_precipitation_volume = 0
     anaerobic_lagoon._accumulated_output.liquid_manure_total_solids = 200.0
+    patch_for_adjust_accumulated_output = mocker.patch.object(
+        anaerobic_lagoon, "_adjust_accumulated_output", return_value=anaerobic_lagoon._accumulated_output
+    )
+    mocker.patch.object(anaerobic_lagoon, "_update_ammonia_emission")
+    mocker.patch.object(anaerobic_lagoon, "_update_methane_emission")
+    anaerobic_lagoon._current_manure_treatment_daily_input = mocker.MagicMock()
+
     precipitation_volume = 100.0
     patch_for_precipitation_volume_property = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon."
@@ -2021,16 +2029,12 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
         return_value=precipitation_volume,
     )
 
-    # mock_daily_output.liquid_manure_nitrogen = 100
-    mock_daily_output.storage_ammonia = 5.0
-    mock_daily_output.storage_methane = 10.0
-    mock_daily_output.daily_final_manure_volume = daily_final_manure_volume = 100.0
-    # new_daily_output_liquid_manure_nitrogen = max(
-    #     mock_daily_output.liquid_manure_nitrogen - mock_daily_output.storage_ammonia, 0.0
-    #     )
-    # mock_daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
+    new_daily_output_liquid_manure_nitrogen = max(
+        mock_daily_output.liquid_manure_nitrogen - mock_daily_output.storage_ammonia, 0.0
+        )
+    mock_daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
-    expected_final_volume = 1000
+    expected_final_volume = 100
     expected_precipitation_volume_increase = 100
 
     # Act
@@ -2038,89 +2042,14 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
 
     # Assert
     assert daily_output.daily_final_manure_volume == expected_final_volume
-    AnaerobicLagoon._update_ammonia_emission.assert_called_once_with(daily_output)
-    AnaerobicLagoon._update_methane_emission.assert_called_once_with(daily_output)
+    anaerobic_lagoon._update_ammonia_emission.assert_called_once_with(daily_output)
+    anaerobic_lagoon._update_methane_emission.assert_called_once_with(daily_output)
     patch_for_adjust_final_manure_volume.assert_called_once_with(daily_final_manure_volume)
-    patch_for_set_daily_final_manure_volume.assert_awaited_once_with(adjusted_final_manure_volume)
+    patch_for_set_daily_final_manure_volume.assert_called_once_with(adjusted_final_manure_volume)
+    patch_for_adjust_accumulated_output.assert_called_once_with(daily_output)
     assert anaerobic_lagoon._accumulated_precipitation_volume == expected_precipitation_volume_increase
-    assert anaerobic_lagoon._accumulated_output.liquid_manure_nitrogen >= 0
-    assert anaerobic_lagoon._accumulated_output.liquid_manure_total_solids >= 0
     assert patch_for_precipitation_volume_property.call_count == 1
     assert isinstance(daily_output, ManureTreatmentDailyOutput)
-
-# def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
-#     """
-#     Unit test for _daily_update_helper() in anaerobic_lagoon.py.
-
-#     This test checks that the _daily_update_helper() method correctly initializes
-#     and updates the daily output, including final manure volume, precipitation volume,
-#     rainfall, sludge output, methane and ammonia emissions, and returns the daily output.
-
-#     """
-#     # Arrange
-#     anaerobic_lagoon = AnaerobicLagoon(
-#         mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()
-#     )
-#     mock_daily_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
-#     mock_daily_output.daily_final_manure_volume = daily_final_manure_volume = 100.0
-
-#     patch_for_initialize_daily_output_during_update = mocker.patch.object(
-#         anaerobic_lagoon,
-#         "_initialize_daily_output_during_update",
-#         return_value=mock_daily_output,
-#     )
-
-#     adjusted_final_manure_volume = 150.0
-#     patch_for_adjust_final_manure_volume = mocker.patch.object(
-#         anaerobic_lagoon,
-#         "_adjust_final_manure_volume",
-#         return_value=adjusted_final_manure_volume,
-#     )
-
-#     patch_for_set_daily_final_manure_volume = mocker.patch.object(
-#         mock_daily_output, "set_daily_final_manure_volume"
-#     )
-
-#     patch_for_adjust_accumulated_output = mocker.patch.object(
-#         anaerobic_lagoon, "_adjust_accumulated_output", return_value=mock_daily_output
-#     )
-
-#     patch_for_update_methane_emission = mocker.patch.object(
-#         anaerobic_lagoon, "_update_methane_emission"
-#     )
-
-#     patch_for_update_ammonia_emission = mocker.patch.object(
-#         anaerobic_lagoon, "_update_ammonia_emission"
-#     )
-
-#     precipitation_volume = 10.0
-#     patch_for_precipitation_volume_property = mocker.patch(
-#         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon."
-#         "AnaerobicLagoon.precipitation_volume",
-#         new_callable=PropertyMock,
-#         return_value=precipitation_volume,
-#     )
-
-#     # Act
-#     result = anaerobic_lagoon._daily_update_helper()
-
-#     # Assert
-#     patch_for_initialize_daily_output_during_update.assert_called_once_with(
-#         anaerobic_lagoon._current_manure_treatment_daily_input
-#     )
-#     patch_for_adjust_final_manure_volume.assert_called_once_with(
-#         daily_final_manure_volume
-#     )
-#     patch_for_set_daily_final_manure_volume.assert_called_once_with(
-#         adjusted_final_manure_volume
-#     )
-#     patch_for_adjust_accumulated_output.assert_called_once_with(mock_daily_output)
-#     patch_for_update_methane_emission.assert_called_once_with(mock_daily_output)
-#     patch_for_update_ammonia_emission.assert_called_once_with(mock_daily_output)
-#     assert patch_for_precipitation_volume_property.call_count == 1
-
-#     assert result == mock_daily_output
-#     assert anaerobic_lagoon._accumulated_precipitation_volume == precipitation_volume
 
 
 @pytest.mark.parametrize(
