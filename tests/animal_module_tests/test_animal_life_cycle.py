@@ -8,6 +8,7 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockerFixture
 
+
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
@@ -24,6 +25,11 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 
 
 @fixture
@@ -1229,7 +1235,7 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
         if cow_herd_exit_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
+                approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
         elif cow_herd_exit_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
@@ -1260,7 +1266,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
     for parity in life_cycle_manager.num_cow_for_parity:
         if cow_num > 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == \
-                   approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
+                approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
         elif cow_num == 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
@@ -1482,3 +1488,404 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_heifer_culling_age == approx(0.0)
     assert life_cycle_manager.avg_cow_culling_age == approx(0.0)
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
+
+
+@pytest.mark.parametrize('temp, nutrient_conc, ndf, tdn, met_energy, prev_DMI, net_energy',
+                         [(20, {'dm': 0.0, 'NDF': 4.5, 'TDN': 7.8}, 0.3, 0.7, 0.0, 0.0, 1.0),
+                          (30, {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}, 0.045, 0.078, 0.0, 0.0, 1.0),
+                          (30, {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}, 0.045, 0.078, 10.0, 20.0, 0.32)
+                          ])
+def test_set_nutrient_rqmts(mocker: MockerFixture, temp: int, nutrient_conc, ndf, tdn,
+                            met_energy, prev_DMI, net_energy) -> None:
+    """Unit tests for the function set_nutrient_rqmts in file routines/animal/life_cycle/heiferI.py."""
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    temp = 30
+    animal_grouping_scenario = mocker.MagicMock(autospec=AnimalGroupingScenario)
+    req = mocker.MagicMock(autospec=AnimalRequirements)
+    animal_req = mocker.patch.object(
+        AnimalRequirements, 'calc_rqmts', return_value=req
+    )
+    heifer_repro_method = 'TAI'
+    heifer_TAI_protocol = 'd5CG2P'
+    heifer_synchedED_protocol = '2P'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": 300,
+        "breeding_start_day_h": 400,
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        },
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
+    if temp == 20:
+        HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
+    else:
+        HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc, met_energy, prev_DMI)
+    animal_req.assert_called_with(body_weight=heiferI.body_weight,
+                                  mature_body_weight=heiferI.mature_body_weight,
+                                  day_of_pregnancy=None,
+                                  animal_type=animal_grouping_scenario.get_animal_type(heiferI),
+                                  body_condition_score_5=3,
+                                  previous_temperature=temp,
+                                  average_daily_gain_heifer=heiferI.daily_growth,
+                                  NDF_conc=ndf,
+                                  TDN_conc=tdn,
+                                  net_energy_diet_concentration=net_energy,
+                                  days_born=heiferI.days_born)
+
+
+def test_heiferI_calc_manure_excretion(mocker: MockerFixture) -> None:
+    """Unit test for the function calc_manure_excretion in file routines/animal/life_cycle/heiferI.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 300
+    heiferI.ration_formulation = mocker.MagicMock()
+    feed = mocker.MagicMock(autospec=Feed)
+    mock_numI = (mocker.MagicMock(autospec=int), mocker.MagicMock(autospec=int))
+    heiferI.calc_base_manure.return_value = mock_numI
+    man_calc = mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.manure_calculations', return_value=(None, None))
+    HeiferI.calc_manure_excretion(heiferI, feed, "methane_model")
+    man_calc.assert_called_with(heiferI.ration_formulation, feed, heiferI.body_weight,
+                                mock_numI[1], mock_numI[0], "methane_model")
+    heiferI.calc_base_manure.assert_called()
+
+
+def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
+    """Unit test for the function phosphorus_rqmts in file routines/animal/life_cycle/heiferI.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.mature_body_weight = 1200.0
+    heiferI.body_weight = 1000.0
+    heiferI.daily_growth = 2.0
+    HeiferI.phosphorus_rqmts(heiferI, 10)
+    p_growth = (0.0012 + 0.004635 * (1200**0.22) * (1000**-0.22)) * 2/0.96 * 1000
+    p_urine = 2.0
+    p_absorb = p_urine + 8 + p_growth
+    p_req = p_absorb / 0.664
+    assert heiferI.p_maint_feces == 8
+    assert heiferI.p_growth == p_growth
+    assert heiferI.p_req == p_req
+
+
+@pytest.mark.parametrize('preg_day, days_born', [(300, 300), (300, 500), (100, 900)])
+def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day, days_born) -> None:
+    """Unit test for the function get_non_preg_bw_change in file routines/animal/life_cycle/heiferI.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = days_born
+    heifer_repro_method = 'TAI'
+    heifer_TAI_protocol = 'd5CG2P'
+    heifer_synchedED_protocol = '2P'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": preg_day,
+        "breeding_start_day_h": 400,
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        },
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
+    weight = HeiferI.get_non_preg_bw_change(heiferI)
+    divisor = abs(preg_day - days_born)
+    if divisor == 0:
+        divisor = 1
+    calc_weight = (0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight) / divisor
+    assert weight == calc_weight
+
+
+def test_heiferI_get_heiferI_values(mocker: MockerFixture) -> None:
+    """Unit test for the function get_heiferI_values in file routines/animal/life_cycle/heiferI.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    heiferI_vals = mocker.MagicMock(autospec=Dict)
+    heiferI.get_calf_values.return_value = heiferI_vals
+    vals = HeiferI.get_heiferI_values(heiferI)
+    assert heiferI_vals == vals
+
+
+def test_update_heiferI(mocker: MockerFixture) -> None:
+    """Unit test for the function update() in file routines/animal/life_cycle/heiferI.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 399
+    heifer_repro_method = 'TAI'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": 399,
+        "breeding_start_day_h": 400,
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
+    heiferI.update_body_weight_history = mocker.MagicMock()
+    heiferI.get_non_preg_bw_change = mocker.MagicMock()
+    heiferI.get_non_preg_bw_change.return_value = 4.0
+
+    # act
+    sim_day = 400
+    updated_val = HeiferI.update(heiferI, sim_day)
+    heiferI.update_body_weight_history.assert_called()
+    heiferI.get_non_preg_bw_change.assert_called()
+    assert updated_val
+    assert heiferI.daily_growth == 4.0
+    assert heiferI.days_born == 399
+    assert heiferI.body_weight == 1004.0
+
+    heiferI.days_born = 398
+    heiferI.body_weight = 1130.0
+    updated_val = HeiferI.update(heiferI, sim_day)
+    assert not updated_val
+    assert heiferI.days_born == 399
+    assert heiferI.body_weight == 1134.0
+    heiferI.update_body_weight_history.assert_called()
+    heiferI.get_non_preg_bw_change.assert_called()
+
+
+@pytest.mark.parametrize(
+    'args',
+    [
+        ({"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 1,
+         "days_born": 1, "body_weight": 1.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+          "birth_weight": 2.0, "p_init": 1}),
+        ({"id": 2, "breed": 1, "birth_date": 1, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+         "wean_weight": 1, "days_born": 1, "birth_weight": 2, "p_init": 1}),
+    ]
+)
+def test_init_calf(mocker: MockerFixture, args: dict) -> None:
+    """Unit test for __init__() method in file routines/animal/life_cycle/calf.py."""
+
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.nutrients',
+                 new_callable=mocker.PropertyMock, return_value=[])
+
+    animal_config = {"wean_day": 10,
+                     "semen_type": "conventional",
+                     "male_calf_rate_conventional_semen": 2.0,
+                     "male_calf_rate_sexed_semen": 3.0,
+                     "still_birth_rate": 1.0,
+                     "birth_weight": 0,
+                     "keep_female_calf_rate": 2.0,
+                     "mature_body_weight_avg": 1.0,
+                     "mature_body_weight_std": 1.0
+                     }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config',
+                 new_callable=mocker.PropertyMock, return_value=animal_config)
+    calf = Calf(args)
+
+    assert calf.birth_weight == 2.0
+    assert calf.animal_intake == 0
+    assert calf.DBW == 0
+
+    if "body_weight" in args:
+        assert calf.gender == "female"
+        assert not calf.sold
+        assert calf.body_weight == args["body_weight"]
+        assert calf.wean_weight == args["wean_weight"]
+    else:
+        assert calf.gender == "male"
+        assert calf.sold
+        assert calf.body_weight == 2.0
+        assert calf.wean_weight == 0
+
+
+@pytest.mark.parametrize(
+    'semen_type, conventional_semen, sexed_semen, birth_rate, female_calf_rate',
+    [
+        ("conventional", -2.0, -3.0, -4.0, 1.0),
+        ("unconventional", 200.0, 500.0, 300.0, 0.2),
+    ]
+)
+def test_calf_init_values(mocker: MockerFixture, semen_type: str, conventional_semen: str,
+                          sexed_semen: str, birth_rate: str, female_calf_rate: str) -> None:
+    """Unit test for function __init_values() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf.random',
+                 return_value=0.5)
+    calf.gender = mocker.MagicMock(autospec=str)
+    calf.sold = mocker.MagicMock(autospec=bool)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf.config', calf)
+    animal_config = {"wean_day": 10,
+                     "semen_type": semen_type,
+                     "male_calf_rate_conventional_semen": conventional_semen,
+                     "male_calf_rate_sexed_semen": sexed_semen,
+                     "still_birth_rate": birth_rate,
+                     "keep_female_calf_rate": female_calf_rate,
+                     "mature_body_weight_avg": 1.0,
+                     "mature_body_weight_std": 1.0
+                     }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_config)
+
+    # act
+    args = {"id": 1, "breed": 2, "birth_date": 1, "wean_weight": 100,
+            "days_born": 10, "body_weight": 5.0, "events": "3: simulation_day=0, event", "mature_body_weight": 2.0,
+            "birth_weight": 2.0, "p_init": 1}
+    Calf.init_values(calf, args)
+
+    # assert
+    if 0.5 < birth_rate:
+        assert calf.culled
+    if 0.5 < conventional_semen:
+        assert calf.gender == "male"
+        assert calf.sold
+    else:
+        assert calf.gender == "female"
+    if calf.gender == "female" or 0.5 < female_calf_rate:
+        assert not calf.sold
+    assert calf.birth_weight == args["birth_weight"]
+    assert calf.body_weight == args["birth_weight"]
+    assert calf.wean_weight == 0
+    assert calf.p_animal == args["p_init"]
+
+
+def test_calf_assign_values(mocker: MockerFixture) -> None:
+    """Unit test for function assign_calf_values() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    mock_args = mocker.MagicMock()
+    calf.events.init_from_string = mocker.MagicMock(autospec=AnimalEvents)
+
+    # act
+    Calf.assign_calf_values(calf, mock_args)
+
+    # assert
+    assert not calf.culled
+    assert not calf.sold
+    assert calf.gender == "female"
+    calf.events.init_from_string.assert_called()
+
+
+def test_calf_get_values(mocker: MockerFixture) -> None:
+    """Unit test for function get_calf_values() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    vals = Calf.get_calf_values(calf)
+
+    assert vals["id"] == calf.id
+    assert vals["breed"] == calf.breed
+    assert vals["birth_date"] == calf.birth_date
+    assert vals["days_born"] == calf.days_born
+    assert vals["birth_weight"] == calf.birth_weight
+    assert vals["body_weight"] == calf.body_weight
+    assert vals["wean_weight"] == calf.wean_weight
+    assert vals["mature_body_weight"] == calf.mature_body_weight
+    assert vals["events"] == str(calf.events)
+
+
+def test_calf_calc_nutrient_reqs(mocker: MockerFixture) -> None:
+    """Unit test for function calc_nutrient_rqmts() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    ration = mocker.MagicMock(autospec=CalfRationManager)
+    calc_req = mocker.patch.object(CalfRationManager, 'calc_requirements', return_value=ration)
+    calc_intake = mocker.patch.object(CalfRationManager, 'calc_intake', return_value=ration)
+
+    temp = 35.0
+    wean_day = 10
+    wean_length = 1.0
+    milk_type = "whole"
+    animal_config = {"wean_day": wean_day,
+                     "wean_length": wean_length,
+                     "milk_type": milk_type
+                     }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_config)
+    feed = mocker.MagicMock(autospec=Feed)
+    Calf.calc_nutrient_rqmts(calf, feed, temp)
+    calc_intake.assert_called_once_with(calf, feed, wean_day, wean_length, milk_type)
+    calc_req.assert_called_once_with(calf, feed, temp, calf.animal_intake)
+
+
+def test_calf_calc_manure_excretion(mocker: MockerFixture) -> None:
+    """Unit test for function calc_manure_excretion() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    feed = mocker.MagicMock(autospec=Feed)
+    one = 1.2
+    two = 0.3
+    calf.calc_base_manure.return_value = (one, two)
+    Calf.calc_manure_excretion(calf, feed, "methane_model")
+    calf.calc_base_manure.assert_called()
+
+
+def test_calf_phosphorus_rqmts(mocker: MockerFixture) -> None:
+    """Unit test for function phosphorus_rqmts() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    calf.p_maint_feces = 10
+    calf.p_req = 0
+    Calf.phosphorus_rqmts(calf, 10)
+    p_urine = 0.000002 * calf.body_weight * 1000
+
+    calf.p_growth = (
+        (0.0012 + 0.004635 * (calf.mature_body_weight**0.22) * (calf.body_weight ** (-0.22)))
+        * calf.daily_growth
+        / 0.96
+        * 1000
+    )
+    p_absorb = p_urine + calf.p_maint_feces + calf.p_growth
+    p_req = p_absorb / 0.664
+    assert calf.p_maint_feces == 8
+    assert calf.p_req == p_req
+
+
+@pytest.mark.parametrize(
+    'days_born, wean_day',
+    [(19, 20),
+     (22, 30)
+     ]
+)
+def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> None:
+    """Unit test for function update() in file routines/animal/life_cycle/calf.py."""
+
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    animal_config = {
+        "wean_day": wean_day,
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_config)
+    calf.update_body_weight_history = mocker.MagicMock()
+    calf.days_born = days_born
+
+    # act
+    sim_day = 2
+    weaned = Calf.update(calf, sim_day)
+    prev_weight = calf.body_weight
+    calf.days_born += 1
+    calf.update_body_weight_history.assert_called()
+    assert calf.daily_growth == calf.body_weight - prev_weight
+    if calf.days_born == wean_day:
+        assert weaned
+        assert calf.wean_weight == calf.body_weight
+    else:
+        assert not weaned

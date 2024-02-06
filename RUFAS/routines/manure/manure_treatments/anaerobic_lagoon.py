@@ -63,7 +63,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             manure_treatment_daily_input.liquid_manure_total_volatile_solids
             * 0.03
             / ManureConstants.MANURE_DENSITY
-        )  # TODO: Use constants instead
+        )  # TODO: Use constants instead - Issue #1120
         return new_daily_output
 
     def _update_methane_emission(
@@ -462,8 +462,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         Raises
         ------
         ValueError
-            If the calculated_sludge_accumulation_volume is negative, or if the lower_bound is negative,
-            or if the upper_bound is less than the lower_bound.
+            If the calculated_sludge_accumulation_volume is negative.
+            If the lower_bound is negative.
+            If the upper_bound is less than the lower_bound.
 
         """
         if calculated_sludge_accumulation_volume < 0:
