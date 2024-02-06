@@ -43,108 +43,56 @@ N/A
 
 Remember, flexibility and creativity are your allies in the grand adventure of project work! 🚀 Each task, whether a solo journey or part of a larger quest, plays a vital role in the epic saga of our project. Approach each with the dedication and spirit they deserve, and together, we will triumph!
 
+# 2024 Road Map
+## Q1 Goals
+### SWE Goals
+* Finish Feed Storage Module (P1)
+*   Fix the issues in the Feed library 
+*   Feed Degradation
+*   Purchase Feed logic
+* Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
+* Implement Scenario Manager (P0)
+* Implement end to end testing (P1)
+* Analyze Animal Module and Plan on action items (P0)
+* Analyze S&C Module and Plan action items (P0)
+* Analyze Manure Module and Plan action items (P0)
+* Un-entangle bio physical modules
+* Implement IM cross validation (P1)
+* Draft Developer’s Rights and Responsibilities (P2)
+* Fix units across the codebase (P1)
+* Revisit website backend (P2)
+### SME Goals
+* Pilot testing reports (P0)
+* Comparison/benchmarking with other estimates of GHG emissions (P0)
+* Develop a set of standard scenarios for end to end testing (P0)
+* SA of Animal & C&S module (P1)
+* Evaluation of Manure Module (P1)
+* SA of Manure Module (P1)
+* SA of Feed module (P2)
+* Energy methodology publication (P2)
+* Website (P1)
+* Complete feed module documentation (P1)
+* Develop design doc for automated lactation curve parameter selection implementation in RuFaS (P2)
+* Refine use of equipment (P2)
+  
+## Q2 Goals
+### SWE Goals
+* Finish Economics from EEE Module
+* Finish Energy and Emission from EEE Module (Electricity and Manure Management Fuel)
+* Take actions on the action items from Q1 Animal Module
+* Take actions on the action items from Q1 S&C Module
+* Take actions on the action items from Q1 Manure Module
+* Revisit Time class
+* Un-entangle bio physical modules- (implementation)
+* Finalize Developer’s Rights and Responsibilities
 
-# 2023 Dev team sprint and on-call schedule
-| Start Date | End Date   | Sprint | On-Call |
-|------------|------------|--------|---------|
-| 11/8/2023  | 11/14/2023 | 1      | Niko       |
-| 11/15/2023 | 11/21/2023 | 1      | Allister       |
-| 11/22/2023 | 11/28/2023 | 2      | Ed       |
-| 11/29/2023 | 12/5/2023  | 2      | Loi       |
-| 12/6/2023  | 12/12/2023 | 3      | Pooya       |
-| 12/13/2023 | 12/19/2023 | 3      | Niko       |
-| 12/20/2023 | 12/26/2023 | 4      | Allister       |
-| 12/27/2023 | 1/2/2024   | 4      | Ed       |
-
-# 2023 H2 Roadmap
-## Milestone 1: Aug 11th
-[GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/2)
-
-Dev Team:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Finish Input Manager Development|Niko, Allister, Pooya|Complete|P0
-Finish Input Manager MetaData|Allister, Niko|Complete|P0
-Confirm the validity of inputs||Consolidated||Will be done in MS 2
-Design and implement EEE |Pooya,Ed|In Progress||Moved to MS 2
-Finish CBPB and Compost for Manure Module |Michael, Loi|Partially Completed||Compost  Not Complete, moved to MS 2
-
-SMEs:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Develop plan and begin model accuracy evaluation execution
-Develop plan and begin sensitivity analysis execution
-Complete Manure Module Documentation and Design Docs for remaining functionality
-Review, modify, and approve EEE design doc. Evaluate its implementation.
-
-## Milestone 2: Sep 30th
-[GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/4)
-
-Dev Team:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||P1
-Finish Compost for Manure Module |Varma, Loi||P0
-Redesign and implement Feed storage module |Kevin, Pooya, Kristan|||Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Manager||Design Phase|P2| Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Review|P0
-Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
-Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
-Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-Revert soil profile properties and rewrite soil profile inputs|Ed|Completed|P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
-
-SMEs:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Complete model evaluation||||Moved to Milestone 3
-Complete Sensitivity Analysis||||Moved to Milestone 3
-Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
-Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil temperature|Ed, Jenn, Matthew|Completed|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
-
-## Milestone 2.5: Oct 31th
-[GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
-
-Dev Team:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
-Refactor Animal Module -- Animal Manager|Joe||P0
-Rewrite and clean field input files in the `input/` directory|Ed, Matthew|Completed|P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
-
-SMEs:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil hydrology|Ed, Jenn, Matthew|Completed|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
-
-## Milestone 3: Dec 31th
-[GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)
-
-Dev Team:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Refactor manure excretion and methane emission in the animal module|Dev team, Joe, Haowen||P2
-Revisit classes.py|Allister
-Deprecate DB(s)|Allister
-Deprecate output handler ||moved to MS 2||
-Develop post-processing and report generation|||P1
-Develop end-to-end testing|||P1
-Publish V1 Repo|||P2
-
-SMEs:
-|Title|Owner|Status|Priority|Remarks|
-|--|--|--|--|--|
-Complete External/Scientific Documentation for the Crop and Soil module|||P0
-Complete model evaluation using existing experimental data|||P2
-Complete Sensitivity Analysis of Animal Module|||P1
-Complete Sensitivity Analysis of Crop and Soil Module|||P1|Should be moved to milestone after this.
-Complete full evaluation of Crop and Soil Module|Ed, Jenn, Matthew||P0|[#762](https://github.com/RuminantFarmSystems/MASM/issues/762)
-Initiate Sensitivity Analysis of Manure Module|||P1
-Complete Cohort 2 Pilot testing|||P0
-Develop standard reports recipe (at least one industry-facing and one scientist-facing)|||P1
-Develop a set of standard scenarios for end-to-end testing|||P1
-
+### SME Goals
+* Publish SA and evaluation of Animal Module
+* Publish SA and evaluation of Crop and Soil Module
+* Evaluate Manure Module and publish introduction manuscript
+* Animal Health Design Doc development
+* Grazing Design doc development
+* Document Stakeholder Requirements
 
 # Resources
 
