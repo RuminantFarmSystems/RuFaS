@@ -496,7 +496,6 @@ class InputManager:
         Handles missing data for a variable, logging errors or warnings based on the context of initialization or
         runtime updates.
 
-
         Parameters
         ----------
         variable_properties : Dict[str, Any]
@@ -517,7 +516,7 @@ class InputManager:
 
         For missing data during runtime updates, it logs an error and raises a KeyError, assuming the data is necessary
         for the update.
-        
+
         - Relies on the caller function's name to determine if it's called during initialization, making the function
           sensitive to naming conventions of the initialization method.
         """
@@ -1256,6 +1255,12 @@ class InputManager:
         While this function modifies the input dictionary in place, it also returns the modified dictionary for
         convenience and chaining operations.
 
+        Be cautious of the in-place modification of the input dictionary, which may lead to unintended side effects.
+
+        In other words, this function operates through the side effect of altering the state of `nested_dict` outside
+        its local scope. This behavior of in-place modification of the input dictionary introduces potential unintended
+        changes.
+
         Parameters
         ----------
         nested_dict : Dict[str, Any]
@@ -1283,13 +1288,6 @@ class InputManager:
         >>> updated_dict = self._set_nested_value(nested_dictionary, ['a', 'b', 'c'], 2)
         >>> print(updated_dict)
         {'a': {'b': {'c': 2}}}
-        Note
-        ----
-        Be cautious of the in-place modification of the input dictionary, which may lead to unintended side effects.
-
-        In other words, this function operates through the side effect of altering the state of `nested_dict` outside
-        its local scope. This behavior of in-place modification of the input dictionary introduces potential unintended
-        changes.
         """
         current_dict_level = nested_dict
         for key in element_hierarchy[:-1]:
