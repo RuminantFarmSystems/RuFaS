@@ -563,7 +563,7 @@ class AnimalModuleReporter:
             info_map,
         )
 
-    def report_daily_reports(animal_manager, feed):
+    def report_daily_reports(animal_manager, available_feeds: Dict[str, Dict[str, Any]]):
         """
         Calls all reporter methods that should happen at the end of each day.
 
@@ -571,12 +571,14 @@ class AnimalModuleReporter:
         ----------
         animal_manager : AnimalManager
             Instance of AnimalManager class.
+        available_feeds : Dict[str, Dict[str, Any]]
+            Available feeds dictionary from the Feed class object.
         """
         AnimalModuleReporter.report_daily_animal_population(animal_manager)
         AnimalModuleReporter.report_life_cycle_manager_data(
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
-        AnimalModuleReporter.report_daily_ration(animal_manager, feed)
+        AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen)
