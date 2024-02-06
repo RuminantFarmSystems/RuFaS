@@ -347,18 +347,23 @@ class InputManager:
                     "function": self._get_variable_modifiability.__name__,
                     }
 
-        if "modifiability" in variable_properties.keys() and variable_properties["modifiability"]:
-            try:
-                return Modifiability.__getitem__('_'.join(variable_properties["modifiability"].strip().upper().split()))
-            except KeyError:
-                om.add_error("Unknown modifiability entry",
-                             f"Unknown modifiability value of {variable_properties['modifiability']} for variable "
-                             f"{variable_name}. Modifiability must be one of {Modifiability.values()}",
-                             info_map)
-                raise KeyError(f"Unknown modifiability value of {variable_properties['modifiability']} for variable "
-                               f"{variable_name}. Modifiability must be one of {Modifiability.values()}")
-        else:
+        modifiability = variable_properties.get("modifiability")
+        if not modifiability:
             return Modifiability.__getitem__("NOT_REQUIRED_AND_UNLOCKED")
+
+        try:
+            return Modifiability.__getitem__('_'.join(modifiability.strip().upper().split()))
+        except KeyError:
+            om.add_error(
+                "Unknown modifiability entry",
+                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability must be "
+                f"one of {Modifiability.values()}",
+                info_map
+            )
+            raise KeyError(
+                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability must be "
+                f"one of {Modifiability.values()}"
+            )
 
     def _get_caller_function(self) -> str:
         """
