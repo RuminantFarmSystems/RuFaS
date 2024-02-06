@@ -1321,17 +1321,11 @@ class InputManager:
 
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(variable_name=variable_name,
                                                                           variable_properties=metadata_properties)
-        if not is_modifiable_during_runtime:
-            if eager_termination:
-                om.add_error("IM Runtime Modification",
-                             f"{variable_name} is not modifiable during runtime.",
-                             info_map)
-                raise PermissionError("IM Runtime Modification Error: "
-                                      f"{variable_name} is not modifiable during runtime.")
-            else:
-                om.add_warning("IM Runtime Modification",
-                               f"{variable_name} is not modifiable during runtime.",
-                               info_map)
+        if not is_modifiable_during_runtime and eager_termination:
+            om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
+        elif not is_modifiable_during_runtime:
+            om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
 
         variable_properties_to_ignore = ["type", "description", "modifiability"]
         for metadata_property in metadata_properties.keys():
