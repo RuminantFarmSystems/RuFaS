@@ -61,7 +61,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     )
     assert pen.manure == expected_pen_manure
     patch_for_count_lactating_cows.assert_called_once_with(
-        mock_pen.animal_combination, list(mock_pen.animals_in_pen.values())
+        mock_pen.animal_combination, mock_pen.animals_in_pen
     )
     assert pen.num_lactating_cows == expected_num_animals
 
@@ -120,6 +120,7 @@ def test_barn_area_from_pen_type(
     )
     mock_pen = ManureManagerPen(mocker.MagicMock(autospec=Pen))
     mock_pen.pen_type = pen_type
+    mock_pen.num_stalls = 1
     mock_pen.classes_in_pen = {"Cow"} if has_cows else {"Calf"}
 
     # Assert
