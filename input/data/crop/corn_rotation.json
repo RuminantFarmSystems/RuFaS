@@ -9,7 +9,8 @@
             "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled",
             "pattern_repeat": 7,
-            "pattern_skip": 0
+            "planting_skip": 0,
+            "harvesting_skip": 0
         }
     ]
 }

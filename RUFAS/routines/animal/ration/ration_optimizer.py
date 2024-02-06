@@ -741,6 +741,11 @@ class RationOptimizer:
         -------
         OptimizeResult object from scipy package
 
+        Raises
+        ------
+        ValueError
+            If the animal combination is invalid.
+
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
