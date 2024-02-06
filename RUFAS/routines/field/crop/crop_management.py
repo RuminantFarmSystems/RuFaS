@@ -344,11 +344,7 @@ class CropManagement:
         self.data.residue_nitrogen = 0.0
         self.data.residue_phosphorus = 0.0
 
-    def _distribute_residue_nutrients(
-            self,
-            soil_data: SoilData,
-            root_residue_mass: float,
-    ) -> None:
+    def _distribute_residue_nutrients(self, soil_data: SoilData, root_residue_mass: float) -> None:
         """
         Distributes nutrients from plant residue into the soil profile.
 
@@ -358,6 +354,11 @@ class CropManagement:
             Object that tracks the attributes of the soil profile that contains this crop.
         root_residue_mass : float
             Dry matter mass of residue that is roots (kg / ha).
+
+        Notes
+        -----
+        This method ensures that when nutrients are added to soil profile layers via root residue, they are distributed
+        proportionally between layers based on the depth the crop's roots reach.
 
         """
         surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
