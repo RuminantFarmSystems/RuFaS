@@ -500,31 +500,30 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": caller_function
         }
-        if is_initialization:
-            is_input_required_upon_initialization = self._is_input_required_upon_initialization(
-                variable_name=var_name,
-                variable_properties=variable_properties)
-            if is_input_required_upon_initialization:
-                om.add_error("Validation: key not found in input data -- input required upon initialization",
-                             f"Key {var_name} not found in input data. Input value is required for this "
-                             "variable upon program initialization.",
-                             info_map)
-                raise KeyError("Key {var_name} not found in input data. Input value is required for this "
-                               "variable upon program initialization.")
-            else:
-                om.add_warning(
-                    "Validation: key not found in input data -- input not required upon initialization",
-                    f"Key {var_name} not found in input data. Input value is not required for this "
-                    "variable upon program initialization, setting the variable value to None.",
-                    info_map)
-                return
-        else:
+        if not is_initialization:
             om.add_error(
                 "Validation: key not found in data -- value required to update variable during runtime",
                 f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
                 info_map)
             raise KeyError(f"Key {var_name} not found in data. A value is required for to update variable "
                            "during runtime.")
+
+        is_input_required_upon_initialization = self._is_input_required_upon_initialization(
+            variable_name=var_name,
+            variable_properties=variable_properties)
+        if is_input_required_upon_initialization:
+            om.add_error("Validation: key not found in input data -- input required upon initialization",
+                            f"Key {var_name} not found in input data. Input value is required for this "
+                            "variable upon program initialization.",
+                            info_map)
+            raise KeyError("Key {var_name} not found in input data. Input value is required for this "
+                           "variable upon program initialization.")
+        
+       om.add_warning(
+            "Validation: key not found in input data -- input not required upon initialization",
+            f"Key {var_name} not found in input data. Input value is not required for this "
+            "variable upon program initialization, setting the variable value to None.",
+            info_map)
 
     def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
                                      properties_blob_key: str) -> bool:
