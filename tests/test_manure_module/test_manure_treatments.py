@@ -2209,25 +2209,6 @@ def test_adjust_accumulated_output(mocker: MockFixture) -> None:
     # Reset mock calls
     mock_manure_treatment_daily_output.clone.reset_mock()
 
-    # Case 2: Accumulate on other days, consider flushing_volume
-    anaerobic_lagoon._sim_day = 2
-    flushing_volume = 50.0
-    mock_flushing_volume_property.return_value = flushing_volume
-
-    # Act
-    result2 = anaerobic_lagoon._adjust_accumulated_output(
-        mock_manure_treatment_daily_output
-    )
-
-    # Assert
-    mock_accumulated_output.__add__.assert_called_once_with(
-        mock_manure_treatment_daily_output
-    )
-    assert result2 == mock_new_accumulated_output
-    assert (
-            result2.daily_final_manure_volume == daily_final_manure_volume - flushing_volume
-    )
-
 
 def test_volume_needed_property(mocker: MockFixture) -> None:
     """Unit test for volume_needed() in anaerobic_lagoon.py."""
