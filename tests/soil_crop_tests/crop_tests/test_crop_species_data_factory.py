@@ -57,19 +57,19 @@ def test_species_factory_defaults():
     assert generic.is_nitrogen_fixer is False
     assert generic.minimum_temperature == 8.0
     assert generic.optimal_temperature == 25.0
-    assert generic.max_leaf_area_index == 3.0
+    assert generic.max_leaf_area_index == 6.0
     assert generic.first_heat_fraction_point == 0.15
-    assert generic.first_leaf_fraction_point == 0.05
+    assert generic.first_leaf_fraction_point == 0.15
     assert generic.second_heat_fraction_point == 0.50
     assert generic.second_leaf_fraction_point == 0.95
     assert generic.senescent_heat_fraction == 0.9
-    assert generic.light_use_efficiency == 39.0
-    assert generic.emergence_nitrogen_fraction == 0.0470
-    assert generic.half_mature_nitrogen_fraction == 0.0177
-    assert generic.mature_nitrogen_fraction == 0.0138
-    assert generic.emergence_phosphorus_fraction == 0.0048
-    assert generic.half_mature_phosphorus_fraction == 0.0018
-    assert generic.mature_phosphorus_fraction == 0.0014
+    assert generic.light_use_efficiency == 40.0
+    assert generic.emergence_nitrogen_fraction == 0.044
+    assert generic.half_mature_nitrogen_fraction == 0.0164
+    assert generic.mature_nitrogen_fraction == 0.0128
+    assert generic.emergence_phosphorus_fraction == 0.0062
+    assert generic.half_mature_phosphorus_fraction == 0.0023
+    assert generic.mature_phosphorus_fraction == 0.0018
     assert generic.optimal_harvest_index == 0.6
     assert generic.min_harvest_index == 0.4
     assert generic.yield_nitrogen_fraction == 0.014
