@@ -1,0 +1,28 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "alfalfa_silage",
+      "planting_years": [1980],
+      "pattern_repeat": 3,
+      "planting_skip": 7,
+      "harvesting_skip": 3,
+      "planting_days": [105],
+      "harvest_years": [1980, 1980, 1980, 1981, 1981, 1981, 1981, 1982, 1982, 1982, 1982, 1983, 1983, 1983, 1983],
+      "harvest_days": [166, 198, 230, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245],
+      "harvest_operations": ["harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only",  "harvest_only", "harvest_kill"],
+      "harvest_type": "scheduled"
+    },
+    {
+      "crop_species": "corn_grain",
+      "planting_years": [1984, 1985, 1986],
+      "pattern_repeat": 3,
+      "planting_skip": 4,
+      "harvesting_skip": 4,
+      "planting_days": [135],
+      "harvest_years": [1984, 1985, 1986],
+      "harvest_days": [258],
+      "harvest_operations": ["harvest_kill"],
+      "harvest_type": "scheduled"
+    }
+  ]
+}
