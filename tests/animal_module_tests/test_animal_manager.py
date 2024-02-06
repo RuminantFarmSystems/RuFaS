@@ -480,12 +480,12 @@ def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
     assert 1 == animal.calc_nutrient_rqmts.call_count
     assert 4 == animal.set_nutrient_rqmts.call_count
     animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
-    animal.set_nutrient_rqmts.assert_has_calls([call(None), call(27, None)], any_order=True)
-    target_p_animal = 0.0072 * 100 * 1000
+    animal.set_nutrient_rqmts.assert_has_calls([call(None)] + ([call(27, None)] * 3), any_order=True)
+    expected_p_animal = 720.0
     for animal_type in animal_types:
         animals = getattr(mock_animal_manager, animal_type)
         for animal in animals:
-            assert getattr(animal, 'p_animal') == target_p_animal
+            assert getattr(animal, 'p_animal') == expected_p_animal
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -525,7 +525,7 @@ def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     assert 4 == animal.set_nutrient_rqmts.call_count
 
 
-def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture):
+def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture) -> None:
     """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_manager.py"""
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     mock_animal_manager = AnimalManager()
@@ -1073,7 +1073,7 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
 
 
-def test__get_dry_cows():
+def test_get_dry_cows() -> None:
     """Unit test for function _get_dry_cows in file routines/animal/animal_manager.py"""
     mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
     for cow in mock_cow_list:
@@ -1083,7 +1083,7 @@ def test__get_dry_cows():
     assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list[1:]
 
 
-def test__get_lactating_cows():
+def test_get_lactating_cows() -> None:
     """Unit test for function _get_lactating_cows in file routines/animal/animal_manager.py"""
     mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
     for cow in mock_cow_list:
@@ -1093,7 +1093,7 @@ def test__get_lactating_cows():
     assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
 
 
-def test__group_pens_by_animal_combination(mocker: MockerFixture):
+def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
     """Unit test for function _group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     mock_animal_manager = AnimalManager()
@@ -1120,9 +1120,8 @@ def test__group_pens_by_animal_combination(mocker: MockerFixture):
      (-1, 1, ValueError),
      (1, -1, ValueError)]
 )
-def test__calc_max_animal_spaces_per_pen(num_stalls: float, max_stocking_density: float, expected: float) -> None:
-    """Unit test for fun
-    ction _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
+def test_calc_max_animal_spaces_per_pen(num_stalls: float, max_stocking_density: float, expected: float) -> None:
+    """Unit test for function _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
     if expected is ValueError:
         with pytest.raises(ValueError,
                            match='The number of stalls and maximum stocking density must be greater than or equal to 0.'
@@ -1162,6 +1161,8 @@ def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     # Assert
     mock_pen_0.calc_manure.assert_called_once_with(mock_feed, 'methane_model_choice')
     mock_pen_1.reset_manure.assert_called_once()
+    mock_pen_0.reset_manure.assert_not_called()
+    mock_pen_1.calc_manure.assert_not_called()
 
 
 def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
