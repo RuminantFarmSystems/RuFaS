@@ -164,7 +164,7 @@
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.45,
       "phosphorus_removal_efficiency_for_treatment": 0.05,
       "potassium_removal_efficiency_for_treatment": 0.05,
-      "storage_time_period": 120,
+      "storage_time_period": 180,
       "freeboard_input": 0.3048
     },
     {
