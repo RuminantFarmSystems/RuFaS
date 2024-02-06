@@ -1,0 +1,40 @@
+{
+  "multiple": [
+    {
+      "name": "DMI by feed, daily",
+      "filters": [
+        "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"
+      ],
+      "variables": [
+        ".*"
+      ],
+      "slice_start": -365
+    },
+    {
+      "name": "DMI by feed, sum",
+      "filters": [
+        "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"
+      ],
+      "variables": [".*"],
+      "vertical_aggregation": "sum",
+      "slice_start": -365
+    },
+    {
+      "name": "Feed emissions by feed, daily",
+      "filters": [
+        "AnimalModuleReporter.report_daily_feed_emissions.*"
+      ],
+      "variables": [".*"],
+      "slice_start": -365
+    },
+    {
+      "name": "Feed emissions by feed, sum",
+      "filters": [
+        "AnimalModuleReporter.report_daily_feed_emissions.*"
+      ],
+      "variables": [".*"],
+      "vertical_aggregation": "sum",
+      "slice_start": -365
+    }
+  ]
+}
