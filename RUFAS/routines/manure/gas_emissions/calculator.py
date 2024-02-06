@@ -315,7 +315,7 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If the input `hours` is not in the range [0, 24],
+            If the input `hours` is not in the range [0, 24].
             If `min_temp` is greater than `max_temp`.
 
         """
@@ -727,8 +727,12 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If the number of animals, storage area, manure total ammoniacal nitrogen, manure volume, manure density or
-            total solids in manure are less than 0.
+            If the num_animals is < 0.
+            If storage_area < 0.
+            If manure_total_ammoniacal_nitrogen < 0.
+            If manure_volume < 0.
+            If manure_density < 0.
+            If total_solids in manure < 0.
 
         """
         if num_animals < 0:
@@ -1175,7 +1179,7 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1]
+            If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1].
 
         """
         if not (0.0 < oxygen_mole_fraction < 1.0):

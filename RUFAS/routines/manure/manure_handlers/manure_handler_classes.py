@@ -20,7 +20,28 @@ from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 
 
 class ManureHandlerType(DefaultEnum):
-    """Enumerates the different types of manure handlers."""
+    """Enumerates the different types of manure handlers.
+
+    Attributes
+    ----------
+    FLUSH_SYSTEM : str
+        A system which uses a surge of water to flush manure from the gutter.
+    MANUAL_SCRAPING : str
+        A system whereby a blade is dragged along the floor of the barns to push
+        or pull the manure to a designated area.
+    ALLEY_SCRAPER : str
+        A system whereby a "V"-shaped mechanical blade that is dragged over an
+        alley by chain or cable to pull manure to a collection channel.
+    TILLAGE : str
+        A system whereby the manure is handled via tillage methods.
+    HARROWING : str
+        A system whereby the manure is handled via harrowing methods.
+
+    Notes
+    -----
+    The DEFAULT ManureHandlerType is FLUSH_SYSTEM.
+
+    """
 
     FLUSH_SYSTEM = "flush system"
     MANUAL_SCRAPING = "manual scraping"
