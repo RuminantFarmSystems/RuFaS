@@ -323,7 +323,6 @@ class LayerData:
             If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
         ValueError
             If the field size specified is not greater than 0.
-        ValueError
             If either the top or bottom depths are negative, or the top depth is greater than the bottom depth.
 
         References

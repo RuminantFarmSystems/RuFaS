@@ -96,7 +96,7 @@ class HeiferI(Calf):
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000
 
-        # amount pf P required for urine production (g) (A.1A-F.E.2)
+        # amount of P required for urine production (g) (A.1A-F.E.2)
         p_urine = 0.000002 * self.body_weight * 1000
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
