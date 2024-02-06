@@ -91,6 +91,8 @@ class CropManagement:
         """
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
+        self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
+        self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
     def determine_harvest_index(self):
         """
@@ -188,11 +190,10 @@ class CropManagement:
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        self.data.wet_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.dry_matter_yield_collected = self.data.wet_yield_collected * (self.data.dry_matter_percentage / 100)
+        self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
+        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
 
-        self.data.yield_residue = \
-            self.data.cut_biomass * (1 - collected_fraction) * (self.data.dry_matter_percentage / 100)
+        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
 
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
@@ -301,6 +302,7 @@ class CropManagement:
                     "species": f"'{self.data.species}'"}
         value = {"crop": self.data.name, "wet_yield": wet_yield_collected, "dry_yield": dry_yield_collected,
                  "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
+                 "yield_residue": self.data.yield_residue, "harvest_index": self.data.harvest_index,
                  "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
@@ -320,22 +322,66 @@ class CropManagement:
         Notes
         -----
         If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
-        killed, then both surface and root residue is added to the soil profile.
+        killed, then both surface and root residue is added to the soil profile. After transferring residue to the soil
+        profile, the residue pools are reset to zero.
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
         soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
-        dry_matter_root_biomass = self.data.root_biomass * (self.data.dry_matter_percentage / 100)
+        dry_matter_root_biomass = self.data.root_biomass
         if killed:
-            soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
+            soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
+            self._distribute_residue_nutrients(soil_data, dry_matter_root_biomass,)
         else:
             soil_data.plant_surface_residue = self.data.yield_residue
             soil_data.plant_root_residue = 0
             soil_data.crop_root_depth = 0
+            soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
+            soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
+        self.data.yield_residue = 0.0
+        self.data.residue_nitrogen = 0.0
+        self.data.residue_phosphorus = 0.0
 
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
+    def _distribute_residue_nutrients(self, soil_data: SoilData, root_residue_mass: float) -> None:
+        """
+        Distributes nutrients from plant residue into the soil profile.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            Object that tracks the attributes of the soil profile that contains this crop.
+        root_residue_mass : float
+            Dry matter mass of residue that is roots (kg / ha).
+
+        Notes
+        -----
+        This method ensures that when nutrients are added to soil profile layers via root residue, they are distributed
+        proportionally between layers based on the depth the crop's roots reach.
+
+        """
+        surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
+        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+
+        subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
+        subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
+
+        surface_layer = soil_data.soil_layers[0]
+        surface_root_fraction = (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth \
+            if surface_layer.bottom_depth <= self.data.root_depth \
+            else max(0.0, (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth)
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
+
+        for layer in soil_data.soil_layers[1:]:
+            layer_fraction = \
+                (layer.bottom_depth - layer.top_depth) / self.data.root_depth \
+                if layer.bottom_depth <= self.data.root_depth \
+                else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
+            layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+            layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
     # ---- Harvest Scheduling ----
 
