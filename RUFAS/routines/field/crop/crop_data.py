@@ -146,7 +146,7 @@ class CropData:
         Proportion of biomass in roots (unitless).
     usable_light : Optional[float]
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth_max : Optional[float]
+    biomass_growth_max : float, default 0.0
         Upper limit of biomass accumulation for the day (kg/ha).
     biomass_growth : Optional[float]
         Biomass accumulated during the day (kg/ha).
@@ -156,13 +156,13 @@ class CropData:
         Above ground plant biomass excluding roots (kg/ha).
     root_biomass : Optional[float]
         Biomass stored in roots (kg/ha).
-    nitrogen : float
+    nitrogen : float, default 0.0
         Nitrogen stored in plant biomass (kg/ha).
-    optimal_nitrogen : float
+    optimal_nitrogen : float, default 0.0
         Optimal amount of nitrogen for current growth stage (kg/ha).
-    phosphorus : float
+    phosphorus : float, default 0.0
         Phosphorus stored in plant biomass (kg/ha).
-    optimal_phosphorus : float
+    optimal_phosphorus : float, default 0.0
         Optimal amount of phosphorus for current growth stage (kg/ha).
     water_stress : float
         Water stress for the day (unitless).
@@ -355,9 +355,9 @@ class CropData:
         Nitrogen contained in the harvested yield (kg/ha).
     yield_phosphorus : Optional[float], default None
         Phosphorus contained in the harvested yield (kg/ha).
-    residue_nitrogen : Optional[float], default None
+    residue_nitrogen : float, default 0.0
         Amount of nitrogen in the residue from this plant (kg/ha).
-    residue_phosphorus : Optional[float], default None
+    residue_phosphorus : float, default 0.0
         Amount of phosphorus in the residue from this plant (kg/ha).
     dormancy_loss_fraction : Optional[float], default None
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
