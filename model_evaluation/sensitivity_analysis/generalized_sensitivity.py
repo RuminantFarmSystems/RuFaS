@@ -20,11 +20,13 @@ class SupportedSensitivityMethods(Enum):
 
     The methods refer to those utilized by the `SALib` package:
 
-    'sobol'
+    Attributes
+    ----------
+    SOBOL : str
         `Sobol method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.sobol>`_
-    'fast'
+    FAST : str
        `FAST method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.fast>`_
-    `morris`
+    MORRIS : str
         `Morris' method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.morris>`_
     """
     SOBOL = "sobol"
@@ -116,7 +118,8 @@ class SensitivityAnalysis:
         parameters. The resulting array should be a matrix with :math:`N \\times K` dimensions where :math:`K` columns
         correspond to outputs of the model for a given parameter set. Each row of the results should represent the
         output for parameter values in the corresponding row of `X`. See
-        `ProblemSpec.evaluate() <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
+        `ProblemSpec.evaluate()
+        <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
         and `Wrapping and existing model <https://salib.readthedocs.io/en/latest/user_guide/wrappers.html>`_ for more
         examples on how to wrap existing functions.
         """
@@ -329,4 +332,3 @@ if __name__ == '__main__':
     sens2.problem.heatmap()
     sens2.problem.plot()
     pyplot.show()
-
