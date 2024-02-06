@@ -20,7 +20,7 @@ class PhosphorusIncorporation:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
 
