@@ -48,11 +48,11 @@ class Modifiability(Enum):
         return list(map(lambda c: c.value, cls))
 
     @classmethod
-    def get_required_during_initialization(cls):
+    def get_required_during_initialization(cls) -> list[str]:
         return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
 
     @classmethod
-    def get_modifiable_at_runtime(cls):
+    def get_modifiable_at_runtime(cls) -> list[str]:
         return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
