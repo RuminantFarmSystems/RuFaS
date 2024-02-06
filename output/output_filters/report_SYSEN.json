@@ -491,7 +491,7 @@
     {
       "name": "Total storage methane, kg",
       "filters": [
-        "ManureTreatmentDailyOutput_Pen_.*storage_methane"
+        "^(?:AnaerobicDigestion_)?ManureTreatmentDailyOutput_Pen_.*storage_methane$"
       ],
       "vertical_aggregation": "sum",
       "horizontal_aggregation": "sum",
