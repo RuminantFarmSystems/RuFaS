@@ -150,7 +150,7 @@ class HeatUnits:
             raise ValueError("min_air_temperature and max_air_temperature must be provided" +
                              " when use_heat_unit_temperature is True")
         if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
-            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
+            raise ValueError("mean_air_temperature must be provided when use_heat_unit_temperature is False")
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
