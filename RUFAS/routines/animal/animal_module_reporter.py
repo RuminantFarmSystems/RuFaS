@@ -99,6 +99,7 @@ class AnimalModuleReporter:
         simulation_day : int
             Day of simulation.
         """
+        
         for pen in animal_manager.all_pens:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
@@ -151,7 +152,7 @@ class AnimalModuleReporter:
                     info_map,
                 )
 
-    def report_daily_ration(animal_manager) -> None:
+    def report_daily_ration(animal_manager, feed) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
@@ -165,18 +166,26 @@ class AnimalModuleReporter:
             "class": "AnimalModuleReporter",
             "function": "report_daily_ration",
         }
+        
+
+        feeds = feed.available_feeds
+
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
             del ration_per_animal["status"]
             del ration_per_animal["objective"]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0
+            ration_total["byproducts_total"] = 0
             for key in ration_per_animal.keys():
                 if key != "status" and key != "objective":
                     ration_total[key] = pen.ration_per_animal[key] * len(
                         pen.animals_in_pen
                     )
                     ration_total["dry_matter_intake_total"] += ration_total[key]
+                    if feeds[key]['Fd_Category'] == 'By-Product/Other': 
+                        ration_total["byproducts_total"] += ration_total[key]
+
             AnimalModuleReporter.report_daily_feed_emissions(
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
@@ -557,7 +566,7 @@ class AnimalModuleReporter:
             info_map,
         )
 
-    def report_daily_reports(animal_manager):
+    def report_daily_reports(animal_manager, feed):
         """
         Calls all reporter methods that should happen at the end of each day.
 
@@ -570,7 +579,7 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_life_cycle_manager_data(
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
-        AnimalModuleReporter.report_daily_ration(animal_manager)
+        AnimalModuleReporter.report_daily_ration(animal_manager, feed)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen)
