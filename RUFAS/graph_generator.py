@@ -150,10 +150,10 @@ class GraphGenerator:
                 return all_logs
 
             fig, _ = plt.subplots()
-            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"]
-                             if k in filtered_pool.keys()}
+            prepared_data = {k: prepared_data[k] for k in graph_details["filters"]
+                             if k in prepared_data.keys()}
             self._draw_graph(
-                graph_details["type"], prepared_data, prepared_data.keys()
+                graph_details["type"], prepared_data, list(prepared_data.keys())
             )
             legend = graph_details.get("legend")
             if not legend:
