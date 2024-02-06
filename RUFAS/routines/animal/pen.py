@@ -688,6 +688,11 @@ class Pen:
         Tuple[str, AnimalManureExcretions]
             A tuple containing the prefix and default manure value for the animal.
 
+        Raises
+        ------
+        ValueError
+            If prefix for animal type is not found.
+
         """
         animal_type_to_prefix = {
             'Calf': 'daily_aggregate_calf',
