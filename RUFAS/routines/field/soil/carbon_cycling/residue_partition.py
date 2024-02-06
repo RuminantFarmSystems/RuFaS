@@ -182,6 +182,7 @@ class ResiduePartition:
         """
         Sets the soil structural litter decomposition rate using the same methodology as the
         `_determine_plant_structural_to_slow_or_active_rate`.
+
         """
         structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
         rates = [structural_litter_decomposition_rate] * len(self.data.soil_layers)
