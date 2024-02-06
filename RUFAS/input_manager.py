@@ -1245,6 +1245,10 @@ class InputManager:
         >>> print(updated_dict)
         {'a': {'b': {'c': 1, 'd': 2}}}
 
+        >>> nested_dictionary = {'a': {'b': {'c': 1}}}
+        >>> updated_dict = self._set_nested_value(nested_dictionary, ['a', 'b', 'c'], 2)
+        >>> print(updated_dict)
+        {'a': {'b': {'c': 2}}}
         Note
         ----
         Be cautious of the in-place modification of the input dictionary, which may lead to unintended side effects.
