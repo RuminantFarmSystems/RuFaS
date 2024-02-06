@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 import numpy as np
 import sys
 
@@ -99,7 +99,7 @@ class AnimalModuleReporter:
         simulation_day : int
             Day of simulation.
         """
-        
+
         for pen in animal_manager.all_pens:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
@@ -152,7 +152,7 @@ class AnimalModuleReporter:
                     info_map,
                 )
 
-    def report_daily_ration(animal_manager, feed) -> None:
+    def report_daily_ration(animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
@@ -160,16 +160,13 @@ class AnimalModuleReporter:
         ----------
         animal_manager : AnimalManager
             Instance of AnimalManager class.
-
+        available_feeds : Dict[str, Dict[str, Any]]
+            Available feeds dictionary from the Feed class object.
         """
         info_map = {
             "class": "AnimalModuleReporter",
             "function": "report_daily_ration",
         }
-        
-
-        feeds = feed.available_feeds
-
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
             del ration_per_animal["status"]
@@ -183,7 +180,7 @@ class AnimalModuleReporter:
                         pen.animals_in_pen
                     )
                     ration_total["dry_matter_intake_total"] += ration_total[key]
-                    if feeds[key]['Fd_Category'] == 'By-Product/Other': 
+                    if available_feeds[key]["Fd_Category"] == "By-Product/Other":
                         ration_total["byproducts_total"] += ration_total[key]
 
             AnimalModuleReporter.report_daily_feed_emissions(

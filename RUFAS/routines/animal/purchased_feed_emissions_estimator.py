@@ -65,6 +65,8 @@ class PurchasedFeedEmissionsEstimator:
         for feed_id, amount_fed in daily_feed_totals.items():
             if feed_id == "dry_matter_intake_total":
                 continue
+            if feed_id == "byproducts_total":
+                continue
             if feed_id in self.missing_feed_ids:
                 continue
             if feed_id not in self.feed_emissions.keys():
