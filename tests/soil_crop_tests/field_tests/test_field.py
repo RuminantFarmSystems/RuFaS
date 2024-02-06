@@ -776,10 +776,10 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
     field._record_fertilizer_application(mix_name, total_mass, nitrogen_mass, phosphorus_mass, potassium_mass, depth,
                                          remainder, year, day)
 
-    expected_info_map = {"suffix": f"field='{field_name}'", "date": {"year": year, "day": day},
-                         "mix_name": mix_name, "field_size": field_size}
+    expected_info_map = {"suffix": f"field='{field_name}'", "mix_name": mix_name, "field_size": field_size}
     expected_value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
-                      "potassium": potassium_mass, "application_depth": depth, "surface_remainder_fraction": remainder}
+                      "potassium": potassium_mass, "application_depth": depth, "surface_remainder_fraction": remainder,
+                      "year": year, "day": day}
     actual = om.variables_pool[f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
@@ -986,17 +986,17 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
 @pytest.mark.parametrize("field_name,field_size,dry_mass,dry_fraction,coverage,nitrogen,phosphorus,depth,remainder,"
                          "year,day,expected_info,expected_values,potassium", [
                              ("test_1", 1.3, 100, 0.1, 0.8, 10, 15, 0.0, 1.0, 1991, 75,
-                              {"prefix": "field='test_1'", "field_size": 1.3},
+                              {"suffix": "field='test_1'", "field_size": 1.3},
                               {"dry_matter_mass": 100, "dry_matter_fraction": 0.1, "application_depth": 0.0,
                                "surface_remainder_fraction": 1.0, "field_coverage": 0.8, "nitrogen": 10,
                                "phosphorus": 15, "potassium": 12.5, "year": 1991, "day": 75}, 12.5),
                              ("test_2", 2.4, 144.6, 0.3, 0.92, 40, 43.1, 45.0, 0.85, 1994, 200,
-                              {"prefix": "field='test_2'", "field_size": 2.4},
+                              {"suffix": "field='test_2'", "field_size": 2.4},
                               {"dry_matter_mass": 144.6, "dry_matter_fraction": 0.3, "application_depth": 45.0,
                                "surface_remainder_fraction": 0.85, "field_coverage": 0.92, "nitrogen": 40,
                                "phosphorus": 43.1, "potassium": 14.55, "year": 1994, "day": 200}, 14.55),
                              ("test_3", 0.66, 266.5, 0.44, 0.95, 100.5, 78.0, 120.0, 0.7, 2009, 150,
-                              {"prefix": "field='test_3'", "field_size": 0.66},
+                              {"suffix": "field='test_3'", "field_size": 0.66},
                               {"dry_matter_mass": 266.5, "dry_matter_fraction": 0.44, "application_depth": 120.0,
                                "surface_remainder_fraction": 0.7, "field_coverage": 0.95, "year": 2009, "day": 150,
                                "nitrogen": 100.5, "phosphorus": 78.0, "potassium": None, }, None)
@@ -1011,7 +1011,9 @@ def test_record_manure_application(field_name: str, field_size: float, dry_mass:
     field._record_manure_application(dry_mass, dry_fraction, coverage, nitrogen, phosphorus, depth, remainder, year,
                                      day, potassium)
 
-    actual = om.variables_pool[f"field='{field_name}'.manure_application"]
+    actual = om.variables_pool[
+        f"{Field.__name__}.{Field._record_manure_application.__name__}.manure_application.field='{field_name}'"
+    ]
     assert actual["info_maps"].__contains__(expected_info)
     assert actual["values"].__contains__(expected_values)
 
