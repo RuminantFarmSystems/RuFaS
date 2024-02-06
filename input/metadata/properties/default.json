@@ -2808,20 +2808,20 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 100
+      "maximum": 625
     },
     "NDICP": {
       "type": "number",
       "description": "NDICP -- Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 100,
+      "maximum": 625,
       "default": 0
     },
     "ADICP": {
       "type": "number",
       "description": "ADICP - Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 100,
+      "maximum": 625,
       "default": 0
     },
     "EE": {
@@ -2877,7 +2877,7 @@
       "type": "number",
       "description": "Total digestible nutrients (% DM).",
       "minimum": 0,
-      "maximum": 100,
+      "maximum": 625,
       "default": 0
     },
     "N_A": {
@@ -2905,7 +2905,6 @@
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
       "minimum": 0,
-      "maximum": 100,
       "default": 0
     },
     "dRUP": {
@@ -3035,7 +3034,7 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 100
+      "maximum": 625
     },
     "N_A": {
       "type": "number",
@@ -3058,8 +3057,7 @@
     "Kd": {
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
-      "minimum": 0,
-      "maximum": 100
+      "minimum": 0
     },
     "RUP": {
       "type": "number",
@@ -3083,14 +3081,14 @@
       "type": "number",
       "description": "ADICP (% DM) -- Acid detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 100,
+      "maximum": 625,
       "default": 0
     },
     "NDICP": {
       "type": "number",
       "description": "NDICP (% DM) -- Neutral detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 100,
+      "maximum": 625,
       "default": 0
     },
     "ADF": {
