@@ -24,19 +24,19 @@ class Modifiability(Enum):
 
     Attributes
     ----------
-    REQUIRED_AND_LOCKED : str
+    REQUIRED_LOCKED : str
         Indicates the variable must be initialized with a value and cannot be modified thereafter.
-    REQUIRED_AND_UNLOCKED : str
+    REQUIRED_UNLOCKED : str
         Indicates the variable must be initialized with a value but can be modified during runtime.
-    NOT_REQUIRED_AND_UNLOCKED : str
+    UNREQUIRED_UNLOCKED : str
         Indicates the variable does not need to be initialized with a value and can be modified during runtime.
     """
-    REQUIRED_AND_LOCKED: str = "required and locked"
-    REQUIRED_AND_UNLOCKED: str = "required and unlocked"
-    NOT_REQUIRED_AND_UNLOCKED: str = "not required and unlocked"
+    REQUIRED_LOCKED: str = "required locked"
+    REQUIRED_UNLOCKED: str = "required unlocked"
+    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
 
     @classmethod
-    def values(cls):
+    def values(cls) -> List[str]:
         """
         Provides a list of the string values of the enum members.
 
@@ -46,6 +46,14 @@ class Modifiability(Enum):
             A list containing the string values of the enum members.
         """
         return list(map(lambda c: c.value, cls))
+
+    @classmethod
+    def get_required_during_initialization(cls):
+        return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
+
+    @classmethod
+    def get_modifiable_at_runtime(cls):
+        return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
 class InputManager:
@@ -371,7 +379,7 @@ class InputManager:
 
         modifiability = variable_properties.get("modifiability")
         if not modifiability:
-            return Modifiability.__getitem__("NOT_REQUIRED_AND_UNLOCKED")
+            return Modifiability.__getitem__("UNREQUIRED_UNLOCKED")
 
         try:
             return Modifiability.__getitem__('_'.join(modifiability.strip().upper().split()))
@@ -528,18 +536,17 @@ class InputManager:
             raise KeyError(f"Key {var_name} not found in data. A value is required for to update variable "
                            "during runtime.")
 
-        is_input_required_upon_initialization = self._is_input_required_upon_initialization(
+        is_input_required_upon_initialization = self._get_variable_modifiability(
             variable_name=var_name,
-            variable_properties=variable_properties)
+            variable_properties=variable_properties) in Modifiability.get_required_during_initialization()
         if is_input_required_upon_initialization:
             om.add_error("Validation: key not found in input data -- input required upon initialization",
-                            f"Key {var_name} not found in input data. Input value is required for this "
-                            "variable upon program initialization.",
-                            info_map)
-            raise KeyError("Key {var_name} not found in input data. Input value is required for this "
+                         f"Key {var_name} not found in input data. Input value is required for this "
+                         "variable upon program initialization.",
+                         info_map)
+            raise KeyError(f"Key {var_name} not found in input data. Input value is required for this "
                            "variable upon program initialization.")
-        
-       om.add_warning(
+        om.add_warning(
             "Validation: key not found in input data -- input not required upon initialization",
             f"Key {var_name} not found in input data. Input value is not required for this "
             "variable upon program initialization, setting the variable value to None.",
@@ -1350,8 +1357,11 @@ class InputManager:
             data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        is_modifiable_during_runtime = self._is_modifiable_during_runtime(variable_name=variable_name,
-                                                                          variable_properties=metadata_properties)
+        is_modifiable_during_runtime = self._get_variable_modifiability(
+            variable_name=variable_name,
+            variable_properties=metadata_properties
+        ) in Modifiability.get_modifiable_at_runtime()
+
         if not is_modifiable_during_runtime and eager_termination:
             om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
