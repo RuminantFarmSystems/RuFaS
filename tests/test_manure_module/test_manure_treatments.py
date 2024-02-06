@@ -2171,11 +2171,6 @@ def test_adjust_accumulated_output(mocker: MockFixture) -> None:
     anaerobic_lagoon = AnaerobicLagoon(
         mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()
     )
-    mock_flushing_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon."
-        "AnaerobicLagoon.flushing_volume",
-        new_callable=PropertyMock,
-    )
 
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output_cloned = mocker.MagicMock()
@@ -2183,11 +2178,12 @@ def test_adjust_accumulated_output(mocker: MockFixture) -> None:
         mock_manure_treatment_daily_output_cloned
     )
 
+    daily_final_manure_volume = 10.0
     mock_accumulated_output = mocker.MagicMock()
     mock_new_accumulated_output = mocker.MagicMock()
     mock_new_accumulated_output.daily_final_manure_volume = (
         daily_final_manure_volume
-    ) = 10.0
+    )
     mock_accumulated_output.__add__ = mocker.MagicMock(
         return_value=mock_new_accumulated_output
     )
