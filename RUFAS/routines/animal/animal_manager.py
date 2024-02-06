@@ -822,7 +822,8 @@ class AnimalManager:
         Raises
         ------
         ValueError
-            If num_animals is negative, or num_spaces is non-positive.
+            If num_animals is negative.
+            IF num_spaces is non-positive.
 
         Notes
         -----
@@ -908,8 +909,8 @@ class AnimalManager:
         Raises
         ------
         ValueError
-            If the length of the allocation plan does not match the number of pens, or if the sum of the
-            allocation plan does not match the number of animals.
+            If the length of the allocation plan does not match the number of pens.
+            If the sum of the allocation plan does not match the number of animals.
 
         """
 

@@ -12,7 +12,7 @@ class CompostingType(DefaultEnum):
     PASSIVE_WINDROW : str
         Passive windrow.
     STATIC_PILE: str
-        Static pile
+        Static pile.
 
     """
     INTENSIVE_WINDROW = "intensive windrow"
