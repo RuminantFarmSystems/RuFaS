@@ -320,6 +320,8 @@ class InputManager:
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
 
+        Notes
+        -----
         This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
         empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
         correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
