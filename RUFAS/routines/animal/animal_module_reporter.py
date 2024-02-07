@@ -186,6 +186,32 @@ class AnimalModuleReporter:
                 info_map,
             )
 
+    def report_daily_ration_nutrients(animal_manager) -> None:
+        """
+        Adds nutrient amount totals as fed to each pen to output manager.
+
+        Parameters
+        ----------
+        animal_manager : AnimalManager
+            Instance of AnimalManager class.
+
+        """
+        info_map = {
+            "class": "AnimalModuleReporter",
+            "function": "report_daily_ration_nutrients",
+        }
+        for pen in animal_manager.all_pens:
+            ration_nutrient_amount = pen.ration_nutrient_amount.copy()
+            ration_total = {}
+            for key in ration_nutrient_amount.keys():
+                if key not in ['dm', 'as_fed']:
+                    ration_total[key] = pen.ration_nutrient_amount[key] * len(pen.animals_in_pen)
+            om.add_variable(
+                f"daily_nutrient_amount_for_pen_{pen.id}_{pen.animal_combination.name}",
+                ration_total,
+                info_map,
+            )
+
     def report_daily_feed_emissions(
         ration_total: dict[str, float],
         pen_id: int,
@@ -571,6 +597,7 @@ class AnimalModuleReporter:
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
         AnimalModuleReporter.report_daily_ration(animal_manager)
+        AnimalModuleReporter.report_daily_ration_nutrients(animal_manager)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen)
