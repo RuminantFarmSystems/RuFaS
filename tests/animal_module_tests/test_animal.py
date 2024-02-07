@@ -1931,7 +1931,7 @@ def test_set_constraints():
         cons
         for cons in ration_optimizer.cow_cons
         if cons["fun"]
-        not in [ration_optimizer.total_energy, ration_optimizer.NEl_constraint, ration_optimizer.DMI_constraint_lower]
+        not in [ration_optimizer.total_energy, ration_optimizer.NEl_constraint]
     ]
 
 
