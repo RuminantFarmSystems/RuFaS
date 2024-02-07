@@ -57,4 +57,5 @@ class NitrogenCycling:
         self.leaching_runoff_erode.leach_runoff_and_erode_nitrogen(field_size)
         self.nitrification_volatilization.do_daily_nitrification_and_volatilization()
         self.denitrification.denitrify()
+        self.mineralization_decomposition.mineralize_and_decompose_nitrogen()
         self.humus_mineralization.mineralize_organic_nitrogen()

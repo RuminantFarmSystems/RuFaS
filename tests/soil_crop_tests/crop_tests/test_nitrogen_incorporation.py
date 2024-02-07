@@ -84,10 +84,16 @@ def test_error_determine_shape_log(heatfrac, current, mature, emergence):
     (0.2, 0.8, 0.5, -0.5, -0.1),  # both negative
     (0.789, 0.587, 0.501, 0.138, 0.920),  # arbitrary
 ])
-def test_determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, shape1, shape2):
-    """ensure that nitrogen fraction is correctly calculated by determine_optimal_nitrogen_fraction()"""
+def test_determine_optimal_nitrogen_fraction(
+        heatfrac: float,
+        emerge: float,
+        mature: float,
+        shape1: float,
+        shape2: float
+) -> None:
+    """Ensure that nitrogen fraction is correctly calculated by determine_optimal_nitrogen_fraction()."""
     observe = NitrogenIncorporation.determine_optimal_nutrient_fraction(heatfrac, emerge, mature, shape1, shape2)
-    expect = (emerge - mature) * (1 - (heatfrac / (heatfrac + exp(shape1 + shape2 * heatfrac)))) + mature
+    expect = (emerge - mature) * (1 - (heatfrac / (heatfrac + exp(shape1 - shape2 * heatfrac)))) + mature
     assert observe == expect
 
 
