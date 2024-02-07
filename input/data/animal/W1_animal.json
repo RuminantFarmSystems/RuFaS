@@ -37,7 +37,7 @@
         "milk_type": "whole"
       },
       "repro": {
-        "voluntary_waiting_period": 72,
+        "voluntary_waiting_period": 0, 
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,
@@ -51,7 +51,7 @@
             "repro_sub_protocol": "5dCG2P",
             "repro_sub_properties": {
                 "conception_rate": 0.6,
-                "estrus_detection_rate": 0.7
+                "estrus_detection_rate": 0.9
             }
         },
         "cows": {
