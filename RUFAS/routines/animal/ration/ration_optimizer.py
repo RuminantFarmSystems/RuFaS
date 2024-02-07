@@ -57,8 +57,7 @@ class RationOptimizer:
         """ constraints for lactating cows """
 
         self.heifer_cons = [cons for cons in self.cow_cons if cons['fun'] not in [self.total_energy,
-                                                                                  self.NEl_constraint,
-                                                                                  self.DMI_constraint_lower]]
+                                                                                  self.NEl_constraint]]
         """constraints for animals that are not lactating cows """
 
     @staticmethod
@@ -740,6 +739,11 @@ class RationOptimizer:
         Returns
         -------
         OptimizeResult object from scipy package
+
+        Raises
+        ------
+        ValueError
+            If the animal combination is invalid.
 
         """
         arguments = (ration_config,)
