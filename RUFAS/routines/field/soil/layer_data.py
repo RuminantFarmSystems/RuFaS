@@ -244,6 +244,8 @@ class LayerData:
     """soil metabolic carbon amount (kg/ha)"""
     soil_structural_carbon_amount: float = 0.0
     """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
+    soil_structural_to_slow_or_active_rate: float = 0.0
+    """the rate at which below ground structural carbon decomposes into slow or active carbon (unitless)"""
 
     # ---- Nitrogen
     initial_soil_nitrate_concentration: Optional[float] = None
@@ -440,18 +442,18 @@ class LayerData:
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
             CUBIC_MILLIMETERS_TO_CUBIC_METERS
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        total_soil_carbon_amount = (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
+        self.total_soil_carbon_amount = (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
 
         if self.top_depth == 0:
-            self.active_carbon_amount = 0.02 * total_soil_carbon_amount
-            self.slow_carbon_amount = 0.98 * total_soil_carbon_amount
+            self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
+            self.slow_carbon_amount = 0.98 * self.total_soil_carbon_amount
             self.passive_carbon_amount = 0.0
             self.structural_litter_amount = (1 / 2) * residue
             self.metabolic_litter_amount = (1 / 2) * residue
         else:
-            self.active_carbon_amount = 0.02 * total_soil_carbon_amount
-            self.slow_carbon_amount = 0.54 * total_soil_carbon_amount
-            self.passive_carbon_amount = 0.44 * total_soil_carbon_amount
+            self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
+            self.slow_carbon_amount = 0.54 * self.total_soil_carbon_amount
+            self.passive_carbon_amount = 0.44 * self.total_soil_carbon_amount
             self.structural_litter_amount = 0.0
             self.metabolic_litter_amount = 0.0
 
@@ -720,6 +722,19 @@ class LayerData:
 
         """
         return (self.percent_silt_content + self.percent_clay_content) / 100
+
+    @property
+    def carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil layer.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in this layer. (kg/ha).
+
+        """
+        return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
 
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0

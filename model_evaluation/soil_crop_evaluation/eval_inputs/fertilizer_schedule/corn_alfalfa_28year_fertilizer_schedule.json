@@ -1,0 +1,26 @@
+{
+    "available_fertilizer_mixes": [
+        {
+            "name": "15_15_15",
+            "N": 0.15,
+            "P": 0.15,
+            "K": 0.15
+        },
+        {
+            "name": "100_0_0",
+            "N": 1.0,
+            "P": 0.0,
+            "K": 0.0
+        }
+    ],
+    "mix_names": ["15_15_15", "15_15_15", "100_0_0", "15_15_15", "100_0_0"],
+    "years": [1984, 1985, 1985, 1986, 1986],
+    "days": [135, 135, 182, 135, 182],
+    "nitrogen_masses": [16.81, 16.81, 84.205, 16.81, 84.205],
+    "phosphorus_masses": [16.81, 16.81, 0.0, 16.81, 0.0],
+    "potassium_masses": [0.0],
+    "application_depths": [25.4, 25.4, 0.0, 25.4, 0.0],
+    "surface_remainder_fractions": [0.0, 0.0, 1.0, 0.0, 1.0],
+    "pattern_repeat": 3,
+    "pattern_skip": 4
+}
