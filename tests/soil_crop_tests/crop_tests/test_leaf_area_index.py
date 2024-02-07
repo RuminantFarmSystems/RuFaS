@@ -212,4 +212,4 @@ def test_grow_canopy(heatfrac: float, previous_leaf_area_index: int, previous_op
         else:  # senescence
             assert data.is_in_senescence is True
             assert data.leaf_area_index == \
-                   LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, 0.9, optimal_lai)
+                   LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, 0.9, data.max_leaf_area_index)
