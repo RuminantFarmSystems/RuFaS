@@ -43,7 +43,6 @@ class Schedule:
         ------
         ValueError
             If the skip is < 0.
-        ValueError
             If the repeat is < 0.
 
         """

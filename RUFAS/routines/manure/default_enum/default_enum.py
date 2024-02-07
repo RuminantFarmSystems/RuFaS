@@ -42,12 +42,15 @@ class DefaultEnum(Enum):
     def get_default_type(cls) -> DefaultEnum:
         """Returns either the DEFAULT member if it exists or the first member.
 
-        Raises:
-            IndexError: If the enum has no members.
+        Raises
+        ------
+        IndexError
+            If the enum has no members.
 
-        Returns:
-            The DEFAULT member of this enum class if it exists. Otherwise, the
-                first member is returned.
+        Returns
+        -------
+        DefaultEnum
+            The DEFAULT member of this enum class if it exists. Otherwise, the first member is returned.
 
         """
         if hasattr(cls, "DEFAULT"):
