@@ -89,9 +89,7 @@ class CropSchedule(Schedule):
         ------
         ValueError
             If not all planting years are valid.
-        ValueError
             If not all planting days are valid.
-        ValueError
             If not number of planting years and days are not equal.
 
         """
@@ -117,11 +115,8 @@ class CropSchedule(Schedule):
         ------
         ValueError
             If not all harvest years are valid.
-        ValueError
             If not all harvest days are valid.
-        ValueError
             If the number of harvest years, days, and operations are not equal.
-        ValueError
             If the last harvest operation is not a final one, or if any operations before the last are final ones.
 
         """

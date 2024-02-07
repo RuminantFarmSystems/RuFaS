@@ -135,6 +135,12 @@ class InputManager:
         -------
         Dict[str, Any]
             The data dictionary loaded from the json file.
+
+        Raises
+        ------
+        Exception
+            For any other unexpected errors during JSON file loading.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_json.__name__,
@@ -161,6 +167,14 @@ class InputManager:
         -------
         Dict[str, Any]
             The data dictionary loaded from the json file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the CSV file does not exist at the specified path.
+        Exception
+            For any other unexpected errors during CSV file loading.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data_from_csv.__name__,
@@ -194,6 +208,12 @@ class InputManager:
         -------
         bool
             True if data is valid, otherwise False.
+
+        Raises
+        ------
+        KeyError
+            If faulty data type found in data blob key.
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._populate_pool.__name__,
@@ -307,7 +327,8 @@ class InputManager:
         Raises
         ------
         KeyError
-            If an invalid type is provided in the variable_properties or if "type" key is missing.
+            If an invalid type is provided in the variable_properties.
+            If "type" key is missing.
 
         Notes
         ------
@@ -439,6 +460,12 @@ class InputManager:
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
 
+        Raises
+        ------
+        KeyError
+            If properties_blob_key not found in input data.
+            If metadata properties for variable is missing the "type" field.
+            If variable metadata is checking for is not found in input data.
 
         """
         info_map = {"class": self.__class__.__name__,
