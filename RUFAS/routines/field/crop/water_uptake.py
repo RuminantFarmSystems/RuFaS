@@ -15,7 +15,7 @@ class WaterUptake:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing specific crop parameters and states. If not provided, a default
         instance with generic crop parameters is created.
 
@@ -111,7 +111,7 @@ class WaterUptake:
     def _take_up_water(potential_uptakes: List[float], water_availabilities: List[float],
                        wilting_points: List[float]) -> List[float]:
         """
-        Calculates the actual water taken up by the plant for each soil layer
+        Calculates the actual water taken up by the plant for each soil layer.
 
         Returns
         -------
@@ -166,16 +166,16 @@ class WaterUptake:
         Parameters
         ----------
         potential_uptakes : list[float]
-            the unadjusted potential water uptakes for each soil layer (mm).
+            The unadjusted potential water uptakes for each soil layer (mm).
         water_availabilities : list[float]
-            the crop's water availabilities for each soil layer (mm).
+            The crop's water availabilities for each soil layer (mm).
         available_capacities : float
-            Available water capacity  for each soil layer (mm).
+            Available water capacity for each soil layer (mm).
 
         Returns
         -------
         corrected_potentials : list[float]
-            a list of corrected potential water that can be taken up from each layer by the crop on the current day.
+            A list of corrected potential water that can be taken up from each layer by the crop on the current day.
 
         Raises
         ------
@@ -202,11 +202,11 @@ class WaterUptake:
         Parameters
         ----------
         potential_uptake : float
-            the (adjusted) potential water uptake from this layer by the crop on the current day (mm).
+            The (adjusted) potential water uptake from this layer by the crop on the current day (mm).
         available_water : float
-            the amount of water actual available for uptake in this layer on the current day (mm).
+            The amount of water actual available for uptake in this layer on the current day (mm).
         available_capacity : float
-            available water capacity (not already holding water) for this layer on the current day (mm).
+            Available water capacity (not already holding water) for this layer on the current day (mm).
 
         Returns
         -------
@@ -234,17 +234,17 @@ class WaterUptake:
         Parameters
         ----------
         potential_uptakes : list[float]
-            the unadjusted potential water uptakes for each soil layer (mm).
+            The unadjusted potential water uptakes for each soil layer (mm).
         unmet_demands : list[float]
-            the crop's water demands for each soil layer (mm).
+            The crop's water demands for each soil layer (mm).
         uptake_compensation : float
-            water uptake compensation factor: the proportion of a crop's water demand from a given layer that can be
+            Water uptake compensation factor: the proportion of a crop's water demand from a given layer that can be
             drawn from the underlying layer when insufficient water exists in the desired layer.
 
         Returns
         -------
         adjusted : list[float]
-            the adjusted potential water to be taken up from each layer (mm).
+            The adjusted potential water to be taken up from each layer (mm).
 
         Raises
         ------
@@ -272,20 +272,20 @@ class WaterUptake:
         Parameters
         ----------
         root_depth : float
-            the current depth of the crop root development (mm).
+            The current depth of the crop root development (mm).
         max_transpiration : float
-            the maximum potential water lost to crop transpiration for the current day (mm).
+            The maximum potential water lost to crop transpiration for the current day (mm).
         water_distro_parameter : float
-            the water-use distribution parameter of the crop (unitless).
+            The water-use distribution parameter of the crop (unitless).
         upper_depths : list[float]
-            depths to the top of each soil layer (mm).
+            Depths to the top of each soil layer (mm).
         lower_depths : list[float]
-            depths to the bottom of each soil layer (mm).
+            Depths to the bottom of each soil layer (mm).
 
         Returns
         -------
         potential_uptakes : list[float]
-            the crop's maximum potential water uptake for each soil layer (mm) during the current day.
+            The crop's maximum potential water uptake for each soil layer (mm) during the current day.
 
         Raises
         ------

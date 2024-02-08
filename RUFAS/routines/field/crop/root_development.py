@@ -12,7 +12,7 @@ class RootDevelopment:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
+    crop_data : CropData, optional
         An instance of `CropData` containing specific crop parameters and states. If not provided, a default
         instance with generic crop parameters is created.
 
@@ -48,7 +48,7 @@ class RootDevelopment:
     @staticmethod
     def _determine_root_fraction(heat_fraction: float) -> float:
         """
-        Calculates root fraction, as a function of plant maturity.
+        Calculates root fraction as a function of plant maturity.
 
         Parameters
         ----------
