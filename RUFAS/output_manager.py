@@ -799,6 +799,9 @@ class OutputManager(object):
                 if filter_file.startswith(
                         self.__supported_filter_types_prefixes["report"]
                 ):
+                    if filter_content.get("graph_details"):
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:
