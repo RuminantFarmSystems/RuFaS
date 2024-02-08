@@ -48,7 +48,7 @@ class MetadataPaths(TypedDict):
 
 # METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
 #                                         "path": Path('input/metadata/default_metadata.json')},
-#                                       ]  
+#                                       ]
 
 METADATA_PATHS: List[MetadataPaths] = [{"prefix": "MW_0",
                                         "path": Path('input/metadata/MW0_metadata.json')},
@@ -61,7 +61,7 @@ METADATA_PATHS: List[MetadataPaths] = [{"prefix": "MW_0",
                                        {"prefix": "NE_0",
                                         "path": Path('input/metadata/NE0_metadata.json')},
                                        {"prefix": "NE_1",
-                                        "path": Path('input/metadata/NE1_metadata.json')},  
+                                        "path": Path('input/metadata/NE1_metadata.json')},
                                        {"prefix": "NE_2",
                                         "path": Path('input/metadata/NE2_metadata.json')},
                                        {"prefix": "NE_3",
@@ -69,9 +69,9 @@ METADATA_PATHS: List[MetadataPaths] = [{"prefix": "MW_0",
                                        {"prefix": "W_0",
                                         "path": Path('input/metadata/W0_metadata.json')},
                                        {"prefix": "W_1",
-                                        "path": Path('input/metadata/W1_metadata.json')},  
+                                        "path": Path('input/metadata/W1_metadata.json')},
                                        {"prefix": "W_2",
                                         "path": Path('input/metadata/W2_metadata.json')},
                                        {"prefix": "W_3",
-                                        "path": Path('input/metadata/W3_metadata.json')},       
+                                        "path": Path('input/metadata/W3_metadata.json')},
                                        ]

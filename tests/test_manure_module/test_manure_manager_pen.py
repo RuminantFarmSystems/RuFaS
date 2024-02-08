@@ -76,9 +76,9 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     ],
 )
 def test_count_lactating_cows(
-    mocker: MockerFixture,
-    animal_combination: AnimalCombination,
-    expected_num_lactating_cows: int,
+        mocker: MockerFixture,
+        animal_combination: AnimalCombination,
+        expected_num_lactating_cows: int,
 ) -> None:
     """Unit test for function count_lactating_cows in file manure_manager_pen.py"""
 
@@ -125,7 +125,7 @@ def test_barn_area_from_pen_type(
     )
     mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
-    mock_pen.num_stalls = 1 
+    mock_pen.num_stalls = 1
     mock_pen.classes_in_pen = {"Cow"} if has_cows else set()
 
     # Act & Assert
