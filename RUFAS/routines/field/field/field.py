@@ -380,11 +380,11 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
-                    "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "suffix": f"field='{self.field_data.name}'",
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass, "application_depth": application_depth,
-                 "surface_remainder_fraction": surface_remainder_fraction}
+                 "surface_remainder_fraction": surface_remainder_fraction, "year": year, "day": day}
         om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float,
@@ -541,7 +541,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size}
+                    "suffix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction,
                  "field_coverage": field_coverage, "application_depth": application_depth,
                  "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
@@ -1110,6 +1110,7 @@ class Field:
                 crop.data.cumulative_evaporation = 0.0
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
+                crop.data.cumulative_water_uptake = 0.0
 
     def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
         """Manages watering of the field.
