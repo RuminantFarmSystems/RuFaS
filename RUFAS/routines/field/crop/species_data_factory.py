@@ -44,13 +44,13 @@ class CropSpecies(Enum):
 
 class CropSpeciesDataFactory:
     """
-    Creates a species data object from a CropSpecies enum
+    Creates a species data object from a CropSpecies enum.
 
     """
     @staticmethod
     def create_species_data(species: CropSpecies = CropSpecies("corn_grain"), **kwargs) -> CropData:
         """
-        Creates a species data object from a CropSpecies enum, with species defaults and the optional ability to modify
+        Creates a species data object from a CropSpecies enum with species defaults and the optional ability to modify
         additional attributes.
 
         Parameters

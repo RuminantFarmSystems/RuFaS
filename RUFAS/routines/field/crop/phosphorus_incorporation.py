@@ -96,7 +96,7 @@ class PhosphorusIncorporation:
         Parameters
         ----------
         layer_phosphates : List[float]
-            Phosphates contained in each soil layer; this list is updated in place.
+            Phosphates contained in each soil layer.
         layer_depths : List[float]
             The lowest depth of each soil layer.
 
