@@ -214,7 +214,7 @@ class PhosphorusIncorporation:
 
     def tally_total_phosphorus_uptake(self) -> None:
         """
-        determines total phosphorus extracted from soil by summing actual uptake from each layer
+        Determines total phosphorus extracted from soil by summing actual uptake from each layer.
 
         """
         self.data.total_phosphorus_uptake = sum(self.data.actual_phosphorus_uptakes)
