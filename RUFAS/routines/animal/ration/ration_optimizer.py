@@ -57,8 +57,7 @@ class RationOptimizer:
         """ constraints for lactating cows """
 
         self.heifer_cons = [cons for cons in self.cow_cons if cons['fun'] not in [self.total_energy,
-                                                                                  self.NEl_constraint,
-                                                                                  self.DMI_constraint_lower]]
+                                                                                  self.NEl_constraint]]
         """constraints for animals that are not lactating cows """
 
     @staticmethod
@@ -331,7 +330,7 @@ class RationOptimizer:
                     ration_config.NElact_list.append(0.8 * ration_config.DEact_list[i])
                 elif ration_config.EE_list[i] >= 3:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 + (
-                            (0.097 * ration_config.MEact_list[i] + 0.19) / 97) * (ration_config.EE_list[i] - 3))
+                        (0.097 * ration_config.MEact_list[i] + 0.19) / 97) * (ration_config.EE_list[i] - 3))
                 else:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19)
             # returning the NElact constraint in the NLP
@@ -408,7 +407,7 @@ class RationOptimizer:
         # [A.Cow.E.16]-[A.Heifer.E.16]
         return (sum(np.multiply(decision_vector, np.multiply(np.multiply(ration_config.calcium_list, 0.01),
                                                              ration_config.dCa_list))) - (
-                        ration_config.C_requirement / 1000))
+            ration_config.C_requirement / 1000))
 
     @staticmethod
     def phosphorus_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
@@ -445,7 +444,7 @@ class RationOptimizer:
                 ration_config.dP_list.append(0)
         return sum(np.multiply(decision_vector, np.multiply(np.multiply(ration_config.phosphorus_list, 0.01),
                                                             ration_config.dP_list))) - (
-                       ration_config.P_requirement / 1000)
+            ration_config.P_requirement / 1000)
 
     @staticmethod
     def protein_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
@@ -644,7 +643,7 @@ class RationOptimizer:
 
         """
         return (sum(decision_vector)) - (
-                ration_config.DMIest_requirement * (1 - AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+            ration_config.DMIest_requirement * (1 - AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
     @staticmethod
     def DMI_constraint_upper(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
@@ -665,7 +664,7 @@ class RationOptimizer:
 
         """
         return -(sum(decision_vector)) + (
-                ration_config.DMIest_requirement * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+            ration_config.DMIest_requirement * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
     @staticmethod
     def get_ration_vals(decision_vector: np.ndarray, ration_config: RationConfig) -> Dict:
@@ -730,7 +729,7 @@ class RationOptimizer:
 
         Parameters
         ----------
-        animal_combination : Pen.AnimalCombination
+        animal_combination : AnimalCombination
             enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
         available_feeds : Dict
             a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
@@ -740,6 +739,11 @@ class RationOptimizer:
         Returns
         -------
         OptimizeResult object from scipy package
+
+        Raises
+        ------
+        ValueError
+            If the animal combination is invalid.
 
         """
         arguments = (ration_config,)
@@ -778,7 +782,7 @@ class RationOptimizer:
 
         available_feeds : Dict
             a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
-        animal_combination : Pen.AnimalCombination
+        animal_combination : AnimalCombination
             enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
 
         """

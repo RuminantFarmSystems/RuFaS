@@ -11,7 +11,6 @@ class ManureType(Enum):
         Represents liquid manure.
     SOLID : str
         Represents manure in solid form.
-
     """
 
     LIQUID = "liquid"

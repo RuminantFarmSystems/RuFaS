@@ -226,7 +226,7 @@ class GasEmissionsCalculator:
         )
         return degradable_volatile_solids, non_degradable_volatile_solids
 
-    # TODO: to be removed in the next PR while refactoring slurry storage treatments
+    # TODO: to be removed in the next PR while refactoring slurry storage treatments - Issue #1066
     @classmethod
     def methane_emission_for_slurry_storage(
             cls,
@@ -244,8 +244,8 @@ class GasEmissionsCalculator:
             manure_total_solids: Total solids, kg.
             is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             temperature_celsius: temperature in Celsius, C.
-            manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this
-            efficiency_fraction: efficiency of process, unitless. # TODO: review this
+            manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this - Issue #1066
+            efficiency_fraction: efficiency of process, unitless. # TODO: review this - Issue #1066
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
@@ -364,7 +364,7 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If the input `hours` is not in the range [0, 24],
+            If the input `hours` is not in the range [0, 24].
             If `min_temp` is greater than `max_temp`.
 
         """
@@ -777,8 +777,12 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If the number of animals, storage area, manure total ammoniacal nitrogen, manure volume, manure density or
-            total solids in manure are less than 0.
+            If the num_animals is < 0.
+            If storage_area < 0.
+            If manure_total_ammoniacal_nitrogen < 0.
+            If manure_volume < 0.
+            If manure_density < 0.
+            If total_solids in manure < 0.
 
         """
         if num_animals < 0:
@@ -861,7 +865,8 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If manure_mass or total_solids are less than 0.
+            If manure_mass < 0.
+            If total_solids < 0.
 
         """
         if manure_mass < 0.0:
@@ -927,7 +932,7 @@ class GasEmissionsCalculator:
             num_animals: int,
             barn_area: float,
             manure_total_ammoniacal_nitrogen: float,
-            manure_mass: float,  # TODO: Decide to use volume or mass
+            manure_mass: float,  # TODO: Decide to use volume or mass - Issue #1117
             temperature_celsius: float,
             housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
     ) -> float:
@@ -1361,7 +1366,7 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1]
+            If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1].
 
         """
         if not (0.0 < oxygen_mole_fraction < 1.0):

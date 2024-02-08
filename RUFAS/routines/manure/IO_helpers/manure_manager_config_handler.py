@@ -51,7 +51,7 @@ class ManureManagerConfigHandler:
             manure_manager_config["manure_treatment_configs"]
         )
 
-    # TODO: For the following getters, pass in an enum member instead of a string
+    # TODO: For the following getters, pass in an enum member instead of a string - Issue #1118
 
     def get_custom_bedding_config(
         self, bedding_type_name: str
@@ -281,7 +281,7 @@ class ManureManagerConfigHandler:
             manure_treatment_config_by_type[
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
             ] = manure_treatment_config_by_type[
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
             ] = combo_config
 
         return manure_treatment_config_by_type

@@ -1,6 +1,6 @@
 from typing import Any
 from typing import List, Dict, Union
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -18,7 +18,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
-
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 om = OutputManager()
 
 
@@ -45,11 +45,11 @@ def pens_with_mock_animals() -> List[MagicMock]:
     mock_animals_in_pens = [
         {
             "id": 0,
-            "animals_in_pen": [mock_animal_1, mock_animal_2]
+            "animals_in_pen": {0: mock_animal_1, 1: mock_animal_2}
         },
         {
             "id": 1,
-            "animals_in_pen": [mock_animal_3, mock_animal_4]
+            "animals_in_pen": {0: mock_animal_3, 1: mock_animal_4}
         }
     ]
 
@@ -65,7 +65,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 2.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": [100000, 100001]
+            "animals_in_pen": {0: 100000, 1: 100001}
         },
         {
             "id": 1,
@@ -73,7 +73,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 10.0,
             "stocking_density": 1.075,
             "num_stalls": 50,
-            "animals_in_pen": [200000, 200001]
+            "animals_in_pen": {1: 200000, 2: 200001}
         },
         {
             "id": 2,
@@ -81,7 +81,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 8.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": [300000, 300001]
+            "animals_in_pen": {1: 300000, 2: 300001}
         },
         {
             "id": 3,
@@ -89,7 +89,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 4.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": [400000, 400001]
+            "animals_in_pen": {3: 400000, 4: 400001}
         },
     ]
 
@@ -178,57 +178,89 @@ def mock_manure_management_scenarios() -> List[Dict[str, Union[str, int]]]:
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
-            "manure_treatment": "slurry storage underfloor"
-        },
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "anaerobic lagoon"
+            },
         {
             "scenario_id": 1,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "slurry storage outdoor"
-        },
+            },
         {
             "scenario_id": 2,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "screw press",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "slurry storage outdoor"
-        },
+            },
         {
             "scenario_id": 3,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
-            "manure_separator": "none",
+            "manure_separator": "rotary screen",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic lagoon"
-        },
+            },
         {
             "scenario_id": 4,
             "bedding_type": "sand",
             "manure_handler": "flush system",
-            "manure_separator": "sand lane",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic lagoon"
-        },
+            },
         {
             "scenario_id": 5,
             "bedding_type": "sawdust",
             "manure_handler": "manual scraping",
             "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic digestion and lagoon"
-        },
+            },
         {
             "scenario_id": 6,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
             "manure_separator": "rotary screen",
+            "manure_separator_after_digestion": "none",
             "manure_treatment": "anaerobic digestion and lagoon"
-        },
+            },
         {
             "scenario_id": 7,
             "bedding_type": "sawdust",
             "manure_handler": "flush system",
-            "manure_separator": "rotary screen",
-            "manure_treatment": "anaerobic digestion and lagoon with split"
-        }
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon with separator"
+            },
+        {
+            "scenario_id": 8,
+            "bedding_type": "CBPB sawdust",
+            "manure_handler": "tillage",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "compost bedded pack barn"
+            },
+        {
+            "scenario_id": 9,
+            "bedding_type": "none",
+            "manure_handler": "harrowing",
+            "manure_separator": "none",
+            "manure_separator_after_digestion": "none",
+            "manure_treatment": "open lots"
+            },
+        {
+            "scenario_id": 10,
+            "bedding_type": "none",
+            "manure_handler": "flush system",
+            "manure_separator": "screw press",
+            "manure_separator_after_digestion": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon with separator"
+            }
     ]
 
 
@@ -301,6 +333,14 @@ def animal_manager_with_mock_pens(animal_manager: AnimalManager,
                                   mock_pens: List[MagicMock]) -> AnimalManager:
     animal_manager.all_pens = mock_pens
     return animal_manager
+
+
+@pytest.fixture
+def cowlist():
+    cowlist = [MagicMock(),
+               MagicMock(),
+               MagicMock()]
+    return cowlist
 
 
 def test_get_animal_config():
@@ -393,9 +433,59 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
         assert add_log.call_count == 2
 
 
-def test_init_nutrient_rqmts():
+def test_animals_by_type(mocker: MockerFixture):
+    """Unit test for function animals_by_type in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.calves = [MagicMock()]
+    mock_animal_manager.heiferIs = [MagicMock()]
+    mock_animal_manager.heiferIIs = [MagicMock()]
+    mock_animal_manager.heiferIIIs = [MagicMock()]
+    mock_animal_manager.cows = [MagicMock()]
+    actual = mock_animal_manager.animals_by_type
+    expected = {
+            Calf: mock_animal_manager.calves,
+            HeiferI: mock_animal_manager.heiferIs,
+            HeiferII: mock_animal_manager.heiferIIs,
+            HeiferIII: mock_animal_manager.heiferIIIs,
+            Cow: mock_animal_manager.cows,
+        }
+    assert actual == expected
+
+
+def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function init_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
+        animal.body_weight = 100
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+
+    mock_weather = MagicMock()
+    mock_current_conditions = MagicMock()
+    mock_current_conditions.mean_air_temperature = 27
+    mock_weather.get_current_day_conditions.return_value = mock_current_conditions
+    mock_time = MagicMock()
+    mock_feed = MagicMock()
+
+    mock_animal_manager.init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
+
+    mock_weather.get_current_day_conditions.assert_called_once_with(mock_time)
+    assert animal.calc_nutrient_rqmts.call_count == 1
+    assert animal.set_nutrient_rqmts.call_count == 4
+    animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
+    animal.set_nutrient_rqmts.assert_has_calls([call(None)] + ([call(27, None)] * 3), any_order=True)
+    expected_p_animal = 720.0
+    for animal_type in animal_types:
+        animals = getattr(mock_animal_manager, animal_type)
+        for animal in animals:
+            assert getattr(animal, 'p_animal') == expected_p_animal
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -407,14 +497,50 @@ def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_calc_nutrient_rqmts():
+def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.all_pens[0].pen = 0
+    mock_animal_manager.all_pens[1].pen = 1
+    mock_animal_manager.all_pens[-1].ration_nutrient_conc = 1.0
+    mock_animal_manager.all_pens[-1].MEdiet = 2.0
+    mock_animal_manager.all_pens[-1].dry_matter_intake = 3.0
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+    mock_feed = MagicMock()
+
+    # act
+    mock_animal_manager.calc_nutrient_rqmts(mock_feed, current_temperature=27)
+
+    # assert
+    assert 1 == animal.calc_nutrient_rqmts.call_count
+    assert 4 == animal.set_nutrient_rqmts.call_count
 
 
-def test_fully_update_animal_to_pen_id_map():
+def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture) -> None:
     """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.animal_to_pen_id_map = {}
+    mock_animal_manager.all_pens[0].id = 0
+    mock_animal_manager.all_pens[1].id = 1
+    i = 0
+    for pen in mock_animal_manager.all_pens:
+        pen.animals_in_pen = {1+i: 100, 2+i: 200}
+        i += 4
+    # act
+    mock_animal_manager.fully_update_animal_to_pen_id_map()
+    # assert
+    assert mock_animal_manager.animal_to_pen_id_map == {1: 0, 2: 0, 5: 1, 6: 1}
 
 
 def pens_test_data_dict() -> List[dict[Any]]:
@@ -445,7 +571,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                          151340, 154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656,
                                          186570, 189951, 194172], 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [],
                                 'Dry_Cow': [], 'Lac_Cow': []},
-                            "pen_animal_combination": Pen.AnimalCombination.CALF,
+                            "pen_animal_combination": AnimalCombination.CALF,
                             "post_removal_stocking_density": 0.50, "num_stalls": 40,
                             "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
                                        "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0,
@@ -456,7 +582,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                          "cow_type_to_id_map": {'Calf': [], 'HeiferI': [100439, 106977, 111123, 111262, 111527, 112516],
                                                 'HeiferII': [120348, 153413, 156414, 193126],
                                                 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                         "pen_animal_combination": Pen.AnimalCombination.GROWING,
+                         "pen_animal_combination": AnimalCombination.GROWING,
                          "post_removal_stocking_density": 0.25, "num_stalls": 36,
                          "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}},
                     "pen2":
@@ -468,7 +594,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                                               162583, 163942,
                                                               176371],
                                                 'Dry_Cow': [187817, 189760, 189801, 198331, 199999], 'Lac_Cow': []},
-                         "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
+                         "pen_animal_combination": AnimalCombination.CLOSE_UP,
                          "post_removal_stocking_density": 0.10, "num_stalls": 150,
                          "ration": {"dummy_feed1": 10.0, "dummy_feed2": 35.0, "dummy_feed3": 0.0,
                                     "dummy_feed4": 84.0}},
@@ -478,7 +604,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                                 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
                                                 'Lac_Cow': [126963, 133132, 156958, 158639, 160697, 162375, 164238,
                                                             198542]},
-                         "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
+                         "pen_animal_combination": AnimalCombination.LAC_COW,
                          "post_removal_stocking_density": 0.20, "num_stalls": 35,
                          "ration": {"dummy_feed1": 100.0, "status": "dummy_val"}}
                 },
@@ -529,7 +655,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                          199441],
                                 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
                                 'Lac_Cow': []},
-                            "pen_animal_combination": Pen.AnimalCombination.CALF,
+                            "pen_animal_combination": AnimalCombination.CALF,
                             "post_removal_stocking_density": 0.50, "num_stalls": 48,
                             "ration": {
                                 "status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
@@ -544,7 +670,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                              142972, 143069, 144943, 146486, 147352, 159225, 161732,
                                              164778, 164961, 186796, 190033, 193035],
                                 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                            "pen_animal_combination": Pen.AnimalCombination.GROWING,
+                            "pen_animal_combination": AnimalCombination.GROWING,
                             "post_removal_stocking_density": 0.14, "num_stalls": 150,
                             "ration": {
                                 "objective": "dummy_val", "dummy_feed2": 4.0, "dummy_feed3": 20.0,
@@ -562,7 +688,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                               177315, 178847],
                                 'Dry_Cow': [179190, 182657, 183755, 186898, 190988, 191700, 193955,
                                             193975, 195540], 'Lac_Cow': []},
-                            "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
+                            "pen_animal_combination": AnimalCombination.CLOSE_UP,
                             "post_removal_stocking_density": 0.35, "num_stalls": 60,
                             "ration": {
                                 "dummy_feed1": 44.4, "dummy_feed2": 21.2, "dummy_feed3": 9.0,
@@ -581,7 +707,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                                                132185, 135078, 135594, 141919, 144930, 145216, 145796,
                                                                149982, 151536, 155905, 164022, 167904, 178041, 181517,
                                                                181810, 184635, 189495, 191337]},
-                            "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
+                            "pen_animal_combination": AnimalCombination.LAC_COW,
                             "post_removal_stocking_density": 0.10, "num_stalls": 210,
                             "ration": {"objective": "dummy_val", "dummy_feed2": 3.0, "dummy_feed3": 12.5,
                                        "dummy_feed4": 0.0, "dummy_feed5": 75.0, "dummy_feed6": 0.0,
@@ -648,7 +774,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                 'Calf': [115259, 138228, 142905, 144752, 156434, 157064, 164638, 167179, 168371,
                                          192382],
                                 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                            "pen_animal_combination": Pen.AnimalCombination.CALF,
+                            "pen_animal_combination": AnimalCombination.CALF,
                             "post_removal_stocking_density": 0.20, "num_stalls": 50,
                             "ration": {
                                 "dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
@@ -658,7 +784,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                          "cow_type_to_id_map": {'Calf': [], 'HeiferI': [112121, 117953, 138864, 144952],
                                                 'HeiferII': [145016, 146409, 166665, 175830, 182621, 190070],
                                                 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                         "pen_animal_combination": Pen.AnimalCombination.GROWING,
+                         "pen_animal_combination": AnimalCombination.GROWING,
                          "post_removal_stocking_density": 0.10, "num_stalls": 100,
                          "ration": {"dummy_feed1": 1.0, "dummy_feed2": 100.0, "dummy_feed3": 77.23,
                                     "dummy_feed4": 60.5, "dummy_feed5": 42.0}},
@@ -667,7 +793,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                          "cow_type_to_id_map": {'Calf': [], 'HeiferI': [114067, 119819, 166593, 168618, 183594],
                                                 'HeiferII': [133865, 142331, 155315, 193905, 197376, 198827],
                                                 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                         "pen_animal_combination": Pen.AnimalCombination.GROWING,
+                         "pen_animal_combination": AnimalCombination.GROWING,
                          "post_removal_stocking_density": 0.11, "num_stalls": 100,
                          "ration": {"dummy_feed1": 62.9, "dummy_feed2": 123.0, "dummy_feed3": 8.9,
                                     "dummy_feed4": 2222.0, "dummy_feed5": 0.0}},
@@ -676,7 +802,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                          "cow_type_to_id_map": {'Calf': [], 'HeiferI': [], 'HeiferII': [],
                                                 'HeiferIII': [107730, 126839, 142837, 143152, 152668, 162701],
                                                 'Dry_Cow': [169688, 174053, 175698, 188017], 'Lac_Cow': []},
-                         "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
+                         "pen_animal_combination": AnimalCombination.CLOSE_UP,
                          "post_removal_stocking_density": 0.5, "num_stalls": 20,
                          "ration": {"status": "dummy_value", "objective": "dummy_value", "dummy_feed1": 8.8,
                                     "dummy_feed2": 72.6, "dummy_feed3": 0.0, "dummy_feed4": 50.0, "dummy_feed5": 4.0}},
@@ -687,7 +813,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                                 'Lac_Cow': [107891, 109102, 110776, 133967, 148657, 157455, 168534,
                                                             183607,
                                                             184783, 196284]},
-                         "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
+                         "pen_animal_combination": AnimalCombination.LAC_COW,
                          "post_removal_stocking_density": 1.0, "num_stalls": 10,
                          "ration": {"dummy_feed1": 35.0, "dummy_feed2": 2.0, "dummy_feed3": 0.0,
                                     "dummy_feed4": 1200.0, "dummy_feed5": 82.50}}
@@ -799,7 +925,8 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
                            'pen_type': 'dummy_pen_type', 'manure_handling': 'dummy_manure_handling',
-                           'manure_separator': 'dummy_manure_separator', 'manure_storage': 'dummy_manure_storage',
+                           'manure_separator': 'dummy_manure_separator', 'manure_separator_after_digestion':
+                           'dummy_manure_separator_after_digestion', 'manure_storage': 'dummy_manure_storage',
                            'animal_combination': 'dummy_animal_combination',
                            'max_stocking_density': 'dummy_max_stocking_density', 'id': pen_id,
                            'number_of_stalls': num_stalls}
@@ -810,10 +937,12 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                     dummy_pen_info_dict['number_of_stalls'],
                     dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
                     dummy_pen_info_dict['pen_type'], dummy_pen_info_dict['manure_handling'],
-                    dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
-                    dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
+                    dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_separator_after_digestion'],
+                    dummy_pen_info_dict['manure_storage'], dummy_pen_info_dict['animal_combination'],
+                    dummy_pen_info_dict['max_stocking_density'])
 
-    dummy_pen.animals_in_pen = animal_list
+    for animal in animal_list:
+        dummy_pen.animals_in_pen[animal.id] = animal
     dummy_pen.stocking_density = len(animal_list) / num_stalls
 
     return dummy_pen
@@ -859,7 +988,8 @@ def setup_dummy_animal_manager_with_pens(animal_manager: AnimalManager, info_dic
 
         dummy_pen.ration = pen_dict['ration']
 
-        dummy_pen.animals_in_pen = animal_list
+        for animal in animal_list:
+            dummy_pen.animals_in_pen[animal.id] = animal
 
         animal_manager.pens_by_animal_combination[pen_dict['pen_animal_combination']].append(dummy_pen)
 
@@ -943,9 +1073,63 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
 
 
-def test_allocate_all_pens():
-    """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
-    pass
+def test_get_dry_cows() -> None:
+    """Unit test for function _get_dry_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_dry = True
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_dry = False
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list[1:]
+
+
+def test_get_lactating_cows() -> None:
+    """Unit test for function _get_lactating_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_lactating = True
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_lactating = False
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
+
+
+def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
+    """Unit test for function _group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_animal_manager.all_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens[0].animal_combination = 'combo_0'
+    mock_animal_manager.all_pens[1].animal_combination = 'combo_1'
+    expected = {'combo_0': [mock_pen_0],
+                'combo_1': [mock_pen_1]}
+    # Act
+    actual = mock_animal_manager._group_pens_by_animal_combination(mock_animal_manager.all_pens)
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    'num_stalls, max_stocking_density, expected',
+    [(1, 1, 1),
+     (1, 2, 2),
+     (0, 1, 0),
+     (1, 0, 0),
+     (100, 1, 100),
+     (-1, 1, ValueError),
+     (1, -1, ValueError)]
+)
+def test_calc_max_animal_spaces_per_pen(num_stalls: float, max_stocking_density: float, expected: float) -> None:
+    """Unit test for function _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
+    if expected is ValueError:
+        with pytest.raises(ValueError,
+                           match='The number of stalls and maximum stocking density must be greater than or equal to 0.'
+                           ):
+            AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+    else:
+        actual = AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        assert actual == expected
 
 
 def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -956,14 +1140,29 @@ def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
         pen.clear.assert_called_once()
 
 
-def test_calc_avg_nutrient_rqmts():
-    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_calc_manure_excretion():
+def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
-    pass
+    mock_feed = MagicMock()
+    methane_model = 'methane_model_choice'
+
+    mock_pen_0 = MagicMock()
+    mock_pen_0.calc_manure = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.reset_manure = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mocked_pens = [mock_pen_0, mock_pen_1]
+
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = mocked_pens
+    # Act
+    mock_animal_manager.calc_manure_excretion(mock_feed, methane_model)
+    # Assert
+    mock_pen_0.calc_manure.assert_called_once_with(mock_feed, 'methane_model_choice')
+    mock_pen_1.reset_manure.assert_called_once()
+    mock_pen_0.reset_manure.assert_not_called()
+    mock_pen_1.calc_manure.assert_not_called()
 
 
 def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -974,12 +1173,24 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
     for pen in animal_manager_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
 
-    pass
 
-
-def test_record_pen_history():
+def test_record_pen_history(mocker: MockerFixture) -> None:
     """Unit test for function record_pen_history in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.calves = MagicMock()
+    mock_animal_manager.heiferIs = MagicMock()
+    mock_animal_manager.heiferIIs = MagicMock()
+    mock_animal_manager.heiferIIIs = MagicMock()
+    mock_animal_manager.cows = MagicMock()
+    mock_animal_manager.gather_pen_history = MagicMock()
+    mock_animal_manager.record_pen_history()
+    mock_animal_manager.gather_pen_history.assert_has_calls([call(mock_animal_manager.calves),
+                                                             call(mock_animal_manager.heiferIs),
+                                                             call(mock_animal_manager.heiferIIs),
+                                                             call(mock_animal_manager.heiferIIIs),
+                                                             call(mock_animal_manager.cows)])
+    assert 5 == mock_animal_manager.gather_pen_history.call_count
 
 
 def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> None:
@@ -994,14 +1205,42 @@ def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> N
     assert actual == pytest.approx(expected)
 
 
-def test_calc_p_rqmts():
+def test_calc_p_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_p_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.call_p_rqmts = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.call_p_rqmts = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.calc_p_rqmts()
+    # Assert
+    mock_pen_0.call_p_rqmts.assert_called_once()
+    mock_pen_1.call_p_rqmts.assert_not_called()
 
 
-def test_daily_p_update():
+def test_daily_p_update(mocker: MockerFixture) -> None:
     """Unit test for function daily_p_update in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.daily_p_update = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.daily_p_update = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.daily_p_update()
+    # Assert
+    mock_pen_0.daily_p_update.assert_called_once()
+    mock_pen_1.daily_p_update.assert_not_called()
 
 
 def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
@@ -1009,7 +1248,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # Set milk_production_reduction to some value
     for pen in pens_with_mock_animals:
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             animal.milk_production_reduction = 100.1
 
     # mock an animal_manager object, but specifically so it returns a list of pens
@@ -1017,7 +1256,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
     penlist.all_pens = pens_with_mock_animals
     for pen in penlist.all_pens:
         pen.animal_combination.name = "NOT_LAC_COW"
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # call the function once on the list of pens
@@ -1025,7 +1264,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # then assert that all animals in all pens are still 100.1
     for pen in penlist.all_pens:
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # now set that they are LAC_COW
@@ -1037,31 +1276,27 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # then assert that all animals in all pens are now 0.0
     for pen in penlist.all_pens:
-        for animal in pen.animals_in_pen:
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 0.0
 
 
-def test_end_ration_interval():
+@pytest.mark.parametrize('simulation_day, formulation_interval, expected',
+                         [(5, 1, True),
+                          (0, 10, True),
+                          (101, 100, True),
+                          (301, 100, True),
+                          (2, 3, False),
+                          (30, 30, False)
+                          ])
+def test_end_ration_interval(simulation_day: int, formulation_interval: int,
+                             expected: bool, mocker: MockerFixture) -> None:
     """Unit test for function end_ration_interval in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_get_life_cycle_output():
-    """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_get_initialize_db_summary():
-    """Unit test for function get_initialize_db_summary in file routines/animal/animal_manager.py"""
-    pass
-
-
-@pytest.fixture
-def cowlist():
-    cowlist = [MagicMock(),
-               MagicMock(),
-               MagicMock()]
-    return cowlist
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.simulation_day = simulation_day
+    mock_animal_manager.formulation_interval = formulation_interval
+    actual = mock_animal_manager.end_ration_interval()
+    assert actual == expected
 
 
 def test_sum_daily_milk(animal_manager, cowlist):
@@ -1151,7 +1386,7 @@ def test_get_animals_snapshot(mocker: MockerFixture):
     # Assert
     assert actual_snapshot == expected_snapshot
     assert mock_animal_grouping_scenario.find_animal_combination.call_count == \
-           num_animal_classes * num_animals_of_each_type
+        num_animal_classes * num_animals_of_each_type
 
     # Reset
     AnimalManager.ANIMAL_GROUPING_SCENARIO = old_animal_grouping_scenario
@@ -1566,11 +1801,11 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     for i in range(num_pens):
         mock_pen = mocker.MagicMock()
         mock_pen.animal_combination.name = 'LAC_COW'
-        mock_pen.animals_in_pen = []
+        mock_pen.animals_in_pen = {}
         for j in range(num_animals_per_pen):
             mock_animal = mocker.MagicMock()
             mock_animal.update_milk_production_history.return_value = None
-            mock_pen.animals_in_pen.append(mock_animal)
+            mock_pen.animals_in_pen[mock_animal.id] = mock_animal
         mock_all_pens.append(mock_pen)
     mock_animal_manager.all_pens = mock_all_pens
 
@@ -1647,7 +1882,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         patch_for_calc_ration_at_interval.assert_called_once_with(mock_feed)
         patch_for_calc_avg_growth.assert_called_once()
         for mock_pen in mock_all_pens:
-            for mock_animal in mock_pen.animals_in_pen:
+            for mock_animal in list(mock_pen.animals_in_pen.values()):
                 mock_animal.update_milk_production_history.assert_called_once_with(
                     mock_animal_manager.simulation_day)
 
@@ -1655,7 +1890,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
 
 
-def test_collect_manure_excretions_output_data(mocker: MockerFixture):
+def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
+    """Unit test for function collect_manure_excretions_output_data in file routines/animal/animal_manager.py"""
     pen = mocker.MagicMock()
     pen.calc_total_manure = mocker.MagicMock()
 
@@ -1677,3 +1913,21 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture):
                                                   animal_manager.methane_mitigation_method,
                                                   animal_manager.methane_mitigation_additive_amount,
                                                   manure_excretions_output_data)
+
+
+@pytest.mark.parametrize('num_animals, max_spaces, expected',
+                         [(100, 99, 1),
+                          (99, 100, -1),
+                          (100, 100, 0),
+                          (42, 100, -58),
+                          ])
+def test_calc_animal_space_shortage(num_animals: int, max_spaces: int, expected: int, mocker: MockerFixture) -> None:
+    """Unit test for function _calc_animal_space_shortage in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager._calc_max_animal_spaces_per_pen = MagicMock(return_value=max_spaces)
+    mock_animal_manager.all_pens = [MagicMock()]
+    mock_animal_manager.all_pens[0].num_stalls = max_spaces
+    mock_animal_manager.all_pens[0].max_stocking_density = 1
+    actual = mock_animal_manager._calc_animal_space_shortage(num_animals, mock_animal_manager.all_pens)
+    assert actual == expected
