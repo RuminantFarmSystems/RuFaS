@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Dict
 from typing import Optional
 from typing import Type
@@ -8,7 +9,6 @@ from typing import Type
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
 )
@@ -19,7 +19,7 @@ from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 
 
-class ManureHandlerType(DefaultEnum):
+class ManureHandlerType(Enum):
     """Enumerates the different types of manure handlers.
 
     Attributes
@@ -37,10 +37,6 @@ class ManureHandlerType(DefaultEnum):
     HARROWING : str
         A system whereby the manure is handled via harrowing methods.
 
-    Notes
-    -----
-    The DEFAULT ManureHandlerType is FLUSH_SYSTEM.
-
     """
 
     FLUSH_SYSTEM = "flush system"
@@ -48,7 +44,6 @@ class ManureHandlerType(DefaultEnum):
     ALLEY_SCRAPER = "alley scraper"
     TILLAGE = "tillage"
     HARROWING = "harrowing"
-    DEFAULT = FLUSH_SYSTEM
 
 
 class BaseManureHandler:
@@ -262,12 +257,14 @@ class Harrowing(BaseManureHandler):
     pass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
 
     Attribute
     ----------
+    manure_handler_type: ManureHandlerType
+        The class of manure handlers that this configuration falls into.
     cleaning_water_use_rate : float
         Amount of cleaning water used per animal per day, L.
     minutes_per_cleaning : int
@@ -280,62 +277,12 @@ class ManureHandlerConfig:
         Fraction of cleaning water that is from recycled (not fresh) water sources.
     """
 
-    cleaning_water_use_rate: float = 0.0
-    minutes_per_cleaning: int = 8
-    cleanings_per_day: int = 2
-    daily_tillage_frequency: int = 0
-    cleaning_water_recycle_fraction: float = 0.0
-
-
-class DefaultManureHandlerConfigFactory:
-    """Class for creating default manure handler configurations."""
-
-    FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
-        cleaning_water_use_rate=757.0,
-        cleaning_water_recycle_fraction=0.80,
-    )
-    MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
-        cleaning_water_use_rate=10.0,
-        cleaning_water_recycle_fraction=0.10,
-    )
-    ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
-        cleaning_water_use_rate=10.0,
-        cleaning_water_recycle_fraction=0.10,
-    )
-    TILLAGE_CONFIG = ManureHandlerConfig(
-        daily_tillage_frequency=1,
-    )
-    HARROWING_CONFIG = ManureHandlerConfig(
-        daily_tillage_frequency=0,
-    )
-
-    @classmethod
-    def get_instance(
-            cls, manure_handler_type: ManureHandlerType
-    ) -> ManureHandlerConfig:
-        """Return a default manure handler configuration for the given manure handler type.
-
-        Parameters
-        ----------
-        manure_handler_type : ManureHandlerType
-            The type of manure handler.
-
-        Returns
-        -------
-        A default ManureHandlerConfig object for the given manure handler type.
-        """
-
-        manure_handler_config_by_type = {
-            ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
-            ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
-            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
-            ManureHandlerType.TILLAGE: cls.TILLAGE_CONFIG,
-            ManureHandlerType.HARROWING: cls.HARROWING_CONFIG,
-        }
-
-        manure_handler_config = manure_handler_config_by_type[manure_handler_type]
-
-        return manure_handler_config
+    manure_handler_type: ManureHandlerType
+    cleaning_water_use_rate: float
+    minutes_per_cleaning: int
+    cleanings_per_day: int
+    daily_tillage_frequency: int
+    cleaning_water_recycle_fraction: float
 
 
 class ManureHandlerFactory:
@@ -344,23 +291,23 @@ class ManureHandlerFactory:
     @classmethod
     def get_instance(
             cls,
-            manure_handler_type_name: str,
+            manure_handler_configuration_name: str,
             weather: Weather,
             time: Time,
-            custom_manure_handler_config: Optional[ManureHandlerConfig] = None,
+            manure_handler_config: ManureHandlerConfig,
     ) -> BaseManureHandler:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
         Parameters
         ----------
-        manure_handler_type_name : str
-            A string that specifies the type of manure handler.
+        manure_handler_configuration_name : str
+            A string that specifies the specific configuration of this manure handler.
         weather : Weather
             A Weather object.
         time : Time
             A Time object.
-        custom_manure_handler_config : ManureHandlerConfig
-            A ManureHandlerConfig object that contains custom initialization data.
+        manure_handler_config : ManureHandlerConfig
+            A ManureHandlerConfig object that containing initialization data.
 
         Returns
         -------
@@ -377,21 +324,10 @@ class ManureHandlerFactory:
             ManureHandlerType.HARROWING: Harrowing,
         }
 
-        manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)
-        manure_handler_class = manure_handler_class_by_type[manure_handler_type]
+        manure_handler_class = manure_handler_class_by_type[manure_handler_config.manure_handler_type]
 
-        if custom_manure_handler_config:
-            manure_handler_subtype = manure_handler_class(
-                weather, time, custom_manure_handler_config
-            )
+        manure_handler_subtype = manure_handler_class(
+            weather, time, manure_handler_config
+        )
 
-            return manure_handler_subtype
-        else:
-            default_manure_handler_config = (
-                DefaultManureHandlerConfigFactory.get_instance(manure_handler_type)
-            )
-            manure_handler_subtype = manure_handler_class(
-                weather, time, default_manure_handler_config
-            )
-
-            return manure_handler_subtype
+        return manure_handler_subtype
