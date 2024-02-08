@@ -406,6 +406,16 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
+    def manure_sums(self, manure, curr_manure, dict):
+        """
+        Accumulator function for calc_manure.
+        The function finds sums of manure components for each 
+        animal in the pen for total manure in pen and total manure by animal type 
+        """
+        for key in manure.keys():
+            manure[key] += curr_manure[key]
+            dict[key] += curr_manure[key]
+
     def calc_manure(self, feed, methane_model: str):  # noqa
         """
         Calculate the manure excretion of the animals in the pen.
@@ -442,25 +452,16 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
-        # TODO: Write an accumulator function
         for animal in animals:
             curr_manure = animal.manure_excretion
             if type(animal) == Calf:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    calf_total[key] += curr_manure[key]
+                self.manure_sums(manure, curr_manure, calf_total)
             elif type(animal) in [HeiferI, HeiferII, HeiferIII]:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    heifer_total[key] += curr_manure[key]
+                self.manure_sums(manure, curr_manure, heifer_total)
             elif type(animal) == Cow and not animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    dry_total[key] += curr_manure[key]
+                self.manure_sums(manure, curr_manure, dry_total)
             elif type(animal) == Cow and animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    lactating_total[key] += curr_manure[key]
+                self.manure_sums(manure, curr_manure, lactating_total)
 
         self.manure = manure
         self.calf_total = calf_total
