@@ -130,7 +130,7 @@ class PhosphorusIncorporation:
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_phosphorus_time(self) -> None:
         """
-        copies the current phosphorus value to previous_phosphorus (for use between time steps)
+        Copies the current phosphorus value to previous_phosphorus (for use between time steps).
 
         """
         self.data.previous_phosphorus = self.data.phosphorus
