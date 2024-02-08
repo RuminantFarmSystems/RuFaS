@@ -69,6 +69,11 @@ class ManureTreatmentConfig:
 
     last_compost_turning_or_addition:
         Number of days since last compot turning or addition activity.
+
+    manure_cover: str
+        Indicates the presence or absence of a cover in the manure treatment or storage system.
+        When used in the case of a slurry storage system (underfloor or outdoors) the cover
+        refers to the presence of a natural crust.
     """
 
     total_solids_removal_efficiency_for_treatment: float = 0.0
