@@ -84,32 +84,41 @@ class GasEmissionsCalculator:
             raise ValueError(
                 f"Total volatile solids must be greater than 0. Total volatile solids provided: {total_volatile_solids}"
             )
-
+        
         arrhenius_exponent = cls._arrhenius_exponent(temp)
-
+        print("arrhenius_exponent", arrhenius_exponent)
         (
             degradable_volatile_solids,
             non_degradable_volatile_solids,
         ) = cls._volatile_solid_components(total_volatile_solids)
+        print("total_volatile_solids", total_volatile_solids)
+        print("degradable_volatile_solids", degradable_volatile_solids)
+        print("non_degradable_volatile_solids", non_degradable_volatile_solids)
 
+        degradable_volatile_solids_comp = degradable_volatile_solids * 1000 / total_volatile_solids
+        non_degradable_volatile_solids_comp = non_degradable_volatile_solids * 1000 / total_volatile_solids
+        print("degradable_volatile_solids_comp", degradable_volatile_solids_comp)
+        print("non_degradable_volatile_solids_comp", non_degradable_volatile_solids_comp)
+        print("DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR", GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR)
+        print("NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR", GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR)
         methane_emission_from_degradable_volatile_solids = (
-                GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                * degradable_volatile_solids
+                degradable_volatile_solids_comp
                 * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
-        )
+        ) * total_volatile_solids / 1000 
+        print("methane_emission_from_degradable_volatile_solids", methane_emission_from_degradable_volatile_solids)
         methane_emission_from_non_degradable_volatile_solids = (
-                GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                * non_degradable_volatile_solids
+                non_degradable_volatile_solids_comp
                 * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
-        )
-
+        ) * total_volatile_solids / 1000 
+        print("methane_emission_from_non_degradable_volatile_solids", methane_emission_from_non_degradable_volatile_solids)
+       
         methane_emission = (
                 methane_emission_from_degradable_volatile_solids
                 + methane_emission_from_non_degradable_volatile_solids
         )
-
+        print("methane_emission", methane_emission)
         return methane_emission
 
     @classmethod
