@@ -80,9 +80,9 @@ def test_calc_temperature_stress(air, mini, opt):
         expect = 1
     if mini < air <= opt:  # B
         expect = 1 - exp(top / ((air - mini) ** 2))
-    if opt < air <= dbl:  # C
-        expect = 1 - exp(top / ((dbl - mini) ** 2))
-    if air > dbl:  # D
+    if opt < air < dbl:  # C
+        expect = 1 - exp(top / ((dbl - air) ** 2))
+    if air >= dbl:  # D
         expect = 1
 
     assert GrowthConstraints._determine_temperature_stress(air_temp=air, min_temp=mini, optimal_temp=opt) == expect
