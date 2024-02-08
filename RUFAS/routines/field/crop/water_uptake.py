@@ -77,7 +77,7 @@ class WaterUptake:
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
         """
-        Transfers the current day's water uptake from soil layers to the crop
+        Transfers the current day's water uptake from soil layers to the crop.
 
         Parameters
         ----------
