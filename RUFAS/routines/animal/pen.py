@@ -410,7 +410,7 @@ class Pen:
         """
         Accumulator function for calc_manure.
         The function finds sums of manure components for each 
-        animal in the pen for total manure in pen and total manure by animal type 
+        animal in the pen  
         """
         for key in manure.keys():
             manure[key] += curr_manure[key]
