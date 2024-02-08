@@ -382,7 +382,7 @@ class GasEmissionsCalculator:
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return num_animals * max(0.0, 0.13 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.13 * barn_temp) * barn_area / 1000
 
     @classmethod
     def housing_carbon_dioxide_emission(
