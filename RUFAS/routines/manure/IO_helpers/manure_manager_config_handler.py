@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
@@ -24,6 +25,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+
+om = OutputManager()
 
 
 class ManureManagerConfigHandler:
@@ -165,34 +168,43 @@ class ManureManagerConfigHandler:
         return bedding_config_by_bedding_type
 
     @classmethod
-    def _process_manure_handler_configs(
-        cls, manure_handler_json_configs: List[Dict]
-    ) -> Dict[ManureHandlerType, ManureHandlerConfig]:
-        """Returns a dictionary of manure handler config objects, with the key being the manure handler type.
+    def _process_manure_handler_configs(cls, manure_handler_configs: List[Dict]) -> Dict[str, ManureHandlerConfig]:
+        """
+        Returns a dictionary of manure handler config objects, with the key being the name of the manure handler
+        configuration option.
 
         Parameters
         ----------
-        manure_handler_json_configs : List[Dict]
+        manure_handler_configs : List[Dict]
             A list of dictionaries containing the manure handler config information.
 
         Returns
         -------
-        Dict[ManureHandlerType, ManureHandlerConfig]
+        Dict[str, ManureHandlerConfig]
             A dictionary of manure handler config objects, with the key being the manure handler type.
 
+        Raises
+        ------
+        ValueError
+            If there are multiple configurations for one configuration name.
+
         """
-        manure_handler_config_by_manure_handler_type: Dict[
-            ManureHandlerType, ManureHandlerConfig
-        ] = {}
-        for json_manure_handler_config in manure_handler_json_configs:
-            manure_handler_type = ManureHandlerType.get_type(
-                json_manure_handler_config["manure_handler_type"]
-            )
-            del json_manure_handler_config["manure_handler_type"]
-            manure_handler_config_by_manure_handler_type[
-                manure_handler_type
-            ] = ManureHandlerConfig(**json_manure_handler_config)
-        return manure_handler_config_by_manure_handler_type
+
+        info_map = {"class": cls.__name__, "function": cls._process_manure_handler_configs.__name__}
+
+        available_manure_handler_configs: Dict[str, ManureHandlerConfig] = {}
+
+        for manure_handler_config in manure_handler_configs:
+            handler_name = manure_handler_config.pop("name")
+            if handler_name in available_manure_handler_configs:
+                error_name = f"Manure handler '{handler_name}' has multiple configurations."
+                error_message = "Raising ValueError."
+                om.add_error(error_name, error_message, info_map)
+                raise ValueError(f"Duplicate configurations for '{handler_name}'.")
+            handler_type = ManureHandlerType(manure_handler_config["manure_handler_type"])
+            manure_handler_config["manure_handler_type"] = handler_type
+            available_manure_handler_configs[handler_name] = ManureHandlerConfig(**manure_handler_config)
+        return available_manure_handler_configs
 
     @classmethod
     def _process_manure_separator_configs(
