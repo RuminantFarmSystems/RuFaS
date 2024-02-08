@@ -320,18 +320,18 @@ class WaterUptake:
         Parameters
         ----------
         root_depth : float
-            current depth of root roots (mm).
+            Current depth of root roots (mm).
         depth : float
-            depth from the soil surface (mm).
+            Depth from the soil surface (mm).
         max_transpiration : float
-            maximum transpiration possible for the plant during the current day (mm).
+            Maximum transpiration possible for the plant during the current day (mm).
         water_distro_parameter : float
-            water use distribution parameter (unitless).
+            Water use distribution parameter (unitless).
 
         Returns
         -------
         water : float
-            maximum amount of water potentially taken up by the plant (mm).
+            Maximum amount of water potentially taken up by the plant (mm).
 
         References
         ----------
