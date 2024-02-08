@@ -20,11 +20,13 @@ class SupportedSensitivityMethods(Enum):
 
     The methods refer to those utilized by the `SALib` package:
 
-    'sobol'
+    Attributes
+    ----------
+    SOBOL : str
         `Sobol method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.sobol>`_
-    'fast'
+    FAST : str
        `FAST method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.fast>`_
-    `morris`
+    MORRIS : str
         `Morris' method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.morris>`_
     """
     SOBOL = "sobol"
