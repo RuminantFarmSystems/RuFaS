@@ -47,7 +47,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         methane_emission = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-            total_volatile_solids=self.accumulated_output.liquid_manure_total_volatile_solids,
+            total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
             temp=self._get_current_day_average_temperature_celsius(),
         )
         methane_emission = max(methane_emission, 0.0)
