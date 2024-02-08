@@ -67,7 +67,7 @@ class WaterDynamics:
 
         References
         ----------
-        SWAT 2:2.3.1
+        SWAT Theoretical documentation section 2:2.3.1
 
         Notes
         -----
@@ -96,7 +96,7 @@ class WaterDynamics:
 
         References
         ----------
-        SWAT 2:2.3.2
+        SWAT Theoretical documentation section 2:2.3.2
 
         """
         self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
