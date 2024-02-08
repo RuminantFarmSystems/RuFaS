@@ -149,7 +149,8 @@ class GraphGenerator:
             if found_errors:
                 return all_logs
 
-            fig, _ = plt.subplots()
+            fig, _ = plt.subplots(figsize=(10, 6))
+            plt.subplots_adjust(right=0.65)
             filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"]
                              if k in filtered_pool.keys()}
             self._draw_graph(

@@ -1,5 +1,5 @@
 from typing import Dict, List, Any, Callable
-
+from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
 
@@ -202,12 +202,15 @@ class ReportGenerator:
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
-
-            for col, values in report_data.items():
-                column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}"
-                    if len(individual_report_name) > 0 else col)
-                self.reports[column_name] = {"values": values}
+                for col, values in report_data.items():
+                    column_name = self._ensure_unique_report_name_with_timestamp(
+                        f"{individual_report_name}_{col}"
+                        if len(individual_report_name) > 0 else col)
+                    self.reports[column_name] = {"values": values}
+                if filter_content.get("graph_details"):
+                    graph_event_log = self._graph_report_data(filter_content, individual_report_name)
+                    event_logs.append(graph_event_log)
+                    self.reports.clear()
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
@@ -219,6 +222,28 @@ class ReportGenerator:
             event_logs.append(error_event_log)
 
         return event_logs
+
+    def _graph_report_data(self, filter_content: Dict[str, Any], individual_report_name: str) -> Dict[str, str]:
+        """Prepare and send aggregated report data to Graph Generator to be graphed.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details
+            such as 'name', 'filters', 'cross_references', and aggregation instructions.
+        individual_report_name : str
+            The name of the report to be graphed.
+        """
+        graph_generator = GraphGenerator()
+        graph_details = filter_content["graph_details"]
+        graph_details["title"] = filter_content["name"]
+        graphics_dir = graph_details["graphics_dir"]
+        graph_details["filters"] = filter_content["filters"]
+        del graph_details["graphics_dir"]
+        graph_event_log = graph_generator.generate_graph(self.reports, graph_details,
+                                                         individual_report_name,
+                                                         graphics_dir)
+        return graph_event_log
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """
