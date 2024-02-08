@@ -569,7 +569,7 @@ def test_methane_emission_for_anaerobic_lagoon() -> None:
                 10,
                 100.0,
                 30.0,
-                10 * max(0.0, 0.13 * 30.0) * 100.0 / 1000,
+                max(0.0, 0.13 * 30.0) * 100.0 / 1000,
                 None,
         ),  # Standard case
         (0, 100.0, 30.0, 0, None),  # Edge case: no animals
