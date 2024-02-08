@@ -44,7 +44,7 @@ class ManureManagerConfigHandler:
         self.custom_bedding_configs = self._process_bedding_configs(
             manure_manager_config["bedding_configs"]
         )
-        self.custom_manure_handler_configs = self._process_manure_handler_configs(
+        self.manure_handler_configs = self._process_manure_handler_configs(
             manure_manager_config["manure_handler_configs"]
         )
         self.custom_manure_separator_configs = self._process_manure_separator_configs(
@@ -76,26 +76,29 @@ class ManureManagerConfigHandler:
             BeddingType.get_type(bedding_type_name), None
         )
 
-    def get_custom_manure_handler_config(
-        self, manure_handler_type_name: str
-    ) -> Optional[ManureHandlerConfig]:
-        """Returns the custom manure handler config for the given manure handler type name, or None if no custom
-        config exists.
+    def get_manure_handler_config(self, manure_handler_type_name: str) -> ManureHandlerConfig:
+        """Returns the manure handler config for the given manure handler type name.
 
         Parameters
         ----------
         manure_handler_type_name : str
-            The name of the manure handler type for which to get the custom config.
+            The name of the manure handler type for which to get the config.
 
         Returns
         -------
-        Optional[ManureHandlerConfig]
-            The custom manure handler config for the given manure handler type name, or None if no custom config exists.
+        ManureHandlerConfig
+            The manure handler config for the given manure handler type name.
 
         """
-        return self.custom_manure_handler_configs.get(
-            ManureHandlerType.get_type(manure_handler_type_name), None
-        )
+        try:
+            return self.manure_handler_configs[manure_handler_type_name]
+        except KeyError:
+            info_map = {"class": self.__class__.__name__, "function": self.get_manure_handler_config.__name__}
+            error_title = \
+                f"Attempted use a non-existent manure handler configuration called '{manure_handler_type_name}'."
+            error_message = "Raising ValueError."
+            om.add_error(error_title, error_message, info_map)
+            raise ValueError(error_title)
 
     def get_custom_manure_separator_config(
         self, manure_separator_type_name: str

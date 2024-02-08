@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict
-from typing import Optional
 from typing import Type
 
 from RUFAS.time import Time
@@ -51,6 +50,8 @@ class BaseManureHandler:
 
     Attributes
     ----------
+    name : str
+        The name of the manure handler.
     weather : Weather
         A Weather object.
     time : Time
@@ -64,11 +65,13 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
+    def __init__(self, name: str, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
         """Initialize a BaseManureHandler object.
 
         Parameters
         ----------
+        name : str
+            The name of the manure handler.
         weather : Weather
             A Weather object.
         time : Time
@@ -291,7 +294,7 @@ class ManureHandlerFactory:
     @classmethod
     def get_instance(
             cls,
-            manure_handler_configuration_name: str,
+            configuration_name: str,
             weather: Weather,
             time: Time,
             manure_handler_config: ManureHandlerConfig,
@@ -300,8 +303,8 @@ class ManureHandlerFactory:
 
         Parameters
         ----------
-        manure_handler_configuration_name : str
-            A string that specifies the specific configuration of this manure handler.
+        configuration_name : str
+            A string that specifies the configuration of the generated manure handler.
         weather : Weather
             A Weather object.
         time : Time
@@ -326,8 +329,6 @@ class ManureHandlerFactory:
 
         manure_handler_class = manure_handler_class_by_type[manure_handler_config.manure_handler_type]
 
-        manure_handler_subtype = manure_handler_class(
-            weather, time, manure_handler_config
-        )
+        manure_handler_subtype = manure_handler_class(configuration_name, weather, time, manure_handler_config)
 
         return manure_handler_subtype
