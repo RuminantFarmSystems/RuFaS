@@ -350,7 +350,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_ammonia_emission',
         return_value=housing_ammonia_emission
     )
-    housing_methane_emission = 2.0
+    housing_methane_emission = 0.02
     patch_for_calc_housing_methane_emission = mocker.patch(
         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_methane_emission',
         return_value=housing_methane_emission
