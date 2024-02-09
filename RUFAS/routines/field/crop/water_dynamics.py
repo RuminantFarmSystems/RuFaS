@@ -131,9 +131,8 @@ class WaterDynamics:
 
     @staticmethod
     def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
-        # TODO: belongs in Soil class? - GitHub Issue #303
         """
-        Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day?
+        Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day? issue #1256
 
         Parameters
         ----------
@@ -147,7 +146,7 @@ class WaterDynamics:
         float
             Total evapotranspiration (mm).
 
-        TODO: find where SWAT has this equation (if it does, if not make note of assumption) #
+        TODO: find where SWAT has this equation (if it does, if not make note of assumption) issue #1255
 
         """
         return evaporation + transpiration
