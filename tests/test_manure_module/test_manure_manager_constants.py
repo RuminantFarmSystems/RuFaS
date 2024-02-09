@@ -2,6 +2,8 @@ from pytest import approx
 
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 def test_manure_constants() -> None:
@@ -79,3 +81,17 @@ def test_gas_emission_constants() -> None:
     assert GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING == approx(0.07)
     assert GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING == approx(0.01)
     assert GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING == approx(0.35)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.SLURRY_STORAGE_OUTDOOR][ManureCoverEnum.COVER.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.SLURRY_STORAGE_OUTDOOR][ManureCoverEnum.NO_COVER.value] == approx(0.0)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR][ManureCoverEnum.COVER.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR][ManureCoverEnum.NO_COVER.value] == approx(0.0)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.ANAEROBIC_LAGOON][ManureCoverEnum.COVER.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.ANAEROBIC_LAGOON][ManureCoverEnum.NO_COVER.value] == approx(0.0)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+               ManureTreatmentType.ANAEROBIC_DIGESTION][ManureCoverEnum.NOT_APPLICABLE.value] == approx(0.0006)
