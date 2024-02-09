@@ -9,7 +9,7 @@ om = OutputManager()
 
 
 class HeiferIII(HeiferII):
-    # TODO: Rank heifers to enter the herd or sold
+    # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
 
     def __init__(self, args):
         """
