@@ -772,7 +772,9 @@ def test_ensure_unique_report_name_with_timestamp(
                 {"ref1": {"values": [4, 5, 6]}},
                 None,
                 None,
-                {'ref1': {'values': [4, 5, 6]}},
+                {'ref1': {'values': [4, 5, 6]},
+                 'report_with_references_some_filter': {'values': [1, 2, 3]},
+                 'report_with_references_ref1': {'values': [4, 5, 6]}},
                 ["Start generating individual report: report_with_references"]
         ),
 
