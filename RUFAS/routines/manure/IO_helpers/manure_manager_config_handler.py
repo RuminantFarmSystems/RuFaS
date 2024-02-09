@@ -3,7 +3,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
-
+import pdb
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
@@ -44,6 +44,7 @@ class ManureManagerConfigHandler:
         self.custom_bedding_configs = self._process_bedding_configs(
             manure_manager_config["bedding_configs"]
         )
+        pdb.set_trace()
         self.manure_handler_configs = self._process_manure_handler_configs(
             manure_manager_config["manure_handler_configs"]
         )
