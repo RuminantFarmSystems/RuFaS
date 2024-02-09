@@ -130,7 +130,7 @@ class GasEmissionConstants:
     in the anaerobic digestion process increases.
     """
 
-    DEFAULT_HOUSING_SPECIFIC_CONSTANT: float = 260.0  # s/m
+    HOUSING_HSC = 260.0  # s/m
     """
     Default housing specific constant (s/m). This constant may be used in calculations
     related to the housing conditions for animals. Default is set to 260.0 s/m.
@@ -161,13 +161,13 @@ class GasEmissionConstants:
     SLURRY_MANURE_HSC: float = 19.0
     """Housing specific constant for slurry manure (s/m)."""
 
-    LIQUID_MANURE_HSC: float = 4.1
-    """Housing specific constant for liquid manure (s/m)."""
+    STORAGE_HSC = 4.1
+    """Housing specific constant for manure storage (s/m)."""
 
-    SOLID_MANURE_THRESHOLD: float = 8.0
+    SOLID_MANURE_THRESHOLD = 0.08
     """Dry matter threshold for classifying solid and semi-solid manure (unitless)."""
 
-    SLURRY_MANURE_THRESHOLD: float = 5.0
+    SLURRY_MANURE_THRESHOLD = 0.05
     """Dry matter threshold for classifying slurry manure (unitless)."""
 
     DEFAULT_STORAGE_AREA_PER_ANIMAL: float = 1.0

@@ -187,13 +187,7 @@ class BaseManureTreatment(ABC):
         )
 
         final_manure_volume = (
-            manure_treatment_daily_input.liquid_manure_daily_volume
-            - (
-                manure_treatment_daily_input.liquid_manure_total_solids
-                * self.config.total_solids_removal_efficiency_for_treatment
-            )
-            / 1000.0
-        )  # TODO: Make 1000.0 a constant - Issue #1120
+            manure_treatment_daily_input.liquid_manure_daily_volume)
 
         return ManureTreatmentDailyOutput(
             simulation_day=simulation_day,
