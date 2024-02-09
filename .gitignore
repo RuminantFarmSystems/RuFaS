@@ -35,8 +35,6 @@ output/graphics/*
 !output/output_filters/
 output/output_filters/*
 !output/output_filters/report_example.json
-!output/output_filters/report_DMI_by_feed.json
-!output/output_filters/report_SYSEN.json
 
 # ignore project files
 *.sublime-project
