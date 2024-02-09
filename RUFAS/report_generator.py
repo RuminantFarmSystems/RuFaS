@@ -339,7 +339,7 @@ class ReportGenerator:
     def _combine_aggregate_report_data(
             self,
             horizontally_aggregated: List[float] | None,
-            vertically_aggregated: List[float] | None,
+            vertically_aggregated: Dict[str, List[float]] | None,
             filter_content: Dict[str, Any]
     ) -> Dict[str, List[float]] | None:
         """
@@ -372,14 +372,22 @@ class ReportGenerator:
         if horizontal_agg_key and vertical_agg_key:
             horizontal_first = filter_content.get("horizontal_first", True)
             aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key if horizontal_first else horizontal_agg_key]
-            aggregated_data = horizontally_aggregated if horizontal_first else vertically_aggregated
-            return {f"{'hor_ver' if horizontal_first else 'ver_hor'}_agg": [aggregator(aggregated_data)]}
+            if horizontal_first:
+                return {"hor_ver_agg": [aggregator(horizontally_aggregated)]}
+            else:
+                ver_hor_aggregated = []
+                for elements in zip(*vertically_aggregated.values()):
+                    ver_hor_aggregated.append(aggregator(list(elements)))
+                return {"ver_hor_agg": ver_hor_aggregated}
 
         if horizontal_agg_key:
             return {"hor_agg": horizontally_aggregated}
 
         if vertical_agg_key:
-            return {"ver_agg": vertically_aggregated}
+            if filter_content.get("variables") is not None or len(vertically_aggregated) > 1:
+                return {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+            elif len(vertically_aggregated) == 1:
+                return {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return None
 
@@ -461,7 +469,8 @@ class ReportGenerator:
     def _apply_vertical_aggregation(
             self,
             report_data: Dict[str, List[float]],
-            aggregator: Callable[[List[float]], float]) -> List[float]:
+            aggregator: Callable[[List[float]], float]
+    ) -> Dict[str, List[float]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -474,15 +483,15 @@ class ReportGenerator:
 
         Returns
         -------
-        List[float]
-            The vertically aggregated data as a list.
+        Dict[str, List[float]]
+            The vertically aggregated data as a dictionary of lists.
         """
 
-        aggregated_data: List[float] = []
-        for _, data in report_data.items():
+        aggregate_data_dict: Dict[str, List[float]] = {}
+        for key, data in report_data.items():
             non_null_data_points = list(filter(lambda x: x is not None, data))
-            aggregated_data.append(aggregator(non_null_data_points))
-        return aggregated_data
+            aggregate_data_dict[key] = [aggregator(non_null_data_points)]
+        return aggregate_data_dict
 
     def _prepare_report_data_with_constants(
             self,
@@ -525,7 +534,7 @@ class ReportGenerator:
 
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict and selected_variables is None:
+            if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
                 raise KeyError(
                     "Can't generate report, use 'variables' arg to select items from data"
                 )
