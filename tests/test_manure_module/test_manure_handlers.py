@@ -265,7 +265,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_manure = mocker.MagicMock(autospec=PenManure)
     mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
     mock_manure.urea = urea = 20.0
-    mock_manure.urine_total_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
+    mock_manure.manure_mass = 22.0
     mock_manure.urine = urine = 22.0
     mock_manure.nitrogen = N = 23.0
     mock_manure.total_solids = TS = 24.0
@@ -281,6 +281,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_pen.num_lactating_cows = 100
     mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 101.0
     mock_pen.manure = mock_manure
+    mock_pen.pen_type = "freestall"
 
     mock_bedding = mocker.MagicMock(autospec=BaseBedding)
     mock_bedding.calc_total_bedding_volume.return_value = total_bedding_volume = 30.0
@@ -332,8 +333,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     # Assert
     patch_for_calc_housing_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
-        barn_area_per_animal=barn_area_from_pen_type,
-        urine_total_ammoniacal_nitrogen=urine_ammoniacal_nitrogen,
+        barn_area=barn_area_from_pen_type,
+        urine_total_ammoniacal_nitrogen=TAN,
         urine=urine,
         temp=current_day_avg_tempC
     )
