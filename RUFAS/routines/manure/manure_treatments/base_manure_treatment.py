@@ -314,11 +314,11 @@ class BaseManureTreatment(ABC):
         """
 
         return GasEmissionsCalculator.empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            emission_factor__kg_nitrous_oxide_N_per_kg_manure_N=(
-                GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR__KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+            emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=(
+                GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
                     manure_treatment_type][manure_cover]
             ),
-            manure_nitrogen__kg_N_per_day=manure_nitrogen__kg_N_per_day,
+            manure_nitrogen_kg_N_per_day=manure_nitrogen__kg_N_per_day,
         )
 
     def _get_current_day_average_temperature_celsius(self) -> float:
