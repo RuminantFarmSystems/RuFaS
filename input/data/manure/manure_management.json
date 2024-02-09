@@ -22,7 +22,7 @@
       "manure_handler": "manual scraping",
       "manure_separator": "screw press",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "slurry storage underfloor"
+      "manure_treatment": "slurry storage outdoor"
     },
     {
       "scenario_id": 3,
