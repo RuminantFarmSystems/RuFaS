@@ -139,13 +139,16 @@ class BaseManureHandler:
             )
         )
 
-        housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
-            num_animals=pen.num_animals,
-            barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
-            urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
-            urine=pen.manure.urine,  # kg
-            temp=self._get_current_day_average_temperature_in_celsius(),
-        )
+        if pen.pen_type in ["freestall", "tiestall"]:
+            housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
+                num_animals=pen.num_animals,
+                barn_area=pen.barn_area_from_pen_type,  # m^2/animal
+                urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
+                urine=pen.manure.urine,  # kg
+                temp=self._get_current_day_average_temperature_in_celsius(),
+            )
+        else:
+            housing_ammonia_emission = 0.0
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
