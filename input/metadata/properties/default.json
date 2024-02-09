@@ -3581,7 +3581,7 @@
           "manure_treatment_type": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
           },
           "total_solids_removal_efficiency_for_treatment": {
             "type": "number"
@@ -3606,6 +3606,23 @@
           },
           "freeboard_input": {
             "type": "number"
+          },
+          "composting_type": {
+            "type": "string",
+            "description": "Composting Type -- The type of composting.",
+            "pattern": "^(intensive windrow|passive windrow|static pile)$",
+            "default": "intensive windrow"
+          },
+          "last_compost_turning_or_addition": {
+            "type": "number",
+            "description": "The number of days since the last turning or addition event (day)",
+            "default": 1
+          },
+          "manure_cover": {
+            "type": "string",
+            "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+            "pattern": "(cover|no cover|N/A)",
+            "default": "no cover"
           }
         }
       }
