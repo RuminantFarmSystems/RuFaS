@@ -47,9 +47,9 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 ## Q1 Goals
 ### SWE Goals
 * Finish Feed Storage Module (P1)
-*   Fix the issues in the Feed library 
-*   Feed Degradation
-*   Purchase Feed logic
+  - Fix the issues in the Feed library 
+  - Feed Degradation
+  - Purchase Feed logic
 * Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
 * Implement Scenario Manager (P0)
 * Implement end to end testing (P1)
