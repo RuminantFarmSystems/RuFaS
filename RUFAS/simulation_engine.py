@@ -65,6 +65,11 @@ class SimulationEngine:
         routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation(
             self.state.animal_manager, self.day_counter
         )
+        om.add_variable(
+            "available_feeds_on_final_day",
+            self.feed_manager.query_available_feeds(),
+            info_map
+        )
         t_end_sim = timer.time()
 
         sys.stdout.write("\nSimulation Successful\n\n")
