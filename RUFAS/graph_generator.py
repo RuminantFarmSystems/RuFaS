@@ -328,6 +328,8 @@ class GraphGenerator:
         for attrib, value in customization_details.items():
             if attrib in FIGURE_SETTERS.keys():
                 FIGURE_SETTERS[attrib](fig, value)
+            elif attrib == "legend":
+                AXES_SETTERS[attrib](fig.axes[0], value, loc='upper left', bbox_to_anchor=(1, 1))
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
 
