@@ -755,6 +755,62 @@ class AnimalManager:
             max_stocking_density=max_stocking_density,
         )
 
+    @classmethod
+    def _create_duplicate_pen(
+            cls, pen_id: int, animal_combination: AnimalCombination, num_stalls: int, max_stocking_density: float,
+            reference_pen: Pen
+    ) -> Pen:
+        """
+        Create a default Pen object with the given parameters.
+
+        Parameters
+        ----------
+        pen_id : int
+            The unique identifier for the pen.
+        animal_combination : AnimalCombination
+            The animal combination for the pen.
+        num_stalls : int
+            The number of stalls in the pen.
+        max_stocking_density : float
+            The maximum stocking density for the pen.
+
+        Returns
+        -------
+        Pen
+            A new Pen object with the specified parameters and default values for other attributes.
+
+        Examples
+        --------
+        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
+        animal_combination=AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
+        >>> pen.id
+        1
+        >>> pen.animal_combination
+        <AnimalCombination.CALF: 0>
+        >>> pen.num_stalls
+        10
+        >>> pen.max_stocking_density
+        1.5
+
+        """
+
+        return Pen(
+            pen_id=pen_id,
+            pen_name=str(pen_id),
+            vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
+            horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
+            number_of_stalls=num_stalls,
+            housing_type=reference_pen.housing_type,
+            bedding_type=reference_pen.bedding_type,
+            pen_type=reference_pen.pen_type,
+            manure_handling=reference_pen.manure_handling,
+            manure_separator=reference_pen.manure_separator,
+            manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
+            manure_storage=reference_pen.manure_storage,
+            animal_combination=animal_combination,
+            max_stocking_density=max_stocking_density,
+        )
+
     def _create_default_pens_for_potential_space_shortage(
             self, num_animals: int, pens: List[Pen], animal_combination: AnimalCombination, start_pen_id=0
     ) -> List[Pen]:
@@ -792,11 +848,12 @@ class AnimalManager:
             num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
             for i in range(num_new_default_pens):
                 new_default_pens.append(
-                    self._create_default_pen(
+                    self._create_duplicate_pen(
                         pen_id=start_pen_id + i,
                         animal_combination=animal_combination,
                         num_stalls=num_stalls_per_pen,
                         max_stocking_density=max_stocking_density,
+                        reference_pen=pens[0]
                     )
                 )
 
