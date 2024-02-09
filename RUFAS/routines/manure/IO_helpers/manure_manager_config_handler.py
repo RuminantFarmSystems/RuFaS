@@ -89,6 +89,11 @@ class ManureManagerConfigHandler:
         ManureHandlerConfig
             The manure handler config for the given manure handler type name.
 
+        Raises
+        ------
+        KeyError
+            If the name of the manure handler type is not present in the available manure handler configs.
+
         """
         try:
             return self.manure_handler_configs[manure_handler_type_name]
@@ -98,7 +103,7 @@ class ManureManagerConfigHandler:
                 f"Attempted use a non-existent manure handler configuration called '{manure_handler_type_name}'."
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
-            raise ValueError(error_title)
+            raise KeyError(error_title)
 
     def get_custom_manure_separator_config(
         self, manure_separator_type_name: str
