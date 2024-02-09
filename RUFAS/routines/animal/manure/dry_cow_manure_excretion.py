@@ -47,9 +47,9 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    # TODO: Add TypedDicts for ration_formulation and available feeds
-    # TODO: Pass in available feeds directly instead of a Feed object
-    # TODO: Rename abbreviated key names to full names
+    # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
+    # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
+    # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
     nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
@@ -65,7 +65,7 @@ def manure_calculations(ration_formulation,
     # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
     soluble_residue = (100 - ASH_concentration) - \
         NDF_concentration - CP_concentration - EE_concentration
-    # TODO: Further calculations to account for entire diet:
+    # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
     # DMI: dry matter intake, kg
     # DM: dietary dry matter, % of diet
     # CP: dietary crude protein, % of DM
