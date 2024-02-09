@@ -133,13 +133,6 @@
       "type": "csv",
       "properties": "weather_properties"
     },
-    "feed_quality": {
-      "title": "Feed Quality",
-      "description": "Deprecated quality data, to be removed during Feed refactor.",
-      "path": "input/data/feed/feed_quality.csv",
-      "type": "csv",
-      "properties": "feed_quality_properties"
-    },
     "user_feeds": {
       "title": "User Feed",
       "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
