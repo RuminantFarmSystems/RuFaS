@@ -36,7 +36,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
             manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
             manure_cover=self.config.manure_cover,
-            manure_nitrogen__kg_N_per_day=daily_output.liquid_manure_nitrogen
+            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide

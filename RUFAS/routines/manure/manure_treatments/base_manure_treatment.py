@@ -281,7 +281,7 @@ class BaseManureTreatment(ABC):
             self,
             manure_treatment_type: ManureTreatmentType,
             manure_cover: str,
-            manure_nitrogen__kg_N_per_day: float,
+            manure_nitrogen_kg_N_per_day: float,
     ) -> float:
         """
         Calculate the empirical nitrogen loss from nitrous oxide emission.
@@ -298,7 +298,7 @@ class BaseManureTreatment(ABC):
             The type of manure treatment.
         manure_cover : str
             The type of cover for the manure. Options are: cover, no cover, and N/A.
-        manure_nitrogen__kg_N_per_day
+        manure_nitrogen_kg_N_per_day
             The amount of manure nitrogen entering the manure treatment and storage system (kg N/day).
 
         Returns
@@ -312,7 +312,7 @@ class BaseManureTreatment(ABC):
                 GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
                     manure_treatment_type][manure_cover]
             ),
-            manure_nitrogen_kg_N_per_day=manure_nitrogen__kg_N_per_day,
+            manure_nitrogen_kg_N_per_day=manure_nitrogen_kg_N_per_day,
         )
 
     def _get_current_day_average_temperature_celsius(self) -> float:
