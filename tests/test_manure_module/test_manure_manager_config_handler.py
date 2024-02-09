@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
@@ -13,6 +14,8 @@ from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+
+om = OutputManager()
 
 
 def test_process_bedding_configs(mocker: MockerFixture) -> None:
@@ -129,15 +132,6 @@ def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
         },
     ]
 
-    # patch_for_manure_handler_type_get_type = mocker.patch(
-    #     "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureHandlerType.get_type",
-    #     side_effect=[
-    #         ManureHandlerType.FLUSH_SYSTEM,
-    #         ManureHandlerType.MANUAL_SCRAPING,
-    #         ManureHandlerType.ALLEY_SCRAPER,
-    #     ],
-    # )
-
     patch_for_manure_handler_config_init = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureHandlerConfig.__init__",
         return_value=None,
@@ -148,12 +142,6 @@ def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
 
     # Assert
     assert len(actual_manure_handler_configs) == 3
-    # assert patch_for_manure_handler_type_get_type.call_count == 3
-    # assert patch_for_manure_handler_type_get_type.call_args_list == [
-    #     mocker.call("flush system"),
-    #     mocker.call("manual scraping"),
-    #     mocker.call("alley scraper"),
-    # ]
     assert patch_for_manure_handler_config_init.call_count == 3
     assert patch_for_manure_handler_config_init.call_args_list == [
         mocker.call(
@@ -567,8 +555,7 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = {}
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_add_error, \
-            pytest.raises(KeyError):
+    with patch.object(om, "add_error") as mock_add_error, pytest.raises(KeyError):
         mock_manure_config_handler.get_manure_handler_config("not there")
 
     mock_add_error.assert_called_once_with(expected_title, expected_message, expected_info_map)
