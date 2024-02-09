@@ -147,7 +147,7 @@ class WaterDynamics:
         float
             Total evapotranspiration (mm).
 
-        TODO: find where SWAT has this equation (if it does, if not make note of assumption)
+        TODO: find where SWAT has this equation (if it does, if not make note of assumption) #
 
         """
         return evaporation + transpiration
