@@ -8,7 +8,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper, Tillage, Harrowing
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerConfig
@@ -112,6 +111,7 @@ def test_manure_handler_daily_output(input_values, expected_values) -> None:
 def test_manure_handler_config() -> None:
     """Unit test for class ManureHandlerConfig in file manure_handler_classes.py."""
     # Arrange
+    manure_handler_type = ManureHandlerType.FLUSH_SYSTEM
     cleaning_water_use_rate = 20.0
     minutes_per_cleaning = 10
     cleanings_per_day = 3
@@ -120,6 +120,7 @@ def test_manure_handler_config() -> None:
 
     # Act
     manure_handler_config = ManureHandlerConfig(
+        manure_handler_type=manure_handler_type,
         cleaning_water_use_rate=cleaning_water_use_rate,
         minutes_per_cleaning=minutes_per_cleaning,
         cleanings_per_day=cleanings_per_day,
@@ -128,46 +129,12 @@ def test_manure_handler_config() -> None:
     )
 
     # Assert
+    assert manure_handler_config.manure_handler_type == ManureHandlerType.FLUSH_SYSTEM
     assert manure_handler_config.cleaning_water_use_rate == approx(cleaning_water_use_rate)
     assert manure_handler_config.minutes_per_cleaning == minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == daily_tillage_frequency
     assert manure_handler_config.cleaning_water_recycle_fraction == approx(cleaning_water_recycle_fraction)
-
-
-# Test DefaultManureHandlerConfigFactory
-# =====================================
-
-@pytest.mark.parametrize(
-    'manure_handler_type, expected_cleaning_water_use_rate, '
-    'expected_minutes_per_cleaning, expected_cleanings_per_day, '
-    'expected_daily_tillage_frequency, expected_cleaning_water_recycle_fraction',
-    [
-        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0, 0.8),
-        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0, 0.1),
-        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0, 0.1),
-        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1, 0.0),
-        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0, 0.0)
-    ]
-)
-def test_default_manure_handler_config_factory_get_instance(manure_handler_type: ManureHandlerType,
-                                                            expected_cleaning_water_use_rate: float,
-                                                            expected_minutes_per_cleaning: int,
-                                                            expected_cleanings_per_day: int,
-                                                            expected_daily_tillage_frequency: int,
-                                                            expected_cleaning_water_recycle_fraction: float,
-                                                            ) -> None:
-    """Unit test for get_instance() of class DefaultManureHandlerConfigFactory"""
-
-    # Act
-    manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(manure_handler_type)
-
-    # Assert
-    assert manure_handler_config.cleaning_water_use_rate == approx(expected_cleaning_water_use_rate)
-    assert manure_handler_config.minutes_per_cleaning == expected_minutes_per_cleaning
-    assert manure_handler_config.cleanings_per_day == expected_cleanings_per_day
-    assert manure_handler_config.daily_tillage_frequency == expected_daily_tillage_frequency
-    assert manure_handler_config.cleaning_water_recycle_fraction == approx(expected_cleaning_water_recycle_fraction)
 
 
 # Test ManureHandlerType
@@ -177,63 +144,29 @@ def test_manure_handler_type_enum() -> None:
     """Unit test for enum ManureHandlerType"""
 
     # Assert
-    assert ManureHandlerType.get_type('flush system') is ManureHandlerType.FLUSH_SYSTEM
-    assert ManureHandlerType.get_type('manual scraping') is ManureHandlerType.MANUAL_SCRAPING
-    assert ManureHandlerType.get_type('alley scraper') is ManureHandlerType.ALLEY_SCRAPER
-    assert ManureHandlerType.get_type('tillage') is ManureHandlerType.TILLAGE
-    assert ManureHandlerType.get_type('harrowing') is ManureHandlerType.HARROWING
-    assert ManureHandlerType.get_type('default') is ManureHandlerType.DEFAULT
-    assert ManureHandlerType.DEFAULT is ManureHandlerType.FLUSH_SYSTEM
-    assert ManureHandlerType.get_type('dummy') is ManureHandlerType.FLUSH_SYSTEM
+    assert ManureHandlerType('flush system') is ManureHandlerType.FLUSH_SYSTEM
+    assert ManureHandlerType('manual scraping') is ManureHandlerType.MANUAL_SCRAPING
+    assert ManureHandlerType('alley scraper') is ManureHandlerType.ALLEY_SCRAPER
+    assert ManureHandlerType('tillage') is ManureHandlerType.TILLAGE
+    assert ManureHandlerType('harrowing') is ManureHandlerType.HARROWING
 
 
 # Test ManureHandlerFactory
 # =========================
 
-@pytest.fixture
-def mock_manure_handler_config() -> ManureHandlerConfig:
-    """Mock ManureHandlerConfig"""
-    return ManureHandlerConfig(
-        cleaning_water_use_rate=20.0,
-        minutes_per_cleaning=10,
-        cleanings_per_day=3,
-        daily_tillage_frequency=0
-    )
-
 
 @pytest.mark.parametrize(
-    'manure_handler_type_name, custom_manure_handler_config,'
-    'expected_manure_handler_class,expected_manure_handler_config',
+    'manure_handler_type_name,manure_handler_type,expected_manure_handler_class',
     [
-        ('flush system', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('manual scraping', None, ManualScraping,
-         DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
-        ('alley scraper', None, AlleyScraper,
-         DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
-        ('tillage', None, Tillage,
-         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
-        ('harrowing', None, Harrowing,
-         DefaultManureHandlerConfigFactory.HARROWING_CONFIG),
-        ('dummy', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('flush system', mock_manure_handler_config,
-         FlushSystem, mock_manure_handler_config),
-        ('manual scraping', mock_manure_handler_config,
-         ManualScraping, mock_manure_handler_config),
-        ('alley scraper', mock_manure_handler_config,
-         AlleyScraper, mock_manure_handler_config),
-        ('tillage', mock_manure_handler_config,
-         Tillage, mock_manure_handler_config),
-        ('harrowing', mock_manure_handler_config,
-         Harrowing, mock_manure_handler_config),
-        ('dummy', mock_manure_handler_config,
-         FlushSystem, mock_manure_handler_config),
+        ('flush system', ManureHandlerType.FLUSH_SYSTEM, FlushSystem),
+        ('alley scraper', ManureHandlerType.ALLEY_SCRAPER, AlleyScraper),
+        ('manual_scraping', ManureHandlerType.MANUAL_SCRAPING, ManualScraping),
+        ('tillage', ManureHandlerType.TILLAGE, Tillage),
+        ('harrowing', ManureHandlerType.HARROWING, Harrowing),
     ])
 def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
-                                             custom_manure_handler_config: ManureHandlerConfig,
+                                             manure_handler_type: ManureHandlerType,
                                              expected_manure_handler_class: BaseManureHandler,
-                                             expected_manure_handler_config: ManureHandlerConfig,
                                              mocker: MockerFixture) \
         -> None:
     """Unit test for get_instance() of class ManureHandlerFactory"""
@@ -245,16 +178,24 @@ def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.MilkingParlor',
         return_value=milking_parlor
     )
+    manure_handler_config = ManureHandlerConfig(
+        manure_handler_type=manure_handler_type,
+        cleaning_water_use_rate=20.0,
+        minutes_per_cleaning=10,
+        cleanings_per_day=3,
+        daily_tillage_frequency=0,
+        cleaning_water_recycle_fraction=0.80,
+    )
 
     # Act
     manure_handler = ManureHandlerFactory.get_instance(weather=weather,
                                                        time=time,
-                                                       manure_handler_type_name=manure_handler_type_name,
-                                                       custom_manure_handler_config=custom_manure_handler_config)
+                                                       configuration_name=manure_handler_type_name,
+                                                       manure_handler_config=manure_handler_config)
 
     # Assert
     assert type(manure_handler) is expected_manure_handler_class
-    assert manure_handler.config == expected_manure_handler_config
+    assert manure_handler.config == manure_handler_config
     patch_for_milking_parlor_init.assert_called_once()
     assert manure_handler.milking_parlor == milking_parlor
     assert manure_handler.weather == weather
@@ -277,7 +218,8 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     mock_manure_handler_config.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
     mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
                                             time=mocker.MagicMock(),
-                                            manure_handler_config=mock_manure_handler_config)
+                                            manure_handler_config=mock_manure_handler_config,
+                                            name="test")
 
     # Act
     cleaning_water_volume_in_main_barn = mock_manure_handler.calc_cleaning_water_volume_in_main_barn(
@@ -301,7 +243,8 @@ def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
 
     mock_manure_handler = BaseManureHandler(weather=mock_weather,
                                             time=mock_time,
-                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
+                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig),
+                                            name="test")
 
     # Act
     current_day_avg_tempC = mock_manure_handler._get_current_day_average_temperature_in_celsius()
@@ -364,7 +307,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
                                             time=mocker.MagicMock(),
-                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
+                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig),
+                                            name="test")
     mock_manure_handler.milking_parlor = mock_milking_parlor = mocker.MagicMock(autospec=MilkingParlor)
     mock_milking_parlor.calc_total_water_volume_used_in_milking_parlor.return_value = \
         total_water_volume_in_milking_parlor = 31.0
@@ -445,7 +389,8 @@ def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None
 
     mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
                                             time=mocker.MagicMock(),
-                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
+                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig),
+                                            name="test")
 
     manure_handler_daily_output = mock_manure_handler.daily_update(
         pen=mock_pen,
