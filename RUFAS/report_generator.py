@@ -207,11 +207,22 @@ class ReportGenerator:
                     f"{individual_report_name}_{col}"
                     if len(individual_report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
-            if filter_content.get("graph_details"):
+            enable_graph_and_report = filter_content.get("graph_and_report")
+            should_graph_report_data = filter_content.get("graph_details")
+            if should_graph_report_data:
                 graph_event_log = self._graph_report_data(filter_content, individual_report_name)
                 event_logs.append(graph_event_log)
-                if not filter_content.get("graph_and_report"):
+                if not enable_graph_and_report:
                     self.reports.clear()
+            if enable_graph_and_report and not should_graph_report_data:
+                warning_event_log = {
+                    "warning": "report_generation_warning",
+                    "message": "Request to graph and report data not fulfilled "
+                    "- no graph_details present in report filter file.",
+                    "info_map": info_map,
+                }
+                event_logs.append(warning_event_log)
+
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
             error_event_log = {
