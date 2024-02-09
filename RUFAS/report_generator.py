@@ -202,16 +202,16 @@ class ReportGenerator:
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
-                for col, values in report_data.items():
-                    column_name = self._ensure_unique_report_name_with_timestamp(
-                        f"{individual_report_name}_{col}"
-                        if len(individual_report_name) > 0 else col)
-                    self.reports[column_name] = {"values": values}
-                if filter_content.get("graph_details"):
-                    graph_event_log = self._graph_report_data(filter_content, individual_report_name)
-                    event_logs.append(graph_event_log)
+            for col, values in report_data.items():
+                column_name = self._ensure_unique_report_name_with_timestamp(
+                    f"{individual_report_name}_{col}"
+                    if len(individual_report_name) > 0 else col)
+                self.reports[column_name] = {"values": values}
+            if filter_content.get("graph_details"):
+                graph_event_log = self._graph_report_data(filter_content, individual_report_name)
+                event_logs.append(graph_event_log)
+                if not filter_content.get("graph_and_report"):
                     self.reports.clear()
-
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
             error_event_log = {
