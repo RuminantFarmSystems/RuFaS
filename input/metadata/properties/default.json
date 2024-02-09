@@ -3607,6 +3607,17 @@
           "freeboard_input": {
             "type": "number"
           },
+          "composting_type": {
+            "type": "string",
+            "description": "Composting Type -- The type of composting.",
+            "pattern": "^(intensive windrow|passive windrow|static pile)$",
+            "default": "intensive windrow"
+          },
+          "last_compost_turning_or_addition": {
+            "type": "number",
+            "description": "The number of days since the last turning or addition event (day)",
+            "default": 1
+          },
           "manure_cover": {
             "type": "string",
             "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
