@@ -18,6 +18,7 @@ class AnimalGroupingScenario(Enum):
 
     """
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
+    # GitHub Issue #1205
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
