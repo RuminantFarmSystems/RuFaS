@@ -203,7 +203,7 @@ class Pen:
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
-        self._pen_type = pen_type
+        self.pen_type = pen_type
         self.pen_name = pen_name
 
         self.manure_handling = manure_handling
@@ -687,6 +687,11 @@ class Pen:
         -------
         Tuple[str, AnimalManureExcretions]
             A tuple containing the prefix and default manure value for the animal.
+
+        Raises
+        ------
+        ValueError
+            If prefix for animal type is not found.
 
         """
         animal_type_to_prefix = {

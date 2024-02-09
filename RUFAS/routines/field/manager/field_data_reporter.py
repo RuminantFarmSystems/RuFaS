@@ -116,6 +116,7 @@ class FieldDataReporter:
             om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen, info_map)
             om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen, info_map)
 
+            om.add_variable("profile_carbon_total", field.soil.data.profile_carbon_total, info_map)
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             om.add_variable("profile_nitrates_total", field.soil.data.profile_nitrates_total, info_map)
             om.add_variable("profile_ammonium_total", field.soil.data.profile_ammonium_total, info_map)
@@ -154,6 +155,7 @@ class FieldDataReporter:
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
                 om.add_variable("water_content", layer.water_content, info_map)
+                om.add_variable("water_factor", layer.water_factor, info_map)
                 om.add_variable("evaporated_water_content", layer.evaporated_water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
@@ -211,6 +213,7 @@ class FieldDataReporter:
                 om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon, info_map)
                 om.add_variable("soil_overall_carbon_fraction", layer.soil_overall_carbon_fraction, info_map)
                 om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount, info_map)
+                om.add_variable("carbon_emissions", layer.total_soil_carbon_amount, info_map)
                 om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter,
                                 info_map)
                 om.add_variable("labile_inorganic_phosphorus_content", layer.labile_inorganic_phosphorus_content,
@@ -219,6 +222,7 @@ class FieldDataReporter:
                                 info_map)
                 om.add_variable("stable_inorganic_phosphorus_content", layer.stable_inorganic_phosphorus_content,
                                 info_map)
+                om.add_variable("fresh_organic_phosphorus_content", layer.fresh_organic_phosphorus_content, info_map)
                 om.add_variable("active_inorganic_unbalanced_counter", layer.active_inorganic_unbalanced_counter,
                                 info_map)
                 om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter,
@@ -244,6 +248,7 @@ class FieldDataReporter:
                 om.add_variable("usable_light", crop.data.usable_light, info_map)
                 om.add_variable("biomass_growth_max", crop.data.biomass_growth_max, info_map)
                 om.add_variable("biomass_growth", crop.data.biomass_growth, info_map)
+                om.add_variable("growth_factor", crop.data.growth_factor, info_map)
                 om.add_variable("above_ground_biomass", crop.data.above_ground_biomass, info_map)
                 om.add_variable("root_biomass", crop.data.root_biomass, info_map)
                 om.add_variable("water_uptake", crop.data.water_uptake, info_map)
@@ -252,6 +257,7 @@ class FieldDataReporter:
                 om.add_variable("nitrogen_stress", crop.data.nitrogen_stress, info_map)
                 om.add_variable("phosphorus_stress", crop.data.phosphorus_stress, info_map)
                 om.add_variable("accumulated_heat_units", crop.data.accumulated_heat_units, info_map)
+                om.add_variable("heat_fraction", crop.data.heat_fraction, info_map)
                 om.add_variable("is_growing", crop.data.is_growing, info_map)
                 om.add_variable("is_dormant", crop.data.is_dormant, info_map)
                 om.add_variable("leaf_area_index", crop.data.leaf_area_index, info_map)
@@ -261,10 +267,10 @@ class FieldDataReporter:
                 om.add_variable("potential_nitrogen_uptake", crop.data.potential_nitrogen_uptake, info_map)
                 om.add_variable("total_phosphorus_uptake", crop.data.total_phosphorus_uptake, info_map)
                 om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
+                om.add_variable("optimal_nitrogen_fraction", crop.data.optimal_nitrogen_fraction, info_map)
                 om.add_variable("potential_phosphorus_uptake", crop.data.potential_phosphorus_uptake, info_map)
                 om.add_variable("actual_phosphorus_uptakes", crop.data.actual_phosphorus_uptakes, info_map)
                 om.add_variable("actual_nitrogen_uptakes", crop.data.actual_nitrogen_uptakes, info_map)
-                om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
                 om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
                 om.add_variable("cumulative_transpiration", crop.data.cumulative_transpiration, info_map)
                 om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
