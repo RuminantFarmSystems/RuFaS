@@ -202,18 +202,22 @@ class ReportGenerator:
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
+            should_graph_report_data = filter_content.get("graph_details")
+            graph_data = {}
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
                     f"{individual_report_name}_{col}"
                     if len(individual_report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
+                if should_graph_report_data:
+                    graph_data[column_name] = {"values": values}
             enable_graph_and_report = filter_content.get("graph_and_report")
-            should_graph_report_data = filter_content.get("graph_details")
             if should_graph_report_data:
-                graph_event_log = self._graph_report_data(filter_content, individual_report_name)
+                graph_event_log = self._prepare_report_data_to_be_graphed(graph_data, filter_content,
+                                                                          individual_report_name)
                 event_logs.append(graph_event_log)
                 if not enable_graph_and_report:
-                    self.reports.clear()
+                    self.reports = Utility.filter_pool(self.reports, graph_data.keys(), filter_by_exclusion=True)
             if enable_graph_and_report and not should_graph_report_data:
                 warning_event_log = {
                     "warning": "report_generation_warning",
@@ -234,24 +238,28 @@ class ReportGenerator:
 
         return event_logs
 
-    def _graph_report_data(self, filter_content: Dict[str, Any], individual_report_name: str) -> Dict[str, str]:
+    def _prepare_report_data_to_be_graphed(
+            self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
+    ) -> Dict[str, str]:
         """Prepare and send aggregated report data to Graph Generator to be graphed.
 
         Parameters
         ----------
+        graph_data : Dict[str, Any]
+            The report data to be graphed.
         filter_content : Dict[str, Any]
             A dictionary containing the configuration for the report, including details
             such as 'name', 'filters', 'cross_references', and aggregation instructions.
         individual_report_name : str
             The name of the report to be graphed.
         """
-        graph_generator = GraphGenerator()
         graph_details = filter_content["graph_details"]
+        graph_generator = GraphGenerator(graph_details["metadata_prefix"])
         graph_details["title"] = filter_content["name"]
         graphics_dir = graph_details["graphics_dir"]
         graph_details["filters"] = filter_content["filters"]
         del graph_details["graphics_dir"]
-        graph_event_log = graph_generator.generate_graph(self.reports, graph_details,
+        graph_event_log = graph_generator.generate_graph(graph_data, graph_details,
                                                          individual_report_name,
                                                          graphics_dir)
         return graph_event_log
