@@ -263,7 +263,7 @@ class GasEmissionConstants:
         CompostingType.INTENSIVE_WINDROW: 0.06
     }
 
-    NITROUS_OXIDE_EMISSION_FACTOR__KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (
+    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (
         Dict)[ManureTreatmentType, Dict[str, float]] = {
         ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
             ManureCoverEnum.COVER.value: 0.005,
