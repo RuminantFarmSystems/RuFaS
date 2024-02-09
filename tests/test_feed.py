@@ -94,11 +94,6 @@ def test_reset_feed_data():
     pass
 
 
-def test_get_feeds_split_by_maturity():
-    """Unit test for function get_feeds_split_by_maturity in file routines/feed/feed.py"""
-    pass
-
-
 def test_get_all_feed_units():
     """Unit test for function get_all_feed_units in file routines/feed/feed.py"""
     pass
@@ -106,16 +101,6 @@ def test_get_all_feed_units():
 
 def test_get_purchased_feed_ids():
     """Unit test for function get_purchased_feed_ids in file routines/feed/feed.py"""
-    pass
-
-
-def test_get_feed_id():
-    """Unit test for function get_feed_id in file routines/feed/feed.py"""
-    pass
-
-
-def test_get_feed_quality():
-    """Unit test for function get_feed_quality in file routines/feed/feed.py"""
     pass
 
 
