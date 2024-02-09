@@ -10,62 +10,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
-
-
-@pytest.mark.parametrize("is_enclosed", [True, False])
-def test_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> None:
-    """Tests methane_emission_for_slurry_storage() in calculator.py."""
-
-    # Arrange
-    manure_total_solids = 1000.0
-    tempC = 15.0
-    tempK = 288.15
-    patch_for_convert_tempC_to_tempK = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin",
-        return_value=tempK,
-    )
-    manure_volatile_solids_fraction = 0.5
-    efficiency_fraction = 0.99
-    degradable_volatile_solids = (
-            GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-            / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
-    )
-    non_degradable_volatile_solids = 1 - degradable_volatile_solids
-    b1 = GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-    b2 = GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-    ex = math.exp(
-        GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
-        - (
-                GasEmissionConstants.ACTIVATION_ENERGY
-                / (GasEmissionConstants.GAS_CONSTANT * tempK)
-        )
-    )
-    expected_E_CH4_open_air = (
-            0.024
-            * manure_total_solids
-            * manure_volatile_solids_fraction
-            * (degradable_volatile_solids * b1 + non_degradable_volatile_solids * b2)
-            * ex
-    )
-    expected_E_CH4_enclosed = expected_E_CH4_open_air * (1 - efficiency_fraction)
-
-    # Act
-    actual = GasEmissionsCalculator.methane_emission_for_slurry_storage(
-        manure_total_solids,
-        is_enclosed,
-        tempC,
-        manure_volatile_solids_fraction,
-        efficiency_fraction,
-    )
-
-    # Assert
-    patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-    if is_enclosed:
-        assert actual == expected_E_CH4_enclosed
-    else:
-        assert actual == expected_E_CH4_open_air
 
 
 def test_mcf() -> None:
@@ -462,73 +407,16 @@ def test_housing_carbon_dioxide_emission(
         assert actual == pytest.approx(expected)
 
 
-@pytest.mark.parametrize("sign_of_RMQ", [-1, 1])
-def test_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
-    """Tests ammonia_emission() in calculator.py."""
-
-    # Arrange
-    num_animals = 100
-    barn_area = 50.0
-    manure_urine_total_ammoniacal_nitrogen = 5.0
-    manure_urine = 25.0
-    c = GeneralConstants.SECONDS_PER_DAY
-    tempC = 20.0
-    tempK = 293.15
-    patch_for_convert_tempC_to_tempK = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin",
-        return_value=tempK,
-    )
-    hsc = 200.0
-    r = sign_of_RMQ * 42.0
-    patch_for_r_barn = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_barn_resistance",
-        return_value=r,
-    )
-    p = ManureConstants.MANURE_DENSITY
-    pH = 7.5
-    Q = 2.0
-    patch_for_Q = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._equilibrium_coefficient",
-        return_value=Q,
-    )
-    M = manure_urine / barn_area
-    expected = (
-            num_animals
-            * barn_area
-            * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p)
-            / (r * M * Q)
-    )
-
-    # Act
-    actual = GasEmissionsCalculator.ammonia_emission(
-        num_animals,
-        barn_area,
-        manure_urine_total_ammoniacal_nitrogen,
-        manure_urine,
-        tempC,
-        hsc,
-    )
-
-    # Assert
-    patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-    patch_for_r_barn.assert_called_once_with(tempC, hsc)
-    patch_for_Q.assert_called_once_with(tempK, pH)
-    if r * M * Q > 0:
-        assert actual == expected
-    else:
-        assert actual == 0.0
-
-
-def test_barn_resistance() -> None:
-    """Tests _barn_resistance() in calculator.py."""
+def test_ammonia_resistance() -> None:
+    """Tests _ammonia_resistance() in calculator.py."""
 
     # Arrange
     tempC = 15.0
-    hsc = GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT
+    hsc = GasEmissionConstants.HOUSING_HSC
     expected = hsc * (1 - 0.027 * (20.0 - tempC))
 
     # Act
-    actual = GasEmissionsCalculator._ammonia_barn_resistance(tempC)
+    actual = GasEmissionsCalculator._ammonia_resistance(tempC, hsc)
 
     # Assert
     assert actual == expected
@@ -730,7 +618,7 @@ def test_housing_methane_emission(
     "num_animals, barn_area, urine_tan, urine, temp, pH, hsc, expected, error_message",
     [
         # Standard case
-        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 2372.453635832584, None),
+        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 237.2453635832584, None),
         # Edge cases: Zero input values for num_animals, barn_area, urine_tan, urine
         (0, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
         (10, 0.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
@@ -768,7 +656,7 @@ def test_housing_methane_emission(
                 7.7,
                 260.0,
                 ValueError,
-                "Urine total ammoniacal nitrogen must be greater than or equal to 0.",
+                "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
         ),
         (
                 10,
@@ -779,7 +667,7 @@ def test_housing_methane_emission(
                 7.7,
                 260.0,
                 ValueError,
-                "Urine must be greater than or equal to 0.",
+                "Manure must be greater than or equal to 0.",
         ),
     ],
 )
@@ -990,18 +878,18 @@ def test_methane_emission_from_slurry_storage(
 
 @pytest.mark.parametrize(
     "num_animals, storage_area, manure_tan, manure_volume, manure_density,"
-    "total_solids, temp, pH, expected, error_message",
+    "temp, pH, expected, error_message",
     [
         # Standard case
-        (10, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 62.315518096348924, None),
+        (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
         # Edge cases: Zero input values for num_animals, storage_area,
         # manure_tan, manure_volume, manure_density, total_solids
-        (0, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 0.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 0.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 0.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 30.0, 0.0, 5.0, 20.0, 7.7, 0.0, None),
-        (10, 100.0, 25.0, 30.0, 1200.0, 0.0, 20.0, 7.7, 0.0, None),
+        (0, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 0.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 0.0, 30.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 0.0, 1000.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 0.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
         # Exception cases: Negative input values for num_animals, storage_area,
         # manure_tan, manure_volume, manure_density, total_solids
         (
@@ -1009,8 +897,7 @@ def test_methane_emission_from_slurry_storage(
                 100.0,
                 25.0,
                 30.0,
-                1200.0,
-                5.0,
+                1000.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -1021,8 +908,7 @@ def test_methane_emission_from_slurry_storage(
                 -100.0,
                 25.0,
                 30.0,
-                1200.0,
-                5.0,
+                1000.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -1033,8 +919,7 @@ def test_methane_emission_from_slurry_storage(
                 100.0,
                 -25.0,
                 30.0,
-                1200.0,
-                5.0,
+                1000.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -1045,8 +930,7 @@ def test_methane_emission_from_slurry_storage(
                 100.0,
                 25.0,
                 -30.0,
-                1200.0,
-                5.0,
+                1000.0,
                 20.0,
                 7.7,
                 ValueError,
@@ -1057,24 +941,11 @@ def test_methane_emission_from_slurry_storage(
                 100.0,
                 25.0,
                 30.0,
-                -1200.0,
-                5.0,
+                -1000.0,
                 20.0,
                 7.7,
                 ValueError,
                 "Manure density must be greater than or equal to 0.",
-        ),
-        (
-                10,
-                100.0,
-                25.0,
-                30.0,
-                1200.0,
-                -5.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Total solids must be greater than or equal to 0.",
         ),
     ],
 )
@@ -1084,7 +955,6 @@ def test_storage_ammonia_emission(
         manure_tan: float,
         manure_volume: float,
         manure_density: float,
-        total_solids: float,
         temp: float,
         pH: float,
         expected: float | Exception,
@@ -1106,7 +976,6 @@ def test_storage_ammonia_emission(
                 manure_tan,
                 manure_volume,
                 manure_density,
-                total_solids,
                 temp,
                 storage_area,
                 pH,
@@ -1117,53 +986,11 @@ def test_storage_ammonia_emission(
             manure_tan,
             manure_volume,
             manure_density,
-            total_solids,
             temp,
             storage_area,
             pH,
         )
         assert actual == pytest.approx(expected)
-
-
-@pytest.mark.parametrize(
-    "manure_mass, total_solids, expected, error_message",
-    [
-        # Test when manure_mass and total_solids are 0
-        (0.0, 0.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
-        # Test when dry matter >= SOLID_MANURE_THRESHOLD
-        (1000.0, 1.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
-        # Test when dry matter >= SLURRY_MANURE_THRESHOLD
-        (10.0, 2.0, GasEmissionConstants.SLURRY_MANURE_HSC, None),
-        # Test when dry matter < SLURRY_MANURE_THRESHOLD (i.e., liquid manure)
-        (10.0, 20.0, GasEmissionConstants.LIQUID_MANURE_HSC, None),
-        # Test when manure_mass < 0
-        (-1.0, 20.0, ValueError, "Manure mass must be greater than or equal to 0."),
-        # Test when total_solids < 0
-        (10.0, -1.0, ValueError, "Total solids must be greater than or equal to 0."),
-    ],
-)
-def test_housing_specific_constant(
-        manure_mass: float,
-        total_solids: float,
-        expected: float | Exception,
-        error_message: str | None,
-) -> None:
-    """
-    Unit test for _housing_specific_constant() method in calculator.py.
-
-    This test verifies that the method correctly calculates the housing-specific constant given
-    the total manure mass and total solids in manure.
-
-    """
-    # Act and assert
-    if isinstance(expected, type) and issubclass(expected, Exception):
-        with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator._housing_specific_constant(manure_mass, total_solids)
-    else:
-        actual = GasEmissionsCalculator._housing_specific_constant(
-            manure_mass, total_solids
-        )
-        assert actual == expected
 
 
 @pytest.mark.parametrize(
