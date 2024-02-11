@@ -49,8 +49,6 @@ class Feed:
         self.nutrient_standard = im.get_data("config.nutrient_standard")
         self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
 
-        self.feeds_split_by_maturity = self._retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
-                                                           unique_value=True)
         self.all_feed_units = self._retrieve_data(data_source='user_feeds',
                                                   var_names=['rufas_id', 'Name', 'units'])
 
@@ -58,7 +56,6 @@ class Feed:
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
                                 for feed_item in data["purchased_feeds"]}
 
-        self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
         self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
@@ -365,15 +362,8 @@ class Feed:
             Args:
                 feed: an instance of class Feed
             """
-            if self.feed_id in feed.entries_split_by_maturity:
-                quality_id = feed.get_feed_id(self.feed_id, self.DM_percent,
-                                              self.NDF_percent)
-                quality_status = feed.get_feed_quality(quality_id)
-                self.feed_key = str(quality_id) + 'g'
-                self.forage_quality = quality_status
-            else:
-                self.feed_key = str(self.feed_id) + 'g'
-                self.forage_quality = 'null'
+            self.feed_key = str(self.feed_id) + 'g'
+            self.forage_quality = 'null'
 
         def store_crop(self, feed, crop):
             """
@@ -828,19 +818,6 @@ class Feed:
 
     # The functions below are Feed class functions that provide utilization of
     # the feed database
-    def get_feeds_split_by_maturity(self):
-        """
-        Description:
-            Returns the feed entries in the database which have different qualities
-            based on nutrient values at harvest.
-
-        Returns: a set-like list (no duplicates) of the entries listed in the
-            table which splits feeds by quality
-        """
-        column = 'rufas_id'
-        dict_list = self.feeds_split_by_maturity
-        return [result[column] for result in dict_list]
-
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
         """
         Description:
@@ -939,58 +916,6 @@ class Feed:
         # feed value costs according to feeds split by maturity
         return updated_costs
 
-    def get_feed_id(self, grown_feed_entry, DM, NDF):
-        """
-        Description:
-            First queries the database to find which nutrient must be used to find
-            the quality of the feed, then uses the feed's value for that nutrient
-            to find the quality by finding which range it belongs to. Returns
-            the feed ID associated with that quality.
-
-        Args:
-            grown_feed_entry: the entry of the feed that needs to be added to
-                available_feeds
-            DM: the dry matter percentage
-            NDF: the NDF percentage
-
-        Returns: the feed ID corresponding to the appropriate quality of the
-        grown_feed_entry according to its specific differentiating nutrient
-        """
-        # round both values to the nearest integer
-        rounded_DM = round(DM)
-        rounded_NDF = round(NDF)
-        column = 'differentiating_nutrient'
-        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column], unique_value=True,
-                                        identifier='rufas_id', desired_rows=grown_feed_entry)
-        nutrient = dict_list[0][column]
-
-        column = 'quality_id'
-        rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column],
-                                        identifier='rufas_id', desired_rows=grown_feed_entry,
-                                        compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
-
-        return dict_list[0][column]
-
-    def get_feed_quality(self, quality_id):
-        """
-        Description:
-            Queries the feed database, specifically the feed_quality table, to
-            find the status of the feed based on the quality id. Returns the
-            status of the feed (immature, mid-maturity, mature)
-
-        Args:
-            quality_id: The unique quality id of the feed
-
-        Returns: a string representation of the quality status
-        """
-        column = 'status'
-        status_dict = self._retrieve_data(data_source='feed_quality',
-                                          var_names=[column], unique_value=False,
-                                          identifier='quality_id', desired_rows=quality_id)
-
-        return status_dict[0][column]
-
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
         """
         Description:
@@ -1009,11 +934,7 @@ class Feed:
         """
         new_feed_ids = []
         for i, new_feed in enumerate(new_grown_feeds):
-            if new_feed in self.entries_split_by_maturity:
-                new_feed_ids.append(
-                    self.get_feed_id(new_feed, DM_list[i], NDF_list[i]))
-            else:
-                new_feed_ids.append(new_feed)
+            new_feed_ids.append(new_feed)
             self.feed_costs[str(new_feed_ids[-1]) + 'g'] = 0
         self.available_feeds.update(self.get_nutrient_vals(new_feed_ids, True))
 

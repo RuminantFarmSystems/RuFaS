@@ -203,7 +203,7 @@ class Pen:
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
-        self._pen_type = pen_type
+        self.pen_type = pen_type
         self.pen_name = pen_name
 
         self.manure_handling = manure_handling
@@ -215,11 +215,11 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-        # TODO: To be removed. Use the property 'is_populated' instead.
+        # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
         self.populated = False
 
         self.classes_in_pen = set()
-        # TODO: To be removed. Use the property 'current_stocking_density' instead.
+        # TODO: To be removed. Use the property 'current_stocking_density' instead. GitHub Issue #1206
         self.stocking_density = 0.0
 
         self.avg_BW = 0.0
@@ -283,6 +283,7 @@ class Pen:
         self.animal_combination = animal_combination
 
     # TODO: (Not used yet) Use this property instead of self.stocking_density because it is dynamically calculated
+    # GitHub Issue #1206
     @property
     def current_stocking_density(self) -> float:
         """
@@ -376,7 +377,7 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum
+    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
     def update_classes_in_pen(self) -> None:
         """
         Updates the classes contained within the pen
@@ -501,7 +502,7 @@ class Pen:
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
-    # TODO: Fix this to use AnimalType enum
+    # TODO: Fix this to use AnimalType enum GitHub Issue #1209
     def calc_daily_walking_dist(self):
         """
         Sets the daily walking distance for the cows in the pen (if any).
@@ -535,7 +536,7 @@ class Pen:
             for animal in list(self.animals_in_pen.values()):
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
-            # TODO: Add warning if total_p_animal < 0
+            # TODO: Add warning if total_p_animal < 0 GitHub Issue #1212
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
@@ -558,11 +559,11 @@ class Pen:
         if num_animals_before_additions == 0:
             # for the case that there are no animals currently in this pen.
             # Avoids a division by 0 error in below calculations
-            # TODO is there a better way?
+            # TODO is there a better way? GitHub Issue #1213
             num_animals_before_additions = 1
 
         # TODO: Question - is this necessary or can we assume that any newly
-        #   added animals will match the existing animal combination?
+        #   added animals will match the existing animal combination? GitHub Issue #1213
         class_name = type(animal).__name__
         self.classes_in_pen.add(class_name)
 
