@@ -408,9 +408,18 @@ class Pen:
 
     def manure_sums(self, manure, curr_manure, dict):
         """
-        Accumulator function for calc_manure.
+        Accumulator helper function for calc_manure.
         The function finds sums of manure components for each 
-        animal in the pen  
+        animal in the pen and the total manure for each animal type.
+        Parameters
+        ----------
+            manure: Dict[float, int] 
+                A dictionary that contains the the accumulated maniure excretion values for all animals
+            curr_manure: AnimalManureExcretions
+                A dictionary that contains the manure excretion values as specified
+                in the AnimalManureExcretions class definition.
+            dict: Dict[float, int]
+                A dictionary that contains the manure excretion values as specified
         """
         for key in manure.keys():
             manure[key] += curr_manure[key]
@@ -418,7 +427,7 @@ class Pen:
 
     def calc_manure(self, feed, methane_model: str):  # noqa
         """
-        Calculate the manure excretion of the animals in the pen.
+        Calculates the manure excretion of the animals in the pen.
 
         Parameters
         ----------
