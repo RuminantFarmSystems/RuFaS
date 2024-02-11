@@ -414,7 +414,7 @@ class Pen:
         animal in the pen and the total manure for each animal type.
         Parameters
         ----------
-            manure: Dict[float, int] 
+            manure: Dict[float, int]
                 A dictionary that contains the the accumulated maniure excretion values for all animals
             curr_manure: AnimalManureExcretions
                 A dictionary that contains the manure excretion values as specified
