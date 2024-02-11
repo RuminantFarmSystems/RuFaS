@@ -112,6 +112,7 @@ def test_initialize_carbon_pools(field_size: float, top_depth: int, expected_act
     assert actual.slow_carbon_amount == pytest.approx(expected_slow)
     assert actual.structural_litter_amount == pytest.approx(expected_structural_litter)
     assert actual.metabolic_litter_amount == pytest.approx(expected_metabolic_litter)
+    assert actual.total_soil_carbon_amount == pytest.approx(expected_active + expected_passive + expected_slow)
 
 
 @pytest.mark.parametrize("top,bottom", [
