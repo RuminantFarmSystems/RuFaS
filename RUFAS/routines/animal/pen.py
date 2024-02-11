@@ -419,7 +419,7 @@ class Pen:
                 A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
             dict: Dict[float, int]
-                A dictionary that contains the manure excretion values as specified
+                A dictionary that contains the manure excretion values for specific animals in the pen
         """
         for key in manure.keys():
             manure[key] += curr_manure[key]
