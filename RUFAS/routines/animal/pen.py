@@ -410,7 +410,7 @@ class Pen:
     def manure_sums(self, manure, curr_manure, dict):
         """
         Accumulator helper function for calc_manure.
-        The function finds sums of manure components for each 
+        The function finds sums of manure components for each
         animal in the pen and the total manure for each animal type.
         Parameters
         ----------
