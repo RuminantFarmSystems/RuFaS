@@ -58,14 +58,14 @@
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
-      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
+      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
       "path": "input/data/feed/NRC_comp.csv",
       "type": "csv",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
-      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
+      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
       "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
@@ -125,13 +125,6 @@
       "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
-    },
-    "feed_quality": {
-      "title": "Feed Quality",
-      "description": "Deprecated quality data, to be removed during Feed refactor.",
-      "path": "input/data/feed/feed_quality.csv",
-      "type": "csv",
-      "properties": "feed_quality_properties"
     },
     "user_feeds": {
       "title": "User Feed",

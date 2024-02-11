@@ -35,11 +35,11 @@ class MineralizationDecomposition:
         gets transferred to the nitrate and active inorganic pools).
 
         """
+        self._correct_fresh_organic_nitrogen_pools()
+
         if self.data.soil_layers[0].temperature <= 0:
             return
 
-        # TODO: in SWAT, this nutrient ratios do not work directly with the carbon in the soil but with the content of
-        #   residue in the soil layer. Currently this not tracked - issue #481
         carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
             self.data.soil_layers[0].total_soil_carbon_amount, self.data.soil_layers[0].fresh_organic_nitrogen_content,
             self.data.soil_layers[0].nitrate_content)
@@ -56,9 +56,6 @@ class MineralizationDecomposition:
             self.data.soil_layers[0].nutrient_cycling_temp_factor,
             self.data.soil_layers[0].nutrient_cycling_water_factor)
 
-        # TODO: reduce the amount of residue in the soil layer by the decay amount when a residue tracker gets added to
-        #   LayerData - issue #481
-
         fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[0].fresh_organic_nitrogen_content
         fresh_organic_nitrogen_removed = min(self.data.soil_layers[0].fresh_organic_nitrogen_content,
                                              fresh_organic_nitrogen_removed)
@@ -66,6 +63,22 @@ class MineralizationDecomposition:
         self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
         self.data.soil_layers[0].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
         self.data.soil_layers[0].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
+
+    def _correct_fresh_organic_nitrogen_pools(self) -> None:
+        """
+        Ensures that no fresh organic nitrogen is kept in subsurface pools.
+
+        Notes
+        -----
+        SWAT only simulates fresh organic nitrogen in the surface soil layer. This method ensures that RuFaS transfers
+        any fresh organic nitrogen that makes it below the surface soil layer into the active organic nitrogen pool.
+        This behavior is consistent with the way that sub-surface nitrogen from plant residue is handled in :class
+        CropManagement:.
+
+        """
+        for layer in self.data.soil_layers[1:]:
+            layer.active_organic_nitrogen_content += layer.fresh_organic_nitrogen_content
+            layer.fresh_organic_nitrogen_content = 0.0
 
     # --- Static methods ---
     @staticmethod

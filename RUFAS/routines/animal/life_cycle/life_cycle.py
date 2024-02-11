@@ -169,7 +169,6 @@ class LifeCycleManager:
         self.replacement_market: List[Cow] = []
         self.animal_population: Optional[AnimalPopulation] = None
 
-    # TODO: Annotate config after removing all the imports in all the __init__.py files
     def initialize_herd(
         self, herd_data: HerdInfoTypedDict
     ) -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
@@ -350,7 +349,7 @@ class LifeCycleManager:
 
     def _reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
-        # TODO: Maybe break this list down into smaller lists
+        # TODO: Maybe break this list down into smaller lists GitHub Issue #1215
         self.calf_num = 0
         self.heiferI_num = 0
         self.heiferII_num = 0
@@ -370,7 +369,7 @@ class LifeCycleManager:
         self.heiferIII_percent = 0.0
         self.cow_percent = 0.0
 
-        # TODO: Check if all the following variables need to reset daily
+        # TODO: Check if all the following variables need to reset daily GitHub Issue #1215
         self.CIDR_count = 0
         self.preg_check_num_h = 0
         self.preg_check_num = 0
@@ -676,7 +675,7 @@ class LifeCycleManager:
             heiferII: The heiferII to extract the stats from.
 
         """
-        # self.CIDR_count += heiferII.CIDR_count  # TODO: add CIDR count to heiferII
+        # self.CIDR_count += heiferII.CIDR_count  # TODO: add CIDR count to heiferII GitHub Issue #1217
         self.GnRH_injection_num_h += heiferII.GnRH_injections
         self.PGF_injection_num_h += heiferII.PGF_injections
         self.preg_check_num_h += heiferII.preg_diagnoses

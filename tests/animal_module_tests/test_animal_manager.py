@@ -1,6 +1,6 @@
 from typing import Any
 from typing import List, Dict, Union
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -335,6 +335,14 @@ def animal_manager_with_mock_pens(animal_manager: AnimalManager,
     return animal_manager
 
 
+@pytest.fixture
+def cowlist():
+    cowlist = [MagicMock(),
+               MagicMock(),
+               MagicMock()]
+    return cowlist
+
+
 def test_get_animal_config():
     """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
     pass
@@ -425,9 +433,59 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
         assert add_log.call_count == 2
 
 
-def test_init_nutrient_rqmts():
+def test_animals_by_type(mocker: MockerFixture):
+    """Unit test for function animals_by_type in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.calves = [MagicMock()]
+    mock_animal_manager.heiferIs = [MagicMock()]
+    mock_animal_manager.heiferIIs = [MagicMock()]
+    mock_animal_manager.heiferIIIs = [MagicMock()]
+    mock_animal_manager.cows = [MagicMock()]
+    actual = mock_animal_manager.animals_by_type
+    expected = {
+            Calf: mock_animal_manager.calves,
+            HeiferI: mock_animal_manager.heiferIs,
+            HeiferII: mock_animal_manager.heiferIIs,
+            HeiferIII: mock_animal_manager.heiferIIIs,
+            Cow: mock_animal_manager.cows,
+        }
+    assert actual == expected
+
+
+def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function init_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
+        animal.body_weight = 100
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+
+    mock_weather = MagicMock()
+    mock_current_conditions = MagicMock()
+    mock_current_conditions.mean_air_temperature = 27
+    mock_weather.get_current_day_conditions.return_value = mock_current_conditions
+    mock_time = MagicMock()
+    mock_feed = MagicMock()
+
+    mock_animal_manager.init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
+
+    mock_weather.get_current_day_conditions.assert_called_once_with(mock_time)
+    assert animal.calc_nutrient_rqmts.call_count == 1
+    assert animal.set_nutrient_rqmts.call_count == 4
+    animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
+    animal.set_nutrient_rqmts.assert_has_calls([call(None)] + ([call(27, None)] * 3), any_order=True)
+    expected_p_animal = 720.0
+    for animal_type in animal_types:
+        animals = getattr(mock_animal_manager, animal_type)
+        for animal in animals:
+            assert getattr(animal, 'p_animal') == expected_p_animal
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -439,14 +497,50 @@ def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_calc_nutrient_rqmts():
+def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.all_pens[0].pen = 0
+    mock_animal_manager.all_pens[1].pen = 1
+    mock_animal_manager.all_pens[-1].ration_nutrient_conc = 1.0
+    mock_animal_manager.all_pens[-1].MEdiet = 2.0
+    mock_animal_manager.all_pens[-1].dry_matter_intake = 3.0
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+    mock_feed = MagicMock()
+
+    # act
+    mock_animal_manager.calc_nutrient_rqmts(mock_feed, current_temperature=27)
+
+    # assert
+    assert 1 == animal.calc_nutrient_rqmts.call_count
+    assert 4 == animal.set_nutrient_rqmts.call_count
 
 
-def test_fully_update_animal_to_pen_id_map():
+def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture) -> None:
     """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.animal_to_pen_id_map = {}
+    mock_animal_manager.all_pens[0].id = 0
+    mock_animal_manager.all_pens[1].id = 1
+    i = 0
+    for pen in mock_animal_manager.all_pens:
+        pen.animals_in_pen = {1+i: 100, 2+i: 200}
+        i += 4
+    # act
+    mock_animal_manager.fully_update_animal_to_pen_id_map()
+    # assert
+    assert mock_animal_manager.animal_to_pen_id_map == {1: 0, 2: 0, 5: 1, 6: 1}
 
 
 def pens_test_data_dict() -> List[dict[Any]]:
@@ -979,9 +1073,63 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
 
 
-def test_allocate_all_pens():
-    """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
-    pass
+def test_get_dry_cows() -> None:
+    """Unit test for function _get_dry_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_dry = True
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_dry = False
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list[1:]
+
+
+def test_get_lactating_cows() -> None:
+    """Unit test for function _get_lactating_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_lactating = True
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_lactating = False
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
+
+
+def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
+    """Unit test for function _group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_animal_manager.all_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens[0].animal_combination = 'combo_0'
+    mock_animal_manager.all_pens[1].animal_combination = 'combo_1'
+    expected = {'combo_0': [mock_pen_0],
+                'combo_1': [mock_pen_1]}
+    # Act
+    actual = mock_animal_manager._group_pens_by_animal_combination(mock_animal_manager.all_pens)
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    'num_stalls, max_stocking_density, expected',
+    [(1, 1, 1),
+     (1, 2, 2),
+     (0, 1, 0),
+     (1, 0, 0),
+     (100, 1, 100),
+     (-1, 1, ValueError),
+     (1, -1, ValueError)]
+)
+def test_calc_max_animal_spaces_per_pen(num_stalls: float, max_stocking_density: float, expected: float) -> None:
+    """Unit test for function _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
+    if expected is ValueError:
+        with pytest.raises(ValueError,
+                           match='The number of stalls and maximum stocking density must be greater than or equal to 0.'
+                           ):
+            AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+    else:
+        actual = AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        assert actual == expected
 
 
 def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -992,14 +1140,29 @@ def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
         pen.clear.assert_called_once()
 
 
-def test_calc_avg_nutrient_rqmts():
-    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_calc_manure_excretion():
+def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
-    pass
+    mock_feed = MagicMock()
+    methane_model = 'methane_model_choice'
+
+    mock_pen_0 = MagicMock()
+    mock_pen_0.calc_manure = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.reset_manure = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mocked_pens = [mock_pen_0, mock_pen_1]
+
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = mocked_pens
+    # Act
+    mock_animal_manager.calc_manure_excretion(mock_feed, methane_model)
+    # Assert
+    mock_pen_0.calc_manure.assert_called_once_with(mock_feed, 'methane_model_choice')
+    mock_pen_1.reset_manure.assert_called_once()
+    mock_pen_0.reset_manure.assert_not_called()
+    mock_pen_1.calc_manure.assert_not_called()
 
 
 def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -1010,12 +1173,24 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
     for pen in animal_manager_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
 
-    pass
 
-
-def test_record_pen_history():
+def test_record_pen_history(mocker: MockerFixture) -> None:
     """Unit test for function record_pen_history in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.calves = MagicMock()
+    mock_animal_manager.heiferIs = MagicMock()
+    mock_animal_manager.heiferIIs = MagicMock()
+    mock_animal_manager.heiferIIIs = MagicMock()
+    mock_animal_manager.cows = MagicMock()
+    mock_animal_manager.gather_pen_history = MagicMock()
+    mock_animal_manager.record_pen_history()
+    mock_animal_manager.gather_pen_history.assert_has_calls([call(mock_animal_manager.calves),
+                                                             call(mock_animal_manager.heiferIs),
+                                                             call(mock_animal_manager.heiferIIs),
+                                                             call(mock_animal_manager.heiferIIIs),
+                                                             call(mock_animal_manager.cows)])
+    assert 5 == mock_animal_manager.gather_pen_history.call_count
 
 
 def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> None:
@@ -1030,14 +1205,42 @@ def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> N
     assert actual == pytest.approx(expected)
 
 
-def test_calc_p_rqmts():
+def test_calc_p_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_p_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.call_p_rqmts = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.call_p_rqmts = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.calc_p_rqmts()
+    # Assert
+    mock_pen_0.call_p_rqmts.assert_called_once()
+    mock_pen_1.call_p_rqmts.assert_not_called()
 
 
-def test_daily_p_update():
+def test_daily_p_update(mocker: MockerFixture) -> None:
     """Unit test for function daily_p_update in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_pen_0 = MagicMock()
+    mock_pen_0.daily_p_update = MagicMock()
+    mock_pen_1 = MagicMock()
+    mock_pen_1.daily_p_update = MagicMock()
+    mock_pen_0.populated = True
+    mock_pen_1.populated = False
+    mock_pens = [mock_pen_0, mock_pen_1]
+    mock_animal_manager.all_pens = mock_pens
+    # Act
+    mock_animal_manager.daily_p_update()
+    # Assert
+    mock_pen_0.daily_p_update.assert_called_once()
+    mock_pen_1.daily_p_update.assert_not_called()
 
 
 def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
@@ -1077,27 +1280,23 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             assert animal.milk_production_reduction == 0.0
 
 
-def test_end_ration_interval():
+@pytest.mark.parametrize('simulation_day, formulation_interval, expected',
+                         [(5, 1, True),
+                          (0, 10, True),
+                          (101, 100, True),
+                          (301, 100, True),
+                          (2, 3, False),
+                          (30, 30, False)
+                          ])
+def test_end_ration_interval(simulation_day: int, formulation_interval: int,
+                             expected: bool, mocker: MockerFixture) -> None:
     """Unit test for function end_ration_interval in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_get_life_cycle_output():
-    """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_get_initialize_db_summary():
-    """Unit test for function get_initialize_db_summary in file routines/animal/animal_manager.py"""
-    pass
-
-
-@pytest.fixture
-def cowlist():
-    cowlist = [MagicMock(),
-               MagicMock(),
-               MagicMock()]
-    return cowlist
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.simulation_day = simulation_day
+    mock_animal_manager.formulation_interval = formulation_interval
+    actual = mock_animal_manager.end_ration_interval()
+    assert actual == expected
 
 
 def test_sum_daily_milk(animal_manager, cowlist):
@@ -1691,7 +1890,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
 
 
-def test_collect_manure_excretions_output_data(mocker: MockerFixture):
+def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
+    """Unit test for function collect_manure_excretions_output_data in file routines/animal/animal_manager.py"""
     pen = mocker.MagicMock()
     pen.calc_total_manure = mocker.MagicMock()
 
@@ -1713,3 +1913,21 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture):
                                                   animal_manager.methane_mitigation_method,
                                                   animal_manager.methane_mitigation_additive_amount,
                                                   manure_excretions_output_data)
+
+
+@pytest.mark.parametrize('num_animals, max_spaces, expected',
+                         [(100, 99, 1),
+                          (99, 100, -1),
+                          (100, 100, 0),
+                          (42, 100, -58),
+                          ])
+def test_calc_animal_space_shortage(num_animals: int, max_spaces: int, expected: int, mocker: MockerFixture) -> None:
+    """Unit test for function _calc_animal_space_shortage in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager._calc_max_animal_spaces_per_pen = MagicMock(return_value=max_spaces)
+    mock_animal_manager.all_pens = [MagicMock()]
+    mock_animal_manager.all_pens[0].num_stalls = max_spaces
+    mock_animal_manager.all_pens[0].max_stocking_density = 1
+    actual = mock_animal_manager._calc_animal_space_shortage(num_animals, mock_animal_manager.all_pens)
+    assert actual == expected
