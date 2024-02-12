@@ -287,7 +287,7 @@ class Pen:
     @property
     def current_stocking_density(self) -> float:
         """
-        Return the current stocking density of the pen.
+        Returns the current stocking density of the pen.
 
         Returns
         -------
@@ -329,7 +329,7 @@ class Pen:
 
     def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction: float) -> None:
         """
-        Sets the pen's average milk and average CP milk
+        Sets the pen's average milk and average CP milk.
 
         Parameters
         ----------
@@ -348,8 +348,9 @@ class Pen:
 
         Parameters
         ----------
-            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
-                list of new animals to be added to the pen
+        new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+            list of new animals to be added to the pen
+
         """
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
@@ -372,8 +373,8 @@ class Pen:
 
         Parameters
         ----------
-            animal_combination: AnimalCombination
-                the new AnimalCombination
+        animal_combination: AnimalCombination
+            the new AnimalCombination
         """
         self.animal_combination = animal_combination
 
