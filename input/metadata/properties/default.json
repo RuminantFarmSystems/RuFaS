@@ -3462,7 +3462,7 @@
         },
         "manure_handler": {
           "type": "string",
-          "description": "Manure Handling Method Name -- Name of the manure handler configuration to be used in this scenario."
+          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
