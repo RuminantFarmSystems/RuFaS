@@ -170,16 +170,14 @@ class ManureManager:
                 custom_bedding_config=custom_bedding_config,  # type: ignore
             )
 
-            custom_manure_handler_config = (
-                self.manure_manager_config_handler.get_custom_manure_handler_config(
-                    mm_pen.manure_handler
-                )
+            manure_handler_config = (
+                self.manure_manager_config_handler.get_manure_handler_config(mm_pen.manure_handler)
             )
-            self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
-                manure_handler_type_name=mm_pen.manure_handler,
+            self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_manure_handler(
+                configuration_name=mm_pen.manure_handler,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_handler_config=custom_manure_handler_config,  # type: ignore
+                manure_handler_config=manure_handler_config,  # type: ignore
             )
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
