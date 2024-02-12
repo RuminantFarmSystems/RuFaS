@@ -8,7 +8,28 @@ class TractorSize(Enum):
 
 
 class TractorSpecs:
+    """
+    A class to represent the specifications of a tractor.
+    The tractor's specifications are determined based on its size or the size of the herd it is intended to work with.
+    """
+
     def __init__(self, tractor_size: TractorSize | None, herd_size: int | None) -> None:
+        """
+        Initializes the TractorSpecs object with the tractor size or calculates it based on the provided herd size.
+        If `tractor_size` is not provided, the size is inferred using the `herd_size` argument.
+
+        Parameters
+        ----------
+        tractor_size : TractorSize | None, optional
+            The size of the tractor as a `TractorSize` enum value.
+        herd_size : int | None, optional
+            The size of the herd to determine the tractor size if `tractor_size` is not provided.
+
+        Raises
+        ------
+        ValueError
+            If neither `tractor_size` nor `herd_size` is provided.
+        """
         if not tractor_size and not herd_size:
             raise ValueError(
                 "At least one of `tractor_size` or `herd_size` must be given."
@@ -16,7 +37,10 @@ class TractorSpecs:
         self.tractor_size = tractor_size or self.herd_size_to_tractor_size(herd_size)
 
     def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
-        "Assign a Tractor Size based on number of cows"
+        """
+        Assign a Tractor Size based on number of cows
+        Implements Helper Function 420  in EEE Functions file.
+        """
         if herd_size < 0:
             raise ValueError("Herd size must be a positive integer.")
         if herd_size < 500:
