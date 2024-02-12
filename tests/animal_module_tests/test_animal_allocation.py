@@ -227,9 +227,9 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: An
     for i in range(num_new_default_pens):
         new_default_pen = mocker.MagicMock(spec=Pen)
         mock_new_default_pens.append(new_default_pen)
-    patch_for_create_default_pen = mocker.patch.object(
+    patch_for_create_duplicate_pen = mocker.patch.object(
         AnimalManager,
-        '_create_default_pen',
+        '_create_duplicate_pen',
         side_effect=mock_new_default_pens
     )
 
@@ -256,13 +256,14 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: An
         num_animals=num_animals,
         pens=mock_pens
     )
-    patch_for_create_default_pen.assert_has_calls(
+    patch_for_create_duplicate_pen.assert_has_calls(
         [
             mocker.call(
                 pen_id=start_pen_id + i,
                 animal_combination=animal_combination,
                 num_stalls=num_stalls_per_pen,
-                max_stocking_density=max_stocking_density_per_pen
+                max_stocking_density=max_stocking_density_per_pen,
+                reference_pen=mock_pens[0],
             )
             for i in range(num_new_default_pens)
         ]
@@ -530,8 +531,12 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         if animal in heiferIIIs + dry_cows
         else AnimalCombination.LAC_COW)
 
+    animal_manager.weather = mocker.MagicMock()
+    animal_manager.time = mocker.MagicMock()
+    manure_manager = mocker.MagicMock()
+
     # Act
-    animal_manager.allocate_animals_to_pens()
+    animal_manager.allocate_animals_to_pens(animal_manager.weather, animal_manager.time, manure_manager)
 
     # Assert
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)

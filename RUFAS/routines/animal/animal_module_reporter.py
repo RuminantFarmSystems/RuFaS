@@ -193,7 +193,7 @@ class AnimalModuleReporter:
         }
         for pen in penlist:
             om.add_variable(
-                f"number_of_animals_in_pen_{pen.id}",
+                f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
                 len(pen.animals_in_pen),
                 info_map,
             )

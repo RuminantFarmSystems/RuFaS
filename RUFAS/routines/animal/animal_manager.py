@@ -859,7 +859,6 @@ class AnimalManager:
                         reference_pen=pens[0]
                     )
                 )
-                # ManureHandlerFactory(manure_handler_type_name=pens[0].manure_handling)
 
         return new_default_pens
 
