@@ -2,10 +2,6 @@ from enum import Enum
 
 
 class TractorSize(Enum):
-    """
-    Enum for Tractor Sizes.
-    """
-
     SMALL = "Small"
     MEDIUM = "Medium"
     LARGE = "Large"

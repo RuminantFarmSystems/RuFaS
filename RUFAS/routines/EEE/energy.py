@@ -1,7 +1,10 @@
 from RUFAS.output_manager import OutputManager
 from math import sqrt
 
+from .tractor import TractorSpecs
+
 om = OutputManager()
+
 
 class EnergyEstimator:
     """Class to esitmate energy consumption for various operations on the farm"""
@@ -16,16 +19,15 @@ class EnergyEstimator:
         }
         crop_yield = 0  # TODO get the correct value
         field_production_size = 0  # TODO get the correct value
-        tractor_size = (
-            TractorSize.SMALL
-        )  # TODO get the correct value Cell J:14 in helper functions
+        herd_size = 0  # TODO get the correct value
+        tractor_specs = TractorSpecs(herd_size=herd_size)
         estimator = EnergyEstimator()
         diesel_consumption_tractor_implement_liter_per_ton = (
             estimator.calculate_diesel_consumption(
-                crop_yield, field_production_size, tractor_size
+                crop_yield, field_production_size, tractor_specs
             )
         )
-        variable_info_map = {"unit": "liter/tone", "tractor_size": tractor_size.value}
+        variable_info_map = {"unit": "liter/tone", "tractor_size": tractor_specs.tractor_size}
         om.add_variable(
             "diesel_consumption_tractor_implement",
             diesel_consumption_tractor_implement_liter_per_ton,
@@ -33,7 +35,7 @@ class EnergyEstimator:
         )
 
     def calculate_diesel_consumption(
-        self, crop_yield: float, field_production_size: float, tractor_size: TractorSize
+        self, crop_yield: float, field_production_size: float, tractor_specs: TractorSpecs
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
