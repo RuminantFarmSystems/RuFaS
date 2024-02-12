@@ -1,7 +1,18 @@
+from enum import Enum
 from RUFAS.output_manager import OutputManager
 from math import sqrt
 
 om = OutputManager()
+
+
+class TractorSize(Enum):
+    """
+    Enum for Tractor Sizes.
+    """
+
+    SMALL = "Small"
+    MEDIUM = "Medium"
+    LARGE = "Large"
 
 
 class EnergyEstimator:
