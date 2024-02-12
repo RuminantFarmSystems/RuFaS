@@ -17,9 +17,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-        fetch-depth: 0
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
@@ -48,12 +45,14 @@ jobs:
     - name: Commit and push formatting changes
       env:
         BRANCH_NAME: ${{ github.head_ref || github.ref }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add -A
         git commit -m "Apply Black Formatting" --allow-empty
-        
+        git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+
         CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
         git push origin HEAD:$CLEAN_BRANCH_NAME
     - name: Lint with flake8
@@ -61,9 +60,6 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 ${{ env.FILES }}
-        - name: Format code with Black
-        run: |
-          black ${{ env.FILES }}
     - name: Check for Unauthorized Changes
       run: |
         paths_to_protect=(
