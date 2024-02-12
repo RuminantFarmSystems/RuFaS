@@ -295,13 +295,13 @@ class ManureHandlerFactory:
     """A class that contains the logic for creating different types of manure handlers."""
 
     @classmethod
-    def get_instance(
+    def get_manure_handler(
             cls,
             configuration_name: str,
             weather: Weather,
             time: Time,
             manure_handler_config: ManureHandlerConfig,
-    ) -> BaseManureHandler:
+    ) -> BaseManureHandler | FlushSystem | AlleyScraper | ManualScraping | Tillage | Harrowing:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
         Parameters
@@ -317,7 +317,8 @@ class ManureHandlerFactory:
 
         Returns
         -------
-        A new instance of a BaseManureHandler subtype.
+        BaseManureHandler | FlushSystem | AlleyScraper | ManualScraping | Tillage | Harrowing
+            A new instance of a BaseManureHandler subtype.
 
         """
         manure_handler_class_by_type: Dict[

@@ -164,11 +164,12 @@ def test_manure_handler_type_enum() -> None:
         ('tillage', ManureHandlerType.TILLAGE, Tillage),
         ('harrowing', ManureHandlerType.HARROWING, Harrowing),
     ])
-def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
-                                             manure_handler_type: ManureHandlerType,
-                                             expected_manure_handler_class: BaseManureHandler,
-                                             mocker: MockerFixture) \
-        -> None:
+def test_manure_handler_factory_get_manure_handler(
+    manure_handler_type_name: str,
+    manure_handler_type: ManureHandlerType,
+    expected_manure_handler_class: BaseManureHandler,
+    mocker: MockerFixture,
+) -> None:
     """Unit test for get_instance() of class ManureHandlerFactory"""
     # Arrange
     weather = mocker.MagicMock()
@@ -188,10 +189,10 @@ def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
     )
 
     # Act
-    manure_handler = ManureHandlerFactory.get_instance(weather=weather,
-                                                       time=time,
-                                                       configuration_name=manure_handler_type_name,
-                                                       manure_handler_config=manure_handler_config)
+    manure_handler = ManureHandlerFactory.get_manure_handler(weather=weather,
+                                                             time=time,
+                                                             configuration_name=manure_handler_type_name,
+                                                             manure_handler_config=manure_handler_config)
 
     # Assert
     assert type(manure_handler) is expected_manure_handler_class

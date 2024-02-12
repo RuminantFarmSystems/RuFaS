@@ -161,8 +161,8 @@ def test_configure_manure_manager_components(manure_separator: str,
     mock_manure_handler_config = mocker.MagicMock()
     mock_manure_manager_config_handler.get_manure_handler_config.return_value = mock_manure_handler_config
     mock_manure_handler = mocker.MagicMock()
-    patch_for_manure_handler_factory_get_instance = mocker.patch(
-        'RUFAS.routines.manure.manure_manager.ManureHandlerFactory.get_instance',
+    patch_for_manure_handler_factory_get_manure_handler = mocker.patch(
+        'RUFAS.routines.manure.manure_manager.ManureHandlerFactory.get_manure_handler',
         return_value=mock_manure_handler,
     )
 
@@ -214,7 +214,7 @@ def test_configure_manure_manager_components(manure_separator: str,
     assert manure_manager.beddings[pen_id] == mock_bedding
 
     mock_manure_manager_config_handler.get_manure_handler_config.assert_called_once_with(manure_handler)
-    patch_for_manure_handler_factory_get_instance.assert_called_once_with(
+    patch_for_manure_handler_factory_get_manure_handler.assert_called_once_with(
         configuration_name=manure_handler,
         weather=mock_weather,
         time=mock_time,
