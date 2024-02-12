@@ -17,6 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        fetch-depth: 0
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
@@ -44,6 +47,19 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 ${{ env.FILES }}
+        - name: Format code with Black
+        run: |
+          black ${{ env.FILES }}
+    - name: Format code with Black
+      run: |
+        black ${{ env.FILES }}
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add -A
+        git commit -m "Apply Black Formatting" --allow-empty
+        git push
     - name: Check for Unauthorized Changes
       run: |
         paths_to_protect=(
