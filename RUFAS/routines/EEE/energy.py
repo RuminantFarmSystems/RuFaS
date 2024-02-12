@@ -1,4 +1,5 @@
 from RUFAS.output_manager import OutputManager
+from math import sqrt
 
 om = OutputManager()
 
@@ -16,10 +17,9 @@ class EnergyEstimator:
         }
         crop_yield = 0  # TODO get the correct value
         field_production_size = 0  # TODO get the correct value
+        estimator = EnergyEstimator()
         diesel_consumption_tractor_implement_liter_per_ton = (
-            EnergyEstimator.calculate_diesel_consumption(
-                crop_yield, field_production_size
-            )
+            estimator.calculate_diesel_consumption(crop_yield, field_production_size)
         )
         variable_info_map = {"unit": "liter/tone"}
         om.add_variable(
@@ -28,9 +28,8 @@ class EnergyEstimator:
             {**base_info_map, **variable_info_map},
         )
 
-    @classmethod
     def calculate_diesel_consumption(
-        crop_yield: float, field_production_size: float
+        self, crop_yield: float, field_production_size: float
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
@@ -49,7 +48,9 @@ class EnergyEstimator:
         float
             Diesel Consumption for Tractor-Implement (l/ton)
         """
-        tractor_implement_specific_fuel_consumption_liter_per_kWh = 0  # TODO get the correct value
+        tractor_implement_specific_fuel_consumption_liter_per_kWh = (
+            self._calculate_tractor_specific_fuel_consumption()
+        )
         tractor_implement_total_power_needed_kW = 0  # TODO get the correct value
         tractor_implement_operation_time_hr = 0  # TODO get the correct value
         diesel_consumption_tractor_implement_liter_per_ton = (
@@ -60,3 +61,14 @@ class EnergyEstimator:
             / crop_yield
         )
         return diesel_consumption_tractor_implement_liter_per_ton
+
+    def _calculate_tractor_specific_fuel_consumption(self) -> float:
+        """
+        Calculates Specific Fuel Consumption: Specific fuel consumption in simple words measures fuel efficiency.
+        It measures the fuel required per unit of power generated hence, the unit is liter/kWh.
+        Corresponds to helper functions 410 and 411 in EEE Functions sheet.
+        """
+        tractor_total_power_needed = 0  # TODO get the correct value
+        tractor_size_power_available = 0  # TODO get the correct value
+        x = tractor_total_power_needed / tractor_size_power_available
+        return (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)
