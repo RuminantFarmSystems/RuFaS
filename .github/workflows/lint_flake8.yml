@@ -45,16 +45,17 @@ jobs:
     - name: Format code with Black
       run: |
         black ${{ env.FILES }}
-    - name: Identify Current Branch
-      id: branch
-      run: echo "::set-output name=branch::$(git branch --show-current)"
     - name: Commit and push formatting changes
+      env:
+        BRANCH_NAME: ${{ github.head_ref || github.ref }}
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add -A
         git commit -m "Apply Black Formatting" --allow-empty
-        git push origin HEAD:${{ steps.branch.outputs.branch }}
+        
+        CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
+        git push origin HEAD:$CLEAN_BRANCH_NAME
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
