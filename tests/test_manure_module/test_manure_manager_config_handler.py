@@ -543,7 +543,7 @@ def test_get_manure_handler_config(
 
 def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
-    expected_title = "Attempted use a non-existent manure handler configuration called 'not there'."
+    expected_title = "Attempted to use a non-existent manure handler configuration called 'not there'."
     expected_message = "Raising ValueError."
     expected_info_map = {"class": "ManureManagerConfigHandler", "function": "get_manure_handler_config"}
 

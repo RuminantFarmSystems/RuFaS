@@ -98,7 +98,7 @@ class ManureManagerConfigHandler:
         except KeyError:
             info_map = {"class": self.__class__.__name__, "function": self.get_manure_handler_config.__name__}
             error_title = \
-                f"Attempted use a non-existent manure handler configuration called '{manure_handler_type_name}'."
+                f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'."
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
