@@ -3467,8 +3467,7 @@
         },
         "manure_handler": {
           "type": "string",
-          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
@@ -3521,19 +3520,25 @@
       "properties": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the unique manure handler config."
+          },
           "manure_handler_type": {
             "type": "string",
-            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
+            "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
           },
           "cleaning_water_use_rate": {
             "type": "number"
           },
           "minutes_per_cleaning": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleanings_per_day": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleaning_water_recycle_fraction": {
             "type": "number",
