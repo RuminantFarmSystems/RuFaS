@@ -33,6 +33,9 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
+# from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
+from RUFAS.routines.manure.manure_manager import ManureManager
+
 om = OutputManager()
 
 
@@ -84,7 +87,7 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time,
+    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time, manure_manager_config,
                  feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None):
         """
         Initializes the pens and animals in the simulation with data from the
@@ -188,7 +191,7 @@ class AnimalManager:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens()
+            self.allocate_animals_to_pens(weather, time, manure_manager_config)
 
         self._print_animal_num_warnings(data["herd_information"])
 
@@ -856,6 +859,7 @@ class AnimalManager:
                         reference_pen=pens[0]
                     )
                 )
+                # ManureHandlerFactory(manure_handler_type_name=pens[0].manure_handling)
 
         return new_default_pens
 
@@ -1066,7 +1070,7 @@ class AnimalManager:
 
         return num_animals_in_pens
 
-    def allocate_animals_to_pens(self) -> None:
+    def allocate_animals_to_pens(self, weather, time, manure_manager) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -1101,6 +1105,7 @@ class AnimalManager:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+            ManureManager.configure_manure_manager_components(manure_manager, new_default_pens)
 
         self.fully_update_animal_to_pen_id_map()
 
@@ -1639,7 +1644,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time, manure_manager):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1701,7 +1706,7 @@ class AnimalManager:
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
-                self.allocate_animals_to_pens()
+                self.allocate_animals_to_pens(weather, time, manure_manager)
                 self._calc_ration_at_interval(feed)
                 AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
                 self.calc_avg_growth()

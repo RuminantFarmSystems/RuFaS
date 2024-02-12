@@ -186,6 +186,18 @@ class AnimalModuleReporter:
                 info_map,
             )
 
+    def report_daily_pen_totals(penlist):
+        info_map = {
+            "class": "AnimalModuleReporter",
+            "function": "report_daily_pen_totals",
+        }
+        for pen in penlist:
+            om.add_variable(
+                f"number_of_animals_in_pen_{pen.id}",
+                len(pen.animals_in_pen),
+                info_map,
+            )
+
     def report_daily_feed_emissions(
         ration_total: dict[str, float],
         pen_id: int,
@@ -571,6 +583,7 @@ class AnimalModuleReporter:
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
         AnimalModuleReporter.report_daily_ration(animal_manager)
+        AnimalModuleReporter.report_daily_pen_totals(animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen)
