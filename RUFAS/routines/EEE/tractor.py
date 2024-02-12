@@ -56,3 +56,9 @@ class TractorSpecs:
             return 12_700.0
         if self.tractor_size == TractorSize.LARGE:
             return 20_856.0
+
+    @property
+    def speed_km_hr(self) -> float:
+        # TODO get these values from IM
+        """Constant 598 in EEE Functions file"""
+        return 10.0
