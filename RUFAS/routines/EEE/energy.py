@@ -47,6 +47,16 @@ class EnergyEstimator:
         Returns
         -------
         float
-            Diesel Consumption Tractor-Implement (l/ton)
+            Diesel Consumption for Tractor-Implement (l/ton)
         """
-        pass
+        tractor_implement_specific_fuel_consumption = 0  # TODO get the correct value
+        tractor_implement_total_power_needed = 0  # TODO get the correct value
+        tractor_implement_operation_time = 0  # TODO get the correct value
+        diesel_consumption_tractor_implement_liter_per_ton = (
+            tractor_implement_specific_fuel_consumption
+            * tractor_implement_total_power_needed
+            * tractor_implement_operation_time
+            / field_production_size
+            / crop_yield
+        )
+        return diesel_consumption_tractor_implement_liter_per_ton
