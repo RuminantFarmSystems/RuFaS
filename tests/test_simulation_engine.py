@@ -39,6 +39,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     simulation_engine = SimulationEngine()
     simulation_engine.day_counter = 100
     simulation_engine.state = mocker.MagicMock()
+    simulation_engine.feed_manager = mocker.MagicMock()
     patch_for_run_simulation_main_loop = mocker.patch.object(
         simulation_engine, "_run_simulation_main_loop", return_value=None
     )
@@ -67,6 +68,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_animal_module_reporter.assert_called_once_with(
         simulation_engine.state.animal_manager, 100
     )
+    simulation_engine.feed_manager.query_available_feeds.assert_called_once()
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:
