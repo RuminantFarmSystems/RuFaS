@@ -15,6 +15,26 @@ class TractorSize(Enum):
     LARGE = "Large"
 
 
+class TractorSpecs:
+    def __init__(self, tractor_size: TractorSize | None, herd_size: int | None) -> None:
+        if tractor_size:
+            self.tractor_size = tractor_size
+        elif herd_size:
+            self.tractor_size = self.herd_size_to_tractor_size(herd_size)
+        else:
+            raise ValueError(
+                "At least one of `tractor_size` or `herd_size` has to be given."
+            )
+
+    def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
+        "Assign a Tractor Size based on number of cows"
+        if herd_size < 500:
+            return TractorSize.SMALL
+        if herd_size < 2000:
+            return TractorSize.MEDIUM
+        return TractorSize.LARGE
+
+
 class EnergyEstimator:
     """Class to esitmate energy consumption for various operations on the farm"""
 
@@ -28,11 +48,16 @@ class EnergyEstimator:
         }
         crop_yield = 0  # TODO get the correct value
         field_production_size = 0  # TODO get the correct value
+        tractor_size = (
+            TractorSize.SMALL
+        )  # TODO get the correct value Cell J:14 in helper functions
         estimator = EnergyEstimator()
         diesel_consumption_tractor_implement_liter_per_ton = (
-            estimator.calculate_diesel_consumption(crop_yield, field_production_size)
+            estimator.calculate_diesel_consumption(
+                crop_yield, field_production_size, tractor_size
+            )
         )
-        variable_info_map = {"unit": "liter/tone"}
+        variable_info_map = {"unit": "liter/tone", "tractor_size": tractor_size.value}
         om.add_variable(
             "diesel_consumption_tractor_implement",
             diesel_consumption_tractor_implement_liter_per_ton,
@@ -40,7 +65,7 @@ class EnergyEstimator:
         )
 
     def calculate_diesel_consumption(
-        self, crop_yield: float, field_production_size: float
+        self, crop_yield: float, field_production_size: float, tractor_size: TractorSize
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
@@ -53,6 +78,8 @@ class EnergyEstimator:
             Amount of crop yielded per hectars (metric ton/ha)
         field_production_size: float
             The filed area under production (ha)
+        tractor_size: TractorSize
+            The categorical size of the tractor
 
         Returns
         -------
