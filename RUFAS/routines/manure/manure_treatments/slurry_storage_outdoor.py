@@ -190,16 +190,18 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self.freeboard_input * self.pit_surface_area
 
     def calc_methane_emission(
-            self, accumulated_liquid_manure_total_volatile_solids: float
+        self, accumulated_liquid_manure_total_volatile_solids: float
     ) -> float:
         """Calculates the CH4 emission from the outdoor slurry storage treatment system.
 
         Args:
-            accumulated_liquid_manure_total_volatile_solids: The accumulated manure total volatile solids in the
-            treatment system, kg.
+            accumulated_liquid_manure_total_volatile_solids: The accumulated total volatile solids in the treatment system, kg.
 
         Returns:
             methane_loss: methane emission from the outdoor slurry storage treatment system, kg.
+            new_accumulated_liquid_manure_total_volatile_solids: Accumulated total volatile solids in the treatment system
+            after the methane emission is calculated, kg.
+
         """
 
         temperature_celsius = self._get_current_day_average_temperature_celsius()
@@ -207,7 +209,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
             temp=temperature_celsius,
         )
-        return max(methane_loss, 0.0)
+        return methane_loss
 
     def calc_ammonia_emission(
             self,
@@ -286,6 +288,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.storage_ammonia += ammonia_loss
         self._accumulated_output.storage_methane += methane_loss
 
+        new_accumulated_liquid_manure_total_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_volatile_solids - methane_loss, 0.0
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            new_accumulated_liquid_manure_total_volatile_solids
+        )
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
