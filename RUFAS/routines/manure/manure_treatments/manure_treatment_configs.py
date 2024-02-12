@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Union, Tuple
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
@@ -68,6 +69,11 @@ class ManureTreatmentConfig:
 
     last_compost_turning_or_addition:
         Number of days since last compot turning or addition activity.
+
+    manure_cover: str
+        Indicates the presence or absence of a cover in the manure treatment or storage system.
+        When used in the case of a slurry storage system (underfloor or outdoors) the cover
+        refers to the presence of a natural crust.
     """
 
     total_solids_removal_efficiency_for_treatment: float = 0.0
@@ -93,6 +99,7 @@ class ManureTreatmentConfig:
 
     composting_type: str = "intensive windrow"
     last_compost_turning_or_addition: int = 1
+    manure_cover: str = ManureCoverEnum.NO_COVER.value
 
 
 class DefaultManureTreatmentConfigFactory:
@@ -106,6 +113,7 @@ class DefaultManureTreatmentConfigFactory:
         phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
@@ -117,6 +125,7 @@ class DefaultManureTreatmentConfigFactory:
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
         freeboard_input=0.3048,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     ANAEROBIC_DIGESTION_CONFIG = ManureTreatmentConfig(
@@ -135,6 +144,7 @@ class DefaultManureTreatmentConfigFactory:
         evaporation_fraction=0.02,  # 2-5% of Wastewater Volume
         anaerobic_digestion_temperature_set_point=37.5,
         anaerobic_digestion_temperature_celsius=37.5,
+        manure_cover=ManureCoverEnum.NOT_APPLICABLE.value,
     )
 
     ANAEROBIC_LAGOON_CONFIG = ManureTreatmentConfig(
@@ -150,6 +160,7 @@ class DefaultManureTreatmentConfigFactory:
         # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
         storage_time_period=365,
         freeboard_input=0.3048,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     COMPOST_BEDDED_PACK_BARN_CONFIG = ManureTreatmentConfig()

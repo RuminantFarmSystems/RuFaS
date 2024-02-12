@@ -81,30 +81,31 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
 @pytest.mark.parametrize(
     "report_data, aggregator_key, expected", [
         # Tests with sum aggregator
-        ({"a": [1, 2], "b": [3, 4]}, "sum", [3, 7]),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "sum", [6, 15]),
+        ({"a": [1, 2], "b": [3, 4]}, "sum", {'a': [3], 'b': [7]}),
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "sum", {'a': [6], 'b': [15]}),
 
         # Tests with product aggregator
-        ({"a": [1, 2], "b": [3, 4]}, "product", [2, 12]),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "product", [6, 120]),
+        ({"a": [1, 2], "b": [3, 4]}, "product", {'a': [2], 'b': [12]}),
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "product", {'a': [6], 'b': [120]}),
 
         # Tests with average aggregator
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "average", [2.0, 5.0]),
-        ({"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}, "average", [2.5, 6.5]),
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "average", {'a': [2.0], 'b': [5.0]}),
+        ({"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}, "average", {'a': [2.5], 'b': [6.5]}),
 
         # Tests with division aggregator
-        ({"a": [8, 4], "b": [2, 1]}, "division", [2.0, 2.0]),
-        ({"a": [8, 4, 2], "b": [2, 1, 1]}, "division", [1.0, 2.0]),
+        ({"a": [8, 4], "b": [2, 1]}, "division", {'a': [2.0], 'b': [2.0]}),
+        ({"a": [8, 4, 2], "b": [2, 1, 1]}, "division", {'a': [1.0], 'b': [2.0]}),
 
         # Tests with standard deviation aggregator
-        ({"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]}, "SD", [6.041522986797286, 2.692582403567252]),
-        ({"a": [10, 12, 23, 23, 23], "b": [17, 15, 22, 20, 20]}, "SD", [5.912698199637793, 2.481934729198171]),
+        ({"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]}, "SD", {'a': [6.041522986797286], 'b': [2.692582403567252]}),
+        ({"a": [10, 12, 23, 23, 23], "b": [17, 15, 22, 20, 20]}, "SD",
+         {'a': [5.912698199637793], 'b': [2.481934729198171]}),
 
         # Test with empty data
-        ({"a": [], "b": []}, "sum", [0, 0]),
+        ({"a": [], "b": []}, "sum", {'a': [0], 'b': [0]}),
 
         # Test with None values in data
-        ({"a": [1, None], "b": [None, 4]}, "sum", [1, 4]),
+        ({"a": [1, None], "b": [None, 4]}, "sum", {'a': [1], 'b': [4]}),
     ])
 def test_apply_vertical_aggregation(report_data: Dict[str, List[float]],
                                     aggregator_key: str,
@@ -548,7 +549,7 @@ def test_perform_aggregations(
     report_generator = ReportGenerator()
     mocker.patch.object(report_generator, '_prepare_report_data_with_constants', return_value=mock_prep_data)
     mocker.patch.object(report_generator, '_apply_horizontal_aggregation', return_value=[5, 7])
-    mocker.patch.object(report_generator, '_apply_vertical_aggregation', return_value=[3.5])
+    mocker.patch.object(report_generator, '_apply_vertical_aggregation', return_value={"some_key": [3.5]})
 
     # Act and assert
     if expected_exception:
@@ -616,9 +617,9 @@ def test_extract_and_check_aggregation_keys(
          {"hor_ver_agg": [sum([1, 2, 3])]}),
 
         # Test case with both horizontal and vertical aggregation, vertical first
-        ([1, 2, 3], [4, 5, 6],
+        ([1, 2, 3], {"a": [4, 5, 6], "b": [7, 8, 9]},
          {"horizontal_aggregation": "sum", "vertical_aggregation": "sum", "horizontal_first": False},
-         {"ver_hor_agg": [sum([4, 5, 6])]}),
+         {"ver_hor_agg": [a + b for a, b in zip([4, 5, 6], [7, 8, 9])]}),
 
         # Test case with only horizontal aggregation
         ([1, 2, 3], None,
@@ -626,7 +627,7 @@ def test_extract_and_check_aggregation_keys(
          {"hor_agg": [1, 2, 3]}),
 
         # Test case with only vertical aggregation
-        (None, [4, 5, 6],
+        (None, {"some_key": [4, 5, 6]},
          {"vertical_aggregation": "sum"},
          {"ver_agg": [4, 5, 6]}),
 
