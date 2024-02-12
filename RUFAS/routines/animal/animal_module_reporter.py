@@ -590,7 +590,7 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_life_cycle_manager_data(
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
-        AnimalModuleReporter.report_daily_ration(animal_manager)
+        AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
         AnimalModuleReporter.report_daily_pen_totals(animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:

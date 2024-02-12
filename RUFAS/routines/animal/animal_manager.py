@@ -33,7 +33,6 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
-# from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_manager import ManureManager
 
 om = OutputManager()
@@ -776,24 +775,13 @@ class AnimalManager:
             The number of stalls in the pen.
         max_stocking_density : float
             The maximum stocking density for the pen.
+        reference_pen : Pen
+            Pen object that has more animals than available space.
 
         Returns
         -------
         Pen
-            A new Pen object with the specified parameters and default values for other attributes.
-
-        Examples
-        --------
-        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
-        animal_combination=AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
-        >>> pen.id
-        1
-        >>> pen.animal_combination
-        <AnimalCombination.CALF: 0>
-        >>> pen.num_stalls
-        10
-        >>> pen.max_stocking_density
-        1.5
+            A new Pen object with the specified parameters and duplicate values for other attributes of reference pen.
 
         """
 
