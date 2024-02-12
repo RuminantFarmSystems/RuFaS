@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8
+        pip install flake8 black
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Get all added or modified files
       run: |
@@ -42,14 +42,6 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
-    - name: Lint with flake8
-      if: ${{ env.FILES != '' }}
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 ${{ env.FILES }}
-        - name: Format code with Black
-        run: |
-          black ${{ env.FILES }}
     - name: Format code with Black
       run: |
         black ${{ env.FILES }}
@@ -60,6 +52,14 @@ jobs:
         git add -A
         git commit -m "Apply Black Formatting" --allow-empty
         git push
+    - name: Lint with flake8
+      if: ${{ env.FILES != '' }}
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 ${{ env.FILES }}
+        - name: Format code with Black
+        run: |
+          black ${{ env.FILES }}
     - name: Check for Unauthorized Changes
       run: |
         paths_to_protect=(
