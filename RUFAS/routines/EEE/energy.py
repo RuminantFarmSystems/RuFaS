@@ -34,6 +34,33 @@ class TractorSpecs:
             return TractorSize.MEDIUM
         return TractorSize.LARGE
 
+    @property
+    def PTO_kw(self) -> float:
+        # TODO get these values from IM
+        """Constants 589, 592, 595 in EEE Functions file"""
+        if self.tractor_size == TractorSize.SMALL:
+            return 55.93
+        if self.tractor_size == TractorSize.MEDIUM:
+            return 208.42
+        if self.tractor_size == TractorSize.LARGE:
+            return 328.11
+
+    @property
+    def power_available_kw(self) -> float:
+        """Constants 590, 593, 596 in EEE Functions file, calculated bsaed on PTO"""
+        return self.PTO_kw / 1.4
+
+    @property
+    def mass_kg(self) -> float:
+        # TODO get these values from IM
+        """Constants 591, 594, 597 in EEE Functions file"""
+        if self.tractor_size == TractorSize.SMALL:
+            return 8_400.0
+        if self.tractor_size == TractorSize.MEDIUM:
+            return 12_700.0
+        if self.tractor_size == TractorSize.LARGE:
+            return 20_856.0
+
 
 class EnergyEstimator:
     """Class to esitmate energy consumption for various operations on the farm"""
