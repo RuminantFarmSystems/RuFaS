@@ -3,6 +3,7 @@
 import random
 import sys
 import time as timer
+from enum import Enum
 from typing import Optional
 
 import numpy
@@ -67,7 +68,10 @@ class SimulationEngine:
         )
         om.add_variable(
             "available_feeds_on_final_day",
-            self.feed_manager.query_available_feeds(),
+            [
+                {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
+                for feed in self.feed_manager.query_available_feeds()
+            ],
             info_map
         )
         t_end_sim = timer.time()
