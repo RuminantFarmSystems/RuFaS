@@ -22,10 +22,8 @@ class EnergyEstimator:
         herd_size = 0  # TODO get the correct value
         tractor_specs = TractorSpecs(herd_size=herd_size)
         estimator = EnergyEstimator()
-        diesel_consumption_tractor_implement_liter_per_ton = (
-            estimator.calculate_diesel_consumption(
-                crop_yield, field_production_size, tractor_specs
-            )
+        diesel_consumption_tractor_implement_liter_per_ton = estimator.calculate_diesel_consumption(
+            crop_yield, field_production_size, tractor_specs
         )
         variable_info_map = {"unit": "liter/tone", "tractor_size": tractor_specs.tractor_size}
         om.add_variable(
@@ -35,7 +33,10 @@ class EnergyEstimator:
         )
 
     def calculate_diesel_consumption(
-        self, crop_yield: float, field_production_size: float, tractor_specs: TractorSpecs
+        self,
+        crop_yield: float,
+        field_production_size: float,
+        tractor_specs: TractorSpecs,
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
@@ -48,35 +49,26 @@ class EnergyEstimator:
             Amount of crop yielded per hectars (metric ton/ha)
         field_production_size: float
             The filed area under production (ha)
-        tractor_size: TractorSize
-            The categorical size of the tractor
+        tractor_specs: TractorSpecs
+            The specifications of the tractor
 
         Returns
         -------
         float
             Diesel Consumption for Tractor-Implement (l/ton)
         """
-        tractor_implement_specific_fuel_consumption_liter_per_kWh = (
-            self._calculate_tractor_specific_fuel_consumption()
-        )
-        tractor_implement_total_power_needed_kW = 0  # TODO get the correct value
+        total_power_needed_kW = self._calculate_total_power_needed()
+        x = total_power_needed_kW / tractor_specs.power_available_kW  # helper function 411
+        specific_fuel_consumption_liter_per_kWh = (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)  # helper function 410
         tractor_implement_operation_time_hr = 0  # TODO get the correct value
         diesel_consumption_tractor_implement_liter_per_ton = (
-            tractor_implement_specific_fuel_consumption_liter_per_kWh
-            * tractor_implement_total_power_needed_kW
+            specific_fuel_consumption_liter_per_kWh
+            * total_power_needed_kW
             * tractor_implement_operation_time_hr
             / field_production_size
             / crop_yield
         )
         return diesel_consumption_tractor_implement_liter_per_ton
 
-    def _calculate_tractor_specific_fuel_consumption(self) -> float:
-        """
-        Calculates Specific Fuel Consumption: Specific fuel consumption in simple words measures fuel efficiency.
-        It measures the fuel required per unit of power generated hence, the unit is liter/kWh.
-        Corresponds to helper functions 410 and 411 in EEE Functions sheet.
-        """
-        tractor_total_power_needed = 0  # TODO get the correct value
-        tractor_size_power_available = 0  # TODO get the correct value
-        x = tractor_total_power_needed / tractor_size_power_available
-        return (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)
+    def _calculate_total_power_needed(self) -> None:
+        pass

@@ -35,29 +35,29 @@ def test_herd_size_negative_value_error(herd_size):
 
 
 @pytest.mark.parametrize(
-    "tractor_size, expected_pto_kw",
+    "tractor_size, expected_pto_kW",
     [
         (TractorSize.SMALL, 55.93),
         (TractorSize.MEDIUM, 208.42),
         (TractorSize.LARGE, 328.11),
     ],
 )
-def test_pto_kw(tractor_size, expected_pto_kw):
+def test_pto_kW(tractor_size, expected_pto_kW):
     specs = TractorSpecs(tractor_size, None)
-    assert specs.PTO_kw == expected_pto_kw
+    assert specs.PTO_kW == expected_pto_kW
 
 
 @pytest.mark.parametrize(
-    "tractor_size, expected_power_available_kw",
+    "tractor_size, expected_power_available_kW",
     [
         (TractorSize.SMALL, 55.93 / 1.4),
         (TractorSize.MEDIUM, 208.42 / 1.4),
         (TractorSize.LARGE, 328.11 / 1.4),
     ],
 )
-def test_power_available_kw(tractor_size, expected_power_available_kw):
+def test_power_available_kW(tractor_size, expected_power_available_kW):
     specs = TractorSpecs(tractor_size, None)
-    assert specs.power_available_kw == expected_power_available_kw
+    assert specs.power_available_kW == expected_power_available_kW
 
 
 @pytest.mark.parametrize(

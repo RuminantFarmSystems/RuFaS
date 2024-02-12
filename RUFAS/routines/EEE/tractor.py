@@ -51,7 +51,7 @@ class TractorSpecs:
             return TractorSize.LARGE
 
     @property
-    def PTO_kw(self) -> float:
+    def PTO_kW(self) -> float:
         # TODO get these values from IM
         """Constants 589, 592, 595 in EEE Functions file"""
         pto_mapping = {
@@ -62,9 +62,9 @@ class TractorSpecs:
         return pto_mapping[self.tractor_size]
 
     @property
-    def power_available_kw(self) -> float:
+    def power_available_kW(self) -> float:
         """Constants 590, 593, 596 in EEE Functions file, calculated bsaed on PTO"""
-        return self.PTO_kw / 1.4
+        return self.PTO_kW / 1.4
 
     @property
     def mass_kg(self) -> float:
