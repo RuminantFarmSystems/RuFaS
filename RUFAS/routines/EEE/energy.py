@@ -72,8 +72,12 @@ class EnergyEstimator:
         return diesel_consumption_tractor_implement_liter_per_ton
 
     def _calculate_total_power_needed(self, tractor: Tractor) -> float:
+        """
+        Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
+        Implements Helper Function 412  in EEE Functions file.
+        """
         tractor_implement = TractorImplement()  # TODO get the correct value
         tactor_axel_power = tractor.calculate_axel_power(tractor_implement)
-        tractor_implement_drawbar_power = 0  # TODO get the correct value
+        tractor_implement_drawbar_power = tractor_implement.calculate_drawbar_power()
         tractor_implement_PTO_power_needed = 0  # TODO get the correct value
         return tactor_axel_power + tractor_implement_drawbar_power + tractor_implement_PTO_power_needed
