@@ -119,11 +119,25 @@ class TractorImplement:
         functional_draft = self.calculate_functional_draft()
         return functional_draft * field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self, crop_type) -> float:  # TODO implement
+    def calculate_functional_draft(self, crop_type: CropType) -> float:  # TODO implement
         """
         Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
         minor tillage tools operated at shallow depths.
         Implements Helper Function 417  in EEE Functions file.
+        """
+        """
+        self.width_m*[(Operation Depth)*I(Operation Depth)+(1-I(Operation Depth)]*(Fi)*[A + B*(Field Speed)+ C *[(Field Speed)^2)]
+                      
+
+        2) Operation Type  in {planting,tilling, liquid manure -surface, liquid manure - below surface, fertilizer, mowing, windrowing, collection} [HF #421] 
+        3) Fi soil texture adjustment parameter (unitless)  {HF #422} 
+        4) Operation Depth (cm) [C&S for tillage and manure application] [Dataset Tractor for planting]
+        5) A (unitless) [Dataset Tractor (Value(Tractor Implement), Column F)]
+        6) B (unitless) [Dataset Tractor (Value(Tractor Implement), Column G)]
+        7) C (unitless) [Dataset Tractor (Value(Tractor Implement), Column H)]
+        8) Field Speed (km/h) [Constant # 585]
+        9) Tractor Implement Width (m) [Dataset Tractor (Value(Tractor Implement), Column G)]
+        10) I(Operation Depth) (unitless) [=1 if there is Operation Depth, =0 else]
         """
         pass
 
