@@ -23,14 +23,14 @@ class Event:
     year : int, default 1
         Year of the simulation on which the event should occur.
     day : int, default 120
-        (julian) day of the year on which the event should occur.
+        Julian day of the year on which the event should occur.
 
     Attributes
     ----------
     year : int
         Year of the simulation on which the event should occur.
     day : int
-        (julian) day of the year on which the event should occur.
+        Julian day of the year on which the event should occur.
 
     Notes
     -----
