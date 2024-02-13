@@ -577,7 +577,7 @@ def test_validate_tabular_element_valid_data(mock_input_manager: InputManager,
         ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
         ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, False, True),
         ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
-        ("element7", {"element9": [1, 2, 3]}, 0, 0, 0, 0, False, False)
+        ("element7", {"element7": [15, 20, 35]}, 3, 0, 3, 0, False, False)
     ]
 )
 def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
@@ -612,12 +612,12 @@ def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
     "element_hierarchy, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
     " eager_termination",
     [
-        ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
-        ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, False, True),
-        ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
+        ("element1", {}, 0, 0, 0, 0, False, False),
+        ("element2", {"element1": [6, 149, 55, 22]}, 0, 0, 0, 0, False, True),
+        ("element7", {"element6": [50]}, 0, 0, 0, 0, False, False),
     ]
 )
-def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
+def test_validate_tabular_element_missing_data(mock_input_manager: InputManager,
                                                mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
                                                element_hierarchy: str, input_data: Dict[str, List[Any]],
                                                total_elements: int, is_valid: bool, valid_elements: int,
@@ -627,21 +627,32 @@ def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
                                                ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     mock_input_manager._fix_data = MagicMock(return_value=is_valid)
+    mock_input_manager._log_missing_data = MagicMock()
+
     properties_blob_key = "property_map_key1"
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
 
+    variable_properties = reduce(lambda d, key: d[key], [element_hierarchy],
+                                 mock_metadata_for_validate_element["properties"][properties_blob_key])
+
     result = mock_input_manager._validate_tabular_element(element_hierarchy, properties_blob_key,
                                                           input_data, eager_termination,
-                                                          mock_element_counter_and_validity)
+                                                          mock_element_counter_and_validity,
+                                                          False)
     assert result["is_valid"] is is_valid
     assert result["total_elements"] == total_elements
     assert result["valid_elements"] == valid_elements
     assert result["invalid_elements"] == invalid_elements
     assert result["fixed_elements"] == fixed_elements
 
+    mock_input_manager._log_missing_data.assert_called_once_with(variable_properties=variable_properties,
+                                                                 var_name=element_hierarchy,
+                                                                 called_during_initialization=False)
+
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
     mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
+    mock_input_manager._log_missing_data = input_manager_original_method_states["_log_missing_data"]
 
 
 def test_validate_json_element_string_type(mock_input_manager: InputManager,
@@ -2607,7 +2618,6 @@ def test_log_missing_data_initialization_input_not_required(
         mock_input_manager: InputManager,
         input_manager_original_method_states: Dict[str, Callable],
         mocker: MockerFixture) -> None:
-
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
@@ -2633,7 +2643,6 @@ def test_log_missing_data_initialization_key_error(
         mock_input_manager: InputManager,
         input_manager_original_method_states: Dict[str, Callable],
         mocker: MockerFixture) -> None:
-
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
