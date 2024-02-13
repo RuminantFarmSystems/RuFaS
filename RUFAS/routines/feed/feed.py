@@ -1131,8 +1131,9 @@ class Feed:
          Returns all rows from the data source "NASEM_Comp" with all columns packed into dictionaries.
 
          6. Filtering with range comparison and specific desired rows:
-         >>> self._retrieve_data(data_source="NASEM_Comp", identifier="feed_type", desired_rows=["Conc"], compare_val=10,
-                           low_col="lower_limit", high_col="limit")
+         >>> self._retrieve_data(data_source="NASEM_Comp", identifier="feed_type", desired_rows=["Conc"],
+         compare_val=10, low_col="lower_limit", high_col="limit")
+
          Returns rows where the "feed_type" column has values "Conc" and where the value 10 lies between the values in
          columns "lower_limit" and "limit".
         """

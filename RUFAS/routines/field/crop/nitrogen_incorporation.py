@@ -179,7 +179,7 @@ class NitrogenIncorporation:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0 : self.data.accessible_soil_layers]
+        return layer_list[0: self.data.accessible_soil_layers]
 
     def extend_nitrate_uptakes_to_full_profile(self) -> None:
         """
