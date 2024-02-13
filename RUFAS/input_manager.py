@@ -510,8 +510,6 @@ class InputManager:
         data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
 
-        For missing data during runtime updates, it logs an error and raises a KeyError, assuming the data is necessary
-        for the update.
 
         - Relies on the caller function's name to determine if it's called during initialization, making the function
           sensitive to naming conventions of the initialization method.
