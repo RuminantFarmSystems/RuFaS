@@ -4,13 +4,57 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import ManureEvent
 
-"""
-This module contains `ManureSchedule`, a `Schedule` child class that defines when and how much manure will be applied to
-a field.
-"""
-
 
 class ManureSchedule(Schedule):
+    """
+    A Schedule child class that defines when and how much manure will be applied to a field.
+
+    Parameters
+    ----------
+    name : str
+        The name of the manure application schedule.
+    years : List[int]
+        The years in which the manure will be applied.
+    days : List[int]
+        The Julian days on which the manure will be applied within the specified years.
+    nitrogen_masses : List[float]
+        The minimum masses of nitrogen to be applied in each manure application, in kilograms (kg).
+    phosphorus_masses : List[float]
+        The minimum masses of phosphorus to be applied in each manure application, in kilograms (kg).
+    manure_types : List[ManureType]
+        The types of manure to be applied.
+    field_coverages : List[float]
+        The fractions of the field covered by manure applications, unitless.
+    application_depths : List[float], optional
+        The depths at which the manure is to be injected into the soil for each application, in millimeters (mm).
+    surface_remainder_fractions : List[float], optional
+        The fractions of each manure application that remain on the soil surface, unitless.
+    pattern_skip : int, optional
+        The number of years to skip between repetitions of the manure application pattern.
+    pattern_repeat : int, optional
+        The number of times the specified manure application pattern should be repeated.
+
+    Attributes
+    ----------
+    nitrogen_masses : List[float]
+        Elongated list of nitrogen masses to ensure a mass value for each application year.
+    phosphorus_masses : List[float]
+        Elongated list of phosphorus masses to ensure a mass value for each application year.
+    manure_types : List[ManureType]
+        Elongated list of manure types to ensure a type for each application year.
+    field_coverages : List[float]
+        Elongated list of field coverages to ensure a coverage value for each application year.
+    application_depths : List[float]
+        Elongated list or default value for application depths to ensure a depth for each application year.
+    surface_remainder_fractions : List[float]
+        Elongated list or default value for surface remainder fractions to ensure a fraction for each application year.
+
+    Notes
+    -----
+    Inherits from the Schedule class to manage and validate a schedule for applying specific manure types to a field,
+    including the timing (years and days) and amounts (masses of nitrogen and phosphorus) of each application.
+
+    """
 
     def __init__(self, name: str, years: List[int], days: List[int], nitrogen_masses: List[float],
                  phosphorus_masses: List[float], manure_types: List[ManureType], field_coverages: List[float],
@@ -130,8 +174,9 @@ class ManureSchedule(Schedule):
                                             f"received '{self.surface_remainder_fractions}'.")
 
         equal_manure_application_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) \
-            == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(self.application_depths) \
-            == len(self.surface_remainder_fractions) == len(self.manure_types)
+                                              == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(
+            self.application_depths) \
+                                              == len(self.surface_remainder_fractions) == len(self.manure_types)
         if not equal_manure_application_parameters:
             raise ValueError(error_header + f"expected equal number of manure application parameters, received "
                                             f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
