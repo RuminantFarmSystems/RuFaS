@@ -13,12 +13,12 @@ class FieldDataReporter:
     Parameters
     ----------
     fields : List[Field]
-        A list of field instances.
+        A list of Field instances.
 
     Attributes
     ----------
     fields : List[Field]
-        A list of field instances.
+        A list of Field instances.
 
     """
     def __init__(self, fields: List[Field]):
