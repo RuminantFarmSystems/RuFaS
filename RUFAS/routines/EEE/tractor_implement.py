@@ -22,6 +22,14 @@ class CropType(Enum):
     TALL_FESCUE_BALEAGE = "tall_fescue_baleage"
 
 
+class FieldOperationEvent(Enum):
+    HARVEST = "harvest"
+    FERTILIZER_APPLICATION = "Fertilizer Application"
+    MANURE_APPLICATION = "Manure Application"
+    PLANTING = "planting"
+    TILLING = "tilling"
+
+
 class TractorImplement:
     @property
     def mass_kg(self) -> float:
