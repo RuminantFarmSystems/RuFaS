@@ -48,9 +48,7 @@ class ManureApplication:
         be tracked.
     """
 
-    def __init__(
-        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def apply_grazing_manure(
@@ -90,18 +88,12 @@ class ManureApplication:
         in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
 
         """
-        self.data.grazing_water_extractable_inorganic_phosphorus += (
-            total_phosphorus_mass * 0.50
-        )
-        self.data.grazing_water_extractable_organic_phosphorus += (
-            total_phosphorus_mass * 0.05
-        )
+        self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
+        self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
         self.data.grazing_stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
         self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 0.3375
 
-        application_field_coverage = self._determine_grazing_manure_field_coverage(
-            field_size, dry_matter_mass
-        )
+        application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
         new_vals = self._determine_weighted_manure_attributes(
             self.data.grazing_manure_dry_mass,
             self.data.grazing_manure_moisture_factor,
@@ -266,30 +258,21 @@ class ManureApplication:
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
         water_extractable_organic_phosphorus_fraction = 0.05
         stable_phosphorus_fraction = 1.0 - (
-            water_extractable_organic_phosphorus_fraction
-            + water_extractable_inorganic_phosphorus_fraction
+            water_extractable_organic_phosphorus_fraction + water_extractable_inorganic_phosphorus_fraction
         )
         stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
         self.data.machine_water_extractable_inorganic_phosphorus += (
-            total_phosphorus_mass
-            * water_extractable_inorganic_phosphorus_fraction
-            * surface_remainder_fraction
+            total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * surface_remainder_fraction
         )
         self.data.machine_water_extractable_organic_phosphorus += (
-            total_phosphorus_mass
-            * water_extractable_organic_phosphorus_fraction
-            * surface_remainder_fraction
+            total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * surface_remainder_fraction
         )
         self.data.machine_stable_inorganic_phosphorus += (
-            total_phosphorus_mass
-            * stable_inorganic_phosphorus_fraction
-            * surface_remainder_fraction
+            total_phosphorus_mass * stable_inorganic_phosphorus_fraction * surface_remainder_fraction
         )
         self.data.machine_stable_organic_phosphorus += (
-            total_phosphorus_mass
-            * stable_organic_phosphorus_fraction
-            * surface_remainder_fraction
+            total_phosphorus_mass * stable_organic_phosphorus_fraction * surface_remainder_fraction
         )
 
         new_vals = self._determine_weighted_manure_attributes(
@@ -313,9 +296,7 @@ class ManureApplication:
             field_size,
         )
 
-        is_not_injection_application = (
-            application_depth == 0.0 and surface_remainder_fraction == 1.0
-        )
+        is_not_injection_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
         if is_not_injection_application:
             return
 
@@ -394,8 +375,7 @@ class ManureApplication:
         surface_retention = 1.0 - soil_infiltration
         water_extractable_organic_phosphorus_fraction = 0.05
         stable_phosphorus_fraction = 1.0 - (
-            water_extractable_organic_phosphorus_fraction
-            + water_extractable_inorganic_phosphorus_fraction
+            water_extractable_organic_phosphorus_fraction + water_extractable_inorganic_phosphorus_fraction
         )
         stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
@@ -419,33 +399,18 @@ class ManureApplication:
             * surface_remainder_fraction
         )
         self.data.machine_stable_organic_phosphorus += (
-            total_phosphorus_mass
-            * stable_organic_phosphorus_fraction
-            * surface_retention
-            * surface_remainder_fraction
+            total_phosphorus_mass * stable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
         )
 
         mass_to_add_to_labile_P = (
-            total_phosphorus_mass
-            * water_extractable_inorganic_phosphorus_fraction
-            * soil_infiltration
+            total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * soil_infiltration
         )
         mass_to_add_to_labile_P += (
-            total_phosphorus_mass
-            * water_extractable_organic_phosphorus_fraction
-            * soil_infiltration
-            * 0.95
+            total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * soil_infiltration * 0.95
         )
-        mass_to_add_to_labile_P += (
-            total_phosphorus_mass
-            * stable_organic_phosphorus_fraction
-            * soil_infiltration
-            * 0.95
-        )
+        mass_to_add_to_labile_P += total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
         mass_to_add_to_labile_P *= surface_remainder_fraction
-        self.data.soil_layers[0].add_to_labile_phosphorus(
-            mass_to_add_to_labile_P, field_size
-        )
+        self.data.soil_layers[0].add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
         mass_to_add_to_active_P = (
             total_phosphorus_mass
@@ -453,9 +418,7 @@ class ManureApplication:
             * soil_infiltration
             * surface_remainder_fraction
         )
-        self.data.soil_layers[0].add_to_active_phosphorus(
-            mass_to_add_to_active_P, field_size
-        )
+        self.data.soil_layers[0].add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
 
         adjusted_field_coverage = field_coverage * 0.5
         adjusted_dry_matter_mass = surface_dry_matter_mass * 0.8
@@ -490,9 +453,7 @@ class ManureApplication:
             field_size,
         )
 
-        is_not_subsurface_application = (
-            application_depth == 0.0 and surface_remainder_fraction == 1.0
-        )
+        is_not_subsurface_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
         if is_not_subsurface_application:
             return
 
@@ -553,31 +514,19 @@ class ManureApplication:
         stable and active pools. Refer to the pseudocode for this.
 
         """
-        nitrates_added = (
-            dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)
-        ) / field_size
-        ammonium_added = (
-            dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction
-        ) / field_size
+        nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
+        ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
         active_organic_nitrogen_added = (
-            dry_matter_mass
-            * organic_nitrogen_fraction
-            * ACTIVE_FRACTION_OF_ORGANIC_NITROGEN
+            dry_matter_mass * organic_nitrogen_fraction * ACTIVE_FRACTION_OF_ORGANIC_NITROGEN
         ) / field_size
         stable_organic_nitrogen_added = (
-            dry_matter_mass
-            * organic_nitrogen_fraction
-            * (1.0 - ACTIVE_FRACTION_OF_ORGANIC_NITROGEN)
+            dry_matter_mass * organic_nitrogen_fraction * (1.0 - ACTIVE_FRACTION_OF_ORGANIC_NITROGEN)
         ) / field_size
 
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
-        self.data.soil_layers[
-            layer_index
-        ].stable_organic_nitrogen_content += stable_organic_nitrogen_added
-        self.data.soil_layers[
-            layer_index
-        ].active_organic_nitrogen_content += active_organic_nitrogen_added
+        self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
+        self.data.soil_layers[layer_index].active_organic_nitrogen_content += active_organic_nitrogen_added
 
     def _apply_subsurface_manure(
         self,
@@ -636,41 +585,25 @@ class ManureApplication:
 
         """
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
-        depth_factors = FertilizerApplication.generate_depth_factors(
-            application_depth, bottom_depths
-        )
-        water_extractable_inorganic_phosphorus = (
-            total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction
-        )
+        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
+        water_extractable_inorganic_phosphorus = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction
         # TODO: put subsurface organic phosphorus into corresponding soil pools - issue #444
         water_extractable_organic_phosphorus = (
             total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * 0.95
         )
-        stable_inorganic_phosphorus = (
-            total_phosphorus_mass * stable_inorganic_phosphorus_fraction
-        )
-        stable_organic_phosphorus = (
-            total_phosphorus_mass * stable_organic_phosphorus_fraction * 0.95
-        )
+        stable_inorganic_phosphorus = total_phosphorus_mass * stable_inorganic_phosphorus_fraction
+        stable_organic_phosphorus = total_phosphorus_mass * stable_organic_phosphorus_fraction * 0.95
         labile_phosphorus_addition = (
-            water_extractable_inorganic_phosphorus
-            + water_extractable_organic_phosphorus
-            + stable_organic_phosphorus
+            water_extractable_inorganic_phosphorus + water_extractable_organic_phosphorus + stable_organic_phosphorus
         ) * subsurface_fraction
         active_phosphorus_addition = stable_inorganic_phosphorus * subsurface_fraction
         for index, depth_factor in enumerate(depth_factors):
             labile_phosphorus_added_to_layer = labile_phosphorus_addition * depth_factor
             active_phosphorus_added_to_layer = active_phosphorus_addition * depth_factor
-            self.data.soil_layers[index].add_to_labile_phosphorus(
-                labile_phosphorus_added_to_layer, field_size
-            )
-            self.data.soil_layers[index].add_to_active_phosphorus(
-                active_phosphorus_added_to_layer, field_size
-            )
+            self.data.soil_layers[index].add_to_labile_phosphorus(labile_phosphorus_added_to_layer, field_size)
+            self.data.soil_layers[index].add_to_active_phosphorus(active_phosphorus_added_to_layer, field_size)
 
-            dry_matter_added_to_layer = (
-                dry_matter_mass * subsurface_fraction * depth_factor
-            )
+            dry_matter_added_to_layer = dry_matter_mass * subsurface_fraction * depth_factor
             self._add_nitrogen_to_soil_layer(
                 index,
                 dry_matter_added_to_layer,
@@ -682,9 +615,7 @@ class ManureApplication:
 
     # --- Static Methods ---
     @staticmethod
-    def _determine_grazing_manure_field_coverage(
-        field_size: float, total_manure_applied: float
-    ) -> float:
+    def _determine_grazing_manure_field_coverage(field_size: float, total_manure_applied: float) -> float:
         """Calculates the fraction of the field covered by manure that was applied by grazers.
 
         Parameters
@@ -714,9 +645,7 @@ class ManureApplication:
         """
         manure_applied_in_grams = total_manure_applied * KILOGRAMS_TO_GRAMS
         field_coverage_in_square_cm = manure_applied_in_grams * (659 / 250)
-        field_coverage_in_ha = (
-            field_coverage_in_square_cm * SQUARE_CENTIMETERS_TO_HECTARES
-        )
+        field_coverage_in_ha = field_coverage_in_square_cm * SQUARE_CENTIMETERS_TO_HECTARES
         field_coverage_fraction = min(1.0, field_coverage_in_ha / field_size)
         return field_coverage_fraction
 
@@ -749,9 +678,7 @@ class ManureApplication:
 
         """
         if not 0.0 < dry_matter_fraction <= 1.0:
-            raise ValueError(
-                f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'."
-            )
+            raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
         return min(0.9, (1 - dry_matter_fraction))
 
     @staticmethod
@@ -797,16 +724,12 @@ class ManureApplication:
 
         """
         new_dry_matter_mass = old_total_dry_mass + application_dry_mass
-        application_moisture_factor = ManureApplication._determine_moisture_factor(
-            application_dry_fraction
-        )
+        application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_fraction)
         new_moisture_factor = (
-            old_moisture_factor * old_total_dry_mass
-            + application_moisture_factor * application_dry_mass
+            old_moisture_factor * old_total_dry_mass + application_moisture_factor * application_dry_mass
         ) / new_dry_matter_mass
         new_field_coverage = (
-            old_field_coverage * old_total_dry_mass
-            + application_field_coverage * application_dry_mass
+            old_field_coverage * old_total_dry_mass + application_field_coverage * application_dry_mass
         ) / new_dry_matter_mass
         return {
             "new_dry_matter_mass": new_dry_matter_mass,
@@ -908,6 +831,4 @@ class ManureApplication:
         elif animal_type == "POULTRY":
             return 0.20
         else:
-            raise ValueError(
-                f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.'
-            )
+            raise ValueError(f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.')

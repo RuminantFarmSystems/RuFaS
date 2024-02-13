@@ -56,9 +56,7 @@ def test_subtraction_aggregator():
 
 class MockUtility:
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(
-        data: List[Dict[str, Any]]
-    ) -> Dict[str, List[Any]]:
+    def convert_list_of_dicts_to_dict_of_lists(data: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
         return {k: [dic[k] for dic in data] for k in data[0]}
 
 
@@ -201,13 +199,9 @@ def test_apply_horizontal_aggregation(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._apply_horizontal_aggregation(
-                report_data, loop_list, aggregator
-            )
+            report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
     else:
-        result = report_generator._apply_horizontal_aggregation(
-            report_data, loop_list, aggregator
-        )
+        result = report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
         assert result == expected
 
 
@@ -266,13 +260,9 @@ def test_prepare_report_data_with_constants(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._prepare_report_data_with_constants(
-                filtered_pool, filter_content
-            )
+            report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
     else:
-        result = report_generator._prepare_report_data_with_constants(
-            filtered_pool, filter_content
-        )
+        result = report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
         assert result == expected_result
 
 
@@ -364,8 +354,7 @@ def test_validate_constants(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, mock_prep_data,"
-    "expected_result, expected_exception",
+    "filtered_pool, filter_content, mock_prep_data," "expected_result, expected_exception",
     [
         # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
@@ -480,9 +469,7 @@ def test_perform_aggregations(
         "_prepare_report_data_with_constants",
         return_value=mock_prep_data,
     )
-    mocker.patch.object(
-        report_generator, "_apply_horizontal_aggregation", return_value=[5, 7]
-    )
+    mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=[5, 7])
     mocker.patch.object(
         report_generator,
         "_apply_vertical_aggregation",
@@ -704,9 +691,7 @@ def test_ensure_unique_report_name_with_timestamp(
     mocker.patch("RUFAS.report_generator.ReportGenerator.__init__", return_value=None)
     report_generator = ReportGenerator()
     report_generator.reports = reports
-    mocker.patch(
-        "RUFAS.util.Utility.get_timestamp", return_value=timestamp_return_value
-    )
+    mocker.patch("RUFAS.util.Utility.get_timestamp", return_value=timestamp_return_value)
 
     # Act
     result = report_generator._ensure_unique_report_name_with_timestamp(report_name)
@@ -823,13 +808,8 @@ def test_generate_report(
         mocker.patch.object(
             report_generator,
             "_perform_aggregations",
-            return_value={
-                fltr: filtered_pool[fltr] for fltr in filter_content["filters"]
-            }
-            | {
-                ref: reports[ref]["values"]
-                for ref in filter_content.get("cross_references", [])
-            },
+            return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
+            | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
         )
 
     # Act

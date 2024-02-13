@@ -36,13 +36,8 @@ def test_cycle_nitrogen(field_size: float) -> None:
     cycle = NitrogenCycling(field_size=field_size)
     cycle.cycle_nitrogen(field_size=field_size)
 
-    LeachingRunoffErosion.leach_runoff_and_erode_nitrogen.assert_called_once_with(
-        field_size
-    )
+    LeachingRunoffErosion.leach_runoff_and_erode_nitrogen.assert_called_once_with(field_size)
     assert Denitrification.denitrify.call_count == 1
     assert HumusMineralization.mineralize_organic_nitrogen.call_count == 1
     assert MineralizationDecomposition.mineralize_and_decompose_nitrogen.call_count == 1
-    assert (
-        NitrificationVolatilization.do_daily_nitrification_and_volatilization.call_count
-        == 1
-    )
+    assert NitrificationVolatilization.do_daily_nitrification_and_volatilization.call_count == 1

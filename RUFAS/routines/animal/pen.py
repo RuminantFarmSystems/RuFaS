@@ -356,13 +356,9 @@ class Pen:
         avg_nutrient_rqmts: Dict[str, float]
             The new average nutrient requirements
         """
-        self.avg_nutrient_rqmts = {
-            key: value for (key, value) in avg_nutrient_rqmts.items()
-        }
+        self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(
-        self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction: float
-    ) -> None:
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction: float) -> None:
         """
         Sets the pen's average milk and average CP milk.
 
@@ -377,9 +373,7 @@ class Pen:
         self.avg_CP_milk = avg_CP_milk
         self.avg_milk_production_reduction = avg_milk_production_reduction
 
-    def add_new_animals(
-        self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]
-    ) -> None:
+    def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
         Adds all animals in new_animals to the pen.
 
@@ -425,9 +419,7 @@ class Pen:
             life_cycle_stage = type(animal).__name__
             self.classes_in_pen.add(life_cycle_stage)
 
-    def update_animals(
-        self, new_animals: List[Any], animal_combination: AnimalCombination
-    ) -> None:
+    def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
 
@@ -539,9 +531,7 @@ class Pen:
         if "Cow" in self.classes_in_pen:
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
-                    animal.calc_daily_walking_dist(
-                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-                    )
+                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
         """
@@ -569,6 +559,7 @@ class Pen:
             # TODO: Add warning if total_p_animal < 0 GitHub Issue #1212
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
+
     # fmt: off
     def set_up_new_animal(  # noqa
         self, animal, p_conc, feed, temp, num_animals_before_additions

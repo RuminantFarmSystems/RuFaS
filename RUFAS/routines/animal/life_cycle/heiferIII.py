@@ -151,9 +151,7 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(
-                self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR
-            )
+            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

@@ -55,16 +55,11 @@ class RationOptimizer:
             self.DMI_constraint_lower,
         ]
 
-        self.cow_cons = [
-            {"type": "ineq", "fun": func, "args": arguments}
-            for func in self.constraint_functions
-        ]
+        self.cow_cons = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
         """ constraints for lactating cows """
 
         self.heifer_cons = [
-            cons
-            for cons in self.cow_cons
-            if cons["fun"] not in [self.total_energy, self.NEl_constraint]
+            cons for cons in self.cow_cons if cons["fun"] not in [self.total_energy, self.NEl_constraint]
         ]
         """constraints for animals that are not lactating cows """
 

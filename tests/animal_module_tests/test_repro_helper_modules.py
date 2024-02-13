@@ -103,9 +103,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         ("cows", "invalid_protocol", None),
     ],
 )
-def test_get_schedule(
-    animal_category: str, protocol_name: str, expected: dict | None
-) -> None:
+def test_get_schedule(animal_category: str, protocol_name: str, expected: dict | None) -> None:
     """
     Unit test for the get_schedule() method of the HormoneDeliverySchedule class in
     hormone_delivery_schedule.py.
@@ -209,19 +207,14 @@ def test_get_schedule(
         ("cows", "invalid_protocol", 2, None),
     ],
 )
-def test_get_adjusted_schedule(
-    animal_category: str, protocol_name: str, start_day: int, expected: dict | None
-) -> None:
+def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_day: int, expected: dict | None) -> None:
     """
     Unit test for the get_adjusted_schedule() method of the HormoneDeliverySchedule class in
     hormone_delivery_schedule.py.
     """
 
     assert (
-        HormoneDeliverySchedule.get_adjusted_schedule(
-            animal_category, protocol_name, start_day
-        )
-        == expected
+        HormoneDeliverySchedule.get_adjusted_schedule(animal_category, protocol_name, start_day) == expected
     )  # type: ignore
 
 
@@ -244,9 +237,7 @@ def test_get_adjusted_schedule(
         ),
     ],
 )
-def test_heifer_repro_protocols_default_values(
-    protocol: str, expected_result: dict[str, Any]
-) -> None:
+def test_heifer_repro_protocols_default_values(protocol: str, expected_result: dict[str, Any]) -> None:
     """
     Unit test for the default sub-protocol and properties of the TAI and SynchED protocols
     in the HEIFER_REPRO_PROTOCOLS attribute of the InternalReproSettings class.
@@ -286,12 +277,7 @@ def test_heifer_synch_ed_sub_protocols_when_estrus_not_detected(
     """
 
     # Act and assert
-    assert (
-        InternalReproSettings.HEIFER_REPRO_PROTOCOLS[sub_protocol][
-            "when_estrus_not_detected"
-        ]
-        == expected_result
-    )
+    assert InternalReproSettings.HEIFER_REPRO_PROTOCOLS[sub_protocol]["when_estrus_not_detected"] == expected_result
 
 
 @pytest.mark.parametrize(
@@ -307,9 +293,7 @@ def test_heifer_synch_ed_sub_protocols_when_estrus_not_detected(
         ("SynchED_2P", "2P"),
     ],
 )
-def test_heifer_repro_protocol_enum_values(
-    protocol_name: str, expected_value: str
-) -> None:
+def test_heifer_repro_protocol_enum_values(protocol_name: str, expected_value: str) -> None:
     """
     Unit test for the values of the HeiferReproProtocolEnum class.
     """

@@ -11,9 +11,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
     "min_daylength,dormancy_threshold",
     [(16, 17), (0, 0), (14, 17), (16.218347349, 16.329438502)],
 )
-def test_find_threshold_daylength(
-    min_daylength: float, dormancy_threshold: float
-) -> None:
+def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: float) -> None:
     """Tests that the dormancy threshold daylength is calculated correctly."""
     observe = Dormancy.find_threshold_daylength(min_daylength, dormancy_threshold)
     expect = min_daylength + dormancy_threshold
@@ -135,12 +133,10 @@ def test_go_into_dormancy(
             or incorp.data.plant_category == PlantCategory.TREE
         ):
             expected_post_dormancy_biomass = biomass * (1 - loss_frac)
-            expected_post_dormancy_residue = (
-                biomass - expected_post_dormancy_biomass
-            ) * (incorp.data.dry_matter_percentage / 100)
-            expected_nitrogen = (
-                expected_post_dormancy_residue * incorp.data.yield_nitrogen_fraction
+            expected_post_dormancy_residue = (biomass - expected_post_dormancy_biomass) * (
+                incorp.data.dry_matter_percentage / 100
             )
+            expected_nitrogen = expected_post_dormancy_residue * incorp.data.yield_nitrogen_fraction
             expected_leaf_area_index = min(lai, min_lai)
 
             assert incorp.data.biomass == expected_post_dormancy_biomass
@@ -148,7 +144,4 @@ def test_go_into_dormancy(
 
             assert soil_data.crop_yield_nitrogen == expected_nitrogen
             assert soil_data.plant_surface_residue == expected_post_dormancy_residue
-            assert (
-                soil_data.plant_residue_lignin_composition
-                == incorp.data.lignin_dry_matter_percentage / 100
-            )
+            assert soil_data.plant_residue_lignin_composition == incorp.data.lignin_dry_matter_percentage / 100

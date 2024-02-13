@@ -8,9 +8,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 #   but the meaning (and validity) of the terms is extremely unclear from either source. The
 #   documentation cannot be adequately completed without a better understanding of these methods.
 class Decomposition:
-    def __init__(
-        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -34,12 +32,8 @@ class Decomposition:
         None
         """
         for layer in self.data.soil_layers:
-            layer.decomposition_moisture_effect = self._calc_moisture_factor(
-                layer.water_factor
-            )
-            layer.decomposition_temperature_effect = self._calc_temp_factor(
-                layer.temperature
-            )
+            layer.decomposition_moisture_effect = self._calc_moisture_factor(layer.water_factor)
+            layer.decomposition_temperature_effect = self._calc_temp_factor(layer.temperature)
 
     @staticmethod
     def _calc_temp_factor(
@@ -73,8 +67,7 @@ class Decomposition:
         # S.6.A.4
         temp_factor = (
             y_inflection
-            + (point_distance / math.pi)
-            * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
+            + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
         ) / normalizer
         return max(0.0, temp_factor)
 

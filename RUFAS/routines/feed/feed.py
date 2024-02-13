@@ -48,49 +48,30 @@ class Feed:
             data: the feed information from the input JSON file
         """
         self.nutrient_standard = im.get_data("config.nutrient_standard")
-        self.nutrient_table = (
-            "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
-        )
+        self.nutrient_table = "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
 
-        self.all_feed_units = self._retrieve_data(
-            data_source="user_feeds", var_names=["rufas_id", "Name", "units"]
-        )
+        self.all_feed_units = self._retrieve_data(data_source="user_feeds", var_names=["rufas_id", "Name", "units"])
 
-        purchased_feeds_list = [
-            feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]
-        ]
+        purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {
-            str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
-            for feed_item in data["purchased_feeds"]
+            str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"] for feed_item in data["purchased_feeds"]
         }
 
         self.farm_grown_feeds = data["farm_grown_feeds"]
-        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(
-            purchased_feeds_list
-        )
+        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
         self.input_feed_combinations = {
-            AnimalCombination.CALF: set(
-                self.get_quality_specific_purchased_feed_ids(data["calf_feeds"])
-            ),
-            AnimalCombination.GROWING: set(
-                self.get_quality_specific_purchased_feed_ids(data["growing_feeds"])
-            ),
-            AnimalCombination.CLOSE_UP: set(
-                self.get_quality_specific_purchased_feed_ids(data["close_up_feeds"])
-            ),
+            AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data["calf_feeds"])),
+            AnimalCombination.GROWING: set(self.get_quality_specific_purchased_feed_ids(data["growing_feeds"])),
+            AnimalCombination.CLOSE_UP: set(self.get_quality_specific_purchased_feed_ids(data["close_up_feeds"])),
             AnimalCombination.GROWING_AND_CLOSE_UP: set(
                 self.get_quality_specific_purchased_feed_ids(data["growing_feeds"])
             )
             | set(self.get_quality_specific_purchased_feed_ids(data["close_up_feeds"])),
-            AnimalCombination.LAC_COW: set(
-                self.get_quality_specific_purchased_feed_ids(data["lac_cow_feeds"])
-            ),
+            AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data["lac_cow_feeds"])),
         }
 
-        self.all_feed_ids = self.get_all_feed_units(
-            purchased_feeds_list, data["farm_grown_feeds"]
-        )
+        self.all_feed_ids = self.get_all_feed_units(purchased_feeds_list, data["farm_grown_feeds"])
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
@@ -108,9 +89,7 @@ class Feed:
         self.storage_options = {}
 
         for count, storage_option in enumerate(data["storage_options"]):
-            self.storage_options[f"storage_option_{count}"] = self.Storage(
-                storage_option
-            )
+            self.storage_options[f"storage_option_{count}"] = self.Storage(storage_option)
 
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0
@@ -134,8 +113,7 @@ class Feed:
         self.user_defined_ration_percentages = data["user_defined_ration_percentages"]
 
         udrm.calf_ration = {
-            str(dict["feed_type"]): dict["ration_percentage"]
-            for dict in self.user_defined_ration_percentages["calf"]
+            str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
         }
 
         udrm.growing_ration = {
@@ -155,9 +133,7 @@ class Feed:
 
         udrm.tolerance = self.user_defined_ration_percentages["tolerance"]
 
-        udrm.milk_reduction_maximum = self.user_defined_ration_percentages[
-            "milk_reduction_maximum"
-        ]
+        udrm.milk_reduction_maximum = self.user_defined_ration_percentages["milk_reduction_maximum"]
 
     def summarize_feed_storage(self):
         """
@@ -586,19 +562,12 @@ class Feed:
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
         # ------------------------------
-        if (
-            storage.forage_quality == "immature"
-            or storage.forage_quality == "mid_maturity"
-        ):
+        if storage.forage_quality == "immature" or storage.forage_quality == "mid_maturity":
             # [F.2.A.6]
             if 1.1 * storage.req_inv["lactating_cows"] >= storage.DM:
-                storage.DMI_forage_max["lactating_cows"] = (
-                    storage.DM / storage.cow_days["lactating_cows"]
-                )
+                storage.DMI_forage_max["lactating_cows"] = storage.DM / storage.cow_days["lactating_cows"]
             else:
-                storage.DMI_forage_max["lactating_cows"] = (
-                    1.1 * storage.inclusion_rate_est["lactating_cows"]
-                )
+                storage.DMI_forage_max["lactating_cows"] = 1.1 * storage.inclusion_rate_est["lactating_cows"]
 
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
@@ -631,8 +600,7 @@ class Feed:
                     for animal, val in storage.inclusion_rate_est.items():
                         storage.inclusion_pct[animal] = (
                             max(
-                                storage.inclusion_pct[animal] / 100
-                                - inclusion_pct_delta,
+                                storage.inclusion_pct[animal] / 100 - inclusion_pct_delta,
                                 0,
                             )
                             * 100
@@ -640,10 +608,7 @@ class Feed:
                         storage.inclusion_rate_est[animal] = (
                             storage.inclusion_pct[animal] / 100
                         ) * storage.animal_avg_BW[animal]
-                        storage.req_inv[animal] = (
-                            storage.inclusion_rate_est[animal]
-                            * storage.cow_days[animal]
-                        )
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:
@@ -651,14 +616,9 @@ class Feed:
                             tot_req_inv_non_lactating_cows += storage.req_inv[animal]
                 # booleans to check if new calculated inclusion rate > 0
                 if tot_req_inv_non_lactating_cows == 0:
-                    tot_cow_days = (
-                        sum(storage.cow_days.values())
-                        - storage.cow_days["lactating_cows"]
-                    )
+                    tot_cow_days = sum(storage.cow_days.values()) - storage.cow_days["lactating_cows"]
                     for animal, val in storage.cow_days.items():
-                        storage.DMI_forage_max = (
-                            (val / tot_cow_days) * storage.DM
-                        ) / val
+                        storage.DMI_forage_max = ((val / tot_cow_days) * storage.DM) / val
                 else:
                     storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max["lactating_cows"] = 0
@@ -676,16 +636,12 @@ class Feed:
 
                 for animal, val in storage.DMI_forage_max.items():
                     if animal != "lactating_cows":
-                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[
-                            animal
-                        ]
+                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
                         tot_req_inv_non_lactating_cows += val
 
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days["lactating_cows"] > 0:
-                    storage.DMI_forage_max["lactating_cows"] = (
-                        available_forage / storage.cow_days["lactating_cows"]
-                    )
+                    storage.DMI_forage_max["lactating_cows"] = available_forage / storage.cow_days["lactating_cows"]
             # updating inclusion rate estimate until inventory is sufficient to
             # satisfy that newly calculated inclusion rate estimate
             # [F.2.A.8]
@@ -701,8 +657,7 @@ class Feed:
                     for animal, val in storage.inclusion_rate_est.items():
                         storage.inclusion_pct[animal] = (
                             max(
-                                storage.inclusion_pct[animal] / 100
-                                - inclusion_pct_delta,
+                                storage.inclusion_pct[animal] / 100 - inclusion_pct_delta,
                                 0,
                             )
                             * 100
@@ -710,28 +665,19 @@ class Feed:
                         storage.inclusion_rate_est[animal] = (
                             storage.inclusion_pct[animal] / 100
                         ) * storage.animal_avg_BW[animal]
-                        storage.req_inv[animal] = (
-                            storage.inclusion_rate_est[animal]
-                            * storage.cow_days[animal]
-                        )
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * storage.cow_days[animal]
 
                     tot_req_inv = sum(storage.req_inv.values())
 
                 tot_req_inv_non_lactating_cows = 0
                 for animal in storage.DMI_forage_max:
                     if animal != "lactating_cows":
-                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[
-                            animal
-                        ]
-                        tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[
-                            animal
-                        ]
+                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
+                        tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[animal]
 
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days["lactating_cows"] > 0:
-                    storage.DMI_forage_max["lactating_cows"] = (
-                        available_forage / storage.cow_days["lactating_cows"]
-                    )
+                    storage.DMI_forage_max["lactating_cows"] = available_forage / storage.cow_days["lactating_cows"]
 
     def daily_feed_storage(self, fields):  # noqa
         """
@@ -792,15 +738,9 @@ class Feed:
                             "removal_rate": 6,
                             "initial_dry_matter": 0,
                         }
-                        standard_name = "standard_storage_" + str(
-                            self.standard_storage_count
-                        )
-                        self.available_storage[standard_name] = self.Storage(
-                            standard_data
-                        )
-                        self.storage_options[standard_name] = self.available_storage[
-                            standard_name
-                        ]
+                        standard_name = "standard_storage_" + str(self.standard_storage_count)
+                        self.available_storage[standard_name] = self.Storage(standard_data)
+                        self.storage_options[standard_name] = self.available_storage[standard_name]
 
                         self.standard_storage_count += 1
 
@@ -854,17 +794,11 @@ class Feed:
             (animal_manager.simulation_day + 1) % animal_manager.formulation_interval
         ) == 1 or animal_manager.formulation_interval == 1
         for silo in self.new_forages:
-            if (
-                silo.days_since_feedout >= -1
-                and ration_interval
-                and silo.feed_id != "null"
-            ):
+            if silo.days_since_feedout >= -1 and ration_interval and silo.feed_id != "null":
                 silo.forage_quality_assessment(self)
                 self.required_inventory(silo, animal_manager)
                 self.forage_inventory_plan(silo)
-                self.add_to_available_feeds(
-                    [silo.feed_id], [silo.DM_percent], [silo.NDF_percent]
-                )
+                self.add_to_available_feeds([silo.feed_id], [silo.DM_percent], [silo.NDF_percent])
                 self.update_available_feed(silo.feed_key, "limit", silo.DMI_forage_max)
                 silo.days_since_feedout += 1
                 self.new_forages.pop(self.new_forages.index(silo))
@@ -924,19 +858,14 @@ class Feed:
         dict_list = self.all_feed_units
 
         all_feed_info = {
-            str(result["rufas_id"]): {"Name": result["Name"], "units": result["units"]}
-            for result in dict_list
+            str(result["rufas_id"]): {"Name": result["Name"], "units": result["units"]} for result in dict_list
         }
 
-        purchased_mapping_ids = self.get_quality_specific_purchased_feed_ids(
-            purchased_feeds
-        )
+        purchased_mapping_ids = self.get_quality_specific_purchased_feed_ids(purchased_feeds)
 
         purchased_mapping = {}
         for id in range(len(purchased_feeds)):
-            purchased_mapping.update(
-                {str(purchased_feeds[id]): str(purchased_mapping_ids[id])}
-            )
+            purchased_mapping.update({str(purchased_feeds[id]): str(purchased_mapping_ids[id])})
 
         grown_feeds_mapping = {str(feed): str(feed) + "g" for feed in grown_feeds}
 
@@ -950,9 +879,7 @@ class Feed:
 
         return all_feed_info
 
-    def get_quality_specific_purchased_feed_ids(
-        self, entries: Union[int, List[int]]
-    ) -> List[int]:
+    def get_quality_specific_purchased_feed_ids(self, entries: Union[int, List[int]]) -> List[int]:
         """
         Description:
             Constructs and returns a dictionary of the purchased feed IDs based on
@@ -976,9 +903,7 @@ class Feed:
             purchased_feed_ids.append(entry)
         return purchased_feed_ids
 
-    def get_quality_specific_feed_costs(
-        self, input_feed_ids: List[int]
-    ) -> Dict[str, float]:
+    def get_quality_specific_feed_costs(self, input_feed_ids: List[int]) -> Dict[str, float]:
         """
         Returns an updated version of the purchased feed costs dictionary.
         A purchased feed id key will be updated if it is in the list of entries
@@ -1097,19 +1022,13 @@ class Feed:
 
         calf_feeds = {}
         for feed_id in feed_ids:
-            feed_id_nutrient = next(
-                nutrient for nutrient in nutrients if nutrient["rufas_id"] == feed_id
-            )
+            feed_id_nutrient = next(nutrient for nutrient in nutrients if nutrient["rufas_id"] == feed_id)
             calf_feeds[feed_id] = {
-                key: feed_id_nutrient[key]
-                for key in list(feed_id_nutrient.keys())
-                if key != "rufas_id"
+                key: feed_id_nutrient[key] for key in list(feed_id_nutrient.keys()) if key != "rufas_id"
             }
         return calf_feeds
 
-    def _pack_into_dict(
-        self, var_names: List[str], var_values: List[Any]
-    ) -> Dict[str, Any]:
+    def _pack_into_dict(self, var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
         """
         Pack the provided variable names and values into a dictionary.
 
@@ -1231,11 +1150,7 @@ class Feed:
 
         for i in range(len(data[var_names[0]])):
             try:
-                if (
-                    desired_rows
-                    and identifier
-                    and data[identifier][i] not in desired_rows
-                ):
+                if desired_rows and identifier and data[identifier][i] not in desired_rows:
                     continue
                 if compare_val and low_col and high_col:
                     low_val, high_val = data[low_col][i], data[high_col][i]

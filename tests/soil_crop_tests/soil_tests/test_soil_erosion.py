@@ -111,9 +111,7 @@ def test_determine_high_sand_factor(sand: float) -> None:
         (50, 30.1948591, 19.8939582, 0.01139495),
     ],
 )
-def test_determine_soil_erodibility_factor(
-    sand: float, silt: float, clay: float, carbon: float
-) -> None:
+def test_determine_soil_erodibility_factor(sand: float, silt: float, clay: float, carbon: float) -> None:
     """Tests _determine_soil_erodibility_factor() in soil_erosion.py"""
 
     # Mock helper methods
@@ -151,9 +149,7 @@ def test_determine_cover_management_factor(min_cover: float, residue: float) -> 
 
 
 @pytest.mark.parametrize("min_cover,residue", [(0, 0)])
-def test_error_determine_cover_management_factor(
-    min_cover: float, residue: float
-) -> None:
+def test_error_determine_cover_management_factor(min_cover: float, residue: float) -> None:
     """Tests that _determine_cover_management_factor() correctly raises error for invalid inputs"""
     with pytest.raises(Exception):
         SoilErosion._determine_cover_management_factor(min_cover, residue)
@@ -199,9 +195,7 @@ def test_determine_topographic_factor(length: float, avg_slope: float) -> None:
     observe = SoilErosion._determine_topographic_factor(length, avg_slope)
 
     # Calculate expected return value
-    expect = ((length / 22.1) ** 0.45) * (
-        65.41 * (sin(atan(avg_slope)) ** 2) + 4.56 * sin(atan(avg_slope)) + 0.065
-    )
+    expect = ((length / 22.1) ** 0.45) * (65.41 * (sin(atan(avg_slope)) ** 2) + 4.56 * sin(atan(avg_slope)) + 0.065)
 
     # Check everything
     SoilErosion._determine_exponential_term.assert_called_with(avg_slope)
@@ -249,9 +243,7 @@ def test_determine_peak_runoff_rate(
         _determine_runoff_coefficient=MagicMock(return_value=0.5),
         _determine_rainfall_intensity=MagicMock(return_value=1.3),
     ):
-        actual = SoilErosion._determine_peak_runoff_rate(
-            runoff, rainfall, length, manning, average, area
-        )
+        actual = SoilErosion._determine_peak_runoff_rate(runoff, rainfall, length, manning, average, area)
         assert pytest.approx(actual) == expected
 
 
@@ -259,9 +251,7 @@ def test_determine_peak_runoff_rate(
     "runoff,rainfall,expected",
     [(10.3, 12.1, 0.85123967), (5.5, 11.0, 0.5), (3.0, 9.0, 0.333333333)],
 )
-def test_determine_runoff_coefficient(
-    runoff: float, rainfall: float, expected: float
-) -> None:
+def test_determine_runoff_coefficient(runoff: float, rainfall: float, expected: float) -> None:
     """Tests that the correct runoff coefficient is calculated."""
     actual = SoilErosion._determine_runoff_coefficient(runoff, rainfall)
     assert pytest.approx(actual) == expected
@@ -279,13 +269,9 @@ def test_determine_rainfall_intensity(
         "RUFAS.routines.field.soil.soil_erosion.SoilErosion",
         _determine_time_of_concentration=MagicMock(return_value=1.5),
         _determine_half_hour_rainfall_fraction=MagicMock(return_value=0.3),
-        _determine_fraction_rainfall_during_time_of_concentration=MagicMock(
-            return_value=0.4
-        ),
+        _determine_fraction_rainfall_during_time_of_concentration=MagicMock(return_value=0.4),
     ):
-        actual = SoilErosion._determine_rainfall_intensity(
-            rainfall, length, manning, average
-        )
+        actual = SoilErosion._determine_rainfall_intensity(rainfall, length, manning, average)
 
         assert pytest.approx(actual) == expected
 
@@ -294,9 +280,7 @@ def test_determine_rainfall_intensity(
     "slope,manning,average_slope",
     [(60.0, 0.4, 33.55), (15.66, 0.8, 14.5), (45.1, 0.4451, 20.22)],
 )
-def test_determine_time_of_concentration(
-    slope: float, manning: float, average_slope: float
-) -> None:
+def test_determine_time_of_concentration(slope: float, manning: float, average_slope: float) -> None:
     """Tests that the time of concentration is determined correctly."""
     expected = ((slope**0.6) * (manning**0.6)) / (18 * (average_slope**0.3))
     actual = SoilErosion._determine_time_of_concentration(slope, manning, average_slope)
@@ -311,17 +295,11 @@ def test_determine_half_hour_rainfall_fraction(rainfall: float) -> None:
     assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "concentration,rainfall_frac", [(3.5, 0.03), (1.44, 0.334), (8.67, 0.67)]
-)
-def test_fraction_rainfall_during_time_of_concentration(
-    concentration: float, rainfall_frac: float
-) -> None:
+@pytest.mark.parametrize("concentration,rainfall_frac", [(3.5, 0.03), (1.44, 0.334), (8.67, 0.67)])
+def test_fraction_rainfall_during_time_of_concentration(concentration: float, rainfall_frac: float) -> None:
     """Tests that the fraction of rainfall that fell during the time of concentration is calculated correctly."""
     expected = 1 - exp(2 * concentration * log(1 - rainfall_frac))
-    actual = SoilErosion._determine_fraction_rainfall_during_time_of_concentration(
-        concentration, rainfall_frac
-    )
+    actual = SoilErosion._determine_fraction_rainfall_during_time_of_concentration(concentration, rainfall_frac)
     assert actual == expected
 
 
@@ -385,13 +363,9 @@ def test_determine_sediment_yield(
         (0.108481, 6.193943),
     ],
 )
-def test_determine_adjusted_sediment_yield(
-    sediment_yield: float, snow_content: float
-) -> float:
+def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: float) -> float:
     """Tests _determine_adjusted_sediment_yield() in soil_erosion.py"""
-    observe = SoilErosion._determine_adjusted_sediment_yield(
-        sediment_yield, snow_content
-    )
+    observe = SoilErosion._determine_adjusted_sediment_yield(sediment_yield, snow_content)
     expect = sediment_yield / exp(3 * snow_content / 25.4)
     assert observe == expect
 
@@ -450,14 +424,8 @@ def test_erode(
         incorp._determine_adjusted_sediment_yield.assert_called_once()
         assert incorp.data.eroded_sediment == 0.0498
         assert incorp.data.annual_eroded_sediment_total == 0.0498
-        assert (
-            incorp.data.surface_runoff_volume
-            == incorp.data.accumulated_runoff / field_size
-        )
-        assert (
-            incorp.data.annual_surface_runoff_total
-            == incorp.data.accumulated_runoff / field_size
-        )
+        assert incorp.data.surface_runoff_volume == incorp.data.accumulated_runoff / field_size
+        assert incorp.data.annual_surface_runoff_total == incorp.data.accumulated_runoff / field_size
 
 
 def test_determine_support_practice_factor() -> None:

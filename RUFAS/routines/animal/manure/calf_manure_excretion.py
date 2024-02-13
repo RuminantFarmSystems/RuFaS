@@ -42,9 +42,7 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
-        ration_formulation, feed.available_feeds
-    )
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
 
@@ -70,9 +68,7 @@ def manure_calculations(
 
     # Nitrogen excretion
     # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
-    manure_nitrogen = (
-        112.55 * dry_matter_intake * (CP_concentration / 100)
-    ) * GeneralConstants.GRAMS_TO_KG
+    manure_nitrogen = (112.55 * dry_matter_intake * (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
 
     # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
     urine_nitrogen = 0.45 * manure_nitrogen

@@ -185,9 +185,7 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
     mock_output_manager.add_error.assert_called_once()
     mock_output_manager.dump_all_nondata_pools.assert_called_once()
     captured = capsys.readouterr()
-    expected_message = (
-        "Unexpected early termination of the simulation. Please see logs for details."
-    )
+    expected_message = "Unexpected early termination of the simulation. Please see logs for details."
     assert expected_message in captured.out
 
 
@@ -592,15 +590,11 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     verbose = LogVerbosity.NONE
     output_dir = Path("output/")
 
-    run_validation(
-        metadata_file_list, exclude_info_maps, format_option, verbose, output_dir
-    )
+    run_validation(metadata_file_list, exclude_info_maps, format_option, verbose, output_dir)
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
-        metadata_file_list
-    )
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exclude_info_maps, format_option)
     ] * len(metadata_file_list)
@@ -749,9 +743,7 @@ def test_execute_simulations(
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
-        metadata_file_list
-    )
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
@@ -920,9 +912,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     # Arrange
     mock_parser = mocker.MagicMock(auto_spec=argparse.ArgumentParser)
     mock_add_argument = mocker.patch.object(mock_parser, "add_argument")
-    mock_parse_args = mocker.patch.object(
-        mock_parser, "parse_args", return_value="test_args"
-    )
+    mock_parse_args = mocker.patch.object(mock_parser, "parse_args", return_value="test_args")
     mocker.patch("main.argparse.ArgumentParser", return_value=mock_parser)
 
     # Act

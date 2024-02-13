@@ -41,10 +41,7 @@ def test_calc_max_accumulation(rad, eff, expected):
 )
 def test_calc_biomass_accumulation(factor, max_growth):
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
-    assert (
-        BiomassAllocation._determine_accumulated_biomass(factor, max_growth)
-        == max_growth * factor
-    )
+    assert BiomassAllocation._determine_accumulated_biomass(factor, max_growth) == max_growth * factor
 
 
 @pytest.mark.parametrize(
@@ -83,9 +80,7 @@ def test_calc_above_ground_biomass(frac, bmass):
 )
 def test_calc_below_ground_biomass(frac, bmass):
     """ensure that below ground biomass is correctly calculated"""
-    assert (
-        BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
-    )
+    assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
 
 
 # ---- member function tests ----

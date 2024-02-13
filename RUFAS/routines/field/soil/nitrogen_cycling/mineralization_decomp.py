@@ -5,9 +5,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class MineralizationDecomposition:
-    def __init__(
-        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -52,10 +50,8 @@ class MineralizationDecomposition:
             self.data.soil_layers[0].labile_inorganic_phosphorus_content,
         )
 
-        residue_composition_factor = (
-            self._calculate_nutrient_cycling_residue_composition_factor(
-                carbon_nitrogen_ratio, carbon_phosphorus_ratio
-            )
+        residue_composition_factor = self._calculate_nutrient_cycling_residue_composition_factor(
+            carbon_nitrogen_ratio, carbon_phosphorus_ratio
         )
 
         decay_rate_constant = self._calculate_decay_rate_constant(
@@ -65,22 +61,15 @@ class MineralizationDecomposition:
             self.data.soil_layers[0].nutrient_cycling_water_factor,
         )
 
-        fresh_organic_nitrogen_removed = (
-            decay_rate_constant
-            * self.data.soil_layers[0].fresh_organic_nitrogen_content
-        )
+        fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[0].fresh_organic_nitrogen_content
         fresh_organic_nitrogen_removed = min(
             self.data.soil_layers[0].fresh_organic_nitrogen_content,
             fresh_organic_nitrogen_removed,
         )
 
-        self.data.soil_layers[
-            0
-        ].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
+        self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
         self.data.soil_layers[0].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
-        self.data.soil_layers[0].active_organic_nitrogen_content += (
-            0.2 * fresh_organic_nitrogen_removed
-        )
+        self.data.soil_layers[0].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
 
     def _correct_fresh_organic_nitrogen_pools(self) -> None:
         """
@@ -95,9 +84,7 @@ class MineralizationDecomposition:
 
         """
         for layer in self.data.soil_layers[1:]:
-            layer.active_organic_nitrogen_content += (
-                layer.fresh_organic_nitrogen_content
-            )
+            layer.active_organic_nitrogen_content += layer.fresh_organic_nitrogen_content
             layer.fresh_organic_nitrogen_content = 0.0
 
     # --- Static methods ---
@@ -142,9 +129,7 @@ class MineralizationDecomposition:
         return carbon_amount / nutrient_total
 
     @staticmethod
-    def _calculate_nutrient_term_for_residue_composition_factor(
-        nutrient_ratio: float, constant_term: float
-    ) -> float:
+    def _calculate_nutrient_term_for_residue_composition_factor(nutrient_ratio: float, constant_term: float) -> float:
         """Calculates terms that used to determine the nutrient cycling composition factor.
 
         Parameters
@@ -176,9 +161,7 @@ class MineralizationDecomposition:
         return exp(inner_term)
 
     @staticmethod
-    def _calculate_nutrient_cycling_residue_composition_factor(
-        carbon_nitrogen_ratio, carbon_phosphorus_ratio
-    ) -> float:
+    def _calculate_nutrient_cycling_residue_composition_factor(carbon_nitrogen_ratio, carbon_phosphorus_ratio) -> float:
         """Calculates the residue composition factor for use in computing the decay rate constant.
 
         Parameters
@@ -244,6 +227,4 @@ class MineralizationDecomposition:
 
         """
         root_term = (temp_factor * water_factor) ** 0.5
-        return (
-            fresh_organic_residue_mineralization_rate * composition_factor * root_term
-        )
+        return fresh_organic_residue_mineralization_rate * composition_factor * root_term

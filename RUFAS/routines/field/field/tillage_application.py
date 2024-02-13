@@ -131,18 +131,10 @@ class TillageApplication:
             total_phosphorus_incorporated, self.field_data.field_size
         )
 
-        self._remove_amount_incorporated(
-            self.soil_data, "machine_manure_dry_mass", incorporation_fraction
-        )
-        self._remove_amount_incorporated(
-            self.soil_data, "machine_manure_field_coverage", incorporation_fraction
-        )
-        self._remove_amount_incorporated(
-            self.soil_data, "grazing_manure_dry_mass", incorporation_fraction
-        )
-        self._remove_amount_incorporated(
-            self.soil_data, "grazing_manure_field_coverage", incorporation_fraction
-        )
+        self._remove_amount_incorporated(self.soil_data, "machine_manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "machine_manure_field_coverage", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "grazing_manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "grazing_manure_field_coverage", incorporation_fraction)
 
         pools_to_till_in_soil = [
             "labile_inorganic_phosphorus_content",
@@ -162,12 +154,8 @@ class TillageApplication:
         pools_to_offset_top_layer = ["passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
             offset_top_layer = pool in pools_to_offset_top_layer
-            self._mix_soil_layers(
-                pool, tillage_depth, mixing_fraction, offset_top_layer
-            )
-        self._record_tillage(
-            tillage_depth, incorporation_fraction, mixing_fraction, year, day
-        )
+            self._mix_soil_layers(pool, tillage_depth, mixing_fraction, offset_top_layer)
+        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
     def _mix_soil_layers(
         self,
@@ -219,21 +207,15 @@ class TillageApplication:
                 break
             elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth
-                layer_redistribution_fraction = tilled_depth / (
-                    tillage_depth - top_layer_offset
-                )
+                layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = tilled_depth / layer.layer_thickness
             else:
-                layer_redistribution_fraction = layer.layer_thickness / (
-                    tillage_depth - top_layer_offset
-                )
+                layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = 1.0
             redistribution_fractions.append(layer_redistribution_fraction)
 
             current_pool_amount = getattr(layer, pool_name)
-            amount_to_remove = (
-                current_pool_amount * mixing_fraction * fraction_of_layer_mixed
-            )
+            amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed
             unmixed_amount_in_pool = current_pool_amount - amount_to_remove
             setattr(layer, pool_name, unmixed_amount_in_pool)
             total_to_mix_from_pools += amount_to_remove
@@ -288,9 +270,7 @@ class TillageApplication:
         pool being removed from.
 
         """
-        data_container_is_correct_type = isinstance(
-            data_container, SoilData
-        ) or isinstance(data_container, FieldData)
+        data_container_is_correct_type = isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
         if not data_container_is_correct_type:
             raise TypeError(
                 f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
