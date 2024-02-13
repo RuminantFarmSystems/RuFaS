@@ -6,30 +6,36 @@ from unittest.mock import patch, PropertyMock
 
 
 # ---- Test Static Functions ----
-@pytest.mark.parametrize("heatfrac,expect", [
-    (-1, 0.4),
-    (0, 0.4),
-    (0.5, 0.4 - (0.2 * 0.5)),
-    (1, 0.4 - (0.2 * 1)),
-    (1.2, 0.4 - (0.2 * 1.2)),
-    (2, 0),
-    (2.1, 0)
-])
+@pytest.mark.parametrize(
+    "heatfrac,expect",
+    [
+        (-1, 0.4),
+        (0, 0.4),
+        (0.5, 0.4 - (0.2 * 0.5)),
+        (1, 0.4 - (0.2 * 1)),
+        (1.2, 0.4 - (0.2 * 1.2)),
+        (2, 0),
+        (2.1, 0),
+    ],
+)
 def test_determine_root_fraction(heatfrac, expect):
     """check that root fraction is properly calculated by
     determine_root_fraction()"""
     assert RootDevelopment._determine_root_fraction(heatfrac) == expect
 
 
-@pytest.mark.parametrize("maxd,heatfrac", [
-    (1, 0.5),
-    (1, 0.3),
-    (1, 0),
-    (1, 1),
-    (1, 1.2),
-    (0, 0.5),
-    (100, 0.5),
-])
+@pytest.mark.parametrize(
+    "maxd,heatfrac",
+    [
+        (1, 0.5),
+        (1, 0.3),
+        (1, 0),
+        (1, 1),
+        (1, 1.2),
+        (0, 0.5),
+        (100, 0.5),
+    ],
+)
 def test_determine_root_depth(maxd, heatfrac):
     """check that root depths are properly calculated by
     determine_root_depths()"""
@@ -42,15 +48,19 @@ def test_determine_root_depth(maxd, heatfrac):
 
 # ---- Test Class Methods ----
 
-@pytest.mark.parametrize("maxd, heatfrac", [
-    (1, 0.5),
-    (1, 0.3),
-    (1, 0),
-    (1, 1),
-    (1, 1.2),
-    (0, 0.5),
-    (100, 0.5),
-])
+
+@pytest.mark.parametrize(
+    "maxd, heatfrac",
+    [
+        (1, 0.5),
+        (1, 0.3),
+        (1, 0),
+        (1, 1),
+        (1, 1.2),
+        (0, 0.5),
+        (100, 0.5),
+    ],
+)
 def test_develop_roots(maxd: int, heatfrac: float) -> None:
     """Integration test for main root development function develop_roots()."""
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):

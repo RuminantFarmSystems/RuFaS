@@ -4,7 +4,9 @@ from typing import Set, Dict, List, Tuple
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.routines.animal.ration.user_defined_ration import (
+    UserDefinedRationManager as UserDefinedRationManager,
+)
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
@@ -70,9 +72,11 @@ class RationManager:
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-                    req, available_feeds, pen.animal_combination
-                )
+                (
+                    solution,
+                    ration_vals,
+                    ration_config,
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 info_map = {
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
@@ -86,7 +90,11 @@ class RationManager:
                     "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
-                om.add_variable(f"failed_constraint_summary_for_pen_{pen.id}", fail_summary, info_map)
+                om.add_variable(
+                    f"failed_constraint_summary_for_pen_{pen.id}",
+                    fail_summary,
+                    info_map,
+                )
 
         if solution is not None:
             ration = cls.make_ration_from_solution(available_feeds, solution)
@@ -192,8 +200,9 @@ class RationManager:
         return solution_from_ration
 
     @classmethod
-    def get_user_defined_ration(cls, req: animal_requirements, pen, available_feeds, animal_grouping_scenario) -> \
-            tuple[Dict[str, float], Dict[str, float]]:  # noqa
+    def get_user_defined_ration(  # noqa
+        cls, req: animal_requirements, pen, available_feeds, animal_grouping_scenario
+    ) -> tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -273,9 +282,9 @@ class RationManager:
                 running_average_milk = cls.calc_milk_average(pen)
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 if (
-                        udrm.milk_reduction_maximum == 0.0
-                        or running_milk_reduction + reduction > udrm.milk_reduction_maximum
-                        or running_average_milk - reduction < 1.0
+                    udrm.milk_reduction_maximum == 0.0
+                    or running_milk_reduction + reduction > udrm.milk_reduction_maximum
+                    or running_average_milk - reduction < 1.0
                 ):
                     fixed_ration = True
                     solution.success = True
@@ -287,9 +296,11 @@ class RationManager:
                 running_average_milk = cls.calc_milk_average(pen)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-                    req, available_feeds, pen.animal_combination
-                )
+                (
+                    solution,
+                    ration_vals,
+                    ration_config,
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
@@ -305,7 +316,11 @@ class RationManager:
                         "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                         "pen requirements": pen.avg_nutrient_rqmts,
                     }
-                    om.add_variable(f"failed_constraint_summary_for_pen_{pen.id}", fail_summary, info_map)
+                    om.add_variable(
+                        f"failed_constraint_summary_for_pen_{pen.id}",
+                        fail_summary,
+                        info_map,
+                    )
 
         if fixed_ration:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
@@ -366,8 +381,22 @@ class RationReporter:
         for non_numeric_key in ["status", "objective"]:
             if non_numeric_key in ration:
                 del ration[non_numeric_key]
-        nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                     'potassium', 'N', 'EE', 'starch', 'TDN', 'DE', 'calcium']
+        nutrients = [
+            "DM",
+            "CP",
+            "ADF",
+            "NDF",
+            "lignin",
+            "ash",
+            "phosphorus",
+            "potassium",
+            "N",
+            "EE",
+            "starch",
+            "TDN",
+            "DE",
+            "calcium",
+        ]
 
         for key, val in ration.items():
             nutrient_amount["dm"] += val
@@ -378,19 +407,18 @@ class RationReporter:
                         nutrient_amount["as_fed"] += val / (available_feeds[key][nutr] / 100)
                 elif nutr == "N":
                     # [A.2.A.2]
-                    if key[:3] in ['172', '181', '202', '216']:
-
+                    if key[:3] in ["172", "181", "202", "216"]:
                         denom = 6.38
                     # [A.2.A.1]
                     else:
                         denom = 6.25
                     nutrient_amount[nutr] += (available_feeds[key]["CP"] / (denom * 100)) * val
                 else:
-                    if nutr == 'DE':
-                        if available_feeds[key]['DE'] != -1:
-                            nutrient_amount[nutr] += val * (available_feeds[key]['DE'] / 100)
+                    if nutr == "DE":
+                        if available_feeds[key]["DE"] != -1:
+                            nutrient_amount[nutr] += val * (available_feeds[key]["DE"] / 100)
                         else:
-                            nutrient_amount[nutr] += val * (available_feeds[key]['DE_Base'] / 100)
+                            nutrient_amount[nutr] += val * (available_feeds[key]["DE_Base"] / 100)
                     else:
                         nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
@@ -409,7 +437,13 @@ class RationReporter:
         return nutrient_amount, nutrient_conc
 
     @classmethod
-    def report_ration_supply(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+    def report_ration_supply(
+        cls,
+        ration: Dict,
+        available_feeds: Dict,
+        ration_report: Dict,
+        body_weight: float,
+    ) -> Dict:
         """
         Nutrient and energy supply of a formulated ration
         Different from the report_ration method, since this takes into account digestibility and other factors
@@ -452,8 +486,9 @@ class RationReporter:
 
         for key, kg_fed in ration_.items():
             for item in supply_report:
-                supply_report[item] += eval("RationReporter.get_" + item +
-                                            "(kg_fed, available_feeds[key], ration_report, body_weight)")
+                supply_report[item] += eval(
+                    "RationReporter.get_" + item + "(kg_fed, available_feeds[key], ration_report, body_weight)"
+                )
         supply_report["forage_NDF_percent"] = supply_report["forage_NDF"] / sum(ration_.values())
         supply_report["metabolizable_protein"] = RationReporter.get_metabolizable_protein(
             ration_, available_feeds, ration_report, body_weight
@@ -493,10 +528,10 @@ class RationReporter:
         somatic_body_weight = body_weight * 0.96
         if body_weight == 0.0 or TDNtotal == 0.0:
             return 0.0
-        if TDNtotal < (0.035 * body_weight ** 0.75):
+        if TDNtotal < (0.035 * body_weight**0.75):
             DMI_to_maint = 1
         else:
-            DMI_to_maint = TDNtotal / (0.035 * somatic_body_weight ** 0.75)
+            DMI_to_maint = TDNtotal / (0.035 * somatic_body_weight**0.75)
         if TDNconc < 60:
             Discount = 1
         else:
@@ -526,7 +561,7 @@ class RationReporter:
             actual digestible energy of feed item, Mcal/kg.
 
         """
-        de_key = 'DE_Base' if feed_item_info['DE'] == -1 else 'DE'
+        de_key = "DE_Base" if feed_item_info["DE"] == -1 else "DE"
         DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(ration_report, body_weight)
         return DE_act
 
@@ -565,8 +600,9 @@ class RationReporter:
         return ME_item
 
     @staticmethod
-    def get_NE_maintenance_and_activity(kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) \
-            -> float:
+    def get_NE_maintenance_and_activity(
+        kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float
+    ) -> float:
         """
         Returns net energy of feed item available for maintenance requirements.
 
@@ -591,7 +627,7 @@ class RationReporter:
         if feed_item_info["is_fat"] is True:
             NEm_item = 0.8 * ME_item
         else:
-            NEm_item = 1.37 * ME_item - 0.138 * ME_item ** 2 + 0.0105 * ME_item ** 3 - 1.12
+            NEm_item = 1.37 * ME_item - 0.138 * ME_item**2 + 0.0105 * ME_item**3 - 1.12
         return NEm_item * kg_fed
 
     @staticmethod
@@ -656,7 +692,7 @@ class RationReporter:
         elif feed_item_info["is_fat"] is True:
             NE_growth = 0.55 * ME_item
         else:
-            NE_growth = 1.42 * ME_item - 0.174 * ME_item ** 2 + 0.0122 * ME_item ** 3 - 1.65
+            NE_growth = 1.42 * ME_item - 0.174 * ME_item**2 + 0.0122 * ME_item**3 - 1.65
         return NE_growth * kg_fed
 
     @staticmethod
@@ -803,8 +839,9 @@ class RationReporter:
         return forage_NDF_item
 
     @staticmethod
-    def get_metabolizable_protein(ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) \
-            -> float:
+    def get_metabolizable_protein(
+        ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float
+    ) -> float:
         """
         Returns metabolizable protein supply  of feed item, g.
 
@@ -967,28 +1004,28 @@ class AvailableFeeds:
 
         for key, feed in available_feeds.items():
             self.feed_key.append(key)
-            self.feed_id.append(feed['rufas_id'])
+            self.feed_id.append(feed["rufas_id"])
             self.price.append(feed_costs[str(key)])
-            self.TDN.append(feed['TDN'])
-            if feed['DE'] != -1:
-                self.DE.append(feed['DE'])
+            self.TDN.append(feed["TDN"])
+            if feed["DE"] != -1:
+                self.DE.append(feed["DE"])
             else:
-                self.DE.append(feed['DE_Base'])
-            self.EE.append(feed['EE'])
-            self.is_fat.append(feed['is_fat'])
-            self.calcium.append(feed['calcium'])
-            self.phosphorus.append(feed['phosphorus'])
-            self.NDF.append(feed['NDF'])
-            self.type.append(feed['feed_type'])
-            self.is_wetforage.append(feed['is_wetforage'])
-            self.Kd.append(feed['Kd'])
-            self.N_A.append(feed['N_A'])
-            self.N_B.append(feed['N_B'])
-            self.CP.append(feed['CP'])
-            self.dRUP.append(feed['dRUP'])
-            if isinstance(feed['limit'], dict):
-                self.lactating_cow_limit.append(feed['limit']['lactating_cows'])
-                self.dry_cow_limit.append(feed['limit']['dry_cows'])
+                self.DE.append(feed["DE_Base"])
+            self.EE.append(feed["EE"])
+            self.is_fat.append(feed["is_fat"])
+            self.calcium.append(feed["calcium"])
+            self.phosphorus.append(feed["phosphorus"])
+            self.NDF.append(feed["NDF"])
+            self.type.append(feed["feed_type"])
+            self.is_wetforage.append(feed["is_wetforage"])
+            self.Kd.append(feed["Kd"])
+            self.N_A.append(feed["N_A"])
+            self.N_B.append(feed["N_B"])
+            self.CP.append(feed["CP"])
+            self.dRUP.append(feed["dRUP"])
+            if isinstance(feed["limit"], dict):
+                self.lactating_cow_limit.append(feed["limit"]["lactating_cows"])
+                self.dry_cow_limit.append(feed["limit"]["dry_cows"])
 
             else:
                 self.lactating_cow_limit.append(feed["limit"])
@@ -1034,12 +1071,16 @@ class AvailableFeeds:
                     idx = self._feed_id_to_list_idx_dict[int(feed_id)]
                     result[key].append(vals[idx])
                 except KeyError:
-                    info_map = {"class": self.__class__.__name__,
-                                "function": self.get_feed_data_from_feed_ids.__name__,
-                                }
-                    om.add_error("KeyError", f"Feed ID {feed_id} not found in AvailableFeeds. "
-                                 f"Check that price was set in purchased_feeds in input feed json, "
-                                 f"and that it is included in the specified NRC or NASEM csv.",
-                                 info_map)
+                    info_map = {
+                        "class": self.__class__.__name__,
+                        "function": self.get_feed_data_from_feed_ids.__name__,
+                    }
+                    om.add_error(
+                        "KeyError",
+                        f"Feed ID {feed_id} not found in AvailableFeeds. "
+                        f"Check that price was set in purchased_feeds in input feed json, "
+                        f"and that it is included in the specified NRC or NASEM csv.",
+                        info_map,
+                    )
                     raise
         return result

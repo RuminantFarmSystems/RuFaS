@@ -3,18 +3,29 @@ from unittest.mock import MagicMock
 import pytest
 
 from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
-from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
-from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
-from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
+from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
+    LeachingRunoffErosion,
+)
+from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import (
+    MineralizationDecomposition,
+)
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import (
+    NitrificationVolatilization,
+)
 from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
-from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
+from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import (
+    HumusMineralization,
+)
 
 
-@pytest.mark.parametrize("field_size", [
-    3,
-    90.24,
-    77,
-])
+@pytest.mark.parametrize(
+    "field_size",
+    [
+        3,
+        90.24,
+        77,
+    ],
+)
 def test_cycle_nitrogen(field_size: float) -> None:
     NitrificationVolatilization.do_daily_nitrification_and_volatilization = MagicMock()
     Denitrification.denitrify = MagicMock()
