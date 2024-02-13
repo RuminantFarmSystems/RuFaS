@@ -142,19 +142,23 @@ def test_evaporate(
     incorp.data.set_vectorized_layer_attribute("evaporated_water_content", [1.1] * 4)
 
     path_str = "RUFAS.routines.field.soil.evaporation.Evaporation"
-    with patch(
-        f"{path_str}._determine_layer_evaporative_demand",
-        new_callable=MagicMock,
-        return_value=0.8,
-    ) as demand, patch(
-        f"{path_str}._determine_evaporative_demand_reduced",
-        new_callable=MagicMock,
-        return_value=0.6,
-    ) as reduced, patch(
-        f"{path_str}._determine_amount_water_removed",
-        new_callable=MagicMock,
-        return_value=0.7,
-    ) as removed:
+    with (
+        patch(
+            f"{path_str}._determine_layer_evaporative_demand",
+            new_callable=MagicMock,
+            return_value=0.8,
+        ) as demand,
+        patch(
+            f"{path_str}._determine_evaporative_demand_reduced",
+            new_callable=MagicMock,
+            return_value=0.6,
+        ) as reduced,
+        patch(
+            f"{path_str}._determine_amount_water_removed",
+            new_callable=MagicMock,
+            return_value=0.7,
+        ) as removed,
+    ):
         incorp.evaporate(max_evaporation)
         actual_water_contents = incorp.data.get_vectorized_layer_attribute("water_content")
         actual_water_evaporated = incorp.data.get_vectorized_layer_attribute("evaporated_water_content")

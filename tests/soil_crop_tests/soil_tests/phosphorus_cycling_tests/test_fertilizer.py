@@ -101,14 +101,15 @@ def test_absorb_phosphorus_from_available_pool(
     fert = Fertilizer(data)
 
     expected_remaining_phosphorus = available_pool_amount - absorbed_phos
-    with patch.object(
-        fert.data.soil_layers[0], "add_to_labile_phosphorus", new_callable=MagicMock
-    ) as add_phos, patch.object(
-        fert,
-        "_determine_fraction_phosphorus_remaining",
-        new_callable=MagicMock,
-        return_value=sorption_fraction,
-    ) as determine_fraction:
+    with (
+        patch.object(fert.data.soil_layers[0], "add_to_labile_phosphorus", new_callable=MagicMock) as add_phos,
+        patch.object(
+            fert,
+            "_determine_fraction_phosphorus_remaining",
+            new_callable=MagicMock,
+            return_value=sorption_fraction,
+        ) as determine_fraction,
+    ):
         fert._absorb_phosphorus_from_available_pool(field_size)
 
     add_phos.assert_called_once_with(absorbed_phos, field_size)
@@ -239,9 +240,11 @@ def test_update_before_and_at_first_rain(
         "runoff_phosphorus": (0.5 * available_pool),
         "absorbed_phosphorus": (0.5 * available_pool),
     }
-    with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, patch.object(
-        fert, "_absorb_phosphorus_from_available_pool"
-    ) as absorb, patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos:
+    with (
+        patch.object(fert, "_add_phosphorus_to_soil") as add_phos,
+        patch.object(fert, "_absorb_phosphorus_from_available_pool") as absorb,
+        patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos,
+    ):
         fert._update_before_and_at_first_rain(rainfall, runoff, field_size)
 
     if not rainfall and not days_since_application:
@@ -297,9 +300,10 @@ def test_update_after_first_rain(
         "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
     }
 
-    with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, patch.object(
-        fert, "_determine_leached_phosphorus", return_value=phos_leached
-    ) as leach_phos:
+    with (
+        patch.object(fert, "_add_phosphorus_to_soil") as add_phos,
+        patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos,
+    ):
         fert._update_after_first_rain(rainfall, runoff, field_size)
 
     expected_absorbed_phos = recalcitrant_pool * fert.data.solubilizing_factor

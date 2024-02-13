@@ -278,31 +278,41 @@ def test_infiltrate(
     setattr(data, "annual_runoff_total", 1.3)
     incorp = Infiltration(data)
 
-    with patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_third_moisture_condition_parameter",
-        return_value=90,
-    ) as third_curve_num, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
-        return_value=10,
-    ) as first_curve_num, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration." "_determine_retention_parameter_for_moisture_condition",
-        return_value=0.5,
-    ) as moisture_param, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
-        return_value=1.1,
-    ) as second_shape, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
-        return_value=1.2,
-    ) as first_shape, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_retention_parameter",
-        return_value=0.6,
-    ) as retention_param, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
-        return_value=0.6,
-    ) as frozen_retention_param, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
-        return_value=3.0,
-    ) as runoff:
+    with (
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_third_moisture_condition_parameter",
+            return_value=90,
+        ) as third_curve_num,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
+            return_value=10,
+        ) as first_curve_num,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration."
+            "_determine_retention_parameter_for_moisture_condition",
+            return_value=0.5,
+        ) as moisture_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
+            return_value=1.1,
+        ) as second_shape,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
+            return_value=1.2,
+        ) as first_shape,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_retention_parameter",
+            return_value=0.6,
+        ) as retention_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
+            return_value=0.6,
+        ) as frozen_retention_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
+            return_value=3.0,
+        ) as runoff,
+    ):
         incorp.infiltrate(rainfall)
 
         third_curve_num.assert_called_once_with(85.0)

@@ -52,15 +52,17 @@ def test_field_manager_init(field_blob_names) -> None:
     expected_field_setup_calls = [
         call(field_name, mocked_manure_manager, mocked_feed_manager) for field_name in field_blob_names
     ]
-    with patch(
-        "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
-        return_value=field_blob_names,
-    ) as patched_data_keys_by_properties, patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-        return_value=MagicMock(Field),
-    ) as patched_field_setup, patch.object(
-        om, "add_warning"
-    ) as warning:
+    with (
+        patch(
+            "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
+            return_value=field_blob_names,
+        ) as patched_data_keys_by_properties,
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
+            return_value=MagicMock(Field),
+        ) as patched_field_setup,
+        patch.object(om, "add_warning") as warning,
+    ):
         field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
@@ -1780,27 +1782,33 @@ def test_setup_field(
 
     mock_input_manager.get_data = mock.MagicMock(return_value=field_config)
 
-    with patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
-        new_callable=MagicMock,
-        return_value=({}, mocked_fertilizer_schedule),
-    ) as patched_fertilizer_setup, patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
-        new_callable=MagicMock,
-        return_value=mocked_manure_schedule,
-    ) as patched_manure_setup, patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
-        new_callable=MagicMock,
-        return_value=mocked_tillage_schedule,
-    ) as patched_tillage_setup, patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
-        new_callable=MagicMock,
-        return_value=mocked_crop_schedules,
-    ) as patched_crop_schedules, patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil",
-        new_callable=MagicMock,
-        return_value=mocked_soil_profile,
-    ) as patched_soil_setup:
+    with (
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
+            new_callable=MagicMock,
+            return_value=({}, mocked_fertilizer_schedule),
+        ) as patched_fertilizer_setup,
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
+            new_callable=MagicMock,
+            return_value=mocked_manure_schedule,
+        ) as patched_manure_setup,
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
+            new_callable=MagicMock,
+            return_value=mocked_tillage_schedule,
+        ) as patched_tillage_setup,
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
+            new_callable=MagicMock,
+            return_value=mocked_crop_schedules,
+        ) as patched_crop_schedules,
+        patch(
+            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil",
+            new_callable=MagicMock,
+            return_value=mocked_soil_profile,
+        ) as patched_soil_setup,
+    ):
         new_field = FieldManager._setup_field(field_name, mocked_manure_manager, mocked_feed_manager)
 
         assert new_field.field_data.name == field_name

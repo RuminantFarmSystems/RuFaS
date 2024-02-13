@@ -229,15 +229,14 @@ def test_manage_harvest(
     crop = CropManagement()
     crop.data.yield_residue = 100.0
 
-    with patch.object(crop, "determine_harvest_index") as harvest_index, patch.object(
-        crop, "kill", wraps=crop.kill
-    ) as kill, patch.object(crop, "cut_crop") as cut_crop, patch.object(
-        crop, "_store_harvested_crop"
-    ) as store_crop, patch.object(
-        crop, "_record_yield"
-    ) as record_yield, patch.object(
-        crop, "_transfer_residue"
-    ) as transfer_residue:
+    with (
+        patch.object(crop, "determine_harvest_index") as harvest_index,
+        patch.object(crop, "kill", wraps=crop.kill) as kill,
+        patch.object(crop, "cut_crop") as cut_crop,
+        patch.object(crop, "_store_harvested_crop") as store_crop,
+        patch.object(crop, "_record_yield") as record_yield,
+        patch.object(crop, "_transfer_residue") as transfer_residue,
+    ):
         crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data, mock_feed_manager)
 
         harvest_index.assert_called_once()

@@ -1569,9 +1569,10 @@ def test_route_save_functions_graph(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    with patch("RUFAS.graph_generator.GraphGenerator.generate_graph") as mock_generate_graph, patch.object(
-        mock_output_manager, "create_directory"
-    ) as mock_create_directory:
+    with (
+        patch("RUFAS.graph_generator.GraphGenerator.generate_graph") as mock_generate_graph,
+        patch.object(mock_output_manager, "create_directory") as mock_create_directory,
+    ):
         dummy_log = ["dummy_log"]
         mock_generate_graph.return_value = dummy_log
         mock_output_manager.add_warning = MagicMock()

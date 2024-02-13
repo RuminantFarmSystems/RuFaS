@@ -700,11 +700,14 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         previous_nitrogen=0,
         biomass_growth_max=999,
     )
-    with patch(
-        "RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor",
-        new_callable=PropertyMock,
-        return_value=water_factor,
-    ), patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
+    with (
+        patch(
+            "RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor",
+            new_callable=PropertyMock,
+            return_value=water_factor,
+        ),
+        patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38),
+    ):
         soil = SoilData(field_size=1.3)
         del soil.soil_layers[3]  # delete 4th layer
         top_depths = [0] + depths[:2]

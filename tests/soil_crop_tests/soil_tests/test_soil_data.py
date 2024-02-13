@@ -423,12 +423,15 @@ def test_profile_nitrates_total(layers: List[LayerData]) -> None:
 )
 def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
     """Tests the property method all_residue sums up the residues correctly"""
-    with patch(
-        "RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue",
-        plant_surface_residue,
-    ), patch(
-        "RUFAS.routines.field.soil.soil_data.SoilData.plant_root_residue",
-        plant_root_residue,
+    with (
+        patch(
+            "RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue",
+            plant_surface_residue,
+        ),
+        patch(
+            "RUFAS.routines.field.soil.soil_data.SoilData.plant_root_residue",
+            plant_root_residue,
+        ),
     ):
         soil_data = SoilData(field_size=0.98)
         assert soil_data.all_residue == expected

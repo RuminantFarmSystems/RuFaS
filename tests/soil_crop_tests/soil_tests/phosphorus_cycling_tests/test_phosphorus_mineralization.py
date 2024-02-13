@@ -155,14 +155,17 @@ def test_mineralize_phosphorus(field_size: float) -> None:
     `mineralize_phosphorus()`
 
     """
-    with patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
-        new_callable=MagicMock,
-        return_value=20,
-    ), patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.labile_inorganic_phosphorus_content",
-        new_callable=MagicMock,
-        return_value=20,
+    with (
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
+            new_callable=MagicMock,
+            return_value=20,
+        ),
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.labile_inorganic_phosphorus_content",
+            new_callable=MagicMock,
+            return_value=20,
+        ),
     ):
         # Case 1: tests that desorption occurs correctly
         LayerData.determine_soil_nutrient_concentration = MagicMock()

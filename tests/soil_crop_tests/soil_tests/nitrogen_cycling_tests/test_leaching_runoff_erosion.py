@@ -82,9 +82,10 @@ def test_calculate_nitrogen_removed_by_water(
     expected_water_in_liters = water * field_size * 1e4
     expected_conc_lost = n_concentration * expected_water_in_liters * coefficient
 
-    with patch.object(
-        LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration
-    ) as conc, patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=n_density) as density:
+    with (
+        patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,
+        patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=n_density) as density,
+    ):
         actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
             nitrogen, water, coefficient, bulk_density, thickness, field_size
         )
@@ -152,11 +153,10 @@ def test_erode_nitrogen(
         call(stable, 1.6, 20, field_size, 0.92),
         call(active, 1.6, 20, field_size, 0.92),
     ]
-    with patch.object(
-        incorp, "_calculate_nitrogen_removed_by_water", return_value=45
-    ) as calc_inorganic_loss, patch.object(
-        incorp, "_calculate_eroded_organic_nitrogen", return_value=3
-    ) as calc_eroded_loss:
+    with (
+        patch.object(incorp, "_calculate_nitrogen_removed_by_water", return_value=45) as calc_inorganic_loss,
+        patch.object(incorp, "_calculate_eroded_organic_nitrogen", return_value=3) as calc_eroded_loss,
+    ):
         incorp._erode_nitrogen(field_size)
 
         calc_inorganic_loss.assert_has_calls(inorganic_loss_calls)

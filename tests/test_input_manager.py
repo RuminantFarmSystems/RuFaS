@@ -1217,9 +1217,10 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
         "is_valid": True,
     }
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error, patch.object(
-        mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False
-    ) as fix_data:
+    with (
+        patch("RUFAS.output_manager.OutputManager.add_error") as add_error,
+        patch.object(mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False) as fix_data,
+    ):
         mock_input_manager._validate_dict_element(
             element_hierarchy,
             properties_blob_key,

@@ -901,15 +901,19 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     field.crops = [crop]
     rainfall = 10.3
 
-    with patch(
-        "RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy",
-        new_callable=MagicMock,
-    ) as dormancy, patch(
-        "RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
-        new_callable=MagicMock,
-    ) as biomass, patch(
-        "RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools"
-    ) as add_residue:
+    with (
+        patch(
+            "RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy",
+            new_callable=MagicMock,
+        ) as dormancy,
+        patch(
+            "RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
+            new_callable=MagicMock,
+        ) as biomass,
+        patch(
+            "RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools"
+        ) as add_residue,
+    ):
         field._assess_dormancy(daylength, rainfall)
 
     if daylength <= threshold_daylength:
@@ -1133,25 +1137,30 @@ def test_execute_fertilizer_application_with_invalid_args(
         manure_manager=MagicMock(ManureManager),
     )
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
-    with patch(
-        "RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
-        new_callable=MagicMock,
-    ) as patched_error, patch(
-        "RUFAS.routines.field.field.field.Field._formulate_fertilizer_required",
-        new_callable=MagicMock,
-        return_value={
-            "total_mass": 100.0,
-            "phosphorus_mass": 50.0,
-            "nitrogen_mass": 50.0,
-            "potassium_mass": 0.0,
-        },
-    ) as patched_formulator, patch(
-        "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.apply_fertilizer",
-        new_callable=MagicMock,
-    ) as patched_applicator, patch(
-        "RUFAS.routines.field.field.field.Field._record_fertilizer_application",
-        new_callable=MagicMock,
-    ) as patched_recorder:
+    with (
+        patch(
+            "RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
+            new_callable=MagicMock,
+        ) as patched_error,
+        patch(
+            "RUFAS.routines.field.field.field.Field._formulate_fertilizer_required",
+            new_callable=MagicMock,
+            return_value={
+                "total_mass": 100.0,
+                "phosphorus_mass": 50.0,
+                "nitrogen_mass": 50.0,
+                "potassium_mass": 0.0,
+            },
+        ) as patched_formulator,
+        patch(
+            "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.apply_fertilizer",
+            new_callable=MagicMock,
+        ) as patched_applicator,
+        patch(
+            "RUFAS.routines.field.field.field.Field._record_fertilizer_application",
+            new_callable=MagicMock,
+        ) as patched_recorder,
+    ):
         field._execute_fertilizer_application("26_4_24", 50.0, 50.0, depth, remainder, 1994, 200)
 
         if invalid_combination:
@@ -1678,23 +1687,29 @@ def test_execute_manure_application_with_invalid_args(
     expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
     expected_total_organic_fraction = 0.35  # equal to (50.0 / 100.0) * 0.7
 
-    with patch(
-        "RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
-        new_callable=MagicMock,
-    ) as patched_error, patch(
-        "RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure",
-        new_callable=MagicMock,
-    ) as patched_manure_applicator, patch(
-        "RUFAS.routines.field.field.field.Field._record_manure_application",
-        new_callable=MagicMock,
-    ) as patched_recorder, patch(
-        "RUFAS.routines.field.field.field.Field._determine_optimal_fertilizer_mix",
-        new_callable=MagicMock,
-        return_value="26_4_24",
-    ) as patched_optimizer, patch(
-        "RUFAS.routines.field.field.field.Field._execute_fertilizer_application",
-        new_callable=MagicMock,
-    ) as patched_fertilizer_applicator:
+    with (
+        patch(
+            "RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
+            new_callable=MagicMock,
+        ) as patched_error,
+        patch(
+            "RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure",
+            new_callable=MagicMock,
+        ) as patched_manure_applicator,
+        patch(
+            "RUFAS.routines.field.field.field.Field._record_manure_application",
+            new_callable=MagicMock,
+        ) as patched_recorder,
+        patch(
+            "RUFAS.routines.field.field.field.Field._determine_optimal_fertilizer_mix",
+            new_callable=MagicMock,
+            return_value="26_4_24",
+        ) as patched_optimizer,
+        patch(
+            "RUFAS.routines.field.field.field.Field._execute_fertilizer_application",
+            new_callable=MagicMock,
+        ) as patched_fertilizer_applicator,
+    ):
         field._execute_manure_application(50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133)
 
         if invalid_combination:

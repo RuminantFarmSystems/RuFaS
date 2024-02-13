@@ -123,13 +123,16 @@ def test_apply_fertilizer(
     fert_app.soil.data.soil_layers[0].fresh_organic_nitrogen_content = 0
     fert_app.soil.data.soil_layers[0].active_organic_nitrogen_content = 0
 
-    with patch(
-        "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication._apply_subsurface_fertilizer",
-        new_callable=MagicMock,
-    ) as patched_subsurface_applicator, patch(
-        "RUFAS.routines.field.soil.phosphorus_cycling.fertilizer.Fertilizer.add_fertilizer_phosphorus",
-        new_callable=MagicMock,
-    ) as patched_phosphorus_applicator:
+    with (
+        patch(
+            "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication._apply_subsurface_fertilizer",
+            new_callable=MagicMock,
+        ) as patched_subsurface_applicator,
+        patch(
+            "RUFAS.routines.field.soil.phosphorus_cycling.fertilizer.Fertilizer.add_fertilizer_phosphorus",
+            new_callable=MagicMock,
+        ) as patched_phosphorus_applicator,
+    ):
         fert_app.apply_fertilizer(
             phosphorus,
             fertilizer,

@@ -448,24 +448,30 @@ def test_apply_subsurface_manure(
 ) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
     manure_app = ManureApplication(field_size=area)
-    with patch(
-        "RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute",
-        new_callable=MagicMock,
-        return_value=[20.0, 50.0, 200.0, 400.0],
-    ) as layer, patch(
-        "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
-        new_callable=MagicMock,
-        return_value=[0.05, 0.35, 0.6],
-    ) as depth_factors, patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.add_to_labile_phosphorus",
-        new_callable=MagicMock,
-    ) as labile, patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.add_to_active_phosphorus",
-        new_callable=MagicMock,
-    ) as active, patch(
-        "RUFAS.routines.field.field.manure_application.ManureApplication._add_nitrogen_to_soil_layer",
-        new_callable=MagicMock,
-    ) as nitrogen:
+    with (
+        patch(
+            "RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute",
+            new_callable=MagicMock,
+            return_value=[20.0, 50.0, 200.0, 400.0],
+        ) as layer,
+        patch(
+            "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
+            new_callable=MagicMock,
+            return_value=[0.05, 0.35, 0.6],
+        ) as depth_factors,
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.add_to_labile_phosphorus",
+            new_callable=MagicMock,
+        ) as labile,
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.add_to_active_phosphorus",
+            new_callable=MagicMock,
+        ) as active,
+        patch(
+            "RUFAS.routines.field.field.manure_application.ManureApplication._add_nitrogen_to_soil_layer",
+            new_callable=MagicMock,
+        ) as nitrogen,
+    ):
         manure_app._apply_subsurface_manure(
             total_phosphorus,
             wip_frac,

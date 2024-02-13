@@ -110,14 +110,17 @@ def test_percolate_between_layers(
         saturation_point_water_concentration=0.1,
         field_size=1.33,
     )
-    with patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.excess_water_available",
-        new_callable=PropertyMock,
-        return_value=excess_water_available,
-    ), patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
-        new_callable=PropertyMock,
-        return_value=acceptable_percolation_amount,
+    with (
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.excess_water_available",
+            new_callable=PropertyMock,
+            return_value=excess_water_available,
+        ),
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
+            new_callable=PropertyMock,
+            return_value=acceptable_percolation_amount,
+        ),
     ):
         Percolation._determine_percolation_travel_time = MagicMock()
         Percolation._determine_percolation_to_next_layer = MagicMock(return_value=amount_to_percolate)
@@ -233,20 +236,23 @@ def test_percolate(
     mock_soil_data.infiltrated_water = infiltration
     incorp = Percolation(mock_soil_data)
 
-    with patch(
-        "RUFAS.routines.field.soil.percolation.Percolation._determine_if_percolation_allowed",
-        return_value=can_percolate,
-    ) as percolation_allowed, patch(
-        "RUFAS.routines.field.soil.percolation.Percolation._percolate_between_layers",
-        return_value=3.0,
-    ) as percolate_between_layers, patch.object(
-        LayerData,
-        "acceptable_percolation_amount",
-        new_callable=PropertyMock,
-        return_value=1.0,
-    ), patch.object(
-        Percolation, "_percolate_excess_water", new_callable=MagicMock
-    ) as percolate_excess:
+    with (
+        patch(
+            "RUFAS.routines.field.soil.percolation.Percolation._determine_if_percolation_allowed",
+            return_value=can_percolate,
+        ) as percolation_allowed,
+        patch(
+            "RUFAS.routines.field.soil.percolation.Percolation._percolate_between_layers",
+            return_value=3.0,
+        ) as percolate_between_layers,
+        patch.object(
+            LayerData,
+            "acceptable_percolation_amount",
+            new_callable=PropertyMock,
+            return_value=1.0,
+        ),
+        patch.object(Percolation, "_percolate_excess_water", new_callable=MagicMock) as percolate_excess,
+    ):
         incorp.percolate(seasonal_high_water_table)
 
     if excessive_infiltration:

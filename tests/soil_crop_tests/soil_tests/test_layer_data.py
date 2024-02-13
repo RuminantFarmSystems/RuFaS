@@ -26,18 +26,22 @@ def test_water_factor(
     expected: float,
 ) -> None:
     """Tests that water factor was calculated correctly"""
-    with patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content",
-        new_callable=PropertyMock,
-        return_value=field_capacity_content,
-    ), patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.wilting_point_content",
-        new_callable=PropertyMock,
-        return_value=wilting_point_content,
-    ), patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.saturation_content",
-        new_callable=PropertyMock,
-        return_value=saturation_content,
+    with (
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content",
+            new_callable=PropertyMock,
+            return_value=field_capacity_content,
+        ),
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.wilting_point_content",
+            new_callable=PropertyMock,
+            return_value=wilting_point_content,
+        ),
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.saturation_content",
+            new_callable=PropertyMock,
+            return_value=saturation_content,
+        ),
     ):
         layer = LayerData(top_depth=15, bottom_depth=32, field_size=35)
         layer.water_content = water_content
@@ -89,21 +93,26 @@ def test_layer_thickness_error(top: float, bottom: float) -> None:
 )
 def test_post_init(top: float, bottom: float, concentration: float) -> None:
     """Test that __post_init__() runs and correctly initializes attributes in LayerData"""
-    with patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter",
-        new_callable=MagicMock,
-        return_value=0.5,
-    ) as calc_psp, patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
-        new_callable=MagicMock,
-        return_value=22,
-    ) as determine_nutrient_density, patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData._initialize_nitrogen_pools",
-        new_callable=MagicMock,
-    ) as init_nitrogen_pools, patch(
-        "RUFAS.routines.field.soil.layer_data.LayerData._initialize_carbon_pools",
-        new_callable=MagicMock,
-    ) as init_carbon_pools:
+    with (
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter",
+            new_callable=MagicMock,
+            return_value=0.5,
+        ) as calc_psp,
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
+            new_callable=MagicMock,
+            return_value=22,
+        ) as determine_nutrient_density,
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData._initialize_nitrogen_pools",
+            new_callable=MagicMock,
+        ) as init_nitrogen_pools,
+        patch(
+            "RUFAS.routines.field.soil.layer_data.LayerData._initialize_carbon_pools",
+            new_callable=MagicMock,
+        ) as init_carbon_pools,
+    ):
         # Initialize object
         layer = LayerData(
             top_depth=top,

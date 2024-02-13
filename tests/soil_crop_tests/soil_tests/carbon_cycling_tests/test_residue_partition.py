@@ -605,17 +605,20 @@ def test_add_subsurface_residue(
         metabolic + structural for metabolic, structural in zip(expected_metabolic, expected_structural)
     ]
 
-    with patch.object(
-        ResiduePartition,
-        "_determine_soil_dry_matter_residue_amount",
-        new_callable=MagicMock,
-        side_effect=expected_litter_amounts,
-    ) as determine_dry_matter, patch.object(
-        LayerData,
-        "layer_thickness",
-        new_callable=PropertyMock,
-        side_effect=[50, 250, 200],
-    ) as thickness:
+    with (
+        patch.object(
+            ResiduePartition,
+            "_determine_soil_dry_matter_residue_amount",
+            new_callable=MagicMock,
+            side_effect=expected_litter_amounts,
+        ) as determine_dry_matter,
+        patch.object(
+            LayerData,
+            "layer_thickness",
+            new_callable=PropertyMock,
+            side_effect=[50, 250, 200],
+        ) as thickness,
+    ):
         partitioner._add_subsurface_residue(residue, depth)
 
     for index, expected in enumerate(list(zip(expected_metabolic, expected_structural))):
@@ -636,24 +639,27 @@ def test_add_residue_to_pools(rainfall: float) -> None:
     data.crop_yield_nitrogen = 50.0
     partitioner = ResiduePartition(data)
 
-    with patch.object(
-        ResiduePartition,
-        "_determine_plant_residue_lignin_composition",
-        new_callable=MagicMock,
-        return_value=20.0,
-    ) as lignin, patch.object(
-        ResiduePartition,
-        "_determine_plant_lignin_nitrogen_fraction",
-        new_callable=MagicMock,
-        return_value=0.4,
-    ) as lignin_nitrogen_frac, patch.object(
-        ResiduePartition,
-        "_determine_plant_residue_metabolic_fraction",
-        new_callable=MagicMock,
-        return_value=0.6,
-    ) as metabolic_fraction, patch.object(
-        ResiduePartition, "_add_litter_to_pools"
-    ) as add_litter:
+    with (
+        patch.object(
+            ResiduePartition,
+            "_determine_plant_residue_lignin_composition",
+            new_callable=MagicMock,
+            return_value=20.0,
+        ) as lignin,
+        patch.object(
+            ResiduePartition,
+            "_determine_plant_lignin_nitrogen_fraction",
+            new_callable=MagicMock,
+            return_value=0.4,
+        ) as lignin_nitrogen_frac,
+        patch.object(
+            ResiduePartition,
+            "_determine_plant_residue_metabolic_fraction",
+            new_callable=MagicMock,
+            return_value=0.6,
+        ) as metabolic_fraction,
+        patch.object(ResiduePartition, "_add_litter_to_pools") as add_litter,
+    ):
         partitioner.add_residue_to_pools(rainfall)
 
     assert data.plant_residue_lignin_composition == 20.0
