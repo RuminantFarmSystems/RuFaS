@@ -8,7 +8,7 @@ class TractorSize(Enum):
     LARGE = "Large"
 
 
-class TractorSpecs:
+class Tractor:
     """
     A class to represent the specifications of a tractor.
     The tractor's specifications are determined based on its size or the size of the herd it is intended to work with.
@@ -16,7 +16,7 @@ class TractorSpecs:
 
     def __init__(self, tractor_size: TractorSize | None, herd_size: int | None) -> None:
         """
-        Initializes the TractorSpecs object with the tractor size or calculates it based on the provided herd size.
+        Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
         If `tractor_size` is not provided, the size is inferred using the `herd_size` argument.
 
         Parameters

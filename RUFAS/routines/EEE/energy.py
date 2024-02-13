@@ -1,7 +1,7 @@
 from RUFAS.output_manager import OutputManager
 from math import sqrt
 
-from .tractor import TractorSpecs
+from .tractor import Tractor
 from .tractor_implement import TractorImplement
 
 om = OutputManager()
@@ -21,12 +21,12 @@ class EnergyEstimator:
         crop_yield = 0  # TODO get the correct value
         field_production_size = 0  # TODO get the correct value
         herd_size = 0  # TODO get the correct value
-        tractor_specs = TractorSpecs(herd_size=herd_size)
+        tractor = Tractor(herd_size=herd_size)
         estimator = EnergyEstimator()
         diesel_consumption_tractor_implement_liter_per_ton = estimator.calculate_diesel_consumption(
-            crop_yield, field_production_size, tractor_specs
+            crop_yield, field_production_size, tractor
         )
-        variable_info_map = {"unit": "liter/tone", "tractor_size": tractor_specs.tractor_size}
+        variable_info_map = {"unit": "liter/tone", "tractor_size": tractor.tractor_size}
         om.add_variable(
             "diesel_consumption_tractor_implement",
             diesel_consumption_tractor_implement_liter_per_ton,
@@ -37,7 +37,7 @@ class EnergyEstimator:
         self,
         crop_yield: float,
         field_production_size: float,
-        tractor_specs: TractorSpecs,
+        tractor: Tractor,
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
@@ -50,7 +50,7 @@ class EnergyEstimator:
             Amount of crop yielded per hectars (metric ton/ha)
         field_production_size: float
             The filed area under production (ha)
-        tractor_specs: TractorSpecs
+        tractor: Tractor
             The specifications of the tractor
 
         Returns
@@ -58,8 +58,8 @@ class EnergyEstimator:
         float
             Diesel Consumption for Tractor-Implement (l/ton)
         """
-        total_power_needed_kW = self._calculate_total_power_needed(tractor_specs)
-        x = total_power_needed_kW / tractor_specs.power_available_kW  # helper function 411
+        total_power_needed_kW = self._calculate_total_power_needed(tractor)
+        x = total_power_needed_kW / tractor.power_available_kW  # helper function 411
         specific_fuel_consumption_liter_per_kWh = (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)  # helper function 410
         tractor_implement_operation_time_hr = 0  # TODO get the correct value
         diesel_consumption_tractor_implement_liter_per_ton = (
@@ -71,9 +71,9 @@ class EnergyEstimator:
         )
         return diesel_consumption_tractor_implement_liter_per_ton
 
-    def _calculate_total_power_needed(self, tractor_specs: TractorSpecs) -> float:
+    def _calculate_total_power_needed(self, tractor: Tractor) -> float:
         tractor_implement = TractorImplement()  # TODO get the correct value
-        tactor_axel_power = tractor_specs.calculate_axel_power(tractor_implement)
+        tactor_axel_power = tractor.calculate_axel_power(tractor_implement)
         tractor_implement_drawbar_power = 0  # TODO get the correct value
         tractor_implement_PTO_power_needed = 0  # TODO get the correct value
         return tactor_axel_power + tractor_implement_drawbar_power + tractor_implement_PTO_power_needed
