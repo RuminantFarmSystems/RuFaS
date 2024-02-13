@@ -133,6 +133,13 @@
       "type": "csv",
       "properties": "user_feeds_properties"
     },
+    "tractor_dataset": {
+      "title": "Tractor Dataset",
+      "description": "Details agricultural machinery operations for various crops, including tractor size, operations (planting, mowing, collection, etc.), implement details, operational parameters (depth, width, mass), and throughput metrics, spanning different crop types and soil management practices.",
+      "path": "input/data/EEE/tractor_dataset.csv",
+      "type": "csv",
+      "properties": "tractor_dataset_properties"
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
