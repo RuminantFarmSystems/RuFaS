@@ -41,8 +41,13 @@ class TillageApplication:
     profile gets incorporated and/or mixed with the same logic.
     If no SoilData object is provided, one is created with the default configuration based on the field size.
     """
-    def __init__(self, field_data: Optional[FieldData] = None, soil_data: Optional[SoilData] = None,
-                 field_size: Optional[float] = None):
+
+    def __init__(
+        self,
+        field_data: Optional[FieldData] = None,
+        soil_data: Optional[SoilData] = None,
+        field_size: Optional[float] = None,
+    ):
         """
         Creates a TillageApplication object based on a SoilData object.
 
@@ -63,8 +68,14 @@ class TillageApplication:
         self.field_data = field_data or FieldData(field_size=field_size or 1)
         self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
 
-    def till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int,
-                  day: int) -> None:
+    def till_soil(
+        self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        year: int,
+        day: int,
+    ) -> None:
         """
         Mixes nutrients, manure/fertilizer mass, and residue from the soil profile and soil surface together in the soil
         profile.
@@ -100,48 +111,59 @@ class TillageApplication:
             tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
 
         total_phosphorus_incorporated = 0
-        phosphorus_pools_to_draw_from = ["available_phosphorus_pool",
-                                         "recalcitrant_phosphorus_pool",
-                                         "machine_water_extractable_inorganic_phosphorus",
-                                         "machine_water_extractable_organic_phosphorus",
-                                         "machine_stable_inorganic_phosphorus",
-                                         "machine_stable_organic_phosphorus",
-                                         "grazing_water_extractable_inorganic_phosphorus",
-                                         "grazing_water_extractable_organic_phosphorus",
-                                         "grazing_stable_inorganic_phosphorus",
-                                         "grazing_stable_organic_phosphorus"]
+        phosphorus_pools_to_draw_from = [
+            "available_phosphorus_pool",
+            "recalcitrant_phosphorus_pool",
+            "machine_water_extractable_inorganic_phosphorus",
+            "machine_water_extractable_organic_phosphorus",
+            "machine_stable_inorganic_phosphorus",
+            "machine_stable_organic_phosphorus",
+            "grazing_water_extractable_inorganic_phosphorus",
+            "grazing_water_extractable_organic_phosphorus",
+            "grazing_stable_inorganic_phosphorus",
+            "grazing_stable_organic_phosphorus",
+        ]
         for pool in phosphorus_pools_to_draw_from:
-            total_phosphorus_incorporated += self._remove_amount_incorporated(self.soil_data, pool,
-                                                                              incorporation_fraction)
-        self.soil_data.soil_layers[0].add_to_labile_phosphorus(total_phosphorus_incorporated,
-                                                               self.field_data.field_size)
+            total_phosphorus_incorporated += self._remove_amount_incorporated(
+                self.soil_data, pool, incorporation_fraction
+            )
+        self.soil_data.soil_layers[0].add_to_labile_phosphorus(
+            total_phosphorus_incorporated, self.field_data.field_size
+        )
 
         self._remove_amount_incorporated(self.soil_data, "machine_manure_dry_mass", incorporation_fraction)
         self._remove_amount_incorporated(self.soil_data, "machine_manure_field_coverage", incorporation_fraction)
         self._remove_amount_incorporated(self.soil_data, "grazing_manure_dry_mass", incorporation_fraction)
         self._remove_amount_incorporated(self.soil_data, "grazing_manure_field_coverage", incorporation_fraction)
 
-        pools_to_till_in_soil = ["labile_inorganic_phosphorus_content",
-                                 "active_inorganic_phosphorus_content",
-                                 "stable_inorganic_phosphorus_content",
-                                 "nitrate_content",
-                                 "ammonium_content",
-                                 "active_organic_nitrogen_content",
-                                 "stable_organic_nitrogen_content",
-                                 "fresh_organic_nitrogen_content",
-                                 "metabolic_litter_amount",
-                                 "structural_litter_amount",
-                                 "active_carbon_amount",
-                                 "slow_carbon_amount",
-                                 "passive_carbon_amount"]
+        pools_to_till_in_soil = [
+            "labile_inorganic_phosphorus_content",
+            "active_inorganic_phosphorus_content",
+            "stable_inorganic_phosphorus_content",
+            "nitrate_content",
+            "ammonium_content",
+            "active_organic_nitrogen_content",
+            "stable_organic_nitrogen_content",
+            "fresh_organic_nitrogen_content",
+            "metabolic_litter_amount",
+            "structural_litter_amount",
+            "active_carbon_amount",
+            "slow_carbon_amount",
+            "passive_carbon_amount",
+        ]
         pools_to_offset_top_layer = ["passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
             offset_top_layer = pool in pools_to_offset_top_layer
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction, offset_top_layer)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
-    def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float,
-                         offset_top_layer: bool = False) -> None:
+    def _mix_soil_layers(
+        self,
+        pool_name: str,
+        tillage_depth: float,
+        mixing_fraction: float,
+        offset_top_layer: bool = False,
+    ) -> None:
         """
         Redistributes matter from the specified pool throughout the soil profile.
 
@@ -212,8 +234,9 @@ class TillageApplication:
             setattr(layer, pool_name, new_pool_amount)
 
     @staticmethod
-    def _remove_amount_incorporated(data_container: object, attribute_name: str,
-                                    incorporation_fraction: float) -> float:
+    def _remove_amount_incorporated(
+        data_container: object, attribute_name: str, incorporation_fraction: float
+    ) -> float:
         """
         Calculates amount incorporated from soil surface pools into the soil profile.
 
@@ -249,8 +272,10 @@ class TillageApplication:
         """
         data_container_is_correct_type = isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
         if not data_container_is_correct_type:
-            raise TypeError(f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
-                            f"'{type(data_container)}'.")
+            raise TypeError(
+                f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
+                f"'{type(data_container)}'."
+            )
 
         amount_in_pool = getattr(data_container, attribute_name)
         amount_removed = amount_in_pool * incorporation_fraction
@@ -258,8 +283,14 @@ class TillageApplication:
         setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
 
-    def _record_tillage(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float,
-                        year: int, day: int) -> None:
+    def _record_tillage(
+        self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        year: int,
+        day: int,
+    ) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
@@ -277,8 +308,17 @@ class TillageApplication:
             Julian day on which this harvest occurred.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._record_tillage.__name__,
-                    "suffix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size}
-        value = {"tillage_depth": tillage_depth, "incorporation_fraction": incorporation_fraction,
-                 "mixing_fraction": mixing_fraction, "year": year, "day": day}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_tillage.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "field_size": self.field_data.field_size,
+        }
+        value = {
+            "tillage_depth": tillage_depth,
+            "incorporation_fraction": incorporation_fraction,
+            "mixing_fraction": mixing_fraction,
+            "year": year,
+            "day": day,
+        }
         om.add_variable("tillage_record", value, info_map)
