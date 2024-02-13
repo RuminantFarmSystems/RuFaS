@@ -23,6 +23,7 @@ class RootDevelopment:
         like root depth, growth rates, and environmental conditions affecting root expansion.
 
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         # data reference
         self.data = crop_data or CropData()  # defaults if not given
@@ -43,7 +44,9 @@ class RootDevelopment:
         if self.data.is_perennial:
             self.data.root_depth = self.data.max_root_depth  # Note: assumption of SWAT
         else:
-            self.data.root_depth = self._determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)
+            self.data.root_depth = self._determine_root_depth(
+                self.data.max_root_depth, self.data.heat_fraction
+            )
 
     @staticmethod
     def _determine_root_fraction(heat_fraction: float) -> float:

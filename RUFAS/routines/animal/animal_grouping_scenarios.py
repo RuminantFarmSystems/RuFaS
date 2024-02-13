@@ -17,6 +17,7 @@ class AnimalGroupingScenario(Enum):
 
 
     """
+
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
     # GitHub Issue #1205
 
@@ -24,14 +25,18 @@ class AnimalGroupingScenario(Enum):
         AnimalCombination.CALF: [AnimalType.CALF],
         AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
         AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
     CALF__GROWING_AND_CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
-        AnimalCombination.GROWING_AND_CLOSE_UP: [AnimalType.HEIFER_I, AnimalType.HEIFER_II,
-                                                 AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.GROWING_AND_CLOSE_UP: [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ],
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
     def __init__(self, value: Dict[AnimalCombination, List[str]]):
@@ -47,10 +52,14 @@ class AnimalGroupingScenario(Enum):
 
         self._value_ = value
 
-        self._animal_combination_by_animal_type: Dict[AnimalType, AnimalCombination] = {}
+        self._animal_combination_by_animal_type: Dict[
+            AnimalType, AnimalCombination
+        ] = {}
         for animal_combination, animal_types in self.value.items():
             for animal_type in animal_types:
-                self._animal_combination_by_animal_type[animal_type] = animal_combination
+                self._animal_combination_by_animal_type[
+                    animal_type
+                ] = animal_combination
 
     # Currently, we don't have subtypes for calves, heiferIs, heiferIIs, and heiferIIIs.
     def _get_calf_type(self, calf: Calf) -> AnimalType:
@@ -142,15 +151,18 @@ class AnimalGroupingScenario(Enum):
         """
 
         cow_subtype_by_scenario = {
-            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
-            else AnimalType.DRY_COW,
-
-            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
-            else AnimalType.DRY_COW,
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
         }
         return cow_subtype_by_scenario[self]
 
-    def get_animal_type(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalType:
+    def get_animal_type(
+        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+    ) -> AnimalType:
         """
         Get the animal type of the given animal.
 
@@ -171,10 +183,14 @@ class AnimalGroupingScenario(Enum):
             HeiferI: self._get_heiferI_type,
             HeiferII: self._get_heiferII_type,
             HeiferIII: self._get_heiferIII_type,
-            Cow: self._get_cow_type
-        }[type(animal)](animal)  # type: ignore
+            Cow: self._get_cow_type,
+        }[type(animal)](
+            animal
+        )  # type: ignore
 
-    def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalCombination:
+    def find_animal_combination(
+        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+    ) -> AnimalCombination:
         """
         Find the animal combination that the given animal belongs to.
 

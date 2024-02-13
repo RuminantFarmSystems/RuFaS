@@ -2,9 +2,14 @@ from dataclasses import dataclass, field, InitVar
 from typing import Optional
 from math import log, exp
 
-from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS, \
-    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+from RUFAS.routines.field.crop_and_soil_constants import (
+    MEGAGRAMS_TO_KILOGRAMS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
+    KILOGRAMS_TO_MILLIGRAMS,
+    MILLIGRAMS_TO_KILOGRAMS,
+    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
+)
 
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
@@ -332,14 +337,24 @@ class LayerData:
         SWAT Theoretical documentation eqn. 3:2.1.1, 2 and last paragraph on page 208 (for phosphorus initialization)
 
         """
-        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
-            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
-                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
+        if (
+            self.top_depth < 0
+            or self.bottom_depth <= 0
+            or self.top_depth >= self.bottom_depth
+        ):
+            raise ValueError(
+                f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'."
+            )
 
         if field_size is None:
-            raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
+            raise TypeError(
+                "'field_size' attribute is NoneType, must be given value when LayerData is initialized."
+            )
         elif field_size <= 0:
-            raise ValueError(f"Expected field_size to be greater than 0, received '{field_size}'.")
+            raise ValueError(
+                f"Expected field_size to be greater than 0, received '{field_size}'."
+            )
 
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
@@ -347,21 +362,49 @@ class LayerData:
         if self.initial_labile_inorganic_phosphorus_concentration is None:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
-        self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
-            self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
-            self.percent_organic_carbon_content)
+        self.mean_phosphorus_sorption_parameter = (
+            self.calculate_phosphorus_sorption_parameter(
+                self.percent_clay_content,
+                self.initial_labile_inorganic_phosphorus_concentration,
+                self.percent_organic_carbon_content,
+            )
+        )
 
-        initial_active_inorganic_phosphorus_concentration = \
-            self.initial_labile_inorganic_phosphorus_concentration * \
-            ((1 - self.mean_phosphorus_sorption_parameter) / self.mean_phosphorus_sorption_parameter)
-        initial_stable_inorganic_phosphorus_concentration = 4 * initial_active_inorganic_phosphorus_concentration
+        initial_active_inorganic_phosphorus_concentration = (
+            self.initial_labile_inorganic_phosphorus_concentration
+            * (
+                (1 - self.mean_phosphorus_sorption_parameter)
+                / self.mean_phosphorus_sorption_parameter
+            )
+        )
+        initial_stable_inorganic_phosphorus_concentration = (
+            4 * initial_active_inorganic_phosphorus_concentration
+        )
 
-        self.labile_inorganic_phosphorus_content = self.determine_soil_nutrient_area_density(
-            self.initial_labile_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
-        self.active_inorganic_phosphorus_content = self.determine_soil_nutrient_area_density(
-            initial_active_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
-        self.stable_inorganic_phosphorus_content = self.determine_soil_nutrient_area_density(
-            initial_stable_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
+        self.labile_inorganic_phosphorus_content = (
+            self.determine_soil_nutrient_area_density(
+                self.initial_labile_inorganic_phosphorus_concentration,
+                self.bulk_density,
+                self.layer_thickness,
+                field_size,
+            )
+        )
+        self.active_inorganic_phosphorus_content = (
+            self.determine_soil_nutrient_area_density(
+                initial_active_inorganic_phosphorus_concentration,
+                self.bulk_density,
+                self.layer_thickness,
+                field_size,
+            )
+        )
+        self.stable_inorganic_phosphorus_content = (
+            self.determine_soil_nutrient_area_density(
+                initial_stable_inorganic_phosphorus_concentration,
+                self.bulk_density,
+                self.layer_thickness,
+                field_size,
+            )
+        )
         # --------------------------------------------------------------------------------------------------------------
 
         self._initialize_nitrogen_pools(field_size, residue)
@@ -391,31 +434,57 @@ class LayerData:
         """
         if self.initial_soil_nitrate_concentration is None:
             # SWAT eqn. 3:1.1.1
-            self.initial_soil_nitrate_concentration = 7 * exp(-1 * self.depth_of_layer_center / 1000)
+            self.initial_soil_nitrate_concentration = 7 * exp(
+                -1 * self.depth_of_layer_center / 1000
+            )
 
-        self.nitrate_content = self.determine_soil_nutrient_area_density(self.initial_soil_nitrate_concentration,
-                                                                         self.bulk_density, self.layer_thickness,
-                                                                         field_size)
+        self.nitrate_content = self.determine_soil_nutrient_area_density(
+            self.initial_soil_nitrate_concentration,
+            self.bulk_density,
+            self.layer_thickness,
+            field_size,
+        )
 
         if self.initial_soil_ammonium_concentration is None:
             self.initial_soil_ammonium_concentration = 0.0
 
-        self.ammonium_content = self.determine_soil_nutrient_area_density(self.initial_soil_ammonium_concentration,
-                                                                          self.bulk_density, self.layer_thickness,
-                                                                          field_size)
+        self.ammonium_content = self.determine_soil_nutrient_area_density(
+            self.initial_soil_ammonium_concentration,
+            self.bulk_density,
+            self.layer_thickness,
+            field_size,
+        )
 
         # SWAT eqn. 3:1.1.2
-        humic_organic_nitrogen_concentration = (10 ** 4) * (self.percent_organic_carbon_content / 14)
+        humic_organic_nitrogen_concentration = (10**4) * (
+            self.percent_organic_carbon_content / 14
+        )
 
-        initial_active_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
-            FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL         # SWAT eqn. 3:1.1.3
-        initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
-            (1 - FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL)    # SWAT eqn. 3:1.1.4
+        initial_active_organic_nitrogen_concentration = (
+            humic_organic_nitrogen_concentration
+            * FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+        )  # SWAT eqn. 3:1.1.3
+        initial_stable_organic_nitrogen_concentration = (
+            humic_organic_nitrogen_concentration
+            * (1 - FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL)
+        )  # SWAT eqn. 3:1.1.4
 
-        self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
-            initial_active_organic_nitrogen_concentration, self.bulk_density, self.layer_thickness, field_size)
-        self.stable_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
-            initial_stable_organic_nitrogen_concentration, self.bulk_density, self.layer_thickness, field_size)
+        self.active_organic_nitrogen_content = (
+            self.determine_soil_nutrient_area_density(
+                initial_active_organic_nitrogen_concentration,
+                self.bulk_density,
+                self.layer_thickness,
+                field_size,
+            )
+        )
+        self.stable_organic_nitrogen_content = (
+            self.determine_soil_nutrient_area_density(
+                initial_stable_organic_nitrogen_concentration,
+                self.bulk_density,
+                self.layer_thickness,
+                field_size,
+            )
+        )
 
         if self.top_depth == 0:
             self.fresh_organic_nitrogen_content = 0.0015 * residue  # SWAT eqn. 3:1.1.5
@@ -439,10 +508,17 @@ class LayerData:
         practices prior to initialization.
 
         """
-        soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-            CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        self.total_soil_carbon_amount = (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
+        soil_volume_in_cubic_meters = (
+            self.layer_thickness
+            * (field_size * HECTARES_TO_SQUARE_MILLIMETERS)
+            * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        )
+        soil_mass_in_kg = (
+            self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        )
+        self.total_soil_carbon_amount = (
+            soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size
+        )
 
         if self.top_depth == 0:
             self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
@@ -457,7 +533,9 @@ class LayerData:
             self.structural_litter_amount = 0.0
             self.metabolic_litter_amount = 0.0
 
-    def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+    def add_to_labile_phosphorus(
+        self, phosphorus_to_add: float, field_size: float
+    ) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
             soil layer.
 
@@ -470,9 +548,12 @@ class LayerData:
 
         """
         self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
-            self.labile_inorganic_phosphorus_content, phosphorus_to_add, field_size)
+            self.labile_inorganic_phosphorus_content, phosphorus_to_add, field_size
+        )
 
-    def add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+    def add_to_active_phosphorus(
+        self, phosphorus_to_add: float, field_size: float
+    ) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
             soil layer.
 
@@ -485,10 +566,13 @@ class LayerData:
 
         """
         self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
-            self.active_inorganic_phosphorus_content, phosphorus_to_add, field_size)
+            self.active_inorganic_phosphorus_content, phosphorus_to_add, field_size
+        )
 
     @staticmethod
-    def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
+    def _add_phosphorus_to_pool(
+        pool_to_add_to: float, phosphorus_to_add: float, field_size: float
+    ) -> float:
         """This is a generic method to be used by wrapper functions to add phosphorus to any of the phosphorus pools.
 
         Parameters
@@ -517,8 +601,11 @@ class LayerData:
         return phosphorus_pool_amount / field_size
 
     @staticmethod
-    def calculate_phosphorus_sorption_parameter(percent_clay_content: float, labile_inorganic_phosphorus: float,
-                                                percent_organic_carbon_content: float) -> float:
+    def calculate_phosphorus_sorption_parameter(
+        percent_clay_content: float,
+        labile_inorganic_phosphorus: float,
+        percent_organic_carbon_content: float,
+    ) -> float:
         """Calculates the phosphorus sorption coefficient based on the current soil conditions.
 
         Parameters
@@ -546,15 +633,19 @@ class LayerData:
         is used in the SurPhos code (see pminrl.f, line 49).
 
         """
-        adjusted_clay_content = max(10 ** -8, percent_clay_content)
+        adjusted_clay_content = max(10**-8, percent_clay_content)
         first_term = -0.045 * log(adjusted_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
         third_term = 0.035 * percent_organic_carbon_content
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
-    def determine_soil_nutrient_concentration(nutrient_content: float, bulk_density: float,
-                                              layer_thickness: float, field_size: float) -> float:
+    def determine_soil_nutrient_concentration(
+        nutrient_content: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
+    ) -> float:
         """Calculates the concentration of nutrients in a soil layer.
 
         Parameters
@@ -574,15 +665,26 @@ class LayerData:
             The concentration of nutrients in the soil layer (mg / kg soil)
 
         """
-        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-            CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = nutrient_content * field_size * KILOGRAMS_TO_MILLIGRAMS
+        soil_volume_in_cubic_meters = (
+            layer_thickness
+            * (field_size * HECTARES_TO_SQUARE_MILLIMETERS)
+            * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        )
+        soil_mass_in_kg = (
+            bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        )
+        soil_phosphorus_mass_in_mg = (
+            nutrient_content * field_size * KILOGRAMS_TO_MILLIGRAMS
+        )
         return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
-    def determine_soil_nutrient_area_density(nutrient_concentration: float, bulk_density: float,
-                                             layer_thickness: float, field_size: float) -> float:
+    def determine_soil_nutrient_area_density(
+        nutrient_concentration: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
+    ) -> float:
         """Converts a mass per mass concentration of nutrients in the soil to a mass per area concentration.
 
         Parameters
@@ -602,10 +704,17 @@ class LayerData:
             The area concentration of nutrients in the soil layer (kg / ha)
 
         """
-        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-            CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
+        soil_volume_in_cubic_meters = (
+            layer_thickness
+            * (field_size * HECTARES_TO_SQUARE_MILLIMETERS)
+            * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        )
+        soil_mass_in_kg = (
+            bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        )
+        total_nutrient_mass_in_kg = (
+            nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
+        )
         return total_nutrient_mass_in_kg / field_size
 
     @property
@@ -621,7 +730,9 @@ class LayerData:
         This factor is lower bounded at 0.1
 
         """
-        second_term = self.temperature / (self.temperature + exp(9.93 - 0.312 * self.temperature))
+        second_term = self.temperature / (
+            self.temperature + exp(9.93 - 0.312 * self.temperature)
+        )
         factor = 0.9 * second_term + 0.1
         return max(0.1, factor)
 
@@ -700,10 +811,12 @@ class LayerData:
         # pseudocode_soil S.4.B.1
         if self.water_content <= self.field_capacity_content:
             return (self.water_content - self.wilting_point_content) / (
-                    self.field_capacity_content - self.wilting_point_content)
+                self.field_capacity_content - self.wilting_point_content
+            )
         else:
             return (self.saturation_content - self.water_content) / (
-                    self.saturation_content - self.field_capacity_content)
+                self.saturation_content - self.field_capacity_content
+            )
 
     @property
     def silt_clay_content(self):
@@ -734,7 +847,11 @@ class LayerData:
             Total amount of CO2 emitted from carbon decomposition in this layer. (kg/ha).
 
         """
-        return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
+        return (
+            self.active_carbon_to_slow_loss
+            + self.slow_carbon_co2_lost_amount
+            + self.passive_carbon_co2_lost_amount
+        )
 
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0

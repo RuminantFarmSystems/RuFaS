@@ -10,7 +10,9 @@ This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1
 
 
 class SoilErosion:
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -24,8 +26,13 @@ class SoilErosion:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float,
-              rainfall: float) -> None:
+    def erode(
+        self,
+        field_size: float,
+        minimum_cover_management_factor: float,
+        surface_residue: float,
+        rainfall: float,
+    ) -> None:
         """
         Main routine for SoilErosion. Runs necessary soil erosion methods and updates attributes.
 
@@ -46,28 +53,48 @@ class SoilErosion:
         how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into the soil,
         and the geometry of the field.
         """
-        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
-                                                                     self.data.soil_layers[0].percent_silt_content,
-                                                                     self.data.soil_layers[0].percent_clay_content,
-                                                                     self.data.soil_layers[0]
-                                                                     .percent_organic_carbon_content)
-        cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
+        erodibility_factor = self._determine_soil_erodibility_factor(
+            self.data.soil_layers[0].percent_sand_content,
+            self.data.soil_layers[0].percent_silt_content,
+            self.data.soil_layers[0].percent_clay_content,
+            self.data.soil_layers[0].percent_organic_carbon_content,
+        )
+        cover_factor = self._determine_cover_management_factor(
+            minimum_cover_management_factor, surface_residue
+        )
         support_practice_factor = self._determine_support_practice_factor()
-        topographic_factor = self._determine_topographic_factor(self.data.slope_length,
-                                                                self.data.average_subbasin_slope)
-        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
+        topographic_factor = self._determine_topographic_factor(
+            self.data.slope_length, self.data.average_subbasin_slope
+        )
+        fragment_factor = self._determine_coarse_fragment_factor(
+            self.data.soil_layers[0].percent_rock_content
+        )
 
-        peak_runoff_rate = self._determine_peak_runoff_rate(self.data.accumulated_runoff, rainfall,
-                                                            self.data.slope_length, self.data.manning,
-                                                            self.data.average_subbasin_slope, field_size)
+        peak_runoff_rate = self._determine_peak_runoff_rate(
+            self.data.accumulated_runoff,
+            rainfall,
+            self.data.slope_length,
+            self.data.manning,
+            self.data.average_subbasin_slope,
+            field_size,
+        )
 
         if self.data.accumulated_runoff is None:
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
-        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, peak_runoff_rate, field_size,
-                                                        erodibility_factor, cover_factor, support_practice_factor,
-                                                        topographic_factor, fragment_factor)
-        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield, self.data.snow_content)
+        sediment_yield = self._determine_sediment_yield(
+            self.data.surface_runoff_volume,
+            peak_runoff_rate,
+            field_size,
+            erodibility_factor,
+            cover_factor,
+            support_practice_factor,
+            topographic_factor,
+            fragment_factor,
+        )
+        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(
+            sediment_yield, self.data.snow_content
+        )
 
         # Update annual totals
         self.data.annual_eroded_sediment_total += self.data.eroded_sediment
@@ -75,7 +102,9 @@ class SoilErosion:
 
     # --- Static methods ---
     @staticmethod
-    def _determine_coarse_sand_factor(percent_sand_content: float, percent_silt_content: float) -> float:
+    def _determine_coarse_sand_factor(
+        percent_sand_content: float, percent_silt_content: float
+    ) -> float:
         """
         Calculates the coarseness factor of soil erodibility.
 
@@ -100,10 +129,14 @@ class SoilErosion:
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.6
         """
-        return 0.2 + 0.3 * exp((-0.256) * percent_sand_content * (1 - (percent_silt_content / 100)))
+        return 0.2 + 0.3 * exp(
+            (-0.256) * percent_sand_content * (1 - (percent_silt_content / 100))
+        )
 
     @staticmethod
-    def _determine_clay_silt_ratio_factor(percent_silt_content: float, percent_clay_content: float) -> float:
+    def _determine_clay_silt_ratio_factor(
+        percent_silt_content: float, percent_clay_content: float
+    ) -> float:
         """
         Calculates the component factor of erodibility that is based on the clay-silt ratio.
 
@@ -129,8 +162,12 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.7
         """
         if percent_silt_content == 0 and percent_clay_content == 0:
-            raise ValueError("Cannot have percent silt content and percent clay content both be 0")
-        return (percent_silt_content / (percent_clay_content + percent_silt_content)) ** 0.3
+            raise ValueError(
+                "Cannot have percent silt content and percent clay content both be 0"
+            )
+        return (
+            percent_silt_content / (percent_clay_content + percent_silt_content)
+        ) ** 0.3
 
     @staticmethod
     def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
@@ -157,8 +194,10 @@ class SoilErosion:
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.8
         """
-        return 1 - ((0.25 * percent_organic_carbon) / (percent_organic_carbon +
-                                                       exp(3.72 - (2.95 * percent_organic_carbon))))
+        return 1 - (
+            (0.25 * percent_organic_carbon)
+            / (percent_organic_carbon + exp(3.72 - (2.95 * percent_organic_carbon)))
+        )
 
     @staticmethod
     def _determine_high_sand_factor(percent_sand_content: float) -> float:
@@ -184,12 +223,18 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.9
         """
         not_sand_fraction = 1 - (percent_sand_content / 100)
-        return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 *
-                                                                         not_sand_fraction)))
+        return 1 - (
+            (0.7 * not_sand_fraction)
+            / (not_sand_fraction + exp(-5.51 + 22.9 * not_sand_fraction))
+        )
 
     @staticmethod
-    def _determine_soil_erodibility_factor(percent_sand_content: float, percent_silt_content: float,
-                                           percent_clay_content: float, percent_organic_carbon_content: float) -> float:
+    def _determine_soil_erodibility_factor(
+        percent_sand_content: float,
+        percent_silt_content: float,
+        percent_clay_content: float,
+        percent_organic_carbon_content: float,
+    ) -> float:
         """
         Calculate the soil erodibility factor for use in calculating the sediment yield on a given day.
 
@@ -220,14 +265,27 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.5
         """
 
-        coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(percent_sand_content, percent_silt_content)
-        clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(percent_silt_content, percent_clay_content)
-        carbon_content_factor = SoilErosion._determine_carbon_content_factor(percent_organic_carbon_content)
+        coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(
+            percent_sand_content, percent_silt_content
+        )
+        clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(
+            percent_silt_content, percent_clay_content
+        )
+        carbon_content_factor = SoilErosion._determine_carbon_content_factor(
+            percent_organic_carbon_content
+        )
         high_sand_factor = SoilErosion._determine_high_sand_factor(percent_sand_content)
-        return coarse_sand_factor * clay_silt_factor * carbon_content_factor * high_sand_factor
+        return (
+            coarse_sand_factor
+            * clay_silt_factor
+            * carbon_content_factor
+            * high_sand_factor
+        )
 
     @staticmethod
-    def _determine_cover_management_factor(minimum_cover_management_factor: float, surface_residue: float) -> float:
+    def _determine_cover_management_factor(
+        minimum_cover_management_factor: float, surface_residue: float
+    ) -> float:
         """
         Calculate cover and management factor for use in calculating sediment yield.
 
@@ -254,16 +312,21 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.10
         """
         if minimum_cover_management_factor <= 0:
-            raise ValueError("Minimum cover and management cannot be less than or equal to 0")
+            raise ValueError(
+                "Minimum cover and management cannot be less than or equal to 0"
+            )
         first_multiplicative_term = log(0.8) - log(minimum_cover_management_factor)
         second_multiplicative_term = exp(-0.00115 * surface_residue)
         second_additive_term = log(minimum_cover_management_factor)
-        return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
+        return exp(
+            first_multiplicative_term * second_multiplicative_term
+            + second_additive_term
+        )
 
     @staticmethod
     def _determine_support_practice_factor() -> float:
         """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
-            stripcropping, and/or terracing)"""
+        stripcropping, and/or terracing)"""
         return 1
 
     @staticmethod
@@ -288,7 +351,9 @@ class SoilErosion:
         return 0.6 * (1 - exp(-35.835 * average_subbasin_slope))
 
     @staticmethod
-    def _determine_topographic_factor(slope_length: float, average_subbasin_slope: float) -> float:
+    def _determine_topographic_factor(
+        slope_length: float, average_subbasin_slope: float
+    ) -> float:
         """
         Calculate the topographic factor, which represents the expected ratio of soil loss per unit area from a field
         slope to that from a 22.1 m length of uniform 9% slope under otherwise identical conditions.
@@ -322,9 +387,15 @@ class SoilErosion:
 
         """
         slope_angle_in_rad = atan(average_subbasin_slope)
-        exponential_term = SoilErosion._determine_exponential_term(average_subbasin_slope)
+        exponential_term = SoilErosion._determine_exponential_term(
+            average_subbasin_slope
+        )
         first_term = (slope_length / 22.1) ** exponential_term
-        second_term = 65.41 * (sin(slope_angle_in_rad) ** 2) + 4.56 * sin(slope_angle_in_rad) + 0.065
+        second_term = (
+            65.41 * (sin(slope_angle_in_rad) ** 2)
+            + 4.56 * sin(slope_angle_in_rad)
+            + 0.065
+        )
         return first_term * second_term
 
     @staticmethod
@@ -354,8 +425,14 @@ class SoilErosion:
         return exp(-0.053 * percent_rock_content)
 
     @staticmethod
-    def _determine_peak_runoff_rate(surface_runoff: float, rainfall: float, slope_length: float, manning: float,
-                                    average_subbasin_slope: float, field_size: float) -> float:
+    def _determine_peak_runoff_rate(
+        surface_runoff: float,
+        rainfall: float,
+        slope_length: float,
+        manning: float,
+        average_subbasin_slope: float,
+        field_size: float,
+    ) -> float:
         """
         Determines the maximum runoff flow rate that occurs with a given rainfall event.
 
@@ -391,9 +468,12 @@ class SoilErosion:
         """
         if rainfall == 0.0:
             return 0.0
-        runoff_coefficient = SoilErosion._determine_runoff_coefficient(surface_runoff, rainfall)
-        rainfall_intensity = SoilErosion._determine_rainfall_intensity(rainfall, slope_length, manning,
-                                                                       average_subbasin_slope)
+        runoff_coefficient = SoilErosion._determine_runoff_coefficient(
+            surface_runoff, rainfall
+        )
+        rainfall_intensity = SoilErosion._determine_rainfall_intensity(
+            rainfall, slope_length, manning, average_subbasin_slope
+        )
         field_size_in_square_km = field_size * HECTARES_TO_SQUARE_KILOMETERS
         return (runoff_coefficient * rainfall_intensity * field_size_in_square_km) / 3.6
 
@@ -422,8 +502,12 @@ class SoilErosion:
         return surface_runoff / rainfall
 
     @staticmethod
-    def _determine_rainfall_intensity(rainfall: float, slope_length: float, manning: float,
-                                      average_subbasin_slope: float) -> float:
+    def _determine_rainfall_intensity(
+        rainfall: float,
+        slope_length: float,
+        manning: float,
+        average_subbasin_slope: float,
+    ) -> float:
         """
         Determines the average rainfall rate during the time of concentration.
 
@@ -448,17 +532,26 @@ class SoilErosion:
         SWAT Theoretical documentation equation 2:1.3.16
 
         """
-        time_of_concentration = SoilErosion._determine_time_of_concentration(slope_length, manning,
-                                                                             average_subbasin_slope)
-        half_hour_rainfall_fraction = SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
-        fraction_of_rain_during_time_of_concentration = \
-            SoilErosion._determine_fraction_rainfall_during_time_of_concentration(time_of_concentration,
-                                                                                  half_hour_rainfall_fraction)
-        rain_during_time_of_concentration = fraction_of_rain_during_time_of_concentration * rainfall
+        time_of_concentration = SoilErosion._determine_time_of_concentration(
+            slope_length, manning, average_subbasin_slope
+        )
+        half_hour_rainfall_fraction = (
+            SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
+        )
+        fraction_of_rain_during_time_of_concentration = (
+            SoilErosion._determine_fraction_rainfall_during_time_of_concentration(
+                time_of_concentration, half_hour_rainfall_fraction
+            )
+        )
+        rain_during_time_of_concentration = (
+            fraction_of_rain_during_time_of_concentration * rainfall
+        )
         return rain_during_time_of_concentration / time_of_concentration
 
     @staticmethod
-    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
+    def _determine_time_of_concentration(
+        slope_length: float, manning: float, average_subbasin_slope
+    ) -> float:
         """
         Calculates the time of concentration for the subbasin.
 
@@ -489,10 +582,12 @@ class SoilErosion:
         concentration. This equation in SWAT also assumes an average flow rate of 6.35 mm per hour.
 
         """
-        adjusted_slope_length = slope_length ** 0.6
-        adjusted_manning = manning ** 0.6
-        adjusted_average_slope_length = average_subbasin_slope ** 0.3
-        return (adjusted_slope_length * adjusted_manning) / (18 * adjusted_average_slope_length)
+        adjusted_slope_length = slope_length**0.6
+        adjusted_manning = manning**0.6
+        adjusted_average_slope_length = average_subbasin_slope**0.3
+        return (adjusted_slope_length * adjusted_manning) / (
+            18 * adjusted_average_slope_length
+        )
 
     @staticmethod
     def _determine_half_hour_rainfall_fraction(rainfall: float) -> float:
@@ -526,8 +621,9 @@ class SoilErosion:
         return (lower_limit + upper_limit) / 2
 
     @staticmethod
-    def _determine_fraction_rainfall_during_time_of_concentration(time_of_concentration: float,
-                                                                  half_hour_rainfall_fraction: float) -> float:
+    def _determine_fraction_rainfall_during_time_of_concentration(
+        time_of_concentration: float, half_hour_rainfall_fraction: float
+    ) -> float:
         """
         Calculates the fraction of rainfall that occurs over the time of concentration.
 
@@ -552,10 +648,16 @@ class SoilErosion:
         return 1 - exp(product)
 
     @staticmethod
-    def _determine_sediment_yield(surface_area_runoff: float, peak_runoff_rate: float, field_area: float,
-                                  soil_erodibility_factor: float, cover_management_factor: float,
-                                  support_practice_factor: float, topographic_factor: float,
-                                  coarse_fragment_factor: float) -> float:
+    def _determine_sediment_yield(
+        surface_area_runoff: float,
+        peak_runoff_rate: float,
+        field_area: float,
+        soil_erodibility_factor: float,
+        cover_management_factor: float,
+        support_practice_factor: float,
+        topographic_factor: float,
+        coarse_fragment_factor: float,
+    ) -> float:
         """
         Calculate the sediment yield for a given day.
 
@@ -587,12 +689,23 @@ class SoilErosion:
             Sediment yield on a given day (metric tons).
 
         """
-        term_with_exponent = (surface_area_runoff * peak_runoff_rate * field_area) ** 0.56
-        return (11.8 * term_with_exponent * soil_erodibility_factor * cover_management_factor * support_practice_factor
-                * topographic_factor * coarse_fragment_factor)
+        term_with_exponent = (
+            surface_area_runoff * peak_runoff_rate * field_area
+        ) ** 0.56
+        return (
+            11.8
+            * term_with_exponent
+            * soil_erodibility_factor
+            * cover_management_factor
+            * support_practice_factor
+            * topographic_factor
+            * coarse_fragment_factor
+        )
 
     @staticmethod
-    def _determine_adjusted_sediment_yield(sediment_yield: float, snow_water_content: float) -> float:
+    def _determine_adjusted_sediment_yield(
+        sediment_yield: float, snow_water_content: float
+    ) -> float:
         """
         Adjust the sediment yield based on the amount of snow cover.
 

@@ -3,6 +3,7 @@ This module will contain the classes and methods needed to apply global sensitiv
 
 The workhorse of this module is the SALib python package (Herman et al. 2023): https://salib.readthedocs.io/en/latest/
 """
+
 from __future__ import annotations
 
 import os
@@ -29,10 +30,12 @@ class SupportedSensitivityMethods(Enum):
     MORRIS : str
         `Morris' method <https://salib.readthedocs.io/en/latest/api/SALib.analyze.html#module-SALib.analyze.morris>`_
     """
+
     SOBOL = "sobol"
     FAST = "fast"
     MORRIS = "morris"
     # TODO: add fractional factorial method
+
 
 # TODO: for some reason, the docstring formatting in this and Example-animal_management_SA-wrapper.py isn't rendering
 #   properly (e.g., equations) in the Pycharm preview. They may need to be tweaked.
@@ -74,9 +77,20 @@ class SensitivityAnalysis:
     `SALib <https://salib.readthedocs.io/en/latest/index.html>`_ package. This class is primarily a wrapper for
     functionality found in `SALib`.
     """
-    def __init__(self, fun: Callable, pars: List[str], bounds: List[Tuple[float, float]], method: str = "fs",
-                 groups: Optional[List[str]] = None, outputs: Optional[List[str]] = None, sample_n: int = 2**10,
-                 n_cores: int = 1, *args, **kwargs):
+
+    def __init__(
+        self,
+        fun: Callable,
+        pars: List[str],
+        bounds: List[Tuple[float, float]],
+        method: str = "fs",
+        groups: Optional[List[str]] = None,
+        outputs: Optional[List[str]] = None,
+        sample_n: int = 2**10,
+        n_cores: int = 1,
+        *args,
+        **kwargs,
+    ):
         """Sets up the sensitivity analysis object
 
         This method first calls assigns attributes from the given arguments, after verifying them with `_check_inputs()`
@@ -129,7 +143,9 @@ class SensitivityAnalysis:
         self.objective_function: Callable = fun
         self.parameter_names: List[str] = pars
         self.parameter_bounds: List[Tuple[float, float]] = bounds
-        self.sensitivity_method: SupportedSensitivityMethods = SupportedSensitivityMethods(method)
+        self.sensitivity_method: SupportedSensitivityMethods = (
+            SupportedSensitivityMethods(method)
+        )
         self.parameter_groups: Optional[List[str]] = groups
         self.output_names: Optional[List[str]] = outputs
         self.sample_n: int = sample_n
@@ -140,9 +156,18 @@ class SensitivityAnalysis:
         self.problem = self.define_problem()
 
     @staticmethod
-    def make_and_run(fun: Callable, pars: List[str], bounds: List[Tuple[float, float]], method: str = "fs",
-                     groups: Optional[List[str]] = None, outputs: Optional[List[str]] = None, sample_n: int = 2**10,
-                     n_cores: int = 1, *args, **kwargs) -> SensitivityAnalysis:
+    def make_and_run(
+        fun: Callable,
+        pars: List[str],
+        bounds: List[Tuple[float, float]],
+        method: str = "fs",
+        groups: Optional[List[str]] = None,
+        outputs: Optional[List[str]] = None,
+        sample_n: int = 2**10,
+        n_cores: int = 1,
+        *args,
+        **kwargs,
+    ) -> SensitivityAnalysis:
         """Standalone method to create a SensitivityAnalysis instance and perform the actual SA in a single call
 
         Returns
@@ -154,7 +179,19 @@ class SensitivityAnalysis:
         -----
         Parameters are identical to those documented in the `__init__()` method.
         """
-        obj = SensitivityAnalysis(fun, pars, bounds, method, groups, outputs, sample_n, n_cores, int, *args, **kwargs)
+        obj = SensitivityAnalysis(
+            fun,
+            pars,
+            bounds,
+            method,
+            groups,
+            outputs,
+            sample_n,
+            n_cores,
+            int,
+            *args,
+            **kwargs,
+        )
         obj.perform_sensitivity_analysis()
         return obj
 
@@ -173,7 +210,11 @@ class SensitivityAnalysis:
         self.analyze_model()
 
     @staticmethod
-    def _check_inputs(pars: List[str], bounds: List[Tuple[float, float]], groups: Optional[List[str]] = None) -> None:
+    def _check_inputs(
+        pars: List[str],
+        bounds: List[Tuple[float, float]],
+        groups: Optional[List[str]] = None,
+    ) -> None:
         """Performs validation checks for class specification arguments
 
         Notes
@@ -193,8 +234,12 @@ class SensitivityAnalysis:
         ProblemSpec
             The problem on which SA will be conducted.
         """
-        return ProblemSpec(names=self.parameter_names, bounds=self.parameter_bounds, groups=self.parameter_groups,
-                           outputs=self.output_names)
+        return ProblemSpec(
+            names=self.parameter_names,
+            bounds=self.parameter_bounds,
+            groups=self.parameter_groups,
+            outputs=self.output_names,
+        )
 
     def sample_parameter_space(self, *args, **kwargs) -> None:
         """Samples the parameter space, based on the `sensitivity_method`.
@@ -211,11 +256,17 @@ class SensitivityAnalysis:
         This is a wrapper for `problem.sample()`. This method is entirely serialized and, therefore, ignores `n_cores`.
         """
         if self.sensitivity_method == SupportedSensitivityMethods.FAST:
-            self.problem.sample(func=fast_sampler.sample, N=self.sample_n, *args, **kwargs)
+            self.problem.sample(
+                func=fast_sampler.sample, N=self.sample_n, *args, **kwargs
+            )
         if self.sensitivity_method == SupportedSensitivityMethods.SOBOL:
-            self.problem.sample(func=sobol_sampler.sample, N=self.sample_n, *args, **kwargs)
+            self.problem.sample(
+                func=sobol_sampler.sample, N=self.sample_n, *args, **kwargs
+            )
         if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
-            self.problem.sample(func=morris_sampler.sample, N=self.sample_n, *args, **kwargs)
+            self.problem.sample(
+                func=morris_sampler.sample, N=self.sample_n, *args, **kwargs
+            )
 
         # add column names to the sample array (does not work, for some reason)
         # self.problem.samples.dtype = {
@@ -235,10 +286,18 @@ class SensitivityAnalysis:
         Running this method in parallel will always result in a warning, indicating that it is experimental.
         """
         if self.parallel_processors > 1:
-            self.problem.evaluate(func=self.objective_function, *self.additional_args, nprocs=self.parallel_processors,
-                                  **self.additional_kwargs)
+            self.problem.evaluate(
+                func=self.objective_function,
+                *self.additional_args,
+                nprocs=self.parallel_processors,
+                **self.additional_kwargs,
+            )
         else:
-            self.problem.evaluate(func=self.objective_function, *self.additional_args, **self.additional_kwargs)
+            self.problem.evaluate(
+                func=self.objective_function,
+                *self.additional_args,
+                **self.additional_kwargs,
+            )
 
     def analyze_model(self, *args, **kwargs) -> None:
         """Performs the actual sensitivity analysis, based on the `sensitivity_method`
@@ -266,11 +325,17 @@ class SensitivityAnalysis:
         #   analyze(..., nprocs=1) will try to run the parallel version.
         if self.parallel_processors > 1:
             if self.sensitivity_method == SupportedSensitivityMethods.FAST:
-                self.problem.analyze(fast.analyze, nprocs=self.parallel_processors, *args, **kwargs)
+                self.problem.analyze(
+                    fast.analyze, nprocs=self.parallel_processors, *args, **kwargs
+                )
             if self.sensitivity_method == SupportedSensitivityMethods.SOBOL:
-                self.problem.analyze(sobol.analyze, nprocs=self.parallel_processors, *args, **kwargs)
+                self.problem.analyze(
+                    sobol.analyze, nprocs=self.parallel_processors, *args, **kwargs
+                )
             if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
-                self.problem.analyze(morris.analyze, nprocs=self.parallel_processors, *args, **kwargs)
+                self.problem.analyze(
+                    morris.analyze, nprocs=self.parallel_processors, *args, **kwargs
+                )
         else:
             if self.sensitivity_method == SupportedSensitivityMethods.FAST:
                 self.problem.analyze(fast.analyze, *args, **kwargs)
@@ -283,7 +348,9 @@ class SensitivityAnalysis:
     #   of parameters, based on the results of FAST or MORRIS. I've chosen to exclude that from this PR due to
     #   complications that I have not yet worked out. Those compound methods may prove not to be all that useful.
 
-    def __str__(self):  # TODO: need to implement this - formatted output for printing the object
+    def __str__(
+        self,
+    ):  # TODO: need to implement this - formatted output for printing the object
         pass
 
     def __repr__(self):  # TODO: need to implement this too.
@@ -291,14 +358,21 @@ class SensitivityAnalysis:
 
 
 # ---- Examples ----
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Run Examples
     from SALib.test_functions import Ishigami, oakley2004
     from matplotlib import pyplot
 
     # -- Simple: Ishigami function --
-    sens = SensitivityAnalysis(Ishigami.evaluate, pars=["x1", "x2", "x3"], bounds=[(-numpy.pi, numpy.pi)]*3,
-                               groups=None, outputs=["response"], method="fast", n_cores=1)
+    sens = SensitivityAnalysis(
+        Ishigami.evaluate,
+        pars=["x1", "x2", "x3"],
+        bounds=[(-numpy.pi, numpy.pi)] * 3,
+        groups=None,
+        outputs=["response"],
+        method="fast",
+        n_cores=1,
+    )
     sens.define_problem()
     sens.sample_parameter_space()
     sens.evaluate_model()
@@ -312,21 +386,36 @@ if __name__ == '__main__':
         # expect_results[i] = Ishigami.evaluate(M)
 
     # -- More complex: Oakley 2004 --
-    weights = numpy.array([[1.0]*5 + [0.1]*5 + [0.01]*5,  # first 5 params have strong main effects, others are weaker
-                           [0.5]*5 + [0.05]*5 + [0.005]*5,
-                           [0.2]*5 + [0.02]*5 + [0.002]*5])
+    weights = numpy.array(
+        [
+            [1.0] * 5
+            + [0.1] * 5
+            + [0.01] * 5,  # first 5 params have strong main effects, others are weaker
+            [0.5] * 5 + [0.05] * 5 + [0.005] * 5,
+            [0.2] * 5 + [0.02] * 5 + [0.002] * 5,
+        ]
+    )
     correlation_matrix = numpy.zeros((15, 15))
     numpy.fill_diagonal(correlation_matrix, 1)
     numpy.random.seed(210)
     for i in range(15):
-        for j in range(i+1, 15, 1):
-            cor = numpy.random.rand().__round__(2)  # random correlations among parameters
+        for j in range(i + 1, 15, 1):
+            cor = numpy.random.rand().__round__(
+                2
+            )  # random correlations among parameters
             correlation_matrix[i, j] = cor
             correlation_matrix[j, i] = cor
 
-    sens2 = SensitivityAnalysis(fun=oakley2004.evaluate, pars=["x" + str(val) for val in range(1, 16, 1)],
-                                bounds=[(-1, 1)]*15, groups=None, outputs=["response"], method="sobol",
-                                A=weights, M=correlation_matrix)
+    sens2 = SensitivityAnalysis(
+        fun=oakley2004.evaluate,
+        pars=["x" + str(val) for val in range(1, 16, 1)],
+        bounds=[(-1, 1)] * 15,
+        groups=None,
+        outputs=["response"],
+        method="sobol",
+        A=weights,
+        M=correlation_matrix,
+    )
     sens2.perform_sensitivity_analysis()
     print(sens2.problem.analysis)
     sens2.problem.heatmap()

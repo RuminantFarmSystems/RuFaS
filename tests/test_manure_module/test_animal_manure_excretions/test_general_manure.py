@@ -1,7 +1,10 @@
 from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, calculate_phosphorus_excretion_values
+from RUFAS.routines.animal.manure.general_manure import (
+    AnimalManureExcretions,
+    calculate_phosphorus_excretion_values,
+)
 
 
 def test_animal_manure_excretion_typed_dict() -> None:
@@ -45,18 +48,29 @@ def test_animal_manure_excretion_typed_dict() -> None:
     # Assert
     assert animal_manure_excretions["urea"] == approx(urea)
     assert animal_manure_excretions["urine"] == approx(urine)
-    assert animal_manure_excretions["total_ammoniacal_nitrogen_concentration"] == \
-           approx(total_ammoniacal_nitrogen_concentration)
+    assert animal_manure_excretions[
+        "total_ammoniacal_nitrogen_concentration"
+    ] == approx(total_ammoniacal_nitrogen_concentration)
     assert animal_manure_excretions["urine_nitrogen"] == approx(urine_nitrogen)
     assert animal_manure_excretions["manure_nitrogen"] == approx(manure_nitrogen)
     assert animal_manure_excretions["manure_mass"] == approx(manure_mass)
     assert animal_manure_excretions["total_solids"] == approx(total_solids)
-    assert animal_manure_excretions["degradable_volatile_solids"] == approx(degradable_volatile_solids)
-    assert animal_manure_excretions["non_degradable_volatile_solids"] == approx(non_degradable_volatile_solids)
-    assert animal_manure_excretions["inorganic_phosphorus_fraction"] == approx(inorganic_phosphorus_fraction)
-    assert animal_manure_excretions["organic_phosphorus_fraction"] == approx(organic_phosphorus_fraction)
+    assert animal_manure_excretions["degradable_volatile_solids"] == approx(
+        degradable_volatile_solids
+    )
+    assert animal_manure_excretions["non_degradable_volatile_solids"] == approx(
+        non_degradable_volatile_solids
+    )
+    assert animal_manure_excretions["inorganic_phosphorus_fraction"] == approx(
+        inorganic_phosphorus_fraction
+    )
+    assert animal_manure_excretions["organic_phosphorus_fraction"] == approx(
+        organic_phosphorus_fraction
+    )
     assert animal_manure_excretions["phosphorus"] == approx(phosphorus)
-    assert animal_manure_excretions["phosphorus_fraction"] == approx(phosphorus_fraction)
+    assert animal_manure_excretions["phosphorus_fraction"] == approx(
+        phosphorus_fraction
+    )
     assert animal_manure_excretions["potassium"] == approx(potassium)
     assert animal_manure_excretions["methane"] == approx(methane)
 
@@ -69,15 +83,16 @@ def test_calculate_phosphorus_excretion_values() -> None:
     fecal_phosphorus = 3.0
     urine_phosphorus_required = 4.0
 
-    expected_manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
-            total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+    expected_manure_phosphorus_fraction = (
+        fecal_phosphorus + urine_phosphorus_required
+    ) / (total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
     expected_inorganic_phosphorus_fraction = 0.5 * expected_manure_phosphorus_fraction
     expected_organic_phosphorus_fraction = 0.05 * expected_manure_phosphorus_fraction
     expected_manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
     expected_total_phosphorus_excreted = (
-            fecal_phosphorus +
-            urine_phosphorus_required +
-            0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
+        fecal_phosphorus
+        + urine_phosphorus_required
+        + 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
     )
 
     # Act
@@ -87,12 +102,19 @@ def test_calculate_phosphorus_excretion_values() -> None:
         fecal_phosphorus=fecal_phosphorus,
         urine_phosphorus_required=urine_phosphorus_required,
     )
-    (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
-     manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
+    (
+        total_phosphorus_excreted,
+        inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction,
+        manure_phosphorus_excreted,
+        manure_phosphorus_fraction,
+    ) = phosphorus_excretion_values
 
     # Assert
     assert total_phosphorus_excreted == approx(expected_total_phosphorus_excreted)
-    assert inorganic_phosphorus_fraction == approx(expected_inorganic_phosphorus_fraction)
+    assert inorganic_phosphorus_fraction == approx(
+        expected_inorganic_phosphorus_fraction
+    )
     assert organic_phosphorus_fraction == approx(expected_organic_phosphorus_fraction)
     assert manure_phosphorus_excreted == approx(expected_manure_phosphorus_excreted)
     assert manure_phosphorus_fraction == approx(expected_manure_phosphorus_fraction)

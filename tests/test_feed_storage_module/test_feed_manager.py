@@ -23,17 +23,29 @@ def harvested_crop() -> HarvestedCrop:
 
 @pytest.fixture
 def alfalfa_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.ALFALFA, CropType.ALFALFA, **sample_crop_data_no_mass, fresh_mass=50)
+    return HarvestedCrop(
+        CropCategory.ALFALFA,
+        CropType.ALFALFA,
+        **sample_crop_data_no_mass,
+        fresh_mass=50
+    )
 
 
 @pytest.fixture
 def corn_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.CORN, CropType.GRAIN, **sample_crop_data_no_mass, fresh_mass=150)
+    return HarvestedCrop(
+        CropCategory.CORN, CropType.GRAIN, **sample_crop_data_no_mass, fresh_mass=150
+    )
 
 
 @pytest.fixture
 def grass_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data_no_mass, fresh_mass=100)
+    return HarvestedCrop(
+        CropCategory.GRASS,
+        CropType.TALL_FESCUE,
+        **sample_crop_data_no_mass,
+        fresh_mass=100
+    )
 
 
 @pytest.fixture
