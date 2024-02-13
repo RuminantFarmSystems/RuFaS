@@ -56,7 +56,8 @@ class TractorImplement:
                 CropType.TALL_FESCUE_BALEAGE,
             ]:
                 return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
-            return [OperationType.COLLECTION]
+            else:
+                return [OperationType.COLLECTION]
         elif self.operation_event == FieldOperationEvent.FERTILIZER_APPLICATION:
             if application_depth == 0:
                 return [OperationType.FERTILIZER_APPLICATION_SURFACE]
