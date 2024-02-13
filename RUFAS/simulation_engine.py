@@ -3,6 +3,7 @@
 import random
 import sys
 import time as timer
+from enum import Enum
 from typing import Optional
 
 import numpy
@@ -64,6 +65,14 @@ class SimulationEngine:
         self._run_simulation_main_loop()
         routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation(
             self.state.animal_manager, self.day_counter
+        )
+        om.add_variable(
+            "available_feeds_on_final_day",
+            [
+                {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
+                for feed in self.feed_manager.query_available_feeds()
+            ],
+            info_map
         )
         t_end_sim = timer.time()
 

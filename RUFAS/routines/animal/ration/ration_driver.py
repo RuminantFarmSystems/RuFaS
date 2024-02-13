@@ -55,6 +55,7 @@ class RationManager:
         num_reattempts = 0
 
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+        # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
                 num_reattempts += 1
@@ -1006,6 +1007,12 @@ class AvailableFeeds:
         -------
         A dictionary that contains a subset of data from all the available feeds based on the
         given set of feed ids
+
+        Raises
+        ------
+        KeyError
+            If the feed id is not found in the feed id list.
+
         """
         # An explanation of code seen below can be found in Basecamp with the following path:
         # RuFaS > Docs & Files > Animal Module > Ration Driver Logic

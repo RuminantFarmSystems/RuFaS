@@ -824,9 +824,9 @@
           "default": "open air barn"
         },
         "pen_type": {
-          "description": "Pen Type select one) -- The type of stalls the pen has",
           "type": "string",
-          "pattern": "^{freestall|tiestall|drylot}$",
+          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
+          "pattern": "^{freestall|tiestall|open lot|compost bedded pack barn}$",
           "default": "freestall"
         },
         "max_stocking_density": {
@@ -2758,7 +2758,7 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined percentage values.",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
         "minimum": 0,
         "maximum": 1
       },
@@ -2801,6 +2801,11 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "minimum": 1
     },
+    "Fd_Category": {
+      "type": "string",
+      "description": "Feed Category.",
+      "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+    },
     "feed_type": {
       "type": "string",
       "description": "The general type or category of the feed.",
@@ -2816,20 +2821,20 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 625
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP -- Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 625,
       "default": 0
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP - Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 625,
       "default": 0
     },
     "EE": {
@@ -2843,21 +2848,21 @@
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "ash": {
@@ -2877,15 +2882,15 @@
     "PAF": {
       "type": "number",
       "description": "Processing adjustment factor.",
-      "minimum": 0.87,
+      "minimum": 0,
       "maximum": 1.04,
-      "default": 0
+      "default": 0.87
     },
     "TDN": {
       "type": "number",
       "description": "Total digestible nutrients (% DM).",
       "minimum": 0,
-      "maximum": 184,
+      "maximum": 625,
       "default": 0
     },
     "N_A": {
@@ -2913,7 +2918,6 @@
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
       "minimum": 0,
-      "maximum": 30,
       "default": 0
     },
     "dRUP": {
@@ -2927,49 +2931,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "DE": {
@@ -2993,9 +2997,9 @@
     },
     "starch": {
       "type": "number",
-      "description": "Starch (%)",
+      "description": "Starch (% DM)",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "limit": {
@@ -3043,7 +3047,7 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 625
     },
     "N_A": {
       "type": "number",
@@ -3066,8 +3070,7 @@
     "Kd": {
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
-      "minimum": 0,
-      "maximum": 30
+      "minimum": 0
     },
     "RUP": {
       "type": "number",
@@ -3089,51 +3092,51 @@
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP (% DM) -- Acid detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 625,
       "default": 0
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP (% DM) -- Neutral detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 625,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "NDF": {
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "NDF48": {
       "type": "number",
       "description": "In vitro 48-hour digestibility (% NDF).",
       "minimum": 0,
-      "maximum": 89,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "starch": {
       "type": "number",
       "description": "Starch (%).",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "WSC": {
@@ -3168,49 +3171,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "copper": {
@@ -3464,8 +3467,7 @@
         },
         "manure_handler": {
           "type": "string",
-          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
@@ -3518,19 +3520,25 @@
       "properties": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the unique manure handler config."
+          },
           "manure_handler_type": {
             "type": "string",
-            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
+            "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
           },
           "cleaning_water_use_rate": {
             "type": "number"
           },
           "minutes_per_cleaning": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleanings_per_day": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleaning_water_recycle_fraction": {
             "type": "number",
@@ -3583,7 +3591,7 @@
           "manure_treatment_type": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
           },
           "total_solids_removal_efficiency_for_treatment": {
             "type": "number"
@@ -3608,6 +3616,23 @@
           },
           "freeboard_input": {
             "type": "number"
+          },
+          "composting_type": {
+            "type": "string",
+            "description": "Composting Type -- The type of composting.",
+            "pattern": "^(intensive windrow|passive windrow|static pile)$",
+            "default": "intensive windrow"
+          },
+          "last_compost_turning_or_addition": {
+            "type": "number",
+            "description": "The number of days since the last turning or addition event (day)",
+            "default": 1
+          },
+          "manure_cover": {
+            "type": "string",
+            "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+            "pattern": "(cover|no cover|N/A)",
+            "default": "no cover"
           }
         }
       }
@@ -3927,40 +3952,6 @@
       "description": "Irrigation (mm H2O).",
       "type": "number",
       "default": 0
-    }
-  },
-  "feed_quality_properties": {
-    "rufas_id": {
-      "type": "number",
-      "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "minimum": 1
-    },
-    "quality_id": {
-      "type": "number",
-      "description": "Quality ID",
-      "minimum": 1
-    },
-    "status": {
-      "type": "string",
-      "description": "Status",
-      "pattern": "(immature|mid-maturity|mature)"
-    },
-    "differentiating_nutrient": {
-      "type": "string",
-      "description": "Differentiating Nutrient",
-      "pattern": "(DM|NDF)"
-    },
-    "low_percent": {
-      "type": "number",
-      "description": "Low Percent",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "high_percent": {
-      "type": "number",
-      "description": "High Percent",
-      "minimum": 0,
-      "maximum": 100
     }
   }
 }

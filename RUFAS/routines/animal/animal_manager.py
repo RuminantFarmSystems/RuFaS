@@ -822,7 +822,8 @@ class AnimalManager:
         Raises
         ------
         ValueError
-            If num_animals is negative, or num_spaces is non-positive.
+            If num_animals is negative.
+            IF num_spaces is non-positive.
 
         Notes
         -----
@@ -908,8 +909,8 @@ class AnimalManager:
         Raises
         ------
         ValueError
-            If the length of the allocation plan does not match the number of pens, or if the sum of the
-            allocation plan does not match the number of animals.
+            If the length of the allocation plan does not match the number of pens.
+            If the sum of the allocation plan does not match the number of animals.
 
         """
 
@@ -1154,12 +1155,12 @@ class AnimalManager:
             if pen.populated:
                 pen.daily_p_update()
 
-    def end_ration_interval(self) -> int:
+    def end_ration_interval(self) -> bool:
         """
         Checks if a new ration should be formulated for the current simulation_day.
 
-        Returns: 1 (True) if today is the day a new ration has to be formulated,
-                0 (False) otherwise.
+        Returns: True if today is the day a new ration has to be formulated,
+                False otherwise.
         """
         return (
             self.simulation_day % self.formulation_interval == 1
@@ -1658,7 +1659,7 @@ class AnimalManager:
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-            AnimalModuleReporter.report_daily_reports(self)
+            AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
 
     def _record_animal_events(self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
         """
