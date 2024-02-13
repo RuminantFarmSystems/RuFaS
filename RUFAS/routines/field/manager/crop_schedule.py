@@ -57,7 +57,9 @@ class CropSchedule(Schedule):
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
         """
-        super().__init__(name, planting_years, planting_days, planting_skip, pattern_repeat)
+        super().__init__(
+            name, planting_years, planting_days, planting_skip, pattern_repeat
+        )
 
         self.crop_reference = crop_reference
         self.planting_years = self.years
@@ -70,9 +72,13 @@ class CropSchedule(Schedule):
         self.harvest_days = self._elongate_list(harvest_days, len(harvest_years))
         self.harvesting_skip = harvesting_skip
 
-        harvest_operations_enum_list = [HarvestOperation(operation) for operation in harvest_operations]
+        harvest_operations_enum_list = [
+            HarvestOperation(operation) for operation in harvest_operations
+        ]
 
-        self.harvest_operations = self._elongate_list(harvest_operations_enum_list, len(harvest_years))
+        self.harvest_operations = self._elongate_list(
+            harvest_operations_enum_list, len(harvest_years)
+        )
 
         self._validate_harvest_parameters()
 
@@ -135,10 +141,15 @@ class CropSchedule(Schedule):
         harvest_days_valid = self._validate_days(self.harvest_years, self.harvest_days)
         if not harvest_days_valid:
             raise ValueError(
-                f"'{self.name}': expected all harvest days to be in range [1, 366], received " f"'{self.harvest_days}'."
+                f"'{self.name}': expected all harvest days to be in range [1, 366], received "
+                f"'{self.harvest_days}'."
             )
 
-        equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
+        equal_harvest_parameters = (
+            len(self.harvest_years)
+            == len(self.harvest_days)
+            == len(self.harvest_operations)
+        )
         if not equal_harvest_parameters:
             raise ValueError(
                 f"'{self.name}': expected number of values for harvest years, days, and operations to be "
@@ -147,7 +158,9 @@ class CropSchedule(Schedule):
             )
 
         last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
-        others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
+        others_dont_kill = (
+            all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
+        )
         only_last_kills = last_kills and others_dont_kill
         if not only_last_kills:
             raise ValueError(
@@ -165,7 +178,9 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = self._repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
+        all_planting_years = self._repeat_pattern(
+            self.planting_years, self.planting_skip, self.pattern_repeat
+        )
         all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 
@@ -195,14 +210,20 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        all_harvesting_years = self._repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
+        all_harvesting_years = self._repeat_pattern(
+            self.harvest_years, self.harvesting_skip, self.pattern_repeat
+        )
         all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
         all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)
-        all_harvesting_dates = list(zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations))
+        all_harvesting_dates = list(
+            zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations)
+        )
 
         if self.heat_scheduled:
             all_harvesting_dates[:] = [
-                harvest for harvest in all_harvesting_dates if harvest[2] in FINAL_HARVEST_OPERATIONS
+                harvest
+                for harvest in all_harvesting_dates
+                if harvest[2] in FINAL_HARVEST_OPERATIONS
             ]
 
         harvest_events = []

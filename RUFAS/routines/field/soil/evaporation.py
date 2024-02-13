@@ -8,7 +8,9 @@ This module is based off of the 'Soil Water Evaporation' (2:2.3.3.2) section of 
 
 
 class Evaporation:
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -40,7 +42,9 @@ class Evaporation:
 
         """
         amount_available_for_evaporation = maximum_soil_water_evaporation
-        self.data.set_vectorized_layer_attribute("evaporated_water_content", [0.0] * len(self.data.soil_layers))
+        self.data.set_vectorized_layer_attribute(
+            "evaporated_water_content", [0.0] * len(self.data.soil_layers)
+        )
         for layer in self.data.soil_layers:
             evaporative_demand = self._determine_layer_evaporative_demand(
                 maximum_soil_water_evaporation,
@@ -60,20 +64,26 @@ class Evaporation:
                 layer.wilting_point_content,
             )
 
-            amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
+            amount_water_removed = min(
+                amount_water_removed, amount_available_for_evaporation
+            )
             layer.water_content -= amount_water_removed
             layer.evaporated_water_content = amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
             if amount_available_for_evaporation == 0:
                 break
 
-        total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
+        total_evaporation_from_soil = (
+            maximum_soil_water_evaporation - amount_available_for_evaporation
+        )
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
 
     # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
     @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+    def _determine_maximum_soil_evaporation(
+        soil_evaporation_adj: float, snow_water_content: float
+    ) -> float:
         """Calculates the maximum amount of evaporation from soil in a given day
 
         Parameters
@@ -101,7 +111,9 @@ class Evaporation:
             return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
-    def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
+    def _determine_depth_evaporative_demand(
+        max_soil_water_evaporation: float, depth: float
+    ) -> float:
         """Calculates evaporative demand.
 
         Parameters
@@ -121,7 +133,9 @@ class Evaporation:
         SWAT Theoretical documentation 2:2.3.16
 
         """
-        return max_soil_water_evaporation * (depth / (depth + exp(2.374 - (0.00713 * depth))))
+        return max_soil_water_evaporation * (
+            depth / (depth + exp(2.374 - (0.00713 * depth)))
+        )
 
     @staticmethod
     def _determine_layer_evaporative_demand(
@@ -164,7 +178,9 @@ class Evaporation:
             raise ValueError("Missing or illegal values for top or bottom depths")
 
         # Calculate evaporative demand at top of layer
-        top_evaporative_demand = Evaporation._determine_depth_evaporative_demand(max_soil_water_evaporation, top_depth)
+        top_evaporative_demand = Evaporation._determine_depth_evaporative_demand(
+            max_soil_water_evaporation, top_depth
+        )
         # Calculate evaporative demand at bottom of layer
         bottom_evaporative_demand = Evaporation._determine_depth_evaporative_demand(
             max_soil_water_evaporation, bottom_depth

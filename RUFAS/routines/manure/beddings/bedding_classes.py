@@ -204,7 +204,9 @@ class BaseBedding(ABC):
             The total amount of dry solids in the bedding (kg/day).
 
         """
-        return self.calc_total_bedding_mass(num_animals) * self.bedding_dry_matter_content
+        return (
+            self.calc_total_bedding_mass(num_animals) * self.bedding_dry_matter_content
+        )
 
 
 class BaseOrganicBedding(BaseBedding):
@@ -519,7 +521,9 @@ class BeddingFactory:
         if custom_bedding_config:
             bedding_obj = bedding_class(custom_bedding_config)
         else:
-            default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
+            default_bedding_config = DefaultBeddingConfigFactory.get_instance(
+                bedding_type
+            )
             bedding_obj = bedding_class(default_bedding_config)
 
         return bedding_obj

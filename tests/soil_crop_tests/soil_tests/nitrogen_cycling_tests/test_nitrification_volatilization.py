@@ -13,9 +13,15 @@ from RUFAS.routines.field.soil.soil_data import SoilData
     "temp,expected",
     [(20, 0.615), (31.493, 1.0), (14.334, 0.382_694), (5.0193, 0.000_791_3)],
 )
-def test_calculate_nitrification_volatilization_temp_factor(temp: float, expected: float) -> None:
+def test_calculate_nitrification_volatilization_temp_factor(
+    temp: float, expected: float
+) -> None:
     """Tests that the temperature factor used by the nitrification volatilization module is calculated correctly."""
-    observed = NitrificationVolatilization._calculate_nitrification_volatilization_temp_factor(temp)
+    observed = (
+        NitrificationVolatilization._calculate_nitrification_volatilization_temp_factor(
+            temp
+        )
+    )
     assert pytest.approx(observed) == expected
 
 
@@ -28,9 +34,13 @@ def test_calculate_nitrification_volatilization_temp_factor(temp: float, expecte
         (7.55, 2.314, 6.0133),
     ],
 )
-def test_calculate_nitrification_soil_water_factor(water: float, wilting: float, field: float) -> None:
+def test_calculate_nitrification_soil_water_factor(
+    water: float, wilting: float, field: float
+) -> None:
     """Tests that the water factor for nitrification is calculated correctly."""
-    observed = NitrificationVolatilization._calculate_nitrification_soil_water_factor(water, wilting, field)
+    observed = NitrificationVolatilization._calculate_nitrification_soil_water_factor(
+        water, wilting, field
+    )
     if water < 0.25 * field - 0.75 * wilting:
         expected = (water - wilting) / (0.25 * (field - wilting))
     else:
@@ -58,9 +68,13 @@ def test_calculate_volatilization_depth_factor(depth: float) -> None:
     "temp_factor,water_factor",
     [(0.9982, 0.7767), (0.6779, 0.88657), (0.144, 0.2295), (0.3059, 0.2259)],
 )
-def test_calculate_nitrification_regulator(temp_factor: float, water_factor: float) -> None:
+def test_calculate_nitrification_regulator(
+    temp_factor: float, water_factor: float
+) -> None:
     """Tests that the nitrification factor is calculated correctly."""
-    observed = NitrificationVolatilization._calculate_nitrification_regulator(temp_factor, water_factor)
+    observed = NitrificationVolatilization._calculate_nitrification_regulator(
+        temp_factor, water_factor
+    )
     expected = temp_factor * water_factor
     assert observed == expected
 
@@ -69,7 +83,9 @@ def test_calculate_nitrification_regulator(temp_factor: float, water_factor: flo
     "temp_factor,depth_factor,exchange_factor",
     [(0.7795, 0.4495, 0.15), (0.11439, 0.9938, 0.1245), (0.8858, 0.6675, 0.22395)],
 )
-def test_calculate_volatilization_regulator(temp_factor: float, depth_factor: float, exchange_factor: float) -> None:
+def test_calculate_volatilization_regulator(
+    temp_factor: float, depth_factor: float, exchange_factor: float
+) -> None:
     """Tests that the volatilization factor is calculated correctly."""
     observed = NitrificationVolatilization._calculate_volatilization_regulator(
         temp_factor, depth_factor, exchange_factor
@@ -82,9 +98,13 @@ def test_calculate_volatilization_regulator(temp_factor: float, depth_factor: fl
     "ammonium,nitrification,volatilization",
     [(30.12, 0.56, 0.056), (21.45, 0.8895, 0.1123), (40.595, 0.411894, 0.0857)],
 )
-def test_calculate_total_ammonium_lost(ammonium: float, nitrification: float, volatilization: float) -> None:
+def test_calculate_total_ammonium_lost(
+    ammonium: float, nitrification: float, volatilization: float
+) -> None:
     """Tests that the amount of ammonium lost to nitrification and volatilization is calculated correctly."""
-    observed = NitrificationVolatilization._calculate_total_ammonium_lost(ammonium, nitrification, volatilization)
+    observed = NitrificationVolatilization._calculate_total_ammonium_lost(
+        ammonium, nitrification, volatilization
+    )
     expected = ammonium * (1 - exp(-1 * nitrification - volatilization))
     assert observed == expected
 
@@ -101,9 +121,13 @@ def test_calculate_ammonium_loss_fraction(regulator: float) -> None:
     "ammonium_lost,actual,other",
     [(12.44, 0.33, 0.132), (33.4495, 0.465, 0.33184), (22.592, 0.2815, 0.44568)],
 )
-def test_calculate_ammonium_lost_to_process(ammonium_lost: float, actual: float, other: float) -> None:
+def test_calculate_ammonium_lost_to_process(
+    ammonium_lost: float, actual: float, other: float
+) -> None:
     """Tests that the amount of ammonium lost to a specific process is calculated correctly."""
-    observed = NitrificationVolatilization._calculate_ammonium_lost_to_process(ammonium_lost, actual, other)
+    observed = NitrificationVolatilization._calculate_ammonium_lost_to_process(
+        ammonium_lost, actual, other
+    )
     expected = ammonium_lost * actual / (actual + other)
     assert pytest.approx(observed) == expected
 
@@ -121,14 +145,18 @@ def test_do_daily_nitrification_and_volatilization() -> None:
         data = SoilData(field_size=1.8)
         incorp = NitrificationVolatilization(data)
         incorp.data.set_vectorized_layer_attribute("temperature", [18, 4, 18, 18])
-        incorp.data.set_vectorized_layer_attribute("water_content", [3.67, 3.67, 3.67, 3.67])
+        incorp.data.set_vectorized_layer_attribute(
+            "water_content", [3.67, 3.67, 3.67, 3.67]
+        )
         incorp.data.set_vectorized_layer_attribute(
             "ammonium_volatilization_cation_exchange_factor", [0.18, 0.18, 0.18, 0.18]
         )
         incorp.data.set_vectorized_layer_attribute("ammonium_content", [25, 25, 25, 25])
         incorp.data.set_vectorized_layer_attribute("nitrate_content", [25, 25, 25, 25])
 
-        incorp._calculate_nitrification_volatilization_temp_factor = MagicMock(return_value=0.8)
+        incorp._calculate_nitrification_volatilization_temp_factor = MagicMock(
+            return_value=0.8
+        )
         incorp._calculate_nitrification_soil_water_factor = MagicMock(return_value=0.75)
         incorp._calculate_volatilization_depth_factor = MagicMock(return_value=0.46)
         incorp._calculate_nitrification_regulator = MagicMock(return_value=0.55)
@@ -140,17 +168,29 @@ def test_do_daily_nitrification_and_volatilization() -> None:
         incorp.do_daily_nitrification_and_volatilization()
 
         temp_factor_calls = [call(18)] * 3
-        incorp._calculate_nitrification_volatilization_temp_factor.assert_has_calls(temp_factor_calls)
+        incorp._calculate_nitrification_volatilization_temp_factor.assert_has_calls(
+            temp_factor_calls
+        )
         depth_factor_calls = [call(57.89)] * 3
-        incorp._calculate_volatilization_depth_factor.assert_has_calls(depth_factor_calls)
+        incorp._calculate_volatilization_depth_factor.assert_has_calls(
+            depth_factor_calls
+        )
         nitrification_regulator_calls = [call(0.8, 0.75)] * 3
-        incorp._calculate_nitrification_regulator.assert_has_calls(nitrification_regulator_calls)
+        incorp._calculate_nitrification_regulator.assert_has_calls(
+            nitrification_regulator_calls
+        )
         volatilization_regulator_calls = [call(0.8, 0.46, 0.18)] * 3
-        incorp._calculate_volatilization_regulator.assert_has_calls(volatilization_regulator_calls)
+        incorp._calculate_volatilization_regulator.assert_has_calls(
+            volatilization_regulator_calls
+        )
         ammonium_loss_frac_calls = [call(0.55), call(0.08)] * 3
-        incorp._calculate_ammonium_loss_fraction.assert_has_calls(ammonium_loss_frac_calls)
+        incorp._calculate_ammonium_loss_fraction.assert_has_calls(
+            ammonium_loss_frac_calls
+        )
         total_ammonium_lost_calls = [call(25, 0.55, 0.08)] * 3
-        incorp._calculate_total_ammonium_lost.assert_has_calls(total_ammonium_lost_calls)
+        incorp._calculate_total_ammonium_lost.assert_has_calls(
+            total_ammonium_lost_calls
+        )
         ammonium_lost_calls = [call(6.5, 0.35, 0.35)] * 6
         incorp._calculate_ammonium_lost_to_process.assert_has_calls(ammonium_lost_calls)
 

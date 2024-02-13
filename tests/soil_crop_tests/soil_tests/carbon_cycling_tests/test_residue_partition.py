@@ -18,7 +18,9 @@ from RUFAS.routines.field.soil.soil_data import SoilData
         (0, 3),  # no plant_residue_lignin_composition
     ],
 )
-def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float, rainfall: float) -> None:
+def test_determine_plant_residue_lignin_composition(
+    plant_residue_lignin_composition: float, rainfall: float
+) -> None:
     """Tests that the plant residue lignin composition will be updated correctly as the equation with given rainfall"""
     expected = plant_residue_lignin_composition + 0.12 * rainfall * 0.1
     assert expected == ResiduePartition._determine_plant_residue_lignin_composition(
@@ -27,7 +29,8 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
 
 
 @pytest.mark.parametrize(
-    "plant_residue_lignin_composition, total_residue, crop_yield_nitrogen," "expected_result",
+    "plant_residue_lignin_composition, total_residue, crop_yield_nitrogen,"
+    "expected_result",
     [
         (0.5, 50, 20, 0.0125),  # default
         (0.5, 50, 0, 0),  # no nitrogen
@@ -54,8 +57,11 @@ def test_determine_plant_lignin_nitrogen_fraction(
             )
         )
     elif nitrogen_fraction_plant_residue == 0:
-        assert expected_result == ResiduePartition._determine_plant_lignin_nitrogen_fraction(
-            plant_residue_lignin_composition, total_residue, crop_yield_nitrogen
+        assert (
+            expected_result
+            == ResiduePartition._determine_plant_lignin_nitrogen_fraction(
+                plant_residue_lignin_composition, total_residue, crop_yield_nitrogen
+            )
         )
     else:
         # case of invalid input
@@ -63,8 +69,9 @@ def test_determine_plant_lignin_nitrogen_fraction(
             ResiduePartition._determine_plant_lignin_nitrogen_fraction(
                 plant_residue_lignin_composition, total_residue, crop_yield_nitrogen
             )
-        expected = "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received " + str(
-            nitrogen_fraction_plant_residue
+        expected = (
+            "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+            + str(nitrogen_fraction_plant_residue)
         )
         assert expected == str(e.value)
 
@@ -82,7 +89,9 @@ def test_determine_plant_residue_metabolic_fraction(
 ) -> None:
     """Tests to see if the fraction of plant residue that is metabolic is calculated correctly"""
     expected = 0.85 - 0.18 * plant_lignin_nitrogen_ratio
-    assert expected == ResiduePartition._determine_plant_residue_metabolic_fraction(plant_lignin_nitrogen_ratio)
+    assert expected == ResiduePartition._determine_plant_residue_metabolic_fraction(
+        plant_lignin_nitrogen_ratio
+    )
 
 
 @pytest.mark.parametrize(
@@ -118,7 +127,8 @@ def test_determine_plant_metabolic_carbon_amount(
 
 
 @pytest.mark.parametrize(
-    "decomposition_moisture_effect, decomposition_temperature_effect, " "plant_metabolic_carbon_amount",
+    "decomposition_moisture_effect, decomposition_temperature_effect, "
+    "plant_metabolic_carbon_amount",
     [
         (3, 8, 7),
         (60, 64, 85),
@@ -162,8 +172,11 @@ def test_determine_plant_metabolic_to_soil_carbon_amount(
 ) -> None:
     """Tests that the the amount of metabolic carbon incorporated into soil during tillage was calculated correctly"""
     expected = plant_metabolic_carbon_amount * tillage_fraction
-    assert expected == ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount(
-        plant_metabolic_carbon_amount, tillage_fraction
+    assert (
+        expected
+        == ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount(
+            plant_metabolic_carbon_amount, tillage_fraction
+        )
     )
 
 
@@ -181,9 +194,16 @@ def test_determine_plant_structural_to_slow_or_active_rate(
     """Tests that the rate at which above ground structural carbon decomposes into slow or active carbon was calculated
     correctly"""
     structural_decomposition_factor = 0.076
-    expected = structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
-    assert expected == ResiduePartition._determine_plant_structural_to_slow_or_active_rate(
-        plant_residue_metabolic_fraction
+    expected = (
+        structural_decomposition_factor
+        * math.exp(-3)
+        * (1 - plant_residue_metabolic_fraction)
+    )
+    assert (
+        expected
+        == ResiduePartition._determine_plant_structural_to_slow_or_active_rate(
+            plant_residue_metabolic_fraction
+        )
     )
 
 
@@ -210,11 +230,14 @@ def test_determine_plant_structural_to_slow_active_carbon_amount(
         * decomposition_temperature_effect
         * plant_structural_carbon_amount
     )
-    assert expected == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
-        plant_structural_to_slow_or_active_rate,
-        decomposition_moisture_effect,
-        decomposition_temperature_effect,
-        plant_structural_carbon_amount,
+    assert (
+        expected
+        == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
+            plant_structural_to_slow_or_active_rate,
+            decomposition_moisture_effect,
+            decomposition_temperature_effect,
+            plant_structural_carbon_amount,
+        )
     )
 
 
@@ -294,12 +317,17 @@ def test_determine_weighted_residue_dry_matter_lignin_fraction(
     """Tests that the weighted fractional of lignin amount in residue dry matter was calculated correctly under each
     condition"""
     if soil_dry_matter_residue_amount + root_biomass != 0:
-        expected = soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + root_biomass)
+        expected = soil_dry_matter_residue_amount / (
+            soil_dry_matter_residue_amount + root_biomass
+        )
     else:
         expected = 0
 
-    assert expected == ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction(
-        soil_dry_matter_residue_amount, root_biomass
+    assert (
+        expected
+        == ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction(
+            soil_dry_matter_residue_amount, root_biomass
+        )
     )
 
 
@@ -319,7 +347,9 @@ def test_determine_soil_residue_lignin_fraction(
     weighted_residue_dry_matter_lignin_fraction: float, rainfall: float
 ) -> None:
     """Tests that the the fraction of soil residue that's comprised of lignin was calculated correctly"""
-    expected = max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
+    expected = max(
+        0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01
+    )
     assert expected == ResiduePartition._determine_soil_residue_lignin_fraction(
         weighted_residue_dry_matter_lignin_fraction, rainfall
     )
@@ -344,9 +374,14 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
 ) -> None:
     """Tests that the soil lignin to nitrogen fraction is calculated correctly"""
     if 0 < nitrogen_fraction_plant_residue <= 1:
-        expected = plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction + (
-            ((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue) / 100
-        ) * (1 - weighted_residue_dry_matter_lignin_fraction)
+        expected = (
+            plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction
+            + (
+                ((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue)
+                / 100
+            )
+            * (1 - weighted_residue_dry_matter_lignin_fraction)
+        )
         assert expected == ResiduePartition._determine_soil_lignin_to_nitrogen_fraction(
             plant_lignin_nitrogen_ratio,
             weighted_residue_dry_matter_lignin_fraction,
@@ -370,8 +405,9 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
                 soil_residue_lignin_fraction,
                 nitrogen_fraction_plant_residue,
             )
-        expected = "Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received " + str(
-            nitrogen_fraction_plant_residue
+        expected = (
+            "Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received "
+            + str(nitrogen_fraction_plant_residue)
         )
         assert expected == str(e.value)
 
@@ -385,7 +421,9 @@ def test_determine_soil_residue_metabolic_fraction(
 ) -> None:
     """test that the fraction of soil residue that is metabolic was calculated correctly"""
     expected = max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio)
-    assert expected == ResiduePartition._determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio)
+    assert expected == ResiduePartition._determine_soil_residue_metabolic_fraction(
+        soil_lignin_to_nitrogen_ratio
+    )
 
 
 @pytest.mark.parametrize(
@@ -423,7 +461,8 @@ def test_determine_soil_metabolic_carbon_amount(
 
 
 @pytest.mark.parametrize(
-    "decomposition_moisture_effect, decomposition_temperature_effect, " "soil_metabolic_carbon_amount",
+    "decomposition_moisture_effect, decomposition_temperature_effect, "
+    "soil_metabolic_carbon_amount",
     [
         (3, 8, 7),
         (60, 64, 85),
@@ -443,15 +482,19 @@ def test_determine_soil_metabolic_to_active_carbon_amount(
         * soil_metabolic_carbon_amount
         * soil_metabolic_active_carbon_rate
     )
-    assert expected == ResiduePartition._determine_soil_metabolic_to_active_carbon_amount(
-        decomposition_moisture_effect,
-        decomposition_temperature_effect,
-        soil_metabolic_carbon_amount,
+    assert (
+        expected
+        == ResiduePartition._determine_soil_metabolic_to_active_carbon_amount(
+            decomposition_moisture_effect,
+            decomposition_temperature_effect,
+            soil_metabolic_carbon_amount,
+        )
     )
 
 
 @pytest.mark.parametrize(
-    "soil_structural_carbon_amount, decomposition_moisture_effect," "decomposition_temperature_effect",
+    "soil_structural_carbon_amount, decomposition_moisture_effect,"
+    "decomposition_temperature_effect",
     [
         (3, 8, 7),
         (60, 64, 85),
@@ -471,10 +514,13 @@ def test_determine_soil_structural_to_slow_active_carbon_amount(
         * soil_structural_carbon_amount
         * soil_structural_to_slow_or_active_rate
     )
-    assert expected == ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount(
-        decomposition_moisture_effect,
-        decomposition_temperature_effect,
-        soil_structural_carbon_amount,
+    assert (
+        expected
+        == ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount(
+            decomposition_moisture_effect,
+            decomposition_temperature_effect,
+            soil_structural_carbon_amount,
+        )
     )
 
 
@@ -516,7 +562,8 @@ def test_determine_soil_structural_carbon_amount(
 
 
 @pytest.mark.parametrize(
-    "root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness," "expected_dry_matter_residue_amount",
+    "root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness,"
+    "expected_dry_matter_residue_amount",
     [
         (100, 100, 50.5, 20.69, 40.3, 40.3),
         (40, 100, 50.53, 20, 32, 50),
@@ -563,11 +610,18 @@ def test_add_litter_to_pools(
     data.crop_root_depth = root_depth
     partitioner = ResiduePartition(data)
 
-    with patch.object(ResiduePartition, "_add_subsurface_residue", new_callable=MagicMock) as add_subsurface:
+    with patch.object(
+        ResiduePartition, "_add_subsurface_residue", new_callable=MagicMock
+    ) as add_subsurface:
         partitioner._add_litter_to_pools()
 
-    assert data.soil_layers[0].metabolic_litter_amount == 15.0 + expected_surface_metabolic
-    assert data.soil_layers[0].structural_litter_amount == 10.0 + expected_surface_structural
+    assert (
+        data.soil_layers[0].metabolic_litter_amount == 15.0 + expected_surface_metabolic
+    )
+    assert (
+        data.soil_layers[0].structural_litter_amount
+        == 10.0 + expected_surface_structural
+    )
     assert data.plant_surface_residue == 0.0
     assert data.plant_root_residue == 0.0
     assert data.crop_root_depth == 0.0
@@ -602,7 +656,8 @@ def test_add_subsurface_residue(
     data.plant_residue_metabolic_fraction = 0.25
     partitioner = ResiduePartition(data)
     expected_litter_amounts = [
-        metabolic + structural for metabolic, structural in zip(expected_metabolic, expected_structural)
+        metabolic + structural
+        for metabolic, structural in zip(expected_metabolic, expected_structural)
     ]
 
     with patch.object(
@@ -618,7 +673,9 @@ def test_add_subsurface_residue(
     ) as thickness:
         partitioner._add_subsurface_residue(residue, depth)
 
-    for index, expected in enumerate(list(zip(expected_metabolic, expected_structural))):
+    for index, expected in enumerate(
+        list(zip(expected_metabolic, expected_structural))
+    ):
         assert data.soil_layers[index].metabolic_litter_amount == expected[0]
         assert data.soil_layers[index].structural_litter_amount == expected[1]
     assert determine_dry_matter.call_count == 3
@@ -773,38 +830,96 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
 
-    ResiduePartition._determine_plant_metabolic_active_carbon_usage = MagicMock(return_value=2.1)
-    ResiduePartition._determine_plant_metabolic_carbon_amount = MagicMock(return_value=2.4)
-    ResiduePartition._determine_plant_structural_to_slow_or_active_rate = MagicMock(return_value=0.58)
-    ResiduePartition._determine_plant_structural_carbon_amount = MagicMock(return_value=2.5)
-    ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount = MagicMock(return_value=2.6)
-    ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction = MagicMock(return_value=0.59)
-    ResiduePartition._determine_soil_residue_lignin_fraction = MagicMock(return_value=0.6)
-    ResiduePartition._determine_soil_lignin_to_nitrogen_fraction = MagicMock(return_value=0.61)
-    ResiduePartition._determine_soil_residue_metabolic_fraction = MagicMock(return_value=0.62)
-    ResiduePartition._determine_soil_metabolic_to_active_carbon_amount = MagicMock(return_value=2.7)
-    ResiduePartition._determine_soil_metabolic_carbon_amount = MagicMock(return_value=2.8)
-    ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount = MagicMock(return_value=2.9)
-    ResiduePartition._determine_soil_structural_carbon_amount = MagicMock(return_value=3)
+    ResiduePartition._determine_plant_metabolic_active_carbon_usage = MagicMock(
+        return_value=2.1
+    )
+    ResiduePartition._determine_plant_metabolic_carbon_amount = MagicMock(
+        return_value=2.4
+    )
+    ResiduePartition._determine_plant_structural_to_slow_or_active_rate = MagicMock(
+        return_value=0.58
+    )
+    ResiduePartition._determine_plant_structural_carbon_amount = MagicMock(
+        return_value=2.5
+    )
+    ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount = (
+        MagicMock(return_value=2.6)
+    )
+    ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction = MagicMock(
+        return_value=0.59
+    )
+    ResiduePartition._determine_soil_residue_lignin_fraction = MagicMock(
+        return_value=0.6
+    )
+    ResiduePartition._determine_soil_lignin_to_nitrogen_fraction = MagicMock(
+        return_value=0.61
+    )
+    ResiduePartition._determine_soil_residue_metabolic_fraction = MagicMock(
+        return_value=0.62
+    )
+    ResiduePartition._determine_soil_metabolic_to_active_carbon_amount = MagicMock(
+        return_value=2.7
+    )
+    ResiduePartition._determine_soil_metabolic_carbon_amount = MagicMock(
+        return_value=2.8
+    )
+    ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount = (
+        MagicMock(return_value=2.9)
+    )
+    ResiduePartition._determine_soil_structural_carbon_amount = MagicMock(
+        return_value=3
+    )
 
     # first_layer_yield_residue_value = crop.yield_residue
     partition.partition_residue(rainfall)
 
     # Checking if methods are called correct number of times
-    assert ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == 1
+    assert (
+        ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == 1
+    )
 
     assert ResiduePartition._determine_plant_metabolic_carbon_amount.call_count == 1
-    assert ResiduePartition._determine_plant_structural_to_slow_or_active_rate.call_count == 1
+    assert (
+        ResiduePartition._determine_plant_structural_to_slow_or_active_rate.call_count
+        == 1
+    )
     assert ResiduePartition._determine_plant_structural_carbon_amount.call_count == 1
-    assert ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount.call_count == 2
-    assert ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction.call_count == len(layers)
-    assert ResiduePartition._determine_soil_residue_lignin_fraction.call_count == len(layers) - 1
-    assert ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.call_count == len(layers) - 1
-    assert ResiduePartition._determine_soil_residue_metabolic_fraction.call_count == len(layers) - 1
-    assert ResiduePartition._determine_soil_metabolic_to_active_carbon_amount.call_count == len(layers) - 1
-    assert ResiduePartition._determine_soil_metabolic_carbon_amount.call_count == len(layers) - 1
-    assert ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount.call_count == (len(layers) - 1) * 2
-    assert ResiduePartition._determine_soil_structural_carbon_amount.call_count == len(layers) - 1
+    assert (
+        ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount.call_count
+        == 2
+    )
+    assert (
+        ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction.call_count
+        == len(layers)
+    )
+    assert (
+        ResiduePartition._determine_soil_residue_lignin_fraction.call_count
+        == len(layers) - 1
+    )
+    assert (
+        ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.call_count
+        == len(layers) - 1
+    )
+    assert (
+        ResiduePartition._determine_soil_residue_metabolic_fraction.call_count
+        == len(layers) - 1
+    )
+    assert (
+        ResiduePartition._determine_soil_metabolic_to_active_carbon_amount.call_count
+        == len(layers) - 1
+    )
+    assert (
+        ResiduePartition._determine_soil_metabolic_carbon_amount.call_count
+        == len(layers) - 1
+    )
+    assert (
+        ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount.call_count
+        == (len(layers) - 1) * 2
+    )
+    assert (
+        ResiduePartition._determine_soil_structural_carbon_amount.call_count
+        == len(layers) - 1
+    )
 
     layer = data.soil_layers[0]
     assert layer.plant_metabolic_active_carbon_usage == 2.1

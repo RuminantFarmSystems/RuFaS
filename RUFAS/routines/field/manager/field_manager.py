@@ -36,7 +36,9 @@ class FieldManager:
         self.fields: List[Field] = []
         fields = im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning("No field input files.", "No fields will be simulated.", info_map)
+            om.add_warning(
+                "No field input files.", "No fields will be simulated.", info_map
+            )
 
         for field in fields:
             new_field = self._setup_field(field, manure_manager, feed_manager)
@@ -75,7 +77,9 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
+    def _setup_field(
+        field_name: str, manure_manager: ManureManager, feed_manager: FeedManager
+    ) -> Field:
         """
 
         Parameters
@@ -98,23 +102,37 @@ class FieldManager:
         absolute_latitude = field_configuration_data.get("absolute_latitude")
         longitude = field_configuration_data.get("longitude")
         minimum_daylength = field_configuration_data.get("minimum_daylength")
-        seasonal_high_water_table = field_configuration_data.get("seasonal_high_water_table")
-        watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
+        seasonal_high_water_table = field_configuration_data.get(
+            "seasonal_high_water_table"
+        )
+        watering_amount_in_liters = field_configuration_data.get(
+            "watering_amount_in_liters"
+        )
         watering_interval = field_configuration_data.get("watering_interval")
-        supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
+        supplement_manure = field_configuration_data.get(
+            "supplement_manure_nutrient_deficiencies"
+        )
 
-        fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
+        fertilizer_configuration = field_configuration_data.get(
+            "fertilizer_management_specification"
+        )
         (
             available_fertilizer_mixes,
             fertilizer_schedule,
         ) = FieldManager._setup_fertilizer_schedule(fertilizer_configuration)
         fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
 
-        manure_configuration = field_configuration_data.get("manure_management_specification")
-        manure_application_schedule = FieldManager._setup_manure_schedule(manure_configuration)
+        manure_configuration = field_configuration_data.get(
+            "manure_management_specification"
+        )
+        manure_application_schedule = FieldManager._setup_manure_schedule(
+            manure_configuration
+        )
         manure_events = manure_application_schedule.generate_manure_events()
 
-        tillage_configuration = field_configuration_data.get("tillage_management_specification")
+        tillage_configuration = field_configuration_data.get(
+            "tillage_management_specification"
+        )
         tillage_schedule = FieldManager._setup_tillage_schedule(tillage_configuration)
         tillage_events = tillage_schedule.generate_tillage_events()
 
@@ -190,7 +208,9 @@ class FieldManager:
             nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
             phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
             application_depths=fertilizer_data.get("application_depths"),
-            surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
+            surface_remainder_fractions=fertilizer_data.get(
+                "surface_remainder_fractions"
+            ),
             pattern_skip=fertilizer_data.get("pattern_skip"),
             pattern_repeat=fertilizer_data.get("pattern_repeat"),
         )
@@ -215,7 +235,9 @@ class FieldManager:
         """
         manure_schedule_data = im.get_data(manure_schedule)
         manure_type_strings = manure_schedule_data.get("manure_types")
-        manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
+        manure_types = [
+            ManureType(manure_type_string) for manure_type_string in manure_type_strings
+        ]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",
             years=manure_schedule_data.get("years"),
@@ -225,7 +247,9 @@ class FieldManager:
             manure_types=manure_types,
             field_coverages=manure_schedule_data.get("coverage_fractions"),
             application_depths=manure_schedule_data.get("application_depths"),
-            surface_remainder_fractions=manure_schedule_data.get("surface_remainder_fractions"),
+            surface_remainder_fractions=manure_schedule_data.get(
+                "surface_remainder_fractions"
+            ),
             pattern_skip=manure_schedule_data.get("pattern_skip"),
             pattern_repeat=manure_schedule_data.get("pattern_repeat"),
         )
@@ -252,7 +276,9 @@ class FieldManager:
             name="tillage_schedule",
             years=tillage_schedule_data.get("years"),
             days=tillage_schedule_data.get("days"),
-            incorporation_fractions=tillage_schedule_data.get("incorporation_fractions"),
+            incorporation_fractions=tillage_schedule_data.get(
+                "incorporation_fractions"
+            ),
             mixing_fractions=tillage_schedule_data.get("mixing_fractions"),
             tillage_depths=tillage_schedule_data.get("tillage_depths"),
             pattern_skip=tillage_schedule_data.get("pattern_skip"),
@@ -332,7 +358,9 @@ class FieldManager:
         soil_layers = []
         top_depth = 0.0
         for index, layer_config in enumerate(soil_layers_config):
-            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, residue, layer_config)
+            new_layer = FieldManager._setup_soil_layer(
+                field_size, top_depth, residue, layer_config
+            )
             soil_layers.append(new_layer)
             top_depth = new_layer.bottom_depth
 
@@ -348,13 +376,17 @@ class FieldManager:
         for value in expected_values:
             config_dictionary[value] = soil_configuration_data.get(value)
 
-        config_dictionary["manning"] = soil_configuration_data.get("manning_roughness_coefficient")
+        config_dictionary["manning"] = soil_configuration_data.get(
+            "manning_roughness_coefficient"
+        )
 
         soil_data = SoilData(field_size=field_size, **config_dictionary)
         return Soil(soil_data=soil_data)
 
     @staticmethod
-    def _setup_soil_layer(field_size: float, top_depth: float, initial_residue: float, layer_config: Dict) -> LayerData:
+    def _setup_soil_layer(
+        field_size: float, top_depth: float, initial_residue: float, layer_config: Dict
+    ) -> LayerData:
         """
         Initializes a LayerData instance to be added to a SoilData object.
 

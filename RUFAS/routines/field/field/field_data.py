@@ -96,7 +96,9 @@ class FieldData:
             If the watering amount is < 0.
             If the watering interval is < 0.
         """
-        self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
+        self.dormancy_threshold = Dormancy.find_dormancy_threshold(
+            self.absolute_latitude
+        )
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(
             self.minimum_daylength, self.dormancy_threshold
         )
@@ -109,9 +111,13 @@ class FieldData:
         )
         if should_water:
             if self.watering_amount_in_liters < 0.0:
-                raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
+                raise ValueError(
+                    f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'."
+                )
             elif self.watering_interval < 0:
-                raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
+                raise ValueError(
+                    f"Expected watering interval to be >= 0, received '{self.watering_interval}'."
+                )
 
             self.watering_amount_in_mm = self.convert_liters_to_millimeters(
                 self.watering_amount_in_liters, self.field_size

@@ -19,26 +19,34 @@ def mock_om() -> OutputManager:
     "soil_data, current_day_conditions",
     [
         (
-            SoilData(previous_day_snow_temperature=-3.5, snow_lag_factor=1.0, field_size=10),
+            SoilData(
+                previous_day_snow_temperature=-3.5, snow_lag_factor=1.0, field_size=10
+            ),
             CurrentDayConditions(mean_air_temperature=-3),
         ),
         (
-            SoilData(previous_day_snow_temperature=-5, snow_lag_factor=1.0, field_size=10),
+            SoilData(
+                previous_day_snow_temperature=-5, snow_lag_factor=1.0, field_size=10
+            ),
             CurrentDayConditions(mean_air_temperature=-10),
         ),
     ],
 )
-def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions):
+def test_calc_snow_temp(
+    soil_data: SoilData, current_day_conditions: CurrentDayConditions
+):
     snow = Snow(soil_data=soil_data)
 
     if soil_data.previous_day_snow_temperature is None:
         expected_result = current_day_conditions.mean_air_temperature
     else:
-        expected_result = (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + (
-            current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor
-        )
+        expected_result = (
+            soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)
+        ) + (current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor)
 
-    actual_result = snow._calc_snow_temp(soil_data=soil_data, current_day_conditions=current_day_conditions)
+    actual_result = snow._calc_snow_temp(
+        soil_data=soil_data, current_day_conditions=current_day_conditions
+    )
 
     assert actual_result == expected_result
 
@@ -95,14 +103,22 @@ def test_melt_snow(
         melt_factor
         * snow_coverage_fraction
         * (
-            (soil_data.current_day_snow_temperature + current_day_conditions.max_air_temperature) / 2
+            (
+                soil_data.current_day_snow_temperature
+                + current_day_conditions.max_air_temperature
+            )
+            / 2
             - soil_data.snow_melt_base_temperature
         ),
         0.0,
     )
 
-    with patch.object(Snow, "_melt_factor", return_value=melt_factor) as mock_melt_factor:
-        actual_result = snow._melt_snow(soil_data=soil_data, current_day_conditions=current_day_conditions, day=day)
+    with patch.object(
+        Snow, "_melt_factor", return_value=melt_factor
+    ) as mock_melt_factor:
+        actual_result = snow._melt_snow(
+            soil_data=soil_data, current_day_conditions=current_day_conditions, day=day
+        )
 
     mock_melt_factor.assert_called_once_with(soil_data=soil_data, day=day)
     if expected_result > soil_data.snow_content:
@@ -134,7 +150,9 @@ def test_melt_snow(
 def test_melt_factor(soil_data: SoilData, day: int):
     snow = Snow(soil_data=soil_data)
 
-    expected_result = (soil_data.snow_melt_factor_maximum + soil_data.snow_melt_factor_minimum) / 2 + (
+    expected_result = (
+        soil_data.snow_melt_factor_maximum + soil_data.snow_melt_factor_minimum
+    ) / 2 + (
         (soil_data.snow_melt_factor_maximum - soil_data.snow_melt_factor_minimum)
         / 2
         * math.sin(2 * math.pi / 365)
@@ -161,7 +179,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0
+            ),
             15,
         ),
         (
@@ -176,7 +196,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0
+            ),
             25,
         ),
         (
@@ -191,7 +213,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0
+            ),
             15,
         ),
         (
@@ -206,7 +230,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0
+            ),
             15,
         ),
         (
@@ -221,7 +247,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0
+            ),
             15,
         ),
         (
@@ -236,7 +264,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0
+            ),
             15,
         ),
         (
@@ -251,7 +281,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0
+            ),
             15,
         ),
         (
@@ -266,12 +298,16 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(
+                mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0
+            ),
             15,
         ),
     ],
 )
-def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int):
+def test_update_snow(
+    soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int
+):
     snow = Snow(soil_data=soil_data)
 
     if soil_data.snow_content < 0.0:
@@ -297,13 +333,18 @@ def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayCond
             dummy_melt_factor
             * soil_data.snow_coverage_fraction
             * (
-                (dummy_snow_temperature + current_day_conditions.max_air_temperature) / 2
+                (dummy_snow_temperature + current_day_conditions.max_air_temperature)
+                / 2
                 - soil_data.snow_melt_base_temperature
             )
         )
 
-        with patch.object(Snow, "_calc_snow_temp", return_value=dummy_snow_temperature) as mock_calc_snow_temp:
-            with patch.object(Snow, "_melt_snow", return_value=snow_melt_amount) as mock_melt_snow:
+        with patch.object(
+            Snow, "_calc_snow_temp", return_value=dummy_snow_temperature
+        ) as mock_calc_snow_temp:
+            with patch.object(
+                Snow, "_melt_snow", return_value=snow_melt_amount
+            ) as mock_melt_snow:
                 snow.update_snow(current_day_conditions=current_day_conditions, day=day)
 
         expected_previous_day_snow_temperature = (
@@ -312,12 +353,18 @@ def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayCond
             else current_day_conditions.mean_air_temperature
         )
 
-        assert soil_data.previous_day_snow_temperature == expected_previous_day_snow_temperature
+        assert (
+            soil_data.previous_day_snow_temperature
+            == expected_previous_day_snow_temperature
+        )
         mock_calc_snow_temp.assert_called_once_with(soil_data, current_day_conditions)
         assert soil_data.current_day_snow_temperature == dummy_snow_temperature
         mock_melt_snow.assert_called_once_with(soil_data, current_day_conditions, day)
         assert soil_data.snow_melt_amount == snow_melt_amount
-        assert soil_data.snow_content == snow_content_before + current_day_conditions.snowfall - snow_melt_amount
+        assert (
+            soil_data.snow_content
+            == snow_content_before + current_day_conditions.snowfall - snow_melt_amount
+        )
 
 
 @pytest.mark.parametrize(

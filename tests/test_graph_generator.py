@@ -25,13 +25,19 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
     with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
         mock_savefig.return_value = None
 
-        with patch("RUFAS.graph_generator.GraphGenerator._generate_graph_path") as mock_generate_graph_path:
+        with patch(
+            "RUFAS.graph_generator.GraphGenerator._generate_graph_path"
+        ) as mock_generate_graph_path:
             mock_generate_graph_path.return_value = Path("graph_path")
 
-            result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
+            result = graph_generator._save_graph(
+                graph_details, filter_file_name, graphics_dir
+            )
 
             mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value)
-            mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+            mock_generate_graph_path.assert_called_once_with(
+                graph_details, filter_file_name, graphics_dir
+            )
             assert result == mock_generate_graph_path.return_value
 
 
@@ -49,7 +55,9 @@ def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
     with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
         mock_savefig.side_effect = Exception("test")
         with pytest.raises(Exception, match="test"):
-            graph_generator._save_graph(graph_details, filter_file_name, save_path, graphics_dir)
+            graph_generator._save_graph(
+                graph_details, filter_file_name, save_path, graphics_dir
+            )
 
 
 def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
@@ -62,8 +70,12 @@ def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None
     graphics_dir: str = "graphics"
 
     with freeze_time("2023-10-13 11:41:23"):
-        result = graph_generator._generate_graph_path(graph_details, filter_file_name, graphics_dir)
-        assert result == Path(r"graphics/metadata_name_test-graph-13-Oct-2023_Fri_11-41-23.png")
+        result = graph_generator._generate_graph_path(
+            graph_details, filter_file_name, graphics_dir
+        )
+        assert result == Path(
+            r"graphics/metadata_name_test-graph-13-Oct-2023_Fri_11-41-23.png"
+        )
 
 
 def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
@@ -75,8 +87,12 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
     graphics_dir: str = "graphics"
 
     with freeze_time("2023-10-13 11:41:23"):
-        result = graph_generator._generate_graph_path(graph_details, filter_file_name, graphics_dir)
-        assert result == Path(r"graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png")
+        result = graph_generator._generate_graph_path(
+            graph_details, filter_file_name, graphics_dir
+        )
+        assert result == Path(
+            r"graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
+        )
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
@@ -114,11 +130,15 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     filtered_pool = {"var1": [1, 2, 3]}
     mock_log_pool = [{"error": "mock_error_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
-    graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
+    graph_generator._prepare_plot_data = MagicMock(
+        return_value=mock_prepare_plot_data_return
+    )
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir)
+    assert mock_log_pool == graph_generator.generate_graph(
+        filtered_pool, graph_details, filter_file_name, graphics_dir
+    )
     graph_generator._draw_graph.assert_not_called()
     graph_generator._customize_graph.assert_not_called()
     graph_generator._save_graph.assert_not_called()
@@ -132,14 +152,22 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     filtered_pool = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
-    graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
+    graph_generator._prepare_plot_data = MagicMock(
+        return_value=mock_prepare_plot_data_return
+    )
     graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir)
-    graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys())
+    assert mock_log_pool == graph_generator.generate_graph(
+        filtered_pool, graph_details, filter_file_name, graphics_dir
+    )
+    graph_generator._draw_graph.assert_called_once_with(
+        "plot", filtered_pool, filtered_pool.keys()
+    )
     graph_generator._customize_graph.assert_called_once()
-    graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+    graph_generator._save_graph.assert_called_once_with(
+        graph_details, filter_file_name, graphics_dir
+    )
 
 
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -152,7 +180,9 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     with pytest.raises(Exception):
-        graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir)
+        graph_generator.generate_graph(
+            filtered_pool, graph_details, filter_file_name, graphics_dir
+        )
 
 
 def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -286,8 +316,12 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
         ),
         (
             {
-                "variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
-                "variable2": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
+                "variable1": {
+                    "values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]
+                },
+                "variable2": {
+                    "values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]
+                },
             },
             {"variables": ["a", "b"], "title": "Test_4"},
             [
@@ -317,7 +351,11 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             ),
         ),
         (
-            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]}},
+            {
+                "variable1": {
+                    "values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]
+                }
+            },
             {"variables": ["a", "b"], "title": "Test_6"},
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
@@ -356,7 +394,9 @@ def test_prepare_plot_data_logic(
     mock_filter_pool.side_effect = expected_util_filter_pool
 
     # Act
-    prepared_pool, log_pool = mock_graph_generator._prepare_plot_data(filtered_pool, graph_details)
+    prepared_pool, log_pool = mock_graph_generator._prepare_plot_data(
+        filtered_pool, graph_details
+    )
 
     # Assert
     assert prepared_pool == expected_result[0]

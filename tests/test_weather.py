@@ -115,7 +115,9 @@ def test_weather_init(mock_weather_input: dict, mock_config: Config) -> None:
         ([-4.55, -3.22, -1.05, -0.3, 1.44, 3.99, 8.6], 0.7014285714285712),
     ],
 )
-def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
+def test_calculate_average_annual_temperature(
+    avg_daily_temperatures: list[float], expected: float
+) -> None:
     """Tests that the annual average air temperature is correctly calculated based on average daily temperatures."""
     actual = Weather._calculate_average_annual_temperature(avg_daily_temperatures)
     assert actual == expected
@@ -258,7 +260,9 @@ def test_get_latitude(
             "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
             return_value=field_keys,
         ) as keys,
-        patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data,
+        patch(
+            "RUFAS.input_manager.InputManager.get_data", return_value=field_data
+        ) as data,
         patch.object(om, "add_warning") as warning,
     ):
         actual = mock_weather._get_latitude()

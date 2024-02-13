@@ -72,7 +72,9 @@ class AnimalModuleReporter:
         for animal in list(pen.animals_in_pen.values()):
             milk_data_update = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
-            milk_data_update["estimated_daily_milk_produced"] = animal.estimated_daily_milk_produced
+            milk_data_update[
+                "estimated_daily_milk_produced"
+            ] = animal.estimated_daily_milk_produced
             milk_data_update["milk_protein"] = animal.mPrt
             milk_data_update["milk_fat"] = animal.fat_percent
             milk_data_update["milk_lactose"] = animal.lactose_milk
@@ -150,7 +152,9 @@ class AnimalModuleReporter:
                     info_map,
                 )
 
-    def report_daily_ration(animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
+    def report_daily_ration(
+        animal_manager, available_feeds: Dict[str, Dict[str, Any]]
+    ) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
@@ -174,7 +178,9 @@ class AnimalModuleReporter:
             ration_total["byproducts_total"] = 0
             for key in ration_per_animal.keys():
                 if key != "status" and key != "objective":
-                    ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
+                    ration_total[key] = pen.ration_per_animal[key] * len(
+                        pen.animals_in_pen
+                    )
                     ration_total["dry_matter_intake_total"] += ration_total[key]
                     if available_feeds[key]["Fd_Category"] == "By-Product/Other":
                         ration_total["byproducts_total"] += ration_total[key]
@@ -296,28 +302,54 @@ class AnimalModuleReporter:
             life_cycle_manager.sold_heiferIII_oversupply_num,
             info_map,
         )
-        om.add_variable("bought_heifer_num", life_cycle_manager.bought_heifer_num, info_map)
-        om.add_variable("sold_heiferII_num", life_cycle_manager.sold_heiferII_num, info_map)
-        om.add_variable("cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, info_map)
+        om.add_variable(
+            "bought_heifer_num", life_cycle_manager.bought_heifer_num, info_map
+        )
+        om.add_variable(
+            "sold_heiferII_num", life_cycle_manager.sold_heiferII_num, info_map
+        )
+        om.add_variable(
+            "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, info_map
+        )
         om.add_variable("sold_cow_num", life_cycle_manager.sold_cow_num, info_map)
-        om.add_variable("GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, info_map)
-        om.add_variable("GnRH_injection_num", life_cycle_manager.GnRH_injection_num, info_map)
-        om.add_variable("PGF_injection_num", life_cycle_manager.PGF_injection_num, info_map)
-        om.add_variable("PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h, info_map)
+        om.add_variable(
+            "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, info_map
+        )
+        om.add_variable(
+            "GnRH_injection_num", life_cycle_manager.GnRH_injection_num, info_map
+        )
+        om.add_variable(
+            "PGF_injection_num", life_cycle_manager.PGF_injection_num, info_map
+        )
+        om.add_variable(
+            "PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h, info_map
+        )
         om.add_variable("ai_num", life_cycle_manager.ai_num, info_map)
         om.add_variable("preg_check_num", life_cycle_manager.preg_check_num, info_map)
-        om.add_variable("preg_check_num_h", life_cycle_manager.preg_check_num_h, info_map)
+        om.add_variable(
+            "preg_check_num_h", life_cycle_manager.preg_check_num_h, info_map
+        )
         om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num, info_map)
-        om.add_variable("daily_milk_production", life_cycle_manager.daily_milk_production, info_map)
+        om.add_variable(
+            "daily_milk_production", life_cycle_manager.daily_milk_production, info_map
+        )
         om.add_variable(
             "dry_cows_daily_milk_production",
             life_cycle_manager.dry_cows_daily_milk_production,
             info_map,
         )
-        om.add_variable("herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map)
-        om.add_variable("herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map)
-        om.add_variable("dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map)
-        om.add_variable("herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map)
+        om.add_variable(
+            "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
+        )
+        om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
+        )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
@@ -333,11 +365,19 @@ class AnimalModuleReporter:
         om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num, info_map)
         om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num, info_map)
         om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num, info_map)
-        om.add_variable("avg_days_in_milk", life_cycle_manager.avg_days_in_milk, info_map)
-        om.add_variable("avg_days_in_preg", life_cycle_manager.avg_days_in_preg, info_map)
-        om.add_variable("avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight, info_map)
+        om.add_variable(
+            "avg_days_in_milk", life_cycle_manager.avg_days_in_milk, info_map
+        )
+        om.add_variable(
+            "avg_days_in_preg", life_cycle_manager.avg_days_in_preg, info_map
+        )
+        om.add_variable(
+            "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight, info_map
+        )
         om.add_variable("avg_parity_num", life_cycle_manager.avg_parity_num, info_map)
-        om.add_variable("avg_calving_interval", life_cycle_manager.avg_calving_interval, info_map)
+        om.add_variable(
+            "avg_calving_interval", life_cycle_manager.avg_calving_interval, info_map
+        )
         om.add_variable(
             "avg_breeding_to_preg_time",
             life_cycle_manager.avg_breeding_to_preg_time,
@@ -348,7 +388,9 @@ class AnimalModuleReporter:
             life_cycle_manager.avg_heifer_culling_age,
             info_map,
         )
-        om.add_variable("avg_cow_culling_age", life_cycle_manager.avg_cow_culling_age, info_map)
+        om.add_variable(
+            "avg_cow_culling_age", life_cycle_manager.avg_cow_culling_age, info_map
+        )
         om.add_variable(
             "avg_mature_body_weight",
             life_cycle_manager.avg_mature_body_weight,
@@ -362,11 +404,15 @@ class AnimalModuleReporter:
         om.add_variable("num_cow_for_parity_1", parity_1, info_map)
         om.add_variable("num_cow_for_parity_2", parity_2, info_map)
         om.add_variable("num_cow_for_parity_3", parity_3, info_map)
-        om.add_variable("num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map)
+        om.add_variable(
+            "num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map
+        )
         calving_to_preg_time_1 = life_cycle_manager.avg_calving_to_preg_time["1"]
         calving_to_preg_time_2 = life_cycle_manager.avg_calving_to_preg_time["2"]
         calving_to_preg_time_3 = life_cycle_manager.avg_calving_to_preg_time["3"]
-        calving_to_preg_time_greater_than_3 = life_cycle_manager.avg_calving_to_preg_time["greater_than_3"]
+        calving_to_preg_time_greater_than_3 = (
+            life_cycle_manager.avg_calving_to_preg_time["greater_than_3"]
+        )
         om.add_variable("calving_to_preg_time_1", calving_to_preg_time_1, info_map)
         om.add_variable("calving_to_preg_time_2", calving_to_preg_time_2, info_map)
         om.add_variable("calving_to_preg_time_3", calving_to_preg_time_3, info_map)
@@ -378,7 +424,9 @@ class AnimalModuleReporter:
         avg_age_for_calving_1 = life_cycle_manager.avg_age_for_calving["1"]
         avg_age_for_calving_2 = life_cycle_manager.avg_age_for_calving["2"]
         avg_age_for_calving_3 = life_cycle_manager.avg_age_for_calving["3"]
-        avg_age_for_calving_greater_than_3 = life_cycle_manager.avg_age_for_calving["greater_than_3"]
+        avg_age_for_calving_greater_than_3 = life_cycle_manager.avg_age_for_calving[
+            "greater_than_3"
+        ]
         om.add_variable("avg_age_for_calving_1", avg_age_for_calving_1, info_map)
         om.add_variable("avg_age_for_calving_2", avg_age_for_calving_2, info_map)
         om.add_variable("avg_age_for_calving_3", avg_age_for_calving_3, info_map)
@@ -387,7 +435,9 @@ class AnimalModuleReporter:
             avg_age_for_calving_greater_than_3,
             info_map,
         )
-        om.add_variable("cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map)
+        om.add_variable(
+            "cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map
+        )
 
     @staticmethod
     def report_sold_animal_information(animal_manager) -> None:
@@ -442,7 +492,9 @@ class AnimalModuleReporter:
                 om.add_variable("parity", "NA", info_map)
 
     @staticmethod
-    def report_sold_animal_information_sort_by_sell_day(sold_animals, report_name: str, total_days: int) -> None:
+    def report_sold_animal_information_sort_by_sell_day(
+        sold_animals, report_name: str, total_days: int
+    ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
 
@@ -480,7 +532,9 @@ class AnimalModuleReporter:
         for day in range(1, total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
-                sold_weight = sum(sold_animal.body_weight for sold_animal in daily_sell[day])
+                sold_weight = sum(
+                    sold_animal.body_weight for sold_animal in daily_sell[day]
+                )
                 om.add_variable(f"{report_name}_sold_count", sold_count, info_map)
                 om.add_variable(f"{report_name}_sold_weight", sold_weight, info_map)
             else:
@@ -502,7 +556,11 @@ class AnimalModuleReporter:
             "class": "cow",
             "function": "update_milk_production_history",
         }
-        milk_history_list = [cow.latest_milk_production_305days for cow in animal_manager.cows if cow.is_lactating]
+        milk_history_list = [
+            cow.latest_milk_production_305days
+            for cow in animal_manager.cows
+            if cow.is_lactating
+        ]
         nonzero_milk_history_list = [x for x in milk_history_list if x != 0.0]
         milk_production_305days_herd_mean = ""
         if nonzero_milk_history_list:
@@ -513,7 +571,9 @@ class AnimalModuleReporter:
             info_map,
         )
 
-    def report_daily_reports(animal_manager, available_feeds: Dict[str, Dict[str, Any]]):
+    def report_daily_reports(
+        animal_manager, available_feeds: Dict[str, Dict[str, Any]]
+    ):
         """
         Calls all reporter methods that should happen at the end of each day.
 

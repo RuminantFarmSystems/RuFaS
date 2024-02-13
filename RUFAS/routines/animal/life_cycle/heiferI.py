@@ -116,7 +116,12 @@ class HeiferI(Calf):
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
-            (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
+            (
+                0.0012
+                + 0.004635
+                * (self.mature_body_weight**0.22)
+                * (self.body_weight ** (-0.22))
+            )
             * self.daily_growth
             / 0.96
             * 1000
@@ -139,7 +144,9 @@ class HeiferI(Calf):
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
         if divisor == 0:
             divisor = 1
-        return (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor
+        return (
+            0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight
+        ) / divisor
 
     def update(self, sim_day):
         """

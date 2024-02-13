@@ -31,7 +31,9 @@ def test_calc_nutrient_stress(act, opt):
     if stress > 1:
         stress = 1
 
-    assert GrowthConstraints._determine_nutrient_stress(stored=act, optimal=opt) == stress
+    assert (
+        GrowthConstraints._determine_nutrient_stress(stored=act, optimal=opt) == stress
+    )
 
 
 @pytest.mark.parametrize(
@@ -94,7 +96,12 @@ def test_calc_temperature_stress(air, mini, opt):
     if air >= dbl:  # D
         expect = 1
 
-    assert GrowthConstraints._determine_temperature_stress(air_temp=air, min_temp=mini, optimal_temp=opt) == expect
+    assert (
+        GrowthConstraints._determine_temperature_stress(
+            air_temp=air, min_temp=mini, optimal_temp=opt
+        )
+        == expect
+    )
 
 
 @pytest.mark.parametrize(
@@ -226,4 +233,6 @@ def test_constrain_growth(trans, temp):
     t_stress = GrowthConstraints._determine_temperature_stress(temp, 12.8, 24.0)
     n_stress = GrowthConstraints._determine_nutrient_stress(38.7, 77.1)
     p_stress = GrowthConstraints._determine_nutrient_stress(12.9, 31.2)
-    assert data.growth_factor == GrowthConstraints._determine_growth_factor(w_stress, t_stress, n_stress, p_stress)
+    assert data.growth_factor == GrowthConstraints._determine_growth_factor(
+        w_stress, t_stress, n_stress, p_stress
+    )

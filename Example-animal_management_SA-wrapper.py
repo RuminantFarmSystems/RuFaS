@@ -150,7 +150,9 @@ class ExampleAnimalSA:
 
         # Set up a new instance of this class
         example_class = ExampleAnimalSA()
-        example_class._perform_initial_setup(animal_management_json, animal_dir, feed_dir, manure_dir)
+        example_class._perform_initial_setup(
+            animal_management_json, animal_dir, feed_dir, manure_dir
+        )
         example_class._setup_main_object()
 
         # alter relevant values (these are just examples)
@@ -182,9 +184,14 @@ class ExampleAnimalSA:
             [pen.avg_p_req for pen in example_class.animal_management_instance.all_pens]
         )
         total_manure_mass = sum(
-            [pen.manure["manure_mass"] for pen in example_class.animal_management_instance.all_pens]
+            [
+                pen.manure["manure_mass"]
+                for pen in example_class.animal_management_instance.all_pens
+            ]
         )
-        mean_pen_phosphorus_requirements = total_phosphorus_requirements / number_of_pens
+        mean_pen_phosphorus_requirements = (
+            total_phosphorus_requirements / number_of_pens
+        )
         mean_pen_manure_mass = total_manure_mass / number_of_pens
 
         return mean_pen_phosphorus_requirements, mean_pen_manure_mass
@@ -226,7 +233,9 @@ class ExampleAnimalSA:
         n_outputs = 2  # length of output from objective_function()
 
         results = numpy.empty((rows, n_outputs))
-        for i in range(rows):  # This loop is probably slowing things down - need faster way to vectorize
+        for i in range(
+            rows
+        ):  # This loop is probably slowing things down - need faster way to vectorize
             dry_matter, carbon, phosphorus, nitrogen, fiber = X[i, :]
             results[i,] = ExampleAnimalSA.objective_function(
                 dry_matter,
@@ -277,11 +286,15 @@ class ExampleAnimalSA:
             directory in which to search for the manure json file
         """
         self.animal_management_json = animal_management_json
-        self.main_input_dict = self.make_data_dict_from_json(self.animal_management_json)
+        self.main_input_dict = self.make_data_dict_from_json(
+            self.animal_management_json
+        )
         self.animal_path = animal_dir + "/" + self.main_input_dict["farm"]["animal"]
         self.config_dict = self.main_input_dict["config"]
         self.feed_path = feed_dir + "/" + self.main_input_dict["farm"]["feed"]
-        self.manure_management_path = manure_dir + "/" + self.main_input_dict["farm"]["manure"]
+        self.manure_management_path = (
+            manure_dir + "/" + self.main_input_dict["farm"]["manure"]
+        )
         self.weather_path = self.main_input_dict["weather"]
 
     def _setup_main_object(self):
@@ -292,10 +305,14 @@ class ExampleAnimalSA:
         self.weather_instance = Weather(self.weather_path, self.config_instance)
         self.time_instance = Time(self.config_instance)
 
-        self.animal_management_dict = self.make_data_dict_from_json(self.animal_path)  # this will get altered
-        self.animal_management_dict["manure_management_scenarios"] = self.make_data_dict_from_json(
-            self.manure_management_path
-        )["manure_management_scenarios"]
+        self.animal_management_dict = self.make_data_dict_from_json(
+            self.animal_path
+        )  # this will get altered
+        self.animal_management_dict[
+            "manure_management_scenarios"
+        ] = self.make_data_dict_from_json(self.manure_management_path)[
+            "manure_management_scenarios"
+        ]
 
 
 # --- Example in Practice ----
@@ -356,7 +373,9 @@ if __name__ == "__main__":
     print("performing SA (expect benign warnings about parallelization) ...")
     SA.perform_sensitivity_analysis()  # note, verify CPU usage in Task Manager or Resource Monitor
     end_time = time.time()
-    print(f"elapsed time for {SA.problem.samples.shape[0]} samples: {end_time - start_time} seconds")
+    print(
+        f"elapsed time for {SA.problem.samples.shape[0]} samples: {end_time - start_time} seconds"
+    )
     # Note: For the run on my work PC, using 2 cores, this took 1.36 seconds per sample (rows of `SA.problem.samples`)
 
     # Total effects of each parameter

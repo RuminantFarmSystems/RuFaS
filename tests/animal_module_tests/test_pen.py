@@ -115,7 +115,11 @@ def test_set_milk_avgs(pen: Pen):
 
     pen.set_milk_avgs(avg_milk, avg_CP_milk, avg_milk_production_reduction)
 
-    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
+    assert (
+        pen.avg_milk == avg_milk
+        and pen.avg_CP_milk == avg_CP_milk
+        and pen.avg_milk_production_reduction == 1.5
+    )
 
 
 @pytest.mark.parametrize(
@@ -428,10 +432,14 @@ def test_get_prefix_and_default_manure_excretion(
 
     # Act and assert
     if expected_prefix is ValueError:
-        with pytest.raises(ValueError, match=f"Unrecognized animal type: {type(animal)}"):
+        with pytest.raises(
+            ValueError, match=f"Unrecognized animal type: {type(animal)}"
+        ):
             Pen._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
     else:
-        prefix, manure = Pen._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
+        prefix, manure = Pen._get_prefix_and_default_manure_excretion(
+            animal, is_lactating_cow
+        )
         assert prefix == expected_prefix
         assert manure == mock_default_manure
         patch_for_get_default_animal_manure_excretions.assert_called_once()
@@ -492,7 +500,9 @@ def test_calc_animal_manure_excretion(
     # Assert
     assert actual_prefix == mock_prefix
     assert actual_manure == mock_default_manure
-    patch_for_get_prefix_and_default_manure_excretion.assert_called_once_with(animal, is_lactating)
+    patch_for_get_prefix_and_default_manure_excretion.assert_called_once_with(
+        animal, is_lactating
+    )
     if animal_class.__name__ == "Cow":
         animal.calc_manure_excretion.assert_called_once_with(
             mock_feed,
@@ -502,7 +512,9 @@ def test_calc_animal_manure_excretion(
             mock_MEdiet,
         )
     else:
-        animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model)
+        animal.calc_manure_excretion.assert_called_once_with(
+            mock_feed, mock_methane_model
+        )
 
 
 @pytest.mark.parametrize(
@@ -612,7 +624,9 @@ def test_update_animal_manure_excretion_data(
             [mocker.call(initial_animal_manure, animal_manure_excretion)]
         )
     else:
-        patch_for_add_animal_manure_excretions.assert_has_calls([mocker.call(default_manure, animal_manure_excretion)])
+        patch_for_add_animal_manure_excretions.assert_has_calls(
+            [mocker.call(default_manure, animal_manure_excretion)]
+        )
 
 
 @pytest.mark.parametrize(
@@ -677,7 +691,9 @@ def test_calc_total_manure(
     pen = Pen()  # type: ignore
     pen.id = "mock_pen_id"
     pen.manure = mock_pen_manure
-    mocker.patch.object(Pen, "is_populated", return_value=is_populated, new_callable=mocker.PropertyMock)
+    mocker.patch.object(
+        Pen, "is_populated", return_value=is_populated, new_callable=mocker.PropertyMock
+    )
     for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
@@ -687,13 +703,17 @@ def test_calc_total_manure(
     methane_mitigation_additive_amount = mocker.MagicMock()
     manure_excretions_output_data = mocker.MagicMock()
     mock_prefixes = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
-    mock_animal_manure_excretions = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
+    mock_animal_manure_excretions = [
+        mocker.MagicMock() for _ in range(len(animals_in_pen))
+    ]
     patch_for_calc_animal_manure_excretion = mocker.patch.object(
         pen,
         "_calc_animal_manure_excretion",
         side_effect=zip(mock_prefixes, mock_animal_manure_excretions),
     )
-    patch_for_update_animal_manure_excretion_data = mocker.patch.object(pen, "_update_animal_manure_excretion_data")
+    patch_for_update_animal_manure_excretion_data = mocker.patch.object(
+        pen, "_update_animal_manure_excretion_data"
+    )
     patch_for_add_animal_manure_excretions = mocker.patch(
         "RUFAS.routines.animal.pen.add_animal_manure_excretions",
         return_value=mock_pen_manure,
@@ -729,7 +749,9 @@ def test_calc_total_manure(
             patch_for_add_animal_manure_excretions.assert_has_calls(
                 [mocker.call(mock_pen_manure, animal.manure_excretion)]
             )
-        assert patch_for_update_animal_manure_excretion_data.call_count == len(animals_in_pen)
+        assert patch_for_update_animal_manure_excretion_data.call_count == len(
+            animals_in_pen
+        )
     else:
         patch_for_get_default_animal_manure_excretions.assert_not_called()
         patch_for_calc_animal_manure_excretion.assert_not_called()

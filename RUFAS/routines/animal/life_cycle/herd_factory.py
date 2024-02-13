@@ -69,7 +69,9 @@ class HerdFactory:
 
         self.breed = im.get_data("animal.herd_information.breed")
         self.CI = im.get_data("animal.animal_config.farm_level.repro.calving_interval")
-        self.initial_animal_num = im.get_data("animal.herd_initialization.initial_animal_num")
+        self.initial_animal_num = im.get_data(
+            "animal.herd_initialization.initial_animal_num"
+        )
         self.simulation_days = im.get_data("animal.herd_initialization.simulation_days")
 
         self.pre_animal_population = AnimalPopulation(
@@ -116,8 +118,12 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["heifer_repro_method"])
-                args.update(tai_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
-                args.update(synch_ed_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
+                args.update(
+                    tai_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"]
+                )
+                args.update(
+                    synch_ed_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"]
+                )
 
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
@@ -152,7 +158,9 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["cow_repro_method"])
-                args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
+                args.update(
+                    presynch_method=AnimalBase.config["cows"]["presynch_program"]
+                )
                 args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
                 args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
 
@@ -186,7 +194,9 @@ class HerdFactory:
                     p_init=cow.p_gest_for_calf,
                     birth_weight=cow.calf_birth_weight,
                 )
-                cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
+                cow.p_animal = (
+                    cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
+                )
                 cow.p_gest_for_calf = 0
                 cow.calf_birth_weight = 0
 
@@ -297,11 +307,19 @@ class HerdFactory:
     def _random_sample_with_replacement(self) -> AnimalPopulation:
         """Function to randomly sample the herd with replacement"""
         post_calves: List[Calf] = self._random_sample_with_replacement_by_type("calf")
-        post_heiferIs: List[HeiferI] = self._random_sample_with_replacement_by_type("heiferI")
-        post_heiferIIs: List[HeiferII] = self._random_sample_with_replacement_by_type("heiferII")
-        post_heiferIIIs: List[HeiferIII] = self._random_sample_with_replacement_by_type("heiferIII")
+        post_heiferIs: List[HeiferI] = self._random_sample_with_replacement_by_type(
+            "heiferI"
+        )
+        post_heiferIIs: List[HeiferII] = self._random_sample_with_replacement_by_type(
+            "heiferII"
+        )
+        post_heiferIIIs: List[HeiferIII] = self._random_sample_with_replacement_by_type(
+            "heiferIII"
+        )
         post_cows: List[Cow] = self._random_sample_with_replacement_by_type("cow")
-        post_replacement: List[Cow] = self._random_sample_with_replacement_by_type("replacement")
+        post_replacement: List[Cow] = self._random_sample_with_replacement_by_type(
+            "replacement"
+        )
 
         return AnimalPopulation(
             calves=post_calves,
@@ -356,13 +374,19 @@ class HerdFactory:
         function also optionally saves the generated herd data into a JSON file.
         The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
         """
-        AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
+        AnimalBase.set_config(
+            AnimalManager.get_animal_config(im.get_data("animal.animal_config"))
+        )
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
-                timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
-                save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
+                timestamp: str = datetime.datetime.now().strftime(
+                    "%d-%b-%Y_%a_%H-%M-%S"
+                )
+                save_path = Path.joinpath(
+                    self.save_animals_path, f"animal_population-{timestamp}.json"
+                )
                 om.dict_to_file_json(
                     self.pre_animal_population.__repr__(),
                     save_path,

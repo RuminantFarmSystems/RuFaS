@@ -47,19 +47,27 @@ class WaterUptake:
         top_depths = soil_data.get_vectorized_layer_attribute("top_depth")
         bottom_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
         water_availabilities = soil_data.get_vectorized_layer_attribute("water_content")
-        water_capacities = soil_data.get_vectorized_layer_attribute("available_water_capacity")
-        wilting_points = soil_data.get_vectorized_layer_attribute("wilting_point_content")
-
-        self.crop_data.potential_water_uptakes = self._find_stratified_max_water_uptakes(
-            root_depth=self.crop_data.root_depth,
-            max_transpiration=self.crop_data.max_transpiration,
-            upper_depths=top_depths,
-            lower_depths=bottom_depths,
-            water_distro_parameter=self.crop_data.water_distro_parameter,
+        water_capacities = soil_data.get_vectorized_layer_attribute(
+            "available_water_capacity"
         )
-        self.crop_data.unmet_water_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
-            uptake_potentials=self.crop_data.potential_water_uptakes,
-            nutrient_availabilities=water_availabilities,
+        wilting_points = soil_data.get_vectorized_layer_attribute(
+            "wilting_point_content"
+        )
+
+        self.crop_data.potential_water_uptakes = (
+            self._find_stratified_max_water_uptakes(
+                root_depth=self.crop_data.root_depth,
+                max_transpiration=self.crop_data.max_transpiration,
+                upper_depths=top_depths,
+                lower_depths=bottom_depths,
+                water_distro_parameter=self.crop_data.water_distro_parameter,
+            )
+        )
+        self.crop_data.unmet_water_demands = (
+            NitrogenIncorporation.determine_layer_nutrient_demands(
+                uptake_potentials=self.crop_data.potential_water_uptakes,
+                nutrient_availabilities=water_availabilities,
+            )
         )
         self.crop_data.potential_water_uptakes = self._adjust_water_uptakes(
             potential_uptakes=self.crop_data.potential_water_uptakes,
@@ -104,7 +112,9 @@ class WaterUptake:
 
         """
         if len(soil_data.soil_layers) != len(self.crop_data.actual_water_uptakes):
-            raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
+            raise Exception(
+                "actual_water_uptakes should be the same length as the number of soil layers"
+            )
 
         available_water = soil_data.get_vectorized_layer_attribute("water_content")
         zipped = zip(available_water, self.crop_data.actual_water_uptakes)
@@ -138,14 +148,25 @@ class WaterUptake:
         This method is a wrapper that applies _determine_actual_layer_uptake() to each layer.
 
         """
-        if not len(potential_uptakes) == len(water_availabilities) == len(wilting_points):
-            raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
+        if (
+            not len(potential_uptakes)
+            == len(water_availabilities)
+            == len(wilting_points)
+        ):
+            raise Exception(
+                "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+            )
 
         zipped = zip(potential_uptakes, water_availabilities, wilting_points)
-        return [WaterUptake._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
+        return [
+            WaterUptake._determine_actual_layer_uptake(pot, avail, wilt)
+            for pot, avail, wilt in zipped
+        ]
 
     @staticmethod
-    def _determine_actual_layer_uptake(potential: float, available_water: float, wilting_point_water: float) -> float:
+    def _determine_actual_layer_uptake(
+        potential: float, available_water: float, wilting_point_water: float
+    ) -> float:
         """
         Calculates the actual water taken up by the plant for a soil layer.
 
@@ -200,11 +221,20 @@ class WaterUptake:
         This method is a wrapper that applies _correct_layer_for_efficiency() to each layer.
 
         """
-        if not len(potential_uptakes) == len(water_availabilities) == len(available_capacities):
-            raise Exception("potential_uptakes, water_availabilities, and available_capacities must be of equal length")
+        if (
+            not len(potential_uptakes)
+            == len(water_availabilities)
+            == len(available_capacities)
+        ):
+            raise Exception(
+                "potential_uptakes, water_availabilities, and available_capacities must be of equal length"
+            )
 
         zipped = zip(potential_uptakes, water_availabilities, available_capacities)
-        return [WaterUptake._correct_layer_for_efficiency(pot, avail, cap) for pot, avail, cap in zipped]
+        return [
+            WaterUptake._correct_layer_for_efficiency(pot, avail, cap)
+            for pot, avail, cap in zipped
+        ]
 
     @staticmethod
     def _correct_layer_for_efficiency(
@@ -274,9 +304,14 @@ class WaterUptake:
 
         """
         if not len(potential_uptakes) == len(unmet_demands):
-            raise Exception("potential_uptakes and unmet_demands must be the same length.")
+            raise Exception(
+                "potential_uptakes and unmet_demands must be the same length."
+            )
 
-        adjusted = [uptake + (demand * uptake_compensation) for uptake, demand in zip(potential_uptakes, unmet_demands)]
+        adjusted = [
+            uptake + (demand * uptake_compensation)
+            for uptake, demand in zip(potential_uptakes, unmet_demands)
+        ]
 
         return adjusted
 

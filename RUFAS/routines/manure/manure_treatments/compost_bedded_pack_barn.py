@@ -98,7 +98,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         total_solids = bedding_total_solids + manure_total_solids
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_emission = GasEmissionsCalculator.ifsm_methane_emission(manure_volatile_solids, temperature_celsius)
+        methane_emission = GasEmissionsCalculator.ifsm_methane_emission(
+            manure_volatile_solids, temperature_celsius
+        )
         carbon_decomposition = GasEmissionsCalculator.total_carbon_decomposition(
             manure_total_solids=manure_total_solids,
             bedding_total_mass=bedding_total_solids,
@@ -111,7 +113,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         remaining_volatile_solids = manure_volatile_solids - methane_emission
         dry_matter_loss = 2 * carbon_decomposition + methane_emission
-        remaining_total_solids = total_solids - methane_emission - 2 * carbon_decomposition
+        remaining_total_solids = (
+            total_solids - methane_emission - 2 * carbon_decomposition
+        )
 
         return remaining_volatile_solids, remaining_total_solids, dry_matter_loss
 
@@ -128,15 +132,20 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         daily_input = self._current_manure_treatment_daily_input
 
-        total_nitrogen_loss = GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
-            daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-            is_bedding_tilled=True,
+        total_nitrogen_loss = (
+            GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
+                daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+                is_bedding_tilled=True,
+            )
         )
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
-        manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
+        manure_organic_nitrogen = (
+            ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
+        )
         manure_inorganic_nitrogen = manure_nitrogen - manure_organic_nitrogen
         manure_inorganic_nitrogen_ammonium = (
-            ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * manure_inorganic_nitrogen
+            ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION
+            * manure_inorganic_nitrogen
         )
 
         (
@@ -148,15 +157,22 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             bedding_total_solids=self._manure_handler_daily_output.total_bedding_mass,
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
         )
-        initial_manure_mass = daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY
+        initial_manure_mass = (
+            daily_input.liquid_manure_daily_volume
+            * ManureConstants.SOLID_MANURE_DENSITY
+        )
         if math.isclose(initial_manure_mass, 0):
             solid_manure_mass = 0
         else:
-            initial_total_solids_fraction = daily_input.liquid_manure_total_solids / initial_manure_mass
+            initial_total_solids_fraction = (
+                daily_input.liquid_manure_total_solids / initial_manure_mass
+            )
             if math.isclose(initial_total_solids_fraction, 0):
                 solid_manure_mass = 0
             else:
-                solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
+                solid_manure_mass = (
+                    remaining_total_solids / initial_total_solids_fraction
+                )
 
         manure_potassium = daily_input.liquid_manure_potassium * (
             1 - self.config.potassium_removal_efficiency_for_treatment
@@ -167,12 +183,16 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         water_extractable_inorganic_phosphorus = (
             self._current_pen.manure.inorganic_phosphorus_fraction * manure_phosphorus
         )
-        water_extractable_organic_phosphorus = self._current_pen.manure.organic_phosphorus_fraction * manure_phosphorus
+        water_extractable_organic_phosphorus = (
+            self._current_pen.manure.organic_phosphorus_fraction * manure_phosphorus
+        )
         non_water_extractable_inorganic_phosphorus = (
-            self._current_pen.manure.non_water_inorganic_phosphorus_fraction * manure_phosphorus
+            self._current_pen.manure.non_water_inorganic_phosphorus_fraction
+            * manure_phosphorus
         )
         non_water_extractable_organic_phosphorus = (
-            self._current_pen.manure.non_water_organic_phosphorus_fraction * manure_phosphorus
+            self._current_pen.manure.non_water_organic_phosphorus_fraction
+            * manure_phosphorus
         )
 
         storage_methane = GasEmissionsCalculator.ifsm_methane_emission(
@@ -183,12 +203,14 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
             is_bedding_tilled=True,
         )
+        # fmt: off
         storage_nitrous_oxide = (
             GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
                 daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
                 is_bedding_tilled=True,
             )
         )
+        # fmt: on
 
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,

@@ -60,7 +60,9 @@ class GrowthConstraints:
             The current air temperature in degrees Celsius.
         """
 
-        self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
+        self.data.water_stress = GrowthConstraints._determine_water_stress(
+            self.data.water_uptake, max_transpiration
+        )
         #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
 
         self.data.temp_stress = GrowthConstraints._determine_temperature_stress(
@@ -109,10 +111,14 @@ class GrowthConstraints:
         ----------
         SWAT 5:3.2.3
         """
-        return 1.0 - max(water_stress, temperature_stress, nitrogen_stress, phosphorus_stress)
+        return 1.0 - max(
+            water_stress, temperature_stress, nitrogen_stress, phosphorus_stress
+        )
 
     @staticmethod
-    def _determine_water_stress(water_uptake: float, max_transpiration: float) -> float:  # pseudocode: C.7.A.1
+    def _determine_water_stress(
+        water_uptake: float, max_transpiration: float
+    ) -> float:  # pseudocode: C.7.A.1
         """
         Calculates water stress for a given day.
 
@@ -181,7 +187,9 @@ class GrowthConstraints:
         return stress
 
     @staticmethod
-    def _determine_nutrient_stress(stored: float, optimal: float) -> float:  # pseudocode C.7.C.2
+    def _determine_nutrient_stress(
+        stored: float, optimal: float
+    ) -> float:  # pseudocode C.7.C.2
         """
         Calculates plant nutrient stress for the day.
 
@@ -205,5 +213,7 @@ class GrowthConstraints:
             stress = 0
         else:
             stress_factor = 200 * (stored / optimal - 0.5)
-            stress = 1 - stress_factor / (stress_factor + exp(3.535 - 0.02597 * stress_factor))
+            stress = 1 - stress_factor / (
+                stress_factor + exp(3.535 - 0.02597 * stress_factor)
+            )
         return min(1, stress)

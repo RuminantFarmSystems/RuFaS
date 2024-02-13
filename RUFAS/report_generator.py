@@ -185,7 +185,9 @@ class ReportGenerator:
             "function": self.generate_report.__name__,
         }
 
-        individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
+        individual_report_name = self._ensure_unique_report_name_with_timestamp(
+            filter_content.get("name")
+        )
 
         init_event_log = {
             "log": "start_generate_individual_report",
@@ -197,15 +199,21 @@ class ReportGenerator:
         try:
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
-                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+                cross_reference_data = {
+                    ref: self.reports[ref] for ref in filter_content["cross_references"]
+                }
                 cross_reference_data.update(filtered_pool)
-                report_data = self._perform_aggregations(cross_reference_data, filter_content)
+                report_data = self._perform_aggregations(
+                    cross_reference_data, filter_content
+                )
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                    f"{individual_report_name}_{col}"
+                    if len(individual_report_name) > 0
+                    else col
                 )
                 self.reports[column_name] = {"values": values}
 
@@ -268,7 +276,9 @@ class ReportGenerator:
         """
         missing_references = [ref for ref in references if ref not in self.reports]
         if missing_references:
-            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+            raise KeyError(
+                f"Missing referenced reports: {', '.join(missing_references)}"
+            )
 
     def _perform_aggregations(
         self,
@@ -308,7 +318,9 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
+            report_data = self._prepare_report_data_with_constants(
+                filtered_pool, filter_content
+            )
         except ValueError:
             raise
 
@@ -326,11 +338,15 @@ class ReportGenerator:
         if horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
             loop_list = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list, horizontal_aggregator)
+            horizontally_aggregated = self._apply_horizontal_aggregation(
+                report_data, loop_list, horizontal_aggregator
+            )
 
         if vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
+            vertically_aggregated = self._apply_vertical_aggregation(
+                report_data, vertical_aggregator
+            )
 
         aggregate_report = self._combine_aggregate_report_data(
             horizontally_aggregated, vertically_aggregated, filter_content
@@ -373,7 +389,9 @@ class ReportGenerator:
 
         if horizontal_agg_key and vertical_agg_key:
             horizontal_first = filter_content.get("horizontal_first", True)
-            aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key if horizontal_first else horizontal_agg_key]
+            aggregator = AGGREGATION_FUNCTIONS[
+                vertical_agg_key if horizontal_first else horizontal_agg_key
+            ]
             if horizontal_first:
                 return {"hor_ver_agg": [aggregator(horizontally_aggregated)]}
             else:
@@ -386,14 +404,22 @@ class ReportGenerator:
             return {"hor_agg": horizontally_aggregated}
 
         if vertical_agg_key:
-            if filter_content.get("variables") is not None or len(vertically_aggregated) > 1:
-                return {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+            if (
+                filter_content.get("variables") is not None
+                or len(vertically_aggregated) > 1
+            ):
+                return {
+                    f"{key}_ver_agg": value
+                    for key, value in vertically_aggregated.items()
+                }
             elif len(vertically_aggregated) == 1:
                 return {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return None
 
-    def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
+    def _extract_and_check_aggregation_keys(
+        self, filter_content: Dict[str, Any]
+    ) -> tuple[str | None, str | None]:
         """
         Extracts horizontal and vertical aggregation keys from the filter content and validates them against
         supported aggregation types.
@@ -419,11 +445,15 @@ class ReportGenerator:
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
         if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
+            raise ValueError(
+                f"Unsupported horizontal aggregation type: {horizontal_agg_key}"
+            )
 
         vertical_agg_key = filter_content.get("vertical_aggregation")
         if vertical_agg_key and vertical_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
+            raise ValueError(
+                f"Unsupported vertical aggregation type: {vertical_agg_key}"
+            )
 
         return horizontal_agg_key, vertical_agg_key
 
@@ -536,13 +566,19 @@ class ReportGenerator:
 
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
-                raise KeyError("Can't generate report, use 'variables' arg to select items from data")
+            if is_data_in_dict and (
+                selected_variables is None or not isinstance(selected_variables, list)
+            ):
+                raise KeyError(
+                    "Can't generate report, use 'variables' arg to select items from data"
+                )
             if is_data_in_dict:
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
                 )
-                filtered_data = Utility.filter_pool(temp_data, selected_variables, filter_by_exclusion)
+                filtered_data = Utility.filter_pool(
+                    temp_data, selected_variables, filter_by_exclusion
+                )
                 for filtered_key, filtered_value in filtered_data.items():
                     if filtered_key in report_data:
                         report_data[filtered_key].extend(filtered_value)
@@ -558,7 +594,9 @@ class ReportGenerator:
 
         return report_data
 
-    def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
+    def _add_constants_to_report_data(
+        self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]
+    ) -> None:
         """
         Add constants to the report data.
 

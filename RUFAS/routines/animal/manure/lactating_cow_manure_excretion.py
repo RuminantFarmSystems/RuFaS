@@ -59,10 +59,14 @@ def methane_mitigation(
     elif methane_mitigation_method == "Monensin":
         if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
             methane_yield_reduction = (
-                0.30054 - 0.00377 * methane_mitigation_additive_amount - 1.57832 * CP_concentration / 100
+                0.30054
+                - 0.00377 * methane_mitigation_additive_amount
+                - 1.57832 * CP_concentration / 100
             ) * 100
         else:
-            methane_yield_reduction = (0.03223 - 0.00410 * methane_mitigation_additive_amount) * 100
+            methane_yield_reduction = (
+                0.03223 - 0.00410 * methane_mitigation_additive_amount
+            ) * 100
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
@@ -121,7 +125,9 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
+        ration_formulation, feed.available_feeds
+    )
     dry_matter_intake = nutrient_amounts["dm"]
     ASH_diet_content = nutrient_amounts["ash"]
     ASH_concentration = nutrient_concentrations["ash"]
@@ -145,10 +151,20 @@ def manure_calculations(
 
     # Total Solids, kg [A.3E.A.2]
     # The amount of fecal solids is assumed to be equivalent to the amount of total solids
-    fecal_solids = -0.576 + 0.370 * dry_matter_intake - 0.075 * CP_concentration + 0.059 * ADF_concentration
+    fecal_solids = (
+        -0.576
+        + 0.370 * dry_matter_intake
+        - 0.075 * CP_concentration
+        + 0.059 * ADF_concentration
+    )
 
     # Total urine, kg [A.3E.A.3]
-    urine = -7.742 + 0.388 * dry_matter_intake + 0.726 * CP_concentration + 2.066 * milk_protein
+    urine = (
+        -7.742
+        + 0.388 * dry_matter_intake
+        + 0.726 * CP_concentration
+        + 2.066 * milk_protein
+    )
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the growing heifer, kg [A.3E.A.4]
@@ -180,25 +196,37 @@ def manure_calculations(
 
     # Degradable volatile solids, kg [A.3E.A.5]
     degradable_volatile_solids = (
-        -1.017 + 0.364 * organic_matter_intake + 0.029 * NDF_concentration - 0.023 * CP_concentration
+        -1.017
+        + 0.364 * organic_matter_intake
+        + 0.029 * NDF_concentration
+        - 0.023 * CP_concentration
     )
 
     # Total volatile solids, kg [A.3E.A.6]
     total_volatile_solids = (
-        -1.201 + 0.402 * organic_matter_intake + 0.036 * NDF_concentration - 0.024 * CP_concentration
+        -1.201
+        + 0.402 * organic_matter_intake
+        + 0.036 * NDF_concentration
+        - 0.024 * CP_concentration
     )
 
     # Non-degradable volatile solids, kg [A.3A.A.6]
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS
+    ) / urine
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
     # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
-    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
+    urine_urea_nitrogen_concentration_lower_bound = (
+        AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
+    )
+    urine_urea_nitrogen_concentration_upper_bound = (
+        AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
+    )
     urine_urea_nitrogen_concentration = max(
         urine_urea_nitrogen_concentration_lower_bound,
         min(
@@ -211,7 +239,9 @@ def manure_calculations(
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100
+    ) * urine_urea_nitrogen_concentration
 
     # Amount of potassium excreted, g [A.3E.B.3]
     potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
@@ -220,21 +250,42 @@ def manure_calculations(
     methane_emission = 0.0
     if methane_model == "Mutian":  # [A.3E.C.1]
         methane_emission = (
-            -126 + 11.3 * dry_matter_intake + 2.30 * NDF_concentration + 28.8 * milk_fat + 0.148 * body_weight
+            -126
+            + 11.3 * dry_matter_intake
+            + 2.30 * NDF_concentration
+            + 28.8 * milk_fat
+            + 0.148 * body_weight
         )
 
     elif methane_model == "Mills":  # [A.3E.C.2]
-        starch_to_ADF_concentration_ratio = -0.0011 * starch_concentration / ADF_concentration
-        temp = -(starch_to_ADF_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
+        starch_to_ADF_concentration_ratio = (
+            -0.0011 * starch_concentration / ADF_concentration
+        )
+        temp = (
+            -(starch_to_ADF_concentration_ratio + 0.0045)
+            * metabolizable_energy_intake
+            * 4.184
+        )
         methane_emission = 45.98 * (1 - math.exp(temp)) / 0.05565
 
     elif methane_model == "IPCC":  # IPCC
         # Calculating gross energy concentration (Moraes et al. 2014)
-        soluble_residue = 100 - ASH_concentration - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = (
+            100
+            - ASH_concentration
+            - NDF_concentration
+            - CP_concentration
+            - EE_concentration
+        )
         gross_energy_concentration = (
-            0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
+            0.263 * CP_concentration
+            + 0.522 * EE_concentration
+            + 0.198 * NDF_concentration
+            + 0.160 * soluble_residue
         )  # [A.3B.C.2]
-        methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565  # [A.3B.C.3]
+        methane_emission = (
+            0.065 * gross_energy_concentration * dry_matter_intake / 0.05565
+        )  # [A.3B.C.3]
 
     # Methane Mitigation
     methane_yield = 0.0
@@ -250,7 +301,9 @@ def manure_calculations(
             methane_mitigation_additive_amount,
         )
 
-    methane_emission = methane_yield * (1 + methane_yield_reduction / 100) * dry_matter_intake
+    methane_emission = (
+        methane_yield * (1 + methane_yield_reduction / 100) * dry_matter_intake
+    )
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,

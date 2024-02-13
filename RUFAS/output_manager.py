@@ -135,7 +135,9 @@ class OutputManager(object):
         # reduced_info_map is identical to info_map without the class key and
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
-        reduced_info_map = {k: info_map[k] for k in info_map.keys() - {"class", "function"}}
+        reduced_info_map = {
+            k: info_map[k] for k in info_map.keys() - {"class", "function"}
+        }
         pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
@@ -257,7 +259,9 @@ class OutputManager(object):
         self._add_to_pool(self.errors_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
 
-    def _handle_log_output(self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity) -> None:
+    def _handle_log_output(
+        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+    ) -> None:
         """Formats log output based on log_level.
 
         Parameters
@@ -318,9 +322,13 @@ class OutputManager(object):
         if info_map.get("prefix") is not None:
             prefix = info_map.get("prefix") + "."
         elif not info_map.get("suppress_prefix", False):
-            prefix = self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            prefix = (
+                self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            )
 
-        suffix = f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
+        suffix = (
+            f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
+        )
 
         return f"{prefix}{name}{suffix}"
 
@@ -342,7 +350,9 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
+    def dict_to_file_json(
+        self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False
+    ) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -391,11 +401,15 @@ class OutputManager(object):
                         json_file,
                         indent=2,
                     )
-                self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
+                self.add_log(
+                    "save_dict_file_success", f"Successfully saved to {path}.", info_map
+                )
         except Exception as e:
             raise e
 
-    def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
+    def _dict_to_csv_column_list(
+        self, variable_name: str, data_dict: Dict[str, List[Any]]
+    ) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
         Parameters
@@ -412,21 +426,31 @@ class OutputManager(object):
 
         """
         column_list = []
-        mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
+        mandatory_fields = (
+            ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
+        )
         for field in mandatory_fields:
             data_list = data_dict[field]
             if data_list and isinstance(data_list[0], dict):
-                csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+                csv_column_lists: Dict[str, List[Any]] = {
+                    subkey: [] for item in data_list for subkey in item.keys()
+                }
                 for nested_dictionary in data_list:
                     for subkey, value in nested_dictionary.items():
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
                     column_title = f"{variable_name}.{subkey}"
-                    column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
+                    column_list.append(
+                        pd.Series(
+                            csv_column_lists[subkey], dtype=object, name=column_title
+                        )
+                    )
             else:
                 column_title = f"{variable_name}"
-                column_list.append(pd.Series(data_list, dtype=object, name=column_title))
+                column_list.append(
+                    pd.Series(data_list, dtype=object, name=column_title)
+                )
 
         return column_list
 
@@ -457,7 +481,9 @@ class OutputManager(object):
 
         csv_columns = []
         for variable_name, variable_data in data_dict.items():
-            csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
+            csv_column_data = self._dict_to_csv_column_list(
+                variable_name, variable_data
+            )
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
@@ -490,7 +516,9 @@ class OutputManager(object):
         try:
             with open(path, "w") as var_names_file:
                 var_names_file.writelines(data_list)
-                self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
+                self.add_log(
+                    "save_txt_file_success", f"Successfully saved to {path}.", info_map
+                )
         except Exception as e:
             raise e
 
@@ -501,7 +529,9 @@ class OutputManager(object):
         timestamp: str = Utility.get_timestamp(include_millis=False)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
-    def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
+    def _exclude_info_maps(
+        self, pool: Dict[str, pool_element_type]
+    ) -> Dict[str, pool_element_type]:
         """Makes a copy of the given pool and removes info_maps from it.
 
         Returns
@@ -549,7 +579,8 @@ class OutputManager(object):
                     filter_files.append(filename)
             self.add_log(
                 "search_path_for_filenames_success",
-                f"Successfully searched in {dir_path}" f" and found {len(filter_files)} filter files.",
+                f"Successfully searched in {dir_path}"
+                f" and found {len(filter_files)} filter files.",
                 info_map,
             )
             return filter_files
@@ -610,14 +641,22 @@ class OutputManager(object):
                     else:
                         result = [json_content]
                 elif path.endswith(".txt"):
-                    list_of_elements = [element for element in filter_file.read().splitlines() if element]
+                    list_of_elements = [
+                        element
+                        for element in filter_file.read().splitlines()
+                        if element
+                    ]
                     result = [{"filters": list_of_elements}]
                 else:
-                    raise Exception("Unsupported file format; only json and txt are supported.")
+                    raise Exception(
+                        "Unsupported file format; only json and txt are supported."
+                    )
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
             return result
         except FileNotFoundError:
-            self.add_error("File not found", f"The file '{path}' does not exist.", info_map)
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
             raise
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
@@ -663,7 +702,10 @@ class OutputManager(object):
         }
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = (
+            filter_patterns
+            and filter_patterns[exclude_keyword_location] == exclude_keyword
+        )
         if filter_by_exclusion:
             filter_vars_msg = (
                 f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
@@ -674,7 +716,9 @@ class OutputManager(object):
                 f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
                 f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             )
-        filter_pattern_matches = Utility.filter_pool(self.variables_pool, filter_patterns, filter_by_exclusion)
+        filter_pattern_matches = Utility.filter_pool(
+            self.variables_pool, filter_patterns, filter_by_exclusion
+        )
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
@@ -743,7 +787,8 @@ class OutputManager(object):
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if not isinstance(filter_content, dict) or (
-                    "filters" not in filter_content.keys() and "cross_references" not in filter_content.keys()
+                    "filters" not in filter_content.keys()
+                    and "cross_references" not in filter_content.keys()
                 ):
                     self.add_error(
                         "Parsing error",
@@ -757,12 +802,18 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
+                    filtered_pool = self._filter_variables_pool(
+                        filter_content["filters"], filter_file
+                    )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
-                if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
-                    log_pool = report_generator.generate_report(filter_content, filtered_pool)
+                if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["report"]
+                ):
+                    log_pool = report_generator.generate_report(
+                        filter_content, filtered_pool
+                    )
                     self._route_logs(log_pool)
                 else:
                     self._route_save_functions(
@@ -874,7 +925,9 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        json_file_path = os.path.join(
+            path, self._generate_file_name("all_variables", "json")
+        )
         self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
@@ -982,7 +1035,9 @@ class OutputManager(object):
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
-        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
+        file_path = os.path.join(
+            path, self._generate_file_name("variable_names", "txt")
+        )
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
@@ -1028,7 +1083,9 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.load_variables_pool_from_file.__name__,
         }
-        self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
+        self.add_log(
+            "open_json_file", f"Attempting to open {str(file_path)}.", info_map
+        )
         try:
             with open(file_path) as file:
                 self.variables_pool = json.load(file)
@@ -1121,6 +1178,8 @@ class OutputManager(object):
                 info_map,
             )
         except PermissionError as e:
-            self.add_error("Permission Error", f"{path=}; Exception: {str(e)}", info_map)
+            self.add_error(
+                "Permission Error", f"{path=}; Exception: {str(e)}", info_map
+            )
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)

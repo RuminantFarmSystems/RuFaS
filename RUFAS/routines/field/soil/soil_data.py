@@ -277,9 +277,13 @@ class SoilData:
 
         """
         if field_size is None:
-            raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
+            raise TypeError(
+                "'field_size' attribute is NoneType, must be given value when SoilData is initialized."
+            )
         elif field_size <= 0:
-            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+            raise ValueError(
+                f"Expected field_size to be greater than 0, received {field_size}."
+            )
 
         if self.soil_layers is None:
             self.soil_layers = [
@@ -471,7 +475,9 @@ class SoilData:
         ----------
         SWAT Theoretical documentation eqn. 5:2.3.18
         """
-        unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
+        unclamped_water_factor = self.profile_soil_water_content / (
+            0.85 * self.profile_field_capacity
+        )
         clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
         return clamped_water_factor
 
@@ -537,7 +543,9 @@ class SoilData:
             The total amount of active organic nitrogen in the soil (kg / ha).
 
         """
-        return sum(self.get_vectorized_layer_attribute("active_organic_nitrogen_content"))
+        return sum(
+            self.get_vectorized_layer_attribute("active_organic_nitrogen_content")
+        )
 
     @property
     def profile_stable_organic_nitrogen_total(self) -> float:
@@ -550,7 +558,9 @@ class SoilData:
             The total amount of stable organic nitrogen in the soil (kg / ha).
 
         """
-        return sum(self.get_vectorized_layer_attribute("stable_organic_nitrogen_content"))
+        return sum(
+            self.get_vectorized_layer_attribute("stable_organic_nitrogen_content")
+        )
 
     @property
     def profile_fresh_organic_nitrogen_total(self) -> float:
@@ -563,7 +573,9 @@ class SoilData:
             The total amount of fresh organic nitrogen in the soil (kg / ha).
 
         """
-        return sum(self.get_vectorized_layer_attribute("fresh_organic_nitrogen_content"))
+        return sum(
+            self.get_vectorized_layer_attribute("fresh_organic_nitrogen_content")
+        )
 
     @property
     def cover_factor(self) -> float:
@@ -593,7 +605,8 @@ class SoilData:
         elif self.cover_type == "GRASSED":
             return 0.8
         raise ValueError(
-            f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'."
+            f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', "
+            f"received: '{self.cover_type}'."
         )
 
     @property
@@ -648,7 +661,13 @@ class SoilData:
             Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
 
         """
-        emissions_from_active = sum(self.get_vectorized_layer_attribute("active_carbon_to_slow_loss"))
-        emissions_from_slow = sum(self.get_vectorized_layer_attribute("slow_carbon_co2_lost_amount"))
-        emissions_from_passive = sum(self.get_vectorized_layer_attribute("passive_carbon_co2_lost_amount"))
+        emissions_from_active = sum(
+            self.get_vectorized_layer_attribute("active_carbon_to_slow_loss")
+        )
+        emissions_from_slow = sum(
+            self.get_vectorized_layer_attribute("slow_carbon_co2_lost_amount")
+        )
+        emissions_from_passive = sum(
+            self.get_vectorized_layer_attribute("passive_carbon_co2_lost_amount")
+        )
         return emissions_from_active + emissions_from_slow + emissions_from_passive

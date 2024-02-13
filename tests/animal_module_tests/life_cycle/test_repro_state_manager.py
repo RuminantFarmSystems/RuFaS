@@ -111,7 +111,9 @@ def test_enter_state(
 
     # Act and assert
     if expected_exception:
-        with pytest.raises(expected_exception, match="Attempting to re-enter the same state"):
+        with pytest.raises(
+            expected_exception, match="Attempting to re-enter the same state"
+        ):
             manager.enter(state_to_enter, keep_existing)
     else:
         manager.enter(state_to_enter, keep_existing)
@@ -161,7 +163,9 @@ def test_exit_state(
 
     # Act and assert
     if expected_exception:
-        with pytest.raises(expected_exception, match="Attempting to exit a state that is not entered"):
+        with pytest.raises(
+            expected_exception, match="Attempting to exit a state that is not entered"
+        ):
             manager.exit(state_to_exit)
     else:
         manager.exit(state_to_exit)
@@ -229,7 +233,9 @@ def test_reset_state_manager() -> None:
         (None, True),
     ],
 )
-def test_is_in_empty_state(initial_states: set[ReproStateEnum] | None, expected_result: bool) -> None:
+def test_is_in_empty_state(
+    initial_states: set[ReproStateEnum] | None, expected_result: bool
+) -> None:
     """
     Test the is_in_empty_state() method of the ReproStateManager class in repro_state_manager.py.
     """

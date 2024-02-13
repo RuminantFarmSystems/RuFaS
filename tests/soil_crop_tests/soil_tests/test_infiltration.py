@@ -23,7 +23,8 @@ def test_determine_curve_number_1(curve_num_2):
     """test _determine_curve_number_1() in infiltration.py"""
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
     expect = curve_num_2 - (
-        (20 * (100 - curve_num_2)) / (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2))))
+        (20 * (100 - curve_num_2))
+        / (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2))))
     )
     assert expect == observe
 
@@ -59,7 +60,9 @@ def test_determine_curve_number_3(curve_num_2):
 )
 def test_determine_max_retention_parameter(curve_num):
     """test _determine_retention_parameter() in infiltration.py"""
-    observe = Infiltration._determine_retention_parameter_for_moisture_condition(curve_num)
+    observe = Infiltration._determine_retention_parameter_for_moisture_condition(
+        curve_num
+    )
     expect = (1000 / curve_num) - 10
     expect = expect * 25.4
     assert expect == observe
@@ -74,12 +77,20 @@ def test_determine_max_retention_parameter(curve_num):
         (0.74, 0.965, 608.783, 435.678),
     ],
 )
-def test_determine_second_shape_coefficient(field_capacity, saturation, max_retention_param, curve_3_retention_param):
+def test_determine_second_shape_coefficient(
+    field_capacity, saturation, max_retention_param, curve_3_retention_param
+):
     """test _determine_second_shape_coefficient() in infiltration.py"""
     top_first_term = log(
-        (field_capacity / (1 - (curve_3_retention_param * (max_retention_param ** (-1))))) - field_capacity
+        (
+            field_capacity
+            / (1 - (curve_3_retention_param * (max_retention_param ** (-1))))
+        )
+        - field_capacity
     )
-    top_second_term = log((saturation / (1 - (2.54 * (max_retention_param ** (-1))))) - saturation)
+    top_second_term = log(
+        (saturation / (1 - (2.54 * (max_retention_param ** (-1))))) - saturation
+    )
     expect = (top_first_term - top_second_term) / (saturation - field_capacity)
     observe = Infiltration._determine_second_shape_coefficient(
         field_capacity, saturation, max_retention_param, curve_3_retention_param
@@ -103,9 +114,10 @@ def test_determine_first_shape_coefficient(
     observe = Infiltration._determine_first_shape_coefficient(
         field_capacity, max_retention_param, curve_3_retention_param, second_shape_coeff
     )
-    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity) + (
-        second_shape_coeff * field_capacity
-    )
+    expect = log(
+        (field_capacity / (1 - (curve_3_retention_param / max_retention_param)))
+        - field_capacity
+    ) + (second_shape_coeff * field_capacity)
     assert expect == observe
 
 
@@ -132,7 +144,8 @@ def test_determine_retention_parameter(
         second_shape_coefficient,
     )
     expect_quotient = water_content / (
-        water_content + exp(first_shape_coefficient - (second_shape_coefficient * water_content))
+        water_content
+        + exp(first_shape_coefficient - (second_shape_coefficient * water_content))
     )
     expect = max_retention_param * (1 - expect_quotient)
     assert observe == expect
@@ -149,7 +162,9 @@ def test_determine_retention_parameter(
 )
 def test_determine_frozen_retention_parameter(max_retention_param, retention_param):
     """test _determine_frozen_retention_param() in infiltration.py"""
-    observe = Infiltration._determine_frozen_retention_parameter(max_retention_param, retention_param)
+    observe = Infiltration._determine_frozen_retention_parameter(
+        max_retention_param, retention_param
+    )
     expect = max_retention_param * (1 - exp(-0.000862 * retention_param))
     assert expect == observe
 
@@ -165,8 +180,12 @@ def test_determine_frozen_retention_parameter(max_retention_param, retention_par
     ],
 )
 def test_determine_curve_2_adjusted(slope_frac, curve_2, curve_3):
-    observe = Infiltration._determine_second_moisture_condition_adjusted(slope_frac, curve_2, curve_3)
-    expect = (((curve_3 - curve_2) / 3) * (1 - (2 * exp(-13.86 * slope_frac)))) + curve_2
+    observe = Infiltration._determine_second_moisture_condition_adjusted(
+        slope_frac, curve_2, curve_3
+    )
+    expect = (
+        ((curve_3 - curve_2) / 3) * (1 - (2 * exp(-13.86 * slope_frac)))
+    ) + curve_2
     assert expect == observe
 
 
@@ -218,7 +237,10 @@ def test_determine_updated_retention_parameter(
     )
     expect = (
         prev_retention_param
-        + (potential_evapotranspiration * exp(((-1) * coefficient * prev_retention_param) / max_retention_param))
+        + (
+            potential_evapotranspiration
+            * exp(((-1) * coefficient * prev_retention_param) / max_retention_param)
+        )
         - rainfall
         + runoff
     )
@@ -285,7 +307,8 @@ def test_infiltrate(
         "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
         return_value=10,
     ) as first_curve_num, patch(
-        "RUFAS.routines.field.soil.infiltration.Infiltration." "_determine_retention_parameter_for_moisture_condition",
+        "RUFAS.routines.field.soil.infiltration.Infiltration."
+        "_determine_retention_parameter_for_moisture_condition",
         return_value=0.5,
     ) as moisture_param, patch(
         "RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",

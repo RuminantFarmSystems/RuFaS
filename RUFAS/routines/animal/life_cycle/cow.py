@@ -288,12 +288,21 @@ class Cow(HeiferIII):
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
         if self.lactation_curve == "wood":
             return (
-                self.wood_l * math.pow(self.days_in_milk, self.wood_m) * math.exp((0 - self.wood_n) * self.days_in_milk)
+                self.wood_l
+                * math.pow(self.days_in_milk, self.wood_m)
+                * math.exp((0 - self.wood_n) * self.days_in_milk)
             )
         if self.lactation_curve == "milkbot":
             return (
                 AnimalBase.config["a"]
-                * (1 - math.exp((AnimalBase.config["c"] - self.days_in_milk) / AnimalBase.config["b"]) / 2)
+                * (
+                    1
+                    - math.exp(
+                        (AnimalBase.config["c"] - self.days_in_milk)
+                        / AnimalBase.config["b"]
+                    )
+                    / 2
+                )
                 * math.exp((0 - AnimalBase.config["d"]) * self.days_in_milk)
             )
         return 0
@@ -311,7 +320,10 @@ class Cow(HeiferIII):
         ---------
             sim_day: simulation day
         """
-        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+        if (
+            len(self.milk_production_history) > 0
+            and self.milk_production_history[-1].simulation_day == sim_day
+        ):
             del self.milk_production_history[-1]
 
         self.milk_production_history.append(
@@ -324,7 +336,9 @@ class Cow(HeiferIII):
         )
 
         if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
-            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            milk_history = [
+                day.milk_production for day in self.milk_production_history[-305:]
+            ]
             self.latest_milk_production_305days = np.sum(milk_history)
 
     @staticmethod
@@ -402,10 +416,15 @@ class Cow(HeiferIII):
         if self.milking:
             self.fat_percent = self.get_user_defined_milk_fat_percent()
             daily_fat_correct_milk_production = (
-                0.4 * estimated_daily_milk_produced + 0.15 * self.fat_percent * estimated_daily_milk_produced
+                0.4 * estimated_daily_milk_produced
+                + 0.15 * self.fat_percent * estimated_daily_milk_produced
             )
-            self.milk_fat_kg = (self.fat_percent / 100) * self.estimated_daily_milk_produced
-            self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
+            self.milk_fat_kg = (
+                self.fat_percent / 100
+            ) * self.estimated_daily_milk_produced
+            self.milk_protein_kg = (
+                self.mPrt / 100
+            ) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
             daily_fat_correct_milk_production = 0.0
@@ -447,7 +466,9 @@ class Cow(HeiferIII):
             The user-defined milk protein percent for the cow.
         """
 
-        return im.get_data("animal.animal_config.management_decisions.milk_protein_percent")
+        return im.get_data(
+            "animal.animal_config.management_decisions.milk_protein_percent"
+        )
 
     def calc_manure_excretion(
         self,
@@ -531,9 +552,12 @@ class Cow(HeiferIII):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
         self.DNED_requirement = (
-            animal_requirements["NEmaint_requirement"] + animal_requirements["NEl_requirement"]
+            animal_requirements["NEmaint_requirement"]
+            + animal_requirements["NEl_requirement"]
         ) / self.DMIest_requirement
-        self.DMDP_requirement = (animal_requirements["MP_requirement"]) / self.DMIest_requirement
+        self.DMDP_requirement = (
+            animal_requirements["MP_requirement"]
+        ) / self.DMIest_requirement
 
     def phosphorus_rqmts(self, DMI):
         """
@@ -547,7 +571,12 @@ class Cow(HeiferIII):
         # absorbed P retained for growth (g) (A.1EF.E.3)
         if self.body_weight < self.mature_body_weight:
             self.p_growth = (
-                (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
+                (
+                    0.0012
+                    + 0.004635
+                    * (self.mature_body_weight**0.22)
+                    * (self.body_weight ** (-0.22))
+                )
                 * self.daily_growth
                 / 0.96
                 * 1000
@@ -561,8 +590,12 @@ class Cow(HeiferIII):
         # absorbed P retained for fetal growth (g) (A.1EF.E.4)
         if self.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
-            exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * (self.days_in_preg - 1)
-            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * 1000
+            exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * (
+                self.days_in_preg - 1
+            )
+            self.p_gest = (
+                0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)
+            ) * 1000
             self.p_gest_for_calf += self.p_gest
         else:
             self.p_gest = 0
@@ -578,11 +611,17 @@ class Cow(HeiferIII):
 
         # requirement of P from the ration (g) (A.1EF.E.7)
         if self.milking:
-            self.p_req = p_absorb / (1.86696 - 5.01238 * self.p_conc_ration + 5.12286 * self.p_conc_ration**2)
+            self.p_req = p_absorb / (
+                1.86696
+                - 5.01238 * self.p_conc_ration
+                + 5.12286 * self.p_conc_ration**2
+            )
         else:
             self.p_req = p_absorb / 0.664
 
-    def calc_daily_walking_dist(self, vertical_dist_to_parlor, horizontal_dist_to_parlor):
+    def calc_daily_walking_dist(
+        self, vertical_dist_to_parlor, horizontal_dist_to_parlor
+    ):
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
@@ -591,8 +630,14 @@ class Cow(HeiferIII):
             horizontal_dist_to_parlor: horizontal distance to milking parlor, km
         """
         # multiplied by 2 for return trip
-        self.DVD = 2 * vertical_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
-        self.DHD = 2 * horizontal_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
+        self.DVD = (
+            2 * vertical_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
+        )
+        self.DHD = (
+            2
+            * horizontal_dist_to_parlor
+            * AnimalBase.config["cow_times_milked_per_day"]
+        )
 
     def get_bw_change(self, CI):  # noqa
         """
@@ -613,8 +658,12 @@ class Cow(HeiferIII):
             self.tissue_changed = 0
         # conceptus weight change during pregnancy
         elif self.days_in_preg > 50:
-            conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
-            conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
+            conceptus_total_weight = (
+                0.0148 * self.gestation_length - 2.408
+            ) * self.calf_birth_weight
+            conceptus_param = conceptus_total_weight ** (1 / 3) / (
+                self.gestation_length - 50
+            )
             conceptus_growth = 3 * conceptus_param**3 * (self.days_in_preg - 50) ** 2
             self.conceptus_weight += conceptus_growth
         else:
@@ -640,17 +689,31 @@ class Cow(HeiferIII):
 
         if not self.days_in_milk == 0:
             if self.calves == 1:
-                bodyweight_tissue = -20 / 65 * math.exp(1 - self.days_in_milk / 65) + 20 / (
-                    65**2
-                ) * self.days_in_milk * math.exp(1 - self.days_in_milk / 65)
+                bodyweight_tissue = -20 / 65 * math.exp(
+                    1 - self.days_in_milk / 65
+                ) + 20 / (65**2) * self.days_in_milk * math.exp(
+                    1 - self.days_in_milk / 65
+                )
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
-                    self.tissue_changed = 20 * self.days_in_milk / 65 * math.exp(1 - self.days_in_milk / 65)
+                    self.tissue_changed = (
+                        20
+                        * self.days_in_milk
+                        / 65
+                        * math.exp(1 - self.days_in_milk / 65)
+                    )
             else:  # parity > 1
-                bodyweight_tissue = -40 / 70 * math.exp(1 - self.days_in_milk / 70) + 40 / (
-                    70**2
-                ) * self.days_in_milk * math.exp(1 - self.days_in_milk / 70)
+                bodyweight_tissue = -40 / 70 * math.exp(
+                    1 - self.days_in_milk / 70
+                ) + 40 / (70**2) * self.days_in_milk * math.exp(
+                    1 - self.days_in_milk / 70
+                )
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
-                    self.tissue_changed = 40 * self.days_in_milk / 70 * math.exp(1 - self.days_in_milk / 70)
+                    self.tissue_changed = (
+                        40
+                        * self.days_in_milk
+                        / 70
+                        * math.exp(1 - self.days_in_milk / 70)
+                    )
         else:  # dry period
             bodyweight_tissue = self.tissue_changed / (
                 self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
@@ -703,12 +766,16 @@ class Cow(HeiferIII):
             self.days_in_preg = 0
             self.gestation_length = 0
             if self.calves >= 2:
-                last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+                last_time_given_birth = self.events.get_most_recent_date(
+                    const.NEW_BIRTH
+                )
                 self.CI = self.days_born - last_time_given_birth
                 self.CI_history.append(self.CI)
             self.BW_at_calving = self.body_weight
             self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH)
-            self.log_event(self.days_born, sim_day, f"{const.NUM_CALVES_BORN_NOTE}: {self.calves}")
+            self.log_event(
+                self.days_born, sim_day, f"{const.NUM_CALVES_BORN_NOTE}: {self.calves}"
+            )
             self.health_cull_update()
             self.death_update()
             new_born = True
@@ -762,7 +829,9 @@ class Cow(HeiferIII):
                     sim_day,
                     f"Pre-existing days in preg: {self.days_in_preg}",
                 )
-                self.log_event(self.days_born, sim_day, f"Pre-existing AI day: {self.ai_day}")
+                self.log_event(
+                    self.days_born, sim_day, f"Pre-existing AI day: {self.ai_day}"
+                )
                 self.log_event(
                     self.days_born,
                     sim_day,
@@ -775,21 +844,27 @@ class Cow(HeiferIII):
             if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                 self.execute_ed_tai_protocol(sim_day)
 
-            if self.repro_program == CowReproProtocolEnum.ED.value or self._repro_state_manager.is_in_any(
-                {
-                    ReproStateEnum.WAITING_FULL_ED_CYCLE,
-                    ReproStateEnum.WAITING_SHORT_ED_CYCLE,
-                    ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
-                }
+            if (
+                self.repro_program == CowReproProtocolEnum.ED.value
+                or self._repro_state_manager.is_in_any(
+                    {
+                        ReproStateEnum.WAITING_FULL_ED_CYCLE,
+                        ReproStateEnum.WAITING_SHORT_ED_CYCLE,
+                        ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
+                    }
+                )
             ):
                 self.execute_ed_protocol(sim_day)
 
-            if self.repro_program == CowReproProtocolEnum.TAI.value or self._repro_state_manager.is_in_any(
-                {
-                    ReproStateEnum.IN_PRESYNCH,
-                    ReproStateEnum.HAS_DONE_PRESYNCH,
-                    ReproStateEnum.IN_OVSYNCH,
-                }
+            if (
+                self.repro_program == CowReproProtocolEnum.TAI.value
+                or self._repro_state_manager.is_in_any(
+                    {
+                        ReproStateEnum.IN_PRESYNCH,
+                        ReproStateEnum.HAS_DONE_PRESYNCH,
+                        ReproStateEnum.IN_OVSYNCH,
+                    }
+                )
             ):
                 self.execute_tai_protocol(sim_day)
 
@@ -815,10 +890,15 @@ class Cow(HeiferIII):
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
         if self.should_decrease_conception_rate_in_rebreeding():
-            self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
+            self.conception_rate -= (
+                self._num_conception_rate_decreases
+                * self.get_conception_rate_decrease()
+            )
 
         if self.should_decrease_conception_rate_by_parity():
-            self.conception_rate = self._decrease_conception_rate_by_parity(self.calves, self.conception_rate)
+            self.conception_rate = self._decrease_conception_rate_by_parity(
+                self.calves, self.conception_rate
+            )
 
         self.conception_rate = max(0.0, self.conception_rate)
 
@@ -861,23 +941,33 @@ class Cow(HeiferIII):
                     self.get_std_estrus_cycle(),
                 )
 
-            if self._repro_state_manager.is_in_any({ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}):
+            if self._repro_state_manager.is_in_any(
+                {ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}
+            ):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
 
             if self.days_born == self.estrus_day:
                 # Used in PGFatPD resynch program
-                if self._repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
-                    self._repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
+                if self._repro_state_manager.is_in(
+                    ReproStateEnum.WAITING_SHORT_ED_CYCLE
+                ):
+                    self._repro_state_manager.exit(
+                        ReproStateEnum.WAITING_SHORT_ED_CYCLE
+                    )
                     self._handle_estrus_detection(
                         sim_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=lambda _: self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH),
+                        on_estrus_not_detected=lambda _: self._repro_state_manager.enter(
+                            ReproStateEnum.IN_OVSYNCH
+                        ),
                     )
                     if self._repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
                         self._log_repro_states(sim_day)
 
-                elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
+                elif self._repro_state_manager.is_in(
+                    ReproStateEnum.WAITING_FULL_ED_CYCLE
+                ):
                     self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                     self._handle_estrus_detection(
                         sim_day,
@@ -886,8 +976,12 @@ class Cow(HeiferIII):
                     )
 
                 # Used in the initial ED portion of the ED-TAI protocol
-                elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
-                    self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
+                elif self._repro_state_manager.is_in(
+                    ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+                ):
+                    self._repro_state_manager.exit(
+                        ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+                    )
                     self._handle_estrus_detection(
                         sim_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
@@ -904,8 +998,9 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self._repro_state_manager.is_in_empty_state() or self._repro_state_manager.is_in(
-            ReproStateEnum.ENTER_HERD_FROM_INIT
+        if (
+            self._repro_state_manager.is_in_empty_state()
+            or self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
         ):
             self._repro_state_manager.enter(ReproStateEnum.FRESH)
             self._log_repro_states(sim_day)
@@ -942,7 +1037,9 @@ class Cow(HeiferIII):
         """
 
         if self._repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-            self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(sim_day)
+            self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
+                sim_day
+            )
 
         self._repro_state_manager.enter(ReproStateEnum.ESTRUS_DETECTED)
         self._log_repro_states(sim_day)
@@ -964,7 +1061,9 @@ class Cow(HeiferIII):
             The estrus detection rate for cows.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.estrus_detection_rate")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.estrus_detection_rate"
+        )
 
     def get_estrus_conception_rate(self) -> float:
         """
@@ -976,7 +1075,9 @@ class Cow(HeiferIII):
             The estrus conception rate.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.ED_conception_rate")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.ED_conception_rate"
+        )
 
     def _simulate_full_estrus_cycle(self, sim_day: int) -> None:
         """
@@ -988,7 +1089,9 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True)
+        self._repro_state_manager.enter(
+            ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True
+        )
         self._log_repro_states(sim_day)
         self._simulate_estrus(
             self.days_born,
@@ -1015,7 +1118,9 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
+        self._repro_state_manager.enter(
+            ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+        )
         self._log_repro_states(sim_day)
         self._simulate_estrus(
             self.days_born,
@@ -1025,7 +1130,9 @@ class Cow(HeiferIII):
             self.get_std_estrus_cycle(),
         )
 
-    def _execute_hormone_delivery_schedule(self, sim_day: int, schedule: dict[int, dict]) -> None:
+    def _execute_hormone_delivery_schedule(
+        self, sim_day: int, schedule: dict[int, dict]
+    ) -> None:
         """
         Execute a hormone delivery schedule for cows.
 
@@ -1112,7 +1219,9 @@ class Cow(HeiferIII):
         """
 
         if self._should_set_up_hormone_delivery_for_presynch():
-            self._set_up_hormone_schedule("cows", self.get_presynch_program(), self.days_born)
+            self._set_up_hormone_schedule(
+                "cows", self.get_presynch_program(), self.days_born
+            )
             self.log_event(
                 self.days_born,
                 sim_day,
@@ -1129,8 +1238,9 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self._repro_state_manager.is_in_empty_state() or self._repro_state_manager.is_in(
-            ReproStateEnum.ENTER_HERD_FROM_INIT
+        if (
+            self._repro_state_manager.is_in_empty_state()
+            or self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
         ):
             self._repro_state_manager.enter(ReproStateEnum.FRESH)
             self._log_repro_states(sim_day)
@@ -1146,7 +1256,9 @@ class Cow(HeiferIII):
         """
 
         if self._should_set_up_hormone_delivery_for_ovsynch():
-            self._set_up_hormone_schedule("cows", self.get_ovsynch_program(), self.days_born)
+            self._set_up_hormone_schedule(
+                "cows", self.get_ovsynch_program(), self.days_born
+            )
             self._TAI_conception_rate = self.get_ovsynch_program_conception_rate()
             self.log_event(
                 self.days_born,
@@ -1177,15 +1289,19 @@ class Cow(HeiferIII):
         if self._hormone_schedule:
             return False
 
-        if self.days_in_milk == self.get_presynch_program_start_day() and self._repro_state_manager.is_in_any(
-            {ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}
+        if (
+            self.days_in_milk == self.get_presynch_program_start_day()
+            and self._repro_state_manager.is_in_any(
+                {ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}
+            )
         ):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
             return True
 
-        if self.days_in_milk > self.get_presynch_program_start_day() and self._repro_state_manager.is_in(
-            ReproStateEnum.ENTER_HERD_FROM_INIT
+        if (
+            self.days_in_milk > self.get_presynch_program_start_day()
+            and self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
         ):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
@@ -1229,12 +1345,15 @@ class Cow(HeiferIII):
             return False
 
         if self.days_in_milk == self.get_ovsynch_program_start_day():
-            if self._repro_state_manager.is_in_empty_state() or self._repro_state_manager.is_in_any(
-                {
-                    ReproStateEnum.ENTER_HERD_FROM_INIT,
-                    ReproStateEnum.FRESH,
-                    ReproStateEnum.HAS_DONE_PRESYNCH,
-                }
+            if (
+                self._repro_state_manager.is_in_empty_state()
+                or self._repro_state_manager.is_in_any(
+                    {
+                        ReproStateEnum.ENTER_HERD_FROM_INIT,
+                        ReproStateEnum.FRESH,
+                        ReproStateEnum.HAS_DONE_PRESYNCH,
+                    }
+                )
             ):
                 self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
                 self._log_repro_states(self.days_born)
@@ -1288,7 +1407,11 @@ class Cow(HeiferIII):
         if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
             self._repeat_estrus_simulation_before_vwp(sim_day)
 
-        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_ovsynch_program_start_day():
+        elif (
+            self.get_voluntary_waiting_period()
+            < self.days_in_milk
+            < self.get_ovsynch_program_start_day()
+        ):
             if (
                 self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
                 and self.days_born > self.estrus_day
@@ -1301,14 +1424,20 @@ class Cow(HeiferIII):
                     self.get_std_estrus_cycle(),
                 )
 
-            if self._repro_state_manager.is_in_any({ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}):
-                self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
+            if self._repro_state_manager.is_in_any(
+                {ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}
+            ):
+                self._repro_state_manager.enter(
+                    ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+                )
                 self._log_repro_states(sim_day)
 
         elif self.days_in_milk >= self.get_ovsynch_program_start_day():
             self._handle_estrus_not_detected_before_ovsynch_start_day(sim_day)
 
-    def _handle_estrus_not_detected_before_ovsynch_start_day(self, sim_day: int) -> None:
+    def _handle_estrus_not_detected_before_ovsynch_start_day(
+        self, sim_day: int
+    ) -> None:
         """
         Redirect the cow to enter an OvSynch program when estrus has not been detected between the
         voluntary waiting period and the OvSynch program start day.
@@ -1323,7 +1452,9 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
 
-        elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
+        elif self._repro_state_manager.is_in(
+            ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+        ):
             self.log_event(
                 self.days_born,
                 sim_day,
@@ -1333,7 +1464,9 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
 
-        elif self._repro_state_manager.is_in(ReproStateEnum.FRESH):  # When no ED is instituted
+        elif self._repro_state_manager.is_in(
+            ReproStateEnum.FRESH
+        ):  # When no ED is instituted
             self.log_event(
                 self.days_born,
                 sim_day,
@@ -1342,7 +1475,9 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
 
-    def _decrease_conception_rate_by_parity(self, calves: int, conception_rate: float) -> float:
+    def _decrease_conception_rate_by_parity(
+        self, calves: int, conception_rate: float
+    ) -> float:
         """
         Adjust conception rate based on the parity of the cow.
 
@@ -1390,7 +1525,8 @@ class Cow(HeiferIII):
         self.log_event(
             self.days_born,
             sim_day,
-            f"{const.SUCCESSFUL_CONCEPTION}, " f"with conception rate at {self.conception_rate}",
+            f"{const.SUCCESSFUL_CONCEPTION}, "
+            f"with conception rate at {self.conception_rate}",
         )
         self.log_event(self.days_born, sim_day, const.COW_PREG)
         self.days_in_preg = 1
@@ -1406,9 +1542,14 @@ class Cow(HeiferIII):
             CowReproProtocolEnum.TAI.value,
             CowReproProtocolEnum.ED_TAI.value,
         ]:
-            if self.get_resynch_program() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
+            if (
+                self.get_resynch_program()
+                == CowReproProtocolEnum.Resynch_TAIbeforePD.value
+            ):
                 self._schedule_ovsynch_program_in_advance(sim_day)
-                self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH, keep_existing=True)
+                self._repro_state_manager.enter(
+                    ReproStateEnum.IN_OVSYNCH, keep_existing=True
+                )
                 self._log_repro_states(sim_day)
 
     def _handle_failed_conception(self, sim_day: int) -> None:
@@ -1433,7 +1574,8 @@ class Cow(HeiferIII):
         self.log_event(
             self.days_born,
             sim_day,
-            f"{const.FAILED_CONCEPTION}, " f"with conception rate at {self.conception_rate}",
+            f"{const.FAILED_CONCEPTION}, "
+            f"with conception rate at {self.conception_rate}",
         )
         self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
 
@@ -1455,12 +1597,17 @@ class Cow(HeiferIII):
             CowReproProtocolEnum.TAI.value,
             CowReproProtocolEnum.ED_TAI.value,
         ]:
-            if self.get_resynch_program() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
+            if (
+                self.get_resynch_program()
+                == CowReproProtocolEnum.Resynch_TAIbeforePD.value
+            ):
                 self._schedule_ovsynch_program_in_advance(sim_day)
 
                 if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                     # We want to keep the ED protocol running at the same time as the OvSynch program.
-                    self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH, keep_existing=True)
+                    self._repro_state_manager.enter(
+                        ReproStateEnum.IN_OVSYNCH, keep_existing=True
+                    )
                     self._log_repro_states(sim_day)
                 elif self.repro_program == CowReproProtocolEnum.TAI.value:
                     self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
@@ -1547,7 +1694,9 @@ class Cow(HeiferIII):
                 )
                 self.do_not_breed = True
 
-    def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int) -> None:
+    def _handle_preg_check(
+        self, preg_check_config: dict[str, int | str], sim_day: int
+    ) -> None:
         """
         Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
 
@@ -1575,7 +1724,9 @@ class Cow(HeiferIII):
             else:
                 self.log_event(self.days_born, sim_day, preg_check_config["on_preg"])
                 if self._repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                    self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(sim_day)
+                    self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
+                        sim_day
+                    )
         elif "on_not_preg" in preg_check_config:  # Due to failed conception
             self.log_event(self.days_born, sim_day, preg_check_config["on_not_preg"])
             self.abortion_day = self.days_born
@@ -1608,7 +1759,9 @@ class Cow(HeiferIII):
             if self.days_born > self.estrus_day:  # No estrus day scheduled yet
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
-                self.log_event(self.days_born, sim_day, f"days in milk: {self.days_in_milk}")
+                self.log_event(
+                    self.days_born, sim_day, f"days in milk: {self.days_in_milk}"
+                )
                 self._simulate_estrus(
                     self.days_born,
                     sim_day,
@@ -1623,7 +1776,9 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
 
-        elif self.get_resynch_program() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
+        elif (
+            self.get_resynch_program() == CowReproProtocolEnum.Resynch_TAIbeforePD.value
+        ):
             self._handle_open_cow_in_tai_before_pd_resynch(sim_day)
 
         elif self.get_resynch_program() == CowReproProtocolEnum.Resynch_PGFatPD.value:
@@ -1707,8 +1862,14 @@ class Cow(HeiferIII):
             The number of days before the first pregnancy check to schedule the OvSynch program.
         """
 
-        hormone_schedule_start_day = self.days_born + self.get_first_preg_check_day() - days_before_first_preg_check
-        self._set_up_hormone_schedule("cows", self.get_ovsynch_program(), hormone_schedule_start_day)
+        hormone_schedule_start_day = (
+            self.days_born
+            + self.get_first_preg_check_day()
+            - days_before_first_preg_check
+        )
+        self._set_up_hormone_schedule(
+            "cows", self.get_ovsynch_program(), hormone_schedule_start_day
+        )
         self._TAI_conception_rate = self.get_ovsynch_program_conception_rate()
         self.log_event(
             self.days_born,
@@ -1716,7 +1877,9 @@ class Cow(HeiferIII):
             f"{const.SETTING_UP_OVSYNCH_PROGRAM_IN_ADVANCE_NOTE}: {self.get_ovsynch_program()}",
         )
 
-    def _exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(self, sim_day: int) -> None:
+    def _exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
+        self, sim_day: int
+    ) -> None:
         """
         Exit the scheduled OvSynch program early in TAIbeforePD resynch protocol when
         the first pregnancy check is successful or estrus has been detected.
@@ -1739,7 +1902,8 @@ class Cow(HeiferIII):
         self.log_event(
             self.days_born,
             sim_day,
-            f"{const.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}:" f" {self.get_ovsynch_program()}",
+            f"{const.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}:"
+            f" {self.get_ovsynch_program()}",
         )
 
     def _set_repro_program(self, sim_day: int, repro_program: str) -> None:
@@ -1772,7 +1936,8 @@ class Cow(HeiferIII):
         self.log_event(
             self.days_born,
             sim_day,
-            f"{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} " f"to {repro_program}",
+            f"{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} "
+            f"to {repro_program}",
         )
         self.repro_program = repro_program
 
@@ -1786,7 +1951,9 @@ class Cow(HeiferIII):
             The first pregnancy check day (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_check_day_1")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_check_day_1"
+        )
 
     def get_second_preg_check_day(self) -> int:
         """
@@ -1798,7 +1965,9 @@ class Cow(HeiferIII):
             The second pregnancy check day (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_check_day_2")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_check_day_2"
+        )
 
     def get_third_preg_check_day(self) -> int:
         """
@@ -1810,7 +1979,9 @@ class Cow(HeiferIII):
             The third pregnancy check day (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_check_day_3")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_check_day_3"
+        )
 
     def get_first_preg_check_loss_rate(self) -> float:
         """
@@ -1822,7 +1993,9 @@ class Cow(HeiferIII):
             The first pregnancy check loss rate ([0, 1]).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_loss_rate_1")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_loss_rate_1"
+        )
 
     def get_second_preg_check_loss_rate(self) -> float:
         """
@@ -1834,7 +2007,9 @@ class Cow(HeiferIII):
             The second pregnancy check loss rate ([0, 1]).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_loss_rate_2")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_loss_rate_2"
+        )
 
     def get_third_preg_check_loss_rate(self) -> float:
         """
@@ -1846,7 +2021,9 @@ class Cow(HeiferIII):
             The third pregnancy check loss rate ([0, 1]).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.preg_loss_rate_3")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.preg_loss_rate_3"
+        )
 
     def get_do_not_breed_time(self) -> int:
         """
@@ -1858,7 +2035,9 @@ class Cow(HeiferIII):
             The breeding period for cows before reproductive programs stop if they fail to get pregnant (days).
         """
 
-        return im.get_data("animal.animal_config.management_decisions.do_not_breed_time")
+        return im.get_data(
+            "animal.animal_config.management_decisions.do_not_breed_time"
+        )
 
     def get_avg_estrus_cycle(self) -> int:
         """
@@ -1870,7 +2049,9 @@ class Cow(HeiferIII):
             The average estrus cycle length for cows (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.avg_estrus_cycle_cow")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.avg_estrus_cycle_cow"
+        )
 
     def get_std_estrus_cycle(self) -> float:
         """
@@ -1882,7 +2063,9 @@ class Cow(HeiferIII):
             The standard deviation of the estrus cycle length for cows (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.std_estrus_cycle_cow")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.std_estrus_cycle_cow"
+        )
 
     def get_avg_estrus_cycle_return(self) -> int:
         """
@@ -1894,7 +2077,9 @@ class Cow(HeiferIII):
             The average return estrus cycle length for cows (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.avg_estrus_cycle_return")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.avg_estrus_cycle_return"
+        )
 
     def get_std_estrus_cycle_return(self) -> float:
         """
@@ -1906,7 +2091,9 @@ class Cow(HeiferIII):
             The standard deviation of the return estrus cycle length for cows (days).
         """
 
-        return im.get_data("animal.animal_config.from_literature.repro.std_estrus_cycle_return")
+        return im.get_data(
+            "animal.animal_config.from_literature.repro.std_estrus_cycle_return"
+        )
 
     def get_voluntary_waiting_period(self) -> int:
         """
@@ -1922,7 +2109,9 @@ class Cow(HeiferIII):
             The voluntary waiting period for cows, used only in the ED and ED-TAI protocols.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.voluntary_waiting_period")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+        )
 
     def get_presynch_program_start_day(self) -> int:
         """
@@ -1941,7 +2130,9 @@ class Cow(HeiferIII):
             The presynch program start day for cows, used in the TAI protocol.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.presynch_program_start_day")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.presynch_program_start_day"
+        )
 
     def get_ovsynch_program_start_day(self) -> int:
         """
@@ -1964,7 +2155,9 @@ class Cow(HeiferIII):
             The OvSynch program start day for cows used in the TAI and ED-TAI protocol.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day"
+        )
 
     def get_conception_rate_decrease(self) -> float:
         """
@@ -1982,7 +2175,9 @@ class Cow(HeiferIII):
             The conception rate decrease for cows used during rebreeding ([0, 1]).
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.conception_rate_decrease")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.conception_rate_decrease"
+        )
 
     def get_user_defined_repro_protocol(self) -> str:
         """
@@ -2029,7 +2224,9 @@ class Cow(HeiferIII):
             The available options are: Presynch, DoubleOvSynch, G6G, N/A.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.presynch_program")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.presynch_program"
+        )
 
     def get_resynch_program(self) -> str:
         """
@@ -2059,7 +2256,9 @@ class Cow(HeiferIII):
             The conception rate for OvSynch programs used in the TAI and ED-TAI protocols.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+        )
 
     def should_decrease_conception_rate_in_rebreeding(self) -> bool:
         """
@@ -2071,7 +2270,9 @@ class Cow(HeiferIII):
             True if the user wants to decrease conception rate during rebreeding, False otherwise.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.decrease_conception_rate_in_rebreeding")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.decrease_conception_rate_in_rebreeding"
+        )
 
     def should_decrease_conception_rate_by_parity(self) -> bool:
         """
@@ -2083,7 +2284,9 @@ class Cow(HeiferIII):
             True if the user wants to decrease conception rate based on the cow's parity, False otherwise.
         """
 
-        return im.get_data("animal.animal_config.farm_level.repro.decrease_conception_rate_by_parity")
+        return im.get_data(
+            "animal.animal_config.farm_level.repro.decrease_conception_rate_by_parity"
+        )
 
     # Cull methods
     def cull_update(self, sim_day):
@@ -2092,7 +2295,11 @@ class Cow(HeiferIII):
         The reasons are reproduction failure, low production, and health issues
         Returns: not culled
         """
-        if self.do_not_breed and self.estimated_daily_milk_produced < AnimalBase.config["cull_milk_production"]:
+        if (
+            self.do_not_breed
+            and self.estimated_daily_milk_produced
+            < AnimalBase.config["cull_milk_production"]
+        ):
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
             self.cull_reason = const.LOW_PROD_CULL
@@ -2115,7 +2322,9 @@ class Cow(HeiferIII):
             death_rate = AnimalBase.config["parity_death_prob"][self.calves - 1]
         death_rand = random()
         if death_rand <= death_rate:
-            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
+            death_upper_limit = (
+                death_lower_limit
+            ) = death_time_upper_limit = death_time_lower_limit = 0
             death_date_random = random()
             for i in range(len(AnimalBase.config["death_cull_prob"]) - 1):
                 if (
@@ -2127,9 +2336,13 @@ class Cow(HeiferIII):
                     death_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
                     death_time_lower_limit = AnimalBase.config["death_cull_prob"][i]
                     death_time_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
-            n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
+            n = (death_time_upper_limit - death_time_lower_limit) / (
+                death_upper_limit - death_lower_limit
+            )
             self.future_death_date = round(
-                death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
+                death_time_lower_limit
+                + n * (death_date_random - death_lower_limit)
+                + self.days_born
             )
 
     def health_cull_update(self):
@@ -2168,14 +2381,24 @@ class Cow(HeiferIII):
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()
-            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+            cull_reason_upper_limit = (
+                cull_reason_lower_limit
+            ) = cull_time_upper_limit = cull_time_lower_limit = 0
             for i in range(len(cull_reason_cull_prob) - 1):
-                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
+                if (
+                    cull_reason_cull_prob[i]
+                    <= cull_time_rand
+                    < cull_reason_cull_prob[i + 1]
+                ):
                     cull_reason_lower_limit = cull_reason_cull_prob[i]
                     cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
                     cull_time_lower_limit = AnimalBase.config["cull_day_count"][i]
                     cull_time_upper_limit = AnimalBase.config["cull_day_count"][i + 1]
-            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
+            x = (cull_time_upper_limit - cull_time_lower_limit) / (
+                cull_reason_upper_limit - cull_reason_lower_limit
+            )
             self.future_cull_date = round(
-                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born
+                cull_time_lower_limit
+                + x * (cull_time_rand - cull_reason_lower_limit)
+                + self.days_born
             )

@@ -35,10 +35,12 @@ class LeafAreaIndex:
             self.data.second_leaf_fraction_point,
         )
 
-        self.data.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(
-            self.data.heat_fraction,
-            self.data._lai_shapes[0],
-            self.data._lai_shapes[1],
+        self.data.optimal_leaf_area_fraction = (
+            self._determine_optimal_leaf_area_fraction(
+                self.data.heat_fraction,
+                self.data._lai_shapes[0],
+                self.data._lai_shapes[1],
+            )
         )
 
         self.data.canopy_height = self.determine_canopy_height(
@@ -78,7 +80,9 @@ class LeafAreaIndex:
 
         """
         self.data.previous_leaf_area_index = self.data.leaf_area_index
-        self.data.previous_optimal_leaf_area_fraction = self.data.optimal_leaf_area_fraction
+        self.data.previous_optimal_leaf_area_fraction = (
+            self.data.optimal_leaf_area_fraction
+        )
 
     def check_previous_leaf_area_values(self) -> None:
         """
@@ -118,10 +122,14 @@ class LeafAreaIndex:
         SWAT 5:2.1.18
 
         """
-        self.data.leaf_area_index = max(0.0, self.data.previous_leaf_area_index + self.data.leaf_area_added)
+        self.data.leaf_area_index = max(
+            0.0, self.data.previous_leaf_area_index + self.data.leaf_area_added
+        )
 
     @staticmethod
-    def determine_canopy_height(max_canopy_height: float, optimal_leaf_area_fraction: float) -> float:
+    def determine_canopy_height(
+        max_canopy_height: float, optimal_leaf_area_fraction: float
+    ) -> float:
         """
         Sets the current height of the canopy, measured in meters.
 
@@ -152,7 +160,9 @@ class LeafAreaIndex:
             raise ValueError("max_canopy_height must be greater than 0")
         if not 0 <= optimal_leaf_area_fraction <= 1:
             raise ValueError("optimal_leaf_area_index must be >= 0 and <= 1")
-        return min(max_canopy_height, max_canopy_height * sqrt(optimal_leaf_area_fraction))
+        return min(
+            max_canopy_height, max_canopy_height * sqrt(optimal_leaf_area_fraction)
+        )
 
     @staticmethod
     def _determine_lai_shapes(
@@ -186,28 +196,42 @@ class LeafAreaIndex:
         if second_heat_fraction <= 0:
             raise ValueError("second_heat_fraction must be greater than 0")
         if not 0 < first_leaf_fraction < 1:
-            raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
+            raise ValueError(
+                "first_leaf_fraction must not be greater than 0 or less than 1"
+            )
         if not 0 < second_leaf_fraction < 1:
-            raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
+            raise ValueError(
+                "second_leaf_fraction must not be greater than 0 or less than 1"
+            )
         if first_heat_fraction == second_heat_fraction:
             # TODO: perhaps a way to handle this instead of throwing an error would be better
             #   something like: second_heat_fraction += 1e-9
-            raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
+            raise ValueError(
+                "first_heat_fraction cannot be exactly equal to second_heat_fractions"
+            )
 
         # TODO: need to add any of these errors that get thrown when RuFaS runs to the  `OutputManager`.
         #    This should probably be done in the `grow_canopy()` function
         #    I'm still unsure how to do this effectively with warnings raised by static functions. - morrowcj
 
-        first_log = LeafAreaIndex._calc_shape_log(first_heat_fraction, first_leaf_fraction)
-        second_log = LeafAreaIndex._calc_shape_log(second_heat_fraction, second_leaf_fraction)
+        first_log = LeafAreaIndex._calc_shape_log(
+            first_heat_fraction, first_leaf_fraction
+        )
+        second_log = LeafAreaIndex._calc_shape_log(
+            second_heat_fraction, second_leaf_fraction
+        )
 
-        second_shape = (first_log - second_log) / (second_heat_fraction - first_heat_fraction)
+        second_shape = (first_log - second_log) / (
+            second_heat_fraction - first_heat_fraction
+        )
         first_shape = first_log + (second_shape * first_heat_fraction)
 
         return [first_shape, second_shape]
 
     @staticmethod
-    def _determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
+    def _determine_optimal_leaf_area_fraction(
+        heat_fraction: float, shape1: float, shape2: float
+    ) -> float:
         """
         Calculates the leaf area index fraction from the optimal leaf area development curve for the initial period of
         plant growth.
@@ -236,7 +260,9 @@ class LeafAreaIndex:
         SWAT 5:2.1.10
 
         """
-        return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)
+        return max(
+            heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0
+        )
 
     @staticmethod
     def _determine_max_leaf_area_change(

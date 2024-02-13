@@ -212,12 +212,20 @@ def test_get_timestamp() -> None:
     """Unit test for the function get_timestamp in file util.py"""
 
     # Arrange
-    timestamp_with_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
-    timestamp_without_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
+    timestamp_with_millis_pattern = (
+        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
+    )
+    timestamp_without_millis_pattern = (
+        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
+    )
 
     # Act & Assert
-    assert re.match(timestamp_with_millis_pattern, Utility.get_timestamp(include_millis=True))
-    assert re.match(timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False))
+    assert re.match(
+        timestamp_with_millis_pattern, Utility.get_timestamp(include_millis=True)
+    )
+    assert re.match(
+        timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False)
+    )
 
 
 @pytest.mark.parametrize(
@@ -242,4 +250,7 @@ def test_get_timestamp() -> None:
     ],
 )
 def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
-    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
+    assert (
+        Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion)
+        == expected_result
+    )

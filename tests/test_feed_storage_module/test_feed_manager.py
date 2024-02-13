@@ -23,17 +23,29 @@ def harvested_crop() -> HarvestedCrop:
 
 @pytest.fixture
 def alfalfa_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.ALFALFA, CropType.ALFALFA, **sample_crop_data_no_mass, fresh_mass=50)
+    return HarvestedCrop(
+        CropCategory.ALFALFA,
+        CropType.ALFALFA,
+        **sample_crop_data_no_mass,
+        fresh_mass=50
+    )
 
 
 @pytest.fixture
 def corn_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.CORN, CropType.GRAIN, **sample_crop_data_no_mass, fresh_mass=150)
+    return HarvestedCrop(
+        CropCategory.CORN, CropType.GRAIN, **sample_crop_data_no_mass, fresh_mass=150
+    )
 
 
 @pytest.fixture
 def grass_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data_no_mass, fresh_mass=100)
+    return HarvestedCrop(
+        CropCategory.GRASS,
+        CropType.TALL_FESCUE,
+        **sample_crop_data_no_mass,
+        fresh_mass=100
+    )
 
 
 @pytest.fixture
@@ -41,7 +53,9 @@ def feed_manager() -> FeedManager:
     return FeedManager()
 
 
-def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_success(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     try:
         feed_manager.receive_crop(
             harvested_crop=harvested_crop,
@@ -51,7 +65,9 @@ def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: Harvest
         pytest.fail("Unexpected ValueError raised")
 
 
-def test_receive_crop_multiple(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_multiple(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     try:
         feed_manager.receive_crop(
             harvested_crop=harvested_crop,
@@ -73,7 +89,9 @@ def test_receive_crop_multiple(feed_manager: FeedManager, harvested_crop: Harves
         pytest.fail("Unexpected ValueError raised")
 
 
-def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_error(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     incompatible_storage = StorageType.PROTECTED_WRAPPED
     with pytest.raises(ValueError) as excinfo:
         feed_manager.receive_crop(
@@ -117,7 +135,9 @@ def test_query_available_feeds_specific_crop_categories(
     feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS)
     feed_manager.receive_crop(corn_crop, StorageType.DRY)
     feed_manager.receive_crop(corn_crop, StorageType.DRY)
-    results = feed_manager.query_available_feeds(query_crop_categories=[CropCategory.CORN])
+    results = feed_manager.query_available_feeds(
+        query_crop_categories=[CropCategory.CORN]
+    )
     assert len(results) == 1
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
