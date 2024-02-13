@@ -4030,5 +4030,39 @@
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "default": 0
     }
+  },
+  "EEE_constants_properties": {
+    "constants": {
+      "type": "array",
+      "description": "The constants used in EEE module.",
+      "properties": {
+        "type": "object",
+        "ID": {
+          "type": "number"
+        },
+        "Grouping": {
+          "type": "string",
+          "default": ""
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string",
+          "default": ""
+        },
+        "Value": {
+          "type": "number"
+        },
+        "Unit": {
+          "type": "string",
+          "default": "unitless"
+        },
+        "Notes and remarks": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    }
   }
 }
