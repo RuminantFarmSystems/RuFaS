@@ -10,9 +10,16 @@ class TractorImplement:
         return 0
 
     @property
-    def operation_time_hr(self) -> float:
+    def field_capacity_ha_per_hr(self) -> float:
         # TODO implement
         return 0
+
+    def calculate_operation_time_hr(self, field_production_size_ha: float) -> float:
+        """
+        Calculates number of hours taken by tractor given other factors like implement size to perform the operation.
+        Implements Helper Function 416  in EEE Functions file.
+        """
+        return field_production_size_ha / self.field_capacity_ha_per_hr
 
     def calculate_drawbar_power(self) -> float:
         """
@@ -28,8 +35,20 @@ class TractorImplement:
         pass
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
-        """Calculates PTO_Power (kW) from the tractor to power the implement's operation"""
+        """
+        Calculates PTO_Power (kW) from the tractor to power the implement's operation.
+        Implements Helper Function 415  in EEE Functions file.
+        """
         E = 0  # TODO get the correct value
         F = 0  # TODO get the correct value
         G = 0  # TODO get the correct value
-        E + (F * self.width_m) + (G * crop_yield_ton_per_ha * field_production_size_ha / self.operation_time_hr)
+        (
+            E
+            + (F * self.width_m)
+            + (
+                G
+                * crop_yield_ton_per_ha
+                * field_production_size_ha
+                / self.calculate_operation_time_hr(field_production_size_ha)
+            )
+        )
