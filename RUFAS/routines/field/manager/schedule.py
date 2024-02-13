@@ -8,8 +8,14 @@ by the Crop and Soil module.
 
 
 class Schedule:
-
-    def __init__(self, name: str, years: List[int], days: List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(
+        self,
+        name: str,
+        years: List[int],
+        days: List[int],
+        pattern_skip: int = 0,
+        pattern_repeat: int = 0,
+    ):
         """
         Creates a base Schedule object which specific types of Scheduling classes will inherit from.
 
