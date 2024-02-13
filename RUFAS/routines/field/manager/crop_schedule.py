@@ -29,11 +29,11 @@ class CropSchedule(Schedule):
         Operations with which the crop is harvested.
     use_heat_scheduling : bool, optional, default False
         Indicates if heat scheduling should be used to determine when the crop is harvested.
-    planting_skip : int, optional, default 0.0
+    planting_skip : int, optional, default 0
         Number of years to skip between planting cycles.
-    harvesting_skip : int, optional, default 0.0
+    harvesting_skip : int, optional, default 0
         Number of years to skip between harvesting cycles.
-    pattern_repeat : int, optional, default 0.0
+    pattern_repeat : int, optional, default 0
         Number of times the specified crop planting and harvesting pattern should be repeated.
 
     Attributes
