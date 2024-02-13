@@ -1,3 +1,18 @@
+from enum import Enum
+
+
+class OperationType(Enum):
+    PLANTING = "Planting"
+    TILLING = "Tilling"
+    LIQUID_MANURE_APPLICATION_SURFACE = "Liquid Manure Application: Surface"
+    LIQUID_MANURE_APPLICATION_BELOW_SURFACE = "Liquid Manure Application: Below Surface"
+    FERTILIZER_APPLICATION_SURFACE = "Fertilizer Application: Surface"
+    FERTILIZER_APPLICATION_BELOW_SURFACE = "Fertilizer Application: Below Surface"
+    MOWING = "Mowing"
+    RAKING = "Raking"
+    COLLECTION = "Collection"
+
+
 class TractorImplement:
     @property
     def mass_kg(self) -> float:
