@@ -41,13 +41,13 @@ class CropSchedule(Schedule):
     crop_reference : str
         Identifier for the crop associated with this schedule.
     planting_years : List[int]
-        List of years for each planting event.
+        List of years in which planting events will occur.
     planting_days : List[int]
         Corresponding Julian days for planting.
     planting_skip : int
         Number of years to skip between planting events.
     harvest_years : List[int]
-        List of years for each harvesting event.
+        List of years in which harvesting events will occur.
     harvest_days : List[int]
         Corresponding Julian days for harvesting.
     harvest_operations : List[HarvestOperation]
