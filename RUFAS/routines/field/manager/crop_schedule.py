@@ -4,13 +4,39 @@ from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation, FINAL_HARVEST_OPERATIONS
 from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
 
-"""
-The `CropSchedule` module allows users to specify a pattern for planting and harvesting a certain crop that can be
-repeated over a specified number of years, with specified breaks in between repetitions of the pattern.
-"""
-
 
 class CropSchedule(Schedule):
+    """
+    A class for defining a schedule for planting and harvesting crops, allows users to specify a pattern for planting
+    and harvesting a certain crop that can be repeated over a specified number of years, with specified breaks in
+    between repetitions of the pattern.
+
+    Parameters
+    ----------
+    name : str
+        Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
+    crop_reference : str
+        Reference to the name of the crop that will be used to identify the correct crop specifications.
+    planting_years : List[int]
+        Years in which the crop is planted.
+    planting_days : List[int]
+        Julian days on which the crop is planted.
+    harvest_years : List[int]
+        Years in which the crop is harvested.
+    harvest_days : List[int]
+        Julian days on which the crop is harvested.
+    harvest_operations : List[str]
+        Operations with which the crop is harvested.
+    use_heat_scheduling : bool, optional
+        Indicates if heat scheduling should be used to determine when the crop is harvested, by default False.
+    planting_skip : int, optional
+        Number of years to skip between planting cycles, by default 0.
+    harvesting_skip : int, optional
+        Number of years to skip between harvesting cycles, by default 0.
+    pattern_repeat : int, optional
+        Number of times the specified crop planting and harvesting pattern should be repeated, by default 0.
+
+    """
 
     def __init__(
             self,
@@ -26,35 +52,6 @@ class CropSchedule(Schedule):
             harvesting_skip: int = 0,
             pattern_repeat: int = 0
     ):
-        """
-        Creates a CropSchedule instance based on user input.
-
-        Parameters
-        ----------
-        name : str
-            Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
-        crop_reference : str
-            Reference to name of the crop that will be used to identify the correct crop specifications.
-        planting_years : List[int]
-            Year(s) in which crop is planted.
-        planting_days : List[int]
-            Julian day(s) on which crop is planted.
-        harvest_years : List[int]
-            Year(s) in which crop is harvested.
-        harvest_days : List[int]
-            Julian day(s) on which crop is harvested.
-        harvest_operations : List[str]
-            Operation(s) with which a crop is harvested.
-        use_heat_scheduling : bool, default=False
-            Variable indicating if heat scheduling should be used to determine when crop is harvested.
-        planting_skip : int, default=0
-            Number of years to skip between planting cycles.
-        harvesting_skip : int, default=0
-            Number of years to skip between harvesting cycles.
-        pattern_repeat : int, default=0
-            Number of times the specified crop planting and harvesting pattern should be repeated.
-
-        """
         super().__init__(name, planting_years, planting_days, planting_skip, pattern_repeat)
 
         self.crop_reference = crop_reference

@@ -4,47 +4,50 @@ from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import FertilizerEvent
 from RUFAS.output_manager import OutputManager
 
-"""
-This module contains `FertilizerSchedule`, a `Schedule` child class that defines when and how much fertilizer will be
-applied to a field.
-"""
 
 om = OutputManager()
 
 
 class FertilizerSchedule(Schedule):
+    """
+    A Schedule child class that defines the timing and amounts of fertilizer application to a field. Inherits from the
+    Schedule class to manage and validate a schedule for applying specific fertilizer mixes to a field, including the
+    timing (years and days) and amounts (masses of nitrogen and phosphorus) of each application.
+
+    Parameters
+    ----------
+    name : str
+        The name of the fertilizer application schedule.
+    mix_names : List[str]
+        The names of the specific fertilizer mixes included in the schedule.
+    years : List[int]
+        The years in which the fertilizer will be applied.
+    days : List[int]
+        The Julian days on which the fertilizer will be applied within the specified years.
+    nitrogen_masses : List[float]
+        The minimum masses of nitrogen to be applied in each fertilizer application, in kilograms (kg).
+    phosphorus_masses : List[float]
+        The minimum masses of phosphorus to be applied in each fertilizer application, in kilograms (kg).
+    application_depths : List[float], optional
+        The depths at which the fertilizer is to be injected into the soil for each application, in millimeters (mm).
+        Defaults to None.
+    surface_remainder_fractions : List[float], optional
+        The fractions of each fertilizer application that remain on the soil surface, unitless. Defaults to None.
+    pattern_skip : int, optional
+        The number of years to skip between repetitions of the fertilizer application pattern. Defaults to 0.
+    pattern_repeat : int, optional
+        The number of times the specified fertilizer application pattern should be repeated. Defaults to 0.
+
+    Notes
+    -----
+    - Application depths and surface remainder fractions are intended to have defaults of [0.0] and [1.0] respectively,
+      but these are not specified directly in the function signature to avoid using mutable default arguments.
+
+    """
 
     def __init__(self, name: str, mix_names: List[str], years: List[int], days: List[int], nitrogen_masses: List[float],
                  phosphorus_masses: List[float], application_depths: List[float] = None,
                  surface_remainder_fractions: List[float] = None, pattern_skip: int = 0, pattern_repeat: int = 0):
-        """
-        Creates and validates a fertilizer application schedule.
-
-        Parameters
-        ----------
-        name : str
-            Name of this fertilizer application schedule.
-        mix_names : List[str]
-            Name(s) of the specific fertilizer mix that fertilizer application is composed of.
-        years : List[int]
-            Year(s) in which fertilizer will be applied.
-        days : List[int]
-            Julian day(s) in which fertilizer will be applied.
-        nitrogen_masses : List[float]
-            Minimum mass(es) of nitrogen in applications (kg)
-        phosphorus_masses : List[float]
-            Minimum mass(es) of phosphorus in applications (kg)
-        application_depths : List[float], default=None
-            Bottom depth(s) of fertilizer injection applications (mm)
-        surface_remainder_fractions : List[float], default=None
-            Fraction(s) of fertilizer application that remain on the soil surface (unitless)
-
-        Notes
-        -----
-        Application depths and surface remainder fractions actually have defaults of [0.0] and [1.0] respectively, but
-        there are not specified in the signature because parameters cannot have mutable defaults.
-
-        """
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.mix_names = self._elongate_list(mix_names, len(years))
