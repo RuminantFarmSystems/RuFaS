@@ -72,7 +72,7 @@ class Event:
 
 class PlantingEvent(Event):
     """
-    A child of Event class that dictates when a crop will be planted and tells the plant how it will eventually be
+    A child of Event class that dictates when a crop will be planted and how it will eventually be
     harvested.
 
     Parameters
