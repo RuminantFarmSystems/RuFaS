@@ -27,14 +27,14 @@ class CropSchedule(Schedule):
         Julian days on which the crop is harvested.
     harvest_operations : List[str]
         Operations with which the crop is harvested.
-    use_heat_scheduling : bool, optional
-        Indicates if heat scheduling should be used to determine when the crop is harvested, by default False.
-    planting_skip : int, optional
-        Number of years to skip between planting cycles, by default 0.
-    harvesting_skip : int, optional
-        Number of years to skip between harvesting cycles, by default 0.
-    pattern_repeat : int, optional
-        Number of times the specified crop planting and harvesting pattern should be repeated, by default 0.
+    use_heat_scheduling : bool, optional, default False
+        Indicates if heat scheduling should be used to determine when the crop is harvested.
+    planting_skip : int, optional, default 0.0
+        Number of years to skip between planting cycles.
+    harvesting_skip : int, optional, default 0.0
+        Number of years to skip between harvesting cycles.
+    pattern_repeat : int, optional, default 0.0
+        Number of times the specified crop planting and harvesting pattern should be repeated.
 
     Attributes
     ----------

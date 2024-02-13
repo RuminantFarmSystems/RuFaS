@@ -25,18 +25,17 @@ class FertilizerSchedule(Schedule):
     days : List[int]
         The Julian days on which the fertilizer will be applied within the specified years.
     nitrogen_masses : List[float]
-        The minimum masses of nitrogen to be applied in each fertilizer application, in kilograms (kg).
+        The minimum masses of nitrogen to be applied in each fertilizer application (kg).
     phosphorus_masses : List[float]
-        The minimum masses of phosphorus to be applied in each fertilizer application, in kilograms (kg).
-    application_depths : List[float], optional
-        The depths at which the fertilizer is to be injected into the soil for each application, in millimeters (mm).
-        Defaults to None.
-    surface_remainder_fractions : List[float], optional
-        The fractions of each fertilizer application that remain on the soil surface, unitless. Defaults to None.
-    pattern_skip : int, optional
-        The number of years to skip between repetitions of the fertilizer application pattern. Defaults to 0.
-    pattern_repeat : int, optional
-        The number of times the specified fertilizer application pattern should be repeated. Defaults to 0.
+        The minimum masses of phosphorus to be applied in each fertilizer application (kg).
+    application_depths : List[float], optional, default None
+        The depths at which the fertilizer is to be injected into the soil for each application (mm).
+    surface_remainder_fractions : List[float], optional, default None
+        The fractions of each fertilizer application that remain on the soil surface (unitless).
+    pattern_skip : int, optional, default 0.0
+        The number of years to skip between repetitions of the fertilizer application pattern.
+    pattern_repeat : int, optional, default 0.0
+        The number of times the specified fertilizer application pattern should be repeated.
 
     Attributes
     ----------
