@@ -20,8 +20,7 @@ om = OutputManager()
             [10],
             [50.0],
             [0.4],
-            "'test_1': expected all years to be > 0 and in non-descending order, received "
-            "'[1992, 1991]'.",
+            "'test_1': expected all years to be > 0 and in non-descending order, received " "'[1992, 1991]'.",
         ),
         (
             "test_2",
@@ -76,8 +75,7 @@ om = OutputManager()
             [10],
             [0.0],
             [1.0, 1.02],
-            "'test_6': expected all surface remainder fractions to be in range [0.0, 1.0], received "
-            "'[1.0, 1.02]'.",
+            "'test_6': expected all surface remainder fractions to be in range [0.0, 1.0], received " "'[1.0, 1.02]'.",
         ),
         (
             "test_7",
@@ -109,9 +107,7 @@ def test_validate_fertilizer_parameters(
 ) -> None:
     """Tests that FertilizerSchedule raises proper errors when initialized with invalid input."""
     with pytest.raises(ValueError) as e:
-        FertilizerSchedule(
-            name, mix_names, years, days, nitrogen, phosphorus, depths, fractions, 1, 1
-        )
+        FertilizerSchedule(name, mix_names, years, days, nitrogen, phosphorus, depths, fractions, 1, 1)
     print(str(e.value))
     print(expected_err_msg)
     assert str(e.value) == expected_err_msg
@@ -127,9 +123,7 @@ def test_validate_fertilizer_parameters(
         ([-2, -4], False),
     ],
 )
-def test_determine_if_all_non_negative_values(
-    values: List[Any], expected: bool
-) -> None:
+def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
     """Tests that lists are correctly checked for negative values."""
     actual = FertilizerSchedule._determine_if_all_non_negative_values(values)
     assert actual == expected

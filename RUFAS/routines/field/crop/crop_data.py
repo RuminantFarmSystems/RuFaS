@@ -570,10 +570,7 @@ class CropData:
         Initialize all attributes with defaults that depend on other attributes after the object has been initialized.
         """
         # Set dormancy loss
-        if (
-            self.plant_category == PlantCategory.PERENNIAL
-            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
-        ):
+        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME:
             self.dormancy_loss_fraction = 0.1
         elif self.plant_category == PlantCategory.TREE:
             self.dormancy_loss_fraction = 0.3
@@ -617,12 +614,7 @@ class CropData:
             True if the plant is in its growing season, False otherwise.
 
         """
-        return (
-            not self.is_mature
-            and not self.is_dormant
-            and self.is_alive
-            and self.is_growing
-        )
+        return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
     @property
     def do_harvest_index_override(self) -> bool:
@@ -665,9 +657,7 @@ class CropData:
         SWAT Theoretical documentation eqn. 2:2.1.1
 
         """
-        return self.max_canopy_water_capacity * (
-            self.leaf_area_index / self.max_leaf_area_index
-        )
+        return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
 
     @property
     def heat_fraction(self) -> float:

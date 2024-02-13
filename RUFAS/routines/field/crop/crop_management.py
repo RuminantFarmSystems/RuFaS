@@ -94,12 +94,8 @@ class CropManagement:
         """
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
-        self.data.residue_nitrogen = (
-            self.data.yield_residue * self.data.yield_nitrogen_fraction
-        )
-        self.data.residue_phosphorus = (
-            self.data.yield_residue * self.data.yield_phosphorus_fraction
-        )
+        self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
+        self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
     def determine_harvest_index(self):
         """
@@ -139,9 +135,7 @@ class CropManagement:
         """
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
         #   The dry down method is not currently used
-        self.data.above_ground_biomass -= (
-            self.data.above_ground_biomass * self.data.dry_down_fraction
-        )
+        self.data.above_ground_biomass -= self.data.above_ground_biomass * self.data.dry_down_fraction
 
     def cut_crop(self, collected_fraction: float = 0) -> None:
         """
@@ -191,9 +185,7 @@ class CropManagement:
 
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
-            self.data.cut_biomass = (
-                self.data.above_ground_biomass * self.data.harvest_index
-            )
+            self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
         else:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(
                 self.data.biomass, self.data.harvest_index
@@ -203,46 +195,23 @@ class CropManagement:
         self._recalculate_biomass_distribution(roots_harvested)
 
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
-        self.data.accumulated_heat_units = self.data.accumulated_heat_units * (
-            1 - fraction_cut
-        )
+        self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        self.data.dry_matter_yield_collected = (
-            self.data.cut_biomass * collected_fraction
-        )
-        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (
-            self.data.dry_matter_percentage / 100
-        )
+        self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
+        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
 
         self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
 
         if self.data.do_harvest_index_override:
-            self.data.yield_nitrogen = (
-                self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
-            )
-            self.data.yield_phosphorus = (
-                self.data.optimal_phosphorus_fraction * self.data.wet_yield_collected
-            )
-            self.data.residue_nitrogen = (
-                self.data.optimal_nitrogen_fraction * self.data.yield_residue
-            )
-            self.data.residue_phosphorus = (
-                self.data.optimal_phosphorus_fraction * self.data.yield_residue
-            )
+            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
+            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * self.data.wet_yield_collected
+            self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
+            self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
-            self.data.yield_nitrogen = (
-                self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
-            )
-            self.data.yield_phosphorus = (
-                self.data.yield_phosphorus_fraction
-                * self.data.dry_matter_yield_collected
-            )
-            self.data.residue_nitrogen = (
-                self.data.yield_nitrogen_fraction * self.data.yield_residue
-            )
-            self.data.residue_phosphorus = (
-                self.data.yield_phosphorus_fraction * self.data.yield_residue
-            )
+            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
+            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
+            self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
+            self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """
@@ -267,16 +236,12 @@ class CropManagement:
             self.data.above_ground_biomass -= self.data.cut_biomass
             self.data.root_fraction = self.data.root_biomass / self.data.biomass
         else:
-            root_biomass_removed = (
-                self.data.cut_biomass - self.data.above_ground_biomass
-            )
+            root_biomass_removed = self.data.cut_biomass - self.data.above_ground_biomass
             self.data.root_biomass -= root_biomass_removed
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _store_harvested_crop(
-        self, time: Time, field_size: float, feed_manager: FeedManager
-    ) -> None:
+    def _store_harvested_crop(self, time: Time, field_size: float, feed_manager: FeedManager) -> None:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
@@ -318,9 +283,7 @@ class CropManagement:
         )
         feed_manager.receive_crop(harvested_crop, self.data.storage_type)
 
-    def _record_yield(
-        self, field_name: str, field_size: float, year: int, day: int
-    ) -> None:
+    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
@@ -383,14 +346,10 @@ class CropManagement:
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
-        soil_data.plant_residue_lignin_composition = (
-            self.data.lignin_dry_matter_percentage / 100
-        )
+        soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
         dry_matter_root_biomass = self.data.root_biomass
         if killed:
-            soil_data.plant_surface_residue = (
-                self.data.yield_residue - dry_matter_root_biomass
-            )
+            soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
             self._distribute_residue_nutrients(
@@ -401,19 +360,13 @@ class CropManagement:
             soil_data.plant_surface_residue = self.data.yield_residue
             soil_data.plant_root_residue = 0
             soil_data.crop_root_depth = 0
-            soil_data.soil_layers[
-                0
-            ].fresh_organic_nitrogen_content += self.data.residue_nitrogen
-            soil_data.soil_layers[
-                0
-            ].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
+            soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
+            soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
         self.data.yield_residue = 0.0
         self.data.residue_nitrogen = 0.0
         self.data.residue_phosphorus = 0.0
 
-    def _distribute_residue_nutrients(
-        self, soil_data: SoilData, root_residue_mass: float
-    ) -> None:
+    def _distribute_residue_nutrients(self, soil_data: SoilData, root_residue_mass: float) -> None:
         """
         Distributes nutrients from plant residue into the soil profile.
 
@@ -430,50 +383,33 @@ class CropManagement:
         proportionally between layers based on the depth the crop's roots reach.
 
         """
-        surface_fraction = (
-            self.data.yield_residue - root_residue_mass
-        ) / self.data.yield_residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += (
-            self.data.residue_nitrogen * surface_fraction
-        )
-        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += (
-            self.data.residue_phosphorus * surface_fraction
-        )
+        surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
+        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
 
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
         surface_layer = soil_data.soil_layers[0]
         surface_root_fraction = (
-            (surface_layer.bottom_depth - surface_layer.top_depth)
-            / self.data.root_depth
+            (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth
             if surface_layer.bottom_depth <= self.data.root_depth
             else max(
                 0.0,
                 (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth,
             )
         )
-        surface_layer.fresh_organic_nitrogen_content += (
-            subsurface_nitrogen * surface_root_fraction
-        )
-        surface_layer.labile_inorganic_phosphorus_content += (
-            subsurface_phosphorus * surface_root_fraction
-        )
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
 
         for layer in soil_data.soil_layers[1:]:
             layer_fraction = (
                 (layer.bottom_depth - layer.top_depth) / self.data.root_depth
                 if layer.bottom_depth <= self.data.root_depth
-                else max(
-                    0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth
-                )
+                else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
             )
-            layer.active_organic_nitrogen_content += (
-                subsurface_nitrogen * layer_fraction
-            )
-            layer.labile_inorganic_phosphorus_content += (
-                subsurface_phosphorus * layer_fraction
-            )
+            layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+            layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
     # ---- Harvest Scheduling ----
 
@@ -496,9 +432,7 @@ class CropManagement:
             the current year
         """
         if self.data.use_heat_scheduling:
-            self.data.is_harvest_day = (
-                self.data.heat_fraction >= self.data.harvest_heat_fraction
-            )
+            self.data.is_harvest_day = self.data.heat_fraction >= self.data.harvest_heat_fraction
         else:
             is_harvest_year = current_day == self.data.next_harvest_day
             is_harvest_day = current_year == self.data.next_harvest_year
@@ -506,9 +440,7 @@ class CropManagement:
 
     # ---- Helper Methods ----
     @staticmethod
-    def _determine_potential_harvest_index(
-        heat_fraction: float, optimal_harvest_index: float
-    ) -> float:
+    def _determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:
         """
         Calculates the potential harvest index for a plant on a given day.
 
@@ -536,16 +468,10 @@ class CropManagement:
 
         """
         heat_percent = 100 * heat_fraction
-        return (
-            optimal_harvest_index
-            * heat_percent
-            / (heat_percent + exp(11.1 - 10 * heat_fraction))
-        )
+        return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
-    def _adjust_harvest_index(
-        harvest_index: float, min_harvest_index: float, water_deficiency: float
-    ) -> float:
+    def _adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
         """
         Calculates the actual harvest index for a given day, adjusted for water deficiency.
 
@@ -584,9 +510,7 @@ class CropManagement:
         return max(adj_harvest_index, 0)
 
     @staticmethod
-    def determine_biomass_cut_from_whole_plant(
-        biomass: float, harvest_index: float
-    ) -> float:
+    def determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:
         """
         Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
         greater than 1.

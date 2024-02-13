@@ -35,11 +35,7 @@ class AnimalEvents:
         for day in split_by_date:
             split = day.split(": ")
             date = int(split[0])
-            events = list(
-                filter(
-                    lambda x: (x != "[" and x != "]" and x != ", "), split[1].split("'")
-                )
-            )
+            events = list(filter(lambda x: (x != "[" and x != "]" and x != ", "), split[1].split("'")))
             for event in events:
                 self.add_event(date, 0, event)
 

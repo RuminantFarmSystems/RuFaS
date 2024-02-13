@@ -142,9 +142,7 @@ class GraphGenerator:
         """
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
-            prepared_data, log_pool = self._prepare_plot_data(
-                filtered_pool, graph_details
-            )
+            prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
             all_logs = log_pool + graph_filter_validation_logs
 
             found_errors = any("error" in log for log in all_logs)
@@ -152,11 +150,7 @@ class GraphGenerator:
                 return all_logs
 
             fig, _ = plt.subplots()
-            filtered_pool = {
-                k: filtered_pool[k]
-                for k in graph_details["filters"]
-                if k in filtered_pool.keys()
-            }
+            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
             self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
             legend = graph_details.get("legend")
             if not legend:
@@ -183,9 +177,7 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = (
-            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
-        )
+        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
@@ -196,17 +188,14 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph "
-                        "filter file.",
+                        "message": f"Required key '{required_key}' not in your graph " "filter file.",
                         "info_map": info_map,
                     }
                 )
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
 
-        optional_graph_details_keys = [
-            key for key in graph_details.keys() if key not in required_graph_filter_keys
-        ]
+        optional_graph_details_keys = [key for key in graph_details.keys() if key not in required_graph_filter_keys]
         for filter_key in optional_graph_details_keys:
             if filter_key not in optional_graph_filter_keys:
                 graph_filter_validation_logs.append(
@@ -266,9 +255,7 @@ class GraphGenerator:
                     )
                     continue
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                filtered_data = Utility.filter_pool(
-                    data_dict, selected_variables, filter_by_exclusion
-                )
+                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
                 if not filtered_data:
                     log_pool.append(
                         {
@@ -283,10 +270,7 @@ class GraphGenerator:
                     for key, value in filtered_data.items()
                     if not (
                         isinstance(value, (int, float))
-                        or (
-                            isinstance(value, list)
-                            and all(isinstance(item, (int, float)) for item in value)
-                        )
+                        or (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value))
                     )
                 ]
                 for key in non_int_float_keys:
@@ -350,9 +334,7 @@ class GraphGenerator:
             for value in data.values():
                 plot_function(value)
 
-    def _customize_graph(
-        self, fig: Figure, customization_details: Dict[str, Any]
-    ) -> None:
+    def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
         """
         Apply customizations to the graph.
 
@@ -401,14 +383,10 @@ class GraphGenerator:
             Generic exception raised if saving the graph fails.
 
         """
-        graph_path = self._generate_graph_path(
-            graph_details, filter_file_name, graphics_dir
-        )
+        graph_path = self._generate_graph_path(graph_details, filter_file_name, graphics_dir)
         counter = 1
         while graph_path.exists():
-            graph_path = graph_path.with_name(
-                f"{graph_path.stem}({counter}){graph_path.suffix}"
-            )
+            graph_path = graph_path.with_name(f"{graph_path.stem}({counter}){graph_path.suffix}")
             counter += 1
         try:
             plt.savefig(graph_path)

@@ -13,9 +13,7 @@ pseudocode_soil S.6.B
 
 
 class ResiduePartition:
-    def __init__(
-        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -40,22 +38,16 @@ class ResiduePartition:
             Amount of rainfall on the current day (mm).
 
         """
-        self.data.plant_residue_lignin_composition = (
-            self._determine_plant_residue_lignin_composition(
-                self.data.plant_residue_lignin_composition, rainfall
-            )
+        self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
+            self.data.plant_residue_lignin_composition, rainfall
         )
-        self.data.plant_lignin_nitrogen_ratio = (
-            self._determine_plant_lignin_nitrogen_fraction(
-                self.data.plant_residue_lignin_composition,
-                self.data.all_residue,
-                self.data.crop_yield_nitrogen,
-            )
+        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
+            self.data.plant_residue_lignin_composition,
+            self.data.all_residue,
+            self.data.crop_yield_nitrogen,
         )
-        self.data.plant_residue_metabolic_fraction = (
-            self._determine_plant_residue_metabolic_fraction(
-                self.data.plant_lignin_nitrogen_ratio
-            )
+        self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
+            self.data.plant_lignin_nitrogen_ratio
         )
 
         self._add_litter_to_pools()
@@ -71,12 +63,10 @@ class ResiduePartition:
             amount of rain (mm)
         """
         layer = self.data.soil_layers[0]
-        layer.plant_metabolic_active_carbon_usage = (
-            self._determine_plant_metabolic_active_carbon_usage(
-                layer.decomposition_moisture_effect,
-                layer.decomposition_temperature_effect,
-                layer.metabolic_litter_amount,
-            )
+        layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(
+            layer.decomposition_moisture_effect,
+            layer.decomposition_temperature_effect,
+            layer.metabolic_litter_amount,
         )
 
         layer.metabolic_litter_amount = self._determine_plant_metabolic_carbon_amount(
@@ -87,28 +77,22 @@ class ResiduePartition:
             layer.plant_metabolic_to_soil_carbon_amount,
         )
 
-        layer.plant_structural_to_slow_or_active_rate = (
-            self._determine_plant_structural_to_slow_or_active_rate(
-                self.data.plant_residue_metabolic_fraction
-            )
+        layer.plant_structural_to_slow_or_active_rate = self._determine_plant_structural_to_slow_or_active_rate(
+            self.data.plant_residue_metabolic_fraction
         )
 
-        layer.plant_structural_active_carbon_usage = (
-            self._determine_plant_structural_to_slow_active_carbon_amount(
-                layer.plant_structural_to_slow_or_active_rate,
-                layer.decomposition_moisture_effect,
-                layer.decomposition_temperature_effect,
-                layer.structural_litter_amount,
-            )
+        layer.plant_structural_active_carbon_usage = self._determine_plant_structural_to_slow_active_carbon_amount(
+            layer.plant_structural_to_slow_or_active_rate,
+            layer.decomposition_moisture_effect,
+            layer.decomposition_temperature_effect,
+            layer.structural_litter_amount,
         )
 
-        layer.plant_structural_slow_carbon_usage = (
-            self._determine_plant_structural_to_slow_active_carbon_amount(
-                layer.plant_structural_to_slow_or_active_rate,
-                layer.decomposition_moisture_effect,
-                layer.decomposition_temperature_effect,
-                layer.structural_litter_amount,
-            )
+        layer.plant_structural_slow_carbon_usage = self._determine_plant_structural_to_slow_active_carbon_amount(
+            layer.plant_structural_to_slow_or_active_rate,
+            layer.decomposition_moisture_effect,
+            layer.decomposition_temperature_effect,
+            layer.structural_litter_amount,
         )
 
         layer.structural_litter_amount = self._determine_plant_structural_carbon_amount(
@@ -122,10 +106,8 @@ class ResiduePartition:
 
         layer.plant_dry_matter_residue_amount = 0
 
-        layer.weighted_residue_dry_matter_lignin_fraction = (
-            self._determine_weighted_residue_dry_matter_lignin_fraction(
-                layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
-            )
+        layer.weighted_residue_dry_matter_lignin_fraction = self._determine_weighted_residue_dry_matter_lignin_fraction(
+            layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
         )
 
         for layer in self.data.soil_layers[1:]:
@@ -137,71 +119,55 @@ class ResiduePartition:
                 )
             )
 
-            layer.soil_residue_lignin_fraction = (
-                self._determine_soil_residue_lignin_fraction(
-                    layer.weighted_residue_dry_matter_lignin_fraction, rainfall
-                )
+            layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
+                layer.weighted_residue_dry_matter_lignin_fraction, rainfall
             )
 
-            layer.soil_lignin_to_nitrogen_fraction = (
-                self._determine_soil_lignin_to_nitrogen_fraction(
-                    self.data.plant_residue_metabolic_fraction,
-                    layer.weighted_residue_dry_matter_lignin_fraction,
-                    layer.soil_residue_lignin_fraction,
-                )
+            layer.soil_lignin_to_nitrogen_fraction = self._determine_soil_lignin_to_nitrogen_fraction(
+                self.data.plant_residue_metabolic_fraction,
+                layer.weighted_residue_dry_matter_lignin_fraction,
+                layer.soil_residue_lignin_fraction,
             )
 
-            layer.soil_residue_metabolic_fraction = (
-                self._determine_soil_residue_metabolic_fraction(
-                    layer.soil_lignin_to_nitrogen_fraction
-                )
+            layer.soil_residue_metabolic_fraction = self._determine_soil_residue_metabolic_fraction(
+                layer.soil_lignin_to_nitrogen_fraction
             )
 
-            layer.soil_metabolic_active_carbon_usage = (
-                self._determine_soil_metabolic_to_active_carbon_amount(
-                    layer.decomposition_moisture_effect,
-                    layer.decomposition_temperature_effect,
-                    layer.metabolic_litter_amount,
-                )
+            layer.soil_metabolic_active_carbon_usage = self._determine_soil_metabolic_to_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                layer.decomposition_temperature_effect,
+                layer.metabolic_litter_amount,
             )
 
-            layer.metabolic_litter_amount = (
-                self._determine_soil_metabolic_carbon_amount(
-                    layer.metabolic_litter_amount,
-                    layer.plant_metabolic_to_soil_carbon_amount,
-                    self.data.plant_root_residue,
-                    layer.soil_residue_metabolic_fraction,
-                    layer.soil_metabolic_active_carbon_usage,
-                )
+            layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
+                layer.metabolic_litter_amount,
+                layer.plant_metabolic_to_soil_carbon_amount,
+                self.data.plant_root_residue,
+                layer.soil_residue_metabolic_fraction,
+                layer.soil_metabolic_active_carbon_usage,
             )
 
-            layer.soil_structural_active_carbon_usage = (
-                self._determine_soil_structural_to_slow_active_carbon_amount(
-                    layer.decomposition_moisture_effect,
-                    layer.decomposition_temperature_effect,
-                    layer.structural_litter_amount,
-                    layer.soil_structural_to_slow_or_active_rate,
-                )
+            layer.soil_structural_active_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                layer.decomposition_temperature_effect,
+                layer.structural_litter_amount,
+                layer.soil_structural_to_slow_or_active_rate,
             )
 
-            layer.soil_structural_slow_carbon_usage = (
-                self._determine_soil_structural_to_slow_active_carbon_amount(
-                    layer.decomposition_moisture_effect,
-                    layer.decomposition_temperature_effect,
-                    layer.structural_litter_amount,
-                    layer.soil_structural_to_slow_or_active_rate,
-                )
+            layer.soil_structural_slow_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                layer.decomposition_temperature_effect,
+                layer.structural_litter_amount,
+                layer.soil_structural_to_slow_or_active_rate,
             )
 
-            layer.structural_litter_amount = (
-                self._determine_soil_structural_carbon_amount(
-                    layer.soil_residue_metabolic_fraction,
-                    layer.structural_carbon_transfer_amount,
-                    layer.soil_structural_active_carbon_usage,
-                    layer.soil_structural_slow_carbon_usage,
-                    self.data.plant_root_residue,
-                    layer.structural_litter_amount,
-                )
+            layer.structural_litter_amount = self._determine_soil_structural_carbon_amount(
+                layer.soil_residue_metabolic_fraction,
+                layer.structural_carbon_transfer_amount,
+                layer.soil_structural_active_carbon_usage,
+                layer.soil_structural_slow_carbon_usage,
+                self.data.plant_root_residue,
+                layer.structural_litter_amount,
             )
 
     def _add_litter_to_pools(self) -> None:
@@ -210,20 +176,15 @@ class ResiduePartition:
         """
         if self.data.plant_surface_residue > 0.0:
             self.data.soil_layers[0].metabolic_litter_amount += (
-                self.data.plant_surface_residue
-                * self.data.plant_residue_metabolic_fraction
+                self.data.plant_surface_residue * self.data.plant_residue_metabolic_fraction
             )
-            self.data.soil_layers[
-                0
-            ].structural_litter_amount += self.data.plant_surface_residue * (
+            self.data.soil_layers[0].structural_litter_amount += self.data.plant_surface_residue * (
                 1 - self.data.plant_residue_metabolic_fraction
             )
             self.data.plant_surface_residue = 0.0
 
         if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
-            self._add_subsurface_residue(
-                self.data.plant_root_residue, self.data.crop_root_depth
-            )
+            self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
             self._set_soil_structural_litter_decomposition_rate()
             self.data.plant_root_residue = 0.0
             self.data.crop_root_depth = 0.0
@@ -234,13 +195,9 @@ class ResiduePartition:
         `_determine_plant_structural_to_slow_or_active_rate`.
 
         """
-        structural_litter_decomposition_rate = (
-            0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
-        )
+        structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
         rates = [structural_litter_decomposition_rate] * len(self.data.soil_layers)
-        self.data.set_vectorized_layer_attribute(
-            "soil_structural_to_slow_or_active_rate", rates
-        )
+        self.data.set_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate", rates)
 
     def _add_subsurface_residue(self, root_residue: float, root_depth: float) -> None:
         """
@@ -267,12 +224,8 @@ class ResiduePartition:
                 layer.top_depth,
                 layer.layer_thickness,
             )
-            layer.metabolic_litter_amount += (
-                self.data.plant_residue_metabolic_fraction * litter_amount
-            )
-            layer.structural_litter_amount += (
-                1 - self.data.plant_residue_metabolic_fraction
-            ) * litter_amount
+            layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * litter_amount
+            layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * litter_amount
 
     @staticmethod
     def _determine_soil_dry_matter_residue_amount(
@@ -310,9 +263,7 @@ class ResiduePartition:
             return plant_root_residue * (root_depth - layer_top) / root_depth
 
     @staticmethod
-    def _determine_plant_residue_lignin_composition(
-        plant_residue_lignin_composition: float, rainfall: float
-    ) -> float:
+    def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float, rainfall: float) -> float:
         """This method calculates and updates the plant_residue_lignin_composition based on the amount of rainfall
 
         Parameters
@@ -368,9 +319,7 @@ class ResiduePartition:
             return 0.0
         nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
         if 0 < nitrogen_fraction_plant_residue <= 1.0:
-            return (
-                plant_residue_lignin_composition / 100
-            ) / nitrogen_fraction_plant_residue
+            return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
         elif nitrogen_fraction_plant_residue == 0:
             return 0
         else:
@@ -436,12 +385,8 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.4, S.6.B.I.7
 
         """
-        plant_metabolic_carbon_amount += (
-            plant_dry_matter_residue_amount * plant_residue_metabolic_fraction
-            - (
-                plant_metabolic_active_carbon_usage
-                + plant_metabolic_to_soil_carbon_amount
-            )
+        plant_metabolic_carbon_amount += plant_dry_matter_residue_amount * plant_residue_metabolic_fraction - (
+            plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount
         )
         return plant_metabolic_carbon_amount
 
@@ -528,11 +473,7 @@ class ResiduePartition:
         -------
         the equation used here currently follows the old code to make mathematical sense
         """
-        return (
-            structural_decomposition_factor
-            * math.exp(-3)
-            * (1 - plant_residue_metabolic_fraction)
-        )
+        return structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
 
     @staticmethod
     def _determine_plant_structural_to_slow_active_carbon_amount(
@@ -666,9 +607,7 @@ class ResiduePartition:
         mention of biomass unit
         """
         if soil_dry_matter_residue_amount + root_biomass != 0:
-            return soil_dry_matter_residue_amount / (
-                soil_dry_matter_residue_amount + root_biomass
-            )
+            return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + root_biomass)
         else:
             return 0
 
@@ -695,9 +634,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.3
         """
         # TODO: Check where the 0.15 and 0.01 factors came from issue #445
-        return max(
-            0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01
-        )
+        return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
 
     @staticmethod
     def _determine_soil_lignin_to_nitrogen_fraction(
@@ -729,18 +666,9 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.4
         """
         if 0 < nitrogen_fraction_plant_residue <= 1:
-            return (
-                plant_lignin_nitrogen_ratio
-                * weighted_residue_dry_matter_lignin_fraction
-                + (
-                    (
-                        (soil_residue_lignin_fraction / 100)
-                        / nitrogen_fraction_plant_residue
-                    )
-                    / 100
-                )
-                * (1 - weighted_residue_dry_matter_lignin_fraction)
-            )
+            return plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction + (
+                ((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue) / 100
+            ) * (1 - weighted_residue_dry_matter_lignin_fraction)
         elif nitrogen_fraction_plant_residue == 0:
             return 0
         else:

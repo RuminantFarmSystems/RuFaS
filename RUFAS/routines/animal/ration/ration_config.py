@@ -203,9 +203,7 @@ class RationConfig:
         self.phosphorus_list = phosphorus__list if phosphorus__list is not None else []
         self.NDF_list = NDF__list if NDF__list is not None else []
         self.feed_type_list = feed_type__list if feed_type__list is not None else []
-        self.is_wetforage_list = (
-            is_wetforage__list if is_wetforage__list is not None else []
-        )
+        self.is_wetforage_list = is_wetforage__list if is_wetforage__list is not None else []
         self.Kd_list = Kd__list if Kd__list is not None else []
         self.N_A_list = N_A__list if N_A__list is not None else []
         self.N_B_list = N_B__list if N_B__list is not None else []

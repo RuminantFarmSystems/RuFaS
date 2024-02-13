@@ -25,9 +25,7 @@ from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 def test_determine_temperature_factor(avg_air_temp: float) -> None:
     """Tests that the temperature factor is correctly calculated and bounded."""
     observe = Manure._determine_temperature_factor(avg_air_temp)
-    expect = min(
-        1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4)
-    )
+    expect = min(1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4))
     assert observe == expect
 
 
@@ -62,9 +60,7 @@ def test_determine_dry_manure_matter_assimilation(
     """Tests that the correct amount of manure dry matter is assimilated into the soil on a given day is calculated
     correctly.
     """
-    observe = Manure._determine_dry_manure_matter_assimilation(
-        moisture, temp_factor, area, is_dung
-    )
+    observe = Manure._determine_dry_manure_matter_assimilation(moisture, temp_factor, area, is_dung)
     if is_dung:
         expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor**0.1) * area
     else:
@@ -92,9 +88,7 @@ def test_determine_moisture_change(
     temp_factor: float,
 ) -> None:
     """Tests that the correct change in the moisture factor of an application of manure is calculated on a given day."""
-    observe = Manure._determine_moisture_change(
-        rain, moisture, current_mass, original_mass, temp_factor
-    )
+    observe = Manure._determine_moisture_change(rain, moisture, current_mass, original_mass, temp_factor)
     if rain < 1:
         expect = -1 * (-0.05 * (current_mass / original_mass) + 0.075) * temp_factor
     elif 1.0 <= rain <= 4.0:
@@ -112,13 +106,9 @@ def test_determine_moisture_change(
         (3.881993, 86.24832, 2.3948),
     ],
 )
-def test_determine_rain_manure_dry_matter_ratio(
-    rain: float, manure_mass: float, manure_coverage: float
-) -> float:
+def test_determine_rain_manure_dry_matter_ratio(rain: float, manure_mass: float, manure_coverage: float) -> float:
     """Tests that the ratio of rain to manure is calculated correctly."""
-    observe = Manure._determine_rain_manure_dry_matter_ratio(
-        rain, manure_mass, manure_coverage
-    )
+    observe = Manure._determine_rain_manure_dry_matter_ratio(rain, manure_mass, manure_coverage)
     expect = rain / manure_mass * manure_coverage * 10_000
     assert observe == expect
 
@@ -134,17 +124,11 @@ def test_determine_water_extractable_inorganic_phosphorus_leached(
     manure: float, rain_manure_ratio: float, is_cow: bool
 ) -> None:
     """Tests that the correct mass of water extractable inorganic phosphorus leached is calculated."""
-    observe = Manure._determine_water_extractable_inorganic_phosphorus_leached(
-        manure, rain_manure_ratio, is_cow
-    )
+    observe = Manure._determine_water_extractable_inorganic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
     if is_cow:
-        expect = (
-            min(1.0, (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)) * manure
-        )
+        expect = min(1.0, (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)) * manure
     else:
-        expect = (
-            min(1.0, (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)) * manure
-        )
+        expect = min(1.0, (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)) * manure
     expect = max(0, expect)
     assert observe == expect
 
@@ -160,12 +144,8 @@ def test_determine_water_extractable_organic_phosphorus_leached(
     manure: float, rain_manure_ratio: float, is_cow: bool
 ) -> None:
     """Tests that the correct mass of water extractable organic phosphorus leached is calculated."""
-    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(
-        return_value=50
-    )
-    observe = Manure._determine_water_extractable_organic_phosphorus_leached(
-        manure, rain_manure_ratio, is_cow
-    )
+    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=50)
+    observe = Manure._determine_water_extractable_organic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
     expect = 50 / 0.6
     Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(
         manure, rain_manure_ratio, is_cow
@@ -235,37 +215,24 @@ def test_determine_phosphorus_leached_from_surface(
     """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
     Manure._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
     Manure._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
-    Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(
-        return_value=25.0
-    )
-    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(
-        return_value=25.0
-    )
-    Manure._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(
-        return_value=5
-    )
+    Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25.0)
+    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25.0)
+    Manure._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
 
     observed = Manure._determine_phosphorus_leached_from_surface(
         rain, runoff, area, manure_mass, field_coverage, phosphorus_mass, organic
     )
-    runoff_in_liters = (
-        runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
-    )
+    runoff_in_liters = runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
     expected_covered_area = area * field_coverage
     expected_water_extractable_phosphorus_leached = min(25.0, phosphorus_mass)
     expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * MILLIGRAMS_TO_KILOGRAMS
     expected_infiltrated_phosphorus = max(
         0,
-        expected_water_extractable_phosphorus_leached
-        - expected_runoff_phosphorus_in_kg,
+        expected_water_extractable_phosphorus_leached - expected_runoff_phosphorus_in_kg,
     )
 
-    Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(
-        rain, manure_mass, expected_covered_area
-    )
-    Manure._determine_phosphorus_distribution_factor.assert_called_once_with(
-        rain, runoff
-    )
+    Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, expected_covered_area)
+    Manure._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
     if organic:
         Manure._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(
             phosphorus_mass, 0.4, True
@@ -279,9 +246,7 @@ def test_determine_phosphorus_leached_from_surface(
     Manure._determine_water_extractable_phosphorus_runoff_concentration.assert_called_once_with(
         expected_water_extractable_phosphorus_leached, rain, area, 1.2
     )
-    assert observed["new_phosphorus_pool_amount"] == (
-        phosphorus_mass - expected_water_extractable_phosphorus_leached
-    )
+    assert observed["new_phosphorus_pool_amount"] == (phosphorus_mass - expected_water_extractable_phosphorus_leached)
     assert observed["infiltrated_phosphorus"] == expected_infiltrated_phosphorus
     assert observed["runoff_phosphorus"] == expected_runoff_phosphorus_in_kg
 
@@ -301,12 +266,8 @@ def test_determine_mineralized_surface_phosphorus(
     phosphorus: float, rate: float, temp_factor: float, moisture_factor: float
 ) -> None:
     """Tests that the correct amount of mineralized phosphorus is calculated."""
-    observed = Manure._determine_mineralized_surface_phosphorus(
-        phosphorus, rate, temp_factor, moisture_factor
-    )
-    expected = min(
-        phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor))
-    )
+    observed = Manure._determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
+    expected = min(phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor)))
     assert observed == expected
 
 
@@ -320,9 +281,7 @@ def test_determine_mineralized_surface_phosphorus(
         (0.0, 0.0),
     ],
 )
-def test_determine_assimilated_phosphorus_amount(
-    ratio: float, phosphorus: float
-) -> None:
+def test_determine_assimilated_phosphorus_amount(ratio: float, phosphorus: float) -> None:
     """Tests that the correct amount of phosphorus assimilated into the soil is calculated."""
     observed = Manure._determine_assimilated_phosphorus_amount(ratio, phosphorus)
     expected = max(0.0, ratio * phosphorus)
@@ -339,9 +298,7 @@ def test_determine_assimilated_phosphorus_amount(
         (66.23, 1.88),
     ],
 )
-def test_add_infiltrated_phosphorus_to_soil(
-    amount_phosphorus: float, field_size: float
-) -> None:
+def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size: float) -> None:
     """Test that methods are called correctly on correct layers of soil profile."""
     data = SoilData(field_size=field_size)
     incorp = Manure(data)
@@ -362,9 +319,7 @@ def test_add_infiltrated_phosphorus_to_soil(
         (4.2, 0, 2.4),
     ],
 )
-def test_leach_and_update_phosphorus_pools(
-    rain: float, runoff: float, area: float
-) -> None:
+def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float) -> None:
     """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
     data = SoilData(
         machine_manure_dry_mass=1000,
@@ -569,22 +524,10 @@ def test_determine_decomposed_surface_manure(
     )
 
     incorp._determine_dry_matter_decomposition_rate.assert_called_once_with(temp_factor)
-    assert (
-        observed["decomposed_machine_manure_mass_change"]
-        == expected_machine_mass_decomp
-    )
-    assert (
-        observed["decomposed_machine_manure_coverage_change"]
-        == expected_machine_coverage_decomp
-    )
-    assert (
-        observed["decomposed_grazing_manure_mass_change"]
-        == expected_grazing_mass_decomp
-    )
-    assert (
-        observed["decomposed_grazing_manure_coverage_change"]
-        == expected_grazing_coverage_decomp
-    )
+    assert observed["decomposed_machine_manure_mass_change"] == expected_machine_mass_decomp
+    assert observed["decomposed_machine_manure_coverage_change"] == expected_machine_coverage_decomp
+    assert observed["decomposed_grazing_manure_mass_change"] == expected_grazing_mass_decomp
+    assert observed["decomposed_grazing_manure_coverage_change"] == expected_grazing_coverage_decomp
 
 
 @pytest.mark.parametrize(
@@ -642,9 +585,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
         call(0.83, temp_factor, expected_grazing_cover_area2, True),
     ]
 
-    incorp2._determine_dry_manure_matter_assimilation.assert_has_calls(
-        expected_assimilation_calls2
-    )
+    incorp2._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls2)
     assert observed2 == expected2
 
     # Case 3: manure in pools, all of it should be assimilated
@@ -676,9 +617,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
         call(0.79, temp_factor, expected_grazing_cover_area3, True),
     ]
 
-    incorp3._determine_dry_manure_matter_assimilation.assert_has_calls(
-        expected_assimilation_calls3
-    )
+    incorp3._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls3)
     assert observed3 == expected3
 
 
@@ -690,9 +629,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
         (0, 0, 2.4, 28),
     ],
 )
-def test_daily_manure_update(
-    rain: float, runoff: float, area: float, mean_temp: float
-) -> None:
+def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp: float) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
     # Case 1: manure pools are empty
     data1 = SoilData(field_size=area)
@@ -724,9 +661,7 @@ def test_daily_manure_update(
     incorp1.daily_manure_update(rain, runoff, area, mean_temp)
 
     if rain > 0.0:
-        incorp1._leach_and_update_phosphorus_pools.assert_called_once_with(
-            rain, runoff, area
-        )
+        incorp1._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     else:
         incorp1._leach_and_update_phosphorus_pools.assert_not_called()
     incorp1._determine_temperature_factor.assert_called_once_with(mean_temp)
@@ -798,9 +733,7 @@ def test_daily_manure_update(
     incorp2.daily_manure_update(rain, runoff, area, mean_temp)
 
     if rain > 0.0:
-        incorp2._leach_and_update_phosphorus_pools.assert_called_once_with(
-            rain, runoff, area
-        )
+        incorp2._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     else:
         incorp2._leach_and_update_phosphorus_pools.assert_not_called()
     incorp2._determine_temperature_factor.assert_called_once_with(mean_temp)
@@ -872,9 +805,7 @@ def test_daily_manure_update(
     incorp3.daily_manure_update(rain, runoff, area, mean_temp)
 
     if rain > 0.0:
-        incorp3._leach_and_update_phosphorus_pools.assert_called_once_with(
-            rain, runoff, area
-        )
+        incorp3._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     else:
         incorp3._leach_and_update_phosphorus_pools.assert_not_called()
     incorp3._determine_temperature_factor.assert_called_once_with(mean_temp)

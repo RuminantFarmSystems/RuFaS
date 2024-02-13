@@ -10,9 +10,7 @@ This module is based on the section 'Percolation' (2:3.2) in SWAT
 
 
 class Percolation:
-    def __init__(
-        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -43,10 +41,7 @@ class Percolation:
         ----------
         SWAT sections 2:3.1 and 2
         """
-        if (
-            self.data.infiltrated_water
-            > self.data.soil_layers[0].acceptable_percolation_amount
-        ):
+        if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
             return
         else:
@@ -70,9 +65,7 @@ class Percolation:
                 has_seasonal_high_water_table,
             )
             if can_percolate:
-                percolated_water = self._percolate_between_layers(
-                    self.data.time_step, current_layer, layer_below
-                )
+                percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
             else:
@@ -98,9 +91,7 @@ class Percolation:
         the entire soil profile.
 
         """
-        self.data.set_vectorized_layer_attribute(
-            "percolated_water", [0.0] * len(self.data.soil_layers)
-        )
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
         for layer in self.data.soil_layers:
             acceptable_percolation = layer.acceptable_percolation_amount
@@ -207,17 +198,14 @@ class Percolation:
         if not is_seasonal_high_water_table:
             return True
         elif soil_water_content <= (
-            field_capacity_content
-            + (0.5 * (saturated_capacity_content - field_capacity_content))
+            field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content))
         ):
             return False
         else:
             return True
 
     @staticmethod
-    def _percolate_between_layers(
-        time_step: float, upper_layer: LayerData, lower_layer: LayerData
-    ) -> float:
+    def _percolate_between_layers(time_step: float, upper_layer: LayerData, lower_layer: LayerData) -> float:
         """
         Determine the actual amount of water that will percolate from the given upper layer to the given lower layer
         over the provided time step.

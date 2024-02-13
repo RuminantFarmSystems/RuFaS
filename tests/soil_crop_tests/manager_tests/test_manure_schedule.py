@@ -16,9 +16,7 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
         ([-2, -4], False),
     ],
 )
-def test_determine_if_all_non_negative_values(
-    values: List[Union[int, float]], expected: bool
-) -> None:
+def test_determine_if_all_non_negative_values(values: List[Union[int, float]], expected: bool) -> None:
     """Tests that lists are correctly checked for negative values."""
     actual = ManureSchedule._determine_if_all_non_negative_values(values)
     assert actual == expected

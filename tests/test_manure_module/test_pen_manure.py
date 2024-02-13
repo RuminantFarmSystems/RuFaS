@@ -60,9 +60,7 @@ def test_pen_manure_init() -> None:
     assert manure.manure_total_ammoniacal_nitrogen == approx(4.0)
     assert manure.nitrogen == approx(5.0)
     assert manure.manure_mass == approx(6.0)
-    assert manure.manure_volume == approx(
-        manure.manure_mass / ManureConstants.MANURE_DENSITY
-    )
+    assert manure.manure_volume == approx(manure.manure_mass / ManureConstants.MANURE_DENSITY)
     assert manure.total_solids == approx(7.0)
     assert manure.degradable_volatile_solids == approx(8.0)
     assert manure.non_degradable_volatile_solids == approx(9.0)
@@ -124,9 +122,7 @@ def test_pen_manure_init() -> None:
         * GeneralConstants.KG_TO_GRAMS
         / ManureConstants.MANURE_DENSITY
     ) * GeneralConstants.GRAMS_TO_KG
-    expected_urine_ammoniacal_nitrogen = (
-        urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
-    )
+    expected_urine_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
 
     # Act
     manure = PenManure.get_instance(animal_manure, num_animals)
@@ -135,42 +131,22 @@ def test_pen_manure_init() -> None:
     assert manure.urea == approx(animal_manure["urea"] / num_animals)
     assert manure.urine == approx(animal_manure["urine"])
     assert manure.urine_nitrogen == approx(animal_manure["urine_nitrogen"])
-    assert manure.urine_total_ammoniacal_nitrogen == approx(
-        expected_urine_ammoniacal_nitrogen
-    )
-    assert manure.manure_total_ammoniacal_nitrogen == approx(
-        expected_total_ammoniacal_nitrogen
-    )
+    assert manure.urine_total_ammoniacal_nitrogen == approx(expected_urine_ammoniacal_nitrogen)
+    assert manure.manure_total_ammoniacal_nitrogen == approx(expected_total_ammoniacal_nitrogen)
     assert manure.nitrogen == approx(animal_manure["manure_nitrogen"])
     assert manure.manure_mass == approx(animal_manure["manure_mass"])
     assert manure.total_solids == approx(animal_manure["total_solids"])
-    assert manure.degradable_volatile_solids == approx(
-        animal_manure["degradable_volatile_solids"]
-    )
-    assert manure.non_degradable_volatile_solids == approx(
-        animal_manure["non_degradable_volatile_solids"]
-    )
-    assert manure.inorganic_phosphorus_fraction == approx(
-        animal_manure["inorganic_phosphorus_fraction"] / num_animals
-    )
-    assert manure.organic_phosphorus_fraction == approx(
-        animal_manure["organic_phosphorus_fraction"] / num_animals
-    )
+    assert manure.degradable_volatile_solids == approx(animal_manure["degradable_volatile_solids"])
+    assert manure.non_degradable_volatile_solids == approx(animal_manure["non_degradable_volatile_solids"])
+    assert manure.inorganic_phosphorus_fraction == approx(animal_manure["inorganic_phosphorus_fraction"] / num_animals)
+    assert manure.organic_phosphorus_fraction == approx(animal_manure["organic_phosphorus_fraction"] / num_animals)
     assert manure.non_water_inorganic_phosphorus_fraction == approx(
         animal_manure["non_water_inorganic_phosphorus_fraction"] / num_animals
     )
     assert manure.non_water_organic_phosphorus_fraction == approx(
         animal_manure["non_water_organic_phosphorus_fraction"] / num_animals
     )
-    assert manure.phosphorus == approx(
-        animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG
-    )
-    assert manure.phosphorus_fraction == approx(
-        animal_manure["phosphorus_fraction"] / num_animals
-    )
-    assert manure.potassium == approx(
-        animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG
-    )
-    assert manure.enteric_methane_kg == approx(
-        animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG
-    )
+    assert manure.phosphorus == approx(animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.phosphorus_fraction == approx(animal_manure["phosphorus_fraction"] / num_animals)
+    assert manure.potassium == approx(animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.enteric_methane_kg == approx(animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG)

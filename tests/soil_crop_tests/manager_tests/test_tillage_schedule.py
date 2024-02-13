@@ -129,9 +129,7 @@ def test_init_tillage_schedule(
     expected_mix: List[float],
 ) -> None:
     """Tests that TillageSchedules are created correctly."""
-    till_sched = TillageSchedule(
-        "test", [1990, 1991], [160, 160], depths, incorp_fracs, mix_fracs, 1, 1
-    )
+    till_sched = TillageSchedule("test", [1990, 1991], [160, 160], depths, incorp_fracs, mix_fracs, 1, 1)
     assert till_sched.tillage_depths == expected_depths
     assert till_sched.incorporation_fractions == expected_incorp
     assert till_sched.mixing_fractions == expected_mix
@@ -204,8 +202,6 @@ def test_generate_tillage_events(
     expected: List[TillageEvent],
 ) -> None:
     """Tests that correct list of TillageEvents are created by TillageSchedule."""
-    till_sched = TillageSchedule(
-        "test", years, days, depths, incorp_fracs, mix_fracs, skip, repeat
-    )
+    till_sched = TillageSchedule("test", years, days, depths, incorp_fracs, mix_fracs, skip, repeat)
     actual = till_sched.generate_tillage_events()
     assert actual == expected

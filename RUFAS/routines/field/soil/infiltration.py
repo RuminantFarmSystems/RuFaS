@@ -8,9 +8,7 @@ This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) 
 
 
 class Infiltration:
-    def __init__(
-        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -41,27 +39,19 @@ class Infiltration:
         surface layer after this.
 
         """
-        third_moisture_condition_parameter = (
-            self._determine_third_moisture_condition_parameter(
-                self.data.second_moisture_condition_parameter
-            )
+        third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
+            self.data.second_moisture_condition_parameter
         )
 
-        first_moisture_condition_parameter = (
-            self._determine_first_moisture_condition_parameter(
-                self.data.second_moisture_condition_parameter
-            )
+        first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
+            self.data.second_moisture_condition_parameter
         )
 
-        first_moisture_condition_retention_parameter = (
-            self._determine_retention_parameter_for_moisture_condition(
-                first_moisture_condition_parameter
-            )
+        first_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
+            first_moisture_condition_parameter
         )
-        third_moisture_condition_retention_parameter = (
-            self._determine_retention_parameter_for_moisture_condition(
-                third_moisture_condition_parameter
-            )
+        third_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
+            third_moisture_condition_parameter
         )
 
         profile_saturation = self.data.profile_saturation
@@ -93,9 +83,7 @@ class Infiltration:
                 first_moisture_condition_retention_parameter, retention_parameter
             )
         # --------------------------------------------------------------------------------------------------------------
-        self.data.accumulated_runoff = min(
-            rainfall, self._determine_accumulated_runoff(rainfall, retention_parameter)
-        )
+        self.data.accumulated_runoff = min(rainfall, self._determine_accumulated_runoff(rainfall, retention_parameter))
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.infiltrated_water = infiltrated_water
 
@@ -123,11 +111,7 @@ class Infiltration:
         SWAT Theoretical documentation eqn. 2:1.1.4
         """
         top = 20 * (100 - second_moisture_condition)
-        bottom = (
-            100
-            - second_moisture_condition
-            + exp(2.533 - 0.0636 * (100 - second_moisture_condition))
-        )
+        bottom = 100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition))
         return second_moisture_condition - (top / bottom)
 
     @staticmethod
@@ -149,9 +133,7 @@ class Infiltration:
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.5
         """
-        return second_moisture_condition * exp(
-            0.00673 * (100 - second_moisture_condition)
-        )
+        return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
 
     @staticmethod
     def _determine_retention_parameter_for_moisture_condition(
@@ -208,21 +190,10 @@ class Infiltration:
         SWAT Theoretical documentation eqn. 2:1.1.8
         """
         first_top_term = log(
-            (
-                field_capacity
-                / (
-                    1
-                    - (
-                        third_moisture_condition_retention_parameter
-                        / max_retention_parameter
-                    )
-                )
-            )
+            (field_capacity / (1 - (third_moisture_condition_retention_parameter / max_retention_parameter)))
             - field_capacity
         )
-        second_top_term = log(
-            (saturation / (1 - (2.54 / max_retention_parameter))) - saturation
-        )
+        second_top_term = log((saturation / (1 - (2.54 / max_retention_parameter))) - saturation)
         return (first_top_term - second_top_term) / (saturation - field_capacity)
 
     @staticmethod
@@ -256,16 +227,7 @@ class Infiltration:
         SWAT Theoretical documentation eqn. 2:1.1.7
         """
         first_term = log(
-            (
-                field_capacity
-                / (
-                    1
-                    - (
-                        third_moisture_condition_retention_parameter
-                        / max_retention_parameter
-                    )
-                )
-            )
+            (field_capacity / (1 - (third_moisture_condition_retention_parameter / max_retention_parameter)))
             - field_capacity
         )
         second_term = second_shape_coefficient * field_capacity
@@ -307,20 +269,12 @@ class Infiltration:
             1
             - (
                 soil_water_content
-                / (
-                    soil_water_content
-                    + exp(
-                        first_shape_coefficient
-                        - (second_shape_coefficient * soil_water_content)
-                    )
-                )
+                / (soil_water_content + exp(first_shape_coefficient - (second_shape_coefficient * soil_water_content)))
             )
         )
 
     @staticmethod
-    def _determine_frozen_retention_parameter(
-        max_retention_parameter: float, retention_parameter: float
-    ) -> float:
+    def _determine_frozen_retention_parameter(max_retention_parameter: float, retention_parameter: float) -> float:
         """
         Determine the adjusted retention parameter if the top layer of soil is frozen.
 
@@ -375,9 +329,7 @@ class Infiltration:
         return (first_factor * second_factor) + second_moisture_condition
 
     @staticmethod
-    def _determine_accumulated_runoff(
-        rainfall: float, retention_parameter: float
-    ) -> float:
+    def _determine_accumulated_runoff(rainfall: float, retention_parameter: float) -> float:
         """
         Calculate accumulated runoff or rainfall excess.
 
@@ -403,9 +355,7 @@ class Infiltration:
         SWAT Theoretical documentation eqn. 2:1.1.1, 3
         """
         if rainfall > (0.2 * retention_parameter):
-            return ((rainfall - (0.2 * retention_parameter)) ** 2) / (
-                rainfall + (0.8 * retention_parameter)
-            )
+            return ((rainfall - (0.2 * retention_parameter)) ** 2) / (rainfall + (0.8 * retention_parameter))
         else:
             return 0
 
@@ -448,8 +398,7 @@ class Infiltration:
         """
         retention_parameter = previous_retention_parameter - rainfall + runoff
         retention_parameter += potential_evapotranspiration * exp(
-            (((-1) * weighting_coefficient) * previous_retention_parameter)
-            / max_retention_parameter
+            (((-1) * weighting_coefficient) * previous_retention_parameter) / max_retention_parameter
         )
         return retention_parameter
 

@@ -126,21 +126,11 @@ def test_nutrient_request_results_init(
     assert request_results.nitrogen == approx(nitrogen)
     assert request_results.phosphorus == approx(phosphorus)
     assert request_results.total_manure_mass == approx(total_manure_mass)
-    assert request_results.organic_nitrogen_fraction == approx(
-        organic_nitrogen_fraction
-    )
-    assert request_results.inorganic_nitrogen_fraction == approx(
-        inorganic_nitrogen_fraction
-    )
-    assert request_results.ammonium_nitrogen_fraction == approx(
-        ammonium_nitrogen_fraction
-    )
-    assert request_results.organic_phosphorus_fraction == approx(
-        organic_phosphorus_fraction
-    )
-    assert request_results.inorganic_phosphorus_fraction == approx(
-        inorganic_phosphorus_fraction
-    )
+    assert request_results.organic_nitrogen_fraction == approx(organic_nitrogen_fraction)
+    assert request_results.inorganic_nitrogen_fraction == approx(inorganic_nitrogen_fraction)
+    assert request_results.ammonium_nitrogen_fraction == approx(ammonium_nitrogen_fraction)
+    assert request_results.organic_phosphorus_fraction == approx(organic_phosphorus_fraction)
+    assert request_results.inorganic_phosphorus_fraction == approx(inorganic_phosphorus_fraction)
     assert request_results.dry_matter == approx(dry_matter)
     assert request_results.dry_matter_fraction == approx(dry_matter_fraction)
 
@@ -178,9 +168,7 @@ def test_nutrient_request_results_init_with_negative_non_fractional_fields(
     nutrient_values[field_to_test_negative] = -1.0
 
     # Act and assert
-    with pytest.raises(
-        ValueError, match=f"{field_to_test_negative} must be non-negative."
-    ):
+    with pytest.raises(ValueError, match=f"{field_to_test_negative} must be non-negative."):
         NutrientRequestResults(**nutrient_values)
 
 
@@ -239,9 +227,7 @@ def test_nutrient_request_results_init_with_out_of_range_fractional_fields(
         nutrient_values[field_to_test_out_of_range] = value
 
         # Act and assert
-        with pytest.raises(
-            ValueError, match=f"{field_to_test_out_of_range} must be between 0 and 1."
-        ):
+        with pytest.raises(ValueError, match=f"{field_to_test_out_of_range} must be between 0 and 1."):
             NutrientRequestResults(**nutrient_values)
 
 
@@ -258,9 +244,7 @@ def test_nutrient_request_results_init_with_out_of_range_fractional_fields(
         ((0.0, 0.0), "phosphorus"),  # Sum is 0
     ],
 )
-def test_nutrient_request_results_init_with_unequal_fractions(
-    fraction_values: tuple[float, float], nutrient_type: str
-):
+def test_nutrient_request_results_init_with_unequal_fractions(fraction_values: tuple[float, float], nutrient_type: str):
     """
     Unit test for the __post_init__ method in the NutrientRequestResults class.
 
