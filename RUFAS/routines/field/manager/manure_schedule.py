@@ -140,9 +140,9 @@ class ManureSchedule(Schedule):
                                             f"received '{self.surface_remainder_fractions}'.")
 
         equal_manure_application_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) \
-                                              == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(
+            == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(
             self.application_depths) \
-                                              == len(self.surface_remainder_fractions) == len(self.manure_types)
+            == len(self.surface_remainder_fractions) == len(self.manure_types)
         if not equal_manure_application_parameters:
             raise ValueError(error_header + f"expected equal number of manure application parameters, received "
                                             f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
