@@ -453,8 +453,7 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return (variable_modifiability == Modifiability.REQUIRED_AND_LOCKED) or \
-               (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
+        return variable_modifiability in Modifiability.get_required_during_initialization()
 
     def _is_modifiable_during_runtime(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
