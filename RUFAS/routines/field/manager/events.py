@@ -233,9 +233,9 @@ class FertilizerEvent(Event):
     day : int
         Day on which this application occurs.
     nitrogen_mass : float
-        Minimum mass of nitrogen that should be in this application (kg/ha).
+        Minimum mass of nitrogen that should be in this application (kg).
     phosphorus_mass : float
-        Minimum mass of phosphorus that should be in this application (kg/ha).
+        Minimum mass of phosphorus that should be in this application (kg).
     depth : float
         Depth at which fertilizer is injected into the soil.
     surface_remainder_fraction : float
