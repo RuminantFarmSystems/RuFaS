@@ -169,8 +169,7 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
     inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
 
     # Water extractable Organic P (WOP) fraction - fraction of maure
-    # compromised of organic water extractable P [A.3.A.3]
-    # TODO: Is it 0.05 or 0.50?
+    # comprised of organic water extractable P [A.3.A.3]
     organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
 
     # amount of P in milk per animal (g) [A.3E.B.1]

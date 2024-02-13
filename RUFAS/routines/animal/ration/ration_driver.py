@@ -55,6 +55,7 @@ class RationManager:
         num_reattempts = 0
 
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+        # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
                 num_reattempts += 1
