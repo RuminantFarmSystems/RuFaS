@@ -41,7 +41,7 @@ jobs:
                         tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Format code with Black
       run: |
-        black ${{ env.FILES }}
+        black --line-length=120 ${{ env.FILES }}
     - name: Commit and push formatting changes
       env:
         BRANCH_NAME: ${{ github.head_ref || github.ref }}

@@ -433,10 +433,10 @@ class Pen:
 
         Parameters
         ----------
-            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
-                list of new animals to be added to the pen
-            animal_combination: AnimalCombination
-                an AnimalCombination Enum representing the type of the new animals
+        new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+            list of new animals to be added to the pen
+        animal_combination: AnimalCombination
+            an AnimalCombination Enum representing the type of the new animals
         """
 
         self.add_new_animals(new_animals)
