@@ -104,7 +104,6 @@ class ExampleAnimalSA:
         This function calculates the average phosphorus requirements and manure production for a pen of animals, based
         on the composition of the feed.
 
-        # TODO: @JoeWaddell, would you please double check my descriptions/units for the parameters and return values:
         Parameters
         ----------
         feed_dry_matter : float
@@ -278,7 +277,6 @@ if __name__ == '__main__':
     import time
     from model_evaluation.sensitivity_analysis.generalized_sensitivity import SensitivityAnalysis
 
-    # TODO: @JoeWaddell, I totally guessed on the values and ranges for these parameters.
     # example of objective function evaluation
     print(ExampleAnimalSA.objective_function(feed_dry_matter=100, feed_carbon=0.8, feed_phosphorus=0.012,
                                              feed_nitrogen=0.11, feed_detergent_fiber=0.001))

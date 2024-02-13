@@ -204,7 +204,7 @@ class Weather:
         """
         info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable("precipitation", current_weather.rainfall, info_map)
+        om.add_variable("precipitation", current_weather.precipitation, info_map)
         om.add_variable("rainfall", current_weather.rainfall, info_map)
         om.add_variable("snowfall", current_weather.snowfall, info_map)
         om.add_variable("daylength", current_weather.daylength, info_map)
