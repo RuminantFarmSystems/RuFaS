@@ -30,10 +30,7 @@ class DefaultEnum(Enum):
         for member in cls:
             if member.name.upper() == lookup_name.strip().upper():
                 return member
-            elif (
-                type(member.value) is str
-                and member.value.upper() == lookup_name.strip().upper()
-            ):
+            elif type(member.value) is str and member.value.upper() == lookup_name.strip().upper():
                 return member
 
         return cls.get_default_type()

@@ -1,0 +1,4 @@
+[tool.black]
+target-version = ["py310", "py311"]
+line-length = 120
+include = '.*\.py$'
