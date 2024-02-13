@@ -651,7 +651,7 @@ class InputManager:
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
         if var_name not in input_data.keys():
-            self._handle_missing_data(variable_properties=variable_properties,
+            self._log_missing_data(variable_properties=variable_properties,
                                       var_name=var_name)
             return {"fixed_elements": 0,
                     "total_elements": 0,
@@ -765,7 +765,7 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                self._handle_missing_data(variable_properties=variable_properties,
+                self._log_missing_data(variable_properties=variable_properties,
                                           var_name=var_name)
                 input_data = self._set_nested_value(nested_dict=input_data,
                                                     element_hierarchy=element_hierarchy,
