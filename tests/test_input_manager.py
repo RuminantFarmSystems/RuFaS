@@ -53,6 +53,12 @@ def input_manager_original_method_states(
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_load_properties": mock_input_manager._load_properties,
+        "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
+        "_get_caller_function": mock_input_manager._get_caller_function,
+        "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
+        "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "__handle_missing_data": mock_input_manager._handle_missing_data,
+        "_update_nested_dict": mock_input_manager._update_nested_dict
     }
 
 
@@ -530,29 +536,29 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-    "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements",
+    "element_hierarchy, input_data, total_elements, valid_elements, invalid_elements, fixed_elements",
     [
         ("element1", {"element1": ["123-45-6789", "000-11-6123", "555-55-5555"]}, 3, 3, 0, 0),
         ("element2", {"element2": [6, 149, 55, 22]}, 4, 4, 0, 0),
         ("element6", {"element6": [True, False, True]}, 3, 3, 0, 0),
     ]
 )
-def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
+def test_validate_tabular_element_valid_data(mock_input_manager: InputManager,
                                          mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                         property: str, input_data: list, total_elements: int,
+                                         element_hierarchy: str, input_data: Dict[str, List[Any]], total_elements: int,
                                          valid_elements: int, invalid_elements: int, fixed_elements: int,
                                          input_manager_original_method_states: Dict[str, Callable],
                                          ) -> None:
     """Unit test for _validate_tabular_element function in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    dummy_property = property
+    dummy_element_hierarchy = element_hierarchy
     properties_blob_key = "property_map_key1"
     dummy_input_data = input_data
     eager_termination = True
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
 
-    result = mock_input_manager._validate_tabular_element(dummy_property, properties_blob_key,
+    result = mock_input_manager._validate_tabular_element(dummy_element_hierarchy, properties_blob_key,
                                                           dummy_input_data, eager_termination,
                                                           mock_element_counter_and_validity)
     assert result["is_valid"] is True
@@ -565,7 +571,7 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-    "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
+    "element_hierarchy, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
     " eager_termination",
     [
         ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
@@ -573,10 +579,11 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
         ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
     ]
 )
-def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
+def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                           property: str, input_data: list, total_elements: int, is_valid: bool,
-                                           valid_elements: int, invalid_elements: int, fixed_elements: int,
+                                           element_hierarchy: str, input_data: Dict[str, List[Any]],
+                                           total_elements: int, is_valid: bool, valid_elements: int,
+                                           invalid_elements: int, fixed_elements: int,
                                            input_manager_original_method_states: Dict[str, Callable],
                                            eager_termination: bool,
                                            ) -> None:
@@ -586,7 +593,43 @@ def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
 
-    result = mock_input_manager._validate_tabular_element(property, properties_blob_key,
+    result = mock_input_manager._validate_tabular_element(element_hierarchy, properties_blob_key,
+                                                          input_data, eager_termination,
+                                                          mock_element_counter_and_validity)
+    assert result["is_valid"] is is_valid
+    assert result["total_elements"] == total_elements
+    assert result["valid_elements"] == valid_elements
+    assert result["invalid_elements"] == invalid_elements
+    assert result["fixed_elements"] == fixed_elements
+
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
+
+
+@pytest.mark.parametrize(
+    "element_hierarchy, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
+    " eager_termination",
+    [
+        ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
+        ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, False, True),
+        ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
+    ]
+)
+def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
+                                           mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                           element_hierarchy: str, input_data: Dict[str, List[Any]],
+                                           total_elements: int, is_valid: bool, valid_elements: int,
+                                           invalid_elements: int, fixed_elements: int,
+                                           input_manager_original_method_states: Dict[str, Callable],
+                                           eager_termination: bool,
+                                           ) -> None:
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    mock_input_manager._fix_data = MagicMock(return_value=is_valid)
+    properties_blob_key = "property_map_key1"
+    mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                         "invalid_elements": 0, "is_valid": True}
+
+    result = mock_input_manager._validate_tabular_element(element_hierarchy, properties_blob_key,
                                                           input_data, eager_termination,
                                                           mock_element_counter_and_validity)
     assert result["is_valid"] is is_valid

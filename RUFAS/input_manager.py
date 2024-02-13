@@ -300,15 +300,14 @@ class InputManager:
 
         return filtered_input_data
 
-    @staticmethod
-    def _get_variable_modifiability(variable_properties: Dict[str, Any]) -> Modifiability:
+    def _get_variable_modifiability(self, variable_properties: Dict[str, Any]) -> Modifiability:
         if "modifiability" in variable_properties.keys() and variable_properties["modifiability"]:
             return Modifiability.__getitem__('_'.join(variable_properties["modifiability"].strip().upper().split()))
         else:
             return Modifiability.__getitem__("NOT_REQUIRED_AND_UNLOCKED")
 
-    @staticmethod
-    def _get_caller_function():
+
+    def _get_caller_function(self):
         """Returns the name of the function that called the current function."""
         current_function = inspect.currentframe().f_back.f_back.f_code.co_name
 
