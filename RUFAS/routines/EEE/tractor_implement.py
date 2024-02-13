@@ -10,16 +10,30 @@ class TractorImplement:
         return 0
 
     @property
-    def field_capacity_ha_per_hr(self) -> float:
+    def throughput(self) -> float:
         # TODO implement
         return 0
 
-    def calculate_operation_time_hr(self, field_production_size_ha: float) -> float:
+    def field_capacity_ha_per_hr(self, crop_yield_ton_per_ha: float | None) -> float:
+        """
+        Calculates the Field Capacity for a specific crop, field operation and tractor implement.
+        Implements Helper Functions 418a and 418b  in EEE Functions file.
+        """
+        field_efficiency = 0.90  # Constant 587 in EEE Functions file # TODO get the value from IM
+        if crop_yield_ton_per_ha:  # TODO this is not correct, the decision should be made based on operation type
+            crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
+            return crop_yield_kg_per_ha / self.throughput * 1000 * field_efficiency
+        field_speed_km_per_hr = 10.00  # Constant 585 in EEE Functions file # TODO get the value from IM
+        return 0.1 * field_speed_km_per_hr * self.width_m * field_efficiency
+
+    def calculate_operation_time_hr(
+        self, field_production_size_ha: float, crop_yield_ton_per_ha: float | None
+    ) -> float:
         """
         Calculates number of hours taken by tractor given other factors like implement size to perform the operation.
         Implements Helper Function 416  in EEE Functions file.
         """
-        return field_production_size_ha / self.field_capacity_ha_per_hr
+        return field_production_size_ha / self.field_capacity_ha_per_hr(crop_yield_ton_per_ha)
 
     def calculate_drawbar_power(self) -> float:
         """
@@ -54,6 +68,6 @@ class TractorImplement:
                 G
                 * crop_yield_ton_per_ha
                 * field_production_size_ha
-                / self.calculate_operation_time_hr(field_production_size_ha)
+                / self.calculate_operation_time_hr(field_production_size_ha, crop_yield_ton_per_ha)
             )
         )
