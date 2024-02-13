@@ -54,6 +54,8 @@ class CropSchedule(Schedule):
         Enumerated list of operations to perform at harvest.
     heat_scheduled : bool
         Flag indicating if heat unit scheduling is utilized for harvesting decisions.
+    harvesting_skip : int, optional, default 0.0
+        Number of years to skip between harvesting cycles.
 
     Notes
     -----
