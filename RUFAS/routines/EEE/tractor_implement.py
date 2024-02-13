@@ -31,7 +31,7 @@ class TractorImplement:
         functional_draft = self.calculate_functional_draft()
         return functional_draft * field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self) -> float:
+    def calculate_functional_draft(self, crop_type) -> float:  # TODO implement
         """
         Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
         minor tillage tools operated at shallow depths.
