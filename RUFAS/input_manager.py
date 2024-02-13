@@ -383,15 +383,11 @@ class InputManager:
         try:
             return Modifiability.__getitem__('_'.join(modifiability.strip().upper().split()))
         except KeyError:
-            om.add_error(
+            om.add_warning(
                 "Unknown modifiability entry",
-                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability must be "
-                f"one of {Modifiability.values()}",
+                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
+                f"one of {Modifiability.values()}. Using the default value: {default}",
                 info_map
-            )
-            raise KeyError(
-                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability must be "
-                f"one of {Modifiability.values()}"
             )
 
     def _get_caller_function(self) -> str:
@@ -483,8 +479,7 @@ class InputManager:
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
-        return (variable_modifiability == Modifiability.UNREQUIRED_UNLOCKED) or \
-               (variable_modifiability == variable_modifiability.REQUIRED_UNLOCKED)
+        return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
             -> None:
@@ -523,17 +518,15 @@ class InputManager:
         }
         if not is_initialization:
             om.add_error(
-                "missing required data",
+                "Missing required data",
                 f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
                 info_map)
             raise KeyError(f"Key {var_name} not found in data. A value is required for to update variable "
                            "during runtime.")
 
-        is_input_required_upon_initialization = self._get_variable_modifiability(
-            variable_name=var_name,
-            variable_properties=variable_properties) in Modifiability.get_required_during_initialization()
-        if is_input_required_upon_initialization:
-            om.add_error("Validation: key not found in input data -- input required upon initialization",
+        if self._is_input_required_upon_initialization(variable_name=var_name,
+                                                       variable_properties=variable_properties):
+            om.add_error("Missing required data",
                          f"Key {var_name} not found in input data. Input value is required for this "
                          "variable upon program initialization.",
                          info_map)
@@ -1349,12 +1342,10 @@ class InputManager:
             data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        is_modifiable_during_runtime = self._get_variable_modifiability(
+        if not (is_modifiable_during_runtime := self._is_modifiable_during_runtime(
             variable_name=variable_name,
             variable_properties=metadata_properties
-        ) in Modifiability.get_modifiable_at_runtime()
-
-        if not is_modifiable_during_runtime and eager_termination:
+        )) and eager_termination:
             om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
