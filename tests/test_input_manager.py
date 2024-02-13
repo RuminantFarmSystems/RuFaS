@@ -2569,11 +2569,11 @@ def test_get_variable_modifiability(variable_name: str,
                                     mock_input_manager: InputManager,
                                     input_manager_original_method_states: Dict[str, Callable]
                                     ) -> None:
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(variable_name=variable_name,
                                                                               variable_properties=variable_properties)
 
-        mock_om_add_error.assert_not_called()
+        mock_om_add_warning.assert_not_called()
         assert actual_modifiability == expected_modifiability
 
 
@@ -2583,18 +2583,17 @@ def test_get_variable_modifiability(variable_name: str,
     ("var3", {"type": "bool", "modifiability": "c"}),
     ("var4", {"type": "object", "modifiability": "d"})
 ])
-def test_get_variable_modifiability_key_error(variable_name: str,
-                                              variable_properties: Dict[str, Any],
-                                              mock_input_manager: InputManager,
-                                              input_manager_original_method_states: Dict[str, Callable]
-                                              ) -> None:
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-        with pytest.raises(KeyError):
-            mock_input_manager._get_variable_modifiability(
-                variable_name=variable_name,
-                variable_properties=variable_properties)
+def test_get_variable_modifiability_unknown_modifiability(variable_name: str,
+                                                          variable_properties: Dict[str, Any],
+                                                          mock_input_manager: InputManager,
+                                                          input_manager_original_method_states: Dict[str, Callable]
+                                                          ) -> None:
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
+        mock_input_manager._get_variable_modifiability(
+            variable_name=variable_name,
+            variable_properties=variable_properties)
 
-    mock_om_add_error.assert_called_once()
+    mock_om_add_warning.assert_called_once()
 
 
 def test_get_caller_function(mock_input_manager: InputManager) -> None:
