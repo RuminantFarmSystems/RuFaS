@@ -36,9 +36,14 @@ class Decomposition:
             layer.decomposition_temperature_effect = self._calc_temp_factor(layer.temperature)
 
     @staticmethod
-    def _calc_temp_factor(layer_temp, x_inflection: float = 15.4, y_inflection: float = 11.75,
-                          point_distance: float = 29.7, inflection_slope=0.03,
-                          normalizer=20.80546) -> float:
+    def _calc_temp_factor(
+        layer_temp,
+        x_inflection: float = 15.4,
+        y_inflection: float = 11.75,
+        point_distance: float = 29.7,
+        inflection_slope=0.03,
+        normalizer=20.80546,
+    ) -> float:
         """
         Calculate the temperature factor for each layer.
 
@@ -60,14 +65,21 @@ class Decomposition:
         of decomposition, which in this context would be considered a bug.
         """
         # S.6.A.4
-        temp_factor = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                layer_temp - x_inflection))) / normalizer
+        temp_factor = (
+            y_inflection
+            + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
+        ) / normalizer
         return max(0.0, temp_factor)
 
     @staticmethod
-    def _calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float = 1.7,
-                              c_term: float = -0.007, first_exponent=6.648115,
-                              second_exponent=3.22) -> float:
+    def _calc_moisture_factor(
+        water_factor,
+        a_term: float = 0.55,
+        b_term: float = 1.7,
+        c_term: float = -0.007,
+        first_exponent=6.648115,
+        second_exponent=3.22,
+    ) -> float:
         """
         Calculate the moisture factor for carbon decomposition for the layer.
 

@@ -65,7 +65,13 @@ class Event:
 
 
 class PlantingEvent(Event):
-    def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
+    def __init__(
+        self,
+        crop_reference: str,
+        year: int = 1,
+        day: int = 120,
+        heat_scheduled_harvest: bool = False,
+    ):
         """
         Initializes a Planting Event, which dictates when a crop will be planted and tells the plant how it will
         eventually be harvested.
@@ -85,8 +91,11 @@ class PlantingEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for PlantingEvent objects."""
         if isinstance(other, PlantingEvent):
-            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+            return (
+                super().__eq__(other)
+                and other.crop_reference == self.crop_reference
                 and other.use_heat_scheduled_harvest == self.use_heat_scheduled_harvest
+            )
         return False
 
     def __hash__(self):
@@ -100,7 +109,7 @@ class HarvestEvent(Event):
         crop_reference: str,
         year: int = 1,
         day: int = 240,
-        operation: HarvestOperation = HarvestOperation.HARVEST_KILL
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL,
     ):
         """Creates a new HarvestEvent instance, which is a child of the Event class.
 
@@ -121,8 +130,11 @@ class HarvestEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
-            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+            return (
+                super().__eq__(other)
+                and other.crop_reference == self.crop_reference
                 and other.operation == self.operation
+            )
         return False
 
     def __hash__(self):
@@ -131,8 +143,14 @@ class HarvestEvent(Event):
 
 
 class TillageEvent(Event):
-    def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
-                 day: int = 160):
+    def __init__(
+        self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        year: int = 1,
+        day: int = 160,
+    ):
         """
         Creates a new TillageEvent instance, which defines a tillage application to be applied on a specific day of a
         year.
@@ -153,19 +171,39 @@ class TillageEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for TillageEvent objects."""
         if isinstance(other, TillageEvent):
-            return super().__eq__(other) and other.tillage_depth == self.tillage_depth \
-                and other.incorporation_fraction == self.incorporation_fraction \
+            return (
+                super().__eq__(other)
+                and other.tillage_depth == self.tillage_depth
+                and other.incorporation_fraction == self.incorporation_fraction
                 and other.mixing_fraction == self.mixing_fraction
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for TillageEvent objects."""
-        return hash((self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction))
+        return hash(
+            (
+                self.year,
+                self.day,
+                self.tillage_depth,
+                self.incorporation_fraction,
+                self.mixing_fraction,
+            )
+        )
 
 
 class ManureEvent(Event):
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
-                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
+    def __init__(
+        self,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        manure_type: ManureType,
+        field_coverage: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+    ):
         """
         Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
         field.
@@ -201,23 +239,44 @@ class ManureEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for ManureEvent objects."""
         if isinstance(other, ManureEvent):
-            return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
-                and other.phosphorus_mass == self.phosphorus_mass \
-                and other.manure_type == self.manure_type \
-                and other.field_coverage == self.field_coverage \
-                and other.application_depth == self.application_depth \
+            return (
+                super().__eq__(other)
+                and other.nitrogen_mass == self.nitrogen_mass
+                and other.phosphorus_mass == self.phosphorus_mass
+                and other.manure_type == self.manure_type
+                and other.field_coverage == self.field_coverage
+                and other.application_depth == self.application_depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.manure_type,
-                     self.field_coverage, self.application_depth, self.surface_remainder_fraction))
+        return hash(
+            (
+                self.year,
+                self.day,
+                self.nitrogen_mass,
+                self.phosphorus_mass,
+                self.manure_type,
+                self.field_coverage,
+                self.application_depth,
+                self.surface_remainder_fraction,
+            )
+        )
 
 
 class FertilizerEvent(Event):
-    def __init__(self, mix_name: str, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, depth: float,
-                 surface_remainder_fraction: float):
+    def __init__(
+        self,
+        mix_name: str,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        depth: float,
+        surface_remainder_fraction: float,
+    ):
         """
         Creates a new FertilizerEvent instance, which defines the parameters of a single fertilizer application.
 
@@ -249,14 +308,26 @@ class FertilizerEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for FertilizerEvent objects."""
         if isinstance(other, FertilizerEvent):
-            return super().__eq__(other) and other.mix_name == self.mix_name \
-                and other.nitrogen_mass == self.nitrogen_mass \
-                and other.phosphorus_mass == self.phosphorus_mass \
-                and other.depth == self.depth \
+            return (
+                super().__eq__(other)
+                and other.mix_name == self.mix_name
+                and other.nitrogen_mass == self.nitrogen_mass
+                and other.phosphorus_mass == self.phosphorus_mass
+                and other.depth == self.depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for FertilizerEvent objects."""
-        return hash((self.year, self.day, self.mix_name, self.nitrogen_mass, self.phosphorus_mass, self.depth,
-                     self.surface_remainder_fraction))
+        return hash(
+            (
+                self.year,
+                self.day,
+                self.mix_name,
+                self.nitrogen_mass,
+                self.phosphorus_mass,
+                self.depth,
+                self.surface_remainder_fraction,
+            )
+        )

@@ -63,21 +63,29 @@ class GrowthConstraints:
         self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
         #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
 
-        self.data.temp_stress = GrowthConstraints._determine_temperature_stress(temperature,
-                                                                                self.data.minimum_temperature,
-                                                                                self.data.optimal_temperature)
-        self.data.nitrogen_stress = GrowthConstraints._determine_nutrient_stress(self.data.nitrogen,
-                                                                                 self.data.optimal_nitrogen)
-        self.data.phosphorus_stress = GrowthConstraints._determine_nutrient_stress(self.data.phosphorus,
-                                                                                   self.data.optimal_phosphorus)
-        self.data.growth_factor = GrowthConstraints._determine_growth_factor(self.data.water_stress,
-                                                                             self.data.temp_stress,
-                                                                             self.data.nitrogen_stress,
-                                                                             self.data.phosphorus_stress)
+        self.data.temp_stress = GrowthConstraints._determine_temperature_stress(
+            temperature, self.data.minimum_temperature, self.data.optimal_temperature
+        )
+        self.data.nitrogen_stress = GrowthConstraints._determine_nutrient_stress(
+            self.data.nitrogen, self.data.optimal_nitrogen
+        )
+        self.data.phosphorus_stress = GrowthConstraints._determine_nutrient_stress(
+            self.data.phosphorus, self.data.optimal_phosphorus
+        )
+        self.data.growth_factor = GrowthConstraints._determine_growth_factor(
+            self.data.water_stress,
+            self.data.temp_stress,
+            self.data.nitrogen_stress,
+            self.data.phosphorus_stress,
+        )
 
     @staticmethod
-    def _determine_growth_factor(water_stress: float, temperature_stress: float, nitrogen_stress: float,
-                                 phosphorus_stress: float) -> float:  # pseudocode: C.7.E.1
+    def _determine_growth_factor(
+        water_stress: float,
+        temperature_stress: float,
+        nitrogen_stress: float,
+        phosphorus_stress: float,
+    ) -> float:  # pseudocode: C.7.E.1
         """
         Calculates the plant growth factor based on various stress parameters.
 
@@ -128,14 +136,15 @@ class GrowthConstraints:
             return 0
 
         stress = 1 - (water_uptake / max_transpiration)
-        stress = max(0., stress)  # constrain to 0
-        stress = min(1., stress)  # constrain to 1
+        stress = max(0.0, stress)  # constrain to 0
+        stress = min(1.0, stress)  # constrain to 1
 
         return stress
 
     @staticmethod
-    def _determine_temperature_stress(air_temp: float, min_temp: float,
-                                      optimal_temp: float) -> float:  # pseudocode C.7.B.
+    def _determine_temperature_stress(
+        air_temp: float, min_temp: float, optimal_temp: float
+    ) -> float:  # pseudocode C.7.B.
         """
         Calculates temperature stress for a given day.
 

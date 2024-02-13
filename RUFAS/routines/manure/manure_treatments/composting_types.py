@@ -15,6 +15,7 @@ class CompostingType(DefaultEnum):
         Static pile.
 
     """
+
     INTENSIVE_WINDROW = "intensive windrow"
     PASSIVE_WINDROW = "passive windrow"
     STATIC_PILE = "static pile"
