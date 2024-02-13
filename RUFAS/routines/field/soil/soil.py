@@ -9,7 +9,9 @@ from RUFAS.routines.field.soil.infiltration import Infiltration
 from RUFAS.routines.field.soil.percolation import Percolation
 from RUFAS.routines.field.soil.soil_temp import SoilTemp
 from RUFAS.routines.field.soil.soil_erosion import SoilErosion
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import (
+    PhosphorusCycling,
+)
 from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
 
 
@@ -57,8 +59,16 @@ class Soil:
         self.snow = Snow(self.data)
         """Process component that tracks snow"""
 
-    def daily_soil_routine(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
-                           plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
+    def daily_soil_routine(
+        self,
+        solar_radiation: float,
+        avg_temp: float,
+        min_temp: float,
+        max_temp: float,
+        plant_cover: float,
+        snow_cover: float,
+        avg_annual_air_temp: float,
+    ) -> None:
         """
         Call all non-water related daily update routines.
 
@@ -81,13 +91,28 @@ class Soil:
         """
         # TODO: if no other daily update methods are added here, this method should be removed and Field should call
         #       this method directly
-        self.soil_temp.daily_soil_temperature_update(solar_radiation, avg_temp, min_temp, max_temp, plant_cover,
-                                                     snow_cover, avg_annual_air_temp)
+        self.soil_temp.daily_soil_temperature_update(
+            solar_radiation,
+            avg_temp,
+            min_temp,
+            max_temp,
+            plant_cover,
+            snow_cover,
+            avg_annual_air_temp,
+        )
 
-    def daily_soil_water_routine(self, rainfall: float, weighting_coefficient: float,
-                                 potential_evapotranspiration: float, has_seasonal_high_water_table: bool,
-                                 maximum_soil_evaporation: float, avg_air_temp: float, residue: float,
-                                 minimum_cover_management_factor: float, field_size: float) -> None:
+    def daily_soil_water_routine(
+        self,
+        rainfall: float,
+        weighting_coefficient: float,
+        potential_evapotranspiration: float,
+        has_seasonal_high_water_table: bool,
+        maximum_soil_evaporation: float,
+        avg_air_temp: float,
+        residue: float,
+        minimum_cover_management_factor: float,
+        field_size: float,
+    ) -> None:
         """
         Call all water-related daily update routines.
 
