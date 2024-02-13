@@ -170,9 +170,7 @@ class DefaultManureTreatmentConfigFactory:
     @classmethod
     def get_instance(
         cls, treatment_type: ManureTreatmentType
-    ) -> Union[
-        ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
-    ]:
+    ) -> Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
         """Return a default manure treatment configuration data instance for the given treatment type.
 
         Args:
@@ -197,6 +195,6 @@ class DefaultManureTreatmentConfigFactory:
             ),
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
             ManureTreatmentType.OPEN_LOTS: cls.OPEN_LOTS_CONFIG,
-            ManureTreatmentType.COMPOSTING: cls.COMPOSTING_CONFIG
+            ManureTreatmentType.COMPOSTING: cls.COMPOSTING_CONFIG,
         }
         return manure_treatment_config_by_type[treatment_type]
