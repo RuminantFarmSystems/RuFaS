@@ -31,6 +31,16 @@ class FieldOperationEvent(Enum):
 
 
 class TractorImplement:
+    def __init__(
+        self,
+        operation_event: FieldOperationEvent,
+        crop_type: CropType | None = None,
+        application_depth: float | None = None,
+    ) -> None:
+        self.operation_event = operation_event
+        self.crop_type = crop_type
+        self.application_depth = application_depth
+
     @property
     def mass_kg(self) -> float:
         # TODO implement
