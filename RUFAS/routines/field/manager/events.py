@@ -20,9 +20,9 @@ class Event:
 
     Parameters
     ----------
-    year : int, default=1
+    year : int, default 1
         Year of the simulation on which the event should occur.
-    day : int, default=120
+    day : int, default 120
         (julian) day of the year on which the event should occur.
 
     Attributes

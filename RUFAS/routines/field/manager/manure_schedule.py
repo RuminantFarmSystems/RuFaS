@@ -18,17 +18,17 @@ class ManureSchedule(Schedule):
     days : List[int]
         The Julian days on which the manure will be applied within the specified years.
     nitrogen_masses : List[float]
-        The minimum masses of nitrogen to be applied in each manure application, in kilograms (kg).
+        The minimum masses of nitrogen to be applied in each manure application (kg).
     phosphorus_masses : List[float]
-        The minimum masses of phosphorus to be applied in each manure application, in kilograms (kg).
+        The minimum masses of phosphorus to be applied in each manure application (kg).
     manure_types : List[ManureType]
         The types of manure to be applied.
     field_coverages : List[float]
-        The fractions of the field covered by manure applications, unitless.
+        The fractions of the field covered by manure applications (unitless).
     application_depths : List[float], optional
-        The depths at which the manure is to be injected into the soil for each application, in millimeters (mm).
+        The depths at which the manure is to be injected into the soil for each application (mm).
     surface_remainder_fractions : List[float], optional
-        The fractions of each manure application that remain on the soil surface, unitless.
+        The fractions of each manure application that remain on the soil surface (unitless).
     pattern_skip : int, optional
         The number of years to skip between repetitions of the manure application pattern.
     pattern_repeat : int, optional
@@ -61,40 +61,6 @@ class ManureSchedule(Schedule):
                  application_depths: Optional[List[float]] = None,
                  surface_remainder_fractions: Optional[List[float]] = None, pattern_skip: int = 0,
                  pattern_repeat: int = 0):
-        """
-        Creates and validates a manure application schedule.
-
-        Parameters
-        ----------
-        name : str
-            Name of this manure schedule.
-        years : List[int]
-            Year(s) in which manure will be applied.
-        days : List[int]
-            Julian day(s) on which manure will be applied.
-        nitrogen_masses : List[float]
-            Minimum mass(s) of nitrogen that should be contained in manure applications (kg)
-        phosphorus_masses : List[float]
-            Minimum mass(s) of phosphorus that should be contained in manure applications (kg)
-        manure_types : List[ManureType]
-            The types of manure for which the application request will be made.
-        field_coverages : List[float]
-            Fraction(s) of the field covered by manure applications (unitless)
-        application_depths : List[float], default=None
-            Bottom depth(s) of manure injection applications (mm)
-        surface_remainder_fractions : List[float], default=None
-            Fractions(s) of manure application that remains on the soil surface (unitless)
-        pattern_skip : int, default=0
-            Number of years to skip between manure application schedule repetitions.
-        pattern_repeat : int, default=0
-            Number of times the specified manure application schedule should be repeated.
-
-        Notes
-        -----
-        Application depths and surface remainder fractions actually have defaults of [0.0] and [1.0] respectively, but
-        these are not specified in the signature because parameters cannot have mutable defaults.
-
-        """
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
