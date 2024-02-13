@@ -16,7 +16,7 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 class Event:
     """
-    Classes that will facilitate scheduling of different management operations.
+    Class that will facilitate scheduling of different management operations.
 
     Parameters
     ----------
