@@ -224,9 +224,9 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     """Unit test for function report_daily_ration in file
     routines/animal/ration/animal_module_reporter.py"""
     test_data = {
-        "ration_per_animal": {"dummy3": 300, "status": 1, "objective": 2},
-        "formatted_ration_1": {"dry_matter_intake_total": 300, "dummy3": 300},
-        "formatted_ration_2": {"dry_matter_intake_total": 600, "dummy3": 600},
+        "ration_per_animal": {"dummy1": 300, "dummy2": 100, "status": 1, "objective": 2},
+        "formatted_ration_1": {"dry_matter_intake_total": 400, "byproducts_total": 100, "dummy1": 300, "dummy2": 100},
+        "formatted_ration_2": {"dry_matter_intake_total": 800, "byproducts_total": 200, "dummy1": 600, "dummy2": 200},
     }
     pen1 = mocker.MagicMock()
     pen1.id = "1"
@@ -240,7 +240,10 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     for pen in animal_manager_fixture.all_pens:
         pen.ration_per_animal = test_data["ration_per_animal"]
     mocker.patch("RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_feed_emissions")
-    AnimalModuleReporter.report_daily_ration(animal_manager_fixture)
+    mock_available_feeds = {}
+    mock_available_feeds["dummy1"] = {"Fd_Category": "NA"}
+    mock_available_feeds["dummy2"] = {"Fd_Category": "By-Product/Other"}
+    AnimalModuleReporter.report_daily_ration(animal_manager_fixture, mock_available_feeds)
 
     for i in range(1, 2):
         assert om.variables_pool[
@@ -477,16 +480,17 @@ def test_report_daily_reports(mocker: MockerFixture):
         AnimalModuleReporter, "report_pen_manure_properties", return_value=""
     )
     patch_for_report_milk = mocker.patch.object(AnimalModuleReporter, "report_milk", return_value="")
+    mock_available_feeds = mocker.MagicMock()
 
     # act
-    AnimalModuleReporter.report_daily_reports(animal_manager)
+    AnimalModuleReporter.report_daily_reports(animal_manager, mock_available_feeds)
 
     # assert
     patch_for_report_daily_animal_population.assert_called_once_with(animal_manager)
     patch_for_report_life_cycle_manager_data.assert_called_once_with(
         animal_manager.life_cycle_manager, animal_manager.simulation_day
     )
-    patch_for_report_report_daily_ration.assert_called_once_with(animal_manager)
+    patch_for_report_report_daily_ration.assert_called_once_with(animal_manager, mock_available_feeds)
     patch_for_report_305d_milk.assert_called_once_with(animal_manager)
     assert patch_for_report_pen_manure_properties.call_count == len(animal_manager.all_pens)
     patch_for_report_milk.assert_called_once_with(animal_manager.all_pens[0], animal_manager.simulation_day)

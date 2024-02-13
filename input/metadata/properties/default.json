@@ -2801,6 +2801,11 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "minimum": 1
     },
+    "Fd_Category": {
+      "type": "string",
+      "description": "Feed Category.",
+      "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+    },
     "feed_type": {
       "type": "string",
       "description": "The general type or category of the feed.",
@@ -3462,8 +3467,7 @@
         },
         "manure_handler": {
           "type": "string",
-          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
@@ -3516,19 +3520,25 @@
       "properties": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the unique manure handler config."
+          },
           "manure_handler_type": {
             "type": "string",
-            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
+            "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
           },
           "cleaning_water_use_rate": {
             "type": "number"
           },
           "minutes_per_cleaning": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleanings_per_day": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "cleaning_water_recycle_fraction": {
             "type": "number",
@@ -3581,7 +3591,7 @@
           "manure_treatment_type": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
           },
           "total_solids_removal_efficiency_for_treatment": {
             "type": "number"
@@ -3606,6 +3616,23 @@
           },
           "freeboard_input": {
             "type": "number"
+          },
+          "composting_type": {
+            "type": "string",
+            "description": "Composting Type -- The type of composting.",
+            "pattern": "^(intensive windrow|passive windrow|static pile)$",
+            "default": "intensive windrow"
+          },
+          "last_compost_turning_or_addition": {
+            "type": "number",
+            "description": "The number of days since the last turning or addition event (day)",
+            "default": 1
+          },
+          "manure_cover": {
+            "type": "string",
+            "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+            "pattern": "(cover|no cover|N/A)",
+            "default": "no cover"
           }
         }
       }
@@ -3925,40 +3952,6 @@
       "description": "Irrigation (mm H2O).",
       "type": "number",
       "default": 0
-    }
-  },
-  "feed_quality_properties": {
-    "rufas_id": {
-      "type": "number",
-      "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "minimum": 1
-    },
-    "quality_id": {
-      "type": "number",
-      "description": "Quality ID",
-      "minimum": 1
-    },
-    "status": {
-      "type": "string",
-      "description": "Status",
-      "pattern": "(immature|mid-maturity|mature)"
-    },
-    "differentiating_nutrient": {
-      "type": "string",
-      "description": "Differentiating Nutrient",
-      "pattern": "(DM|NDF)"
-    },
-    "low_percent": {
-      "type": "number",
-      "description": "Low Percent",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "high_percent": {
-      "type": "number",
-      "description": "High Percent",
-      "minimum": 0,
-      "maximum": 100
     }
   }
 }

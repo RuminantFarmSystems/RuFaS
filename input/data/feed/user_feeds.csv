@@ -135,7 +135,7 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 134,PINEAPPLE,Cannery waste,Conc,kg,----
 135,POTATO,Byproduct meal,Conc,kg,NRC_and_NASEM
 136,POTATO,Byproduct ,Conc,kg,----
-137,POULTRY,Byproduct meal,Conc,kg,----
+137,POULTRY,Byproduct meal,Conc,kg,NASEM_only
 138,RICE,Bran,Conc,kg,NRC_and_NASEM
 139,RICE,"Bran, deffated ",Conc,kg,----
 140,RICE,Hulls,Conc,kg,----
