@@ -413,11 +413,6 @@ class InputManager:
         bool
             True if the variable's modifiability status necessitates an input value upon initialization,
             False otherwise.
-
-        Notes
-        -----
-        - The determination is based solely on the modifiability status of the variable. Other factors that might affect
-          initialization requirements are not considered by this function.
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
@@ -443,13 +438,6 @@ class InputManager:
         -------
         bool
             True if the variable is allowed to be modified during runtime, False otherwise.
-
-        Notes
-        -----
-        - The function relies on the 'Modifiability' enum and the '_get_variable_modifiability' method. Changes to these
-          components may impact the function's behavior.
-        - This function does not consider other aspects of the variable that might affect its ability to be modified at
-          runtime, focusing solely on its declared modifiability status.
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
@@ -467,6 +455,8 @@ class InputManager:
             Properties of the variable, potentially including its modifiability status.
         var_name : str
             The name of the variable with missing data.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization
 
         Raises
         ------
@@ -478,10 +468,6 @@ class InputManager:
         This function determines if it's being called during the initialization phase and checks if the missing variable
         data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
-
-
-        - Relies on the caller function's name to determine if it's called during initialization, making the function
-          sensitive to naming conventions of the initialization method.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -600,6 +586,8 @@ class InputManager:
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization
 
         Returns
         -------
@@ -673,6 +661,8 @@ class InputManager:
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization
 
         Returns
         -------

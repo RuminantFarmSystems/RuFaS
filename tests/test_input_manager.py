@@ -2657,20 +2657,18 @@ def test_log_missing_data_initialization_key_error(
     assert mock_add_warning.call_count == 0
 
 
-@pytest.mark.parametrize('variable_name, variable_properties, caller_function', [
-    ("var1", {"type": "string", "modifiability": "required locked"}, "add_tabular_variable_to_pool"),
-    ("var2", {"type": "number", "modifiability": "required locked"}, "add_tabular_variable_to_pool"),
-    ("var3", {"type": "bool", "modifiability": "unrequired locked"}, "add_dict_variable_to_pool"),
-    ("var4", {"type": "object", "modifiability": "unrequired locked"}, "add_dict_variable_to_pool")
+@pytest.mark.parametrize('variable_name, variable_properties', [
+    ("var1", {"type": "string", "modifiability": "required locked"}),
+    ("var2", {"type": "number", "modifiability": "required locked"}),
+    ("var3", {"type": "bool", "modifiability": "unrequired locked"}),
+    ("var4", {"type": "object", "modifiability": "unrequired locked"})
 ])
 def test_log_missing_data_runtime_key_error(
         variable_name: str,
         variable_properties: Dict[str, Any],
-        caller_function: str,
         mock_input_manager: InputManager,
         input_manager_original_method_states: Dict[str, Callable],
         mocker: MockerFixture) -> None:
-    mock_input_manager._get_caller_function = MagicMock(return_value=caller_function)
 
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
