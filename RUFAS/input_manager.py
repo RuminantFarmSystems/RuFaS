@@ -289,13 +289,15 @@ class InputManager:
                 if file_type == "json":
                     element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
                                                                                filtered_input_data, eager_termination,
-                                                                               element_counter_and_validity)
+                                                                               element_counter_and_validity,
+                                                                               True)
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_tabular_element(metadata_property,
                                                                                   properties_blob_key,
                                                                                   filtered_input_data,
                                                                                   eager_termination,
-                                                                                  element_counter_and_validity)
+                                                                                  element_counter_and_validity,
+                                                                                  True)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -390,33 +392,6 @@ class InputManager:
                 info_map
             )
 
-    def _get_caller_function(self) -> str:
-        """
-        Retrieves the name of the function that called the current function within the call stack.
-
-        This function examines the call stack to find the current function's name and then identifies the name of the
-        function that called it. This is achieved by navigating the call stack frames and extracting the function names,
-        ensuring to remove any duplicates to preserve the actual call sequence.
-
-        Returns
-        -------
-        str
-            The name of the function that called the current function.
-
-        Notes
-        -----
-        - The function uses the `inspect` module to access the current and previous frames in the call stack.
-        - It is designed to work within a single thread; behavior in multi-threaded environments may be unpredictable.
-        - Special care is taken to handle the call stack in a way that avoids creating references that could prevent
-          garbage collection of stack frames.
-        """
-        current_function = inspect.currentframe().f_back.f_back.f_code.co_name
-
-        call_stack = inspect.stack()
-        call_stack_functions = list(dict.fromkeys([call_stack[i].function for i in range(len(call_stack))]))
-
-        return call_stack_functions[call_stack_functions.index(current_function) + 1]
-
     def _is_input_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
         Determines whether a variable requires an input value upon initialization based on its modifiability status.
@@ -481,8 +456,8 @@ class InputManager:
                                                                   variable_properties=variable_properties)
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
-    def _log_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
-            -> None:
+    def _log_missing_data(self, variable_properties: Dict[str, Any], var_name: str,
+                          called_during_initialization: bool = False) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
         initialization or runtime updates.
@@ -509,14 +484,11 @@ class InputManager:
         - Relies on the caller function's name to determine if it's called during initialization, making the function
           sensitive to naming conventions of the initialization method.
         """
-        caller_function = self._get_caller_function()
-        is_initialization = caller_function == self._populate_pool.__name__
-
         info_map = {
             "class": self.__class__.__name__,
-            "function": caller_function
+            "function": self._log_missing_data.__name__
         }
-        if not is_initialization:
+        if not called_during_initialization:
             om.add_error(
                 "Missing required data",
                 f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
@@ -604,8 +576,8 @@ class InputManager:
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
     def _validate_tabular_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                                  eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
-                                  ) -> Dict[str, int | bool]:
+                                  eager_termination: bool, element_counter_and_validity: Dict[str, int | bool],
+                                  called_during_initialization: bool = False) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -645,7 +617,8 @@ class InputManager:
                                      self.__metadata["properties"][properties_blob_key])
         if var_name not in input_data.keys():
             self._log_missing_data(variable_properties=variable_properties,
-                                   var_name=var_name)
+                                   var_name=var_name,
+                                   called_during_initialization=called_during_initialization)
             return {"fixed_elements": 0,
                     "total_elements": 0,
                     "valid_elements": 0,
@@ -676,7 +649,8 @@ class InputManager:
 
     def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
-                               element_counter_and_validity: Dict[str, int | bool], ) -> dict:
+                               element_counter_and_validity: Dict[str, int | bool],
+                               called_during_initialization: bool = False) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -737,7 +711,8 @@ class InputManager:
                     element_hierarchy.append(nested_key)
                     element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
                                                                                input_data, eager_termination,
-                                                                               element_counter_and_validity)
+                                                                               element_counter_and_validity,
+                                                                               called_during_initialization)
                     is_child_valid = element_counter_and_validity["is_valid"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
@@ -759,7 +734,8 @@ class InputManager:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
                 self._log_missing_data(variable_properties=variable_properties,
-                                       var_name=var_name)
+                                       var_name=var_name,
+                                       called_during_initialization=called_during_initialization)
                 input_data = self._set_nested_value(nested_dict=input_data,
                                                     element_hierarchy=element_hierarchy,
                                                     value=None)
@@ -1343,8 +1319,8 @@ class InputManager:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
         if not (is_modifiable_during_runtime := self._is_modifiable_during_runtime(
-            variable_name=variable_name,
-            variable_properties=metadata_properties
+                variable_name=variable_name,
+                variable_properties=metadata_properties
         )) and eager_termination:
             om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
@@ -1364,7 +1340,8 @@ class InputManager:
                     properties_blob_key=properties_blob_key,
                     input_data=data,
                     eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity
+                    element_counter_and_validity=element_counter_and_validity,
+                    called_during_initialization=False
                 )
             else:
                 element_counter_and_validity = self._validate_tabular_element(
@@ -1372,7 +1349,8 @@ class InputManager:
                     properties_blob_key=properties_blob_key,
                     input_data=data,
                     eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity
+                    element_counter_and_validity=element_counter_and_validity,
+                    called_during_initialization=False
                 )
 
             for key in element_counter.keys():

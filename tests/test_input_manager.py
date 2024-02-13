@@ -38,7 +38,6 @@ def input_manager_original_method_states(
         "_populate_pool": mock_input_manager._populate_pool,
         "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
-        "_get_caller_function": mock_input_manager._get_caller_function,
         "_log_missing_data": mock_input_manager._log_missing_data,
         "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_tabular_element": mock_input_manager._validate_tabular_element,
@@ -958,7 +957,7 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
         _log_missing_data.assert_called_once_with(variable_properties={
             "type": "string"
         },
-            var_name="secondary_key")
+            var_name="secondary_key", called_during_initialization=False)
         fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
 
     mock_input_manager._log_missing_data = input_manager_original_method_states["_log_missing_data"]
@@ -2596,48 +2595,30 @@ def test_get_variable_modifiability_unknown_modifiability(variable_name: str,
     mock_om_add_warning.assert_called_once()
 
 
-def test_get_caller_function(mock_input_manager: InputManager) -> None:
-    def function_c() -> str:
-        return mock_input_manager._get_caller_function()
-
-    def function_b() -> str:
-        return function_c()
-
-    def function_a() -> str:
-        return function_b()
-
-    caller_name = function_a()
-
-    assert caller_name == "function_a"
-
-
 @pytest.mark.parametrize('variable_name, variable_properties', [
     ("var1", {"type": "string", "modifiability": "unrequired unlocked"}),
     ("var2", {"type": "number", "modifiability": "unrequired unlocked"}),
     ("var3", {"type": "bool", "modifiability": "unrequired unlocked"}),
     ("var4", {"type": "object"})
 ])
-def test_handle_missing_data_initialization_input_not_required(
+def test_log_missing_data_initialization_input_not_required(
         variable_name: str,
         variable_properties: Dict[str, Any],
         mock_input_manager: InputManager,
         input_manager_original_method_states: Dict[str, Callable],
         mocker: MockerFixture) -> None:
-    mock_input_manager._get_caller_function = MagicMock(return_value=InputManager._populate_pool.__name__)
 
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
     mock_input_manager._log_missing_data(
         var_name=variable_name,
-        variable_properties=variable_properties
+        variable_properties=variable_properties,
+        called_during_initialization=True
     )
 
-    mock_input_manager._get_caller_function.assert_called_once()
     assert mock_add_error.call_count == 0
     assert mock_add_warning.call_count == 1
-
-    mock_input_manager._get_caller_function = input_manager_original_method_states["_get_caller_function"]
 
 
 @pytest.mark.parametrize('variable_name, variable_properties', [
@@ -2646,13 +2627,12 @@ def test_handle_missing_data_initialization_input_not_required(
     ("var3", {"type": "bool", "modifiability": "required unlocked"}),
     ("var4", {"type": "object", "modifiability": "required locked"})
 ])
-def test_handle_missing_data_initialization_key_error(
+def test_log_missing_data_initialization_key_error(
         variable_name: str,
         variable_properties: Dict[str, Any],
         mock_input_manager: InputManager,
         input_manager_original_method_states: Dict[str, Callable],
         mocker: MockerFixture) -> None:
-    mock_input_manager._get_caller_function = MagicMock(return_value=InputManager._populate_pool.__name__)
 
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -2660,14 +2640,12 @@ def test_handle_missing_data_initialization_key_error(
     with pytest.raises(KeyError):
         mock_input_manager._log_missing_data(
             var_name=variable_name,
-            variable_properties=variable_properties
+            variable_properties=variable_properties,
+            called_during_initialization=True
         )
 
-    mock_input_manager._get_caller_function.assert_called_once()
     assert mock_add_error.call_count == 1
     assert mock_add_warning.call_count == 0
-
-    mock_input_manager._get_caller_function = input_manager_original_method_states["_get_caller_function"]
 
 
 @pytest.mark.parametrize('variable_name, variable_properties, caller_function', [
@@ -2676,7 +2654,7 @@ def test_handle_missing_data_initialization_key_error(
     ("var3", {"type": "bool", "modifiability": "unrequired locked"}, "add_dict_variable_to_pool"),
     ("var4", {"type": "object", "modifiability": "unrequired locked"}, "add_dict_variable_to_pool")
 ])
-def test_handle_missing_data_runtime_key_error(
+def test_log_missing_data_runtime_key_error(
         variable_name: str,
         variable_properties: Dict[str, Any],
         caller_function: str,
@@ -2691,14 +2669,12 @@ def test_handle_missing_data_runtime_key_error(
     with pytest.raises(KeyError):
         mock_input_manager._log_missing_data(
             var_name=variable_name,
-            variable_properties=variable_properties
+            variable_properties=variable_properties,
+            called_during_initialization=False
         )
 
-    mock_input_manager._get_caller_function.assert_called_once()
     assert mock_add_error.call_count == 1
     assert mock_add_warning.call_count == 0
-
-    mock_input_manager._get_caller_function = input_manager_original_method_states["_get_caller_function"]
 
 
 @pytest.mark.parametrize('nested_dict, element_hierarchy, value, expected_result', [
