@@ -16,21 +16,21 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 class Event:
     """
-    Classes that will facilitate scheduling of different management operations.
+    Class that will facilitate scheduling of different management operations.
 
     Parameters
     ----------
     year : int, default 1
         Year of the simulation on which the event should occur.
     day : int, default 120
-        (julian) day of the year on which the event should occur.
+        Julian day of the year on which the event should occur.
 
     Attributes
     ----------
     year : int
         Year of the simulation on which the event should occur.
     day : int
-        (julian) day of the year on which the event should occur.
+        Julian day of the year on which the event should occur.
 
     Notes
     -----
@@ -71,7 +71,7 @@ class Event:
 
 class PlantingEvent(Event):
     """
-    A child of Event class that dictates when a crop will be planted and tells the plant how it will eventually be
+    A child of Event class that dictates when a crop will be planted and how it will eventually be
     harvested.
 
     Parameters
@@ -142,7 +142,7 @@ class TillageEvent(Event):
     ----------
     tillage_depth : float
         The lowest depth the tilling implement reaches (mm).
-    incorporation_fraction : float.
+    incorporation_fraction : float
         Fraction of soil surface pool incorporated into the soil profile (unitless).
     mixing_fraction : float
         Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
@@ -232,9 +232,9 @@ class FertilizerEvent(Event):
     day : int
         Day on which this application occurs.
     nitrogen_mass : float
-        Minimum mass of nitrogen that should be in this application (kg/ha).
+        Minimum mass of nitrogen that should be in this application (kg).
     phosphorus_mass : float
-        Minimum mass of phosphorus that should be in this application (kg/ha).
+        Minimum mass of phosphorus that should be in this application (kg).
     depth : float
         Depth at which fertilizer is injected into the soil.
     surface_remainder_fraction : float
