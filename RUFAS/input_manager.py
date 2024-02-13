@@ -492,10 +492,10 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_dict_element(
+    def _validate_dict_element(  # noqa
         self,
         element_hierarchy: List[str],
-        properties_blob_key: str,  # noqa
+        properties_blob_key: str,
         input_data: Dict[str, Any],
         eager_termination: bool,
         element_counter_and_validity: Dict[str, int | bool],

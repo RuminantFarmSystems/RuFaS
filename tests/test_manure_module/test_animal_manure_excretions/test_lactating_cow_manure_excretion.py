@@ -59,9 +59,9 @@ def test_methane_mitigation(
         ("Mutian", "None"),
     ],
 )
-def test_lactating_cow_manure_calculations(
+def test_lactating_cow_manure_calculations(  # noqa
     methane_model: str, methane_mitigation_method: str, mocker: MockerFixture
-) -> None:  # noqa
+) -> None:
     """Unit test for the manure_calculations function in lactating_cow_manure_excretion.py."""
     # Arrange
     mock_ration_formulation = mocker.MagicMock()

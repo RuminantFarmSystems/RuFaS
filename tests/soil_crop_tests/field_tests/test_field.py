@@ -1090,7 +1090,8 @@ def test_execute_fertilizer_application(
             "test_field_2",
             "101_0_0",
             {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12}},
-            "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received '{'50_22_12': {'N': 0.5, 'P': 0.22, "
+            "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received "
+            "'{'50_22_12': {'N': 0.5, 'P': 0.22, "
             "'K': 0.12}, '100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': {'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"",
         ),
     ],
@@ -1875,8 +1876,8 @@ def test_record_manure_application(
                 "date": {"year": 1998, "day": 200},
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             },
-            "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
-            "mm and a surface remainder fraction of 1.0.",
+            "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting"
+            " to application depth of 0.0 mm and a surface remainder fraction of 1.0.",
         ),
         (
             800.0,
@@ -1889,8 +1890,8 @@ def test_record_manure_application(
                 "date": {"year": 2005, "day": 100},
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             },
-            "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting the application "
-            "depth to be at the bottom of the soil profile.",
+            "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting"
+            "the application depth to be at the bottom of the soil profile.",
         ),
     ],
 )
