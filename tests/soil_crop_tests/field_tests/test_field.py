@@ -1891,7 +1891,7 @@ def test_record_manure_application(
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             },
             "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting"
-            "the application depth to be at the bottom of the soil profile.",
+            " the application depth to be at the bottom of the soil profile.",
         ),
     ],
 )

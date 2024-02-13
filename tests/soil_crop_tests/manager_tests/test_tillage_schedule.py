@@ -61,9 +61,8 @@ from RUFAS.routines.field.manager.events import TillageEvent
             [0.5],
             [0.5],
             "'test_6': expected number of years, days, depths, incorporation and mixing fractions to be equal, received"
-            "'[1990]' years, '[150, 200]' days, '[100]' tillage depths, '[0.5]' incorporation fractions, and '[0.5]' "
-            "mixing "
-            "fractions.",
+            " '[1990]' years, '[150, 200]' days, '[100]' tillage depths, '[0.5]' incorporation fractions, and '[0.5]' "
+            "mixing fractions.",
         ),
     ],
 )
