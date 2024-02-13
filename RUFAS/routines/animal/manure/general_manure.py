@@ -87,12 +87,13 @@ def get_default_animal_manure_excretions() -> AnimalManureExcretions:
         phosphorus=0.0,
         phosphorus_fraction=0.0,
         potassium=0.0,
-        enteric_methane_g=0.0
+        enteric_methane_g=0.0,
     )
 
 
-def add_animal_manure_excretions(first: AnimalManureExcretions, second: AnimalManureExcretions) \
-        -> AnimalManureExcretions:
+def add_animal_manure_excretions(
+    first: AnimalManureExcretions, second: AnimalManureExcretions
+) -> AnimalManureExcretions:
     """
     Add two AnimalManureExcretions objects together.
 
@@ -116,19 +117,21 @@ def add_animal_manure_excretions(first: AnimalManureExcretions, second: AnimalMa
     return AnimalManureExcretions(**data)
 
 
-def scalar_mult_animal_manure_excretions(manure: AnimalManureExcretions, scalar: float) \
-        -> AnimalManureExcretions:
+def scalar_mult_animal_manure_excretions(
+    manure: AnimalManureExcretions, scalar: float
+) -> AnimalManureExcretions:
     data = {}
     for key in manure:
         data[key] = manure[key] * scalar
     return AnimalManureExcretions(**data)
 
 
-def calculate_phosphorus_excretion_values(daily_milk_production: float,
-                                          total_manure_excreted: float,
-                                          fecal_phosphorus: float,
-                                          urine_phosphorus_required: float) \
-        -> Tuple[float, float, float, float, float]:
+def calculate_phosphorus_excretion_values(
+    daily_milk_production: float,
+    total_manure_excreted: float,
+    fecal_phosphorus: float,
+    urine_phosphorus_required: float,
+) -> Tuple[float, float, float, float, float]:
     """Calculates a set of phosphorus excretion values produced by a given animal.
 
     Parameters
@@ -160,7 +163,8 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
     # P fraction of manure (A.3.A.1)
     if total_manure_excreted > 0:
         manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
-                total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+            total_manure_excreted * GeneralConstants.KG_TO_GRAMS
+        )
     else:
         manure_phosphorus_fraction = 0.0
 
@@ -179,7 +183,14 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
     manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
 
     # amount of P excreted by an animal (g) [A.3.B.3]
-    total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
+    total_phosphorus_excreted = (
+        phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
+    )
 
-    return (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
-            manure_phosphorus_excreted, manure_phosphorus_fraction)
+    return (
+        total_phosphorus_excreted,
+        inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction,
+        manure_phosphorus_excreted,
+        manure_phosphorus_fraction,
+    )

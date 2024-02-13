@@ -3,8 +3,11 @@ from math import exp, inf
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
-from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS, \
-    MILLIGRAMS_TO_KILOGRAMS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_LITERS,
+    MILLIGRAMS_TO_KILOGRAMS,
+)
 
 """
 This module tracks the movement of phosphorus in the soil profile based on equations from APLE.
@@ -12,8 +15,9 @@ This module tracks the movement of phosphorus in the soil profile based on equat
 
 
 class SolublePhosphorus:
-
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -50,9 +54,15 @@ class SolublePhosphorus:
         self.data.soil_phosphorus_runoff = 0.0
         if runoff > 0:
             phosphorus_runoff = self._determine_phosphorus_runoff_from_top_soil(
-                runoff, field_size, self.data.soil_layers[0].labile_inorganic_phosphorus_content,
-                self.data.soil_layers[0].bulk_density, self.data.soil_layers[0].layer_thickness)
-            self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
+                runoff,
+                field_size,
+                self.data.soil_layers[0].labile_inorganic_phosphorus_content,
+                self.data.soil_layers[0].bulk_density,
+                self.data.soil_layers[0].layer_thickness,
+            )
+            self.data.soil_layers[
+                0
+            ].labile_inorganic_phosphorus_content -= phosphorus_runoff
             self.data.soil_phosphorus_runoff = phosphorus_runoff * field_size
             self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
 
@@ -66,9 +76,13 @@ class SolublePhosphorus:
                 next_layer = self.data.vadose_zone_layer
 
             phosphorus_percolated = self._determine_phosphorus_percolated_from_layer(
-                current_layer.labile_inorganic_phosphorus_content, current_layer.bulk_density,
-                current_layer.layer_thickness, current_layer.percent_clay_content, current_layer.percolated_water,
-                field_size)
+                current_layer.labile_inorganic_phosphorus_content,
+                current_layer.bulk_density,
+                current_layer.layer_thickness,
+                current_layer.percent_clay_content,
+                current_layer.percolated_water,
+                field_size,
+            )
 
             current_layer.percolated_phosphorus = phosphorus_percolated
             current_layer.labile_inorganic_phosphorus_content -= phosphorus_percolated
@@ -76,8 +90,13 @@ class SolublePhosphorus:
 
     # --- Static methods ---
     @staticmethod
-    def _determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: float, labile_phosphorus: float,
-                                                   bulk_density: float, layer_thickness: float) -> float:
+    def _determine_phosphorus_runoff_from_top_soil(
+        runoff: float,
+        field_size: float,
+        labile_phosphorus: float,
+        bulk_density: float,
+        layer_thickness: float,
+    ) -> float:
         """This method calculates how much phosphorus is lost from the top soil layer to runoff.
 
         Parameters
@@ -103,18 +122,27 @@ class SolublePhosphorus:
         APLE Theoretical eqn. [9] (used to calculate `top_layer_dissolved_reactive_phosphorus_runoff`)
 
         """
-        runoff_in_liters = (runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
+        runoff_in_liters = (
+            runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        ) * CUBIC_MILLIMETERS_TO_LITERS
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
-        top_layer_soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(labile_phosphorus,
-                                                                                                  bulk_density,
-                                                                                                  layer_thickness,
-                                                                                                  field_size)
+        top_layer_soil_phosphorus_concentration = (
+            LayerData.determine_soil_nutrient_concentration(
+                labile_phosphorus, bulk_density, layer_thickness, field_size
+            )
+        )
         extraction_coefficient = 0.005
-        top_layer_dissolved_reactive_phosphorus_runoff = top_layer_soil_phosphorus_concentration * \
-            extraction_coefficient * runoff_in_liters_per_hectare * (10 ** (-6))
+        top_layer_dissolved_reactive_phosphorus_runoff = (
+            top_layer_soil_phosphorus_concentration
+            * extraction_coefficient
+            * runoff_in_liters_per_hectare
+            * (10 ** (-6))
+        )
 
-        adjusted_phosphorus_runoff = min(labile_phosphorus, top_layer_dissolved_reactive_phosphorus_runoff)
+        adjusted_phosphorus_runoff = min(
+            labile_phosphorus, top_layer_dissolved_reactive_phosphorus_runoff
+        )
         return adjusted_phosphorus_runoff
 
     @staticmethod
@@ -160,8 +188,9 @@ class SolublePhosphorus:
         return 4.726 * isotherm_slope - 8.97
 
     @staticmethod
-    def _determine_dissolved_reactive_phosphorus_leachate(soil_phosphorus: float, isotherm_slope: float,
-                                                          isotherm_intercept: float) -> float:
+    def _determine_dissolved_reactive_phosphorus_leachate(
+        soil_phosphorus: float, isotherm_slope: float, isotherm_intercept: float
+    ) -> float:
         """Calculates how much phosphorus can be leached out of a soil layer by percolation from layer.
 
         Parameters
@@ -191,13 +220,17 @@ class SolublePhosphorus:
 
         """
         try:
-            dissolved_reactive_phosphorus_leachate = exp((soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope)
+            dissolved_reactive_phosphorus_leachate = exp(
+                (soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope
+            )
         except OverflowError:
             dissolved_reactive_phosphorus_leachate = inf
         return min(20.0, dissolved_reactive_phosphorus_leachate)
 
     @staticmethod
-    def _determine_percolated_water_volume(percolated_water: float, field_size: float) -> float:
+    def _determine_percolated_water_volume(
+        percolated_water: float, field_size: float
+    ) -> float:
         """Calculates the volume of water that is percolated out of a soil layer.
 
         Parameters
@@ -213,14 +246,23 @@ class SolublePhosphorus:
             Volume of water that percolated out of the soil on the current day (L)
 
         """
-        percolated_water_in_cubic_millimeters = percolated_water * field_size * HECTARES_TO_SQUARE_MILLIMETERS
-        percolated_water_in_liters = percolated_water_in_cubic_millimeters * CUBIC_MILLIMETERS_TO_LITERS
+        percolated_water_in_cubic_millimeters = (
+            percolated_water * field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        )
+        percolated_water_in_liters = (
+            percolated_water_in_cubic_millimeters * CUBIC_MILLIMETERS_TO_LITERS
+        )
         return percolated_water_in_liters
 
     @staticmethod
-    def _determine_phosphorus_percolated_from_layer(labile_phosphorus: float, bulk_density: float,
-                                                    layer_thickness: float, percent_clay_content: float,
-                                                    percolated_water: float, field_size: float) -> float:
+    def _determine_phosphorus_percolated_from_layer(
+        labile_phosphorus: float,
+        bulk_density: float,
+        layer_thickness: float,
+        percent_clay_content: float,
+        percolated_water: float,
+        field_size: float,
+    ) -> float:
         """Calculates the actual amount of phosphorus that leaves a soil layer and enters the one below it.
 
         Parameters
@@ -244,23 +286,38 @@ class SolublePhosphorus:
             The amount of phosphorus that leaves this layer of soil on the current day (kg / ha)
 
         """
-        soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(labile_phosphorus, bulk_density,
-                                                                                        layer_thickness, field_size)
+        soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(
+            labile_phosphorus, bulk_density, layer_thickness, field_size
+        )
 
-        isotherm_slope = SolublePhosphorus._determine_isotherm_slope(percent_clay_content)
-        isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(isotherm_slope)
+        isotherm_slope = SolublePhosphorus._determine_isotherm_slope(
+            percent_clay_content
+        )
+        isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(
+            isotherm_slope
+        )
 
-        dissolved_reactive_phosphorus_leachate = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(
-            soil_phosphorus_concentration, isotherm_slope, isotherm_intercept)
+        dissolved_reactive_phosphorus_leachate = (
+            SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(
+                soil_phosphorus_concentration, isotherm_slope, isotherm_intercept
+            )
+        )
 
-        percolated_water_in_liters = SolublePhosphorus._determine_percolated_water_volume(percolated_water, field_size)
+        percolated_water_in_liters = (
+            SolublePhosphorus._determine_percolated_water_volume(
+                percolated_water, field_size
+            )
+        )
 
-        dissolved_reactive_phosphorus_leachate_in_mg = dissolved_reactive_phosphorus_leachate * \
-            percolated_water_in_liters
+        dissolved_reactive_phosphorus_leachate_in_mg = (
+            dissolved_reactive_phosphorus_leachate * percolated_water_in_liters
+        )
 
-        dissolved_reactive_phosphorus_leachate_in_kg_per_ha = (dissolved_reactive_phosphorus_leachate_in_mg *
-                                                               MILLIGRAMS_TO_KILOGRAMS) / field_size
+        dissolved_reactive_phosphorus_leachate_in_kg_per_ha = (
+            dissolved_reactive_phosphorus_leachate_in_mg * MILLIGRAMS_TO_KILOGRAMS
+        ) / field_size
 
-        actual_dissolved_reactive_phosphorus_leachate = min(labile_phosphorus,
-                                                            dissolved_reactive_phosphorus_leachate_in_kg_per_ha)
+        actual_dissolved_reactive_phosphorus_leachate = min(
+            labile_phosphorus, dissolved_reactive_phosphorus_leachate_in_kg_per_ha
+        )
         return actual_dissolved_reactive_phosphorus_leachate

@@ -3,7 +3,10 @@ from __future__ import annotations
 import copy
 from typing import Literal
 
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum, CowReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
+    HeiferReproProtocolEnum,
+    CowReproProtocolEnum,
+)
 
 
 class HormoneDeliverySchedule:
@@ -41,91 +44,92 @@ class HormoneDeliverySchedule:
 
     HEIFER_REPRO_PROTOCOLS = {
         HeiferReproProtocolEnum.TAI_5dCG2P.value: {
-            0: {'deliver_hormones': ['CIDR']},
-            5: {'deliver_hormones': ['PGF']},
-            6: {'deliver_hormones': ['PGF']},
-            8: {'deliver_hormones': ['GnRH']},
-            9: {'set_ai_day': True, 'set_conception_rate': True}
+            0: {"deliver_hormones": ["CIDR"]},
+            5: {"deliver_hormones": ["PGF"]},
+            6: {"deliver_hormones": ["PGF"]},
+            8: {"deliver_hormones": ["GnRH"]},
+            9: {"set_ai_day": True, "set_conception_rate": True},
         },
         HeiferReproProtocolEnum.TAI_5dCGP.value: {
-            0: {'deliver_hormones': ['CIDR']},
-            5: {'deliver_hormones': ['PGF']},
-            8: {'deliver_hormones': ['GnRH']},
-            9: {'set_ai_day': True, 'set_conception_rate': True}
+            0: {"deliver_hormones": ["CIDR"]},
+            5: {"deliver_hormones": ["PGF"]},
+            8: {"deliver_hormones": ["GnRH"]},
+            9: {"set_ai_day": True, "set_conception_rate": True},
         },
         HeiferReproProtocolEnum.SynchED_2P.value: {
-            0: {'deliver_hormones': ['PGF']},
-            14: {'deliver_hormones': ['PGF']},
+            0: {"deliver_hormones": ["PGF"]},
+            14: {"deliver_hormones": ["PGF"]},
         },
         HeiferReproProtocolEnum.SynchED_CP.value: {
-            0: {'deliver_hormones': ['CIDR']},
-            7: {'deliver_hormones': ['PGF']},
-        }
+            0: {"deliver_hormones": ["CIDR"]},
+            7: {"deliver_hormones": ["PGF"]},
+        },
     }
 
     COW_REPRO_PROTOCOLS = {
         CowReproProtocolEnum.Presynch_PreSynch.value: {
-            0: {'deliver_hormones': ['PGF']},
-            14: {'deliver_hormones': ['PGF']},
-            25: {'set_presynch_end': True},
+            0: {"deliver_hormones": ["PGF"]},
+            14: {"deliver_hormones": ["PGF"]},
+            25: {"set_presynch_end": True},
         },
         CowReproProtocolEnum.Presynch_DoubleOvSynch.value: {
-            0: {'deliver_hormones': ['GnRH']},
-            7: {'deliver_hormones': ['PGF']},
-            10: {'deliver_hormones': ['GnRH']},
-            16: {'set_presynch_end': True},
+            0: {"deliver_hormones": ["GnRH"]},
+            7: {"deliver_hormones": ["PGF"]},
+            10: {"deliver_hormones": ["GnRH"]},
+            16: {"set_presynch_end": True},
         },
         CowReproProtocolEnum.Presynch_G6G.value: {
-            0: {'deliver_hormones': ['PGF']},
-            2: {'deliver_hormones': ['GnRH']},
-            8: {'set_presynch_end': True},
+            0: {"deliver_hormones": ["PGF"]},
+            2: {"deliver_hormones": ["GnRH"]},
+            8: {"set_presynch_end": True},
         },
-
         CowReproProtocolEnum.TAI_OvSynch_48.value: {
-            0: {'deliver_hormones': ['GnRH']},
-            7: {'deliver_hormones': ['PGF']},
-            9: {'deliver_hormones': ['GnRH']},
+            0: {"deliver_hormones": ["GnRH"]},
+            7: {"deliver_hormones": ["PGF"]},
+            9: {"deliver_hormones": ["GnRH"]},
             10: {
-                'set_ai_day': True,
-                'set_conception_rate': True,
-                'set_ovsynch_end': True
-            }
+                "set_ai_day": True,
+                "set_conception_rate": True,
+                "set_ovsynch_end": True,
+            },
         },
         CowReproProtocolEnum.TAI_OvSynch_56.value: {
-            0: {'deliver_hormones': ['GnRH']},
-            7: {'deliver_hormones': ['PGF']},
-            9: {'deliver_hormones': ['GnRH']},
+            0: {"deliver_hormones": ["GnRH"]},
+            7: {"deliver_hormones": ["PGF"]},
+            9: {"deliver_hormones": ["GnRH"]},
             10: {
-                'set_ai_day': True,
-                'set_conception_rate': True,
-                'set_ovsynch_end': True
-            }
+                "set_ai_day": True,
+                "set_conception_rate": True,
+                "set_ovsynch_end": True,
+            },
         },
         CowReproProtocolEnum.TAI_CoSynch_72.value: {
-            0: {'deliver_hormones': ['GnRH']},
-            7: {'deliver_hormones': ['PGF']},
+            0: {"deliver_hormones": ["GnRH"]},
+            7: {"deliver_hormones": ["PGF"]},
             10: {
-                'deliver_hormones': ['GnRH'],
-                'set_ai_day': True,
-                'set_conception_rate': True,
-                'set_ovsynch_end': True
-            }
+                "deliver_hormones": ["GnRH"],
+                "set_ai_day": True,
+                "set_conception_rate": True,
+                "set_ovsynch_end": True,
+            },
         },
         CowReproProtocolEnum.TAI_5d_CoSynch.value: {
-            0: {'deliver_hormones': ['GnRH']},
-            5: {'deliver_hormones': ['PGF']},
-            6: {'deliver_hormones': ['PGF']},
+            0: {"deliver_hormones": ["GnRH"]},
+            5: {"deliver_hormones": ["PGF"]},
+            6: {"deliver_hormones": ["PGF"]},
             8: {
-                'deliver_hormones': ['GnRH'],
-                'set_ai_day': True,
-                'set_conception_rate': True,
-                'set_ovsynch_end': True
-            }
+                "deliver_hormones": ["GnRH"],
+                "set_ai_day": True,
+                "set_conception_rate": True,
+                "set_ovsynch_end": True,
+            },
         },
     }
 
     @staticmethod
-    def get_schedule(animal_category: Literal['heifers', 'cows'], protocol_name: str) -> dict[int, dict] | None:
+    def get_schedule(
+        animal_category: Literal["heifers", "cows"], protocol_name: str
+    ) -> dict[int, dict] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name.
 
@@ -145,8 +149,8 @@ class HormoneDeliverySchedule:
         """
 
         animal_category_to_protocols = {
-            'heifers': HormoneDeliverySchedule.HEIFER_REPRO_PROTOCOLS,
-            'cows': HormoneDeliverySchedule.COW_REPRO_PROTOCOLS
+            "heifers": HormoneDeliverySchedule.HEIFER_REPRO_PROTOCOLS,
+            "cows": HormoneDeliverySchedule.COW_REPRO_PROTOCOLS,
         }
 
         if animal_category not in animal_category_to_protocols:
@@ -159,9 +163,9 @@ class HormoneDeliverySchedule:
         return copy.deepcopy(protocols[protocol_name])
 
     @staticmethod
-    def get_adjusted_schedule(animal_category: Literal['heifers', 'cows'],
-                              protocol_name: str,
-                              start_day: int) -> dict[int, dict] | None:
+    def get_adjusted_schedule(
+        animal_category: Literal["heifers", "cows"], protocol_name: str, start_day: int
+    ) -> dict[int, dict] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name, adjusted to start
         on the given start day.

@@ -75,7 +75,7 @@ class ManureTreatmentFactory:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
             ManureTreatmentType.OPEN_LOTS: OpenLots,
-            ManureTreatmentType.COMPOSTING: Composting
+            ManureTreatmentType.COMPOSTING: Composting,
         }
 
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)

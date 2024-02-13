@@ -34,6 +34,7 @@ class AnimalPopulation:
         A flag to indicate whether the animals should be ordered randomly.
 
     """
+
     calves: List[Calf]
     heiferIs: List[HeiferI]
     heiferIIs: List[HeiferII]
@@ -46,8 +47,15 @@ class AnimalPopulation:
 
     def __post_init__(self):
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows +
-               self.replacement]
+        ids = [
+            i.id
+            for i in self.calves
+            + self.heiferIs
+            + self.heiferIIs
+            + self.heiferIIIs
+            + self.cows
+            + self.replacement
+        ]
         if ids:
             self.current_animal_id = max(ids)
 
@@ -56,10 +64,16 @@ class AnimalPopulation:
         return {
             "calves": [calf.get_calf_values() for calf in self.calves],
             "heiferIs": [heiferI.get_heiferI_values() for heiferI in self.heiferIs],
-            "heiferIIs": [heiferII.get_heiferII_values() for heiferII in self.heiferIIs],
-            "heiferIIIs": [heiferIII.get_heiferIII_values() for heiferIII in self.heiferIIIs],
+            "heiferIIs": [
+                heiferII.get_heiferII_values() for heiferII in self.heiferIIs
+            ],
+            "heiferIIIs": [
+                heiferIII.get_heiferIII_values() for heiferIII in self.heiferIIIs
+            ],
             "cows": [cow.get_cow_values() for cow in self.cows],
-            "replacement": [replacement.get_replacement_values() for replacement in self.replacement]
+            "replacement": [
+                replacement.get_replacement_values() for replacement in self.replacement
+            ],
         }
 
     def next_id(self) -> int:
@@ -188,11 +202,19 @@ class AnimalPopulation:
         num_replacement = len(self.replacement)
 
         avg_calf_age = self._average([calf.days_born for calf in self.calves])
-        avg_heiferI_age = self._average([heiferI.days_born for heiferI in self.heiferIs])
-        avg_heiferII_age = self._average([heiferII.days_born for heiferII in self.heiferIIs])
-        avg_heiferIII_age = self._average([heiferIII.days_born for heiferIII in self.heiferIIIs])
+        avg_heiferI_age = self._average(
+            [heiferI.days_born for heiferI in self.heiferIs]
+        )
+        avg_heiferII_age = self._average(
+            [heiferII.days_born for heiferII in self.heiferIIs]
+        )
+        avg_heiferIII_age = self._average(
+            [heiferIII.days_born for heiferIII in self.heiferIIIs]
+        )
         avg_cow_age = self._average([cow.days_born for cow in self.cows])
-        avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
+        avg_replacement_age = self._average(
+            [replacement.days_born for replacement in self.replacement]
+        )
 
         cow_avg_days_in_preg = self._average([cow.days_in_preg for cow in self.cows])
         cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
@@ -200,23 +222,21 @@ class AnimalPopulation:
         cow_avg_CI = self._average([cow.CI for cow in self.cows])
 
         summary = {
-            'num_calf': num_calf,
-            'num_heiferI': num_heiferI,
-            'num_heiferII': num_heiferII,
-            'num_heiferIII': num_heiferIII,
-            'num_cow': num_cow,
-            'num_replacement': num_replacement,
-
-            'avg_calf_age': avg_calf_age,
-            'avg_heiferI_age': avg_heiferI_age,
-            'avg_heiferII_age': avg_heiferII_age,
-            'avg_heiferIII_age': avg_heiferIII_age,
-            'avg_cow_age': avg_cow_age,
-            'avg_replacement_age': avg_replacement_age,
-
-            'cow_avg_days_in_preg': cow_avg_days_in_preg,
-            'cow_avg_days_in_milk': cow_avg_days_in_milk,
-            'cow_avg_parity': cow_avg_parity,
-            'cow_avg_CI': cow_avg_CI
+            "num_calf": num_calf,
+            "num_heiferI": num_heiferI,
+            "num_heiferII": num_heiferII,
+            "num_heiferIII": num_heiferIII,
+            "num_cow": num_cow,
+            "num_replacement": num_replacement,
+            "avg_calf_age": avg_calf_age,
+            "avg_heiferI_age": avg_heiferI_age,
+            "avg_heiferII_age": avg_heiferII_age,
+            "avg_heiferIII_age": avg_heiferIII_age,
+            "avg_cow_age": avg_cow_age,
+            "avg_replacement_age": avg_replacement_age,
+            "cow_avg_days_in_preg": cow_avg_days_in_preg,
+            "cow_avg_days_in_milk": cow_avg_days_in_milk,
+            "cow_avg_parity": cow_avg_parity,
+            "cow_avg_CI": cow_avg_CI,
         }
         return summary

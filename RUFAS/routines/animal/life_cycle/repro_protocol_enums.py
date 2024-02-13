@@ -28,13 +28,13 @@ class HeiferReproProtocolEnum(Enum):
         The 2P sub-protocol of the SynchED protocol.
     """
 
-    ED = 'ED'
-    TAI = 'TAI'
-    SynchED = 'SynchED'
-    TAI_5dCG2P = '5dCG2P'
-    TAI_5dCGP = '5dCGP'
-    SynchED_CP = 'CP'
-    SynchED_2P = '2P'
+    ED = "ED"
+    TAI = "TAI"
+    SynchED = "SynchED"
+    TAI_5dCG2P = "5dCG2P"
+    TAI_5dCGP = "5dCGP"
+    SynchED_CP = "CP"
+    SynchED_2P = "2P"
 
 
 class CowReproProtocolEnum(Enum):
@@ -78,23 +78,23 @@ class CowReproProtocolEnum(Enum):
         The PGFatPD resynch program used in TAI and ED-TAI protocols.
     """
 
-    NONE = 'None'
-    ED = 'ED'
-    TAI = 'TAI'
-    ED_TAI = 'ED-TAI'
+    NONE = "None"
+    ED = "ED"
+    TAI = "TAI"
+    ED_TAI = "ED-TAI"
 
-    Presynch_PreSynch = 'PreSynch'
-    Presynch_DoubleOvSynch = 'Double OvSynch'
-    Presynch_G6G = 'G6G'
+    Presynch_PreSynch = "PreSynch"
+    Presynch_DoubleOvSynch = "Double OvSynch"
+    Presynch_G6G = "G6G"
 
-    TAI_OvSynch_48 = 'OvSynch 48'
-    TAI_OvSynch_56 = 'OvSynch 56'
-    TAI_CoSynch_72 = 'CoSynch 72'
-    TAI_5d_CoSynch = '5d CoSynch'
+    TAI_OvSynch_48 = "OvSynch 48"
+    TAI_OvSynch_56 = "OvSynch 56"
+    TAI_CoSynch_72 = "CoSynch 72"
+    TAI_5d_CoSynch = "5d CoSynch"
 
-    Resynch_TAIbeforePD = 'TAIbeforePD'
-    Resynch_TAIafterPD = 'TAIafterPD'
-    Resynch_PGFatPD = 'PGFatPD'
+    Resynch_TAIbeforePD = "TAIbeforePD"
+    Resynch_TAIafterPD = "TAIafterPD"
+    Resynch_PGFatPD = "PGFatPD"
 
 
 class ReproStateEnum(Enum):
@@ -129,15 +129,17 @@ class ReproStateEnum(Enum):
         The state that represents the animal has just entered the herd through initialization.
     """
 
-    NONE = 'none'
-    WAITING_FULL_ED_CYCLE = 'waiting for full estrus cycle'
-    WAITING_SHORT_ED_CYCLE = 'waiting for short estrus cycle'
-    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = 'waiting for full estrus cycle before OvSynch'
-    IN_PRESYNCH = 'in presynch'
-    HAS_DONE_PRESYNCH = 'has done presynch'
-    IN_OVSYNCH = 'in OvSynch'
-    ESTRUS_DETECTED = 'estrus detected'
-    AFTER_AI = 'after AI'
-    FRESH = 'fresh'
-    PREGNANT = 'pregnant'
-    ENTER_HERD_FROM_INIT = 'entered herd from init'
+    NONE = "none"
+    WAITING_FULL_ED_CYCLE = "waiting for full estrus cycle"
+    WAITING_SHORT_ED_CYCLE = "waiting for short estrus cycle"
+    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = (
+        "waiting for full estrus cycle before OvSynch"
+    )
+    IN_PRESYNCH = "in presynch"
+    HAS_DONE_PRESYNCH = "has done presynch"
+    IN_OVSYNCH = "in OvSynch"
+    ESTRUS_DETECTED = "estrus detected"
+    AFTER_AI = "after AI"
+    FRESH = "fresh"
+    PREGNANT = "pregnant"
+    ENTER_HERD_FROM_INIT = "entered herd from init"

@@ -74,9 +74,7 @@ class Utility:
             return Path(__file__).resolve().parents[1]
 
     @staticmethod
-    def read_json_file(
-        file_path: Path
-    ) -> Dict[Any, Any]:
+    def read_json_file(file_path: Path) -> Dict[Any, Any]:
         """
         Description:
             Reads and interprets the JSON file at the given path. Compiles the
@@ -345,11 +343,40 @@ class Utility:
         The calendar year is specified so it can be determined if it is a leap year.
 
         """
-        non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
-        leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+        non_leap_cumulative_days_in_months = [
+            31,
+            59,
+            90,
+            120,
+            151,
+            181,
+            212,
+            243,
+            273,
+            304,
+            334,
+            365,
+        ]
+        leap_cumulative_days_in_months = [
+            31,
+            60,
+            91,
+            121,
+            152,
+            182,
+            213,
+            244,
+            274,
+            305,
+            335,
+            366,
+        ]
 
-        cumulative_days_in_months = \
-            leap_cumulative_days_in_months if is_leap_year(calendar_year) else non_leap_cumulative_days_in_months
+        cumulative_days_in_months = (
+            leap_cumulative_days_in_months
+            if is_leap_year(calendar_year)
+            else non_leap_cumulative_days_in_months
+        )
 
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
@@ -385,7 +412,9 @@ class Utility:
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     @staticmethod
-    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+    def filter_pool(
+        data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
+    ) -> Dict[Any, Any]:
         """
         Returns a filtered data pool based on either inclusion or exclusion.
 
@@ -411,7 +440,7 @@ class Utility:
                 if not any(re.search(pattern, key) for pattern in filter_patterns)
             }
         return {
-                key: data_pool[key]
-                for key in data_pool.keys()
-                if any(re.search(pattern, key) for pattern in filter_patterns)
-            }
+            key: data_pool[key]
+            for key in data_pool.keys()
+            if any(re.search(pattern, key) for pattern in filter_patterns)
+        }

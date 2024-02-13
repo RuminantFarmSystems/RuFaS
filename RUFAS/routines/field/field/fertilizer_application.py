@@ -34,9 +34,17 @@ class FertilizerApplication:
     def __init__(self, soil: Optional[Soil] = None, field_size: Optional[float] = None):
         self.soil = soil or Soil(field_size=field_size)
 
-    def apply_fertilizer(self, phosphorus_applied: float, fertilizer_mass: float, inorganic_nitrogen_fraction: float,
-                         ammonium_fraction: float, organic_nitrogen_fraction: float, application_depth: float,
-                         surface_remainder_fraction: float, field_size: float) -> None:
+    def apply_fertilizer(
+        self,
+        phosphorus_applied: float,
+        fertilizer_mass: float,
+        inorganic_nitrogen_fraction: float,
+        ammonium_fraction: float,
+        organic_nitrogen_fraction: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+        field_size: float,
+    ) -> None:
         """
         Applies nutrients to the soil through fertilizer.
 
@@ -71,31 +79,59 @@ class FertilizerApplication:
         """
         # TODO: move application functionality from soil/phosphorus_cycling up to this module, and increase
         #  functionality of this module - issue #492
-        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(phosphorus_applied *
-                                                                          surface_remainder_fraction)
+        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(
+            phosphorus_applied * surface_remainder_fraction
+        )
 
-        nitrates_applied = (fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
-        ammonium_applied = (fertilizer_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
-        organic_nitrogen_applied = (fertilizer_mass * organic_nitrogen_fraction * 0.5) / field_size
+        nitrates_applied = (
+            fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)
+        ) / field_size
+        ammonium_applied = (
+            fertilizer_mass * inorganic_nitrogen_fraction * ammonium_fraction
+        ) / field_size
+        organic_nitrogen_applied = (
+            fertilizer_mass * organic_nitrogen_fraction * 0.5
+        ) / field_size
 
-        self.soil.data.soil_layers[0].nitrate_content += (nitrates_applied * surface_remainder_fraction)
-        self.soil.data.soil_layers[0].ammonium_content += (ammonium_applied * surface_remainder_fraction)
-        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += \
-            (organic_nitrogen_applied * surface_remainder_fraction)
-        self.soil.data.soil_layers[0].active_organic_nitrogen_content += \
-            (organic_nitrogen_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].nitrate_content += (
+            nitrates_applied * surface_remainder_fraction
+        )
+        self.soil.data.soil_layers[0].ammonium_content += (
+            ammonium_applied * surface_remainder_fraction
+        )
+        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += (
+            organic_nitrogen_applied * surface_remainder_fraction
+        )
+        self.soil.data.soil_layers[0].active_organic_nitrogen_content += (
+            organic_nitrogen_applied * surface_remainder_fraction
+        )
 
-        non_injection_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
+        non_injection_application = (
+            application_depth == 0.0 and surface_remainder_fraction == 1.0
+        )
         if non_injection_application:
             return
 
         subsurface_fraction = 1.0 - surface_remainder_fraction
         phosphorus_area_density = phosphorus_applied / field_size
-        self._apply_subsurface_fertilizer(phosphorus_area_density, nitrates_applied, ammonium_applied,
-                                          organic_nitrogen_applied, application_depth, subsurface_fraction)
+        self._apply_subsurface_fertilizer(
+            phosphorus_area_density,
+            nitrates_applied,
+            ammonium_applied,
+            organic_nitrogen_applied,
+            application_depth,
+            subsurface_fraction,
+        )
 
-    def _apply_subsurface_fertilizer(self, phosphorus: float, nitrates: float, ammonium: float, organic_nitrogen: float,
-                                     application_depth: float, subsurface_fraction: float) -> None:
+    def _apply_subsurface_fertilizer(
+        self,
+        phosphorus: float,
+        nitrates: float,
+        ammonium: float,
+        organic_nitrogen: float,
+        application_depth: float,
+        subsurface_fraction: float,
+    ) -> None:
         """
         Applies subsurface nutrients to the soil profile.
 
@@ -124,17 +160,26 @@ class FertilizerApplication:
         bottom_depths = self.soil.data.get_vectorized_layer_attribute("bottom_depth")
         depth_factors = self.generate_depth_factors(application_depth, bottom_depths)
         for index, depth_factor in enumerate(depth_factors):
-            self.soil.data.soil_layers[index].labile_inorganic_phosphorus_content += (phosphorus * depth_factor *
-                                                                                      subsurface_fraction)
-            self.soil.data.soil_layers[index].nitrate_content += (nitrates * depth_factor * subsurface_fraction)
-            self.soil.data.soil_layers[index].ammonium_content += (ammonium * depth_factor * subsurface_fraction)
-            self.soil.data.soil_layers[index].fresh_organic_nitrogen_content += (organic_nitrogen * depth_factor *
-                                                                                 subsurface_fraction)
-            self.soil.data.soil_layers[index].active_organic_nitrogen_content += (organic_nitrogen * depth_factor *
-                                                                                  subsurface_fraction)
+            self.soil.data.soil_layers[index].labile_inorganic_phosphorus_content += (
+                phosphorus * depth_factor * subsurface_fraction
+            )
+            self.soil.data.soil_layers[index].nitrate_content += (
+                nitrates * depth_factor * subsurface_fraction
+            )
+            self.soil.data.soil_layers[index].ammonium_content += (
+                ammonium * depth_factor * subsurface_fraction
+            )
+            self.soil.data.soil_layers[index].fresh_organic_nitrogen_content += (
+                organic_nitrogen * depth_factor * subsurface_fraction
+            )
+            self.soil.data.soil_layers[index].active_organic_nitrogen_content += (
+                organic_nitrogen * depth_factor * subsurface_fraction
+            )
 
     @staticmethod
-    def generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
+    def generate_depth_factors(
+        application_depth: float, soil_layer_bottom_depths: list[float]
+    ) -> list[float]:
         """
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
 

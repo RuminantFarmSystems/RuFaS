@@ -112,9 +112,9 @@ class PenManure:
             manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
         ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
-            animal_manure["total_ammoniacal_nitrogen_concentration"]  # g/L
+            animal_manure["total_ammoniacal_nitrogen_concentration"]
             / num_animals
-            * manure_volume  # L
+            * manure_volume  # g/L  # L
         ) * GeneralConstants.GRAMS_TO_KG  # kg
 
         if num_animals == 0:
@@ -149,5 +149,6 @@ class PenManure:
             phosphorus=animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure["phosphorus_fraction"] / num_animals,
             potassium=animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,
-            enteric_methane_kg=animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
+            enteric_methane_kg=animal_manure["enteric_methane_g"]
+            * GeneralConstants.GRAMS_TO_KG,
         )
