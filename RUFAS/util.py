@@ -12,9 +12,7 @@ from RUFAS.config import is_leap_year
 
 class Utility:
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(
-        list_of_dicts: List[Dict[str, Any]]
-    ) -> Dict[str, List[Any]]:
+    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
         """
         Convert a list of dictionaries into a dictionary of lists.
 
@@ -112,9 +110,7 @@ class Utility:
             print(e.msg)
 
     @staticmethod
-    def calc_average(
-        num_values: int, cur_avg: float, new_value: float
-    ) -> Tuple[int, float]:
+    def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
         """
         Calculate the new average given the number of values,
         the current average, and the new value.
@@ -235,9 +231,7 @@ class Utility:
 
         # If the object is a tuple, serialize each element recursively
         if isinstance(obj, tuple):
-            return tuple(
-                [cls._make_serializable(elem, depth + 1, max_depth) for elem in obj]
-            )
+            return tuple([cls._make_serializable(elem, depth + 1, max_depth) for elem in obj])
 
         # If the object is a set, serialize each element recursively
         # Note: sets are not serializable by default, so we convert them to lists
@@ -248,9 +242,7 @@ class Utility:
         # Note: dictionary keys must be strings
         if isinstance(obj, dict):
             return {
-                str(
-                    cls._make_serializable(key, depth, max_depth)
-                ): cls._make_serializable(value, depth, max_depth)
+                str(cls._make_serializable(key, depth, max_depth)): cls._make_serializable(value, depth, max_depth)
                 for key, value in obj.items()
             }
 
@@ -373,9 +365,7 @@ class Utility:
         ]
 
         cumulative_days_in_months = (
-            leap_cumulative_days_in_months
-            if is_leap_year(calendar_year)
-            else non_leap_cumulative_days_in_months
+            leap_cumulative_days_in_months if is_leap_year(calendar_year) else non_leap_cumulative_days_in_months
         )
 
         for month, day_count in enumerate(cumulative_days_in_months):
@@ -406,15 +396,11 @@ class Utility:
         """
 
         base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
-        timestamp_format_string: str = (
-            f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
-        )
+        timestamp_format_string: str = f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     @staticmethod
-    def filter_pool(
-        data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
-    ) -> Dict[Any, Any]:
+    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
         """
         Returns a filtered data pool based on either inclusion or exclusion.
 

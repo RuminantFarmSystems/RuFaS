@@ -47,9 +47,7 @@ def test_determine_water_deficiency(et, max_et):
     ],
 )
 def test_determine_maximum_transpiration(leaf_area_index, potential_evapotrans_adj):
-    observe = WaterDynamics._determine_maximum_transpiration(
-        leaf_area_index, potential_evapotrans_adj
-    )
+    observe = WaterDynamics._determine_maximum_transpiration(leaf_area_index, potential_evapotrans_adj)
     if leaf_area_index > 3:
         assert observe == potential_evapotrans_adj
     else:
@@ -70,9 +68,7 @@ def test_determine_maximum_transpiration(leaf_area_index, potential_evapotrans_a
         (132.58, 72.01, 635.2),  # arbitrary
     ],
 )
-def test_cycle_water(
-    mocker: MockFixture, evap: float, trans: float, et_max: float
-) -> None:
+def test_cycle_water(mocker: MockFixture, evap: float, trans: float, et_max: float) -> None:
     """Integration test to check that water cycling routines are properly carried out."""
     data = CropData(
         cumulative_evaporation=0,
@@ -82,9 +78,7 @@ def test_cycle_water(
         cumulative_water_uptake=10.0,
     )
     water_dyn = WaterDynamics(data)
-    water_deficiency = mocker.patch.object(
-        water_dyn, "_determine_water_deficiency", return_value=0.8
-    )
+    water_deficiency = mocker.patch.object(water_dyn, "_determine_water_deficiency", return_value=0.8)
 
     water_dyn.cycle_water(evap, trans, et_max)
 
@@ -133,9 +127,7 @@ def test_evaporate_from_canopy(
     "leaf_area_index,potential_evapotranspiration_adjusted",
     [(1.8, 50.44), (4.5, 15.556), (3.3, 0.0)],
 )
-def test_set_maximum_transpiration(
-    leaf_area_index: float, potential_evapotranspiration_adjusted: float
-) -> None:
+def test_set_maximum_transpiration(leaf_area_index: float, potential_evapotranspiration_adjusted: float) -> None:
     """Tests that the maximum transpiration of a crop is set correctly."""
     data = CropData(max_transpiration=0, leaf_area_index=leaf_area_index)
     incorp = WaterDynamics(data)

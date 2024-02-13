@@ -57,21 +57,15 @@ class ManureManagerPen:
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
-        self.manure_separator_after_digestion: str = (
-            pen.manure_separator_after_digestion
-        )
+        self.manure_separator_after_digestion: str = pen.manure_separator_after_digestion
         self.manure_treatment: str = pen.manure_storage
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
-        self.num_lactating_cows = self.count_lactating_cows(
-            pen.animal_combination, pen.animals_in_pen
-        )
+        self.num_lactating_cows = self.count_lactating_cows(pen.animal_combination, pen.animals_in_pen)
         self.num_stalls = pen.num_stalls
 
     @classmethod
-    def count_lactating_cows(
-        cls, animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]
-    ) -> int:
+    def count_lactating_cows(cls, animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:

@@ -124,9 +124,7 @@ def test_get_animals(
     animal_getter_by_animal_type[animal_type].assert_called_once()
 
 
-def test_initialize_herd(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function initialize_herd() in file life_cycle.py"""
     breed = "HO"
     herd_data: HerdInfoTypedDict = HerdInfoTypedDict(
@@ -155,9 +153,7 @@ def test_initialize_herd(
     )
 
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
-    mock_replacement_cows = [
-        mocker.MagicMock(autospec=Cow) for _ in range(herd_data["replace_num"])
-    ]
+    mock_replacement_cows = [mocker.MagicMock(autospec=Cow) for _ in range(herd_data["replace_num"])]
     mock_animal_population.get_replacement_cows.return_value = mock_replacement_cows
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.life_cycle.AnimalPopulation",
@@ -195,9 +191,7 @@ def test_reset_parity(life_cycle_manager: LifeCycleManager) -> None:
     for parity in parities:
         parities[parity] = count_per_parity
         preg_times[parity] = avg_calving_to_preg_time_default
-        life_cycle_manager.percent_cow_for_parity[parity] = (
-            count_per_parity * 100 / cow_num
-        )
+        life_cycle_manager.percent_cow_for_parity[parity] = count_per_parity * 100 / cow_num
         life_cycle_manager.avg_age_for_parity[parity] = avg_age_for_parity_default
         life_cycle_manager.avg_age_for_calving[parity] = avg_age_for_calving_default
 
@@ -260,16 +254,12 @@ def test_convert_calf_to_heiferI(mocker: MockerFixture) -> None:
     assert heiferIs[0] == mock_new_heiferI  # check identity
 
 
-def test_evaluate_calves_for_weaning(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_evaluate_calves_for_weaning(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _evaluate_calves_for_weaning in file life_cycle.py"""
     sim_day = 10
     mock_weaned_calf = mocker.MagicMock(autospec=Calf)
     mock_weaned_calf.update.return_value = True
-    patch_convert_calf_to_heiferI = mocker.patch.object(
-        life_cycle_manager, "_convert_calf_to_heiferI"
-    )
+    patch_convert_calf_to_heiferI = mocker.patch.object(life_cycle_manager, "_convert_calf_to_heiferI")
 
     mock_matured_calf = mocker.MagicMock(autospec=Calf)
     mock_matured_calf.update.return_value = False
@@ -377,9 +367,7 @@ def test_evaluate_heiferIs_for_transitioning_to_heiferIIs(
     sim_day = 100
     mock_heiferI_second_stage = mocker.MagicMock(autospec=HeiferI)
     mock_heiferI_second_stage.update.return_value = True
-    patch_convert_heiferI_to_heiferII = mocker.patch.object(
-        life_cycle_manager, "_convert_heiferI_to_heiferII"
-    )
+    patch_convert_heiferI_to_heiferII = mocker.patch.object(life_cycle_manager, "_convert_heiferI_to_heiferII")
 
     mock_matured_heiferI = mocker.MagicMock(autospec=HeiferI)
     mock_matured_heiferI.update.return_value = False
@@ -391,16 +379,12 @@ def test_evaluate_heiferIs_for_transitioning_to_heiferIIs(
     total_animal_num = 0
     life_cycle_manager.avg_mature_body_weight = 0.0
 
-    new_total_animal_num = (
-        life_cycle_manager._evaluate_heiferIs_for_transitioning_to_heiferIIs(
-            sim_day, mock_heiferIs, mock_heiferIIs, total_animal_num
-        )
+    new_total_animal_num = life_cycle_manager._evaluate_heiferIs_for_transitioning_to_heiferIIs(
+        sim_day, mock_heiferIs, mock_heiferIIs, total_animal_num
     )
 
     mock_heiferI_second_stage.update.assert_called_once_with(sim_day)
-    patch_convert_heiferI_to_heiferII.assert_called_once_with(
-        mock_heiferI_second_stage, mock_heiferIIs
-    )
+    patch_convert_heiferI_to_heiferII.assert_called_once_with(mock_heiferI_second_stage, mock_heiferIIs)
 
     mock_matured_heiferI.update.assert_called_once_with(sim_day)
     assert life_cycle_manager.heiferI_num == 1
@@ -447,9 +431,7 @@ def test_convert_heiferII_to_heiferIII(mocker: MockerFixture) -> None:
     assert heiferIIIs[0] == mock_new_heiferIII  # check identity
 
 
-def test_extract_repro_stats_from_heiferII(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_extract_repro_stats_from_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _extract_repro_stats_from_heiferII in file life_cycle.py"""
     mock_data = {
         "CIDR_count": 10,
@@ -469,9 +451,7 @@ def test_extract_repro_stats_from_heiferII(
     mock_heiferII.AI_times = mock_data["AI_times"]
     mock_heiferII.ED_days = mock_data["ED_days"]
 
-    spy_extract_repro_stats = mocker.spy(
-        life_cycle_manager, "_extract_repro_stats_from_heiferII"
-    )
+    spy_extract_repro_stats = mocker.spy(life_cycle_manager, "_extract_repro_stats_from_heiferII")
 
     # Before
     assert life_cycle_manager.CIDR_count == 0
@@ -495,9 +475,7 @@ def test_extract_repro_stats_from_heiferII(
     assert life_cycle_manager.ed_period_h == mock_data["ED_days"]
 
 
-def test_remain_heiferII(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_remain_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _remain_heiferII in file life_cycle.py"""
     # Arrange
     mock_heiferII = mocker.MagicMock(autospec=HeiferII)
@@ -515,9 +493,7 @@ def test_remain_heiferII(
     assert life_cycle_manager.avg_breeding_to_preg_time == approx(20.0)
 
     # Act
-    result = life_cycle_manager._remain_heiferII(
-        mock_heiferII, total_animal_num, preg_heifer_num
-    )
+    result = life_cycle_manager._remain_heiferII(mock_heiferII, total_animal_num, preg_heifer_num)
     new_total_animal_num, new_preg_heifer_num = result
 
     # Assert after
@@ -549,9 +525,7 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
         False,
         True,
     ]  # cull_stage = False, third_stage = True
-    patch_convert_heiferII_to_heiferIII = mocker.patch.object(
-        life_cycle_manager, "_convert_heiferII_to_heiferIII"
-    )
+    patch_convert_heiferII_to_heiferIII = mocker.patch.object(life_cycle_manager, "_convert_heiferII_to_heiferIII")
 
     mock_heiferII_pregnant_stage = mocker.MagicMock(autospec=HeiferII)
     mock_heiferII_pregnant_stage.update.return_value = [
@@ -591,13 +565,9 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
     assert life_cycle_manager.sold_heiferIIs[0] == mock_heiferII_cull_stage
     mock_heiferII_cull_stage.update.assert_called_once_with(sim_day)
 
-    patch_convert_heiferII_to_heiferIII.assert_called_once_with(
-        mock_heiferII_third_stage, mock_heiferIIIs
-    )
+    patch_convert_heiferII_to_heiferIII.assert_called_once_with(mock_heiferII_third_stage, mock_heiferIIIs)
 
-    patch_remain_heiferII.assert_called_once_with(
-        mock_heiferII_pregnant_stage, total_animal_num, preg_heifer_num
-    )
+    patch_remain_heiferII.assert_called_once_with(mock_heiferII_pregnant_stage, total_animal_num, preg_heifer_num)
     assert new_total_animal_num == 1
     assert new_preg_heifer_num == 1
     assert len(mock_heiferIIs) == 1
@@ -623,9 +593,7 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
 
     cows: List[Cow] = []
     mock_new_cow = mocker.MagicMock(autospec=Cow)
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.Cow", return_value=mock_new_cow
-    )
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Cow", return_value=mock_new_cow)
 
     cow_repro_method = "TAI"
     cow_presynch_program = "Double OvSynch"
@@ -667,16 +635,12 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     assert cows[0] == mock_new_cow  # check identity
 
 
-def test_transition_heiferIII_to_cow(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_transition_heiferIII_to_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _evaluate_heiferIIIs_for_transitioning_to_cows in file life_cycle.py"""
     sim_day = 400
     mock_heiferIII_cow_stage = mocker.MagicMock(autospec=HeiferIII)
     mock_heiferIII_cow_stage.update.return_value = True
-    patch_convert_heiferIII_to_cow = mocker.patch.object(
-        life_cycle_manager, "_convert_heiferIII_to_cow"
-    )
+    patch_convert_heiferIII_to_cow = mocker.patch.object(life_cycle_manager, "_convert_heiferIII_to_cow")
 
     mock_matured_heiferIII = mocker.MagicMock(autospec=HeiferIII)
     mock_matured_heiferIII.update.return_value = False
@@ -697,17 +661,13 @@ def test_transition_heiferIII_to_cow(
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
 
     # Act
-    new_total_animal_num = (
-        life_cycle_manager._evaluate_heiferIIIs_for_transitioning_to_cows(
-            sim_day, mock_heiferIIIs, mock_cows, total_animal_num
-        )
+    new_total_animal_num = life_cycle_manager._evaluate_heiferIIIs_for_transitioning_to_cows(
+        sim_day, mock_heiferIIIs, mock_cows, total_animal_num
     )
 
     # Assert after
     mock_heiferIII_cow_stage.update.assert_called_once_with(sim_day)
-    patch_convert_heiferIII_to_cow.assert_called_once_with(
-        mock_heiferIII_cow_stage, mock_cows
-    )
+    patch_convert_heiferIII_to_cow.assert_called_once_with(mock_heiferIII_cow_stage, mock_cows)
 
     mock_matured_heiferIII.update.assert_called_once_with(sim_day)
     assert life_cycle_manager.heiferIII_num == 1
@@ -718,9 +678,7 @@ def test_transition_heiferIII_to_cow(
     assert life_cycle_manager.avg_mature_body_weight == approx(mature_body_weight)
 
 
-def test_check_if_heifers_need_to_be_sold(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _check_if_heifers_need_to_be_sold in file life_cycle.py"""
 
     # Case 1: len(heiferIIIs) + len(cows) > herd_num * 1.03 AND len(heiferIIIs) > 0
@@ -741,9 +699,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(
-        mock_heiferIIIs, mock_cows, animals_removed
-    )
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 53
@@ -771,9 +727,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(
-        mock_heiferIIIs, mock_cows, animals_removed
-    )
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 53
@@ -797,9 +751,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(
-        mock_heiferIIIs, mock_cows, animals_removed
-    )
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 0
@@ -809,9 +761,7 @@ def test_check_if_heifers_need_to_be_sold(
     assert len(animals_removed) == 0
 
 
-def test_check_if_replacement_heifers_needed(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _check_if_replacement_heifers_needed in file life_cycle.py"""
 
     # Case 1: len(cows) + len(heiferIIIs) + bought_heifer_num < herd_num * 1.01 AND sim_day > 1
@@ -835,17 +785,13 @@ def test_check_if_replacement_heifers_needed(
     assert life_cycle_manager.bought_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_replacement_heifers_needed(
-        sim_day, mock_heiferIIIs, mock_cows, animals_added
-    )
+    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs, mock_cows, animals_added)
 
     # Assert after
     assert life_cycle_manager.bought_heifer_num == 1
     assert len(animals_added) == 1
     assert animals_added[0].id == 0
-    animals_added[0].events.add_event.assert_called_once_with(
-        days_born, sim_day, ENTER_HERD
-    )
+    animals_added[0].events.add_event.assert_called_once_with(days_born, sim_day, ENTER_HERD)
     animals_added[0].set_p_purchased.assert_called_once()
     # ---------------------------------------------------------------
 
@@ -870,9 +816,7 @@ def test_check_if_replacement_heifers_needed(
     assert life_cycle_manager.bought_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_replacement_heifers_needed(
-        sim_day, mock_heiferIIIs, mock_cows, animals_added
-    )
+    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs, mock_cows, animals_added)
 
     # Assert after
     assert life_cycle_manager.bought_heifer_num == 0
@@ -903,9 +847,7 @@ def test_check_if_replacement_heifers_needed(
     assert life_cycle_manager.bought_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_replacement_heifers_needed(
-        sim_day, mock_heiferIIIs, mock_cows, animals_added
-    )
+    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs, mock_cows, animals_added)
 
     # Assert after
     assert life_cycle_manager.bought_heifer_num == 0
@@ -964,9 +906,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert life_cycle_manager.cow_herd_exit_num == 2
 
 
-def test_handle_cow_body_weight_and_parity(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_handle_cow_body_weight_and_parity(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _handle_cow_body_weight_and_parity() in file life_cycle.py"""
     # Arrange
     total_animal_num = 100
@@ -982,8 +922,7 @@ def test_handle_cow_body_weight_and_parity(
 
     expected_new_cow_num = 11
     expected_new_avg_cow_body_weight = (
-        life_cycle_manager.avg_cow_body_weight * life_cycle_manager.cow_num
-        + mock_cow.body_weight
+        life_cycle_manager.avg_cow_body_weight * life_cycle_manager.cow_num + mock_cow.body_weight
     ) / expected_new_cow_num
     expected_new_avg_parity_num = (
         life_cycle_manager.avg_parity_num * life_cycle_manager.cow_num + mock_cow.calves
@@ -991,35 +930,24 @@ def test_handle_cow_body_weight_and_parity(
 
     expected_new_total_animal_num = total_animal_num + 1
     expected_new_avg_mature_body_weight = (
-        life_cycle_manager.avg_mature_body_weight * total_animal_num
-        + mock_cow.mature_body_weight
+        life_cycle_manager.avg_mature_body_weight * total_animal_num + mock_cow.mature_body_weight
     ) / expected_new_total_animal_num
-    spy_handle_cow_body_weight = mocker.spy(
-        life_cycle_manager, "_handle_cow_body_weight_and_parity"
-    )
+    spy_handle_cow_body_weight = mocker.spy(life_cycle_manager, "_handle_cow_body_weight_and_parity")
 
     # Act
-    new_total_animal_num = life_cycle_manager._handle_cow_body_weight_and_parity(
-        mock_cow, total_animal_num
-    )
+    new_total_animal_num = life_cycle_manager._handle_cow_body_weight_and_parity(mock_cow, total_animal_num)
 
     # Assert
     assert new_total_animal_num == expected_new_total_animal_num
     assert life_cycle_manager.cow_num == expected_new_cow_num
-    assert life_cycle_manager.avg_cow_body_weight == approx(
-        expected_new_avg_cow_body_weight
-    )
+    assert life_cycle_manager.avg_cow_body_weight == approx(expected_new_avg_cow_body_weight)
     assert life_cycle_manager.avg_parity_num == approx(expected_new_avg_parity_num)
-    assert life_cycle_manager.avg_mature_body_weight == approx(
-        expected_new_avg_mature_body_weight
-    )
+    assert life_cycle_manager.avg_mature_body_weight == approx(expected_new_avg_mature_body_weight)
     spy_handle_cow_body_weight.assert_called_once_with(mock_cow, total_animal_num)
 
 
 @pytest.mark.parametrize("is_cow_milking", [True, False])
-def test_handle_cow_milking(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager, is_cow_milking: bool
-) -> None:
+def test_handle_cow_milking(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, is_cow_milking: bool) -> None:
     """Unit test for function _handle_cow_milking() in file life_cycle.py"""
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
@@ -1038,8 +966,7 @@ def test_handle_cow_milking(
 
     expected_new_milking_cow_num = life_cycle_manager.milking_cow_num + 1
     expected_new_avg_days_in_milk = (
-        life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num
-        + mock_cow.days_in_milk
+        life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num + mock_cow.days_in_milk
     ) / expected_new_milking_cow_num
     expected_vwp_cow_num = life_cycle_manager.vwp_cow_num + 1
     expected_new_dry_cow_num = life_cycle_manager.dry_cow_num + 1
@@ -1052,9 +979,7 @@ def test_handle_cow_milking(
     spy_handle_cow_milking.assert_called_once_with(mock_cow)
     if is_cow_milking:
         assert life_cycle_manager.milking_cow_num == expected_new_milking_cow_num
-        assert life_cycle_manager.avg_days_in_milk == approx(
-            expected_new_avg_days_in_milk
-        )
+        assert life_cycle_manager.avg_days_in_milk == approx(expected_new_avg_days_in_milk)
         assert life_cycle_manager.vwp_cow_num == expected_vwp_cow_num
     else:
         assert life_cycle_manager.dry_cow_num == expected_new_dry_cow_num
@@ -1075,13 +1000,10 @@ def test_handle_cow_days_in_preg(
 
     expected_new_pregnant_cow_num = life_cycle_manager.preg_cow_num + 1
     expected_new_avg_days_in_preg = (
-        life_cycle_manager.avg_days_in_preg * life_cycle_manager.preg_cow_num
-        + mock_cow.days_in_preg
+        life_cycle_manager.avg_days_in_preg * life_cycle_manager.preg_cow_num + mock_cow.days_in_preg
     ) / expected_new_pregnant_cow_num
     expected_new_open_cow_num = life_cycle_manager.open_cow_num + 1
-    spy_handle_cow_days_in_preg = mocker.spy(
-        life_cycle_manager, "_handle_cow_days_in_preg"
-    )
+    spy_handle_cow_days_in_preg = mocker.spy(life_cycle_manager, "_handle_cow_days_in_preg")
 
     # Act
     life_cycle_manager._handle_cow_days_in_preg(mock_cow)
@@ -1090,17 +1012,13 @@ def test_handle_cow_days_in_preg(
     spy_handle_cow_days_in_preg.assert_called_once_with(mock_cow)
     if mock_cow.days_in_preg > 0:
         assert life_cycle_manager.preg_cow_num == expected_new_pregnant_cow_num
-        assert life_cycle_manager.avg_days_in_preg == approx(
-            expected_new_avg_days_in_preg
-        )
+        assert life_cycle_manager.avg_days_in_preg == approx(expected_new_avg_days_in_preg)
     else:
         assert life_cycle_manager.open_cow_num == expected_new_open_cow_num
 
 
 @pytest.mark.parametrize("cow_CI", [0, 1])
-def test_handle_cow_CI(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_CI: int
-) -> None:
+def test_handle_cow_CI(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_CI: int) -> None:
     """Unit test for function _handle_cow_CI() in file life_cycle.py"""
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
@@ -1109,30 +1027,23 @@ def test_handle_cow_CI(
     life_cycle_manager.avg_calving_interval = 7.0
     expected_new_calving_interval_avail_num = calving_interval_avail_num + 1
     expected_new_avg_calving_interval = (
-        life_cycle_manager.avg_calving_interval * calving_interval_avail_num
-        + mock_cow.CI
+        life_cycle_manager.avg_calving_interval * calving_interval_avail_num + mock_cow.CI
     ) / expected_new_calving_interval_avail_num
     spy_handle_cow_CI = mocker.spy(life_cycle_manager, "_handle_cow_CI")
 
     # Act
-    new_calving_interval_avail_num = life_cycle_manager._handle_cow_CI(
-        mock_cow, calving_interval_avail_num
-    )
+    new_calving_interval_avail_num = life_cycle_manager._handle_cow_CI(mock_cow, calving_interval_avail_num)
 
     # Assert
     spy_handle_cow_CI.assert_called_once_with(mock_cow, calving_interval_avail_num)
     if mock_cow.CI != 0:
         assert new_calving_interval_avail_num == expected_new_calving_interval_avail_num
-        assert life_cycle_manager.avg_calving_interval == approx(
-            expected_new_avg_calving_interval
-        )
+        assert life_cycle_manager.avg_calving_interval == approx(expected_new_avg_calving_interval)
     else:
         assert new_calving_interval_avail_num == calving_interval_avail_num
 
 
-def test_extract_repro_stats_from_cow(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _extract_repro_stats_from_cow() in file life_cycle.py"""
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
@@ -1148,21 +1059,13 @@ def test_extract_repro_stats_from_cow(
     life_cycle_manager.semen_num = 1
     life_cycle_manager.ai_num = 1
 
-    expected_GnRH_injection_num = (
-        life_cycle_manager.GnRH_injection_num + mock_cow.GnRH_injections
-    )
-    expected_PGF_injections = (
-        life_cycle_manager.PGF_injection_num + mock_cow.PGF_injections
-    )
-    expected_preg_check_num = (
-        life_cycle_manager.preg_check_num + mock_cow.preg_diagnoses
-    )
+    expected_GnRH_injection_num = life_cycle_manager.GnRH_injection_num + mock_cow.GnRH_injections
+    expected_PGF_injections = life_cycle_manager.PGF_injection_num + mock_cow.PGF_injections
+    expected_preg_check_num = life_cycle_manager.preg_check_num + mock_cow.preg_diagnoses
     expected_semen_num = life_cycle_manager.semen_num + mock_cow.semen_num
     expected_ai_num = life_cycle_manager.ai_num + mock_cow.AI_times
 
-    spy_extract_repro_stats_from_cow = mocker.spy(
-        life_cycle_manager, "_extract_repro_stats_from_cow"
-    )
+    spy_extract_repro_stats_from_cow = mocker.spy(life_cycle_manager, "_extract_repro_stats_from_cow")
 
     # Act
     life_cycle_manager._extract_repro_stats_from_cow(mock_cow)
@@ -1206,15 +1109,11 @@ def test_handle_new_born(
     mock_calf.culled = is_calf_culled
     mock_calf.sold = is_calf_sold
     mock_calf.sold_at_day = 0
-    patch_for_mock_calf = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=mock_calf
-    )
+    patch_for_mock_calf = mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=mock_calf)
     calves_born = []
 
     mock_input_manager = InputManager()
-    patch_im_getdata = mocker.patch.object(
-        mock_input_manager, "get_data", return_value="HO"
-    )
+    patch_im_getdata = mocker.patch.object(mock_input_manager, "get_data", return_value="HO")
 
     # Act
     life_cycle_manager._handle_new_born(sim_day, mock_cow, calves_born)
@@ -1235,9 +1134,7 @@ def test_handle_new_born(
         }
     )
     if not is_calf_culled and not is_calf_sold:
-        mock_calf.events.add_event.assert_called_once_with(
-            calf_days_born, sim_day, animal_constants.ENTER_HERD
-        )
+        mock_calf.events.add_event.assert_called_once_with(calf_days_born, sim_day, animal_constants.ENTER_HERD)
         assert len(calves_born) == 1
         assert calves_born[0] == mock_calf
     if is_calf_sold:
@@ -1248,9 +1145,7 @@ def test_handle_new_born(
 
 
 @pytest.mark.parametrize("cow_calves", [1, 2, 3, 4])
-def test_handle_cow_calves(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_calves: int
-) -> None:
+def test_handle_cow_calves(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_calves: int) -> None:
     """Unit test for function _handle_cow_calves() in file life_cycle.py."""
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
@@ -1270,31 +1165,19 @@ def test_handle_cow_calves(
     expected_avg_calving_to_preg_time = 200.0
 
     # Act
-    life_cycle_manager._handle_cow_calves(
-        mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num
-    )
+    life_cycle_manager._handle_cow_calves(mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num)
 
     # Assert
-    spy_handle_cow_calves.assert_called_once_with(
-        mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num
-    )
+    spy_handle_cow_calves.assert_called_once_with(mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num)
     assert life_cycle_manager.num_cow_for_parity[key] == 1
-    assert life_cycle_manager.avg_age_for_parity[key] == approx(
-        expected_avg_age_for_parity_for_key
-    )
+    assert life_cycle_manager.avg_age_for_parity[key] == approx(expected_avg_age_for_parity_for_key)
 
-    mock_cow.events.get_most_recent_date.assert_called_once_with(
-        animal_constants.NEW_BIRTH
-    )
+    mock_cow.events.get_most_recent_date.assert_called_once_with(animal_constants.NEW_BIRTH)
     assert calving_age_avail_num[key] == 1
-    assert life_cycle_manager.avg_age_for_calving[key] == approx(
-        expected_avg_age_for_calving_for_key
-    )
+    assert life_cycle_manager.avg_age_for_calving[key] == approx(expected_avg_age_for_calving_for_key)
 
     assert calf_to_preg_time_avail_num[key] == 1
-    assert life_cycle_manager.avg_calving_to_preg_time[key] == approx(
-        expected_avg_calving_to_preg_time
-    )
+    assert life_cycle_manager.avg_calving_to_preg_time[key] == approx(expected_avg_calving_to_preg_time)
 
 
 @pytest.mark.parametrize("total_animal_num", [0, 50, 100])
@@ -1309,12 +1192,8 @@ def test_calculate_herd_percentages(
         life_cycle_manager.heiferI_num = heiferI_num = int(0.2 * total_animal_num)
         life_cycle_manager.heiferII_num = heiferII_num = int(0.2 * total_animal_num)
         life_cycle_manager.heiferIII_num = heiferIII_num = int(0.2 * total_animal_num)
-        life_cycle_manager.cow_num = cow_num = (
-            total_animal_num - calf_num - heiferI_num - heiferII_num - heiferIII_num
-        )
-    spy_calc_herd_percentages = mocker.spy(
-        life_cycle_manager, "_calculate_herd_percentages"
-    )
+        life_cycle_manager.cow_num = cow_num = total_animal_num - calf_num - heiferI_num - heiferII_num - heiferIII_num
+    spy_calc_herd_percentages = mocker.spy(life_cycle_manager, "_calculate_herd_percentages")
 
     # Act
     life_cycle_manager._calculate_herd_percentages(total_animal_num)
@@ -1322,21 +1201,11 @@ def test_calculate_herd_percentages(
     # Assert
     spy_calc_herd_percentages.assert_called_once_with(total_animal_num)
     if total_animal_num > 0:
-        assert life_cycle_manager.calf_percent == approx(
-            calf_num * 100.0 / total_animal_num
-        )
-        assert life_cycle_manager.heiferI_percent == approx(
-            heiferI_num * 100.0 / total_animal_num
-        )
-        assert life_cycle_manager.heiferII_percent == approx(
-            heiferII_num * 100.0 / total_animal_num
-        )
-        assert life_cycle_manager.heiferIII_percent == approx(
-            heiferIII_num * 100.0 / total_animal_num
-        )
-        assert life_cycle_manager.cow_percent == approx(
-            cow_num * 100.0 / total_animal_num
-        )
+        assert life_cycle_manager.calf_percent == approx(calf_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferI_percent == approx(heiferI_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferII_percent == approx(heiferII_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferIII_percent == approx(heiferIII_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.cow_percent == approx(cow_num * 100.0 / total_animal_num)
     elif total_animal_num == 0:
         assert life_cycle_manager.calf_percent == approx(0.0)
         assert life_cycle_manager.heiferI_percent == approx(0.0)
@@ -1346,9 +1215,7 @@ def test_calculate_herd_percentages(
 
 
 @pytest.mark.parametrize("cow_num", [0, 50, 100])
-def test_calc_cow_percentages(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_num: int
-) -> None:
+def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_num: int) -> None:
     """Unit test for function _calculate_cow_percentages() in file life_cycle.py."""
     # Arrange
     dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = 0
@@ -1358,9 +1225,7 @@ def test_calc_cow_percentages(
         life_cycle_manager.milking_cow_num = milking_cow_num = int(0.2 * cow_num)
         life_cycle_manager.preg_cow_num = preg_cow_num = int(0.2 * cow_num)
         life_cycle_manager.open_cow_num = open_cow_num = int(0.2 * cow_num)
-    spy_calc_cow_percentages = mocker.spy(
-        life_cycle_manager, "_calculate_cow_percentages"
-    )
+    spy_calc_cow_percentages = mocker.spy(life_cycle_manager, "_calculate_cow_percentages")
 
     # Act
     life_cycle_manager._calculate_cow_percentages()
@@ -1368,18 +1233,10 @@ def test_calc_cow_percentages(
     # Assert
     spy_calc_cow_percentages.assert_called_once()
     if cow_num > 0:
-        assert life_cycle_manager.dry_cow_percent == approx(
-            dry_cow_num * 100.0 / cow_num
-        )
-        assert life_cycle_manager.milking_cow_percent == approx(
-            milking_cow_num * 100.0 / cow_num
-        )
-        assert life_cycle_manager.preg_cow_percent == approx(
-            preg_cow_num * 100.0 / cow_num
-        )
-        assert life_cycle_manager.non_preg_cow_percent == approx(
-            open_cow_num * 100.0 / cow_num
-        )
+        assert life_cycle_manager.dry_cow_percent == approx(dry_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.milking_cow_percent == approx(milking_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.preg_cow_percent == approx(preg_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.non_preg_cow_percent == approx(open_cow_num * 100.0 / cow_num)
     elif cow_num == 0:
         assert life_cycle_manager.dry_cow_percent == approx(0.0)
         assert life_cycle_manager.milking_cow_percent == approx(0.0)
@@ -1407,13 +1264,11 @@ def test_calc_cull_reason_stats_percent(
             animal_constants.UNKNOWN_CULL: 0,  # Initialized with 0
         }
     )
-    life_cycle_manager.cull_reason_stats[
-        animal_constants.UNKNOWN_CULL
-    ] = cow_herd_exit_num - sum(life_cycle_manager.cull_reason_stats.values())
-
-    spy_calc_cull_reason_stats_percent = mocker.spy(
-        life_cycle_manager, "_calculate_cull_reason_stats_percent"
+    life_cycle_manager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = cow_herd_exit_num - sum(
+        life_cycle_manager.cull_reason_stats.values()
     )
+
+    spy_calc_cull_reason_stats_percent = mocker.spy(life_cycle_manager, "_calculate_cull_reason_stats_percent")
 
     # Act
     life_cycle_manager._calculate_cull_reason_stats_percent()
@@ -1423,20 +1278,14 @@ def test_calc_cull_reason_stats_percent(
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
         if cow_herd_exit_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(
-                life_cycle_manager.cull_reason_stats[cull_reason]
-                * 100.0
-                / cow_herd_exit_num
+                life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num
             )
         elif cow_herd_exit_num == 0:
-            assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(
-                0.0
-            )
+            assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
 
 @pytest.mark.parametrize("cow_num", [0, 50, 100])
-def test_calc_percent_cow_per_parity(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_num: int
-) -> None:
+def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, cow_num: int) -> None:
     """Unit test for function _calculate_percent_cow_per_parity() in file life_cycle.py."""
     # Arrange
     life_cycle_manager.cow_num = cow_num
@@ -1453,9 +1302,7 @@ def test_calc_percent_cow_per_parity(
         life_cycle_manager.num_cow_for_parity.values()
     )
 
-    spy_calc_percent_cow_per_parity = mocker.spy(
-        life_cycle_manager, "_calculate_percent_cow_per_parity"
-    )
+    spy_calc_percent_cow_per_parity = mocker.spy(life_cycle_manager, "_calculate_percent_cow_per_parity")
 
     # Act
     life_cycle_manager._calculate_percent_cow_per_parity()
@@ -1471,9 +1318,7 @@ def test_calc_percent_cow_per_parity(
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
 
-def test_cull_cows_and_record_stats(
-    mocker: MockerFixture, life_cycle_manager: LifeCycleManager
-) -> None:
+def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     # Arrange
     sim_day = 1
     mock_cows = []
@@ -1516,25 +1361,15 @@ def test_cull_cows_and_record_stats(
         "_handle_cow_body_weight_and_parity",
         side_effect=total_animal_num_side_effect,
     )
-    patch_for_handle_cow_milking = mocker.patch.object(
-        life_cycle_manager, "_handle_cow_milking"
-    )
-    patch_for_handle_cow_days_in_preg = mocker.patch.object(
-        life_cycle_manager, "_handle_cow_days_in_preg"
-    )
-    patch_for_handle_cow_calves = mocker.patch.object(
-        life_cycle_manager, "_handle_cow_calves"
-    )
+    patch_for_handle_cow_milking = mocker.patch.object(life_cycle_manager, "_handle_cow_milking")
+    patch_for_handle_cow_days_in_preg = mocker.patch.object(life_cycle_manager, "_handle_cow_days_in_preg")
+    patch_for_handle_cow_calves = mocker.patch.object(life_cycle_manager, "_handle_cow_calves")
     patch_for_handle_cow_CI = mocker.patch.object(
         life_cycle_manager, "_handle_cow_CI", return_value=calving_interval_avail_num
     )
-    patch_for_extract_repro_stats_from_cow = mocker.patch.object(
-        life_cycle_manager, "_extract_repro_stats_from_cow"
-    )
+    patch_for_extract_repro_stats_from_cow = mocker.patch.object(life_cycle_manager, "_extract_repro_stats_from_cow")
 
-    patch_for_handle_new_born = mocker.patch.object(
-        life_cycle_manager, "_handle_new_born"
-    )
+    patch_for_handle_new_born = mocker.patch.object(life_cycle_manager, "_handle_new_born")
     patch_for_remove_items_from_list_by_indices = mocker.patch(
         "RUFAS.routines.animal.life_cycle.life_cycle.Utility.remove_items_from_list_by_indices"
     )
@@ -1552,14 +1387,10 @@ def test_cull_cows_and_record_stats(
             assert cow in animals_removed
             assert cow.id in removed_cows_idx
         else:
-            patch_for_handle_cow_body_weight_and_parity.assert_any_call(
-                cow, total_animal_num_side_effect.pop(0) - 1
-            )
+            patch_for_handle_cow_body_weight_and_parity.assert_any_call(cow, total_animal_num_side_effect.pop(0) - 1)
             patch_for_handle_cow_milking.assert_any_call(cow)
             patch_for_handle_cow_days_in_preg.assert_any_call(cow)
-            patch_for_handle_cow_calves.assert_any_call(
-                cow, calving_age_avail_num, calf_to_preg_time_avail_num
-            )
+            patch_for_handle_cow_calves.assert_any_call(cow, calving_age_avail_num, calf_to_preg_time_avail_num)
             patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
             patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
         if has_new_born:
@@ -1574,9 +1405,7 @@ def test_cull_cows_and_record_stats(
     assert patch_for_extract_repro_stats_from_cow.call_count == num_cows_not_culled
     assert patch_for_handle_new_born.call_count == num_new_born
 
-    patch_for_remove_items_from_list_by_indices.assert_called_once_with(
-        mock_cows_original, removed_cows_idx
-    )
+    patch_for_remove_items_from_list_by_indices.assert_called_once_with(mock_cows_original, removed_cows_idx)
     assert actual_total_animal_num == current_total_animal_num
 
 
@@ -1742,13 +1571,9 @@ def test_set_nutrient_rqmts(
         animal_base_config,
     )
     if temp == 20:
-        HeiferI.set_nutrient_rqmts(
-            heiferI, temp, animal_grouping_scenario, nutrient_conc
-        )
+        HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
     else:
-        HeiferI.set_nutrient_rqmts(
-            heiferI, temp, animal_grouping_scenario, nutrient_conc, met_energy, prev_DMI
-        )
+        HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc, met_energy, prev_DMI)
     animal_req.assert_called_with(
         body_weight=heiferI.body_weight,
         mature_body_weight=heiferI.mature_body_weight,
@@ -1818,9 +1643,7 @@ def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize("preg_day, days_born", [(300, 300), (300, 500), (100, 900)])
-def test_heiferI_get_non_preg_bw_change(
-    mocker: MockerFixture, preg_day, days_born
-) -> None:
+def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day, days_born) -> None:
     """Unit test for the function get_non_preg_bw_change in file routines/animal/life_cycle/heiferI.py."""
 
     heiferI = mocker.MagicMock(autospec=HeiferI)
@@ -1850,9 +1673,7 @@ def test_heiferI_get_non_preg_bw_change(
     divisor = abs(preg_day - days_born)
     if divisor == 0:
         divisor = 1
-    calc_weight = (
-        0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight
-    ) / divisor
+    calc_weight = (0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight) / divisor
     assert weight == calc_weight
 
 
@@ -2008,9 +1829,7 @@ def test_calf_init_values(
 
     calf = mocker.MagicMock(autospec=Calf)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=calf)
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.Calf.random", return_value=0.5
-    )
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf.random", return_value=0.5)
     calf.gender = mocker.MagicMock(autospec=str)
     calf.sold = mocker.MagicMock(autospec=bool)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf.config", calf)
@@ -2024,9 +1843,7 @@ def test_calf_init_values(
         "mature_body_weight_avg": 1.0,
         "mature_body_weight_std": 1.0,
     }
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config
-    )
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config)
 
     # act
     args = {
@@ -2101,12 +1918,8 @@ def test_calf_calc_nutrient_reqs(mocker: MockerFixture) -> None:
     calf = mocker.MagicMock(autospec=Calf)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=calf)
     ration = mocker.MagicMock(autospec=CalfRationManager)
-    calc_req = mocker.patch.object(
-        CalfRationManager, "calc_requirements", return_value=ration
-    )
-    calc_intake = mocker.patch.object(
-        CalfRationManager, "calc_intake", return_value=ration
-    )
+    calc_req = mocker.patch.object(CalfRationManager, "calc_requirements", return_value=ration)
+    calc_intake = mocker.patch.object(CalfRationManager, "calc_intake", return_value=ration)
 
     temp = 35.0
     wean_day = 10
@@ -2117,9 +1930,7 @@ def test_calf_calc_nutrient_reqs(mocker: MockerFixture) -> None:
         "wean_length": wean_length,
         "milk_type": milk_type,
     }
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config
-    )
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config)
     feed = mocker.MagicMock(autospec=Feed)
     Calf.calc_nutrient_rqmts(calf, feed, temp)
     calc_intake.assert_called_once_with(calf, feed, wean_day, wean_length, milk_type)
@@ -2150,12 +1961,7 @@ def test_calf_phosphorus_rqmts(mocker: MockerFixture) -> None:
     p_urine = 0.000002 * calf.body_weight * 1000
 
     calf.p_growth = (
-        (
-            0.0012
-            + 0.004635
-            * (calf.mature_body_weight**0.22)
-            * (calf.body_weight ** (-0.22))
-        )
+        (0.0012 + 0.004635 * (calf.mature_body_weight**0.22) * (calf.body_weight ** (-0.22)))
         * calf.daily_growth
         / 0.96
         * 1000
@@ -2175,9 +1981,7 @@ def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> No
     animal_config = {
         "wean_day": wean_day,
     }
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config
-    )
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_config)
     calf.update_body_weight_history = mocker.MagicMock()
     calf.days_born = days_born
 

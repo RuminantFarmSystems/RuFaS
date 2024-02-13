@@ -74,8 +74,7 @@ def test_layer_thickness_error(top: float, bottom: float) -> None:
     with pytest.raises(ValueError) as e:
         LayerData(top_depth=top, bottom_depth=bottom, field_size=1.75)
     assert (
-        str(e.value)
-        == f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+        str(e.value) == f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
         f"received top: '{top}', bottom: '{bottom}'."
     )
 
@@ -118,9 +117,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
         # Check everything
         assert layer.water_content == expected_water_content
-        calc_psp.assert_called_once_with(
-            layer.percent_clay_content, 25, layer.percent_organic_carbon_content
-        )
+        calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
         assert determine_nutrient_density.call_count == 3
         assert layer.mean_phosphorus_sorption_parameter == 0.5
         assert layer.labile_inorganic_phosphorus_content == 22
@@ -166,9 +163,7 @@ def test_initialize_carbon_pools(
     assert actual.slow_carbon_amount == pytest.approx(expected_slow)
     assert actual.structural_litter_amount == pytest.approx(expected_structural_litter)
     assert actual.metabolic_litter_amount == pytest.approx(expected_metabolic_litter)
-    assert actual.total_soil_carbon_amount == pytest.approx(
-        expected_active + expected_passive + expected_slow
-    )
+    assert actual.total_soil_carbon_amount == pytest.approx(expected_active + expected_passive + expected_slow)
 
 
 @pytest.mark.parametrize(
@@ -195,9 +190,7 @@ def test_depth_of_layer_center(top: float, bottom: float) -> None:
         (101.450, 1039.1948, 0.4990291094),
     ],
 )
-def test_field_capacity_content(
-    top: float, bottom: float, field_concentration: float
-) -> None:
+def test_field_capacity_content(top: float, bottom: float, field_concentration: float) -> None:
     """Test that field_capacity_content() in LayerData correctly calculates the field water content of the layer"""
     layer = LayerData(
         top_depth=top,
@@ -218,9 +211,7 @@ def test_field_capacity_content(
         (101.450, 1039.1948, 0.179384383),
     ],
 )
-def test_wilting_point_content(
-    top: float, bottom: float, wilt_concentration: float
-) -> None:
+def test_wilting_point_content(top: float, bottom: float, wilt_concentration: float) -> None:
     """Test that wilting_point_content() in LayerData calculates the wilting point content correctly"""
     layer = LayerData(
         top_depth=top,
@@ -237,9 +228,7 @@ def test_wilting_point_content(
     "saturation_concentration,layer_thickness",
     [(0.55, 45), (1.011292, 76.2), (0.9847, 146.3)],
 )
-def test_saturation_content(
-    saturation_concentration: float, layer_thickness: float
-) -> None:
+def test_saturation_content(saturation_concentration: float, layer_thickness: float) -> None:
     """Test that saturation_content() in LayerData calculates the saturation content of a soil layer correctly"""
     with patch(
         "RUFAS.routines.field.soil.layer_data.LayerData.layer_thickness",
@@ -266,9 +255,7 @@ def test_saturation_content(
         (0.21, 0.21),
     ],
 )
-def test_excess_water_available(
-    water_content: float, field_capacity_content: float
-) -> None:
+def test_excess_water_available(water_content: float, field_capacity_content: float) -> None:
     """Test that excess_water_available() in LayerData correctly calculates the amount of excess water available in a
     layer"""
     with patch.multiple(
@@ -295,9 +282,7 @@ def test_excess_water_available(
         (0.546, 0.546),
     ],
 )
-def test_acceptable_percolation_amount(
-    water_content: float, saturation_content: float
-) -> None:
+def test_acceptable_percolation_amount(water_content: float, saturation_content: float) -> None:
     """Test that acceptable_percolation_amount() in LayerData correctly calculates the maximum amount of water that can
     be percolated into it"""
     with patch.multiple(
@@ -342,9 +327,7 @@ def test_percent_organic_matter_proportion(
         (138, 0, 3.29184),
     ],
 )
-def test_add_to_labile_phosphorus(
-    added_phosphorus: float, initial_labile_phosphorus: float, field_size: float
-) -> None:
+def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
     """Tests that the labile phosphorus content of the top soil layer has phosphorus correctly added to it."""
     layer = LayerData(top_depth=0, bottom_depth=30, field_size=field_size)
     layer.labile_inorganic_phosphorus_content = initial_labile_phosphorus
@@ -352,9 +335,7 @@ def test_add_to_labile_phosphorus(
 
     layer.add_to_labile_phosphorus(added_phosphorus, field_size)
 
-    layer._add_phosphorus_to_pool.assert_called_once_with(
-        initial_labile_phosphorus, added_phosphorus, field_size
-    )
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
     assert layer.labile_inorganic_phosphorus_content == 100
 
 
@@ -367,9 +348,7 @@ def test_add_to_labile_phosphorus(
         (215, 0, 4.15),
     ],
 )
-def test_add_to_active_phosphorus(
-    added_phosphorus: float, initial_active_phosphorus: float, field_size: float
-) -> None:
+def test_add_to_active_phosphorus(added_phosphorus: float, initial_active_phosphorus: float, field_size: float) -> None:
     """Tests that the stable phosphorus content of the top soil layer has phosphorus correctly added to it."""
     layer = LayerData(top_depth=0, bottom_depth=27, field_size=field_size)
     layer.active_inorganic_phosphorus_content = initial_active_phosphorus
@@ -377,9 +356,7 @@ def test_add_to_active_phosphorus(
 
     layer.add_to_active_phosphorus(added_phosphorus, field_size)
 
-    layer._add_phosphorus_to_pool.assert_called_once_with(
-        initial_active_phosphorus, added_phosphorus, field_size
-    )
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_active_phosphorus, added_phosphorus, field_size)
     assert layer.active_inorganic_phosphorus_content == 200
 
 
@@ -391,9 +368,7 @@ def test_add_to_active_phosphorus(
         (0, 221, 2.334),
     ],
 )
-def test_add_phosphorus_to_pool(
-    pool: float, added_phosphorus: float, area: float
-) -> None:
+def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: float) -> None:
     """Tests that this method correctly calculates the new value of the soil phosphorus pool being added to."""
     observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
     expect = pool + (added_phosphorus / area)
@@ -409,14 +384,10 @@ def test_add_phosphorus_to_pool(
         (0.0, 0.0, 0.0),
     ],
 )
-def test_calculate_phosphorus_sorption_parameter(
-    clay: float, phosphorus: float, carbon: float
-) -> None:
+def test_calculate_phosphorus_sorption_parameter(clay: float, phosphorus: float, carbon: float) -> None:
     """Tests the that the phosphorus sorption parameter is calculated properly based on the clay, labile inorganic
     phosphorus, and carbon contents of the soil."""
-    observed = LayerData.calculate_phosphorus_sorption_parameter(
-        clay, phosphorus, carbon
-    )
+    observed = LayerData.calculate_phosphorus_sorption_parameter(clay, phosphorus, carbon)
     if clay <= 0.0:
         clay = 10**-8
     expected = -0.045 * log(clay) + 0.001 * phosphorus - 0.035 * carbon + 0.43
@@ -432,24 +403,13 @@ def test_calculate_phosphorus_sorption_parameter(
         (1.2344, 19.84, 15, 2.3341),
     ],
 )
-def test_determine_soil_nutrient_concentration(
-    nutrient: float, density: float, depth: float, area: float
-) -> None:
+def test_determine_soil_nutrient_concentration(nutrient: float, density: float, depth: float, area: float) -> None:
     """Tests that the soil nutrient concentration is calculated correctly."""
-    observed = LayerData.determine_soil_nutrient_concentration(
-        nutrient, density, depth, area
-    )
-    total_soil_volume = (
-        depth
-        * area
-        * HECTARES_TO_SQUARE_MILLIMETERS
-        * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-    )
+    observed = LayerData.determine_soil_nutrient_concentration(nutrient, density, depth, area)
+    total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
     total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
     total_nutrient_mass = nutrient * area
-    expected_concentration = (
-        total_nutrient_mass * KILOGRAMS_TO_MILLIGRAMS
-    ) / total_soil_mass
+    expected_concentration = (total_nutrient_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
     assert pytest.approx(observed) == expected_concentration
 
 
@@ -461,22 +421,13 @@ def test_determine_soil_nutrient_area_density(
     phosphorus: float, density: float, thickness: float, field_size: float
 ) -> None:
     """Tests that the conversion from mg / kg soil to kg / ha is performed correctly."""
-    observed = LayerData.determine_soil_nutrient_area_density(
-        phosphorus, density, thickness, field_size
-    )
+    observed = LayerData.determine_soil_nutrient_area_density(phosphorus, density, thickness, field_size)
     expected_soil_mass_kg = (
         density
         * MEGAGRAMS_TO_KILOGRAMS
-        * (
-            thickness
-            * field_size
-            * HECTARES_TO_SQUARE_MILLIMETERS
-            * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        )
+        * (thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS)
     )
-    expected = (
-        phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
-    )
+    expected = phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
     assert pytest.approx(observed) == expected
 
 
@@ -498,12 +449,8 @@ def test_nutrient_cycling_temp_factor(temp: float) -> None:
     assert observed == expected
 
 
-@pytest.mark.parametrize(
-    "water_content,field_capacity", [(13.44, 16.77), (14.332, 12.445), (0, 5.334)]
-)
-def test_nutrient_cycling_water_factor(
-    water_content: float, field_capacity: float
-) -> float:
+@pytest.mark.parametrize("water_content,field_capacity", [(13.44, 16.77), (14.332, 12.445), (0, 5.334)])
+def test_nutrient_cycling_water_factor(water_content: float, field_capacity: float) -> float:
     """Tests that the nutrient cycling water factor is correctly calculated as a property of LayerData."""
     with patch(
         "RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content",

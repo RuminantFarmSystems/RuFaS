@@ -64,9 +64,7 @@ class ManureTreatmentFactory:
 
         """
 
-        manure_treatment_class_by_type: Dict[
-            ManureTreatmentType, Type[BaseManureTreatment]
-        ] = {
+        manure_treatment_class_by_type: Dict[ManureTreatmentType, Type[BaseManureTreatment]] = {
             ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
@@ -82,15 +80,9 @@ class ManureTreatmentFactory:
         manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
 
         if custom_manure_treatment_config:
-            manure_treatment_obj = manure_treatment_class(
-                weather, time, custom_manure_treatment_config
-            )
+            manure_treatment_obj = manure_treatment_class(weather, time, custom_manure_treatment_config)
         else:
-            default_manure_treatment_config = (
-                DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            )
-            manure_treatment_obj = manure_treatment_class(
-                weather, time, default_manure_treatment_config
-            )
+            default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
+            manure_treatment_obj = manure_treatment_class(weather, time, default_manure_treatment_config)
 
         return manure_treatment_obj

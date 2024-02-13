@@ -18,9 +18,7 @@ from RUFAS.routines.field.field.manure_application import ManureApplication
 )
 def test_determine_field_coverage(field_size: float, mass_applied: float) -> None:
     """Tests that the correct fraction of field covered by the new manure application is calculated."""
-    observe = ManureApplication._determine_grazing_manure_field_coverage(
-        field_size, mass_applied
-    )
+    observe = ManureApplication._determine_grazing_manure_field_coverage(field_size, mass_applied)
     mass_applied_grams = 1000 * mass_applied
     area_covered = mass_applied_grams * (659 / 250)
     area_covered /= 100000000
@@ -57,10 +55,7 @@ def test_error_determine_moisture_factor(mass: float, dry_fraction: float) -> No
     """Tests that correct error is raised when invalid argument is passed."""
     with pytest.raises(ValueError) as e:
         ManureApplication._determine_moisture_factor(dry_fraction)
-    assert (
-        str(e.value)
-        == f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_fraction}'."
-    )
+    assert str(e.value) == f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_fraction}'."
 
 
 @pytest.mark.parametrize(
@@ -93,12 +88,8 @@ def test_determine_weighted_manure_attributes(
             app_coverage,
         )
         new_mass = old_mass + app_mass
-        new_moisture = (old_moisture * old_mass) / new_mass + (
-            0.65 * app_mass
-        ) / new_mass
-        new_coverage = (old_coverage * old_mass) / new_mass + (
-            app_coverage * app_mass
-        ) / new_mass
+        new_moisture = (old_moisture * old_mass) / new_mass + (0.65 * app_mass) / new_mass
+        new_coverage = (old_coverage * old_mass) / new_mass + (app_coverage * app_mass) / new_mass
 
         patched_moisture_factor.assert_called_once_with(app_dry_fraction)
         assert observe.get("new_dry_matter_mass") == new_mass
@@ -114,15 +105,11 @@ def test_determine_weighted_manure_attributes(
         (1394.2943, 0.085643, 0.788184, 1.97482),
     ],
 )
-def test_determine_wet_rate_factor(
-    dry_mass: float, dry_fraction: float, coverage: float, area: float
-) -> None:
+def test_determine_wet_rate_factor(dry_mass: float, dry_fraction: float, coverage: float, area: float) -> None:
     """Tests that the wet rate factor is calculated correctly based on the mass applied, fraction of solids in
     application, and area of coverage of the field.
     """
-    observe = ManureApplication._determine_wet_rate_factor(
-        dry_mass, dry_fraction, coverage, area
-    )
+    observe = ManureApplication._determine_wet_rate_factor(dry_mass, dry_fraction, coverage, area)
     expect = dry_mass * (1 / (dry_fraction * (coverage * area)))
     assert pytest.approx(observe) == expect
 
@@ -144,17 +131,11 @@ def test_determine_infiltration_factor(wet_rate: float) -> None:
     assert observe == expect
 
 
-@pytest.mark.parametrize(
-    "animal_type,expected", [("CATTLE", 0.50), ("SWINE", 0.35), ("POULTRY", 0.20)]
-)
-def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-    animal_type: str, expected: float
-) -> None:
+@pytest.mark.parametrize("animal_type,expected", [("CATTLE", 0.50), ("SWINE", 0.35), ("POULTRY", 0.20)])
+def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str, expected: float) -> None:
     """Tests that the water extractable inorganic phosphorus fraction is correctly determined based on the animal
     type"""
-    actual = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-        animal_type
-    )
+    actual = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
     assert actual == expected
 
 
@@ -164,13 +145,8 @@ def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_anim
 ) -> None:
     """Tests that errors caused by unsupported animal types are handled appropriately."""
     with pytest.raises(ValueError) as e:
-        ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-            animal_type
-        )
-    assert (
-        str(e.value)
-        == f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.'
-    )
+        ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
+    assert str(e.value) == f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.'
 
 
 # ---- Helper function tests
@@ -238,17 +214,10 @@ def test_apply_solid_machine_manure(
     incorp._add_nitrogen_to_soil_layer.assert_called_once_with(
         0, expected_dry_mass, inorganic_frac, ammonium_frac, organic_frac, 1.1
     )
+    assert incorp.data.machine_water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac * remainder
+    assert incorp.data.machine_water_extractable_organic_phosphorus == phosphorus_mass * 0.05 * remainder
     assert (
-        incorp.data.machine_water_extractable_inorganic_phosphorus
-        == phosphorus_mass * weiP_frac * remainder
-    )
-    assert (
-        incorp.data.machine_water_extractable_organic_phosphorus
-        == phosphorus_mass * 0.05 * remainder
-    )
-    assert (
-        incorp.data.machine_stable_inorganic_phosphorus
-        == phosphorus_mass * expected_stable_inorganic_frac * remainder
+        incorp.data.machine_stable_inorganic_phosphorus == phosphorus_mass * expected_stable_inorganic_frac * remainder
     )
     assert (
         pytest.approx(incorp.data.machine_stable_organic_phosphorus)
@@ -344,13 +313,9 @@ def test_apply_liquid_machine_manure(
     expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.5 * remainder
     expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.5 * remainder
     expect_stable_inorganic_frac = (1 - (weiP_frac + 0.05)) * 0.25
-    expect_stable_inorganic = (
-        phosphorus_mass * expect_stable_inorganic_frac * 0.5 * remainder
-    )
+    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.5 * remainder
     expect_stable_organic_frac = (1 - (weiP_frac + 0.05)) * 0.75
-    expect_stable_organic = (
-        phosphorus_mass * expect_stable_organic_frac * 0.5 * remainder
-    )
+    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.5 * remainder
     expect_labile = phosphorus_mass * weiP_frac * 0.5
     expect_labile += phosphorus_mass * 0.05 * 0.5 * 0.95
     expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5 * 0.95
@@ -364,32 +329,20 @@ def test_apply_liquid_machine_manure(
     ]
     expected_subsurface_frac = 1.0 - remainder
 
-    incorp._determine_wet_rate_factor.assert_called_once_with(
-        expect_surface_dry_mass, dry_frac, coverage, area
-    )
+    incorp._determine_wet_rate_factor.assert_called_once_with(expect_surface_dry_mass, dry_frac, coverage, area)
     incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(
         1000, 0.8, 0.9, expect_adjusted_dry_mass, dry_frac, expect_adjusted_coverage
     )
 
     incorp._add_nitrogen_to_soil_layer.assert_has_calls(expected_nitrogen_calls)
-    incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(
-        expect_labile, area
-    )
-    incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(
-        expect_active, area
-    )
+    incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
+    incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(expect_active, area)
     assert incorp.data.machine_manure_dry_mass == 2050
     assert incorp.data.machine_manure_moisture_factor == 0.93
     assert incorp.data.machine_manure_field_coverage == 0.98
-    assert (
-        incorp.data.machine_water_extractable_inorganic_phosphorus
-        == expect_water_extractable_inorganic
-    )
-    assert (
-        incorp.data.machine_water_extractable_organic_phosphorus
-        == expect_water_extractable_organic
-    )
+    assert incorp.data.machine_water_extractable_inorganic_phosphorus == expect_water_extractable_inorganic
+    assert incorp.data.machine_water_extractable_organic_phosphorus == expect_water_extractable_organic
     assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
     if subsurface_app:
@@ -559,32 +512,17 @@ def test_add_nitrogen_to_soil_layer(
     man_app.data.soil_layers[index].stable_organic_nitrogen_content = 5
     man_app.data.soil_layers[index].active_organic_nitrogen_content = 5
 
-    man_app._add_nitrogen_to_soil_layer(
-        index, mass, inorganic_frac, ammonium_frac, organic_frac, field_size
-    )
+    man_app._add_nitrogen_to_soil_layer(index, mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
 
     active_fraction_of_organic_nitrogen = 0.9286
     expected_nitrates = 5 + (expected[0] / field_size)
     expected_ammonium = 5 + (expected[1] / field_size)
-    expected_organic_stable = 5 + (
-        expected[2] * (1 - active_fraction_of_organic_nitrogen) / field_size
-    )
-    expected_organic_active = 5 + (
-        expected[2] * active_fraction_of_organic_nitrogen / field_size
-    )
-    assert (
-        pytest.approx(man_app.data.soil_layers[index].nitrate_content)
-        == expected_nitrates
-    )
+    expected_organic_stable = 5 + (expected[2] * (1 - active_fraction_of_organic_nitrogen) / field_size)
+    expected_organic_active = 5 + (expected[2] * active_fraction_of_organic_nitrogen / field_size)
+    assert pytest.approx(man_app.data.soil_layers[index].nitrate_content) == expected_nitrates
     assert man_app.data.soil_layers[index].ammonium_content == expected_ammonium
-    assert (
-        man_app.data.soil_layers[index].stable_organic_nitrogen_content
-        == expected_organic_stable
-    )
-    assert (
-        man_app.data.soil_layers[index].active_organic_nitrogen_content
-        == expected_organic_active
-    )
+    assert man_app.data.soil_layers[index].stable_organic_nitrogen_content == expected_organic_stable
+    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic_active
 
 
 # ---- Main routine tests
@@ -634,23 +572,13 @@ def test_apply_grazing_manure(
         field_size,
     )
 
-    incorp._determine_grazing_manure_field_coverage.assert_called_once_with(
-        field_size, dry_mass
-    )
-    incorp._determine_weighted_manure_attributes.assert_called_once_with(
-        4000, 0.75, 0.6, dry_mass, dry_fraction, 0.8
-    )
+    incorp._determine_grazing_manure_field_coverage.assert_called_once_with(field_size, dry_mass)
+    incorp._determine_weighted_manure_attributes.assert_called_once_with(4000, 0.75, 0.6, dry_mass, dry_fraction, 0.8)
     incorp._add_nitrogen_to_soil_layer.assert_called_once_with(
         0, dry_mass, inorganic_frac, ammonium_frac, organic_frac, field_size
     )
-    assert (
-        incorp.data.grazing_water_extractable_inorganic_phosphorus
-        == phosphorus_mass * 0.50
-    )
-    assert (
-        incorp.data.grazing_water_extractable_organic_phosphorus
-        == phosphorus_mass * 0.05
-    )
+    assert incorp.data.grazing_water_extractable_inorganic_phosphorus == phosphorus_mass * 0.50
+    assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125
     assert incorp.data.grazing_stable_organic_phosphorus == phosphorus_mass * 0.3375
     assert incorp.data.grazing_manure_dry_mass == 5000
@@ -734,14 +662,11 @@ def test_apply_machine_manure(
                 source_animal,
             )
         assert (
-            str(e.value)
-            == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
+            str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
             f" received '{weiP_frac}'."
         )
     else:
-        incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = (
-            MagicMock(return_value=0.25)
-        )
+        incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
         incorp._apply_liquid_machine_manure = MagicMock()
         incorp._apply_solid_machine_manure = MagicMock()
         incorp.apply_machine_manure(

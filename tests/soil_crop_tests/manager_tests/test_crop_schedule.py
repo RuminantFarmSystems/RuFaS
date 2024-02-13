@@ -128,15 +128,13 @@ def test_crop_schedule_init(
             "test_1",
             [1990, 1989],
             [],
-            "'test_1': expected all years to be > 0 and in non-descending order, received "
-            "'[1990, 1989]'.",
+            "'test_1': expected all years to be > 0 and in non-descending order, received " "'[1990, 1989]'.",
         ),
         (
             "test_2",
             [1998, 1999, 2000],
             [200, 200, 367],
-            "'test_2': expected all planting days to be in range [1, 366], "
-            "received '[200, 200, 367]'.",
+            "'test_2': expected all planting days to be in range [1, 366], " "received '[200, 200, 367]'.",
         ),
         (
             "test_3",
@@ -147,14 +145,10 @@ def test_crop_schedule_init(
         ),
     ],
 )
-def test_validate_planting_parameters(
-    name: str, years: List[int], days: List[int], expected: str
-) -> None:
+def test_validate_planting_parameters(name: str, years: List[int], days: List[int], expected: str) -> None:
     """Tests that the errors are raised properly when crop planting parameters are invalid."""
     with pytest.raises(ValueError) as e:
-        test = CropSchedule(
-            name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1
-        )
+        test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
         test._validate_planting_parameters()
     assert str(e.value) == expected
 
@@ -201,9 +195,7 @@ def test_validate_harvest_parameters(
 ) -> None:
     """Tests that harvest schedule parameters are valid."""
     with pytest.raises(ValueError) as e:
-        test = CropSchedule(
-            name, "test_crop", [1990], [130], years, days, operations, False, 1, 1
-        )
+        test = CropSchedule(name, "test_crop", [1990], [130], years, days, operations, False, 1, 1)
         test._validate_harvest_parameters()
     assert str(e.value) == expected
 

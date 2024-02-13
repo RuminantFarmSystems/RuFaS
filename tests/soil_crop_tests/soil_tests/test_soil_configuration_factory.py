@@ -95,9 +95,7 @@ def test_config_factory_defaults():
 def test_soil_factory_alterations(config: str, args_dict: Dict) -> None:
     """Test that SoilConfigFactory can properly create default SoilData objects with altered attributes"""
     # Create soil object
-    altered_soil = SoilConfigFactory.create_soil_data(
-        1.2, SoilConfiguration(config), **args_dict
-    )
+    altered_soil = SoilConfigFactory.create_soil_data(1.2, SoilConfiguration(config), **args_dict)
     # Check altered characteristics
     for key, val in args_dict.items():
         assert getattr(altered_soil, key) == val

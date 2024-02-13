@@ -47,9 +47,7 @@ class ReproStateManager:
             A set of initial reproductive states to start with. If None, initializes with {ReproStateEnum.NONE}.
         """
 
-        self._states: set[ReproStateEnum] = (
-            initial_states if initial_states is not None else {ReproStateEnum.NONE}
-        )
+        self._states: set[ReproStateEnum] = initial_states if initial_states is not None else {ReproStateEnum.NONE}
 
     def enter(self, state: ReproStateEnum, keep_existing: bool = False) -> None:
         """

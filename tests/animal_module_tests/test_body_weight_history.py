@@ -11,9 +11,7 @@ from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHisto
         (100, 200, 50.5),
     ],
 )
-def test_body_weight_history_initialization(
-    sim_day: int, days_born: int, body_weight: float
-) -> None:
+def test_body_weight_history_initialization(sim_day: int, days_born: int, body_weight: float) -> None:
     """
     Unit test for the initialization of the BodyWeightHistory object in body_weight_history.py.
 
@@ -24,10 +22,6 @@ def test_body_weight_history_initialization(
     bw_history = BodyWeightHistory(sim_day, days_born, body_weight)
 
     # Assert
-    assert (
-        bw_history.simulation_day == sim_day
-    ), "simulation_day not initialized correctly"
+    assert bw_history.simulation_day == sim_day, "simulation_day not initialized correctly"
     assert bw_history.days_born == days_born, "days_born not initialized correctly"
-    assert (
-        bw_history.body_weight == body_weight
-    ), "body_weight not initialized correctly"
+    assert bw_history.body_weight == body_weight, "body_weight not initialized correctly"

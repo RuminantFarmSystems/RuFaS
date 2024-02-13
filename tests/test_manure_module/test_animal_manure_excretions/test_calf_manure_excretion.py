@@ -32,9 +32,7 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     degradable_volatile_solids = 0.9 * total_volatile_solids
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-    manure_nitrogen = (
-        112.55 * dry_matter_intake * (CP_concentration / 100)
-    ) * GeneralConstants.GRAMS_TO_KG
+    manure_nitrogen = (112.55 * dry_matter_intake * (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = 0.45 * manure_nitrogen
 
     methane_emission = 0.0
@@ -75,9 +73,7 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     )
 
     # Assert
-    patch_for_ration_report.assert_called_once_with(
-        mock_ration_formulation, mock_feed.available_feeds
-    )
+    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=0,
         total_manure_excreted=total_manure_excreted,
@@ -94,21 +90,11 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)
     assert manure_excretion_values["total_solids"] == approx(total_solids)
-    assert manure_excretion_values["degradable_volatile_solids"] == approx(
-        degradable_volatile_solids
-    )
-    assert manure_excretion_values["non_degradable_volatile_solids"] == approx(
-        non_degradable_volatile_solids
-    )
-    assert manure_excretion_values["inorganic_phosphorus_fraction"] == approx(
-        inorganic_phosphorus_fraction
-    )
-    assert manure_excretion_values["organic_phosphorus_fraction"] == approx(
-        organic_phosphorus_fraction
-    )
+    assert manure_excretion_values["degradable_volatile_solids"] == approx(degradable_volatile_solids)
+    assert manure_excretion_values["non_degradable_volatile_solids"] == approx(non_degradable_volatile_solids)
+    assert manure_excretion_values["inorganic_phosphorus_fraction"] == approx(inorganic_phosphorus_fraction)
+    assert manure_excretion_values["organic_phosphorus_fraction"] == approx(organic_phosphorus_fraction)
     assert manure_excretion_values["phosphorus"] == approx(manure_phosphorus_excreted)
-    assert manure_excretion_values["phosphorus_fraction"] == approx(
-        manure_phosphorus_fraction
-    )
+    assert manure_excretion_values["phosphorus_fraction"] == approx(manure_phosphorus_fraction)
     assert manure_excretion_values["potassium"] == approx(potassium)
     assert manure_excretion_values["enteric_methane_g"] == approx(methane_emission)

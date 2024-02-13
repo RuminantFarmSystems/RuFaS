@@ -117,9 +117,7 @@ def add_animal_manure_excretions(
     return AnimalManureExcretions(**data)
 
 
-def scalar_mult_animal_manure_excretions(
-    manure: AnimalManureExcretions, scalar: float
-) -> AnimalManureExcretions:
+def scalar_mult_animal_manure_excretions(manure: AnimalManureExcretions, scalar: float) -> AnimalManureExcretions:
     data = {}
     for key in manure:
         data[key] = manure[key] * scalar
@@ -183,9 +181,7 @@ def calculate_phosphorus_excretion_values(
     manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
 
     # amount of P excreted by an animal (g) [A.3.B.3]
-    total_phosphorus_excreted = (
-        phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
-    )
+    total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
 
     return (
         total_phosphorus_excreted,

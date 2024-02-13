@@ -87,9 +87,7 @@ def test_request_nutrients(
     # Arrange
     manager = ManureNutrientManager()
     dummy_manure_type = ManureType.LIQUID
-    nutrient_request = NutrientRequest(
-        nitrogen=1, phosphorus=1, manure_type=dummy_manure_type
-    )
+    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
 
     patch_for_evaluate_nutrient_request = mocker.patch.object(
         manager, "_evaluate_nutrient_request", return_value=eval_return
@@ -103,9 +101,7 @@ def test_request_nutrients(
     patch_for_evaluate_nutrient_request.assert_called_once_with(nutrient_request)
 
     if remove_called:
-        patch_for_remove_nutrients.assert_called_once_with(
-            expected_result, dummy_manure_type
-        )
+        patch_for_remove_nutrients.assert_called_once_with(expected_result, dummy_manure_type)
     else:
         patch_for_remove_nutrients.assert_not_called()
 
@@ -220,9 +216,7 @@ def test_evaluate_nutrient_request(
     if expected_no_results:
         patch_for_create_nutrient_request_results.assert_not_called()
     elif projected_manure_mass <= current_nutrient_values.total_manure_mass:
-        patch_for_create_nutrient_request_results.assert_called_once_with(
-            projected_manure_mass, manure_type
-        )
+        patch_for_create_nutrient_request_results.assert_called_once_with(projected_manure_mass, manure_type)
     else:
         patch_for_create_nutrient_request_results.assert_called_once_with(
             current_nutrient_values.total_manure_mass, manure_type
@@ -254,9 +248,7 @@ def test_calculate_projected_manure_mass(
 
     """
     # Act
-    actual_result = ManureNutrientManager._calculate_projected_manure_mass(
-        request_nutrient, nutrient_composition
-    )
+    actual_result = ManureNutrientManager._calculate_projected_manure_mass(request_nutrient, nutrient_composition)
 
     # Assert
     assert actual_result == expected_result
@@ -301,9 +293,7 @@ def test_calculate_projected_manure_mass_exceptions(
     """
     # Act & Assert
     with pytest.raises(expected_exception, match=re.escape(expected_error_msg)):
-        ManureNutrientManager._calculate_projected_manure_mass(
-            request_nutrient, nutrient_composition
-        )
+        ManureNutrientManager._calculate_projected_manure_mass(request_nutrient, nutrient_composition)
 
 
 @pytest.mark.parametrize(
@@ -317,9 +307,7 @@ def test_calculate_projected_manure_mass_exceptions(
         ([0, 0, 0], 0),
     ],
 )
-def test_select_projected_manure_mass(
-    projected_manure_masses: list[float], expected_result: float
-) -> None:
+def test_select_projected_manure_mass(projected_manure_masses: list[float], expected_result: float) -> None:
     """
     Unit test for the method _select_projected_manure_mass() of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -329,9 +317,7 @@ def test_select_projected_manure_mass(
 
     """
     # Act
-    actual_result = ManureNutrientManager._select_projected_manure_mass(
-        projected_manure_masses
-    )
+    actual_result = ManureNutrientManager._select_projected_manure_mass(projected_manure_masses)
 
     # Assert
     assert actual_result == expected_result
@@ -459,24 +445,13 @@ def test_create_nutrient_request_results(
     manager.add_nutrients(nutrients)
 
     # Act
-    actual_results = manager._create_nutrient_request_results(
-        projected_manure_mass, manure_type
-    )
+    actual_results = manager._create_nutrient_request_results(projected_manure_mass, manure_type)
 
     # Assert
-    assert (
-        actual_results.nitrogen
-        == projected_manure_mass * nutrients.nitrogen_composition
-    )
-    assert (
-        actual_results.phosphorus
-        == projected_manure_mass * nutrients.phosphorus_composition
-    )
+    assert actual_results.nitrogen == projected_manure_mass * nutrients.nitrogen_composition
+    assert actual_results.phosphorus == projected_manure_mass * nutrients.phosphorus_composition
     assert actual_results.total_manure_mass == projected_manure_mass
-    assert (
-        actual_results.dry_matter
-        == projected_manure_mass * nutrients.dry_matter_fraction
-    )
+    assert actual_results.dry_matter == projected_manure_mass * nutrients.dry_matter_fraction
     assert actual_results.dry_matter_fraction == nutrients.dry_matter_fraction
 
 
@@ -512,9 +487,7 @@ def test_create_nutrient_request_results_exceptions(
 
     # Act & Assert
     with pytest.raises(expected_exception, match=expected_error_msg):
-        manager._create_nutrient_request_results(
-            projected_manure_mass, manure_type=ManureType.LIQUID
-        )
+        manager._create_nutrient_request_results(projected_manure_mass, manure_type=ManureType.LIQUID)
 
 
 @pytest.mark.parametrize(

@@ -38,26 +38,16 @@ def test_determine_phosphorus_runoff_from_top_soil(
         return_value=100,
     ) as mocked_soil_nutrient_concentration:
         expected_runoff_liters_per_ha = (
-            runoff
-            * field_size
-            * HECTARES_TO_SQUARE_MILLIMETERS
-            * CUBIC_MILLIMETERS_TO_LITERS
-            / field_size
+            runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS / field_size
         )
-        expected_unadjusted_phosphorus_removed = (
-            100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
-        )
-        expected_actual_phosphorus_removed = min(
-            phosphorus, expected_unadjusted_phosphorus_removed
-        )
+        expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
+        expected_actual_phosphorus_removed = min(phosphorus, expected_unadjusted_phosphorus_removed)
 
         observed = SolublePhosphorus._determine_phosphorus_runoff_from_top_soil(
             runoff, field_size, phosphorus, density, thickness
         )
 
-        mocked_soil_nutrient_concentration.assert_called_once_with(
-            phosphorus, density, thickness, field_size
-        )
+        mocked_soil_nutrient_concentration.assert_called_once_with(phosphorus, density, thickness, field_size)
         assert observed == expected_actual_phosphorus_removed
 
 
@@ -111,9 +101,7 @@ def test_determine_dissolved_reactive_phosphorus_leachate(
     phosphorus: float, slope: float, intercept: float, overflow: bool
 ) -> float:
     """Tests that the amount of phosphorus calculated to leach out of the layer is correct."""
-    observed = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(
-        phosphorus, slope, intercept
-    )
+    observed = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(phosphorus, slope, intercept)
     if overflow:
         assert observed == 20
     else:
@@ -121,22 +109,11 @@ def test_determine_dissolved_reactive_phosphorus_leachate(
         assert observed == expected
 
 
-@pytest.mark.parametrize(
-    "percolated_water,area", [(1.8, 3.4), (2.3, 1.22), (0.88, 0.97)]
-)
-def test_determine_percolated_water_volume(
-    percolated_water: float, area: float
-) -> None:
+@pytest.mark.parametrize("percolated_water,area", [(1.8, 3.4), (2.3, 1.22), (0.88, 0.97)])
+def test_determine_percolated_water_volume(percolated_water: float, area: float) -> None:
     """Tests that a water amount is correctly converted to a volume."""
-    observed = SolublePhosphorus._determine_percolated_water_volume(
-        percolated_water, area
-    )
-    expected = (
-        percolated_water
-        * area
-        * HECTARES_TO_SQUARE_MILLIMETERS
-        * CUBIC_MILLIMETERS_TO_LITERS
-    )
+    observed = SolublePhosphorus._determine_percolated_water_volume(percolated_water, area)
+    expected = percolated_water * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
     assert observed == expected
 
 
@@ -163,9 +140,7 @@ def test_determine_phosphorus_percolated_from_layer(
     LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=3.8)
     SolublePhosphorus._determine_isotherm_slope = MagicMock(return_value=35)
     SolublePhosphorus._determine_isotherm_intercept = MagicMock(return_value=155)
-    SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(
-        return_value=2_000_000
-    )
+    SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=2_000_000)
     SolublePhosphorus._determine_percolated_water_volume = MagicMock(return_value=1.0)
     drp_leachate_in_kg_per_ha = 2_000_000 * MILLIGRAMS_TO_KILOGRAMS / area
     bounded_drp_leachate_in_kg_per_ha = min(phosphorus, drp_leachate_in_kg_per_ha)
@@ -174,17 +149,11 @@ def test_determine_phosphorus_percolated_from_layer(
         phosphorus, density, thickness, clay_content, percolated_water, area
     )
 
-    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(
-        phosphorus, density, thickness, area
-    )
+    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(phosphorus, density, thickness, area)
     SolublePhosphorus._determine_isotherm_slope.assert_called_once_with(clay_content)
     SolublePhosphorus._determine_isotherm_intercept.assert_called_once_with(35)
-    SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate.assert_called_once_with(
-        3.8, 35, 155
-    )
-    SolublePhosphorus._determine_percolated_water_volume.assert_called_once_with(
-        percolated_water, area
-    )
+    SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate.assert_called_once_with(3.8, 35, 155)
+    SolublePhosphorus._determine_percolated_water_volume.assert_called_once_with(percolated_water, area)
     assert observed == bounded_drp_leachate_in_kg_per_ha
 
 
@@ -232,33 +201,18 @@ def test_daily_update_routine(runoff: float, field_size: float) -> None:
     incorp.daily_update_routine(runoff, field_size)
 
     if runoff > 0:
-        incorp._determine_phosphorus_runoff_from_top_soil.assert_called_once_with(
-            runoff, field_size, 3.4, 1.4, 20
-        )
-        assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (
-            3.4 - 0.9 - 1.2
-        )
+        incorp._determine_phosphorus_runoff_from_top_soil.assert_called_once_with(runoff, field_size, 3.4, 1.4, 20)
+        assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (3.4 - 0.9 - 1.2)
         assert incorp.data.annual_soil_phosphorus_runoff == (0.9 * field_size)
         assert incorp.data.soil_phosphorus_runoff == (0.9 * field_size)
     else:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_not_called()
-        assert (
-            incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.2
-        )
+        assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.2
         assert incorp.data.soil_phosphorus_runoff == 0.0
     assert incorp._determine_phosphorus_percolated_from_layer.call_count == len(layers)
-    assert (
-        pytest.approx(incorp.data.soil_layers[1].labile_inorganic_phosphorus_content)
-        == 3.18
-    )
-    assert (
-        pytest.approx(incorp.data.soil_layers[2].labile_inorganic_phosphorus_content)
-        == 2.8
-    )
-    assert (
-        pytest.approx(incorp.data.soil_layers[3].labile_inorganic_phosphorus_content)
-        == 2.9
-    )
+    assert pytest.approx(incorp.data.soil_layers[1].labile_inorganic_phosphorus_content) == 3.18
+    assert pytest.approx(incorp.data.soil_layers[2].labile_inorganic_phosphorus_content) == 2.8
+    assert pytest.approx(incorp.data.soil_layers[3].labile_inorganic_phosphorus_content) == 2.9
     assert incorp.data.vadose_zone_layer.labile_inorganic_phosphorus_content == 1.2
     for layer in incorp.data.soil_layers:
         assert layer.percolated_phosphorus == 1.2

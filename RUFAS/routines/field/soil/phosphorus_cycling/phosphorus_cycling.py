@@ -17,9 +17,7 @@ necessary aspects for managing phosphorus in and on top of a soil profile.
 
 
 class PhosphorusCycling:
-    def __init__(
-        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
-    ):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -67,11 +65,7 @@ class PhosphorusCycling:
             Mean air temperature on the current day (degrees C)
 
         """
-        self.manure.daily_manure_update(
-            rainfall, runoff, field_size, mean_air_temperature
-        )
-        self.fertilizer.do_fertilizer_phosphorus_operations(
-            rainfall, runoff, field_size
-        )
+        self.manure.daily_manure_update(rainfall, runoff, field_size, mean_air_temperature)
+        self.fertilizer.do_fertilizer_phosphorus_operations(rainfall, runoff, field_size)
         self.mineralization.mineralize_phosphorus(field_size)
         self.soluble_phosphorus.daily_update_routine(runoff, field_size)

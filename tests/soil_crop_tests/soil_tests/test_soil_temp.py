@@ -18,12 +18,8 @@ def test_determine_weighted_average_temperature(
     top_temp: float, top_thickness: float, bottom_temp: float, bottom_thickness: float
 ) -> None:
     """Tests that the correct weighted average temperature is calculated for the two soil layers given."""
-    observe = SoilTemp._determine_weighted_average_temperature(
-        top_temp, top_thickness, bottom_temp, bottom_thickness
-    )
-    expect = (top_temp * top_thickness + bottom_temp * bottom_thickness) / (
-        top_thickness + bottom_thickness
-    )
+    observe = SoilTemp._determine_weighted_average_temperature(top_temp, top_thickness, bottom_temp, bottom_thickness)
+    expect = (top_temp * top_thickness + bottom_temp * bottom_thickness) / (top_thickness + bottom_thickness)
     assert observe == expect
 
 
@@ -40,9 +36,7 @@ def test_determine_weighted_average_temperature(
 def test_determine_maximum_damping_depth(bulk_density):
     """tests _determine_maximum_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_maximum_damping_depth(bulk_density)
-    expect = 1000 + (
-        (2500 * bulk_density) / (bulk_density + (686 * exp(-5.63 * bulk_density)))
-    )
+    expect = 1000 + ((2500 * bulk_density) / (bulk_density + (686 * exp(-5.63 * bulk_density))))
     assert observe == expect
 
 
@@ -75,10 +69,7 @@ def test_determine_scaling_factor(water_content, density, bottom_depth):
 def test_determine_damping_depth(max_damping_depth, scaling_factor):
     """tests _determine_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_damping_depth(max_damping_depth, scaling_factor)
-    expect = max_damping_depth * exp(
-        log(500 / max_damping_depth)
-        * ((1 - scaling_factor) / (1 + scaling_factor)) ** 2
-    )
+    expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor)) ** 2)
     assert observe == expect
 
 
@@ -99,8 +90,7 @@ def test_determine_depth_factor(center_depth, damping_depth):
     """tests _determine_depth_factor() in soil_temp.py"""
     observe = SoilTemp._determine_depth_factor(center_depth, damping_depth)
     expect = (center_depth / damping_depth) / (
-        (center_depth / damping_depth)
-        + exp(-0.867 - (2.078 * (center_depth / damping_depth)))
+        (center_depth / damping_depth) + exp(-0.867 - (2.078 * (center_depth / damping_depth)))
     )
     assert observe == expect
 
@@ -136,9 +126,7 @@ def test_determine_radiation_factor(radiation, albedo):
 )
 def test_determine_bare_soil_surface_temp(radiation, avg_temp, min_temp, max_temp):
     """tests _determine_bare_soil_surface_temp() in soil_tests.py"""
-    observed = SoilTemp._determine_bare_soil_surface_temp(
-        radiation, avg_temp, min_temp, max_temp
-    )
+    observed = SoilTemp._determine_bare_soil_surface_temp(radiation, avg_temp, min_temp, max_temp)
     expect = avg_temp + radiation * ((max_temp - min_temp) / 2)
     assert observed == expect
 
@@ -171,15 +159,9 @@ def test_determine_cover_weighting_factor(plant_cover, snow_cover):
         (0.42495, 17.8547, 20.4857),
     ],
 )
-def test_determine_soil_surface_temp(
-    cover_factor, previous_top_layer_temp, bare_surface_temp
-):
-    observe = SoilTemp._determine_soil_surface_temp(
-        cover_factor, previous_top_layer_temp, bare_surface_temp
-    )
-    expect = (cover_factor * previous_top_layer_temp) + (
-        (1 - cover_factor) * bare_surface_temp
-    )
+def test_determine_soil_surface_temp(cover_factor, previous_top_layer_temp, bare_surface_temp):
+    observe = SoilTemp._determine_soil_surface_temp(cover_factor, previous_top_layer_temp, bare_surface_temp)
+    expect = (cover_factor * previous_top_layer_temp) + ((1 - cover_factor) * bare_surface_temp)
     assert observe == expect
 
 
@@ -193,19 +175,13 @@ def test_determine_soil_surface_temp(
         (0.677534, 13.9683, 0.892, 19.33854, 15.10393),
     ],
 )
-def test_determine_average_soil_temperature(
-    lag, prev_soil_temp, depth_factor, avg_annual_air_temp, soil_surface_temp
-):
+def test_determine_average_soil_temperature(lag, prev_soil_temp, depth_factor, avg_annual_air_temp, soil_surface_temp):
     """tests _determine_average_soil_temperature() in soil_tests.py"""
     observe = SoilTemp._determine_average_soil_temperature(
         lag, prev_soil_temp, depth_factor, avg_annual_air_temp, soil_surface_temp
     )
     expect = (lag * prev_soil_temp) + (
-        (1 - lag)
-        * (
-            (depth_factor * (avg_annual_air_temp - soil_surface_temp))
-            + soil_surface_temp
-        )
+        (1 - lag) * ((depth_factor * (avg_annual_air_temp - soil_surface_temp)) + soil_surface_temp)
     )
     assert observe == expect
 
@@ -262,9 +238,7 @@ def test_daily_soil_temperature_update(
     )
 
     # Check everything
-    incorp._determine_maximum_damping_depth.assert_called_with(
-        incorp.data.profile_bulk_density
-    )
+    incorp._determine_maximum_damping_depth.assert_called_with(incorp.data.profile_bulk_density)
     incorp._determine_scaling_factor.assert_called_with(
         incorp.data.profile_soil_water_content,
         incorp.data.profile_bulk_density,
@@ -272,24 +246,15 @@ def test_daily_soil_temperature_update(
     )
     incorp._determine_damping_depth.assert_called_with(1000, 0.35)
     incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
-    incorp._determine_bare_soil_surface_temp.assert_called_with(
-        0.5, avg_temp, min_temp, max_temp
-    )
+    incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
     incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
-    incorp._determine_soil_surface_temp.assert_called_with(
-        0.5, incorp.data.soil_layers[0].previous_day_temperature, 20
-    )
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, incorp.data.soil_layers[0].previous_day_temperature, 20)
 
     assert incorp._determine_depth_factor.call_count == len(data.soil_layers)
-    assert incorp._determine_average_soil_temperature.call_count == len(
-        data.soil_layers
-    )
+    assert incorp._determine_average_soil_temperature.call_count == len(data.soil_layers)
     for layer_index in range(len(incorp.data.soil_layers)):
         assert 14 == incorp.data.soil_layers[layer_index].temperature
-        assert (
-            expect_prev_temps[layer_index]
-            == incorp.data.soil_layers[layer_index].previous_day_temperature
-        )
+        assert expect_prev_temps[layer_index] == incorp.data.soil_layers[layer_index].previous_day_temperature
 
     # Run method a second time for expanded code coverage
     incorp.daily_soil_temperature_update(
@@ -303,9 +268,7 @@ def test_daily_soil_temperature_update(
     )
 
     # Re-check everything
-    incorp._determine_maximum_damping_depth.assert_called_with(
-        incorp.data.profile_bulk_density
-    )
+    incorp._determine_maximum_damping_depth.assert_called_with(incorp.data.profile_bulk_density)
     incorp._determine_scaling_factor.assert_called_with(
         incorp.data.profile_soil_water_content,
         incorp.data.profile_bulk_density,
@@ -313,18 +276,11 @@ def test_daily_soil_temperature_update(
     )
     incorp._determine_damping_depth.assert_called_with(1000, 0.35)
     incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
-    incorp._determine_bare_soil_surface_temp.assert_called_with(
-        0.5, avg_temp, min_temp, max_temp
-    )
+    incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
     incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
-    incorp._determine_soil_surface_temp.assert_called_with(
-        0.5, expect_prev_temps[0], 20
-    )
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, expect_prev_temps[0], 20)
     assert incorp._determine_depth_factor.call_count == len(data.soil_layers) * 2
-    assert (
-        incorp._determine_average_soil_temperature.call_count
-        == len(data.soil_layers) * 2
-    )
+    assert incorp._determine_average_soil_temperature.call_count == len(data.soil_layers) * 2
     for layer in incorp.data.soil_layers:
         assert 14 == layer.temperature
         assert 14 == layer.previous_day_temperature

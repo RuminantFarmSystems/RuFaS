@@ -69,18 +69,12 @@ class Crop:
         # growth process components
         self.growth_constraints = GrowthConstraints(self.data)
         self.biomass_allocation = BiomassAllocation(self.data)
-        self.water_dynamics = WaterDynamics(
-            self.data
-        )  # needs soil.evapotranspiration.evapotranspirate() called 1st
+        self.water_dynamics = WaterDynamics(self.data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
         self.water_uptake = WaterUptake(self.data)
         self.nitrogen_incorporation = NitrogenIncorporation(self.data)
         self.phosphorus_incorporation = PhosphorusIncorporation(self.data)
-        self.heat_units = HeatUnits(
-            self.data
-        )  # TODO: rename module and component (e.g., "HeatAccumulation")?
-        self.leaf_area_index = LeafAreaIndex(
-            self.data
-        )  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        self.heat_units = HeatUnits(self.data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        self.leaf_area_index = LeafAreaIndex(self.data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
         self.root_development = RootDevelopment(self.data)
         self.crop_management = CropManagement(self.data)
         self.dormancy = Dormancy(self.data)
@@ -116,14 +110,10 @@ class Crop:
 
         """
         if self.data.in_growing_season:
-            self.heat_units.absorb_heat_units(
-                mean_air_temperature, min_air_temperature, max_air_temperature
-            )
+            self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
             self.root_development.develop_roots()
             self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
             self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-            self.growth_constraints.constrain_growth(
-                self.data.max_transpiration, mean_air_temperature
-            )
+            self.growth_constraints.constrain_growth(self.data.max_transpiration, mean_air_temperature)
             self.leaf_area_index.grow_canopy()
             self.biomass_allocation.allocate_biomass(incoming_light)

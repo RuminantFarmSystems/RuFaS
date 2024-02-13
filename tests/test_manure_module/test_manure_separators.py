@@ -70,12 +70,8 @@ def test_manure_separator_daily_output() -> None:
 
     total_daily_manure_volume = 12.0
     final_solids_wet_mass = 13.0
-    expected_final_solids_wet_mass_volume = (
-        final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
-    )
-    expected_final_daily_volume = (
-        total_daily_manure_volume - expected_final_solids_wet_mass_volume
-    )
+    expected_final_solids_wet_mass_volume = final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
+    expected_final_daily_volume = total_daily_manure_volume - expected_final_solids_wet_mass_volume
 
     def assert_manure_separator_daily_output(
         output: ManureSeparatorDailyOutput,
@@ -95,9 +91,7 @@ def test_manure_separator_daily_output() -> None:
         assert output.liquid_manure_potassium == K
         assert output.total_daily_manure_volume == total_daily_manure_volume
         assert output.final_solids_wet_mass == final_solids_wet_mass
-        assert output.final_solids_wet_mass_volume == approx(
-            expected_final_solids_wet_mass_volume
-        )
+        assert output.final_solids_wet_mass_volume == approx(expected_final_solids_wet_mass_volume)
         assert output.final_daily_volume == approx(expected_final_daily_volume)
         assert output.liquid_manure_daily_volume == approx(expected_final_daily_volume)
 
@@ -185,30 +179,17 @@ def test_manure_separator_config() -> None:
 
     # Assert
     assert manure_separator_config.percent_dry_solids == percent_dry_solids
+    assert manure_separator_config.total_solids_removal_efficiency_for_separator == TS_removal_efficiency_for_separator
     assert (
-        manure_separator_config.total_solids_removal_efficiency_for_separator
-        == TS_removal_efficiency_for_separator
+        manure_separator_config.volatile_solids_removal_efficiency_for_separator == VS_removal_efficiency_for_separator
     )
-    assert (
-        manure_separator_config.volatile_solids_removal_efficiency_for_separator
-        == VS_removal_efficiency_for_separator
-    )
-    assert (
-        manure_separator_config.nitrogen_removal_efficiency_for_separator
-        == N_removal_efficiency_for_separator
-    )
+    assert manure_separator_config.nitrogen_removal_efficiency_for_separator == N_removal_efficiency_for_separator
     assert (
         manure_separator_config.total_ammoniacal_nitrogen_removal_efficiency_for_separator
         == TAN_removal_efficiency_for_separator
     )
-    assert (
-        manure_separator_config.phosphorus_removal_efficiency_for_separator
-        == P_removal_efficiency_for_separator
-    )
-    assert (
-        manure_separator_config.potassium_removal_efficiency_for_separator
-        == K_removal_efficiency_for_separator
-    )
+    assert manure_separator_config.phosphorus_removal_efficiency_for_separator == P_removal_efficiency_for_separator
+    assert manure_separator_config.potassium_removal_efficiency_for_separator == K_removal_efficiency_for_separator
 
     # --------------------
 
@@ -229,30 +210,17 @@ def test_manure_separator_config() -> None:
 
     # Assert
     assert manure_separator_config.percent_dry_solids == percent_dry_solids
+    assert manure_separator_config.total_solids_removal_efficiency_for_separator == TS_removal_efficiency_for_separator
     assert (
-        manure_separator_config.total_solids_removal_efficiency_for_separator
-        == TS_removal_efficiency_for_separator
+        manure_separator_config.volatile_solids_removal_efficiency_for_separator == VS_removal_efficiency_for_separator
     )
-    assert (
-        manure_separator_config.volatile_solids_removal_efficiency_for_separator
-        == VS_removal_efficiency_for_separator
-    )
-    assert (
-        manure_separator_config.nitrogen_removal_efficiency_for_separator
-        == N_removal_efficiency_for_separator
-    )
+    assert manure_separator_config.nitrogen_removal_efficiency_for_separator == N_removal_efficiency_for_separator
     assert (
         manure_separator_config.total_ammoniacal_nitrogen_removal_efficiency_for_separator
         == TAN_removal_efficiency_for_separator
     )
-    assert (
-        manure_separator_config.phosphorus_removal_efficiency_for_separator
-        == P_removal_efficiency_for_separator
-    )
-    assert (
-        manure_separator_config.potassium_removal_efficiency_for_separator
-        == K_removal_efficiency_for_separator
-    )
+    assert manure_separator_config.phosphorus_removal_efficiency_for_separator == P_removal_efficiency_for_separator
+    assert manure_separator_config.potassium_removal_efficiency_for_separator == K_removal_efficiency_for_separator
 
     # --------------------
 
@@ -263,14 +231,9 @@ def test_manure_separator_config() -> None:
     # Assert
     assert manure_separator_config.percent_dry_solids == 1.0
     assert manure_separator_config.total_solids_removal_efficiency_for_separator == 0.0
-    assert (
-        manure_separator_config.volatile_solids_removal_efficiency_for_separator == 0.0
-    )
+    assert manure_separator_config.volatile_solids_removal_efficiency_for_separator == 0.0
     assert manure_separator_config.nitrogen_removal_efficiency_for_separator == 0.0
-    assert (
-        manure_separator_config.total_ammoniacal_nitrogen_removal_efficiency_for_separator
-        == 0.0
-    )
+    assert manure_separator_config.total_ammoniacal_nitrogen_removal_efficiency_for_separator == 0.0
     assert manure_separator_config.phosphorus_removal_efficiency_for_separator == 0.0
     assert manure_separator_config.potassium_removal_efficiency_for_separator == 0.0
 
@@ -312,10 +275,7 @@ def test_manure_separator_type(
 ) -> None:
     """Unit test for class ManureSeparatorType in file manure_separator_classes.py."""
     # Assert
-    assert (
-        ManureSeparatorType.get_type(manure_separator_type_name)
-        == expected_manure_separator_type
-    )
+    assert ManureSeparatorType.get_type(manure_separator_type_name) == expected_manure_separator_type
 
 
 # Test ManureSeparatorFactory
@@ -482,20 +442,14 @@ def test_manure_separator_factory_get_instance(
     )
 
     # Act
-    manure_separator = ManureSeparatorFactory.get_instance(
-        manure_separator_type_name, custom_manure_separator_config
-    )
+    manure_separator = ManureSeparatorFactory.get_instance(manure_separator_type_name, custom_manure_separator_config)
 
     # Assert
-    patch_for_manure_separator_get_type.assert_called_once_with(
-        manure_separator_type_name
-    )
+    patch_for_manure_separator_get_type.assert_called_once_with(manure_separator_type_name)
     assert type(manure_separator) is expected_manure_separator_class
     assert manure_separator.config == expected_manure_separator_config
     if not custom_manure_separator_config:
-        patch_for_default_manure_separator_config_factory_get_instance.assert_called_once_with(
-            manure_separator_type
-        )
+        patch_for_default_manure_separator_config_factory_get_instance.assert_called_once_with(manure_separator_type)
 
 
 # Test BaseManureSeparator's daily_update() method
@@ -505,9 +459,7 @@ def test_manure_separator_factory_get_instance(
 def test_base_manure_separator_daily_update(mocker: MockFixture) -> None:
     """Unit test for BaseManureSeparator's daily_update() method."""
     # Arrange
-    mock_manure_separator_config: ManureSeparatorConfig = mocker.MagicMock(
-        spec=ManureSeparatorConfig
-    )
+    mock_manure_separator_config: ManureSeparatorConfig = mocker.MagicMock(spec=ManureSeparatorConfig)
     mock_manure_separator_config.total_solids_removal_efficiency_for_separator = (
         total_solids_removal_efficiency_for_separator
     ) = 0.1
@@ -533,46 +485,29 @@ def test_base_manure_separator_daily_update(mocker: MockFixture) -> None:
     manure_separator_daily_input = mocker.MagicMock()
     manure_separator_daily_input.simulation_day = simulation_day = 1
     manure_separator_daily_input.pen_id = pen_id = 2
-    manure_separator_daily_input.liquid_manure_daily_volume = (
-        liquid_manure_daily_volume
-    ) = 3.0
-    manure_separator_daily_input.liquid_manure_total_solids = (
-        liquid_manure_total_solids
-    ) = 4.0
-    manure_separator_daily_input.liquid_manure_total_volatile_solids = (
-        liquid_manure_total_volatile_solids
-    ) = 5.0
+    manure_separator_daily_input.liquid_manure_daily_volume = liquid_manure_daily_volume = 3.0
+    manure_separator_daily_input.liquid_manure_total_solids = liquid_manure_total_solids = 4.0
+    manure_separator_daily_input.liquid_manure_total_volatile_solids = liquid_manure_total_volatile_solids = 5.0
     manure_separator_daily_input.liquid_manure_nitrogen = liquid_manure_nitrogen = 6.0
-    manure_separator_daily_input.liquid_manure_phosphorus = (
-        liquid_manure_phosphorus
-    ) = 7.0
+    manure_separator_daily_input.liquid_manure_phosphorus = liquid_manure_phosphorus = 7.0
     manure_separator_daily_input.liquid_manure_potassium = liquid_manure_potassium = 8.0
-    manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen = (
-        liquid_manure_total_ammoniacal_nitrogen
-    ) = 9.0
+    manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 9.0
 
     # Act
-    manure_separator_daily_output = base_manure_separator.daily_update(
-        manure_separator_daily_input
-    )
+    manure_separator_daily_output = base_manure_separator.daily_update(manure_separator_daily_input)
 
     # Assert
     assert manure_separator_daily_output.simulation_day == simulation_day
     assert manure_separator_daily_output.pen_id == pen_id
-    assert manure_separator_daily_output.total_daily_manure_volume == approx(
-        liquid_manure_daily_volume
-    )
+    assert manure_separator_daily_output.total_daily_manure_volume == approx(liquid_manure_daily_volume)
     assert manure_separator_daily_output.final_solids_wet_mass == approx(
-        liquid_manure_total_solids
-        * total_solids_removal_efficiency_for_separator
-        / percent_dry_solids
+        liquid_manure_total_solids * total_solids_removal_efficiency_for_separator / percent_dry_solids
     )
     assert manure_separator_daily_output.solid_manure_total_solids == approx(
         liquid_manure_total_solids * total_solids_removal_efficiency_for_separator
     )
     assert manure_separator_daily_output.solid_manure_total_volatile_solids == approx(
-        liquid_manure_total_volatile_solids
-        * volatile_solids_removal_efficiency_for_separator
+        liquid_manure_total_volatile_solids * volatile_solids_removal_efficiency_for_separator
     )
     assert manure_separator_daily_output.solid_manure_nitrogen == approx(
         liquid_manure_nitrogen * nitrogen_removal_efficiency_for_separator
@@ -588,8 +523,7 @@ def test_base_manure_separator_daily_update(mocker: MockFixture) -> None:
         liquid_manure_total_solids * (1 - total_solids_removal_efficiency_for_separator)
     )
     assert manure_separator_daily_output.liquid_manure_total_volatile_solids == approx(
-        liquid_manure_total_volatile_solids
-        * (1 - volatile_solids_removal_efficiency_for_separator)
+        liquid_manure_total_volatile_solids * (1 - volatile_solids_removal_efficiency_for_separator)
     )
     assert manure_separator_daily_output.liquid_manure_nitrogen == approx(
         liquid_manure_nitrogen * (1 - nitrogen_removal_efficiency_for_separator)
@@ -600,10 +534,6 @@ def test_base_manure_separator_daily_update(mocker: MockFixture) -> None:
     assert manure_separator_daily_output.liquid_manure_potassium == approx(
         liquid_manure_potassium * (1 - potassium_removal_efficiency_for_separator)
     )
-    assert (
-        manure_separator_daily_output.liquid_manure_total_ammoniacal_nitrogen
-        == approx(
-            liquid_manure_total_ammoniacal_nitrogen
-            * (1 - total_ammoniacal_nitrogen_removal_efficiency_for_separator)
-        )
+    assert manure_separator_daily_output.liquid_manure_total_ammoniacal_nitrogen == approx(
+        liquid_manure_total_ammoniacal_nitrogen * (1 - total_ammoniacal_nitrogen_removal_efficiency_for_separator)
     )

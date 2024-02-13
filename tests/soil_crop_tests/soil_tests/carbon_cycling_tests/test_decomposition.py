@@ -32,8 +32,7 @@ def test_calc_temp_factor(
         0.0,
         (
             y_inflection
-            + (point_distance / math.pi)
-            * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
+            + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
         )
         / normalizer,
     )
