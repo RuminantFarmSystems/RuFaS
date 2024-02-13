@@ -346,7 +346,7 @@ def test_execute_allocation_plan(num_animals: int, allocation_plan: List[int], m
     # Assert
     for i in range(len(allocation_plan)):
         mock_pens[i].update_animals.assert_called_once_with(animals[: allocation_plan[i]], animal_combination)
-        animals = animals[allocation_plan[i]:]
+        animals = animals[allocation_plan[i] :]
 
 
 @pytest.mark.parametrize(
@@ -505,7 +505,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
 
     assert animal_manager.all_pens[
-        -(num_new_default_pens * len(animals_by_combination)):
+        -(num_new_default_pens * len(animals_by_combination)) :
     ] == dummy_new_default_pens * len(animals_by_combination)
     for animal_combination in animals_by_combination:
         assert pens_by_animal_combination[animal_combination][-num_new_default_pens:] == dummy_new_default_pens

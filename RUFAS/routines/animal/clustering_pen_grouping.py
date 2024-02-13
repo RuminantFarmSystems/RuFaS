@@ -159,7 +159,7 @@ def grouping(cow_list, pens, stocking_density):
     key = 0
 
     for i in range(len(separating_index) - 1):
-        group = cow[separating_index[i]: separating_index[i + 1]]
+        group = cow[separating_index[i] : separating_index[i + 1]]
         grouping_data[key] = group
         key += 1
 
