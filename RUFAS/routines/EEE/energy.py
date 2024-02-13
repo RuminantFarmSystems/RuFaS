@@ -70,5 +70,8 @@ class EnergyEstimator:
         )
         return diesel_consumption_tractor_implement_liter_per_ton
 
-    def _calculate_total_power_needed(self) -> None:  # TODO implement
-        pass
+    def _calculate_total_power_needed(self) -> float:
+        tactor_axel_power = 0  # TODO get the correct value
+        tractor_implement_drawbar_power = 0  # TODO get the correct value
+        tractor_implement_PTO_power_needed = 0  # TODO get the correct value
+        return tactor_axel_power + tractor_implement_drawbar_power + tractor_implement_PTO_power_needed
