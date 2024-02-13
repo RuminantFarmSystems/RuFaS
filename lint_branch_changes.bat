@@ -33,7 +33,7 @@ IF EXIST ".\.changed_python_files.txt" (
     FOR /F "tokens=*" %%G IN (.\.changed_python_files.txt) DO (set changed_python_files=%%G)
     
     REM Run Flake8 on the changed Python files
-    flake8 --ignore=E203,W503 %changed_python_files%
+    flake8 %changed_python_files%
 ) ELSE (
     call echo No Python files modified on this branch yet.
 )
