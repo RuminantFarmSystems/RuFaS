@@ -34,7 +34,6 @@ class Event:
 
     Notes
     -----
-    An Event object determines when an event should occur, relative to the start of the RuFaS simulation.
     An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
 
     """
