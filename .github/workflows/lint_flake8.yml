@@ -59,7 +59,7 @@ jobs:
       if: ${{ env.FILES != '' }}
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 ${{ env.FILES }} --ignore=E203
+        flake8 ${{ env.FILES }} --ignore=E203,W503
     - name: Check for Unauthorized Changes
       run: |
         paths_to_protect=(
