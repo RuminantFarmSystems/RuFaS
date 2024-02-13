@@ -35,7 +35,7 @@ class Event:
     Notes
     -----
     An Event object determines when an event should occur, relative to the start of the RuFaS simulation.
-    An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
+    Events are used to determine when the following field management operations occur: planting, harvesting, tillage, manure applications, and synthetic fertilizer applications.
 
     """
     def __init__(self, year: int = 1, day: int = 120):
