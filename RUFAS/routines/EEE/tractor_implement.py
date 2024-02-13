@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class OperationType(Enum):
@@ -9,8 +10,8 @@ class OperationType(Enum):
     FERTILIZER_APPLICATION_SURFACE = "Fertilizer Application: Surface"
     FERTILIZER_APPLICATION_BELOW_SURFACE = "Fertilizer Application: Below Surface"
     MOWING = "Mowing"
-    RAKING = "Raking"
     COLLECTION = "Collection"
+    WINDROWING = "windrowing"
 
 
 class CropType(Enum):
@@ -35,11 +36,41 @@ class TractorImplement:
         self,
         operation_event: FieldOperationEvent,
         crop_type: CropType | None = None,
-        application_depth: float | None = None,
     ) -> None:
         self.operation_event = operation_event
         self.crop_type = crop_type
-        self.application_depth = application_depth
+
+    def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:  # noqa C901
+        """
+        Assigns a specific field operation based on the general name for the operation and the crop type for harvest
+        operations or depth for nutrient application.
+        Implements Helper Function 421 in EEE Functions file.
+        """
+        if self.operation_event == FieldOperationEvent.HARVEST:
+            if self.crop_type in [
+                CropType.ALFALFA_HAY,
+                CropType.ALFALFA_SILAGE,
+                CropType.ALFALFA_BALEAGE,
+                CropType.TALL_FESCUE_HAY,
+                CropType.TALL_FESCUE_SILAGE,
+                CropType.TALL_FESCUE_BALEAGE,
+            ]:
+                return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
+            return [OperationType.COLLECTION]
+        elif self.operation_event == FieldOperationEvent.FERTILIZER_APPLICATION:
+            if application_depth == 0:
+                return [OperationType.FERTILIZER_APPLICATION_SURFACE]
+            elif application_depth > 0:
+                return [OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE]
+        elif self.operation_event == FieldOperationEvent.MANURE_APPLICATION:
+            if application_depth == 0:
+                return [OperationType.LIQUID_MANURE_APPLICATION_SURFACE]
+            elif application_depth > 0:
+                return [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE]
+        elif self.operation_event == FieldOperationEvent.PLANTING:
+            return [OperationType.PLANTING]
+        elif self.operation_event == FieldOperationEvent.TILLING:
+            return [OperationType.TILLING]
 
     @property
     def mass_kg(self) -> float:
