@@ -28,10 +28,15 @@ class TractorImplement:
         Implements Helper Function 414  in EEE Functions file.
         """
         field_speed_km_per_hr = 10.00  # Constant 585 in EEE Functions file # TODO get the value from IM
-        functional_draft = self.calculate_functional_draft
+        functional_draft = self.calculate_functional_draft()
         return functional_draft * field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self) -> float:  # TODO imeplement
+    def calculate_functional_draft(self) -> float:
+        """
+        Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
+        minor tillage tools operated at shallow depths.
+        Implements Helper Function 417  in EEE Functions file.
+        """
         pass
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
