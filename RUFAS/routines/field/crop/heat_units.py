@@ -27,8 +27,12 @@ class HeatUnits:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def absorb_heat_units(self, mean_air_temperature: float = None,
-                          min_air_temperature: float = None, max_air_temperature: float = None) -> None:
+    def absorb_heat_units(
+        self,
+        mean_air_temperature: float = None,
+        min_air_temperature: float = None,
+        max_air_temperature: float = None,
+    ) -> None:
         """
         Main function for absorbing heat units during a day and accumulating them.
 
@@ -52,21 +56,33 @@ class HeatUnits:
         SWAT 5:1.1, 5:2.1.2
 
         """
-        self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
+        self._check_absorb_heat_for_input_errors(
+            mean_air_temperature, min_air_temperature, max_air_temperature
+        )
 
         if self.data.use_heat_unit_temperature:
-            self.data.maximum_heat_unit_temperature = \
-                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.data.maximum_temperature)
-            self.data.minimum_heat_unit_temperature = \
-                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.data.minimum_temperature)
-            self.data.heat_unit_temperature = \
-                (self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature) / 2
+            self.data.maximum_heat_unit_temperature = (
+                HeatUnits._determine_maximum_heat_unit_temperature(
+                    max_air_temperature, self.data.maximum_temperature
+                )
+            )
+            self.data.minimum_heat_unit_temperature = (
+                HeatUnits._determine_minimum_heat_unit_temperature(
+                    min_air_temperature, self.data.minimum_temperature
+                )
+            )
+            self.data.heat_unit_temperature = (
+                self.data.minimum_heat_unit_temperature
+                + self.data.maximum_heat_unit_temperature
+            ) / 2
 
         if self.data.use_heat_unit_temperature or mean_air_temperature is None:
             use_temp = self.data.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
-        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
+        self.data.is_growing = (
+            self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
+        )
         self.accumulate_heat_units(mean_air_temperature)
 
     def accumulate_heat_units(self, air_temperature: float = None) -> None:
@@ -109,11 +125,16 @@ class HeatUnits:
             The average air temperature during the day (°C).
 
         """
-        if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.data.new_heat_units = self._determine_new_heat_units(self.data.heat_unit_temperature,
-                                                                      self.data.minimum_temperature)
+        if self.data.use_heat_unit_temperature or (
+            air_temperature is None
+        ):  # alternative method
+            self.data.new_heat_units = self._determine_new_heat_units(
+                self.data.heat_unit_temperature, self.data.minimum_temperature
+            )
         else:  # main method
-            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
+            self.data.new_heat_units = self._determine_new_heat_units(
+                air_temperature, self.data.minimum_temperature
+            )
 
     def add_heat_units(self) -> None:
         """
@@ -122,9 +143,12 @@ class HeatUnits:
         self.data.accumulated_heat_units += self.data.new_heat_units
 
     # TODO: add these warnings to output manager at a later date.
-    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
-                                            min_air_temperature: float = None,
-                                            max_air_temperature: float = None) -> None:
+    def _check_absorb_heat_for_input_errors(
+        self,
+        mean_air_temperature: float = None,
+        min_air_temperature: float = None,
+        max_air_temperature: float = None,
+    ) -> None:
         """
         Raises errors if inputs given for absorb_heat_units don't make sense with the value of the
         use_heat_unit_temperature attribute.
@@ -146,11 +170,17 @@ class HeatUnits:
             If `use_heat_unit_temperature` is False and `mean_air_temperature` is not provided.
 
         """
-        if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
-            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
-                             " when use_heat_unit_temperature is True")
+        if self.data.use_heat_unit_temperature and (
+            min_air_temperature is None or max_air_temperature is None
+        ):
+            raise ValueError(
+                "min_air_temperature and max_air_temperature must be provided"
+                + " when use_heat_unit_temperature is True"
+            )
         if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
-            raise ValueError("mean_air_temperature must be provided when use_heat_unit_temperature is False")
+            raise ValueError(
+                "mean_air_temperature must be provided when use_heat_unit_temperature is False"
+            )
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
@@ -177,7 +207,9 @@ class HeatUnits:
         return max(temperature - min_temperature, 0)  # from SWAT:
 
     @staticmethod
-    def _determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
+    def _determine_minimum_heat_unit_temperature(
+        min_air_temp: float, min_growth_temp: float
+    ) -> float:
         """
         Calculates the minimum heat unit temperature on the current day.
 
@@ -197,7 +229,9 @@ class HeatUnits:
         return max(min_air_temp, min_growth_temp)
 
     @staticmethod
-    def _determine_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: float) -> float:
+    def _determine_maximum_heat_unit_temperature(
+        max_air_temp: float, max_growth_temp: float
+    ) -> float:
         """
         Calculates the maximum heat unit temperature on the current day.
 

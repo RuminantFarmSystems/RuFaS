@@ -122,11 +122,11 @@ class OutputManager(object):
         return {"info_maps": info_maps, "values": values}
 
     def _add_to_pool(
-            self,
-            pool: Dict[str, pool_element_type],
-            key: str,
-            value: Any,
-            info_map: Dict[str, Any],
+        self,
+        pool: Dict[str, pool_element_type],
+        key: str,
+        value: Any,
+        info_map: Dict[str, Any],
     ) -> None:
         """Adds value and info map at key in the given pool."""
         key_not_exists_in_pool = pool.get(key) is None
@@ -136,8 +136,7 @@ class OutputManager(object):
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
         reduced_info_map = {
-            k: info_map[k]
-            for k in info_map.keys() - {"class", "function"}
+            k: info_map[k] for k in info_map.keys() - {"class", "function"}
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
@@ -261,7 +260,7 @@ class OutputManager(object):
         self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
 
     def _handle_log_output(
-            self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
     ) -> None:
         """Formats log output based on log_level.
 
@@ -324,7 +323,7 @@ class OutputManager(object):
             prefix = info_map.get("prefix") + "."
         elif not info_map.get("suppress_prefix", False):
             prefix = (
-                    self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+                self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
             )
 
         suffix = (
@@ -351,7 +350,9 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
+    def dict_to_file_json(
+        self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False
+    ) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -392,7 +393,7 @@ class OutputManager(object):
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=3),
                         json_file,
-                        separators=(",", ":")
+                        separators=(",", ":"),
                     )
                 else:
                     json.dump(
@@ -407,7 +408,7 @@ class OutputManager(object):
             raise e
 
     def _dict_to_csv_column_list(
-            self, variable_name: str, data_dict: Dict[str, List[Any]]
+        self, variable_name: str, data_dict: Dict[str, List[Any]]
     ) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
@@ -529,7 +530,7 @@ class OutputManager(object):
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(
-            self, pool: Dict[str, pool_element_type]
+        self, pool: Dict[str, pool_element_type]
     ) -> Dict[str, pool_element_type]:
         """Makes a copy of the given pool and removes info_maps from it.
 
@@ -563,8 +564,8 @@ class OutputManager(object):
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     for (
-                            _,
-                            supported_prefix,
+                        _,
+                        supported_prefix,
                     ) in self.__supported_filter_types_prefixes.items():
                         if filename.startswith(supported_prefix):
                             break
@@ -668,7 +669,7 @@ class OutputManager(object):
             raise
 
     def _filter_variables_pool(
-            self, filter_patterns: List[str], input_file_name: Optional[str]
+        self, filter_patterns: List[str], input_file_name: Optional[str]
     ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
@@ -702,8 +703,8 @@ class OutputManager(object):
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
         filter_by_exclusion = (
-                filter_patterns
-                and filter_patterns[exclude_keyword_location] == exclude_keyword
+            filter_patterns
+            and filter_patterns[exclude_keyword_location] == exclude_keyword
         )
         if filter_by_exclusion:
             filter_vars_msg = (
@@ -715,7 +716,9 @@ class OutputManager(object):
                 f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
                 f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             )
-        filter_pattern_matches = Utility.filter_pool(self.variables_pool, filter_patterns, filter_by_exclusion)
+        filter_pattern_matches = Utility.filter_pool(
+            self.variables_pool, filter_patterns, filter_by_exclusion
+        )
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
@@ -725,13 +728,13 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_results(
-            self,
-            save_path: Path,
-            filters_dir_path: Path,
-            exclude_info_maps: bool,
-            produce_graphics: bool,
-            graphics_dir: Path,
-            csv_dir: Path
+        self,
+        save_path: Path,
+        filters_dir_path: Path,
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        graphics_dir: Path,
+        csv_dir: Path,
     ) -> None:
         """
         Parses the filter files in the given directory and saves the results to the given path.
@@ -775,17 +778,17 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            if filter_file.startswith(
-                    self.__supported_filter_types_prefixes["report"]
-            ):
-                self.add_log("init_report_generation",
-                             f"Generating report for file: {filter_file}",
-                             info_map)
+            if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                self.add_log(
+                    "init_report_generation",
+                    f"Generating report for file: {filter_file}",
+                    info_map,
+                )
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
-                if (
-                        not isinstance(filter_content, dict)
-                        or ("filters" not in filter_content.keys() and "cross_references" not in filter_content.keys())
+                if not isinstance(filter_content, dict) or (
+                    "filters" not in filter_content.keys()
+                    and "cross_references" not in filter_content.keys()
                 ):
                     self.add_error(
                         "Parsing error",
@@ -797,7 +800,7 @@ class OutputManager(object):
                     )
                     continue
 
-                filtered_pool:  Dict[str, OutputManager.pool_element_type] = {}
+                filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self._filter_variables_pool(
                         filter_content["filters"], filter_file
@@ -806,9 +809,11 @@ class OutputManager(object):
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(
-                        self.__supported_filter_types_prefixes["report"]
+                    self.__supported_filter_types_prefixes["report"]
                 ):
-                    log_pool = report_generator.generate_report(filter_content, filtered_pool)
+                    log_pool = report_generator.generate_report(
+                        filter_content, filtered_pool
+                    )
                     self._route_logs(log_pool)
                 else:
                     self._route_save_functions(
@@ -829,14 +834,14 @@ class OutputManager(object):
                 report_generator.clear_reports()
 
     def _route_save_functions(
-            self,
-            filter_file: str,
-            save_path: Path,
-            filtered_pool: Dict[str, pool_element_type],
-            produce_graphics: bool,
-            filter_content: Dict[str, str | int],
-            graphics_dir: Path,
-            csv_dir: Path
+        self,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        produce_graphics: bool,
+        filter_content: Dict[str, str | int],
+        graphics_dir: Path,
+        csv_dir: Path,
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the
@@ -865,11 +870,11 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     log_pool = graph_generator.generate_graph(
-                                filtered_pool,
-                                filter_content,
-                                filter_file,
-                                graphics_dir,
-                                )
+                        filtered_pool,
+                        filter_content,
+                        filter_file,
+                        graphics_dir,
+                    )
                     self._route_logs(log_pool)
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
@@ -947,10 +952,10 @@ class OutputManager(object):
         self.dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
-            self,
-            path: str,
-            exclude_info_maps: bool,
-            format_option: str,
+        self,
+        path: str,
+        exclude_info_maps: bool,
+        format_option: str,
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -1036,10 +1041,10 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-            self,
-            path: str,
-            exclude_info_maps: bool,
-            format_option: str,
+        self,
+        path: str,
+        exclude_info_maps: bool,
+        format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.

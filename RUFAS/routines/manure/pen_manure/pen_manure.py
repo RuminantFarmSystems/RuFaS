@@ -149,5 +149,6 @@ class PenManure:
             phosphorus=animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure["phosphorus_fraction"] / num_animals,
             potassium=animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,
-            enteric_methane_kg=animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
+            enteric_methane_kg=animal_manure["enteric_methane_g"]
+            * GeneralConstants.GRAMS_TO_KG,
         )

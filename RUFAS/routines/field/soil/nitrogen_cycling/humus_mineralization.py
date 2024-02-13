@@ -1,7 +1,9 @@
 from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+from RUFAS.routines.field.crop_and_soil_constants import (
+    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
+)
 
 """
 This module handles the mineralization operations for the active and stable organic nitrogen pools, based on SWAT
@@ -10,8 +12,9 @@ section 3:1.2.1.
 
 
 class HumusMineralization:
-
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -49,21 +52,37 @@ class HumusMineralization:
             if layer.temperature <= 0:
                 continue
 
-            active_to_stable_mineralized_nitrogen = self._determine_intra_organic_mineralization(
-                layer.active_organic_nitrogen_content, layer.stable_organic_nitrogen_content)
-            layer.active_organic_nitrogen_content -= active_to_stable_mineralized_nitrogen
-            layer.stable_organic_nitrogen_content += active_to_stable_mineralized_nitrogen
+            active_to_stable_mineralized_nitrogen = (
+                self._determine_intra_organic_mineralization(
+                    layer.active_organic_nitrogen_content,
+                    layer.stable_organic_nitrogen_content,
+                )
+            )
+            layer.active_organic_nitrogen_content -= (
+                active_to_stable_mineralized_nitrogen
+            )
+            layer.stable_organic_nitrogen_content += (
+                active_to_stable_mineralized_nitrogen
+            )
 
-            active_to_ammonium_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
-                layer.active_organic_nitrogen_content, layer.nutrient_cycling_temp_factor,
-                layer.nutrient_cycling_water_factor, layer.humus_mineralization_rate_factor)
-            layer.active_organic_nitrogen_content -= active_to_ammonium_mineralized_nitrogen
+            active_to_ammonium_mineralized_nitrogen = (
+                self._determine_organic_to_nitrate_mineralization(
+                    layer.active_organic_nitrogen_content,
+                    layer.nutrient_cycling_temp_factor,
+                    layer.nutrient_cycling_water_factor,
+                    layer.humus_mineralization_rate_factor,
+                )
+            )
+            layer.active_organic_nitrogen_content -= (
+                active_to_ammonium_mineralized_nitrogen
+            )
             layer.ammonium_content += active_to_ammonium_mineralized_nitrogen
 
     # --- Static methods ---
     @staticmethod
-    def _determine_intra_organic_mineralization(active_organic_nitrogen: float,
-                                                stable_organic_nitrogen: float) -> float:
+    def _determine_intra_organic_mineralization(
+        active_organic_nitrogen: float, stable_organic_nitrogen: float
+    ) -> float:
         """Calculates the amount of nitrogen transferred between different organic pools.
 
         Parameters
@@ -92,21 +111,29 @@ class HumusMineralization:
         results.
 
         """
-        rate_constant = 10 ** -5
-        amount_transferred = rate_constant * \
-            (active_organic_nitrogen * ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable_organic_nitrogen)
+        rate_constant = 10**-5
+        amount_transferred = rate_constant * (
+            active_organic_nitrogen
+            * ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1)
+            - stable_organic_nitrogen
+        )
 
         if amount_transferred > 0:
             amount_transferred = min(active_organic_nitrogen, amount_transferred)
         elif amount_transferred < 0:
-            amount_transferred = -1 * min(stable_organic_nitrogen, -1 * amount_transferred)
+            amount_transferred = -1 * min(
+                stable_organic_nitrogen, -1 * amount_transferred
+            )
 
         return amount_transferred
 
     @staticmethod
-    def _determine_organic_to_nitrate_mineralization(active_organic_nitrogen: float, temperature_factor: float,
-                                                     water_factor: float,
-                                                     humus_active_organic_mineralization_coefficient: float) -> float:
+    def _determine_organic_to_nitrate_mineralization(
+        active_organic_nitrogen: float,
+        temperature_factor: float,
+        water_factor: float,
+        humus_active_organic_mineralization_coefficient: float,
+    ) -> float:
         """Calculates phosphorus mineralized from the active inorganic pool that goes to the nitrate pool.
 
         Parameters
@@ -131,5 +158,8 @@ class HumusMineralization:
         SWAT Theoretical documentation eqn. 3:1.2.4
 
         """
-        return humus_active_organic_mineralization_coefficient * ((temperature_factor * water_factor) ** 0.5) * \
-            active_organic_nitrogen
+        return (
+            humus_active_organic_mineralization_coefficient
+            * ((temperature_factor * water_factor) ** 0.5)
+            * active_organic_nitrogen
+        )

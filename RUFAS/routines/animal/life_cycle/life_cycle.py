@@ -330,11 +330,21 @@ class LifeCycleManager:
             cow.estimated_daily_milk_produced for cow in cows if not cow.milking
         )
         self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
-        self.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
-        self.dry_cows_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if not cow.milking)
-        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
-        self.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
-        self.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
+        self.herd_milk_fat_percent = (
+            self.herd_milk_fat_kg / self.daily_milk_production
+        ) * 100
+        self.dry_cows_milk_fat_kg = sum(
+            cow.milk_fat_kg for cow in cows if not cow.milking
+        )
+        self.herd_milk_protein_kg = sum(
+            cow.milk_protein_kg for cow in cows if cow.milking
+        )
+        self.herd_milk_protein_percent = (
+            self.herd_milk_protein_kg / self.daily_milk_production
+        ) * 100
+        self.dry_cows_milk_protein_kg = sum(
+            cow.milk_protein_kg for cow in cows if not cow.milking
+        )
 
         return (
             animals_added,
@@ -731,16 +741,18 @@ class LifeCycleManager:
 
         """
         args = heiferIII.get_heiferIII_values()
-        args.update({
-            'body_weight_history': heiferIII.body_weight_history,
-            'pen_history': heiferIII.pen_history,
-            'conceptus_weight': heiferIII.conceptus_weight,
-            'calf_birth_weight': heiferIII.calf_birth_weight
-        })
-        args.update(repro_program=AnimalBase.config['cow_repro_method'])
-        args.update(presynch_method=AnimalBase.config['cows']['presynch_program'])
-        args.update(tai_method_c=AnimalBase.config['cows']['ovsynch_program'])
-        args.update(resynch_method=AnimalBase.config['cows']['resynch_program'])
+        args.update(
+            {
+                "body_weight_history": heiferIII.body_weight_history,
+                "pen_history": heiferIII.pen_history,
+                "conceptus_weight": heiferIII.conceptus_weight,
+                "calf_birth_weight": heiferIII.calf_birth_weight,
+            }
+        )
+        args.update(repro_program=AnimalBase.config["cow_repro_method"])
+        args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
+        args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
+        args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
         new_cow = Cow(args)
         if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
@@ -924,7 +936,7 @@ class LifeCycleManager:
                 self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk
             )
 
-            if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
+            if cow.days_in_milk < self.animal_config["voluntary_waiting_period"]:
                 self.vwp_cow_num += 1
         else:
             self.dry_cow_num += 1
