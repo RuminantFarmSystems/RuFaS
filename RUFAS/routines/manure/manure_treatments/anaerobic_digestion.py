@@ -30,7 +30,8 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
-        self._accumulate_daily_output(daily_output)
+        # self._accumulate_daily_output(daily_output)
+        self._accumulated_output = self._adjust_accumulated_output(daily_output)
 
         return daily_output
 
@@ -173,3 +174,30 @@ class AnaerobicDigestion(BaseManureTreatment):
             + 0.025662 * average_temperature_celsius
             + 0.01306 * moisture_content * 100
         )
+
+    def _adjust_accumulated_output(
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+    ) -> ManureTreatmentDailyOutput:
+        """
+        Adjust the accumulated output by either resetting it or adding the daily output to it.
+
+        The accumulated output will be reset on the first day of every storage time period.
+
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput
+            The adjusted accumulated output.
+
+        """
+        if self._sim_day % self.config.storage_time_period == 1:
+            return manure_treatment_daily_output.clone()
+        else:
+            new_accumulated_output = (
+                self._accumulated_output + manure_treatment_daily_output
+            )
+            return new_accumulated_output

@@ -110,13 +110,13 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
         self._accumulated_output.storage_ammonia += daily_output.storage_ammonia
-        self._accumulated_output.storage_methane += (daily_output.storage_methane)
+        self._accumulated_output.storage_methane += daily_output.storage_methane
 
-        new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - daily_output.storage_methane, 0.0
+        new_accumulated_liquid_manure_total_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_volatile_solids - daily_output.storage_methane, 0.0
         )
-        self._accumulated_output.liquid_manure_total_solids = (
-            new_accumulated_liquid_manure_total_solids
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            new_accumulated_liquid_manure_total_volatile_solids
         )
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
