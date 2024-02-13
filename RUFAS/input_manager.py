@@ -377,9 +377,8 @@ class InputManager:
                     "function": self._get_variable_modifiability.__name__,
                     }
 
-        modifiability = variable_properties.get("modifiability")
-        if not modifiability:
-            return Modifiability.__getitem__("UNREQUIRED_UNLOCKED")
+        default = "UNREQUIRED UNLOCKED"
+        modifiability = variable_properties.get("modifiability", default)
 
         try:
             return Modifiability.__getitem__('_'.join(modifiability.strip().upper().split()))
