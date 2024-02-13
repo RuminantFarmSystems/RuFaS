@@ -83,12 +83,18 @@ def test_daily_soil_water_routine(
         field_size,
     )
 
-    soil.infiltration.infiltrate.assert_called_once_with(rainfall, weighting_coefficient, potential_evapotranspiration)
+    soil.infiltration.infiltrate.assert_called_once_with(
+        rainfall, weighting_coefficient, potential_evapotranspiration
+    )
     soil.percolation.percolate.assert_called_once_with(has_seasonal_high_water_table)
     soil.evaporation.evaporate.assert_called_once_with(maximum_soil_evaporation)
-    soil.soil_erosion.erode.assert_called_once_with(field_size, minimum_cover_management_factor, residue, rainfall)
+    soil.soil_erosion.erode.assert_called_once_with(
+        field_size, minimum_cover_management_factor, residue, rainfall
+    )
     soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(
         rainfall, soil.data.accumulated_runoff, field_size, avg_air_temp
     )
     soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
-    soil.carbon_cycling.cycle_carbon.assert_called_once_with(rainfall, avg_air_temp, field_size)
+    soil.carbon_cycling.cycle_carbon.assert_called_once_with(
+        rainfall, avg_air_temp, field_size
+    )

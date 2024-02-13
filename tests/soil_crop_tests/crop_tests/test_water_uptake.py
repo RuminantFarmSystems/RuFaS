@@ -29,7 +29,9 @@ def test_correct_layer_for_efficiency(pot, avail, cap):
     if avail >= cap * 0.25:
         assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot
     else:
-        assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot * exp(5 * ((avail / (0.25 * cap)) - 1))
+        assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot * exp(
+            5 * ((avail / (0.25 * cap)) - 1)
+        )
 
 
 @pytest.mark.parametrize("max_trans", [5])
@@ -37,7 +39,8 @@ def test_uptake_water(max_trans):
     """ensure that uptake_water can run without error"""
     # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
     with patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation." "determine_layer_nutrient_demands",
+        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation."
+        "determine_layer_nutrient_demands",
         new_callable=MagicMock,
         return_value=[1, 2, 3, 4],
     ):
@@ -75,7 +78,10 @@ def test_extract_water_from_soil(layers, uptakes, should_fail: bool) -> None:
     if should_fail:
         with pytest.raises(Exception) as e:
             uptake.extract_water_from_soil(soil_data)
-        assert str(e.value) == "actual_water_uptakes should be the same length as the number of soil layers"
+        assert (
+            str(e.value)
+            == "actual_water_uptakes should be the same length as the number of soil layers"
+        )
     else:
         soil_data.get_vectorized_layer_attribute = MagicMock()
         soil_data.set_vectorized_layer_attribute = MagicMock()
@@ -102,14 +108,19 @@ def test_reduce_efficiency_of_uptake(
     """Tests that the reduced efficiency of uptake is calculated correctly when there's no error in input"""
     if should_fail:
         with pytest.raises(Exception) as e:
-            WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
+            WaterUptake._reduce_efficiency_of_uptake(
+                potential_uptakes, water_availabilities, available_capacities
+            )
         assert (
-            str(e.value) == "potential_uptakes, water_availabilities, and available_capacities must be of equal"
+            str(e.value)
+            == "potential_uptakes, water_availabilities, and available_capacities must be of equal"
             " length"
         )
     else:
         WaterUptake._correct_layer_for_efficiency = MagicMock(return_value=0.5)
-        result = WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
+        result = WaterUptake._reduce_efficiency_of_uptake(
+            potential_uptakes, water_availabilities, available_capacities
+        )
         expected_calls = []
         for i in range(len(potential_uptakes)):
             expected_calls.append(
@@ -141,8 +152,13 @@ def test_adjust_water_uptakes(
     """Tests that the adjusted water uptakes are calculated correctly when there's no error in input"""
     if should_fail:
         with pytest.raises(Exception) as e:
-            WaterUptake._adjust_water_uptakes(potential_uptakes, unmet_demands, uptake_compensation)
-        assert str(e.value) == "potential_uptakes and unmet_demands must be the same length."
+            WaterUptake._adjust_water_uptakes(
+                potential_uptakes, unmet_demands, uptake_compensation
+            )
+        assert (
+            str(e.value)
+            == "potential_uptakes and unmet_demands must be the same length."
+        )
     else:
         assert WaterUptake._adjust_water_uptakes(
             potential_uptakes, unmet_demands, uptake_compensation
@@ -150,7 +166,8 @@ def test_adjust_water_uptakes(
 
 
 @pytest.mark.parametrize(
-    "root_depth,max_transpiration,water_distro_parameter,upper_depths,lower_depths,should_fail," "expected",
+    "root_depth,max_transpiration,water_distro_parameter,upper_depths,lower_depths,should_fail,"
+    "expected",
     [
         (
             69.4,
@@ -185,7 +202,9 @@ def test_find_stratified_max_water_uptakes(
             )
         assert str(e.value) == "upper_depths and lower_depths must be the same length"
     else:
-        assert pytest.approx(expected) == WaterUptake._find_stratified_max_water_uptakes(
+        assert pytest.approx(
+            expected
+        ) == WaterUptake._find_stratified_max_water_uptakes(
             root_depth,
             max_transpiration,
             water_distro_parameter,
@@ -235,14 +254,23 @@ def test_take_up_water(
     """Tests that the the correct output _take_up_water of were calculated when there's no error in input"""
     if should_fail:
         with pytest.raises(Exception) as e:
-            WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
-        assert str(e.value) == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+            WaterUptake._take_up_water(
+                potential_uptakes, water_availabilities, wilting_points
+            )
+        assert (
+            str(e.value)
+            == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+        )
     else:
         WaterUptake._determine_actual_layer_uptake = MagicMock(return_value=0.5)
-        result = WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
+        result = WaterUptake._take_up_water(
+            potential_uptakes, water_availabilities, wilting_points
+        )
         expected_calls = []
         for i in range(len(potential_uptakes)):
-            expected_calls.append(call(potential_uptakes[i], water_availabilities[i], wilting_points[i]))
+            expected_calls.append(
+                call(potential_uptakes[i], water_availabilities[i], wilting_points[i])
+            )
         WaterUptake._determine_actual_layer_uptake.assert_has_calls(expected_calls)
         expected = [0.5] * len(potential_uptakes)
         assert expected == result

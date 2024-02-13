@@ -44,7 +44,9 @@ def test_remove_amount_incorporated(
     """Tests that correct amount is removed and returned from the specified pool."""
     setattr(data, attr_name, attr_value)
 
-    actual_removed = TillageApplication._remove_amount_incorporated(data, attr_name, incorp_frac)
+    actual_removed = TillageApplication._remove_amount_incorporated(
+        data, attr_name, incorp_frac
+    )
     actual_remaining = getattr(data, attr_name)
 
     assert pytest.approx(actual_removed) == expected_removed
@@ -66,7 +68,8 @@ def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
     with pytest.raises(TypeError) as e:
         TillageApplication._remove_amount_incorporated(data, "test", 0.5)
     assert (
-        str(e.value) == f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
+        str(e.value)
+        == f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
         f"'{expected}'."
     )
 
@@ -173,7 +176,9 @@ def test_mix_soil_layers(
         (5000, 0.44, 0.51, 2023, 31),
     ],
 )
-def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
+def test_record_tillage(
+    till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int
+) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
 
@@ -194,7 +199,9 @@ def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, 
     with patch.object(om, "add_variable") as add_var:
         till_app._record_tillage(till_depth, incorp_frac, mix_frac, year, day)
 
-        add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
+        add_var.assert_called_once_with(
+            "tillage_record", expected_value, expected_info_map
+        )
 
 
 @pytest.mark.parametrize(
@@ -206,7 +213,9 @@ def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, 
         (5000, 0.44, 0.51, 2023, 31),
     ],
 )
-def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
+def test_till_soil(
+    till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int
+) -> None:
     """Tests that soil is tilled correctly."""
     field_data_1 = FieldData(name="field1", field_size=1.5)
 
@@ -253,11 +262,19 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
     ]
     till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
     expected_total_phosphorus = len(remove_calls) * 8
-    till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
+    till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(
+        expected_total_phosphorus, 1.5
+    )
     mix_calls = [
-        call("labile_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
-        call("active_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
-        call("stable_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
+        call(
+            "labile_inorganic_phosphorus_content", expected_till_depth, mix_frac, False
+        ),
+        call(
+            "active_inorganic_phosphorus_content", expected_till_depth, mix_frac, False
+        ),
+        call(
+            "stable_inorganic_phosphorus_content", expected_till_depth, mix_frac, False
+        ),
         call("nitrate_content", expected_till_depth, mix_frac, False),
         call("ammonium_content", expected_till_depth, mix_frac, False),
         call("active_organic_nitrogen_content", expected_till_depth, mix_frac, False),

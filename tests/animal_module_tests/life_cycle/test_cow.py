@@ -95,7 +95,9 @@ def test_decrease_conception_rate_by_parity(
     cow = Cow(args=mocker.MagicMock())
 
     # Act
-    adjusted_conception_rate = cow._decrease_conception_rate_by_parity(calves, conception_rate)
+    adjusted_conception_rate = cow._decrease_conception_rate_by_parity(
+        calves, conception_rate
+    )
 
     # Assert
     assert adjusted_conception_rate == expected_conception_rate
@@ -127,7 +129,9 @@ def test_check_do_not_breed_flag(
     cow.days_in_milk = days_in_milk
     cow.do_not_breed = False
     cow.days_born = 100
-    mocker.patch.object(Cow, "is_pregnant", new_callable=mocker.PropertyMock, return_value=is_pregnant)
+    mocker.patch.object(
+        Cow, "is_pregnant", new_callable=mocker.PropertyMock, return_value=is_pregnant
+    )
     mocker.patch.object(cow, "get_do_not_breed_time", return_value=do_not_breed_time)
     patch_for_log_event = mocker.patch.object(cow, "log_event")
 
@@ -180,12 +184,18 @@ def test_handle_preg_check(
     mocker.patch("RUFAS.routines.animal.life_cycle.cow.Cow.__init__", return_value=None)
     cow = Cow(args=mocker.MagicMock())
     cow._repro_state_manager = mock_repro_state_manager = mocker.MagicMock()
-    mocker.patch.object(Cow, "is_pregnant", return_value=is_pregnant, new_callable=mocker.PropertyMock)
+    mocker.patch.object(
+        Cow, "is_pregnant", return_value=is_pregnant, new_callable=mocker.PropertyMock
+    )
     cow.preg_diagnoses = 0
     cow.days_born = 100
     patch_for_log_event = mocker.patch.object(cow, "log_event", return_value=None)
-    mocker.patch.object(cow, "_compare_randomized_rate_less_than", return_value=(loss_rate > 0))
-    patch_for_terminate_pregnancy = mocker.patch.object(cow, "_terminate_pregnancy", return_value=None)
+    mocker.patch.object(
+        cow, "_compare_randomized_rate_less_than", return_value=(loss_rate > 0)
+    )
+    patch_for_terminate_pregnancy = mocker.patch.object(
+        cow, "_terminate_pregnancy", return_value=None
+    )
     mocker.patch.object(
         cow,
         "_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected",
@@ -200,13 +210,22 @@ def test_handle_preg_check(
     if "log_event" in expected_method_calls:
         assert patch_for_log_event.call_count == expected_method_calls["log_event"]
     if "terminate_pregnancy" in expected_method_calls:
-        assert patch_for_terminate_pregnancy.call_count == expected_method_calls["terminate_pregnancy"]
+        assert (
+            patch_for_terminate_pregnancy.call_count
+            == expected_method_calls["terminate_pregnancy"]
+        )
     if "open" in expected_method_calls:
         assert patch_for_open.call_count == expected_method_calls["open"]
     if "exit_state" in expected_method_calls:
-        assert mock_repro_state_manager.exit.call_count == expected_method_calls["exit_state"]
+        assert (
+            mock_repro_state_manager.exit.call_count
+            == expected_method_calls["exit_state"]
+        )
     if "is_in_state" in expected_method_calls:
-        assert mock_repro_state_manager.is_in.call_count == expected_method_calls["is_in_state"]
+        assert (
+            mock_repro_state_manager.is_in.call_count
+            == expected_method_calls["is_in_state"]
+        )
 
 
 @pytest.mark.parametrize(
@@ -250,7 +269,9 @@ def test_handle_preg_check(
         ),
     ],
 )
-def test_open(mocker, repro_program, resynch_program, expected_state, expected_method_call):
+def test_open(
+    mocker, repro_program, resynch_program, expected_state, expected_method_call
+):
     """
     Unit test for the open method of the Cow class in cow.py.
     """
@@ -271,9 +292,13 @@ def test_open(mocker, repro_program, resynch_program, expected_state, expected_m
     mocker.patch.object(cow, "get_avg_estrus_cycle", return_value=21)
     mocker.patch.object(cow, "get_std_estrus_cycle", return_value=2.0)
     patch_for_expected_method = (
-        mocker.patch.object(cow, expected_method_call, return_value=None) if expected_method_call else None
+        mocker.patch.object(cow, expected_method_call, return_value=None)
+        if expected_method_call
+        else None
     )
-    patch_for_log_repro_states = mocker.patch.object(cow, "_log_repro_states", return_value=None)
+    patch_for_log_repro_states = mocker.patch.object(
+        cow, "_log_repro_states", return_value=None
+    )
 
     # Act
     cow.open(sim_day)
@@ -305,19 +330,31 @@ def test_handle_open_cow_in_pgf_at_pd_resynch(mocker: MockFixture) -> None:
     patch_for_execute_hormone_delivery_schedule = mocker.patch.object(
         cow, "_execute_hormone_delivery_schedule", return_value=None
     )
-    patch_for_log_repro_states = mocker.patch.object(cow, "_log_repro_states", return_value=None)
-    patch_for_simulate_estrus = mocker.patch.object(cow, "_simulate_estrus", return_value=None)
+    patch_for_log_repro_states = mocker.patch.object(
+        cow, "_log_repro_states", return_value=None
+    )
+    patch_for_simulate_estrus = mocker.patch.object(
+        cow, "_simulate_estrus", return_value=None
+    )
     cow._repro_state_manager = mock_repro_state_manager = mocker.MagicMock()
-    mocker.patch.object(cow, "get_avg_estrus_cycle_after_pgf", return_value=avg_estrus_cycle_after_pgf)
-    mocker.patch.object(cow, "get_std_estrus_cycle_after_pgf", return_value=std_estrus_cycle_after_pgf)
+    mocker.patch.object(
+        cow, "get_avg_estrus_cycle_after_pgf", return_value=avg_estrus_cycle_after_pgf
+    )
+    mocker.patch.object(
+        cow, "get_std_estrus_cycle_after_pgf", return_value=std_estrus_cycle_after_pgf
+    )
 
     # Act
     cow._handle_open_cow_in_pgf_at_pd_resynch(sim_day)
 
     # Assert
     single_pgf_injection_schedule = {days_born: {"deliver_hormones": ["PGF"]}}
-    patch_for_execute_hormone_delivery_schedule.assert_called_once_with(sim_day, single_pgf_injection_schedule)
-    mock_repro_state_manager.enter.assert_called_once_with(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
+    patch_for_execute_hormone_delivery_schedule.assert_called_once_with(
+        sim_day, single_pgf_injection_schedule
+    )
+    mock_repro_state_manager.enter.assert_called_once_with(
+        ReproStateEnum.WAITING_SHORT_ED_CYCLE
+    )
     patch_for_log_repro_states.assert_called_once_with(sim_day)
     patch_for_simulate_estrus.assert_called_once_with(
         days_born,
@@ -359,7 +396,9 @@ def test_handle_open_cow_in_tai_before_pd_resynch(
     cow.days_born = days_born
     cow._repro_state_manager = mock_repro_state_manager = mocker.MagicMock()
     patch_for_log_event = mocker.patch.object(cow, "log_event", return_value=None)
-    patch_for_log_repro_states = mocker.patch.object(cow, "_log_repro_states", return_value=None)
+    patch_for_log_repro_states = mocker.patch.object(
+        cow, "_log_repro_states", return_value=None
+    )
     mock_repro_state_manager.is_in_empty_state.return_value = is_in_empty_state
     mock_repro_state_manager.is_in.return_value = is_waiting_full_ed_cycle
 
@@ -368,18 +407,24 @@ def test_handle_open_cow_in_tai_before_pd_resynch(
 
     # Assert
     if expected_enter_call:
-        mock_repro_state_manager.enter.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
+        mock_repro_state_manager.enter.assert_called_once_with(
+            ReproStateEnum.IN_OVSYNCH
+        )
         patch_for_log_repro_states.assert_called_once_with(sim_day)
     else:
         mock_repro_state_manager.enter.assert_not_called()
 
     if expected_exit_call:
-        mock_repro_state_manager.exit.assert_called_once_with(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+        mock_repro_state_manager.exit.assert_called_once_with(
+            ReproStateEnum.WAITING_FULL_ED_CYCLE
+        )
     else:
         mock_repro_state_manager.exit.assert_not_called()
 
     if expected_log_event:
-        patch_for_log_event.assert_called_once_with(cow.days_born, sim_day, const.CANCEL_ESTRUS_DETECTION_NOTE)
+        patch_for_log_event.assert_called_once_with(
+            cow.days_born, sim_day, const.CANCEL_ESTRUS_DETECTION_NOTE
+        )
     else:
         patch_for_log_event.assert_not_called()
 
@@ -403,23 +448,31 @@ def test_schedule_ovsynch_program_in_advance(mocker: MockFixture) -> None:
     patch_for_get_first_preg_check_day = mocker.patch.object(
         cow, "get_first_preg_check_day", return_value=first_preg_check_day
     )
-    patch_for_get_ovsynch_program = mocker.patch.object(cow, "get_ovsynch_program", return_value=ov_synch_program)
+    patch_for_get_ovsynch_program = mocker.patch.object(
+        cow, "get_ovsynch_program", return_value=ov_synch_program
+    )
     patch_for_get_ovsynch_program_conception_rate = mocker.patch.object(
         cow,
         "get_ovsynch_program_conception_rate",
         return_value=ov_synch_conception_rate,
     )
-    patch_for_set_up_hormone_schedule = mocker.patch.object(cow, "_set_up_hormone_schedule", return_value=None)
+    patch_for_set_up_hormone_schedule = mocker.patch.object(
+        cow, "_set_up_hormone_schedule", return_value=None
+    )
     patch_for_log_event = mocker.patch.object(cow, "log_event", return_value=None)
 
     # Act
     cow._schedule_ovsynch_program_in_advance(sim_day, days_before_first_preg_check)
 
     # Assert
-    hormone_schedule_start_day = days_born + first_preg_check_day - days_before_first_preg_check
+    hormone_schedule_start_day = (
+        days_born + first_preg_check_day - days_before_first_preg_check
+    )
     patch_for_get_first_preg_check_day.assert_called_once()
     assert patch_for_get_ovsynch_program.call_count == 2
-    patch_for_set_up_hormone_schedule.assert_called_once_with("cows", ov_synch_program, hormone_schedule_start_day)
+    patch_for_set_up_hormone_schedule.assert_called_once_with(
+        "cows", ov_synch_program, hormone_schedule_start_day
+    )
     assert cow._TAI_conception_rate == ov_synch_conception_rate
     patch_for_get_ovsynch_program_conception_rate.assert_called_once()
     patch_for_log_event.assert_called_once()
@@ -448,7 +501,9 @@ def test_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detec
     )
 
     # Act
-    cow._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(sim_day)
+    cow._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
+        sim_day
+    )
 
     # Assert
     mock_repro_state_manager.exit.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
@@ -887,7 +942,10 @@ def test_get_presynch_program_start_day(mocker: MockFixture) -> None:
         Mock function for the method get_data() of the InputManager class in cow.py
         to get the presynch program start day for cows.
         """
-        if key == "animal.animal_config.farm_level.repro.cows.presynch_program_start_day":
+        if (
+            key
+            == "animal.animal_config.farm_level.repro.cows.presynch_program_start_day"
+        ):
             return expected_presynch_program_start_day
         return None
 
@@ -918,7 +976,10 @@ def test_get_ovsynch_program_start_day(mocker: MockFixture) -> None:
         Mock function for the method get_data() of the InputManager class in cow.py
         to get the OvSynch program start day for cows.
         """
-        if key == "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day":
+        if (
+            key
+            == "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day"
+        ):
             return expected_ovsynch_program_start_day
         return None
 
@@ -1104,7 +1165,10 @@ def test_get_ovsynch_program_conception_rate(mocker: MockFixture) -> None:
         Mock function for the method get_data() of the InputManager class in cow.py
         to get the conception rate for OvSynch programs.
         """
-        if key == "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate":
+        if (
+            key
+            == "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+        ):
             return expected_conception_rate
         return None
 
@@ -1135,7 +1199,10 @@ def test_should_decrease_conception_rate_in_rebreeding(mocker: MockFixture) -> N
         Mock function for the method get_data() of the InputManager class in cow.py
         to get the user choice for decreasing conception rate during rebreeding.
         """
-        if key == "animal.animal_config.farm_level.repro.decrease_conception_rate_in_rebreeding":
+        if (
+            key
+            == "animal.animal_config.farm_level.repro.decrease_conception_rate_in_rebreeding"
+        ):
             return expected_decision
         return None
 
@@ -1166,7 +1233,10 @@ def test_should_decrease_conception_rate_by_parity(mocker: MockFixture) -> None:
         Mock function for the method get_data() of the InputManager class in cow.py
         to get the user choice for decreasing conception rate based on the cow's parity.
         """
-        if key == "animal.animal_config.farm_level.repro.decrease_conception_rate_by_parity":
+        if (
+            key
+            == "animal.animal_config.farm_level.repro.decrease_conception_rate_by_parity"
+        ):
             return expected_user_choice
         return None
 

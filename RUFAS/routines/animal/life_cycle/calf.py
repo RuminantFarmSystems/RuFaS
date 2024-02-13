@@ -69,7 +69,10 @@ class Calf(AnimalBase):
         # if AnimalBase.config['keep_female_calf_rate = 0,
         # sell all female calves)
 
-        if self.gender == "male" or random() > AnimalBase.config["keep_female_calf_rate"]:
+        if (
+            self.gender == "male"
+            or random() > AnimalBase.config["keep_female_calf_rate"]
+        ):
             self.sold = True
         else:
             self.sold = False
@@ -134,8 +137,12 @@ class Calf(AnimalBase):
         wean_day = AnimalBase.config["wean_day"]
         wean_length = AnimalBase.config["wean_length"]
         milk_type = AnimalBase.config["milk_type"]
-        self.animal_intake = CalfRationManager.calc_intake(self, feed, wean_day, wean_length, milk_type)
-        self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
+        self.animal_intake = CalfRationManager.calc_intake(
+            self, feed, wean_day, wean_length, milk_type
+        )
+        self.nutrient_rqmts = CalfRationManager.calc_requirements(
+            self, feed, temp, self.animal_intake
+        )
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
     def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str) -> None:
@@ -180,7 +187,12 @@ class Calf(AnimalBase):
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
-            (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
+            (
+                0.0012
+                + 0.004635
+                * (self.mature_body_weight**0.22)
+                * (self.body_weight ** (-0.22))
+            )
             * self.daily_growth
             / 0.96
             * 1000

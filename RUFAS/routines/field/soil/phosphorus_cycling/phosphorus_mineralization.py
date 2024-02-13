@@ -10,7 +10,9 @@ the "Inorganic Soil P Model" section of SurPhos.
 
 
 class PhosphorusMineralization:
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -54,14 +56,18 @@ class PhosphorusMineralization:
                 layer.layer_thickness,
                 field_size,
             )
-            current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-                layer.percent_clay_content,
-                soil_phosphorus_content,
-                layer.percent_organic_carbon_content,
+            current_phosphorus_sorption_parameter = (
+                layer.calculate_phosphorus_sorption_parameter(
+                    layer.percent_clay_content,
+                    soil_phosphorus_content,
+                    layer.percent_organic_carbon_content,
+                )
             )
-            layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
-                layer.mean_phosphorus_sorption_parameter,
-                current_phosphorus_sorption_parameter,
+            layer.mean_phosphorus_sorption_parameter = (
+                self._recompute_mean_phosphorus_sorption_parameter(
+                    layer.mean_phosphorus_sorption_parameter,
+                    current_phosphorus_sorption_parameter,
+                )
             )
 
             balance = self._determine_phosphorus_imbalance(
@@ -79,10 +85,15 @@ class PhosphorusMineralization:
                     layer.mean_phosphorus_sorption_parameter,
                     balance,
                 )
-                phosphorus_mineralized = min(layer.active_inorganic_phosphorus_content, phosphorus_mineralized)
+                phosphorus_mineralized = min(
+                    layer.active_inorganic_phosphorus_content, phosphorus_mineralized
+                )
             elif balance > 0:
                 layer.active_inorganic_unbalanced_counter = 0
-                if layer.previous_phosphorus_balance is not None and layer.previous_phosphorus_balance < balance:
+                if (
+                    layer.previous_phosphorus_balance is not None
+                    and layer.previous_phosphorus_balance < balance
+                ):
                     layer.labile_inorganic_unbalanced_counter = 0
                 layer.labile_inorganic_unbalanced_counter += 1
 
@@ -91,7 +102,9 @@ class PhosphorusMineralization:
                     layer.mean_phosphorus_sorption_parameter,
                     balance,
                 )
-                phosphorus_mineralized = min(layer.labile_inorganic_phosphorus_content, phosphorus_mineralized)
+                phosphorus_mineralized = min(
+                    layer.labile_inorganic_phosphorus_content, phosphorus_mineralized
+                )
                 phosphorus_mineralized *= -1
             else:
                 layer.labile_inorganic_unbalanced_counter = 0
@@ -103,12 +116,18 @@ class PhosphorusMineralization:
 
             layer.previous_phosphorus_balance = balance
 
-            stable_to_active_mineralization_amount = self._determine_stable_to_active_phosphorus_mineralization(
-                layer.stable_inorganic_phosphorus_content,
-                layer.active_inorganic_phosphorus_content,
+            stable_to_active_mineralization_amount = (
+                self._determine_stable_to_active_phosphorus_mineralization(
+                    layer.stable_inorganic_phosphorus_content,
+                    layer.active_inorganic_phosphorus_content,
+                )
             )
-            layer.stable_inorganic_phosphorus_content -= stable_to_active_mineralization_amount
-            layer.active_inorganic_phosphorus_content += stable_to_active_mineralization_amount
+            layer.stable_inorganic_phosphorus_content -= (
+                stable_to_active_mineralization_amount
+            )
+            layer.active_inorganic_phosphorus_content += (
+                stable_to_active_mineralization_amount
+            )
 
     # --- Static methods ---
     @staticmethod
@@ -147,8 +166,12 @@ class PhosphorusMineralization:
 
         """
         days_to_average_over = 365
-        weighted_sum_to_average = (days_to_average_over - 1) * mean_sorption_parameter + current_sorption_parameter
-        new_mean_phosphorus_sorption_parameter = weighted_sum_to_average / days_to_average_over
+        weighted_sum_to_average = (
+            days_to_average_over - 1
+        ) * mean_sorption_parameter + current_sorption_parameter
+        new_mean_phosphorus_sorption_parameter = (
+            weighted_sum_to_average / days_to_average_over
+        )
         return max(0.05, min(0.7, new_mean_phosphorus_sorption_parameter))
 
     @staticmethod
@@ -182,7 +205,9 @@ class PhosphorusMineralization:
         the two pools are balanced.
 
         """
-        return labile_phosphorus - (active_phosphorus * (sorption_parameter / (1 - sorption_parameter)))
+        return labile_phosphorus - (
+            active_phosphorus * (sorption_parameter / (1 - sorption_parameter))
+        )
 
     @staticmethod
     def _calculate_phosphorus_desorption(

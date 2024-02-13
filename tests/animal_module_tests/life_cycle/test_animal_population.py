@@ -17,11 +17,15 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 @pytest.fixture
 def mock_animal_population() -> AnimalPopulation:
     """InputManager fixture"""
-    return AnimalPopulation(calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[])
+    return AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[]
+    )
 
 
 @pytest.mark.parametrize("starting_animal_id", [0, 1, 31415, sys.maxsize])
-def test_next_id(starting_animal_id: int, mock_animal_population: AnimalPopulation) -> None:
+def test_next_id(
+    starting_animal_id: int, mock_animal_population: AnimalPopulation
+) -> None:
     """Unit test for next_id()"""
     mock_animal_population.current_animal_id = starting_animal_id
 
@@ -89,7 +93,9 @@ def test_get_animals(
 
 
 class MockAnimals:
-    def __init__(self, num_animal: int, animal_type: Type, starting_id: int = 0) -> None:
+    def __init__(
+        self, num_animal: int, animal_type: Type, starting_id: int = 0
+    ) -> None:
         self.num_animal = num_animal
         self.animal_type = animal_type
 
@@ -97,16 +103,24 @@ class MockAnimals:
         self.days_born_list = [random.randint(0, 5000) for _ in range(num_animal)]
 
         self.days_in_preg_list = (
-            [random.randint(0, 365) for _ in range(num_animal)] if animal_type == Cow else [None] * num_animal
+            [random.randint(0, 365) for _ in range(num_animal)]
+            if animal_type == Cow
+            else [None] * num_animal
         )
         self.days_in_milk_list = (
-            [random.randint(0, 365) for _ in range(num_animal)] if animal_type == Cow else [None] * num_animal
+            [random.randint(0, 365) for _ in range(num_animal)]
+            if animal_type == Cow
+            else [None] * num_animal
         )
         self.calves_list = (
-            [random.randint(0, 10) for _ in range(num_animal)] if animal_type == Cow else [None] * num_animal
+            [random.randint(0, 10) for _ in range(num_animal)]
+            if animal_type == Cow
+            else [None] * num_animal
         )  # Parity
         self.CI_list = (
-            [random.randint(180, 540) for _ in range(num_animal)] if animal_type == Cow else [None] * num_animal
+            [random.randint(180, 540) for _ in range(num_animal)]
+            if animal_type == Cow
+            else [None] * num_animal
         )  # Calving Interval
 
         self.animals = list(
@@ -126,19 +140,33 @@ class MockAnimals:
 
     def __post_init__(self):
         self.current_max_id = max(self.id_list) if self.id_list else 0
-        self.average_age = sum(animal.days_born for animal in self.animals) / self.num_animal if self.num_animal else 0
+        self.average_age = (
+            sum(animal.days_born for animal in self.animals) / self.num_animal
+            if self.num_animal
+            else 0
+        )
 
         if self.animal_type == Cow:
             self.average_days_in_preg = (
-                sum(animal.days_in_preg for animal in self.animals) / self.num_animal if self.num_animal else 0
+                sum(animal.days_in_preg for animal in self.animals) / self.num_animal
+                if self.num_animal
+                else 0
             )
             self.average_days_in_milk = (
-                sum(animal.days_in_milk for animal in self.animals) / self.num_animal if self.num_animal else 0
+                sum(animal.days_in_milk for animal in self.animals) / self.num_animal
+                if self.num_animal
+                else 0
             )
             self.average_parity = (
-                sum(animal.calves for animal in self.animals) / self.num_animal if self.num_animal else 0
+                sum(animal.calves for animal in self.animals) / self.num_animal
+                if self.num_animal
+                else 0
             )
-            self.average_CI = sum(animal.CI for animal in self.animals) / self.num_animal if self.num_animal else 0
+            self.average_CI = (
+                sum(animal.CI for animal in self.animals) / self.num_animal
+                if self.num_animal
+                else 0
+            )
 
     @staticmethod
     def mock_animal(
@@ -158,19 +186,31 @@ class MockAnimals:
         dummy_animal.calves = calves if calves is not None else None
         dummy_animal.CI = CI if CI is not None else None
 
-        dummy_animal.get_calf_values = MagicMock(return_value={"dummy": "calf"}) if animal_type == Calf else None
+        dummy_animal.get_calf_values = (
+            MagicMock(return_value={"dummy": "calf"}) if animal_type == Calf else None
+        )
         dummy_animal.get_heiferI_values = (
-            MagicMock(return_value={"dummy": "heiferI"}) if animal_type == HeiferI else None
+            MagicMock(return_value={"dummy": "heiferI"})
+            if animal_type == HeiferI
+            else None
         )
         dummy_animal.get_heiferII_values = (
-            MagicMock(return_value={"dummy": "heiferII"}) if animal_type == HeiferII else None
+            MagicMock(return_value={"dummy": "heiferII"})
+            if animal_type == HeiferII
+            else None
         )
         dummy_animal.get_heiferIII_values = (
-            MagicMock(return_value={"dummy": "heiferIII"}) if animal_type == HeiferIII else None
+            MagicMock(return_value={"dummy": "heiferIII"})
+            if animal_type == HeiferIII
+            else None
         )
-        dummy_animal.get_cow_values = MagicMock(return_value={"dummy": "cow"}) if animal_type == Cow else None
+        dummy_animal.get_cow_values = (
+            MagicMock(return_value={"dummy": "cow"}) if animal_type == Cow else None
+        )
         dummy_animal.get_replacement_values = (
-            MagicMock(return_value={"dummy": "replacement"}) if animal_type == Cow else None
+            MagicMock(return_value={"dummy": "replacement"})
+            if animal_type == Cow
+            else None
         )
         return dummy_animal
 
@@ -190,7 +230,9 @@ class MockAnimals:
         ([]),
     ],
 )
-def test_average(data: List[int | float], mock_animal_population: AnimalPopulation) -> None:
+def test_average(
+    data: List[int | float], mock_animal_population: AnimalPopulation
+) -> None:
     expected_result = sum(data) / len(data) if len(data) else 0
 
     actual_result = mock_animal_population._average(data=data)

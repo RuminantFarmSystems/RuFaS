@@ -138,7 +138,9 @@ def test_manure_nutrients_init(
         ),
     ],
 )
-def test_manure_nutrients_invalid_init(manure_type: ManureType | str, nutrient_values: dict[str, float]) -> None:
+def test_manure_nutrients_invalid_init(
+    manure_type: ManureType | str, nutrient_values: dict[str, float]
+) -> None:
     """
     Unit test for the __post_init__ method in the ManureNutrients class in manure_nutrients.py.
 
@@ -152,7 +154,9 @@ def test_manure_nutrients_invalid_init(manure_type: ManureType | str, nutrient_v
                 ManureNutrients(**nutrient_values, manure_type=manure_type)
             break
     if not manure_type:
-        with pytest.raises(ValueError, match="Field manure_type must be an instance of ManureType."):
+        with pytest.raises(
+            ValueError, match="Field manure_type must be an instance of ManureType."
+        ):
             ManureNutrients(**nutrient_values, manure_type=manure_type)
 
 
@@ -247,17 +251,21 @@ def test_manure_nutrients_add_subtract_raises_errors(
     if nutrients.manure_type != nutrients2.manure_type:
         with pytest.raises(
             TypeError,
-            match=f"Cannot add {nutrients.manure_type} " f"nutrients to {nutrients2.manure_type} nutrients.",
+            match=f"Cannot add {nutrients.manure_type} "
+            f"nutrients to {nutrients2.manure_type} nutrients.",
         ):
             nutrients + nutrients2
         with pytest.raises(
             TypeError,
-            match=f"Cannot subtract {nutrients.manure_type} " f"nutrients from {nutrients2.manure_type} nutrients.",
+            match=f"Cannot subtract {nutrients.manure_type} "
+            f"nutrients from {nutrients2.manure_type} nutrients.",
         ):
             nutrients2 - nutrients
 
         nutrients2 = "dummy_invalid_nutrients"
-        with pytest.raises(TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."):
+        with pytest.raises(
+            TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."
+        ):
             nutrients + nutrients2
         with pytest.raises(
             TypeError,
@@ -267,7 +275,8 @@ def test_manure_nutrients_add_subtract_raises_errors(
     else:
         with pytest.raises(
             ValueError,
-            match=f"The amount of {nutrient_to_subtract} in other " f"object is greater than what is available.",
+            match=f"The amount of {nutrient_to_subtract} in other "
+            f"object is greater than what is available.",
         ):
             nutrients2 - nutrients
 
@@ -294,9 +303,13 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
 
     # Act and Assert
     if type(multiplier) not in [int, float]:
-        with pytest.raises(TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."):
+        with pytest.raises(
+            TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."
+        ):
             nutrients * multiplier
-        with pytest.raises(TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."):
+        with pytest.raises(
+            TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."
+        ):
             multiplier * nutrients
     elif multiplier >= 0:
         nutrients_multiplied = nutrients * multiplier
@@ -312,10 +325,16 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
         assert nutrients_multiplied_2.phosphorus == pytest.approx(2.0 * multiplier)
         assert nutrients_multiplied_2.potassium == pytest.approx(3.0 * multiplier)
         assert nutrients_multiplied_2.dry_matter == pytest.approx(4.0 * multiplier)
-        assert nutrients_multiplied_2.total_manure_mass == pytest.approx(5.0 * multiplier)
+        assert nutrients_multiplied_2.total_manure_mass == pytest.approx(
+            5.0 * multiplier
+        )
     else:
-        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
+        with pytest.raises(
+            ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."
+        ):
             nutrients * multiplier
 
-        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
+        with pytest.raises(
+            ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."
+        ):
             multiplier * nutrients

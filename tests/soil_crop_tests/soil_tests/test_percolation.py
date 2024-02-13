@@ -20,10 +20,16 @@ from math import exp, inf
         (6.78, 4.56, 8.9607),
     ],
 )
-def test_determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity):
+def test_determine_percolation_travel_time(
+    saturation, field_capacity, hydraulic_conductivity
+):
     """tests _determine_percolation_travel_time() in percolation.py"""
-    observe = Percolation._determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity)
-    expect = (saturation / hydraulic_conductivity) - (field_capacity / hydraulic_conductivity)
+    observe = Percolation._determine_percolation_travel_time(
+        saturation, field_capacity, hydraulic_conductivity
+    )
+    expect = (saturation / hydraulic_conductivity) - (
+        field_capacity / hydraulic_conductivity
+    )
     assert pytest.approx(observe) == expect
 
 
@@ -34,10 +40,14 @@ def test_determine_percolation_travel_time(saturation, field_capacity, hydraulic
         (4.5, 4.1, -1.32),
     ],
 )
-def test_error_determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity):
+def test_error_determine_percolation_travel_time(
+    saturation, field_capacity, hydraulic_conductivity
+):
     """test that _determine_percolation_travel_time() correctly raises errors when invalid input is passed"""
     with pytest.raises(Exception):
-        Percolation._determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity)
+        Percolation._determine_percolation_travel_time(
+            saturation, field_capacity, hydraulic_conductivity
+        )
 
 
 @pytest.mark.parametrize(
@@ -52,7 +62,9 @@ def test_error_determine_percolation_travel_time(saturation, field_capacity, hyd
 )
 def test_determine_percolation_to_next_layer(drainable_water, time_step, travel_time):
     """tests _determine_percolation_to_next_layer() in percolation.py"""
-    observe = Percolation._determine_percolation_to_next_layer(drainable_water, time_step, travel_time)
+    observe = Percolation._determine_percolation_to_next_layer(
+        drainable_water, time_step, travel_time
+    )
     expect = 1 - exp((-1 * time_step) / travel_time)
     expect *= drainable_water
     assert observe == expect
@@ -84,7 +96,11 @@ def test_determine_if_percolation_allowed(
     if not high_seasonal_water_table:
         assert observe is True
     elif (
-        water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))
+        water_content
+        > (
+            field_capacity_content
+            + (0.5 * (saturated_capacity_content - field_capacity_content))
+        )
     ) and high_seasonal_water_table:
         assert observe is True
     else:
@@ -120,8 +136,12 @@ def test_percolate_between_layers(
         return_value=acceptable_percolation_amount,
     ):
         Percolation._determine_percolation_travel_time = MagicMock()
-        Percolation._determine_percolation_to_next_layer = MagicMock(return_value=amount_to_percolate)
-        result = Percolation._percolate_between_layers(time_step, upper_data, lower_data)
+        Percolation._determine_percolation_to_next_layer = MagicMock(
+            return_value=amount_to_percolate
+        )
+        result = Percolation._percolate_between_layers(
+            time_step, upper_data, lower_data
+        )
         if excess_water_available <= 0:
             assert result == expected
         else:
@@ -132,7 +152,8 @@ def test_percolate_between_layers(
 
 # --- Integration tests ----
 @pytest.mark.parametrize(
-    "infiltration,water_contents,acceptable_percolation_amounts,percolated_water," "expected_water_contents",
+    "infiltration,water_contents,acceptable_percolation_amounts,percolated_water,"
+    "expected_water_contents",
     [
         (
             10.0,
@@ -196,7 +217,9 @@ def test_percolate_excess_water(
     for index, layer in enumerate(percolation.data.soil_layers):
         assert pytest.approx(layer.water_content) == expected_water_contents[index]
         assert pytest.approx(layer.percolated_water) == percolated_water[index]
-    assert percolation.data.vadose_zone_layer.water_content == expected_water_contents[-1]
+    assert (
+        percolation.data.vadose_zone_layer.water_content == expected_water_contents[-1]
+    )
 
 
 @pytest.fixture
@@ -259,11 +282,16 @@ def test_percolate(
             100.0,
         ]
         assert mock_soil_data.vadose_zone_layer.water_content == 0.0
-        assert mock_soil_data.get_vectorized_layer_attribute("percolated_water") == [0.0] * 3
+        assert (
+            mock_soil_data.get_vectorized_layer_attribute("percolated_water")
+            == [0.0] * 3
+        )
     else:
         percolate_excess.assert_not_called()
         assert percolation_allowed.call_count == 3
-        actual_percolation = mock_soil_data.get_vectorized_layer_attribute("percolated_water")
+        actual_percolation = mock_soil_data.get_vectorized_layer_attribute(
+            "percolated_water"
+        )
         if can_percolate:
             assert percolate_between_layers.call_count == 3
             assert actual_percolation == [3.0, 3.0, 3.0]
@@ -271,7 +299,9 @@ def test_percolate(
             percolate_between_layers.assert_not_called()
             assert actual_percolation == [0.0, 0.0, 0.0]
 
-        actual_profile_contents = mock_soil_data.get_vectorized_layer_attribute("water_content")
+        actual_profile_contents = mock_soil_data.get_vectorized_layer_attribute(
+            "water_content"
+        )
         assert actual_profile_contents == expected[:-1]
         actual_vadose_content = mock_soil_data.vadose_zone_layer.water_content
         assert actual_vadose_content == expected[-1]

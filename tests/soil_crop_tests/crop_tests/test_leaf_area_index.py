@@ -25,7 +25,9 @@ def test_determine_optimal_leaf_area_fraction(heatfrac, s1, s2):
         expect = 0
     else:
         expect = heatfrac / x
-    assert LeafAreaIndex._determine_optimal_leaf_area_fraction(heatfrac, s1, s2) == expect
+    assert (
+        LeafAreaIndex._determine_optimal_leaf_area_fraction(heatfrac, s1, s2) == expect
+    )
 
 
 @pytest.mark.parametrize(
@@ -88,7 +90,9 @@ def test_determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2):
     y = LeafAreaIndex._calc_shape_log(heatfrac2, areafrac2)
     s2 = (x - y) / (heatfrac2 - heatfrac1)
     s1 = x + s2 * heatfrac1
-    assert LeafAreaIndex._determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2) == [s1, s2]
+    assert LeafAreaIndex._determine_lai_shapes(
+        heatfrac1, heatfrac2, areafrac1, areafrac2
+    ) == [s1, s2]
 
 
 @pytest.mark.parametrize(
@@ -132,13 +136,22 @@ def test_determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac)
     top = 1 - heatfrac
     bottom = 1 - senheatfrac
     expect = optareafrac * (top / bottom)
-    assert LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac) == expect
+    assert (
+        LeafAreaIndex._determine_senescent_leaf_area_index(
+            heatfrac, senheatfrac, optareafrac
+        )
+        == expect
+    )
 
 
-@pytest.mark.parametrize("heatfrac,senheatfrac,optareafrac", [(1.1, 1, 0.9), (1.1, 1.9, 0.9)])
+@pytest.mark.parametrize(
+    "heatfrac,senheatfrac,optareafrac", [(1.1, 1, 0.9), (1.1, 1.9, 0.9)]
+)
 def test_error_determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac):
     with pytest.raises(Exception) as e:
-        LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac)
+        LeafAreaIndex._determine_senescent_leaf_area_index(
+            heatfrac, senheatfrac, optareafrac
+        )
     assert "Senescent heat fraction must be less than 1" in str(e.value)
 
 
@@ -157,15 +170,24 @@ def test_error_determine_senescent_leaf_area_index(heatfrac, senheatfrac, optare
 def test_determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai):
     scaled_diff = (frac - prev_frac) * max_lai
     expo = 1 - exp(5 * (prev_lai - max_lai))
-    assert LeafAreaIndex._determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai) == scaled_diff * expo
+    assert (
+        LeafAreaIndex._determine_max_leaf_area_change(
+            frac, prev_frac, max_lai, prev_lai
+        )
+        == scaled_diff * expo
+    )
 
 
-@pytest.mark.parametrize("max_can_height, opt_leaf_area_frac", [(0, 0), (1, 1), (1.3, 0.4), (2.4, 0.9)])
+@pytest.mark.parametrize(
+    "max_can_height, opt_leaf_area_frac", [(0, 0), (1, 1), (1.3, 0.4), (2.4, 0.9)]
+)
 def test_determine_canopy_height(max_can_height, opt_leaf_area_frac):
     sqrt_opt = sqrt(opt_leaf_area_frac)
     product = max_can_height * sqrt_opt
     expect = min(max_can_height, product)
-    assert expect == LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
+    assert expect == LeafAreaIndex.determine_canopy_height(
+        max_can_height, opt_leaf_area_frac
+    )
 
 
 @pytest.mark.parametrize(
@@ -216,26 +238,41 @@ def test_grow_canopy(
     )
     lai = LeafAreaIndex(data)
 
-    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
+    with patch.object(
+        CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac
+    ):
         lai.grow_canopy()
         # expect
         shapes = LeafAreaIndex._determine_lai_shapes(0.2, 0.33, 0.05, 0.95)
         assert data._lai_shapes == shapes
-        optimal_lai = LeafAreaIndex._determine_optimal_leaf_area_fraction(heatfrac, shapes[0], shapes[1])
+        optimal_lai = LeafAreaIndex._determine_optimal_leaf_area_fraction(
+            heatfrac, shapes[0], shapes[1]
+        )
         assert data.optimal_leaf_area_fraction == optimal_lai
         assert data.canopy_height == LeafAreaIndex.determine_canopy_height(
             data.max_canopy_height, data.optimal_leaf_area_fraction
         )
         if heatfrac <= 0.9:  # normal growth
             assert data.is_in_senescence is False
-            if previous_leaf_area_index is None and previous_optimal_leaf_area_fraction is None:
-                max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0, 3.0, 0)
+            if (
+                previous_leaf_area_index is None
+                and previous_optimal_leaf_area_fraction is None
+            ):
+                max_change = LeafAreaIndex._determine_max_leaf_area_change(
+                    optimal_lai, 0, 3.0, 0
+                )
             elif previous_leaf_area_index is None:
-                max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0.01, 3.0, 0)
+                max_change = LeafAreaIndex._determine_max_leaf_area_change(
+                    optimal_lai, 0.01, 3.0, 0
+                )
             elif previous_optimal_leaf_area_fraction is None:
-                max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0, 3.0, 0.1)
+                max_change = LeafAreaIndex._determine_max_leaf_area_change(
+                    optimal_lai, 0, 3.0, 0.1
+                )
             else:
-                max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0.01, 3.0, 0.1)
+                max_change = LeafAreaIndex._determine_max_leaf_area_change(
+                    optimal_lai, 0.01, 3.0, 0.1
+                )
             assert data.optimal_leaf_area_change == max_change
             added = max_change * sqrt(0.95)
             if max_change < added:  # when heatfrac = 0, no growth occurs
@@ -249,6 +286,9 @@ def test_grow_canopy(
             assert data.previous_optimal_leaf_area_fraction == optimal_lai
         else:  # senescence
             assert data.is_in_senescence is True
-            assert data.leaf_area_index == LeafAreaIndex._determine_senescent_leaf_area_index(
-                heatfrac, 0.9, data.max_leaf_area_index
+            assert (
+                data.leaf_area_index
+                == LeafAreaIndex._determine_senescent_leaf_area_index(
+                    heatfrac, 0.9, data.max_leaf_area_index
+                )
             )

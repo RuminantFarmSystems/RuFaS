@@ -53,8 +53,12 @@ def test_get_vectorized_layer_attribute() -> None:
         30,
         5000,
     ]
-    assert soil_data.get_vectorized_layer_attribute("field_capacity_water_concentration") == [0.15, 0.5, 0.10, 0.5]
-    assert soil_data.get_vectorized_layer_attribute("saturation_point_water_concentration") == [0.2, 0.8, 0.11, 0.5]
+    assert soil_data.get_vectorized_layer_attribute(
+        "field_capacity_water_concentration"
+    ) == [0.15, 0.5, 0.10, 0.5]
+    assert soil_data.get_vectorized_layer_attribute(
+        "saturation_point_water_concentration"
+    ) == [0.2, 0.8, 0.11, 0.5]
     with pytest.raises(Exception):
         soil_data.get_vectorized_layer_attribute("non_existant_variable")
 
@@ -63,8 +67,13 @@ def test_set_vectorized_layer_attribute() -> None:
     """ensures that layer attributes are properly set"""
     soil_data = SoilData(field_size=1.55)  # 4 layers by default
     water_concentration = [0.1, 0.2, 1, 0.8]
-    soil_data.set_vectorized_layer_attribute("soil_water_concentration", water_concentration)
-    assert soil_data.get_vectorized_layer_attribute("soil_water_concentration") == water_concentration
+    soil_data.set_vectorized_layer_attribute(
+        "soil_water_concentration", water_concentration
+    )
+    assert (
+        soil_data.get_vectorized_layer_attribute("soil_water_concentration")
+        == water_concentration
+    )
 
 
 def test_manual_soil_data_configuration() -> None:
@@ -139,7 +148,9 @@ def test_error_manual_soil_data_configuration() -> None:
         SoilData(
             field_size=1.8,
             soil_layers=[
-                LayerData(top_depth=0, bottom_depth=19, initial_soil_nitrate_concentration=1.8),
+                LayerData(
+                    top_depth=0, bottom_depth=19, initial_soil_nitrate_concentration=1.8
+                ),
                 LayerData(
                     top_depth=19,
                     bottom_depth=150,
@@ -152,7 +163,10 @@ def test_error_manual_soil_data_configuration() -> None:
                 ),
             ],
         )
-    assert str(e.value) == "'field_size' attribute is NoneType, must be given value when LayerData is initialized."
+    assert (
+        str(e.value)
+        == "'field_size' attribute is NoneType, must be given value when LayerData is initialized."
+    )
     with pytest.raises(ValueError) as e:
         SoilData(
             field_size=1.8,
@@ -202,7 +216,10 @@ def test_error_manual_soil_data_configuration() -> None:
                 ),
             ],
         )
-    assert str(e.value) == "Expected bottom depth of top soil layer must be 20 mm or greater, received '19'."
+    assert (
+        str(e.value)
+        == "Expected bottom depth of top soil layer must be 20 mm or greater, received '19'."
+    )
 
 
 def test_annual_reset() -> None:
@@ -298,7 +315,9 @@ def test_profile_field_capacity() -> None:
     "profile_water,profile_field_capacity,expected",
     [(3.5, 4.5, 0.91503268), (5.0, 5.5, 1.0), (0.0, 3.0, 0.0), (-1.0, 3.0, 0.0)],
 )
-def test_soil_water_factor(profile_water: float, profile_field_capacity: float, expected: float) -> None:
+def test_soil_water_factor(
+    profile_water: float, profile_field_capacity: float, expected: float
+) -> None:
     """Test that SoilData correctly calculates the soil water factor for a soil profile."""
     with patch.multiple(
         "RUFAS.routines.field.soil.soil_data.SoilData",
@@ -319,14 +338,26 @@ def test_soil_water_factor(profile_water: float, profile_field_capacity: float, 
             LayerData(top_depth=76, bottom_depth=145, bulk_density=3.4, field_size=1.5),
         ],
         [
-            LayerData(top_depth=0, bottom_depth=140, bulk_density=5.683745, field_size=1.5),
-            LayerData(top_depth=140, bottom_depth=369, bulk_density=8.9384785, field_size=1.5),
-            LayerData(top_depth=369, bottom_depth=798, bulk_density=7.485968, field_size=1.5),
+            LayerData(
+                top_depth=0, bottom_depth=140, bulk_density=5.683745, field_size=1.5
+            ),
+            LayerData(
+                top_depth=140, bottom_depth=369, bulk_density=8.9384785, field_size=1.5
+            ),
+            LayerData(
+                top_depth=369, bottom_depth=798, bulk_density=7.485968, field_size=1.5
+            ),
         ],
         [
-            LayerData(top_depth=0, bottom_depth=99, bulk_density=1.88973834, field_size=1.5),
-            LayerData(top_depth=99, bottom_depth=213, bulk_density=2.119481, field_size=1.5),
-            LayerData(top_depth=213, bottom_depth=359, bulk_density=2.556948, field_size=1.5),
+            LayerData(
+                top_depth=0, bottom_depth=99, bulk_density=1.88973834, field_size=1.5
+            ),
+            LayerData(
+                top_depth=99, bottom_depth=213, bulk_density=2.119481, field_size=1.5
+            ),
+            LayerData(
+                top_depth=213, bottom_depth=359, bulk_density=2.556948, field_size=1.5
+            ),
         ],
     ],
 )
@@ -421,7 +452,9 @@ def test_profile_nitrates_total(layers: List[LayerData]) -> None:
     "plant_surface_residue,plant_root_residue,expected",
     [(16, 4, 20), (16.5, 4.5, 21), (0, 0, 0)],
 )
-def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
+def test_all_residue(
+    plant_surface_residue: float, plant_root_residue: float, expected: float
+) -> None:
     """Tests the property method all_residue sums up the residues correctly"""
     with patch(
         "RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue",
@@ -439,7 +472,10 @@ def test_soil_data_post_init_error() -> None:
     with pytest.raises(TypeError) as e:
         soil_data = SoilData(field_size=0.98)
         soil_data.__post_init__(None)
-        assert str(e) == "'field_size' attribute is NoneType, must be given value when SoilData is initialized."
+        assert (
+            str(e)
+            == "'field_size' attribute is NoneType, must be given value when SoilData is initialized."
+        )
 
     with pytest.raises(ValueError) as e2:
         soil_data = SoilData(field_size=0.98)
@@ -461,6 +497,7 @@ def test_cover_factor(cover_type: str) -> None:
         with pytest.raises(ValueError) as e:
             soil_data.cover_factor
             assert (
-                str(e) == f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', "
+                str(e)
+                == f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', "
                 f"received: '{cover_type}'."
             )

@@ -19,9 +19,13 @@ class FieldDataReporter:
         for field in self.fields:
             info_map["suffix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
-            om.add_variable("current_residue", field.field_data.current_residue, info_map)
+            om.add_variable(
+                "current_residue", field.field_data.current_residue, info_map
+            )
             om.add_variable("transpiration", field.field_data.transpiration, info_map)
-            om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
+            om.add_variable(
+                "max_transpiration", field.field_data.max_transpiration, info_map
+            )
             om.add_variable(
                 "max_evapotranspiration",
                 field.field_data.max_evapotranspiration,
@@ -34,10 +38,18 @@ class FieldDataReporter:
             )
 
             # ----------------------------adding soil data
-            om.add_variable("water_evaporated", field.soil.data.water_evaporated, info_map)
-            om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
-            om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
-            om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, info_map)
+            om.add_variable(
+                "water_evaporated", field.soil.data.water_evaporated, info_map
+            )
+            om.add_variable(
+                "eroded_sediment", field.soil.data.eroded_sediment, info_map
+            )
+            om.add_variable(
+                "accumulated_runoff", field.soil.data.accumulated_runoff, info_map
+            )
+            om.add_variable(
+                "infiltrated_water", field.soil.data.infiltrated_water, info_map
+            )
             om.add_variable("snow_content", field.soil.data.snow_content, info_map)
             om.add_variable("snow_melt", field.soil.data.snow_melt_amount, info_map)
             om.add_variable(
@@ -45,7 +57,9 @@ class FieldDataReporter:
                 field.soil.data.current_day_snow_temperature,
                 info_map,
             )
-            om.add_variable("water_sublimated", field.soil.data.water_sublimated, info_map)
+            om.add_variable(
+                "water_sublimated", field.soil.data.water_sublimated, info_map
+            )
             om.add_variable("cover_type", field.soil.data.cover_type, info_map)
             om.add_variable(
                 "full_available_phosphorus_pool",
@@ -183,7 +197,9 @@ class FieldDataReporter:
                 info_map,
             )
             om.add_variable("nitrate_runoff", field.soil.data.nitrate_runoff, info_map)
-            om.add_variable("ammonium_runoff", field.soil.data.ammonium_runoff, info_map)
+            om.add_variable(
+                "ammonium_runoff", field.soil.data.ammonium_runoff, info_map
+            )
             om.add_variable(
                 "eroded_fresh_organic_nitrogen",
                 field.soil.data.eroded_fresh_organic_nitrogen,
@@ -200,7 +216,9 @@ class FieldDataReporter:
                 info_map,
             )
 
-            om.add_variable("profile_carbon_total", field.soil.data.profile_carbon_total, info_map)
+            om.add_variable(
+                "profile_carbon_total", field.soil.data.profile_carbon_total, info_map
+            )
             om.add_variable(
                 "profile_carbon_emissions",
                 field.soil.data.profile_carbon_emissions,
@@ -233,7 +251,9 @@ class FieldDataReporter:
             )
 
             # Adding vadose zone layer data
-            info_map["suffix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
+            info_map["suffix"] = (
+                "field='" + field.field_data.name + "',vadose_zone_layer"
+            )
             om.add_variable(
                 "active_organic_nitrogen_content",
                 field.soil.data.vadose_zone_layer.active_organic_nitrogen_content,
@@ -282,13 +302,17 @@ class FieldDataReporter:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
+                info_map["suffix"] = (
+                    "field='" + field.field_data.name + "',layer='" + str(index) + "'"
+                )
 
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
                 om.add_variable("water_content", layer.water_content, info_map)
                 om.add_variable("water_factor", layer.water_factor, info_map)
-                om.add_variable("evaporated_water_content", layer.evaporated_water_content, info_map)
+                om.add_variable(
+                    "evaporated_water_content", layer.evaporated_water_content, info_map
+                )
                 om.add_variable(
                     "plant_metabolic_active_carbon_usage",
                     layer.plant_metabolic_active_carbon_usage,
@@ -309,8 +333,12 @@ class FieldDataReporter:
                     layer.plant_structural_active_carbon_usage,
                     info_map,
                 )
-                om.add_variable("metabolic_litter_amount", layer.metabolic_litter_amount, info_map)
-                om.add_variable("structural_litter_amount", layer.structural_litter_amount, info_map)
+                om.add_variable(
+                    "metabolic_litter_amount", layer.metabolic_litter_amount, info_map
+                )
+                om.add_variable(
+                    "structural_litter_amount", layer.structural_litter_amount, info_map
+                )
                 om.add_variable(
                     "plant_structural_active_carbon_remaining",
                     layer.plant_structural_active_carbon_remaining,
@@ -381,9 +409,15 @@ class FieldDataReporter:
                     layer.active_carbon_decomposition_amount,
                     info_map,
                 )
-                om.add_variable("active_carbon_amount", layer.active_carbon_amount, info_map)
-                om.add_variable("slow_carbon_amount", layer.slow_carbon_amount, info_map)
-                om.add_variable("passive_carbon_amount", layer.passive_carbon_amount, info_map)
+                om.add_variable(
+                    "active_carbon_amount", layer.active_carbon_amount, info_map
+                )
+                om.add_variable(
+                    "slow_carbon_amount", layer.slow_carbon_amount, info_map
+                )
+                om.add_variable(
+                    "passive_carbon_amount", layer.passive_carbon_amount, info_map
+                )
                 om.add_variable(
                     "slow_carbon_decomposition_amount",
                     layer.slow_carbon_decomposition_amount,
@@ -444,8 +478,12 @@ class FieldDataReporter:
                     layer.soil_overall_carbon_fraction,
                     info_map,
                 )
-                om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount, info_map)
-                om.add_variable("carbon_emissions", layer.total_soil_carbon_amount, info_map)
+                om.add_variable(
+                    "total_soil_carbon_amount", layer.total_soil_carbon_amount, info_map
+                )
+                om.add_variable(
+                    "carbon_emissions", layer.total_soil_carbon_amount, info_map
+                )
                 om.add_variable(
                     "mean_phosphorus_sorption_parameter",
                     layer.mean_phosphorus_sorption_parameter,
@@ -481,7 +519,9 @@ class FieldDataReporter:
                     layer.labile_inorganic_unbalanced_counter,
                     info_map,
                 )
-                om.add_variable("percolated_phosphorus", layer.percolated_phosphorus, info_map)
+                om.add_variable(
+                    "percolated_phosphorus", layer.percolated_phosphorus, info_map
+                )
                 om.add_variable("nitrate_content", layer.nitrate_content, info_map)
                 om.add_variable("ammonium_content", layer.ammonium_content, info_map)
                 om.add_variable(
@@ -499,10 +539,16 @@ class FieldDataReporter:
                     layer.fresh_organic_nitrogen_content,
                     info_map,
                 )
-                om.add_variable("nitrous_oxide_emissions", layer.nitrous_oxide_emissions, info_map)
+                om.add_variable(
+                    "nitrous_oxide_emissions", layer.nitrous_oxide_emissions, info_map
+                )
                 om.add_variable("ammonia_emissions", layer.ammonia_emissions, info_map)
-                om.add_variable("percolated_nitrates", layer.percolated_nitrates, info_map)
-                om.add_variable("percolated_ammonium", layer.percolated_ammonium, info_map)
+                om.add_variable(
+                    "percolated_nitrates", layer.percolated_nitrates, info_map
+                )
+                om.add_variable(
+                    "percolated_ammonium", layer.percolated_ammonium, info_map
+                )
                 om.add_variable(
                     "percolated_active_organic_nitrogen",
                     layer.percolated_active_organic_nitrogen,
@@ -517,17 +563,25 @@ class FieldDataReporter:
                 om.add_variable("root_depth", crop.data.root_depth, info_map)
                 om.add_variable("biomass", crop.data.biomass, info_map)
                 om.add_variable("usable_light", crop.data.usable_light, info_map)
-                om.add_variable("biomass_growth_max", crop.data.biomass_growth_max, info_map)
+                om.add_variable(
+                    "biomass_growth_max", crop.data.biomass_growth_max, info_map
+                )
                 om.add_variable("biomass_growth", crop.data.biomass_growth, info_map)
                 om.add_variable("growth_factor", crop.data.growth_factor, info_map)
-                om.add_variable("above_ground_biomass", crop.data.above_ground_biomass, info_map)
+                om.add_variable(
+                    "above_ground_biomass", crop.data.above_ground_biomass, info_map
+                )
                 om.add_variable("root_biomass", crop.data.root_biomass, info_map)
                 om.add_variable("water_uptake", crop.data.water_uptake, info_map)
                 om.add_variable("water_stress", crop.data.water_stress, info_map)
                 om.add_variable("temp_stress", crop.data.temp_stress, info_map)
                 om.add_variable("nitrogen_stress", crop.data.nitrogen_stress, info_map)
-                om.add_variable("phosphorus_stress", crop.data.phosphorus_stress, info_map)
-                om.add_variable("accumulated_heat_units", crop.data.accumulated_heat_units, info_map)
+                om.add_variable(
+                    "phosphorus_stress", crop.data.phosphorus_stress, info_map
+                )
+                om.add_variable(
+                    "accumulated_heat_units", crop.data.accumulated_heat_units, info_map
+                )
                 om.add_variable("heat_fraction", crop.data.heat_fraction, info_map)
                 om.add_variable("is_growing", crop.data.is_growing, info_map)
                 om.add_variable("is_dormant", crop.data.is_dormant, info_map)
@@ -549,7 +603,9 @@ class FieldDataReporter:
                     crop.data.total_phosphorus_uptake,
                     info_map,
                 )
-                om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
+                om.add_variable(
+                    "total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map
+                )
                 om.add_variable(
                     "optimal_nitrogen_fraction",
                     crop.data.optimal_nitrogen_fraction,
@@ -570,7 +626,9 @@ class FieldDataReporter:
                     crop.data.actual_nitrogen_uptakes,
                     info_map,
                 )
-                om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
+                om.add_variable(
+                    "cumulative_evaporation", crop.data.cumulative_evaporation, info_map
+                )
                 om.add_variable(
                     "cumulative_transpiration",
                     crop.data.cumulative_transpiration,
@@ -581,16 +639,30 @@ class FieldDataReporter:
                     crop.data.cumulative_evapotranspiration,
                     info_map,
                 )
-                om.add_variable("water_deficiency", crop.data.water_deficiency, info_map)
-                om.add_variable("max_transpiration", crop.data.max_transpiration, info_map)
+                om.add_variable(
+                    "water_deficiency", crop.data.water_deficiency, info_map
+                )
+                om.add_variable(
+                    "max_transpiration", crop.data.max_transpiration, info_map
+                )
                 om.add_variable("canopy_water", crop.data.canopy_water, info_map)
                 om.add_variable("cut_biomass", crop.data.cut_biomass, info_map)
-                om.add_variable("wet_yield_collected", crop.data.wet_yield_collected, info_map)
-                om.add_variable("dry_matter_yield_residue", crop.data.yield_residue, info_map)
+                om.add_variable(
+                    "wet_yield_collected", crop.data.wet_yield_collected, info_map
+                )
+                om.add_variable(
+                    "dry_matter_yield_residue", crop.data.yield_residue, info_map
+                )
                 om.add_variable("yield_nitrogen", crop.data.yield_nitrogen, info_map)
-                om.add_variable("yield_phosphorus", crop.data.yield_phosphorus, info_map)
-                om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
-                om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
+                om.add_variable(
+                    "yield_phosphorus", crop.data.yield_phosphorus, info_map
+                )
+                om.add_variable(
+                    "residue_nitrogen", crop.data.residue_nitrogen, info_map
+                )
+                om.add_variable(
+                    "residue_phosphorus", crop.data.residue_phosphorus, info_map
+                )
 
     def send_annual_variables(self) -> None:
         """sends annual variables to the output manager"""
@@ -609,10 +681,20 @@ class FieldDataReporter:
             )
 
             # Adding soil data
-            water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
-            om.add_variable("annual_water_content_change", water_content_change, info_map)
-            nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
-            om.add_variable("annual_nitrates_content_change", nitrates_content_change, info_map)
+            water_content_change = (
+                field.soil.data.profile_soil_water_content
+                - field.soil.data.initial_water_content
+            )
+            om.add_variable(
+                "annual_water_content_change", water_content_change, info_map
+            )
+            nitrates_content_change = (
+                field.soil.data.profile_nitrates_total
+                - field.soil.data.initial_nitrates_total
+            )
+            om.add_variable(
+                "annual_nitrates_content_change", nitrates_content_change, info_map
+            )
 
             om.add_variable(
                 "annual_soil_evaporation_total",
@@ -687,7 +769,9 @@ class FieldDataReporter:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
+                info_map["suffix"] = (
+                    "field='" + field.field_data.name + "',layer='" + str(index) + "'"
+                )
 
                 om.add_variable(
                     "annual_nitrous_oxide_emissions_total",
@@ -704,4 +788,6 @@ class FieldDataReporter:
                     layer.annual_decomposition_carbon_CO2_lost,
                     info_map,
                 )
-                om.add_variable("annual_carbon_CO2_lost", layer.annual_carbon_CO2_lost, info_map)
+                om.add_variable(
+                    "annual_carbon_CO2_lost", layer.annual_carbon_CO2_lost, info_map
+                )

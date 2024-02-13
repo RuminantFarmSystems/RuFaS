@@ -9,7 +9,9 @@ This module handles the denitrification of nitrogen in the nitrates pool, based 
 
 
 class Denitrification:
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """Initializes the SoilData object that this module will work with, or creates one if none is provided.
 
         Parameters
@@ -42,10 +44,13 @@ class Denitrification:
         denitrified, then removing that amount from the nitrate pool and adding it to denitrification emissions tracker.
 
         """
-        self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
+        self.data.set_vectorized_layer_attribute(
+            "nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers)
+        )
         for layer in self.data.soil_layers:
             nutrient_is_below_threshold = (
-                layer.nutrient_cycling_water_factor < layer.denitrification_threshold_water_content
+                layer.nutrient_cycling_water_factor
+                < layer.denitrification_threshold_water_content
             )
             if nutrient_is_below_threshold:
                 continue
@@ -97,7 +102,12 @@ class Denitrification:
         is physically impossible to remove more nitrate than there is in the soil.
 
         """
-        exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * percent_organic_carbon_content)
+        exponential_term = exp(
+            -1
+            * denitrification_rate_coefficient
+            * temp_factor
+            * percent_organic_carbon_content
+        )
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
         return nitrate_content * bounded_denitrification_factor

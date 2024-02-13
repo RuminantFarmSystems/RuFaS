@@ -28,20 +28,31 @@ def test_constructor() -> None:
 def test_get_calf_type(mocker: MockerFixture) -> None:
     """Unit test for _get_calf_type() in file routines/animal/animal_grouping_scenarios.py"""
     mock_calf = mocker.MagicMock(autospec=Calf)
-    assert AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_calf_type(mock_calf) == AnimalType.CALF
+    assert (
+        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_calf_type(mock_calf)
+        == AnimalType.CALF
+    )
 
 
 def test_get_heiferI_type(mocker: MockerFixture) -> None:
     """Unit test for _get_heiferI_type() in file routines/animal/animal_grouping_scenarios.py"""
     mock_heiferI = mocker.MagicMock(autospec=HeiferI)
-    assert AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferI_type(mock_heiferI) == AnimalType.HEIFER_I
+    assert (
+        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferI_type(
+            mock_heiferI
+        )
+        == AnimalType.HEIFER_I
+    )
 
 
 def test_get_heiferII_type(mocker: MockerFixture) -> None:
     """Unit test for _get_heiferII_type() in file routines/animal/animal_grouping_scenarios.py"""
     mock_heiferII = mocker.MagicMock(autospec=HeiferII)
     assert (
-        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferII_type(mock_heiferII) == AnimalType.HEIFER_II
+        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferII_type(
+            mock_heiferII
+        )
+        == AnimalType.HEIFER_II
     )
 
 
@@ -49,7 +60,9 @@ def test_get_heiferIII_type(mocker: MockerFixture) -> None:
     """Unit test for _get_heiferIII_type() in file routines/animal/animal_grouping_scenarios.py"""
     mock_heiferIII = mocker.MagicMock(autospec=HeiferIII)
     assert (
-        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferIII_type(mock_heiferIII)
+        AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW._get_heiferIII_type(
+            mock_heiferIII
+        )
         == AnimalType.HEIFER_III
     )
 
@@ -78,7 +91,12 @@ def test_get_animal_type(mocker: MockerFixture) -> None:
     ]
     for animal, type_name, expected_type in data:
         with patch("builtins.type", return_value=type_name):
-            assert AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW.get_animal_type(animal) == expected_type
+            assert (
+                AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW.get_animal_type(
+                    animal
+                )
+                == expected_type
+            )
 
 
 def test_find_animal_combination() -> None:

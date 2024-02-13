@@ -123,7 +123,9 @@ def test_validate_years(years: List[int], expected: bool) -> None:
         ),
     ],
 )
-def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected: str) -> None:
+def test_validate_pattern_parameters(
+    name: str, skip: int, repeat: int, expected: str
+) -> None:
     """Tests that errors are correctly raised by Schedule when invalid"""
     with pytest.raises(ValueError) as e:
         test = Schedule(name, [], [], skip, repeat)

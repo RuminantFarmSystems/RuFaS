@@ -19,7 +19,9 @@ from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
     "rainfall,runoff,field_size,mean_air_temperature",
     [(1, 2, 3, 4), (1.3, 0.2, 9.24, 7.7)],
 )
-def test_phosphorus_cycling(rainfall: float, runoff: float, field_size: float, mean_air_temperature: float) -> None:
+def test_phosphorus_cycling(
+    rainfall: float, runoff: float, field_size: float, mean_air_temperature: float
+) -> None:
     """Tests that the main routine were executed correctly"""
     manure = MagicMock(Manure)
     manure.daily_manure_update = MagicMock()
@@ -37,7 +39,11 @@ def test_phosphorus_cycling(rainfall: float, runoff: float, field_size: float, m
 
     cycle.cycle_phosphorus(rainfall, runoff, field_size, mean_air_temperature)
 
-    manure.daily_manure_update.assert_called_once_with(rainfall, runoff, field_size, mean_air_temperature)
-    fert.do_fertilizer_phosphorus_operations.assert_called_once_with(rainfall, runoff, field_size)
+    manure.daily_manure_update.assert_called_once_with(
+        rainfall, runoff, field_size, mean_air_temperature
+    )
+    fert.do_fertilizer_phosphorus_operations.assert_called_once_with(
+        rainfall, runoff, field_size
+    )
     mineralization.mineralize_phosphorus.assert_called_once_with(field_size)
     soluble_phosphorus.daily_update_routine.assert_called_once_with(runoff, field_size)

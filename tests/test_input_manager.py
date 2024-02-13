@@ -56,7 +56,9 @@ def input_manager_original_method_states(
     }
 
 
-def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+def test_load_properties_success(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
     properties_data = {"key1": "value1", "key2": "value2"}
@@ -66,18 +68,26 @@ def test_load_properties_success(mock_input_manager: InputManager, mocker: Mocke
         return_value=properties_data,
     )
 
-    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+    mock_input_manager._InputManager__metadata = {
+        "files": {"properties": {"path": "path/to/properties.json"}}
+    }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         mock_input_manager._load_properties()
-        assert mock_input_manager._InputManager__metadata["properties"] == properties_data
+        assert (
+            mock_input_manager._InputManager__metadata["properties"] == properties_data
+        )
         assert add_log.call_count == 2
 
 
-def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+def test_load_properties_file_not_found(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
     """Unit test for handling FileNotFoundError in _load_properties method."""
     mocker.patch("os.path.exists", return_value=False)
-    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/missing_properties.json"}}}
+    mock_input_manager._InputManager__metadata = {
+        "files": {"properties": {"path": "path/to/missing_properties.json"}}
+    }
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         with pytest.raises(FileNotFoundError):
@@ -85,12 +95,16 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
         assert add_error.call_count == 1
 
 
-def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+def test_load_properties_json_decode_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
     """Unit test for handling JSONDecodeError in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
 
-    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/invalid_json.json"}}}
+    mock_input_manager._InputManager__metadata = {
+        "files": {"properties": {"path": "path/to/invalid_json.json"}}
+    }
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         with pytest.raises(json.JSONDecodeError):
@@ -98,7 +112,9 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
         assert add_error.call_count == 1
 
 
-def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+def test_load_properties_unexpected_error(
+    mock_input_manager: InputManager, mocker: MockerFixture
+) -> None:
     """Unit test for handling unexpected errors in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="valid_json"))
@@ -107,7 +123,9 @@ def test_load_properties_unexpected_error(mock_input_manager: InputManager, mock
         side_effect=Exception("Unexpected error"),
     )
 
-    mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/properties.json"}}}
+    mock_input_manager._InputManager__metadata = {
+        "files": {"properties": {"path": "path/to/properties.json"}}
+    }
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         with pytest.raises(Exception, match="Unexpected error"):
@@ -119,7 +137,9 @@ def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch(
         "builtins.open",
-        mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'),
+        mock_open(
+            read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'
+        ),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_metadata("path/dummy_metadata.json")
@@ -146,7 +166,9 @@ def test_load_data_from_json(
     mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with valid json file in file input_manager.py"""
-    dummy_data = {"files": {"dummy_data_file": {"path": "dummy_data.json", "type": "json"}}}
+    dummy_data = {
+        "files": {"dummy_data_file": {"path": "dummy_data.json", "type": "json"}}
+    }
     file_path = "path/to/json/file"
     dummy_file_content = json.dumps(dummy_data)
 
@@ -212,7 +234,9 @@ def test_load_data_from_csv_invalid_data_raises_error(
     """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data="invalid_csv_data")):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-            with patch("pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")):
+            with patch(
+                "pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")
+            ):
                 with pytest.raises(pd.errors.ParserError):
                     mock_input_manager._load_data_from_csv("dummy_file.csv")
                 assert add_log.call_count == 1
@@ -237,9 +261,15 @@ def test_start_data_processing(
     mock_input_manager._load_properties.assert_called_once()
 
     # Restore original methods
-    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
+    mock_input_manager._load_metadata = input_manager_original_method_states[
+        "_load_metadata"
+    ]
+    mock_input_manager._populate_pool = input_manager_original_method_states[
+        "_populate_pool"
+    ]
+    mock_input_manager._load_properties = input_manager_original_method_states[
+        "_load_properties"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -265,12 +295,14 @@ def test_filter_input_data_by_metadata(
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function _filter_input_data_by_metadata() in file input_manager.py"""
-    filtered_input_data = mock_input_manager._filter_input_data_by_metadata(input_data, metadata_properties)
+    filtered_input_data = mock_input_manager._filter_input_data_by_metadata(
+        input_data, metadata_properties
+    )
     assert filtered_input_data == expected_result
 
-    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
-        "_filter_input_data_by_metadata"
-    ]
+    mock_input_manager._filter_input_data_by_metadata = (
+        input_manager_original_method_states["_filter_input_data_by_metadata"]
+    )
 
 
 @pytest.fixture
@@ -335,9 +367,15 @@ def test_populate_pool_valid(
         assert "file1" in mock_input_manager._InputManager__pool
         assert "file2" in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._populate_pool = input_manager_original_method_states[
+        "_populate_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 def test_populate_pool_invalid(
@@ -381,9 +419,15 @@ def test_populate_pool_invalid(
         assert "file1" not in mock_input_manager._InputManager__pool
         assert "file2" not in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._populate_pool = input_manager_original_method_states[
+        "_populate_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 def test_populate_pool_eager_termination(
@@ -420,8 +464,12 @@ def test_populate_pool_eager_termination(
             assert "file1" not in mock_input_manager._InputManager__pool
             assert "file2" not in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._populate_pool = input_manager_original_method_states[
+        "_populate_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_populate_pool_raises_keyerror(
@@ -447,8 +495,12 @@ def test_populate_pool_raises_keyerror(
             assert add_log.call_count == 0
             assert add_warning.call_count == 0
 
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._populate_pool = input_manager_original_method_states[
+        "_populate_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -475,9 +527,9 @@ def test_validate_input_type_dynamic_valid_data(
     )
     assert result is True
 
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
+    mock_input_manager._validate_input_type_dynamic = (
+        input_manager_original_method_states["_validate_input_type_dynamic"]
+    )
 
 
 def test_validate_input_type_dynamic_invalid_type_raises_keyerror(
@@ -496,9 +548,9 @@ def test_validate_input_type_dynamic_invalid_type_raises_keyerror(
             variable_properties, var_name, input_data_value, dummy_properties_key
         )
 
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
+    mock_input_manager._validate_input_type_dynamic = (
+        input_manager_original_method_states["_validate_input_type_dynamic"]
+    )
 
 
 def test_validate_input_type_dynamic_missing_type_raises_keyerror(
@@ -517,9 +569,9 @@ def test_validate_input_type_dynamic_missing_type_raises_keyerror(
             variable_properties, var_name, input_data_value, dummy_properties_key
         )
 
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
+    mock_input_manager._validate_input_type_dynamic = (
+        input_manager_original_method_states["_validate_input_type_dynamic"]
+    )
 
 
 @pytest.fixture
@@ -616,8 +668,12 @@ def test_validate_element_fixable_data(
     assert result["invalid_elements"] == 0
     assert result["valid_elements"] == 0
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._num_type_validator = input_manager_original_method_states["_num_type_validator"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._num_type_validator = input_manager_original_method_states[
+        "_num_type_validator"
+    ]
     mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
 
 
@@ -674,7 +730,9 @@ def test_validate_csv_element_valid_data(
     assert result["invalid_elements"] == invalid_elements
     assert result["fixed_elements"] == fixed_elements
 
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -732,7 +790,9 @@ def test_validate_csv_element_invalid_data(
     assert result["invalid_elements"] == invalid_elements
     assert result["fixed_elements"] == fixed_elements
 
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
     mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
 
 
@@ -812,7 +872,9 @@ def test_validate_json_element_string_type(
         assert result["total_elements"] == 1
         assert result["valid_elements"] == 0
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_number_type(
@@ -867,7 +929,9 @@ def test_validate_json_element_number_type(
     assert result["total_elements"] == 1
     assert result["valid_elements"] == 0
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_array_type(
@@ -922,7 +986,9 @@ def test_validate_json_element_array_type(
     assert result["total_elements"] == 1
     assert result["valid_elements"] == 0
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_valid_object_type(
@@ -955,7 +1021,9 @@ def test_validate_json_element_valid_object_type(
     assert result["total_elements"] == 2
     assert result["valid_elements"] == 2
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_invalid_object_type(
@@ -1015,7 +1083,9 @@ def test_validate_json_element_invalid_object_type(
     assert result["total_elements"] == 1
     assert result["valid_elements"] == 0
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_element_valid_nested_object_type(
@@ -1058,7 +1128,9 @@ def test_validate_element_valid_nested_object_type(
     assert result["total_elements"] == 4
     assert result["valid_elements"] == 4
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_element_invalid_nested_object_type(
@@ -1132,7 +1204,9 @@ def test_validate_element_invalid_nested_object_type(
     assert result["total_elements"] == 3
     assert result["valid_elements"] == 2
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1148,7 +1222,9 @@ def test_validate_element_invalid_nested_object_type(
         (None, False),
     ],
 )
-def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock_input_manager: InputManager) -> None:
+def test_bool_type_validator(
+    input_data_value: bool, expected_result: bool, mock_input_manager: InputManager
+) -> None:
     """Unit test for function _bool_type_validator in file input_manager.py"""
     variable_properties = {}
     var_name = "dummy_var_name"
@@ -1192,7 +1268,9 @@ def test_validate_json_element_invalid_var_name_raises_metadata_keyerror(
             mock_element_counter_and_validity,
         )
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
@@ -1202,7 +1280,9 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
     """Unit test for keyerror raised for invalid var name for _validate_dict_element in file input_manager.py"""
     mock_input_manager._InputManager__metadata = {
         "properties": {
-            "dummy_properties_blob_key": {"valid_key": {"type": "object", "secondary_key": {"type": "string"}}}
+            "dummy_properties_blob_key": {
+                "valid_key": {"type": "object", "secondary_key": {"type": "string"}}
+            }
         }
     }
     element_hierarchy = ["valid_key", "secondary_key"]
@@ -1217,7 +1297,9 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
         "is_valid": True,
     }
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error, patch.object(
+    with patch(
+        "RUFAS.output_manager.OutputManager.add_error"
+    ) as add_error, patch.object(
         mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False
     ) as fix_data:
         mock_input_manager._validate_dict_element(
@@ -1229,9 +1311,13 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
         )
 
         assert add_error.call_count == 1
-        fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
+        fix_data.assert_called_once_with(
+            {"type": "string"}, element_hierarchy, input_data, properties_blob_key
+        )
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_invalid_var_type_raises_keyerror(
@@ -1264,7 +1350,9 @@ def test_validate_json_element_invalid_var_type_raises_keyerror(
             mock_element_counter_and_validity,
         )
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 def test_validate_json_element_missing_type_raises_keyerror(
@@ -1276,7 +1364,9 @@ def test_validate_json_element_missing_type_raises_keyerror(
     element_hierarchy = ["valid_key"]
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
-    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key: {"valid_key": {}}}}
+    mock_input_manager._InputManager__metadata = {
+        "properties": {properties_blob_key: {"valid_key": {}}}
+    }
     eager_termination = False
     mock_element_counter_and_validity = {
         "fixed_elements": 0,
@@ -1295,7 +1385,9 @@ def test_validate_json_element_missing_type_raises_keyerror(
             mock_element_counter_and_validity,
         )
 
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1696,7 +1788,9 @@ def test_fix_array_type_fixable_data(
             dummy_properties_key,
         )
 
-    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
+    variable_to_check = reduce(
+        lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data
+    )
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1865,7 +1959,9 @@ def test_fix_string_type_fixable_data(
             dummy_properties_key,
         )
 
-    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
+    variable_to_check = reduce(
+        lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data
+    )
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1887,7 +1983,9 @@ def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:
             dummy_properties_key,
         )
 
-    fixed_variable = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
+    fixed_variable = reduce(
+        lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data
+    )
 
     assert fixed_variable == 3
     assert result is True
@@ -2058,14 +2156,17 @@ def test_fix_number_type_fixable_data(
             dummy_properties_key,
         )
 
-    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
+    variable_to_check = reduce(
+        lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data
+    )
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_result, " "expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_result, "
+    "expected_warning_call_count",
     [
         (
             {
@@ -2534,7 +2635,9 @@ def test_get_data_by_properties_no_data(
     assert add_error.call_count == 1
     assert actual == []
 
-    mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]
+    mock_input_manager.get_metadata = input_manager_original_method_states[
+        "get_metadata"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -2584,7 +2687,9 @@ def test_get_data_keys_by_properties(
 
     assert actual == expected_keys
 
-    mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]
+    mock_input_manager.get_metadata = input_manager_original_method_states[
+        "get_metadata"
+    ]
 
 
 def test_flush_pool(mock_input_manager: InputManager) -> None:
@@ -2813,8 +2918,12 @@ def test_add_variable_to_pool_valid(
     expected_add_warning_count = 1 if starting_im_pool else 0
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+        with patch(
+            "RUFAS.output_manager.OutputManager.add_warning"
+        ) as mock_om_add_warning:
+            with patch(
+                "RUFAS.output_manager.OutputManager.add_error"
+            ) as mock_om_add_error:
                 result = mock_input_manager._add_variable_to_pool(
                     variable_name=variable_name,
                     data=data,
@@ -2830,9 +2939,15 @@ def test_add_variable_to_pool_valid(
     assert variable_name in mock_input_manager._InputManager__pool
     assert mock_input_manager.get_data(variable_name) == data
 
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+        "_add_variable_to_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -2966,8 +3081,12 @@ def test_add_variable_to_pool_invalid(
     }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+        with patch(
+            "RUFAS.output_manager.OutputManager.add_warning"
+        ) as mock_om_add_warning:
+            with patch(
+                "RUFAS.output_manager.OutputManager.add_error"
+            ) as mock_om_add_error:
                 result = mock_input_manager._add_variable_to_pool(
                     variable_name=variable_name,
                     data=data,
@@ -2982,13 +3101,21 @@ def test_add_variable_to_pool_invalid(
     assert mock_om_add_error.call_count == 1
 
     if starting_im_pool:
-        assert starting_im_pool[variable_name] == mock_input_manager.get_data(variable_name)
+        assert starting_im_pool[variable_name] == mock_input_manager.get_data(
+            variable_name
+        )
     else:
         assert variable_name not in mock_input_manager._InputManager__pool
 
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+        "_add_variable_to_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -3122,8 +3249,12 @@ def test_add_variable_to_pool_eager_termination(
     }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+        with patch(
+            "RUFAS.output_manager.OutputManager.add_warning"
+        ) as mock_om_add_warning:
+            with patch(
+                "RUFAS.output_manager.OutputManager.add_error"
+            ) as mock_om_add_error:
                 with pytest.raises(ValueError):
                     mock_input_manager._add_variable_to_pool(
                         variable_name=variable_name,
@@ -3138,12 +3269,20 @@ def test_add_variable_to_pool_eager_termination(
     assert mock_om_add_error.call_count == 1
 
     if starting_im_pool:
-        assert starting_im_pool[variable_name] == mock_input_manager.get_data(variable_name)
+        assert starting_im_pool[variable_name] == mock_input_manager.get_data(
+            variable_name
+        )
     else:
         assert variable_name not in mock_input_manager._InputManager__pool
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+        "_add_variable_to_pool"
+    ]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states[
+        "_validate_dict_element"
+    ]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states[
+        "_validate_tabular_element"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -3185,9 +3324,15 @@ def test_add_dict_variable_to_pool(
         is_variable_dict=True,
     )
 
-    mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
-    mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+    mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states[
+        "add_dict_variable_to_pool"
+    ]
+    mock_input_manager._metadata_properties_exist = (
+        input_manager_original_method_states["_metadata_properties_exist"]
+    )
+    mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+        "_add_variable_to_pool"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -3221,11 +3366,15 @@ def test_add_dict_variable_to_pool_type_error(
         mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
+        mock_input_manager.add_dict_variable_to_pool = (
+            input_manager_original_method_states["add_dict_variable_to_pool"]
+        )
+        mock_input_manager._metadata_properties_exist = (
+            input_manager_original_method_states["_metadata_properties_exist"]
+        )
+        mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+            "_add_variable_to_pool"
         ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize(
@@ -3267,11 +3416,15 @@ def test_add_dict_variable_to_pool_invalid_data(
             is_variable_dict=True,
         )
 
-        mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
+        mock_input_manager.add_dict_variable_to_pool = (
+            input_manager_original_method_states["add_dict_variable_to_pool"]
+        )
+        mock_input_manager._metadata_properties_exist = (
+            input_manager_original_method_states["_metadata_properties_exist"]
+        )
+        mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+            "_add_variable_to_pool"
         ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize(
@@ -3294,7 +3447,9 @@ def test_add_tabular_variable_to_pool(
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
 
-    expected_data_for_add_variable_to_pool = {variable_name: data} if isinstance(data, List) else data
+    expected_data_for_add_variable_to_pool = (
+        {variable_name: data} if isinstance(data, List) else data
+    )
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_tabular_variable_to_pool(
@@ -3317,11 +3472,15 @@ def test_add_tabular_variable_to_pool(
         is_variable_dict=False,
     )
 
-    mock_input_manager.add_tabular_variable_to_pool = input_manager_original_method_states[
-        "add_tabular_variable_to_pool"
+    mock_input_manager.add_tabular_variable_to_pool = (
+        input_manager_original_method_states["add_tabular_variable_to_pool"]
+    )
+    mock_input_manager._metadata_properties_exist = (
+        input_manager_original_method_states["_metadata_properties_exist"]
+    )
+    mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+        "_add_variable_to_pool"
     ]
-    mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize(
@@ -3356,13 +3515,15 @@ def test_add_tabular_variable_to_pool_type_error(
         mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_tabular_variable_to_pool = input_manager_original_method_states[
-            "add_tabular_variable_to_pool"
+        mock_input_manager.add_tabular_variable_to_pool = (
+            input_manager_original_method_states["add_tabular_variable_to_pool"]
+        )
+        mock_input_manager._metadata_properties_exist = (
+            input_manager_original_method_states["_metadata_properties_exist"]
+        )
+        mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+            "_add_variable_to_pool"
         ]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
-        ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize(
@@ -3385,7 +3546,9 @@ def test_add_tabular_variable_to_pool_invalid_data(
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
 
-    expected_data_for_add_variable_to_pool = {variable_name: data} if isinstance(data, List) else data
+    expected_data_for_add_variable_to_pool = (
+        {variable_name: data} if isinstance(data, List) else data
+    )
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_tabular_variable_to_pool(
@@ -3408,10 +3571,12 @@ def test_add_tabular_variable_to_pool_invalid_data(
             is_variable_dict=False,
         )
 
-        mock_input_manager.add_tabular_variable_to_pool = input_manager_original_method_states[
-            "add_tabular_variable_to_pool"
+        mock_input_manager.add_tabular_variable_to_pool = (
+            input_manager_original_method_states["add_tabular_variable_to_pool"]
+        )
+        mock_input_manager._metadata_properties_exist = (
+            input_manager_original_method_states["_metadata_properties_exist"]
+        )
+        mock_input_manager._add_variable_to_pool = input_manager_original_method_states[
+            "_add_variable_to_pool"
         ]
-        mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
-            "_metadata_properties_exist"
-        ]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]

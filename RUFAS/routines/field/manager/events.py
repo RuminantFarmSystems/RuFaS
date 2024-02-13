@@ -100,7 +100,9 @@ class PlantingEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for PlantingEvent objects."""
-        return hash((self.crop_reference, self.year, self.day, self.use_heat_scheduled_harvest))
+        return hash(
+            (self.crop_reference, self.year, self.day, self.use_heat_scheduled_harvest)
+        )
 
 
 class HarvestEvent(Event):

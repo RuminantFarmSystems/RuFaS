@@ -31,7 +31,9 @@ from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
 # 'bound' is used to restrict the type to only the classes listed in the union.
-GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
+GenericAnimal = TypeVar(
+    "GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+)
 
 im = InputManager()
 om = OutputManager()
@@ -204,7 +206,10 @@ class LifeCycleManager:
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
-        if "use_input_calving_interval" in self.animal_config and self.animal_config["use_input_calving_interval"]:
+        if (
+            "use_input_calving_interval" in self.animal_config
+            and self.animal_config["use_input_calving_interval"]
+        ):
             self.avg_CI = self.animal_config["calving_interval"]
         else:
             self.initial_herd_summary = self.animal_population.get_herd_summary()
@@ -223,7 +228,9 @@ class LifeCycleManager:
             A list of animals of the given type.
 
         """
-        animal_getter_by_animal_type: Dict[Type[GenericAnimal], Callable[..., List[GenericAnimal]]] = {
+        animal_getter_by_animal_type: Dict[
+            Type[GenericAnimal], Callable[..., List[GenericAnimal]]
+        ] = {
             Calf: self.animal_population.get_calves,
             HeiferI: self.animal_population.get_heiferIs,
             HeiferII: self.animal_population.get_heiferIIs,
@@ -285,7 +292,9 @@ class LifeCycleManager:
         self._reset_parity()
         self._reset_cull_reason_stats()
 
-        total_animal_num = self._evaluate_calves_for_weaning(sim_day, calves, heiferIs, total_animal_num)
+        total_animal_num = self._evaluate_calves_for_weaning(
+            sim_day, calves, heiferIs, total_animal_num
+        )
         total_animal_num = self._evaluate_heiferIs_for_transitioning_to_heiferIIs(
             sim_day, heiferIs, heiferIIs, total_animal_num
         )
@@ -302,22 +311,40 @@ class LifeCycleManager:
         total_animal_num = self._cull_cows_and_record_stats(
             sim_day, cows, calves_born, animals_removed, total_animal_num
         )
-        self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
-        self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
+        self._check_if_heifers_need_to_be_sold(
+            heiferIIIs, cows, animals_removed, sim_day
+        )
+        self._check_if_replacement_heifers_needed(
+            sim_day, heiferIIIs, cows, animals_added
+        )
 
         self._calculate_herd_percentages(total_animal_num)
         self._calculate_cow_percentages()
         self._calculate_cull_reason_stats_percent()
         self._calculate_percent_cow_per_parity()
 
-        self.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows)
-        self.dry_cows_daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows if not cow.milking)
+        self.daily_milk_production = sum(
+            cow.estimated_daily_milk_produced for cow in cows
+        )
+        self.dry_cows_daily_milk_production = sum(
+            cow.estimated_daily_milk_produced for cow in cows if not cow.milking
+        )
         self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
-        self.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
-        self.dry_cows_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if not cow.milking)
-        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
-        self.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
-        self.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
+        self.herd_milk_fat_percent = (
+            self.herd_milk_fat_kg / self.daily_milk_production
+        ) * 100
+        self.dry_cows_milk_fat_kg = sum(
+            cow.milk_fat_kg for cow in cows if not cow.milking
+        )
+        self.herd_milk_protein_kg = sum(
+            cow.milk_protein_kg for cow in cows if cow.milking
+        )
+        self.herd_milk_protein_percent = (
+            self.herd_milk_protein_kg / self.daily_milk_production
+        ) * 100
+        self.dry_cows_milk_protein_kg = sum(
+            cow.milk_protein_kg for cow in cows if not cow.milking
+        )
 
         return (
             animals_added,
@@ -508,7 +535,9 @@ class LifeCycleManager:
         return total_animal_num
 
     @staticmethod
-    def _convert_heiferI_to_heiferII(heiferI: HeiferI, heiferIIs: List[HeiferII]) -> None:
+    def _convert_heiferI_to_heiferII(
+        heiferI: HeiferI, heiferIIs: List[HeiferII]
+    ) -> None:
         """Converts a heiferI to a heiferII and appends it to the heiferIIs list.
 
         Args:
@@ -524,12 +553,22 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
-        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
-            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+        if (
+            HeiferII.get_user_defined_repro_protocol()
+            == HeiferReproProtocolEnum.TAI.value
+        ):
+            heiferI_vals.update(
+                tai_method_h=HeiferII.get_user_defined_repro_sub_protocol()
+            )
             heiferI_vals.update(synch_ed_method_h="")
-        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
+        elif (
+            HeiferII.get_user_defined_repro_protocol()
+            == HeiferReproProtocolEnum.SynchED.value
+        ):
             heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+            heiferI_vals.update(
+                synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol()
+            )
         else:
             heiferI_vals.update(tai_method_h="")
             heiferI_vals.update(synch_ed_method_h="")
@@ -580,14 +619,18 @@ class LifeCycleManager:
                 self._convert_heiferII_to_heiferIII(heiferII, heiferIIIs)
                 removed_heiferIIs_idx.append(idx)
             else:
-                total_animal_num, preg_heifer_num = self._remain_heiferII(heiferII, total_animal_num, preg_heifer_num)
+                total_animal_num, preg_heifer_num = self._remain_heiferII(
+                    heiferII, total_animal_num, preg_heifer_num
+                )
                 self._extract_repro_stats_from_heiferII(heiferII)
 
         Utility.remove_items_from_list_by_indices(heiferIIs, removed_heiferIIs_idx)
         return total_animal_num, preg_heifer_num
 
     @staticmethod
-    def _convert_heiferII_to_heiferIII(heiferII: HeiferII, heiferIIIs: List[HeiferIII]) -> None:
+    def _convert_heiferII_to_heiferIII(
+        heiferII: HeiferII, heiferIIIs: List[HeiferIII]
+    ) -> None:
         """Converts a heiferII to a heiferIII and appends it to the heiferIIIs list.
 
         Args:
@@ -607,7 +650,9 @@ class LifeCycleManager:
         new_heiferIII = HeiferIII(heiferII_vals)
         heiferIIIs.append(new_heiferIII)
 
-    def _remain_heiferII(self, heiferII: HeiferII, total_animal_num: int, preg_heifer_num: int):
+    def _remain_heiferII(
+        self, heiferII: HeiferII, total_animal_num: int, preg_heifer_num: int
+    ):
         """Updates relevant stats by keeping a heiferII as is.
 
         The following attributes are updated: heiferII_num, avg_mature_body_weight,
@@ -732,7 +777,10 @@ class LifeCycleManager:
 
         """
         sell_threshold = 1.03
-        while len(heiferIIIs) + len(cows) > self.herd_num * sell_threshold and len(heiferIIIs) > 0:
+        while (
+            len(heiferIIIs) + len(cows) > self.herd_num * sell_threshold
+            and len(heiferIIIs) > 0
+        ):
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = sim_day
@@ -760,11 +808,17 @@ class LifeCycleManager:
 
         """
         buy_threshold = 1.01
-        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * buy_threshold and sim_day > 1:
+        while (
+            len(cows) + len(heiferIIIs) + self.bought_heifer_num
+            < self.herd_num * buy_threshold
+            and sim_day > 1
+        ):
             if len(self.replacement_market) == 0:
                 break
             replacement = self.replacement_market.pop(0)
-            replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
+            replacement.events.add_event(
+                replacement.days_born, sim_day, animal_constants.ENTER_HERD
+            )
             replacement.set_p_purchased()
             animals_added.append(replacement)
             self.bought_heifer_num += 1
@@ -805,11 +859,17 @@ class LifeCycleManager:
                 animals_removed.append(cow)
                 removed_cows_idx.append(index)
             else:
-                total_animal_num = self._handle_cow_body_weight_and_parity(cow, total_animal_num)
+                total_animal_num = self._handle_cow_body_weight_and_parity(
+                    cow, total_animal_num
+                )
                 self._handle_cow_milking(cow)
                 self._handle_cow_days_in_preg(cow)
-                self._handle_cow_calves(cow, calving_age_avail_num, calf_to_preg_time_avail_num)
-                calving_interval_avail_num = self._handle_cow_CI(cow, calving_interval_avail_num)
+                self._handle_cow_calves(
+                    cow, calving_age_avail_num, calf_to_preg_time_avail_num
+                )
+                calving_interval_avail_num = self._handle_cow_CI(
+                    cow, calving_interval_avail_num
+                )
                 self._extract_repro_stats_from_cow(cow)
 
             if new_born:
@@ -839,7 +899,9 @@ class LifeCycleManager:
             self.cow_herd_exit_num, self.avg_cow_culling_age, cow.days_born
         )
 
-    def _handle_cow_body_weight_and_parity(self, cow: Cow, total_animal_num: int) -> int:
+    def _handle_cow_body_weight_and_parity(
+        self, cow: Cow, total_animal_num: int
+    ) -> int:
         """Adjusts the average cow body weight, average parity number, and average mature body weight
 
         Args:
@@ -850,8 +912,12 @@ class LifeCycleManager:
             total_animal_num: The newly updated total number of animals in the herd.
 
         """
-        _, self.avg_cow_body_weight = Utility.calc_average(self.cow_num, self.avg_cow_body_weight, cow.body_weight)
-        self.cow_num, self.avg_parity_num = Utility.calc_average(self.cow_num, self.avg_parity_num, cow.calves)
+        _, self.avg_cow_body_weight = Utility.calc_average(
+            self.cow_num, self.avg_cow_body_weight, cow.body_weight
+        )
+        self.cow_num, self.avg_parity_num = Utility.calc_average(
+            self.cow_num, self.avg_parity_num, cow.calves
+        )
 
         total_animal_num, self.avg_mature_body_weight = Utility.calc_average(
             total_animal_num, self.avg_mature_body_weight, cow.mature_body_weight
@@ -889,7 +955,9 @@ class LifeCycleManager:
                 self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg
             )
 
-    def _handle_cow_calves(self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num) -> None:
+    def _handle_cow_calves(
+        self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num
+    ) -> None:
         """Adjusts the average cow age per parity, average calving age, and average time from calf to pregnant."""
         if 0 < cow.calves <= 3:
             key = str(cow.calves)
@@ -899,14 +967,18 @@ class LifeCycleManager:
         (
             self.num_cow_for_parity[key],
             self.avg_age_for_parity[key],
-        ) = Utility.calc_average(self.num_cow_for_parity[key], self.avg_age_for_parity[key], cow.days_born)
+        ) = Utility.calc_average(
+            self.num_cow_for_parity[key], self.avg_age_for_parity[key], cow.days_born
+        )
 
         calving_age = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
         if calving_age != -1:
             (
                 calving_age_avail_num[key],
                 self.avg_age_for_calving[key],
-            ) = Utility.calc_average(calving_age_avail_num[key], self.avg_age_for_calving[key], calving_age)
+            ) = Utility.calc_average(
+                calving_age_avail_num[key], self.avg_age_for_calving[key], calving_age
+            )
 
         if cow.calving_to_preg_time != 0:
             avg_times = self.avg_calving_to_preg_time
@@ -931,7 +1003,9 @@ class LifeCycleManager:
             (
                 calving_interval_avail_num,
                 self.avg_calving_interval,
-            ) = Utility.calc_average(calving_interval_avail_num, self.avg_calving_interval, cow.CI)
+            ) = Utility.calc_average(
+                calving_interval_avail_num, self.avg_calving_interval, cow.CI
+            )
         return calving_interval_avail_num
 
     def _extract_repro_stats_from_cow(self, cow: Cow) -> None:
@@ -960,12 +1034,16 @@ class LifeCycleManager:
         # subtracted from the animal value. the sum of P absorbed for
         # gestation is equal to the initial animal P value for the calf
         # (A.1G.A.4)
-        cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
+        cow.p_animal = (
+            cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
+        )
         new_calf = Calf(args)
         cow.p_gest_for_calf = 0
         cow.calf_birth_weight = 0
         if not (new_calf.culled or new_calf.sold):
-            new_calf.events.add_event(new_calf.days_born, sim_day, animal_constants.ENTER_HERD)
+            new_calf.events.add_event(
+                new_calf.days_born, sim_day, animal_constants.ENTER_HERD
+            )
             calves_born.append(new_calf)
         if new_calf.sold:
             new_calf.sold_at_day = sim_day
@@ -1004,7 +1082,9 @@ class LifeCycleManager:
         denominator = self.cow_herd_exit_num if self.cow_herd_exit_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in self.cull_reason_stats:
-            self.cull_reason_stats_percent[cull_reason] = pc(self.cull_reason_stats[cull_reason])
+            self.cull_reason_stats_percent[cull_reason] = pc(
+                self.cull_reason_stats[cull_reason]
+            )
 
     def _calculate_percent_cow_per_parity(self) -> None:
         """Calculates the percentage of cows for each parity number."""

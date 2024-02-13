@@ -16,7 +16,9 @@ from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import Nitrogen
 
 
 class Soil:
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """Creates a Soil object based on a SoilData object.
 
         Parameters
@@ -144,10 +146,16 @@ class Soil:
         The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
         profile depend on how much water enters and moves through the soil profile.
         """
-        self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
+        self.infiltration.infiltrate(
+            rainfall, weighting_coefficient, potential_evapotranspiration
+        )
         self.percolation.percolate(has_seasonal_high_water_table)
         self.evaporation.evaporate(maximum_soil_evaporation)
-        self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue, rainfall)
-        self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)
+        self.soil_erosion.erode(
+            field_size, minimum_cover_management_factor, residue, rainfall
+        )
+        self.phosphorus_cycling.cycle_phosphorus(
+            rainfall, self.data.accumulated_runoff, field_size, avg_air_temp
+        )
         self.nitrogen_cycling.cycle_nitrogen(field_size)
         self.carbon_cycling.cycle_carbon(rainfall, avg_air_temp, field_size)

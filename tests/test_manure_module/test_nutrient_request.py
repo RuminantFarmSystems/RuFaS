@@ -15,7 +15,9 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequ
         (1.0, 1.0, ""),  # Invalid ManureType
     ],
 )
-def test_nutrient_request_invalid_init(nitrogen: float, phosphorus: float, manure_type: ManureType):
+def test_nutrient_request_invalid_init(
+    nitrogen: float, phosphorus: float, manure_type: ManureType
+):
     """
     Unit test for the __post_init__ method in the NutrientRequest class in nutrient_request.py.
 
@@ -25,7 +27,9 @@ def test_nutrient_request_invalid_init(nitrogen: float, phosphorus: float, manur
 
     """
     with pytest.raises(ValueError):
-        NutrientRequest(nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type)
+        NutrientRequest(
+            nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type
+        )
 
 
 @mark.parametrize(
@@ -36,7 +40,9 @@ def test_nutrient_request_invalid_init(nitrogen: float, phosphorus: float, manur
         (1.0, 2.0, ManureType.SOLID),  # Both nutrients requested
     ],
 )
-def test_nutrient_request_valid_init(nitrogen: float, phosphorus: float, manure_type: ManureType):
+def test_nutrient_request_valid_init(
+    nitrogen: float, phosphorus: float, manure_type: ManureType
+):
     """
     Unit test for the NutrientRequest class in nutrient_request.py.
 
@@ -44,7 +50,9 @@ def test_nutrient_request_valid_init(nitrogen: float, phosphorus: float, manure_
 
     """
     # Act
-    nutrient_request = NutrientRequest(nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type)
+    nutrient_request = NutrientRequest(
+        nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type
+    )
 
     # Assert
     assert nutrient_request.nitrogen == approx(nitrogen)

@@ -3,11 +3,15 @@ from unittest.mock import patch, PropertyMock
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
-@pytest.mark.parametrize("frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)])
+@pytest.mark.parametrize(
+    "frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)]
+)
 def test_is_mature_property(frac: float, expect: bool) -> None:
     """check that the is_mature property is properly assigning maturity by heat fraction"""
     data = CropData()
-    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=frac):
+    with patch.object(
+        CropData, "heat_fraction", new_callable=PropertyMock, return_value=frac
+    ):
         assert data.is_mature == expect
 
 
@@ -22,7 +26,9 @@ def test_is_mature_property(frac: float, expect: bool) -> None:
         (False, False, True, True, True),
     ],
 )
-def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, growing: bool, expected: bool) -> None:
+def test_in_growing_season_property(
+    mature: bool, dormant: bool, alive: bool, growing: bool, expected: bool
+) -> None:
     """Tests that crop's growth status is correctly determined."""
     with patch(
         "RUFAS.routines.field.crop.crop_data.CropData.is_mature",
@@ -50,7 +56,9 @@ def test_given_harvest_index_property(usr_index, expect):
         (4.33, 3.7, 3.7),
     ],
 )
-def test_water_canopy_storage_capacity(max_capacity: float, lai: float, max_lai: float) -> None:
+def test_water_canopy_storage_capacity(
+    max_capacity: float, lai: float, max_lai: float
+) -> None:
     """Tests that the current storage capacity of the canopy is correctly calculated."""
     data = CropData(
         max_canopy_water_capacity=max_capacity,

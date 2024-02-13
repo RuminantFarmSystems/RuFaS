@@ -32,7 +32,9 @@ class InputManager:
         self.__pool: Dict[str, Any] = {}
         self.__properties_used: Dict[str, Any] = {}
 
-    def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
+    def start_data_processing(
+        self, metadata_path: str, eager_termination: bool = True
+    ) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
@@ -118,7 +120,9 @@ class InputManager:
                 info_map,
             )
             if not os.path.exists(properties_path):
-                raise FileNotFoundError(f"Properties file not found at {properties_path}")
+                raise FileNotFoundError(
+                    f"Properties file not found at {properties_path}"
+                )
 
             self.__properties_used = self.__metadata["files"]["properties"]
             del self.__metadata["files"]["properties"]
@@ -207,7 +211,9 @@ class InputManager:
         try:
             with open(file_path, "r") as csv_file:
                 data_frame = pd.read_csv(csv_file)
-                data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
+                data_dict = {
+                    column: data_frame[column].tolist() for column in data_frame.columns
+                }
                 if not data_frame.empty:
                     om.add_log(
                         "load_data_successful",
@@ -264,12 +270,15 @@ class InputManager:
                 input_data = data_loader(file_path)
             except KeyError:
                 raise KeyError(
-                    f"Faulty data type in {file_blob_key}," f"supported types are: {data_type_to_loader_map.keys()}"
+                    f"Faulty data type in {file_blob_key},"
+                    f"supported types are: {data_type_to_loader_map.keys()}"
                 )
 
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
-            filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+            filtered_input_data = self._filter_input_data_by_metadata(
+                input_data, metadata_properties
+            )
             for metadata_property in metadata_properties.keys():
                 element_counter_and_validity = {
                     "fixed_elements": 0,
@@ -302,14 +311,24 @@ class InputManager:
                     self.__pool[file_blob_key] = filtered_input_data
                 else:
                     if not eager_termination:
-                        invalid_elements_counter += element_counter_and_validity["invalid_elements"]
+                        invalid_elements_counter += element_counter_and_validity[
+                            "invalid_elements"
+                        ]
                     else:
                         return False
 
-        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
-        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
-        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
+        om.add_log(
+            "Validation count: total items", f"{total_elements_counter=}", info_map
+        )
+        om.add_log(
+            "Validation count: total valid", f"{valid_elements_counter=}", info_map
+        )
+        om.add_log(
+            "Validation count: total fixed", f"{fixed_elements_counter=}", info_map
+        )
+        om.add_log(
+            "Validation count: total invalid", f"{invalid_elements_counter=}", info_map
+        )
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(
@@ -333,8 +352,12 @@ class InputManager:
         filtered_input_data = {}
         for key, value in input_data.items():
             if key in metadata_properties:
-                if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
-                    nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
+                if isinstance(metadata_properties[key], dict) and isinstance(
+                    value, dict
+                ):
+                    nested_input_data = self._filter_input_data_by_metadata(
+                        value, metadata_properties[key]
+                    )
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
                 else:
@@ -407,8 +430,12 @@ class InputManager:
         try:
             validator = data_type_to_validator_map[var_type]
         except KeyError:
-            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-        return validator(variable_properties, var_name, input_data_value, properties_blob_key)
+            raise KeyError(
+                f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}"
+            )
+        return validator(
+            variable_properties, var_name, input_data_value, properties_blob_key
+        )
 
     def _validate_tabular_element(
         self,
@@ -591,7 +618,9 @@ class InputManager:
             var_name = element_hierarchy[-1]
 
             try:
-                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
+                input_data_value = reduce(
+                    lambda d, key: d[key], element_hierarchy, input_data
+                )
             except KeyError:
                 om.add_error(
                     "Validation: key not found in input data",
@@ -640,12 +669,14 @@ class InputManager:
             "function": self._array_type_validator.__name__,
         }
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section"
+            f" '{properties_blob_key}'."
         )
         if type(input_data_value) is not list:
             warning_string = "Validation: array is not a list"
             warning_message = (
-                f"Variable: '{var_name}' is type: {type(input_data_value)}. " f"{properties_violation_message}"
+                f"Variable: '{var_name}' is type: {type(input_data_value)}. "
+                f"{properties_violation_message}"
             )
             om.add_warning(warning_string, warning_message, info_map)
             return False
@@ -689,7 +720,8 @@ class InputManager:
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section"
+            f" '{properties_blob_key}'."
         )
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number"
@@ -735,7 +767,8 @@ class InputManager:
             "function": self._string_type_validator.__name__,
         }
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section"
+            f" '{properties_blob_key}'."
         )
         if type(input_data_value) is not str:
             warning_name = "Validation: string variable is not a string"
@@ -761,7 +794,9 @@ class InputManager:
         minimum_length = variable_properties.get("minimum_length")
         maximum_length = variable_properties.get("maximum_length")
         if minimum_length is not None:
-            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
+            is_valid_string = variable_properties["minimum_length"] <= len(
+                input_data_value
+            )
             if not is_valid_string:
                 warning_name = "Validation: string length less than minimum"
                 warning_message = (
@@ -771,7 +806,9 @@ class InputManager:
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
-            is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
+            is_valid_string = (
+                len(input_data_value) <= variable_properties["maximum_length"]
+            )
             if not is_valid_string:
                 warning_name = "Validation: string length greater than maximum"
                 warning_message = (
@@ -796,7 +833,8 @@ class InputManager:
             "function": self._bool_type_validator.__name__,
         }
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section"
+            f" '{properties_blob_key}'."
         )
         if type(input_data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
@@ -843,23 +881,29 @@ class InputManager:
             "function": self._fix_data.__name__,
         }
 
-        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1], input_data)
+        variable_parent = reduce(
+            lambda d, key: d[key], element_hierarchy[:-1], input_data
+        )
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section"
+            f" '{properties_blob_key}'."
         )
         if "default" not in variable_properties.keys():
             error_message = (
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
-            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            om.add_error(
+                "Validation: invalid data not able to be fixed", error_message, info_map
+            )
             return False
 
         original_invalid_value = variable_parent[element_hierarchy[-1]]
         warning_message = (
-            f"Variable: '{element_path}' has value: {original_invalid_value}. " f"{properties_violation_message}"
+            f"Variable: '{element_path}' has value: {original_invalid_value}. "
+            f"{properties_violation_message}"
         )
         om.add_warning("Validation: invalid data found", warning_message, info_map)
 
@@ -935,7 +979,9 @@ class InputManager:
 
             om.add_error(
                 "Validation: data not found:",
-                f'Cannot find "{data_address}", ' f'"{parent_address}" does not have attribute ' f'"{invalid_key}".',
+                f'Cannot find "{data_address}", '
+                f'"{parent_address}" does not have attribute '
+                f'"{invalid_key}".',
                 info_map,
             )
 
@@ -996,7 +1042,9 @@ class InputManager:
         element_hierarchy = metadata_address.split(".")
 
         try:
-            metadata_value = reduce(lambda d, key: d[key], element_hierarchy, self.__metadata)
+            metadata_value = reduce(
+                lambda d, key: d[key], element_hierarchy, self.__metadata
+            )
             return deepcopy(metadata_value)
 
         except KeyError:
@@ -1078,7 +1126,11 @@ class InputManager:
             om.add_error(error_name, error_message, info_map)
             return data_keys
 
-        data_keys = [key for key, data in input_data.items() if data.get("properties") == target_properties]
+        data_keys = [
+            key
+            for key, data in input_data.items()
+            if data.get("properties") == target_properties
+        ]
 
         return data_keys
 
@@ -1093,7 +1145,9 @@ class InputManager:
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
-    def _metadata_properties_exist(self, variable_name: str, properties_blob_key: str) -> bool:
+    def _metadata_properties_exist(
+        self, variable_name: str, properties_blob_key: str
+    ) -> bool:
         """
         Checks if specific properties exist in the metadata for a given variable.
 
@@ -1258,7 +1312,8 @@ class InputManager:
             if variable_name in self.__pool.keys():
                 om.add_warning(
                     "Overwriting existing variable",
-                    f"Variable {variable_name} already exists in " f"InputManager pool, overwriting the old value.",
+                    f"Variable {variable_name} already exists in "
+                    f"InputManager pool, overwriting the old value.",
                     info_map,
                 )
 
@@ -1330,7 +1385,9 @@ class InputManager:
                 f"the expected type of `Dict[str, Any]`.",
                 info_map,
             )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
+            raise TypeError(
+                "Incorrect variable type. Expected types: `data: Dict[str, Any]`."
+            )
 
         metadata_properties_exist = self._metadata_properties_exist(
             variable_name=variable_name, properties_blob_key=properties_blob_key
@@ -1395,7 +1452,9 @@ class InputManager:
                 f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
                 info_map,
             )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`.")
+            raise TypeError(
+                "Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`."
+            )
 
         data = {variable_name: data} if isinstance(data, List) else data
 

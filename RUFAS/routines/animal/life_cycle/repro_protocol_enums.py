@@ -132,7 +132,9 @@ class ReproStateEnum(Enum):
     NONE = "none"
     WAITING_FULL_ED_CYCLE = "waiting for full estrus cycle"
     WAITING_SHORT_ED_CYCLE = "waiting for short estrus cycle"
-    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = "waiting for full estrus cycle before OvSynch"
+    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = (
+        "waiting for full estrus cycle before OvSynch"
+    )
     IN_PRESYNCH = "in presynch"
     HAS_DONE_PRESYNCH = "has done presynch"
     IN_OVSYNCH = "in OvSynch"

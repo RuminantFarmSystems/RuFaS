@@ -14,7 +14,9 @@ om = OutputManager()
 
 
 class State:
-    def __init__(self, config: Config, weather: Weather, time: Time, feed_manager: FeedManager):
+    def __init__(
+        self, config: Config, weather: Weather, time: Time, feed_manager: FeedManager
+    ):
         """
         Description:
             Contains information about the current state of the farm.
@@ -42,11 +44,19 @@ class State:
         self.feed = Feed(feed_class_config)
         manure_class_config = im.get_data("manure_management")
         animal_class_config = im.get_data("animal")
-        animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
-        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
-        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
+        animal_class_config["manure_management_scenarios"] = manure_class_config[
+            "manure_management_scenarios"
+        ]
+        self.animal_manager = AnimalManager(
+            animal_class_config, config, self.feed, weather, time
+        )
+        self.manure_manager = ManureManager(
+            self.animal_manager, weather, time, manure_class_config
+        )
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=feed_manager)
+        self.field_manager = FieldManager(
+            manure_manager=self.manure_manager, feed_manager=feed_manager
+        )
 
     def annual_reset(self):
         """

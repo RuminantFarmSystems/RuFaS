@@ -45,7 +45,9 @@ class ManureNutrients:
                     raise ValueError(f"Field {field.name} must be non-negative.")
             else:
                 if not isinstance(value, ManureType):
-                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+                    raise ValueError(
+                        f"Field {field.name} must be an instance of ManureType."
+                    )
 
     @property
     def dry_matter_fraction(self) -> float:
@@ -117,7 +119,9 @@ class ManureNutrients:
             raise TypeError(f"Cannot add {type(self)} to {type(other)}.")
 
         if self.manure_type != other.manure_type:
-            raise TypeError(f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients.")
+            raise TypeError(
+                f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients."
+            )
 
         summed_attributes = {
             field.name: getattr(self, field.name) + getattr(other, field.name)
@@ -157,7 +161,9 @@ class ManureNutrients:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
         multiplied_attributes = {
-            field.name: getattr(self, field.name) * scalar for field in fields(self) if field.name != "manure_type"
+            field.name: getattr(self, field.name) * scalar
+            for field in fields(self)
+            if field.name != "manure_type"
         }
         multiplied_attributes["manure_type"] = self.manure_type
 
@@ -190,7 +196,9 @@ class ManureNutrients:
             raise TypeError(f"Cannot subtract {type(other)} from {type(self)}.")
 
         if self.manure_type != other.manure_type:
-            raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
+            raise TypeError(
+                f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients."
+            )
 
         subtracted_attributes = {}
         for field in fields(self):
@@ -198,7 +206,9 @@ class ManureNutrients:
                 self_value = getattr(self, field.name)
                 other_value = getattr(other, field.name)
                 if other_value > self_value:
-                    raise ValueError(f"The amount of {field.name} in other object is greater than what is available.")
+                    raise ValueError(
+                        f"The amount of {field.name} in other object is greater than what is available."
+                    )
                 subtracted_attributes[field.name] = self_value - other_value
         subtracted_attributes["manure_type"] = self.manure_type
 

@@ -16,7 +16,10 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 def test_mcf() -> None:
     """Tests _methane_conversion_factor() in calculator.py."""
     assert GasEmissionsCalculator._methane_conversion_factor(1.0) == pytest.approx(
-        (GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B))
+        (
+            GasEmissionConstants.MCF_CONSTANT_A
+            * math.exp(GasEmissionConstants.MCF_CONSTANT_B)
+        )
     )
 
 
@@ -34,7 +37,9 @@ def test_ifsm_methane_emission(mocker: MockerFixture) -> None:
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
     # Actual
-    actual = GasEmissionsCalculator.ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
+    actual = GasEmissionsCalculator.ifsm_methane_emission(
+        manure_volatile_solids, ambient_barn_temp
+    )
 
     # Assert
     patch_for_ifsm_methane_emission.assert_called_once_with(mcf)
@@ -107,7 +112,9 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
         with pytest.raises(expected_error):
             GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
     else:
-        actual = GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
+        actual = GasEmissionsCalculator._nitrogen_loss_from_leaching(
+            daily_nitrogen_input
+        )
         assert actual == pytest.approx(expected)
 
 
@@ -190,7 +197,8 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
         return_value=expected_ammonia,
     )
     mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator" "._nitrogen_loss_from_leaching",
+        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator"
+        "._nitrogen_loss_from_leaching",
         return_value=expected_leaching,
     )
     mocker.patch(
@@ -206,8 +214,10 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
                 daily_nitrogen_input, is_bedding_tilled
             )
     else:
-        total_nitrogen_loss = GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
-            daily_nitrogen_input, is_bedding_tilled
+        total_nitrogen_loss = (
+            GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
+                daily_nitrogen_input, is_bedding_tilled
+            )
         )
         expected = expected_ammonia + expected_leaching + expected_nitrous_oxide
         assert total_nitrogen_loss == pytest.approx(expected)
@@ -217,12 +227,15 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
 def test_microbial_decomp_rate(temperature: float) -> None:
     """Tests _microbial_decomp_rate() in calculator.py."""
     assert GasEmissionsCalculator._microbial_decomp_rate(temperature) == pytest.approx(
-        2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
+        2.37e-3
+        * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
     )
 
 
 @pytest.mark.parametrize("days_since_last_tillage, lag", [(1, 1), (10, 2), (1, 3)])
-def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillage: int, lag: int) -> None:
+def test_carbon_decomposition_rate(
+    mocker: MockerFixture, days_since_last_tillage: int, lag: int
+) -> None:
     """Tests _carbon_decomposition_rate() in calculator.py."""
 
     # Arrange
@@ -234,7 +247,9 @@ def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillag
     )
     expected = math.exp(0.1 * (days_since_last_tillage - lag))
 
-    assert GasEmissionsCalculator._carbon_decomposition_rate(days_since_last_tillage, lag) == pytest.approx(expected)
+    assert GasEmissionsCalculator._carbon_decomposition_rate(
+        days_since_last_tillage, lag
+    ) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
@@ -285,7 +300,12 @@ def test_total_carbon_decomposition(mocker: MockerFixture) -> None:
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._anaerobic_effect",
         return_value=anaerobic_effect,
     )
-    expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect
+    expected = (
+        (total_solids * 0.5 + bedding_mass * 0.35)
+        * c_decomp_rate
+        * 0.65
+        * anaerobic_effect
+    )
 
     assert GasEmissionsCalculator.total_carbon_decomposition(
         total_solids, bedding_mass, days_since_last_tillage, lag
@@ -375,9 +395,13 @@ def test_housing_carbon_dioxide_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+            GasEmissionsCalculator.housing_carbon_dioxide_emission(
+                num_animals, barn_area, barn_temp
+            )
     else:
-        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+            num_animals, barn_area, barn_temp
+        )
         assert actual == pytest.approx(expected)
 
 
@@ -488,7 +512,9 @@ def test_methane_volume_via_Chen_equation() -> None:
     )
 
     # Act
-    actual = GasEmissionsCalculator.methane_volume_via_Chen_equation(VS_total, hydraulic_retention_time)
+    actual = GasEmissionsCalculator.methane_volume_via_Chen_equation(
+        VS_total, hydraulic_retention_time
+    )
 
     # Assert
     assert actual == expected
@@ -499,7 +525,11 @@ def test_biogas_energy_content() -> None:
 
     # Arrange
     CH4_volume = 10.0
-    expected = CH4_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+    expected = (
+        CH4_volume
+        * GasEmissionConstants.METHANE_DENSITY
+        * GasEmissionConstants.METHANE_ENERGY_DENSITY
+    )
 
     # Act
     actual = GasEmissionsCalculator.biogas_energy_content(CH4_volume)
@@ -522,7 +552,9 @@ def test_methane_emission_for_anaerobic_lagoon() -> None:
     )
 
     # Act
-    actual = GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon(manure_volatile_solids)
+    actual = GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon(
+        manure_volatile_solids
+    )
 
     # Assert
     assert actual == approx(expected)
@@ -570,9 +602,13 @@ def test_housing_methane_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_methane_emission(num_animals, barn_area, barn_temp)
+            GasEmissionsCalculator.housing_methane_emission(
+                num_animals, barn_area, barn_temp
+            )
     else:
-        actual = GasEmissionsCalculator.housing_methane_emission(num_animals, barn_area, barn_temp)
+        actual = GasEmissionsCalculator.housing_methane_emission(
+            num_animals, barn_area, barn_temp
+        )
         assert actual == pytest.approx(expected)
 
 
@@ -655,7 +691,9 @@ def test_housing_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+            GasEmissionsCalculator.housing_ammonia_emission(
+                num_animals, barn_area, urine_tan, urine, temp, pH, hsc
+            )
     else:
         actual = GasEmissionsCalculator.housing_ammonia_emission(
             num_animals, barn_area, urine_tan, urine, temp, pH, hsc
@@ -757,7 +795,9 @@ def test_volatile_solid_components(
         with pytest.raises(expected, match=error_message):
             GasEmissionsCalculator._volatile_solid_components(total_volatile_solids)
     else:
-        actual = GasEmissionsCalculator._volatile_solid_components(total_volatile_solids)
+        actual = GasEmissionsCalculator._volatile_solid_components(
+            total_volatile_solids
+        )
         assert actual == approx(expected, rel=1e-6)
 
 
@@ -802,28 +842,41 @@ def test_methane_emission_from_slurry_storage(
     )
     patch_for_volatile_solid_components = mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._volatile_solid_components",
-        return_value=(1.0, 1.0) if total_volatile_solids != 0.0 else (0.0, 0.0),  # Dummy return value
+        return_value=(1.0, 1.0)
+        if total_volatile_solids != 0.0
+        else (0.0, 0.0),  # Dummy return value
     )
 
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(total_volatile_solids, temp)
+            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+                total_volatile_solids, temp
+            )
     else:
         if temp is None:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(total_volatile_solids)
+            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
+                total_volatile_solids
+            )
         else:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(total_volatile_solids, temp)
+            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
+                total_volatile_solids, temp
+            )
         assert actual == approx(expected, rel=1e-6)
 
         patch_for_arrhenius_exponent.assert_called_once_with(
-            temp if temp is not None else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE
+            temp
+            if temp is not None
+            else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE
         )
-        patch_for_volatile_solid_components.assert_called_once_with(total_volatile_solids)
+        patch_for_volatile_solid_components.assert_called_once_with(
+            total_volatile_solids
+        )
 
 
 @pytest.mark.parametrize(
-    "num_animals, storage_area, manure_tan, manure_volume, manure_density," "temp, pH, expected, error_message",
+    "num_animals, storage_area, manure_tan, manure_volume, manure_density,"
+    "temp, pH, expected, error_message",
     [
         # Standard case
         (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
@@ -961,10 +1014,14 @@ def test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(
 
     if expect_exception:
         with pytest.raises(ValueError):
-            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(
+                daily_nitrogen_input
+            )
     else:
         assert (
-            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(
+                daily_nitrogen_input
+            )
             == expected_output
         )
 
@@ -996,9 +1053,13 @@ def test_nitrogen_loss_in_open_lots_from_ammonia_emission(
 
     if expect_exception:
         with pytest.raises(ValueError):
-            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(
+                daily_nitrogen_input
+            )
     else:
         assert (
-            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(
+                daily_nitrogen_input
+            )
             == expected_output
         )

@@ -54,17 +54,24 @@ def test_total_minutes_spent_in_holding_area(
 
     # Arrange
     expected_total_minutes_spent_in_holding_area = (
-        mock_milking_parlor.num_milkings * mock_milking_parlor.minutes_spent_in_holding_area
+        mock_milking_parlor.num_milkings
+        * mock_milking_parlor.minutes_spent_in_holding_area
     )
 
     # Act
-    total_minutes_spent_in_holding_area = mock_milking_parlor.total_minutes_spent_in_holding_area
+    total_minutes_spent_in_holding_area = (
+        mock_milking_parlor.total_minutes_spent_in_holding_area
+    )
 
     # Assert
-    assert total_minutes_spent_in_holding_area == approx(expected_total_minutes_spent_in_holding_area)
+    assert total_minutes_spent_in_holding_area == approx(
+        expected_total_minutes_spent_in_holding_area
+    )
 
 
-def test_fraction_of_day_spent_in_holding_area(mocker: MockerFixture, mock_milking_parlor: MilkingParlor) -> None:
+def test_fraction_of_day_spent_in_holding_area(
+    mocker: MockerFixture, mock_milking_parlor: MilkingParlor
+) -> None:
     """Unit test for fraction_of_day_spent_in_holding_area() of class MilkingParlor in file milking_parlor.py"""
 
     # Arrange
@@ -92,13 +99,19 @@ def test_calc_wash_water_volume_used_in_holding_area(
 
     # Arrange
     num_cows = 10
-    expected_wash_water_volume_used_in_holding_area = num_cows * mock_milking_parlor.wash_water_use_rate
+    expected_wash_water_volume_used_in_holding_area = (
+        num_cows * mock_milking_parlor.wash_water_use_rate
+    )
 
     # Act
-    wash_water_volume_used_in_holding_area = mock_milking_parlor.calc_wash_water_volume_used_in_holding_area(num_cows)
+    wash_water_volume_used_in_holding_area = (
+        mock_milking_parlor.calc_wash_water_volume_used_in_holding_area(num_cows)
+    )
 
     # Assert
-    assert wash_water_volume_used_in_holding_area == approx(expected_wash_water_volume_used_in_holding_area)
+    assert wash_water_volume_used_in_holding_area == approx(
+        expected_wash_water_volume_used_in_holding_area
+    )
 
 
 def test_total_minutes_spent_milking(mock_milking_parlor: MilkingParlor) -> None:
@@ -116,7 +129,9 @@ def test_total_minutes_spent_milking(mock_milking_parlor: MilkingParlor) -> None
     assert total_minutes_spent_milking == approx(expected_total_minutes_spent_milking)
 
 
-def test_fraction_of_day_spent_milking(mocker: MockerFixture, mock_milking_parlor: MilkingParlor) -> None:
+def test_fraction_of_day_spent_milking(
+    mocker: MockerFixture, mock_milking_parlor: MilkingParlor
+) -> None:
     """Unit test for fraction_of_day_spent_milking() of class MilkingParlor in file milking_parlor.py"""
 
     # Arrange
@@ -132,7 +147,9 @@ def test_fraction_of_day_spent_milking(mocker: MockerFixture, mock_milking_parlo
 
     # Assert
     assert fraction_of_day == approx(expected_fraction_of_day)
-    patch_for_calc_fraction_of_day_from_minutes.assert_called_once_with(mock_milking_parlor.total_minutes_spent_milking)
+    patch_for_calc_fraction_of_day_from_minutes.assert_called_once_with(
+        mock_milking_parlor.total_minutes_spent_milking
+    )
 
 
 def test_calc_fresh_water_volume_used_for_milking(
@@ -142,13 +159,19 @@ def test_calc_fresh_water_volume_used_for_milking(
 
     # Arrange
     num_cows = 10
-    expected_fresh_water_volume_used_for_milking = num_cows * mock_milking_parlor.fresh_water_use_rate
+    expected_fresh_water_volume_used_for_milking = (
+        num_cows * mock_milking_parlor.fresh_water_use_rate
+    )
 
     # Act
-    fresh_water_volume_used_for_milking = mock_milking_parlor.calc_fresh_water_volume_used_for_milking(num_cows)
+    fresh_water_volume_used_for_milking = (
+        mock_milking_parlor.calc_fresh_water_volume_used_for_milking(num_cows)
+    )
 
     # Assert
-    assert fresh_water_volume_used_for_milking == approx(expected_fresh_water_volume_used_for_milking)
+    assert fresh_water_volume_used_for_milking == approx(
+        expected_fresh_water_volume_used_for_milking
+    )
 
 
 def test_total_minutes_spent_in_milking_parlor(
@@ -158,14 +181,19 @@ def test_total_minutes_spent_in_milking_parlor(
 
     # Arrange
     expected_total_minutes_spent_in_milking_parlor = (
-        mock_milking_parlor.total_minutes_spent_in_holding_area + mock_milking_parlor.total_minutes_spent_milking
+        mock_milking_parlor.total_minutes_spent_in_holding_area
+        + mock_milking_parlor.total_minutes_spent_milking
     )
 
     # Act
-    total_minutes_spent_in_milking_parlor = mock_milking_parlor.total_minutes_spent_in_milking_parlor
+    total_minutes_spent_in_milking_parlor = (
+        mock_milking_parlor.total_minutes_spent_in_milking_parlor
+    )
 
     # Assert
-    assert total_minutes_spent_in_milking_parlor == approx(expected_total_minutes_spent_in_milking_parlor)
+    assert total_minutes_spent_in_milking_parlor == approx(
+        expected_total_minutes_spent_in_milking_parlor
+    )
 
 
 def test_total_fraction_of_day_spent_in_milking_parlor(
@@ -175,11 +203,14 @@ def test_total_fraction_of_day_spent_in_milking_parlor(
 
     # Arrange
     expected_total_fraction_of_day_spent_in_milking_parlor = (
-        mock_milking_parlor.fraction_of_day_spent_in_holding_area + mock_milking_parlor.fraction_of_day_spent_milking
+        mock_milking_parlor.fraction_of_day_spent_in_holding_area
+        + mock_milking_parlor.fraction_of_day_spent_milking
     )
 
     # Act
-    total_fraction_of_day_spent_in_milking_parlor = mock_milking_parlor.total_fraction_of_day_spent_in_milking_parlor
+    total_fraction_of_day_spent_in_milking_parlor = (
+        mock_milking_parlor.total_fraction_of_day_spent_in_milking_parlor
+    )
 
     # Assert
     assert total_fraction_of_day_spent_in_milking_parlor == approx(
@@ -211,32 +242,41 @@ def test_calc_total_water_volume_used_in_milking_parlor(
     )
 
     # Act
-    total_water_volume_used_in_milking_parlor = mock_milking_parlor.calc_total_water_volume_used_in_milking_parlor(
-        num_cows
+    total_water_volume_used_in_milking_parlor = (
+        mock_milking_parlor.calc_total_water_volume_used_in_milking_parlor(num_cows)
     )
 
     # Assert
-    assert total_water_volume_used_in_milking_parlor == approx(expected_total_water_volume_used_in_milking_parlor)
-    patch_for_calc_wash_water_volume_used_in_holding_area.assert_called_once_with(num_cows)
+    assert total_water_volume_used_in_milking_parlor == approx(
+        expected_total_water_volume_used_in_milking_parlor
+    )
+    patch_for_calc_wash_water_volume_used_in_holding_area.assert_called_once_with(
+        num_cows
+    )
     patch_for_calc_fresh_water_volume_used_for_milking.assert_called_once_with(num_cows)
 
 
 @pytest.mark.parametrize("num_cows", [10, 0])
-def test_calc_manure_mass_deposited_in_milking_parlor(num_cows: int, mock_milking_parlor: MilkingParlor) -> None:
+def test_calc_manure_mass_deposited_in_milking_parlor(
+    num_cows: int, mock_milking_parlor: MilkingParlor
+) -> None:
     """Unit test for calc_manure_mass_deposited_in_milking_parlor() in file milking_parlor.py"""
 
     # Arrange
     manure_mass = 100.0
 
     # Act
-    manure_mass_deposited_in_milking_parlor = mock_milking_parlor.calc_manure_mass_deposited_in_milking_parlor(
-        num_cows, manure_mass
+    manure_mass_deposited_in_milking_parlor = (
+        mock_milking_parlor.calc_manure_mass_deposited_in_milking_parlor(
+            num_cows, manure_mass
+        )
     )
 
     # Assert
     if num_cows > 0:
         assert manure_mass_deposited_in_milking_parlor == approx(
-            manure_mass * mock_milking_parlor.total_fraction_of_day_spent_in_milking_parlor
+            manure_mass
+            * mock_milking_parlor.total_fraction_of_day_spent_in_milking_parlor
         )
     else:
         assert manure_mass_deposited_in_milking_parlor == approx(0.0)
@@ -261,13 +301,19 @@ def test_calc_manure_volume_deposited_in_milking_parlor(
     )
 
     # Act
-    manure_volume_deposited_in_milking_parlor = mock_milking_parlor.calc_manure_volume_deposited_in_milking_parlor(
-        num_cows, manure_mass
+    manure_volume_deposited_in_milking_parlor = (
+        mock_milking_parlor.calc_manure_volume_deposited_in_milking_parlor(
+            num_cows, manure_mass
+        )
     )
 
     # Assert
-    assert manure_volume_deposited_in_milking_parlor == approx(expected_manure_volume_deposited_in_milking_parlor)
-    patch_for_calc_manure_mass_deposited_in_milking_parlor.assert_called_once_with(num_cows, manure_mass)
+    assert manure_volume_deposited_in_milking_parlor == approx(
+        expected_manure_volume_deposited_in_milking_parlor
+    )
+    patch_for_calc_manure_mass_deposited_in_milking_parlor.assert_called_once_with(
+        num_cows, manure_mass
+    )
 
 
 def test_calc_fraction_of_day_from_minutes() -> None:

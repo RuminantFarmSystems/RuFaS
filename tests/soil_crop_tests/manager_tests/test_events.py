@@ -22,7 +22,9 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
         (2, 1, 3, 144, False),
     ],
 )
-def test_occurs_today(year: int, day: int, current_year: int, current_day: int, expected: bool) -> None:
+def test_occurs_today(
+    year: int, day: int, current_year: int, current_day: int, expected: bool
+) -> None:
     """Tests that Event objects can correctly determine whether they run on a given day."""
     mocked_time = MagicMock()
     setattr(mocked_time, "calendar_year", current_year)
@@ -65,33 +67,53 @@ def test_event_hash(event: Event, expected: float) -> None:
     "planting_event1,planting_event2,expected",
     [
         (
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
             True,
         ),
         (
-            PlantingEvent(crop_reference="corn", year=3, day=20, heat_scheduled_harvest=True),
-            PlantingEvent(crop_reference="corn", year=1, day=21, heat_scheduled_harvest=True),
+            PlantingEvent(
+                crop_reference="corn", year=3, day=20, heat_scheduled_harvest=True
+            ),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=21, heat_scheduled_harvest=True
+            ),
             False,
         ),
         (
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=False),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=False
+            ),
             False,
         ),
         (
-            PlantingEvent(crop_reference="njnj", year=1, day=20, heat_scheduled_harvest=True),
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
+            PlantingEvent(
+                crop_reference="njnj", year=1, day=20, heat_scheduled_harvest=True
+            ),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
             False,
         ),
         (
             2,
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
             False,
         ),
     ],
 )
-def test_planting_event_equality(planting_event1, planting_event2, expected: bool) -> None:
+def test_planting_event_equality(
+    planting_event1, planting_event2, expected: bool
+) -> None:
     """Tests that equality is tested correctly between PlantingEvent objects."""
     actual = planting_event1 == planting_event2
     assert actual == expected
@@ -101,7 +123,9 @@ def test_planting_event_equality(planting_event1, planting_event2, expected: boo
     "planting_event,expected",
     [
         (
-            PlantingEvent(crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True),
+            PlantingEvent(
+                crop_reference="corn", year=1, day=20, heat_scheduled_harvest=True
+            ),
             hash(("corn", 1, 20, True)),
         )
     ],
@@ -161,28 +185,46 @@ def test_harvest_event_hash(harvest_event: HarvestEvent, expected: float) -> Non
     "tillage_event1,tillage_event2,expected",
     [
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
             True,
         ),
         (
-            TillageEvent(tillage_depth=10.24, incorporation_fraction=0.77, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=10.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
             False,
         ),
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131
+            ),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
             False,
         ),
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.214),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131
+            ),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.214
+            ),
             False,
         ),
         (
             2,
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
             False,
         ),
     ],
@@ -197,7 +239,9 @@ def test_tillage_event_equality(tillage_event1, tillage_event2, expected: bool) 
     "tillage_event,expected",
     [
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131
+            ),
             hash((1, 160, 9.24, 0.77, 0.131)),
         )
     ],
@@ -537,7 +581,9 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
         ),
     ],
 )
-def test_fertilizer_event_equality(fertilizer_event1, fertilizer_event2, expected: bool) -> None:
+def test_fertilizer_event_equality(
+    fertilizer_event1, fertilizer_event2, expected: bool
+) -> None:
     """Tests that equality is tested correctly between FertilizerEvent objects."""
     actual = fertilizer_event1 == fertilizer_event2
     assert actual == expected
@@ -560,6 +606,8 @@ def test_fertilizer_event_equality(fertilizer_event1, fertilizer_event2, expecte
         )
     ],
 )
-def test_fertilizer_event_hash(fertilizer_event: FertilizerEvent, expected: float) -> None:
+def test_fertilizer_event_hash(
+    fertilizer_event: FertilizerEvent, expected: float
+) -> None:
     """Tests that hash returns correctly for FertilizerEvent objects."""
     assert fertilizer_event.__hash__() == expected

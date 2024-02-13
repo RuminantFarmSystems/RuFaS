@@ -25,7 +25,9 @@ def test_recompute_mean_phosphorus_sorption_parameter(
     old_parameter: float, current_parameter: float, expected: float
 ) -> None:
     """Tests that the mean phosphorus sorption parameter is re-averaged correctly."""
-    observed = PhosphorusMineralization._recompute_mean_phosphorus_sorption_parameter(old_parameter, current_parameter)
+    observed = PhosphorusMineralization._recompute_mean_phosphorus_sorption_parameter(
+        old_parameter, current_parameter
+    )
     assert pytest.approx(observed) == expected
 
 
@@ -40,9 +42,13 @@ def test_recompute_mean_phosphorus_sorption_parameter(
         (0.0, 0.0, 0.6698),
     ],
 )
-def test_determine_phosphorus_imbalance(labile: float, active: float, sorption_parameter: float) -> None:
+def test_determine_phosphorus_imbalance(
+    labile: float, active: float, sorption_parameter: float
+) -> None:
     """Tests that the balance or imbalance between the active and labile pools is correctly calculated."""
-    observed = PhosphorusMineralization._determine_phosphorus_imbalance(labile, active, sorption_parameter)
+    observed = PhosphorusMineralization._determine_phosphorus_imbalance(
+        labile, active, sorption_parameter
+    )
     expected = labile - active * (sorption_parameter / (1 - sorption_parameter))
     assert observed == expected
 
@@ -51,7 +57,9 @@ def test_determine_phosphorus_imbalance(labile: float, active: float, sorption_p
     "active_counter,sorption_parameter,balance",
     [(1, 0.3345, 1.34), (3, 0.5531, 0.9953), (5, 0.05, 2.345)],
 )
-def test_calculate_phosphorus_desorption(active_counter: int, sorption_parameter: float, balance: float) -> None:
+def test_calculate_phosphorus_desorption(
+    active_counter: int, sorption_parameter: float, balance: float
+) -> None:
     """Tests that the amount of phosphorus to be transferred from the active to labile pools is correctly calculated."""
     with patch(
         "RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
@@ -81,7 +89,9 @@ def test_determine_desorption_base(sorption_parameter: float) -> None:
     "labile_counter,sorption_parameter,balance",
     [(1, 0.05, -1.34), (2, 0.4434, -0.887), (4, 0.6778, -0.33)],
 )
-def test_calculate_phosphorus_sorption(labile_counter: int, sorption_parameter: float, balance: float) -> None:
+def test_calculate_phosphorus_sorption(
+    labile_counter: int, sorption_parameter: float, balance: float
+) -> None:
     """Tests that the correct amount of phosphorus to remove from the labile inorganic pool is calculated."""
     with patch(
         "RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
@@ -134,9 +144,15 @@ def test_determine_sorption_exponent(scalar: float) -> None:
         (-3, 0.0),
     ],
 )
-def test_determine_stable_to_active_phosphorus_mineralization(stable: float, active: float) -> None:
+def test_determine_stable_to_active_phosphorus_mineralization(
+    stable: float, active: float
+) -> None:
     """Tests that the amount mineralized between the stable and active pools is calculated correctly."""
-    observed = PhosphorusMineralization._determine_stable_to_active_phosphorus_mineralization(stable, active)
+    observed = (
+        PhosphorusMineralization._determine_stable_to_active_phosphorus_mineralization(
+            stable, active
+        )
+    )
     expected = 0.0006 * (stable - 4 * active)
     expected = min(stable, expected)
     expected = max(-1.0 * active, expected)
@@ -175,11 +191,15 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         data1 = SoilData(soil_layers=layers1, field_size=field_size)
         incorp1 = PhosphorusMineralization(data1)
 
-        incorp1._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.35)
+        incorp1._recompute_mean_phosphorus_sorption_parameter = MagicMock(
+            return_value=0.35
+        )
         incorp1._determine_phosphorus_imbalance = MagicMock(return_value=-0.5)
         incorp1._calculate_phosphorus_desorption = MagicMock(return_value=5)
         incorp1._calculate_phosphorus_sorption = MagicMock()
-        incorp1._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=6)
+        incorp1._determine_stable_to_active_phosphorus_mineralization = MagicMock(
+            return_value=6
+        )
 
         incorp1.mineralize_phosphorus(field_size)
 
@@ -189,7 +209,10 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         assert incorp1._determine_phosphorus_imbalance.call_count == 3
         assert incorp1._calculate_phosphorus_desorption.call_count == 3
         assert incorp1._calculate_phosphorus_sorption.call_count == 0
-        assert incorp1._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        assert (
+            incorp1._determine_stable_to_active_phosphorus_mineralization.call_count
+            == 3
+        )
         for layer in incorp1.data.soil_layers:
             assert layer.mean_phosphorus_sorption_parameter == 0.35
             assert layer.active_inorganic_unbalanced_counter == 1
@@ -209,11 +232,15 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         data2 = SoilData(soil_layers=layers2, field_size=field_size)
         incorp2 = PhosphorusMineralization(data2)
 
-        incorp2._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.37)
+        incorp2._recompute_mean_phosphorus_sorption_parameter = MagicMock(
+            return_value=0.37
+        )
         incorp2._determine_phosphorus_imbalance = MagicMock(return_value=0.5)
         incorp2._calculate_phosphorus_desorption = MagicMock()
         incorp2._calculate_phosphorus_sorption = MagicMock(return_value=4)
-        incorp2._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=2)
+        incorp2._determine_stable_to_active_phosphorus_mineralization = MagicMock(
+            return_value=2
+        )
 
         incorp2.mineralize_phosphorus(field_size)
 
@@ -223,7 +250,10 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         assert incorp2._determine_phosphorus_imbalance.call_count == 3
         assert incorp2._calculate_phosphorus_desorption.call_count == 0
         assert incorp2._calculate_phosphorus_sorption.call_count == 3
-        assert incorp2._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        assert (
+            incorp2._determine_stable_to_active_phosphorus_mineralization.call_count
+            == 3
+        )
         for layer in incorp2.data.soil_layers:
             assert layer.mean_phosphorus_sorption_parameter == 0.37
             assert layer.active_inorganic_unbalanced_counter == 0
@@ -243,11 +273,15 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         data3 = SoilData(soil_layers=layers3, field_size=field_size)
         incorp3 = PhosphorusMineralization(data3)
 
-        incorp3._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.44)
+        incorp3._recompute_mean_phosphorus_sorption_parameter = MagicMock(
+            return_value=0.44
+        )
         incorp3._determine_phosphorus_imbalance = MagicMock(return_value=0.0)
         incorp3._calculate_phosphorus_desorption = MagicMock()
         incorp3._calculate_phosphorus_sorption = MagicMock()
-        incorp3._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=5)
+        incorp3._determine_stable_to_active_phosphorus_mineralization = MagicMock(
+            return_value=5
+        )
 
         incorp3.mineralize_phosphorus(field_size)
 
@@ -257,7 +291,10 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         assert incorp3._determine_phosphorus_imbalance.call_count == 3
         assert incorp3._calculate_phosphorus_desorption.call_count == 0
         assert incorp3._calculate_phosphorus_sorption.call_count == 0
-        assert incorp3._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        assert (
+            incorp3._determine_stable_to_active_phosphorus_mineralization.call_count
+            == 3
+        )
         for layer in incorp3.data.soil_layers:
             assert layer.mean_phosphorus_sorption_parameter == 0.44
             assert layer.active_inorganic_unbalanced_counter == 0
@@ -278,11 +315,15 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         data1 = SoilData(soil_layers=layers1, field_size=field_size)
         incorp1 = PhosphorusMineralization(data1)
 
-        incorp1._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.35)
+        incorp1._recompute_mean_phosphorus_sorption_parameter = MagicMock(
+            return_value=0.35
+        )
         incorp1._determine_phosphorus_imbalance = MagicMock(return_value=1000)
         incorp1._calculate_phosphorus_desorption = MagicMock(return_value=5)
         incorp1._calculate_phosphorus_sorption = MagicMock(return_value=15)
-        incorp1._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=6)
+        incorp1._determine_stable_to_active_phosphorus_mineralization = MagicMock(
+            return_value=6
+        )
 
         incorp1.mineralize_phosphorus(field_size)
 
@@ -292,7 +333,10 @@ def test_mineralize_phosphorus(field_size: float) -> None:
         assert incorp1._determine_phosphorus_imbalance.call_count == 3
         assert incorp1._calculate_phosphorus_desorption.call_count == 0
         assert incorp1._calculate_phosphorus_sorption.call_count == 3
-        assert incorp1._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        assert (
+            incorp1._determine_stable_to_active_phosphorus_mineralization.call_count
+            == 3
+        )
         for layer in incorp1.data.soil_layers:
             assert layer.mean_phosphorus_sorption_parameter == 0.35
             assert layer.active_inorganic_unbalanced_counter == 0

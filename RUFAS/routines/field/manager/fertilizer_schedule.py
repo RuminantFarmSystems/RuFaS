@@ -66,7 +66,9 @@ class FertilizerSchedule(Schedule):
 
         if surface_remainder_fractions is None:
             surface_remainder_fractions = [1.0]
-        self.surface_remainder_fractions = self._elongate_list(surface_remainder_fractions, len(years))
+        self.surface_remainder_fractions = self._elongate_list(
+            surface_remainder_fractions, len(years)
+        )
 
         self._validate_fertilizer_parameters()
 
@@ -93,35 +95,52 @@ class FertilizerSchedule(Schedule):
         valid_years = self._validate_years(self.years)
         if not valid_years:
             raise ValueError(
-                error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
+                error_header
+                + f"expected all years to be > 0 and in non-descending order, received "
+                f"'{self.years}'."
             )
 
         valid_days = self._validate_days(self.years, self.days)
         if not valid_days:
-            raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
+            raise ValueError(
+                error_header
+                + f"expected all days to be in range [1, 366], received '{self.days}'."
+            )
 
-        valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
+        valid_nitrogen_masses = self._determine_if_all_non_negative_values(
+            self.nitrogen_masses
+        )
         if not valid_nitrogen_masses:
             raise ValueError(
-                error_header + f"expected all nitrogen masses to be in >= 0, received " f"'{self.nitrogen_masses}'."
+                error_header + f"expected all nitrogen masses to be in >= 0, received "
+                f"'{self.nitrogen_masses}'."
             )
 
-        valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
+        valid_phosphorus_masses = self._determine_if_all_non_negative_values(
+            self.phosphorus_masses
+        )
         if not valid_phosphorus_masses:
             raise ValueError(
-                error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
+                error_header + f"expected all phosphorus masses to be >= 0, received "
+                f"'{self.phosphorus_masses}'."
             )
 
-        valid_depths = self._determine_if_all_non_negative_values(self.application_depths)
+        valid_depths = self._determine_if_all_non_negative_values(
+            self.application_depths
+        )
         if not valid_depths:
             raise ValueError(
-                error_header + f"expected all application depths to be >= 0, received " f"'{self.application_depths}'."
+                error_header + f"expected all application depths to be >= 0, received "
+                f"'{self.application_depths}'."
             )
 
-        valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
+        valid_fractions = all(
+            0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions
+        )
         if not valid_fractions:
             raise ValueError(
-                error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
+                error_header
+                + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
                 f"received '{self.surface_remainder_fractions}'."
             )
 
@@ -136,7 +155,8 @@ class FertilizerSchedule(Schedule):
         )
         if not equal_fertilizer_parameters:
             raise ValueError(
-                error_header + f"expected equal numbers of fertilizer application parameters, received "
+                error_header
+                + f"expected equal numbers of fertilizer application parameters, received "
                 f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
                 f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
                 f"phosphorus masses, '{self.application_depths}' application depths, and "
@@ -153,13 +173,17 @@ class FertilizerSchedule(Schedule):
             List of all fertilizer events that occur over the course of this fertilizer schedule.
 
         """
-        all_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_years = self._repeat_pattern(
+            self.years, self.pattern_skip, self.pattern_repeat
+        )
         all_days = self.days * (self.pattern_repeat + 1)
         all_mix_names = self.mix_names * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
         all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
         all_depths = self.application_depths * (self.pattern_repeat + 1)
-        all_surface_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
+        all_surface_fractions = self.surface_remainder_fractions * (
+            self.pattern_repeat + 1
+        )
         all_events = list(
             zip(
                 all_mix_names,

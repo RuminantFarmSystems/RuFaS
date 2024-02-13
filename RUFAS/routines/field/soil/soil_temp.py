@@ -9,7 +9,9 @@ This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
 
 
 class SoilTemp:
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData], field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -67,18 +69,26 @@ class SoilTemp:
         SWAT Theoretical documentation eqn. 1:1.3.3
 
         """
-        max_damping_depth = self._determine_maximum_damping_depth(self.data.profile_bulk_density)
+        max_damping_depth = self._determine_maximum_damping_depth(
+            self.data.profile_bulk_density
+        )
         scaling_factor = self._determine_scaling_factor(
             self.data.profile_soil_water_content,
             self.data.profile_bulk_density,
             self.data.soil_layers[-1].bottom_depth,
         )
         damping_depth = self._determine_damping_depth(max_damping_depth, scaling_factor)
-        radiation_factor = self._determine_radiation_factor(solar_radiation, self.data.albedo)
-        bare_soil_surface_temp = self._determine_bare_soil_surface_temp(radiation_factor, avg_temp, min_temp, max_temp)
+        radiation_factor = self._determine_radiation_factor(
+            solar_radiation, self.data.albedo
+        )
+        bare_soil_surface_temp = self._determine_bare_soil_surface_temp(
+            radiation_factor, avg_temp, min_temp, max_temp
+        )
         cover_factor = self._determine_cover_weighting_factor(plant_cover, snow_cover)
         if self.data.soil_layers[0].previous_day_temperature is None:
-            self.data.soil_layers[0].previous_day_temperature = self.data.soil_layers[0].temperature
+            self.data.soil_layers[0].previous_day_temperature = self.data.soil_layers[
+                0
+            ].temperature
         actual_soil_surface_temp = self._determine_soil_surface_temp(
             cover_factor,
             self.data.soil_layers[0].previous_day_temperature,
@@ -87,7 +97,9 @@ class SoilTemp:
 
         for layer in self.data.soil_layers:
             new_previous_temperature = layer.temperature
-            layer_depth_factor = self._determine_depth_factor(layer.depth_of_layer_center, damping_depth)
+            layer_depth_factor = self._determine_depth_factor(
+                layer.depth_of_layer_center, damping_depth
+            )
             if layer.previous_day_temperature is None:
                 layer.previous_day_temperature = layer.temperature
             layer.temperature = self._determine_average_soil_temperature(
@@ -124,7 +136,9 @@ class SoilTemp:
         return 1000 + (top_term / bottom_term)
 
     @staticmethod
-    def _determine_scaling_factor(soil_water_content: float, bulk_density: float, bottom_depth: float) -> float:
+    def _determine_scaling_factor(
+        soil_water_content: float, bulk_density: float, bottom_depth: float
+    ) -> float:
         """
         Calculate the scaling factor for use in calculating the damping depth.
 
@@ -149,7 +163,9 @@ class SoilTemp:
         return soil_water_content / ((0.356 - (0.144 * bulk_density)) * bottom_depth)
 
     @staticmethod
-    def _determine_damping_depth(max_damping_depth: float, scaling_factor: float) -> float:
+    def _determine_damping_depth(
+        max_damping_depth: float, scaling_factor: float
+    ) -> float:
         """
         Calculate the daily value for the damping depth.
 
@@ -252,7 +268,9 @@ class SoilTemp:
         return avg_temp + (radiation_factor * ((max_temp - min_temp) / 2))
 
     @staticmethod
-    def _determine_cover_weighting_factor(plant_cover: float, snow_cover: float) -> float:
+    def _determine_cover_weighting_factor(
+        plant_cover: float, snow_cover: float
+    ) -> float:
         """
         Calculate the weighting factor for use in calculating the soil surface temperature.
 
@@ -272,7 +290,9 @@ class SoilTemp:
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.11
         """
-        plant_factor = plant_cover / (plant_cover + exp(7.563 - ((1.297 * 10 ** (-4)) * plant_cover)))
+        plant_factor = plant_cover / (
+            plant_cover + exp(7.563 - ((1.297 * 10 ** (-4)) * plant_cover))
+        )
         snow_factor = snow_cover / (snow_cover + exp(6.055 - (0.3002 * snow_cover)))
         return max(plant_factor, snow_factor)
 
@@ -304,7 +324,9 @@ class SoilTemp:
         """
         weighted_top_temp = first_layer_temp * first_layer_thickness
         weighted_bottom_temp = second_layer_temp * second_layer_thickness
-        return (weighted_top_temp + weighted_bottom_temp) / (first_layer_thickness + second_layer_thickness)
+        return (weighted_top_temp + weighted_bottom_temp) / (
+            first_layer_thickness + second_layer_thickness
+        )
 
     @staticmethod
     def _determine_soil_surface_temp(

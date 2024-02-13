@@ -10,10 +10,16 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 # --- Static method tests ---
-@pytest.mark.parametrize("carbon,organic,inorganic", [(55, 22, 44), (12, 23, 18), (180, 56, 120), (0, 0, 0)])
-def test_calculate_residue_nutrient_ratio(carbon: float, organic: float, inorganic: float) -> None:
+@pytest.mark.parametrize(
+    "carbon,organic,inorganic", [(55, 22, 44), (12, 23, 18), (180, 56, 120), (0, 0, 0)]
+)
+def test_calculate_residue_nutrient_ratio(
+    carbon: float, organic: float, inorganic: float
+) -> None:
     """Tests that the correct carbon-residue ratio is calculated."""
-    observed = MineralizationDecomposition._calculate_residue_nutrient_ratio(carbon, organic, inorganic)
+    observed = MineralizationDecomposition._calculate_residue_nutrient_ratio(
+        carbon, organic, inorganic
+    )
     if organic + inorganic == 0.0:
         expected = inf
     else:
@@ -21,11 +27,17 @@ def test_calculate_residue_nutrient_ratio(carbon: float, organic: float, inorgan
     assert observed == expected
 
 
-@pytest.mark.parametrize("ratio,constant", [(1.334, 25), (0.4465, 25), (0.234, 200), (0, 200), (inf, 25)])
-def test_calculate_nutrient_term_for_residue_composition_factor(ratio: float, constant: float) -> None:
+@pytest.mark.parametrize(
+    "ratio,constant", [(1.334, 25), (0.4465, 25), (0.234, 200), (0, 200), (inf, 25)]
+)
+def test_calculate_nutrient_term_for_residue_composition_factor(
+    ratio: float, constant: float
+) -> None:
     """Tests that the nitrogen and phosphorus ratio terms are calculated correctly for use in calculating the nutrient
     cycling residue composition factor."""
-    observed = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(ratio, constant)
+    observed = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
+        ratio, constant
+    )
     expected = exp(-0.693 * ((ratio - constant) / constant))
     assert observed == expected
 
@@ -52,7 +64,9 @@ def test_calculate_nutrient_cycling_residue_composition_factor(
     expected = min(1.0, nutrient_term)
 
     calls = [call(nitrogen_ratio, 25), call(phosphorus_ratio, 200)]
-    MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(calls)
+    MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(
+        calls
+    )
     assert observed == expected
 
 
@@ -74,7 +88,9 @@ def test_calculate_rate_constant(
     observed = MineralizationDecomposition._calculate_decay_rate_constant(
         mineralization_rate, composition_factor, temp_factor, water_factor
     )
-    expected = mineralization_rate * composition_factor * (temp_factor * water_factor) ** 0.5
+    expected = (
+        mineralization_rate * composition_factor * (temp_factor * water_factor) ** 0.5
+    )
     assert observed == expected
 
 
@@ -82,16 +98,26 @@ def test_correct_fresh_organic_nitrogen_pools() -> None:
     """Tests that the fresh organic nitrogen pools in the soil are reset appropriately."""
     data = SoilData(field_size=1.0)
     layer_count = len(data.soil_layers)
-    data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [10.0] * layer_count)
-    data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [5.0] * layer_count)
+    data.set_vectorized_layer_attribute(
+        "fresh_organic_nitrogen_content", [10.0] * layer_count
+    )
+    data.set_vectorized_layer_attribute(
+        "active_organic_nitrogen_content", [5.0] * layer_count
+    )
     expected_fresh_organic_n = [10.0] + [0.0] * (layer_count - 1)
     expected_active_organic_n = [5.0] + [15.0] * (layer_count - 1)
     incorp = MineralizationDecomposition(soil_data=data)
 
     incorp._correct_fresh_organic_nitrogen_pools()
 
-    assert incorp.data.get_vectorized_layer_attribute("fresh_organic_nitrogen_content") == expected_fresh_organic_n
-    assert incorp.data.get_vectorized_layer_attribute("active_organic_nitrogen_content") == expected_active_organic_n
+    assert (
+        incorp.data.get_vectorized_layer_attribute("fresh_organic_nitrogen_content")
+        == expected_fresh_organic_n
+    )
+    assert (
+        incorp.data.get_vectorized_layer_attribute("active_organic_nitrogen_content")
+        == expected_active_organic_n
+    )
 
 
 # --- Test main routine ---
@@ -104,7 +130,9 @@ def test_correct_fresh_organic_nitrogen_pools() -> None:
         (-3, 20, 1.3),
     ],
 )
-def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, decay_rate: float) -> None:
+def test_mineralize_and_decompose_nitrogen(
+    temp: float, fresh_nitrogen: float, decay_rate: float
+) -> None:
     """Tests that the main routine correctly calculates and updates all necessary values."""
     top_layer = LayerData(
         top_depth=0,
@@ -122,15 +150,24 @@ def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, d
 
     incorp._correct_fresh_organic_nitrogen_pools = MagicMock()
     incorp._calculate_residue_nutrient_ratio = MagicMock(return_value=0.66)
-    incorp._calculate_nutrient_cycling_residue_composition_factor = MagicMock(return_value=0.88)
-    incorp._calculate_decay_rate_constant = MagicMock(return_value=decay_rate)
-    expected_fresh_nitrogen_removed = decay_rate * incorp.data.soil_layers[0].fresh_organic_nitrogen_content
-    expected_fresh_nitrogen = (
-        incorp.data.soil_layers[0].fresh_organic_nitrogen_content - expected_fresh_nitrogen_removed
+    incorp._calculate_nutrient_cycling_residue_composition_factor = MagicMock(
+        return_value=0.88
     )
-    expected_nitrate_content = incorp.data.soil_layers[0].nitrate_content + 0.8 * expected_fresh_nitrogen_removed
+    incorp._calculate_decay_rate_constant = MagicMock(return_value=decay_rate)
+    expected_fresh_nitrogen_removed = (
+        decay_rate * incorp.data.soil_layers[0].fresh_organic_nitrogen_content
+    )
+    expected_fresh_nitrogen = (
+        incorp.data.soil_layers[0].fresh_organic_nitrogen_content
+        - expected_fresh_nitrogen_removed
+    )
+    expected_nitrate_content = (
+        incorp.data.soil_layers[0].nitrate_content
+        + 0.8 * expected_fresh_nitrogen_removed
+    )
     expected_active_nitrogen = (
-        incorp.data.soil_layers[0].active_organic_nitrogen_content + 0.2 * expected_fresh_nitrogen_removed
+        incorp.data.soil_layers[0].active_organic_nitrogen_content
+        + 0.2 * expected_fresh_nitrogen_removed
     )
 
     incorp.mineralize_and_decompose_nitrogen()
@@ -150,16 +187,24 @@ def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, d
             ),
         ]
         incorp._calculate_residue_nutrient_ratio.assert_has_calls(nutrient_ratio_calls)
-        incorp._calculate_nutrient_cycling_residue_composition_factor.assert_called_once_with(0.66, 0.66)
+        incorp._calculate_nutrient_cycling_residue_composition_factor.assert_called_once_with(
+            0.66, 0.66
+        )
         incorp._calculate_decay_rate_constant(
             incorp.data.soil_layers[0].residue_fresh_organic_mineralization_rate,
             0.88,
             incorp.data.soil_layers[0].nutrient_cycling_temp_factor,
             incorp.data.soil_layers[0].nutrient_cycling_water_factor,
         )
-        assert incorp.data.soil_layers[0].fresh_organic_nitrogen_content == expected_fresh_nitrogen
+        assert (
+            incorp.data.soil_layers[0].fresh_organic_nitrogen_content
+            == expected_fresh_nitrogen
+        )
         assert incorp.data.soil_layers[0].nitrate_content == expected_nitrate_content
-        assert incorp.data.soil_layers[0].active_organic_nitrogen_content == expected_active_nitrogen
+        assert (
+            incorp.data.soil_layers[0].active_organic_nitrogen_content
+            == expected_active_nitrogen
+        )
     else:
         incorp._calculate_residue_nutrient_ratio.assert_not_called()
         incorp._calculate_nutrient_cycling_residue_composition_factor.assert_not_called()

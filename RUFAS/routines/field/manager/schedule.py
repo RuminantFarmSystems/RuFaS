@@ -53,12 +53,18 @@ class Schedule:
 
         """
         if self.pattern_skip < 0:
-            raise ValueError(f"'{self.name}': expected pattern skip to be >= 0, received '{self.pattern_skip}'.")
+            raise ValueError(
+                f"'{self.name}': expected pattern skip to be >= 0, received '{self.pattern_skip}'."
+            )
         if self.pattern_repeat < 0:
-            raise ValueError(f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'.")
+            raise ValueError(
+                f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'."
+            )
 
     @staticmethod
-    def _elongate_list(list_to_elongate: List[Any], reference_list_length: int) -> List[Any]:
+    def _elongate_list(
+        list_to_elongate: List[Any], reference_list_length: int
+    ) -> List[Any]:
         """
         Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
 
@@ -159,10 +165,14 @@ class Schedule:
         A list of years is valid if every year is > 0, and the list of years does not descend at all.
 
         """
-        return all(0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1))
+        return all(
+            0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1)
+        )
 
     @staticmethod
-    def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+    def _repeat_pattern(
+        pattern: List[int], skip: int = 0, repeat: int = 0
+    ) -> List[int]:
         """
         Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
         repetitions, skipping over specified gaps between repetitions.

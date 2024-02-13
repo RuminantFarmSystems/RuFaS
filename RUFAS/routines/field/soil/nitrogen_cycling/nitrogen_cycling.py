@@ -22,7 +22,9 @@ managing nitrogen in the soil profile.
 
 
 class NitrogenCycling:
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """Initializes the SoilData object that this module will work with, or creates one if none is provided.
 
         Parameters

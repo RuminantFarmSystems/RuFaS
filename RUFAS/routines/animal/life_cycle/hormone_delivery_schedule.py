@@ -127,7 +127,9 @@ class HormoneDeliverySchedule:
     }
 
     @staticmethod
-    def get_schedule(animal_category: Literal["heifers", "cows"], protocol_name: str) -> dict[int, dict] | None:
+    def get_schedule(
+        animal_category: Literal["heifers", "cows"], protocol_name: str
+    ) -> dict[int, dict] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name.
 
