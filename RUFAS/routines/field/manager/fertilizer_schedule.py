@@ -38,6 +38,24 @@ class FertilizerSchedule(Schedule):
     pattern_repeat : int, optional
         The number of times the specified fertilizer application pattern should be repeated. Defaults to 0.
 
+    Attributes
+    ----------
+    mix_names : List[str]
+        Elongated list of mix names to match the length of the years list, ensuring a mix name for each application
+        year.
+    nitrogen_masses : List[float]
+        Elongated list of nitrogen masses to match the length of the years list, ensuring a nitrogen mass for each
+        application year.
+    phosphorus_masses : List[float]
+        Elongated list of phosphorus masses to match the length of the years list, ensuring a phosphorus mass for each
+        application year.
+    application_depths : List[float]
+        Elongated list or default value [0.0] for application depths, ensuring an application depth for each application
+        year.
+    surface_remainder_fractions : List[float]
+        Elongated list or default value [1.0] for surface remainder fractions, ensuring a fraction for each application
+        year.
+
     Notes
     -----
     - Application depths and surface remainder fractions are intended to have defaults of [0.0] and [1.0] respectively,

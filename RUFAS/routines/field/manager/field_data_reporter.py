@@ -8,7 +8,18 @@ om = OutputManager()
 
 class FieldDataReporter:
     """
-    This class is responsible for reporting
+    This class is responsible for reporting daily and annual variables for the whole field.
+
+    Parameters
+    ----------
+    fields : List[Field]
+        A list of field instances.
+
+    Attributes
+    ----------
+    fields : List[Field]
+        A list of field instances.
+
     """
     def __init__(self, fields: List[Field]):
         self.fields = fields

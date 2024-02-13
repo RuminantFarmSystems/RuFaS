@@ -25,6 +25,13 @@ class Event:
     day : int, default=120
         (julian) day of the year on which the event should occur.
 
+    Attributes
+    ----------
+    year : int
+        Year of the simulation on which the event should occur.
+    day : int
+        (julian) day of the year on which the event should occur.
+
     Notes
     -----
     An Event object determines when an event should occur, relative to the start of the RuFaS simulation.
