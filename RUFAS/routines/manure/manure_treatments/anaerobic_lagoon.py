@@ -15,7 +15,9 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class AnaerobicLagoon(BaseManureTreatment):
@@ -31,7 +33,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_precipitation_volume = 0.0
 
     def _update_methane_emission(
-            self, daily_output: ManureTreatmentDailyOutput
+        self, daily_output: ManureTreatmentDailyOutput
     ) -> None:
         """
         Calculate the methane emission from the anaerobic lagoon.
@@ -55,7 +57,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output.storage_methane = methane_emission
 
     def _update_ammonia_emission(
-            self, daily_output: ManureTreatmentDailyOutput
+        self, daily_output: ManureTreatmentDailyOutput
     ) -> None:
         """
         Calculate the ammonia emission from the anaerobic lagoon.
@@ -111,40 +113,52 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
         self._accumulated_output.storage_ammonia += daily_output.storage_ammonia
-        self._accumulated_output.storage_methane += (daily_output.storage_methane)
+        self._accumulated_output.storage_methane += daily_output.storage_methane
 
         new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - daily_output.storage_methane, 0.0
+            self._accumulated_output.liquid_manure_total_solids
+            - daily_output.storage_methane,
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_solids = (
             new_accumulated_liquid_manure_total_solids
         )
         new_accumulated_liquid_manure_nitrogen = max(
-            self._accumulated_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
+            self._accumulated_output.liquid_manure_nitrogen
+            - daily_output.storage_ammonia,
+            0.0,
         )
         self._accumulated_output.liquid_manure_nitrogen = (
             new_accumulated_liquid_manure_nitrogen
         )
         new_accumulated_liquid_total_ammoniacal_nitrogen = max(
-            self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - daily_output.storage_ammonia, 0.0
+            self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
+            - daily_output.storage_ammonia,
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_total_ammoniacal_nitrogen
         )
 
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.ANAEROBIC_LAGOON,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen
+        daily_output.storage_nitrous_oxide = (
+            self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                manure_treatment_type=ManureTreatmentType.ANAEROBIC_LAGOON,
+                manure_cover=self.config.manure_cover,
+                manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
-        self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
-        self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
+        self._accumulated_output.storage_nitrous_oxide += (
+            daily_output.storage_nitrous_oxide
+        )
+        self._accumulated_output.liquid_manure_nitrogen -= (
+            daily_output.storage_nitrous_oxide
+        )
 
         return daily_output
 
     def _adjust_final_manure_volume(
-            self, current_day_final_manure_volume: float
+        self, current_day_final_manure_volume: float
     ) -> float:
         """
         Adjust the final manure volume to account for the precipitation and the storage time period.
@@ -182,7 +196,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self._manure_handler_daily_output.cleaning_water_volume
 
     def _adjust_accumulated_output(
-            self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
         """
         Adjust the accumulated output by either resetting it or adding the daily output to it.
@@ -204,7 +218,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             return manure_treatment_daily_output.clone()
         else:
             new_accumulated_output = (
-                    self._accumulated_output + manure_treatment_daily_output
+                self._accumulated_output + manure_treatment_daily_output
             )
             return new_accumulated_output
 
@@ -217,8 +231,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         return (
-                self._accumulated_output.daily_final_manure_volume
-                + self.sludge_accumulation_volume
+            self._accumulated_output.daily_final_manure_volume
+            + self.sludge_accumulation_volume
         )
 
     @property
@@ -277,10 +291,10 @@ class AnaerobicLagoon(BaseManureTreatment):
         a = 3 * self.lagoon_depth
         if math.isclose(a, 0.0, abs_tol=1e-9):
             raise ValueError("Coefficient for the squared term (a) cannot be 0.")
-        b = -4 * self.lagoon_slope * self.lagoon_depth ** 2
+        b = -4 * self.lagoon_slope * self.lagoon_depth**2
         c = (
-                4 * (self.lagoon_slope ** 2) * (self.lagoon_depth ** 3) / 3
-                - self.volume_needed
+            4 * (self.lagoon_slope**2) * (self.lagoon_depth**3) / 3
+            - self.volume_needed
         )
         return a, b, c
 
@@ -304,13 +318,13 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         a, b, c = self._calc_lagoon_width_coefficients()
-        discriminant = b ** 2 - 4 * a * c
+        discriminant = b**2 - 4 * a * c
 
         if discriminant < 0:
             return 0.0
 
-        root1 = (-b + discriminant ** 0.5) / (2 * a)
-        root2 = (-b - discriminant ** 0.5) / (2 * a)
+        root1 = (-b + discriminant**0.5) / (2 * a)
+        root2 = (-b - discriminant**0.5) / (2 * a)
 
         if root1 < 0 and root2 < 0:
             return 0.0
@@ -366,10 +380,10 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         base_volume = self.lagoon_length * self.lagoon_width * self.lagoon_depth
-        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth ** 2)) * (
-                self.lagoon_length + self.lagoon_width
+        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (
+            self.lagoon_length + self.lagoon_width
         )
-        slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth ** 3) / 3
+        slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth**3) / 3
 
         return base_volume - slope_correction_sides + slope_correction_corners
 
@@ -403,10 +417,10 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self.freeboard_input * self.lagoon_surface_area
 
     def _bound_sludge_accumulation_volume(
-            self,
-            calculated_sludge_accumulation_volume: float,
-            lower_bound: float,
-            upper_bound: float,
+        self,
+        calculated_sludge_accumulation_volume: float,
+        lower_bound: float,
+        upper_bound: float,
     ) -> float:
         """
         Calculate a value for sludge accumulation volume bounded by the specified lower and upper bounds.

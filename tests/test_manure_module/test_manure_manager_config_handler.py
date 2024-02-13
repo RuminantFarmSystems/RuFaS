@@ -7,7 +7,10 @@ from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType, ManureHandlerConfig
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    ManureHandlerType,
+    ManureHandlerConfig,
+)
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     ManureSeparatorType,
 )
@@ -138,7 +141,11 @@ def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
     )
 
     # Act
-    actual_manure_handler_configs = ManureManagerConfigHandler._process_manure_handler_configs(manure_handler_configs)
+    actual_manure_handler_configs = (
+        ManureManagerConfigHandler._process_manure_handler_configs(
+            manure_handler_configs
+        )
+    )
 
     # Assert
     assert len(actual_manure_handler_configs) == 3
@@ -487,24 +494,33 @@ def test_get_custom_bedding_config(mocker: MockerFixture) -> None:
     assert actual_bedding_config is None
 
 
-@pytest.mark.parametrize("handler_name,expected_config", [
-    ("alley scraper", ManureHandlerConfig(
-        manure_handler_type=ManureHandlerType.ALLEY_SCRAPER,
-        cleaning_water_use_rate=100.0,
-        minutes_per_cleaning=10,
-        cleanings_per_day=10,
-        daily_tillage_frequency=0,
-        cleaning_water_recycle_fraction=0.9,
-    )),
-    ("unorthodox handler", ManureHandlerConfig(
-        manure_handler_type=ManureHandlerType.FLUSH_SYSTEM,
-        cleaning_water_use_rate=20.0,
-        minutes_per_cleaning=30,
-        cleanings_per_day=2,
-        daily_tillage_frequency=0,
-        cleaning_water_recycle_fraction=0.5,
-    ))
-])
+@pytest.mark.parametrize(
+    "handler_name,expected_config",
+    [
+        (
+            "alley scraper",
+            ManureHandlerConfig(
+                manure_handler_type=ManureHandlerType.ALLEY_SCRAPER,
+                cleaning_water_use_rate=100.0,
+                minutes_per_cleaning=10,
+                cleanings_per_day=10,
+                daily_tillage_frequency=0,
+                cleaning_water_recycle_fraction=0.9,
+            ),
+        ),
+        (
+            "unorthodox handler",
+            ManureHandlerConfig(
+                manure_handler_type=ManureHandlerType.FLUSH_SYSTEM,
+                cleaning_water_use_rate=20.0,
+                minutes_per_cleaning=30,
+                cleanings_per_day=2,
+                daily_tillage_frequency=0,
+                cleaning_water_recycle_fraction=0.5,
+            ),
+        ),
+    ],
+)
 def test_get_manure_handler_config(
     handler_name: str,
     expected_config: ManureHandlerConfig,
@@ -527,11 +543,11 @@ def test_get_manure_handler_config(
             cleanings_per_day=2,
             daily_tillage_frequency=0,
             cleaning_water_recycle_fraction=0.5,
-        )
+        ),
     }
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
-        return_value=None
+        return_value=None,
     )
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = manure_handler_configs
@@ -545,11 +561,14 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
     expected_title = "Attempted to use a non-existent manure handler configuration called 'not there'."
     expected_message = "Raising ValueError."
-    expected_info_map = {"class": "ManureManagerConfigHandler", "function": "get_manure_handler_config"}
+    expected_info_map = {
+        "class": "ManureManagerConfigHandler",
+        "function": "get_manure_handler_config",
+    }
 
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
-        return_value=None
+        return_value=None,
     )
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = {}
@@ -557,7 +576,9 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     with patch.object(om, "add_error") as mock_add_error, pytest.raises(KeyError):
         mock_manure_config_handler.get_manure_handler_config("not there")
 
-    mock_add_error.assert_called_once_with(expected_title, expected_message, expected_info_map)
+    mock_add_error.assert_called_once_with(
+        expected_title, expected_message, expected_info_map
+    )
 
 
 def test_get_custom_manure_separator_config(mocker: MockerFixture) -> None:
@@ -791,7 +812,10 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
         manure_manager_config_handler.custom_bedding_configs
         == mock_custom_bedding_configs
     )
-    assert manure_manager_config_handler.manure_handler_configs == mock_manure_handler_configs
+    assert (
+        manure_manager_config_handler.manure_handler_configs
+        == mock_manure_handler_configs
+    )
     assert (
         manure_manager_config_handler.custom_manure_separator_configs
         == mock_custom_manure_separator_configs

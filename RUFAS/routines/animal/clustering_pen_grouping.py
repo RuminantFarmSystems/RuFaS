@@ -6,11 +6,11 @@ from scipy.stats import percentileofscore
 
 def norm(x):
     """
-        Helper function to normalize a list of values and return that normalized
-        list.
+    Helper function to normalize a list of values and return that normalized
+    list.
 
-        Args:
-            x: A list of values
+    Args:
+        x: A list of values
     """
     x = np.array(x)
     if max(x) != min(x):
@@ -22,11 +22,11 @@ def norm(x):
 
 def percentile_list(original_list):
     """
-        Helper function that returns a list of percentiles corresponding
-        to its matching value in the original list.
+    Helper function that returns a list of percentiles corresponding
+    to its matching value in the original list.
 
-        Args:
-            l: a list of values
+    Args:
+        l: a list of values
     """
     perc_list = []
     for value in original_list:
@@ -37,16 +37,16 @@ def percentile_list(original_list):
 
 def grouping(cow_list, pens, stocking_density):
     """
-        Grouping algorithm that utilizes k-means clustering and takes an input
-        that is a list of objects of class cow (see cow.py) and a list of
-        pen objects (from pen.py), and then groups the lactating cows into the
-        available pens based on their nutritional requirements relative to the
-        rest of the cows.
+    Grouping algorithm that utilizes k-means clustering and takes an input
+    that is a list of objects of class cow (see cow.py) and a list of
+    pen objects (from pen.py), and then groups the lactating cows into the
+    available pens based on their nutritional requirements relative to the
+    rest of the cows.
 
-        Args:
-            cow_list: a list of lactating cows
-            pens: a list of pens allocated for lactating
-            stocking_density: The required stocking density to group all cows
+    Args:
+        cow_list: a list of lactating cows
+        pens: a list of pens allocated for lactating
+        stocking_density: The required stocking density to group all cows
     """
 
     #########################
@@ -68,20 +68,22 @@ def grouping(cow_list, pens, stocking_density):
 
     # Create a pandas data frame with cow objects and relevant nutrition information
     cow_nutr_df = pd.DataFrame()  # cow nutrition data frame
-    cow_nutr_df['DNED_req'] = DNED_req
-    cow_nutr_df['DMPD_req'] = DMPD_req
-    cow_nutr_df['milk_avg'] = milk_avg
-    cow_nutr_df['cow'] = cow_list
+    cow_nutr_df["DNED_req"] = DNED_req
+    cow_nutr_df["DMPD_req"] = DMPD_req
+    cow_nutr_df["milk_avg"] = milk_avg
+    cow_nutr_df["cow"] = cow_list
 
     # Use the various nutrition requirement variables to create and assign a
     # percentile value to each cow
     # Grouping By Ranking Methodology
-    rank_data = cow_nutr_df[["DNED_req", "DMPD_req", "milk_avg"]]  # Rank data frame to create percentile vector
+    rank_data = cow_nutr_df[
+        ["DNED_req", "DMPD_req", "milk_avg"]
+    ]  # Rank data frame to create percentile vector
     rank_data = rank_data.dropna()
 
-    DNED_req = rank_data['DNED_req'].to_list()
-    DMPD_req = rank_data['DMPD_req'].to_list()
-    milk_avg = rank_data['milk_avg'].to_list()
+    DNED_req = rank_data["DNED_req"].to_list()
+    DMPD_req = rank_data["DMPD_req"].to_list()
+    milk_avg = rank_data["milk_avg"].to_list()
 
     # Normalize Vectors DNED_req, DMPD_req, milk_avg
     sc_DNED = norm(DNED_req).tolist()
@@ -90,20 +92,22 @@ def grouping(cow_list, pens, stocking_density):
 
     # Add the normalized vectors to the rank_data data frame
     n = len(rank_data.columns)
-    rank_data.insert(n, 'sc_DNED', sc_DNED)
-    rank_data.insert(n + 1, 'sc_DMPD', sc_DMPD)
-    rank_data.insert(n + 2, 'sc_milk', sc_milk)
+    rank_data.insert(n, "sc_DNED", sc_DNED)
+    rank_data.insert(n + 1, "sc_DMPD", sc_DMPD)
+    rank_data.insert(n + 2, "sc_milk", sc_milk)
 
     # Sum standard nutrient requirement values
-    std = rank_data[['sc_DNED', 'sc_DMPD', 'sc_milk']].sum(axis=1, skipna=True).to_list()
-    rank_data.insert(n + 3, 'std', std)
+    std = (
+        rank_data[["sc_DNED", "sc_DMPD", "sc_milk"]].sum(axis=1, skipna=True).to_list()
+    )
+    rank_data.insert(n + 3, "std", std)
 
     # Create a nutrient requirement percentile vector (with respect to all cows)
     percentile = percentile_list(std)
 
-    rank_data.insert(n + 4, 'percentile', percentile)
-    cow_nutr_df['percentile'] = percentile
-    cow_nutr_df['percentile'] = 1 - cow_nutr_df['percentile']
+    rank_data.insert(n + 4, "percentile", percentile)
+    cow_nutr_df["percentile"] = percentile
+    cow_nutr_df["percentile"] = 1 - cow_nutr_df["percentile"]
 
     # Group by nutrient requirement percentile percentile and num of stalls in
     # each pen
@@ -116,26 +120,30 @@ def grouping(cow_list, pens, stocking_density):
     key = 0
     for pen in pens:
         # filling pens based on input stocking density
-        index[key] = (round(pen.num_stalls * stocking_density + 0.5) / num_cows) + index[(key - 1)]
+        index[key] = (
+            round(pen.num_stalls * stocking_density + 0.5) / num_cows
+        ) + index[(key - 1)]
         if index[key] > 1:
             index[key] = 1
         key += 1
 
     # list of pen assignments to be added to the data frame
     pen_assignment = []
-    percentile = rank_data['percentile'].to_list()
+    percentile = rank_data["percentile"].to_list()
 
     # Adding pen_assignment number to list based on percentile
     for i in range(len(percentile)):
         key = 0
         while percentile[i] <= index[key - 1] or (
-                percentile[i] > index[key] and not math.isclose(percentile[i], index[key], rel_tol=1e-09)):
+            percentile[i] > index[key]
+            and not math.isclose(percentile[i], index[key], rel_tol=1e-09)
+        ):
             key += 1
         pen_assignment.append(key)
 
     # Adding the pen_assignment assignment vector to the DataFrame
     n = len(rank_data.columns)
-    rank_data.insert(n, 'pen_assignment', pen_assignment)
+    rank_data.insert(n, "pen_assignment", pen_assignment)
     cow_nutr_df["pen_assignment"] = pen_assignment
 
     #########################
@@ -143,13 +151,16 @@ def grouping(cow_list, pens, stocking_density):
     # Sort the data frame by pen assignment and return a dictionary of
     # lists of cow objects, with keys corresponding to pen IDs
     #########################
-    pen_data = cow_nutr_df.sort_values(by='pen_assignment', ascending=True)
+    pen_data = cow_nutr_df.sort_values(by="pen_assignment", ascending=True)
     # Creating a list of values that keep track of the index for the start of each pen in the ID list
     separating_index = [0]
-    pen_assignment = pen_data['pen_assignment'].to_list()
-    cow = pen_data['cow'].to_list()
+    pen_assignment = pen_data["pen_assignment"].to_list()
+    cow = pen_data["cow"].to_list()
     for i in range(len(pen_assignment)):
-        if i != (len(pen_assignment) - 1) and pen_assignment[i] != pen_assignment[i + 1]:
+        if (
+            i != (len(pen_assignment) - 1)
+            and pen_assignment[i] != pen_assignment[i + 1]
+        ):
             separating_index.append(i + 1)
     separating_index.append(len(pen_assignment))
 
@@ -158,7 +169,7 @@ def grouping(cow_list, pens, stocking_density):
     key = 0
 
     for i in range(len(separating_index) - 1):
-        group = cow[separating_index[i]: separating_index[i + 1]]
+        group = cow[separating_index[i] : separating_index[i + 1]]
         grouping_data[key] = group
         key += 1
 

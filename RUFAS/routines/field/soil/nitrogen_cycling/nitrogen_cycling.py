@@ -1,11 +1,19 @@
 from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
-from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
+from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
+    LeachingRunoffErosion,
+)
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import (
+    NitrificationVolatilization,
+)
 from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
-from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
-from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
+from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import (
+    MineralizationDecomposition,
+)
+from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import (
+    HumusMineralization,
+)
 
 """
 This module contains the composite class for nitrogen cycling, which contains and manages all the necessary elements for
@@ -14,8 +22,9 @@ managing nitrogen in the soil profile.
 
 
 class NitrogenCycling:
-
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """Initializes the SoilData object that this module will work with, or creates one if none is provided.
 
         Parameters

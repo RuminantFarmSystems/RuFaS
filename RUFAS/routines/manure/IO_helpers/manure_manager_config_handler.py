@@ -74,7 +74,9 @@ class ManureManagerConfigHandler:
             BeddingType.get_type(bedding_type_name), None
         )
 
-    def get_manure_handler_config(self, manure_handler_type_name: str) -> ManureHandlerConfig:
+    def get_manure_handler_config(
+        self, manure_handler_type_name: str
+    ) -> ManureHandlerConfig:
         """Returns the manure handler config for the given manure handler type name.
 
         Parameters
@@ -96,9 +98,11 @@ class ManureManagerConfigHandler:
         try:
             return self.manure_handler_configs[manure_handler_type_name]
         except KeyError:
-            info_map = {"class": self.__class__.__name__, "function": self.get_manure_handler_config.__name__}
-            error_title = \
-                f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'."
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.get_manure_handler_config.__name__,
+            }
+            error_title = f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'."
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
@@ -174,7 +178,9 @@ class ManureManagerConfigHandler:
         return bedding_config_by_bedding_type
 
     @classmethod
-    def _process_manure_handler_configs(cls, manure_handler_configs: List[Dict]) -> Dict[str, ManureHandlerConfig]:
+    def _process_manure_handler_configs(
+        cls, manure_handler_configs: List[Dict]
+    ) -> Dict[str, ManureHandlerConfig]:
         """
         Returns a dictionary of manure handler config objects, with the key being the name of the manure handler
         configuration option.
@@ -196,20 +202,29 @@ class ManureManagerConfigHandler:
 
         """
 
-        info_map = {"class": cls.__name__, "function": cls._process_manure_handler_configs.__name__}
+        info_map = {
+            "class": cls.__name__,
+            "function": cls._process_manure_handler_configs.__name__,
+        }
 
         available_manure_handler_configs: Dict[str, ManureHandlerConfig] = {}
 
         for manure_handler_config in manure_handler_configs:
             handler_name = manure_handler_config.pop("name")
             if handler_name in available_manure_handler_configs:
-                error_name = f"Manure handler '{handler_name}' has multiple configurations."
+                error_name = (
+                    f"Manure handler '{handler_name}' has multiple configurations."
+                )
                 error_message = "Raising ValueError."
                 om.add_error(error_name, error_message, info_map)
                 raise ValueError(f"Duplicate configurations for '{handler_name}'.")
-            handler_type = ManureHandlerType(manure_handler_config["manure_handler_type"])
+            handler_type = ManureHandlerType(
+                manure_handler_config["manure_handler_type"]
+            )
             manure_handler_config["manure_handler_type"] = handler_type
-            available_manure_handler_configs[handler_name] = ManureHandlerConfig(**manure_handler_config)
+            available_manure_handler_configs[handler_name] = ManureHandlerConfig(
+                **manure_handler_config
+            )
         return available_manure_handler_configs
 
     @classmethod

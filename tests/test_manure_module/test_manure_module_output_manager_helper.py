@@ -5,7 +5,9 @@ from dataclasses import dataclass
 import pytest
 from pytest_mock import MockFixture
 
-from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
 
 
 @dataclass
@@ -32,13 +34,15 @@ class MockDataclass:
         ((10, "value"), None, [("field1", 10), ("field2", "value")]),
         ((10, "value"), ["field2"], [("field1", 10)]),
         ((5, "other_value"), None, [("field1", 5), ("field2", "other_value")]),
-        ((5, "other_value"), ["field2"], [("field1", 5)])
-    ]
+        ((5, "other_value"), ["field2"], [("field1", 5)]),
+    ],
 )
-def test_add_dataclass_object(mocker: MockFixture,
-                              mock_data: tuple[int, str],
-                              exclude_fields: list[str] | None,
-                              expected_calls: list[tuple[str, int | str]]) -> None:
+def test_add_dataclass_object(
+    mocker: MockFixture,
+    mock_data: tuple[int, str],
+    exclude_fields: list[str] | None,
+    expected_calls: list[tuple[str, int | str]],
+) -> None:
     """
     Unit test for add_dataclass_object() method in ManureModuleOutputManagerHelper.
 
@@ -48,10 +52,10 @@ def test_add_dataclass_object(mocker: MockFixture,
     """
 
     # Arrange
-    mock_add_variable = mocker.patch('RUFAS.output_manager.OutputManager.add_variable')
+    mock_add_variable = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
 
     obj = MockDataclass(field1=mock_data[0], field2=mock_data[1])
-    info_maps = {'info_map1': 'value1', 'info_map2': 'value2', 'info_map3': 'value3'}
+    info_maps = {"info_map1": "value1", "info_map2": "value2", "info_map3": "value3"}
 
     # Act
     ManureModuleOutputManagerHelper.add_dataclass_object(obj, info_maps, exclude_fields)

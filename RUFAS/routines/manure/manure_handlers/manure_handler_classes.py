@@ -65,7 +65,13 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self, name: str, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
+    def __init__(
+        self,
+        name: str,
+        weather: Weather,
+        time: Time,
+        manure_handler_config: ManureHandlerConfig,
+    ):
         """Initialize a BaseManureHandler object.
 
         Parameters
@@ -98,10 +104,9 @@ class BaseManureHandler:
 
         return avg_temp
 
-    def daily_update(self,
-                     pen: ManureManagerPen,
-                     bedding: BaseBedding | None,
-                     sim_day: int) -> ManureHandlerDailyOutput:
+    def daily_update(
+        self, pen: ManureManagerPen, bedding: BaseBedding | None, sim_day: int
+    ) -> ManureHandlerDailyOutput:
         """
         Calculate the daily manure handler output based on input passed from the animal module.
 
@@ -172,18 +177,21 @@ class BaseManureHandler:
             housing_ammonia=housing_ammonia_emission,
             manure_volume=pen.manure.manure_volume,
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
-                pen.num_animals),
-            total_bedding_volume=bedding.calc_total_bedding_volume(
-                pen.num_animals) if bedding is not None else 0.0,
-            total_bedding_mass=bedding.calc_total_bedding_mass(
-                pen.num_animals) if bedding is not None else 0.0,
+                pen.num_animals
+            ),
+            total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals)
+            if bedding is not None
+            else 0.0,
+            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals)
+            if bedding is not None
+            else 0.0,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(
                     pen.num_lactating_cows
                 )
             ),
             tempC=self._get_current_day_average_temperature_in_celsius(),
-            num_animals=pen.num_animals
+            num_animals=pen.num_animals,
         )
 
         return daily_output
@@ -201,8 +209,11 @@ class BaseManureHandler:
         Volume of cleaning water needed for the given pen, L.
 
         """
-        cleaning_water_volume = (num_animals * self.config.cleaning_water_use_rate *
-                                 (1-self.config.cleaning_water_recycle_fraction))
+        cleaning_water_volume = (
+            num_animals
+            * self.config.cleaning_water_use_rate
+            * (1 - self.config.cleaning_water_recycle_fraction)
+        )
 
         return cleaning_water_volume
 
@@ -296,12 +307,19 @@ class ManureHandlerFactory:
 
     @classmethod
     def get_manure_handler(
-            cls,
-            configuration_name: str,
-            weather: Weather,
-            time: Time,
-            manure_handler_config: ManureHandlerConfig,
-    ) -> BaseManureHandler | FlushSystem | AlleyScraper | ManualScraping | Tillage | Harrowing:
+        cls,
+        configuration_name: str,
+        weather: Weather,
+        time: Time,
+        manure_handler_config: ManureHandlerConfig,
+    ) -> (
+        BaseManureHandler
+        | FlushSystem
+        | AlleyScraper
+        | ManualScraping
+        | Tillage
+        | Harrowing
+    ):
         """Returns an instance of a specific subtype of BaseManureHandler.
 
         Parameters
@@ -331,8 +349,12 @@ class ManureHandlerFactory:
             ManureHandlerType.HARROWING: Harrowing,
         }
 
-        manure_handler_class = manure_handler_class_by_type[manure_handler_config.manure_handler_type]
+        manure_handler_class = manure_handler_class_by_type[
+            manure_handler_config.manure_handler_type
+        ]
 
-        manure_handler_subtype = manure_handler_class(configuration_name, weather, time, manure_handler_config)
+        manure_handler_subtype = manure_handler_class(
+            configuration_name, weather, time, manure_handler_config
+        )
 
         return manure_handler_subtype

@@ -63,8 +63,10 @@ class Dormancy:
         SWAT Theoretical documentation section 5:1.2
 
         """
-        if self.data.plant_category == PlantCategory.WARM_ANNUAL or self.data.plant_category == \
-                PlantCategory.WARM_ANNUAL_LEGUME:
+        if (
+            self.data.plant_category == PlantCategory.WARM_ANNUAL
+            or self.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME
+        ):
             return
 
         if self.data.is_dormant:
@@ -72,18 +74,28 @@ class Dormancy:
 
         self.data.is_dormant = True
         if self.data.plant_category == PlantCategory.TREE or self.data.is_perennial:
-            residue = (self.data.biomass * self.data.dormancy_loss_fraction * (self.data.dry_matter_percentage / 100))
+            residue = (
+                self.data.biomass
+                * self.data.dormancy_loss_fraction
+                * (self.data.dry_matter_percentage / 100)
+            )
             nitrogen = residue * self.data.yield_nitrogen_fraction
             soil_data.crop_yield_nitrogen = nitrogen
             soil_data.plant_surface_residue = residue
-            soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
+            soil_data.plant_residue_lignin_composition = (
+                self.data.lignin_dry_matter_percentage / 100
+            )
 
-            self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
+            self.data.biomass *= 1 - self.data.dormancy_loss_fraction
 
-            self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
+            self.data.leaf_area_index = min(
+                self.data.leaf_area_index, self.data.minimum_lai_during_dormancy
+            )
 
     @staticmethod
-    def find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:
+    def find_threshold_daylength(
+        minimum_daylength: float, dormancy_threshold: float
+    ) -> float:
         """
         Calculates the threshold daylength for dormancy.
 

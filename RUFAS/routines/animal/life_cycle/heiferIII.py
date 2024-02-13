@@ -1,7 +1,9 @@
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
+    manure_calculations,
+)
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
@@ -58,8 +60,14 @@ class HeiferIII(HeiferII):
         """
         return self.get_heiferII_values()
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {},
-                           metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
+    def set_nutrient_rqmts(
+        self,
+        temp,
+        animal_grouping_scenario,
+        nutrient_conc: dict = {},
+        metabolizable_energy: float = 15.625,
+        previous_DMI: float = 10.0,
+    ):
         """
         Calculates this heiferIII's nutrient requirements.
         """
@@ -67,10 +75,10 @@ class HeiferIII(HeiferII):
             metabolizable_energy = 15.625
         if previous_DMI == 0.0:
             previous_DMI = 10.0
-        if nutrient_conc and nutrient_conc['dm'] != 0.0:
-            NDF_conc = nutrient_conc['NDF'] / 100
-            TDN_conc = nutrient_conc['TDN'] / 100
-            net_energy_diet_concentration = (metabolizable_energy * 0.64)/previous_DMI
+        if nutrient_conc and nutrient_conc["dm"] != 0.0:
+            NDF_conc = nutrient_conc["NDF"] / 100
+            TDN_conc = nutrient_conc["TDN"] / 100
+            net_energy_diet_concentration = (metabolizable_energy * 0.64) / previous_DMI
         else:
             NDF_conc = 0.3
             TDN_conc = 0.7
@@ -87,7 +95,7 @@ class HeiferIII(HeiferII):
             NDF_conc=NDF_conc,
             TDN_conc=TDN_conc,
             net_energy_diet_concentration=net_energy_diet_concentration,
-            days_born=self.days_born
+            days_born=self.days_born,
         )
         self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
         self.NEg_requirement = animal_requirements["NEg_requirement"]
@@ -109,7 +117,12 @@ class HeiferIII(HeiferII):
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+            self.ration_formulation,
+            feed,
+            self.body_weight,
+            p_feces_excrt,
+            p_urine,
+            methane_model,
         )
 
     def update(self, sim_day):
@@ -138,7 +151,9 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
+            self.events.add_event(
+                self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR
+            )
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

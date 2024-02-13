@@ -72,7 +72,7 @@ class SimulationEngine:
                 {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
                 for feed in self.feed_manager.query_available_feeds()
             ],
-            info_map
+            info_map,
         )
         t_end_sim = timer.time()
 

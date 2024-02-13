@@ -110,11 +110,11 @@ def test_count_lactating_cows(
     ],
 )
 def test_barn_area_from_pen_type(
-        pen_type: str,
-        has_cows: bool,
-        expected_area: float | None,
-        raises_error: bool,
-        mocker: MockerFixture
+    pen_type: str,
+    has_cows: bool,
+    expected_area: float | None,
+    raises_error: bool,
+    mocker: MockerFixture,
 ):
     """Unit test for barn_area_from_pen_type property in file manure_manager_pen.py"""
 
