@@ -16,3 +16,4 @@ juliandate
 freezegun
 salib
 tqdm
+black
