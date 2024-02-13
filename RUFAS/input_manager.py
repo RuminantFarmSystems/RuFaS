@@ -448,8 +448,6 @@ class InputManager:
         -----
         - The determination is based solely on the modifiability status of the variable. Other factors that might affect
           initialization requirements are not considered by this function.
-        - This function depends on the 'Modifiability' enum and the '_get_variable_modifiability' method to function
-          correctly. Any changes to these components may affect the behavior of this function.
         """
         variable_modifiability = self._get_variable_modifiability(variable_name=variable_name,
                                                                   variable_properties=variable_properties)
