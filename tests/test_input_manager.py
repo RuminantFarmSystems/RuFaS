@@ -58,8 +58,7 @@ def input_manager_original_method_states(
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
-        "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
-        "_set_nested_value": mock_input_manager._set_nested_value
+        "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime
     }
 
 
@@ -545,11 +544,12 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
     ]
 )
 def test_validate_tabular_element_valid_data(mock_input_manager: InputManager,
-                                         mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                         element_hierarchy: str, input_data: Dict[str, List[Any]], total_elements: int,
-                                         valid_elements: int, invalid_elements: int, fixed_elements: int,
-                                         input_manager_original_method_states: Dict[str, Callable],
-                                         ) -> None:
+                                             mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                             element_hierarchy: str, input_data: Dict[str, List[Any]],
+                                             total_elements: int,
+                                             valid_elements: int, invalid_elements: int, fixed_elements: int,
+                                             input_manager_original_method_states: Dict[str, Callable],
+                                             ) -> None:
     """Unit test for _validate_tabular_element function in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     dummy_element_hierarchy = element_hierarchy
@@ -582,13 +582,13 @@ def test_validate_tabular_element_valid_data(mock_input_manager: InputManager,
     ]
 )
 def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
-                                           mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                           element_hierarchy: str, input_data: Dict[str, List[Any]],
-                                           total_elements: int, is_valid: bool, valid_elements: int,
-                                           invalid_elements: int, fixed_elements: int,
-                                           input_manager_original_method_states: Dict[str, Callable],
-                                           eager_termination: bool,
-                                           ) -> None:
+                                               mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                               element_hierarchy: str, input_data: Dict[str, List[Any]],
+                                               total_elements: int, is_valid: bool, valid_elements: int,
+                                               invalid_elements: int, fixed_elements: int,
+                                               input_manager_original_method_states: Dict[str, Callable],
+                                               eager_termination: bool,
+                                               ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     mock_input_manager._fix_data = MagicMock(return_value=is_valid)
     mock_input_manager._handle_missing_data = MagicMock()
@@ -619,13 +619,13 @@ def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
     ]
 )
 def test_validate_tabular_element_invalid_data(mock_input_manager: InputManager,
-                                           mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                           element_hierarchy: str, input_data: Dict[str, List[Any]],
-                                           total_elements: int, is_valid: bool, valid_elements: int,
-                                           invalid_elements: int, fixed_elements: int,
-                                           input_manager_original_method_states: Dict[str, Callable],
-                                           eager_termination: bool,
-                                           ) -> None:
+                                               mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                               element_hierarchy: str, input_data: Dict[str, List[Any]],
+                                               total_elements: int, is_valid: bool, valid_elements: int,
+                                               invalid_elements: int, fixed_elements: int,
+                                               input_manager_original_method_states: Dict[str, Callable],
+                                               eager_termination: bool,
+                                               ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     mock_input_manager._fix_data = MagicMock(return_value=is_valid)
     properties_blob_key = "property_map_key1"
