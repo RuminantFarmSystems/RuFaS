@@ -40,12 +40,16 @@ class Snow:
         Update snow-related data including snow content and temperatures.
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """object that tracks all soil variable throughout the simulation"""
         self.soil_data = soil_data or SoilData(field_size=field_size)
 
     @staticmethod
-    def _calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions) -> float:
+    def _calc_snow_temp(
+        soil_data: SoilData, current_day_conditions: CurrentDayConditions
+    ) -> float:
         """
         This function calculates the snow pack temperature for the current day.
 
@@ -65,11 +69,14 @@ class Snow:
         ----------
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
         """
-        return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
-               (current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor)
+        return (
+            soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)
+        ) + (current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor)
 
     @staticmethod
-    def _melt_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int) -> float:
+    def _melt_snow(
+        soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int
+    ) -> float:
         """
         This function calculates the amount of snow melting for the current day.
 
@@ -98,8 +105,14 @@ class Snow:
         max_air_temperature = current_day_conditions.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
 
-        snow_melt_amount = melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
-                                                                   snow_melt_base_temperature)
+        snow_melt_amount = (
+            melt_factor
+            * snow_coverage_fraction
+            * (
+                (snow_temperature + max_air_temperature) / 2
+                - snow_melt_base_temperature
+            )
+        )
 
         if snow_melt_amount > soil_data.snow_content:
             return soil_data.snow_content
@@ -127,9 +140,13 @@ class Snow:
         """
         mlt6 = soil_data.snow_melt_factor_maximum
         mlt12 = soil_data.snow_melt_factor_minimum
-        return (mlt6 + mlt12) / 2 + ((mlt6 - mlt12) / 2 * (math.sin(2 * math.pi / 365) * (day - 81)))
+        return (mlt6 + mlt12) / 2 + (
+            (mlt6 - mlt12) / 2 * (math.sin(2 * math.pi / 365) * (day - 81))
+        )
 
-    def update_snow(self, current_day_conditions: CurrentDayConditions, day: int) -> None:
+    def update_snow(
+        self, current_day_conditions: CurrentDayConditions, day: int
+    ) -> None:
         """
         Update snow-related data for the current day.
 
@@ -170,14 +187,24 @@ class Snow:
         self.soil_data.snow_content += current_day_conditions.snowfall
 
         if self.soil_data.snow_content == 0.0:
-            self.soil_data.previous_day_snow_temperature, self.soil_data.current_day_snow_temperature = None, None
+            (
+                self.soil_data.previous_day_snow_temperature,
+                self.soil_data.current_day_snow_temperature,
+            ) = (None, None)
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
-            self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
-                self.soil_data.current_day_snow_temperature is not None else current_day_conditions.mean_air_temperature
-            self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_conditions)
+            self.soil_data.previous_day_snow_temperature = (
+                self.soil_data.current_day_snow_temperature
+                if self.soil_data.current_day_snow_temperature is not None
+                else current_day_conditions.mean_air_temperature
+            )
+            self.soil_data.current_day_snow_temperature = self._calc_snow_temp(
+                self.soil_data, current_day_conditions
+            )
 
-            self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_conditions, day)
+            self.soil_data.snow_melt_amount = self._melt_snow(
+                self.soil_data, current_day_conditions, day
+            )
             self.soil_data.snow_content -= self.soil_data.snow_melt_amount
 
     def sublimate(self, maximum_sublimation: float) -> None:

@@ -128,9 +128,9 @@ class Weather:
             self.__radiation.append([0.0 for _ in range(len(year))])
             self.__irrigation.append([0.0 for _ in range(len(year))])
 
-        for i in range(len(weather_file['year'])):
-            current_year = weather_file['year'][i]
-            current_day = weather_file['jday'][i]
+        for i in range(len(weather_file["year"])):
+            current_year = weather_file["year"][i]
+            current_day = weather_file["jday"][i]
 
             current_year_index = current_year - start_year
             current_day_index = current_day - 1
@@ -140,17 +140,37 @@ class Weather:
             elif current_year == config.end_year and current_day > config.end_day:
                 break
 
-            self.__precipitation[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.__max_daily_temperature[current_year_index][current_day_index] = weather_file['high'][i]
-            self.__min_daily_temperature[current_year_index][current_day_index] = weather_file['low'][i]
-            self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.__radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.__irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
+            self.__precipitation[current_year_index][current_day_index] = weather_file[
+                "precip"
+            ][i]
+            self.__max_daily_temperature[current_year_index][
+                current_day_index
+            ] = weather_file["high"][i]
+            self.__min_daily_temperature[current_year_index][
+                current_day_index
+            ] = weather_file["low"][i]
+            self.__mean_daily_temperature[current_year_index][
+                current_day_index
+            ] = weather_file["avg"][i]
+            self.__radiation[current_year_index][current_day_index] = weather_file[
+                "Hday"
+            ][i]
+            self.__irrigation[current_year_index][current_day_index] = weather_file[
+                "irrigation"
+            ][i]
 
-        self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
+        self.__mean_annual_temperature = self._calculate_average_annual_temperature(
+            weather_file["avg"]
+        )
 
-        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
-        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__,
+            "prefix": "Weather",
+        }
+        om.add_variable(
+            "average_annual_temperature", self.__mean_annual_temperature, info_map
+        )
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -175,7 +195,9 @@ class Weather:
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(day, time.calendar_year)
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
+        daylength = CurrentDayConditions.determine_daylength(
+            day, self.__latitude, month
+        )
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -185,10 +207,12 @@ class Weather:
                 annual_mean_air_temperature=self.__mean_annual_temperature,
                 precipitation=self.__precipitation[year - 1][day - 1],
                 irrigation=self.__irrigation[year - 1][day - 1],
-                daylength=daylength
+                daylength=daylength,
             )
         except IndexError:
-            raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
+            raise IndexError(
+                f"Attempted to get weather conditions for day: {day}, year: {year}."
+            )
 
         return current_conditions
 
@@ -202,20 +226,32 @@ class Weather:
             Time object containing the current time of the simulation.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_weather.__name__,
+            "prefix": "Weather",
+        }
         current_weather = self.get_current_day_conditions(time)
         om.add_variable("precipitation", current_weather.precipitation, info_map)
         om.add_variable("rainfall", current_weather.rainfall, info_map)
         om.add_variable("snowfall", current_weather.snowfall, info_map)
         om.add_variable("daylength", current_weather.daylength, info_map)
-        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
-        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
-        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
+        om.add_variable(
+            "maximum_temperature", current_weather.max_air_temperature, info_map
+        )
+        om.add_variable(
+            "minimum_temperature", current_weather.min_air_temperature, info_map
+        )
+        om.add_variable(
+            "average_temperature", current_weather.mean_air_temperature, info_map
+        )
         om.add_variable("radiation", current_weather.incoming_light, info_map)
         om.add_variable("irrigation", current_weather.irrigation, info_map)
 
     @staticmethod
-    def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
+    def _calculate_average_annual_temperature(
+        daily_average_temperatures: list[float],
+    ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
 
@@ -267,7 +303,7 @@ class Weather:
         """
         info_map = {
             "class": Weather.__name__,
-            "function": Weather._get_latitude.__name__
+            "function": Weather._get_latitude.__name__,
         }
 
         field_input_keys = im.get_data_keys_by_properties("field_properties")
@@ -276,7 +312,7 @@ class Weather:
             om.add_warning(
                 "No location data provided to Weather.",
                 "Defaulting to latitude 43.0723 (location of Madison, WI).",
-                info_map
+                info_map,
             )
             return 43.0723
 

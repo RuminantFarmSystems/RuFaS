@@ -10,8 +10,9 @@ the "Inorganic Soil P Model" section of SurPhos.
 
 
 class PhosphorusMineralization:
-
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(
+        self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None
+    ):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -50,32 +51,60 @@ class PhosphorusMineralization:
         """
         for layer in self.data.soil_layers:
             soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
-                layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
-            current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-                layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
-            layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
-                layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
+                layer.labile_inorganic_phosphorus_content,
+                layer.bulk_density,
+                layer.layer_thickness,
+                field_size,
+            )
+            current_phosphorus_sorption_parameter = (
+                layer.calculate_phosphorus_sorption_parameter(
+                    layer.percent_clay_content,
+                    soil_phosphorus_content,
+                    layer.percent_organic_carbon_content,
+                )
+            )
+            layer.mean_phosphorus_sorption_parameter = (
+                self._recompute_mean_phosphorus_sorption_parameter(
+                    layer.mean_phosphorus_sorption_parameter,
+                    current_phosphorus_sorption_parameter,
+                )
+            )
 
-            balance = self._determine_phosphorus_imbalance(layer.labile_inorganic_phosphorus_content,
-                                                           layer.active_inorganic_phosphorus_content,
-                                                           layer.mean_phosphorus_sorption_parameter)
+            balance = self._determine_phosphorus_imbalance(
+                layer.labile_inorganic_phosphorus_content,
+                layer.active_inorganic_phosphorus_content,
+                layer.mean_phosphorus_sorption_parameter,
+            )
 
             if balance < 0:
                 layer.active_inorganic_unbalanced_counter += 1
                 layer.labile_inorganic_unbalanced_counter = 0
 
                 phosphorus_mineralized = self._calculate_phosphorus_desorption(
-                    layer.active_inorganic_unbalanced_counter, layer.mean_phosphorus_sorption_parameter, balance)
-                phosphorus_mineralized = min(layer.active_inorganic_phosphorus_content, phosphorus_mineralized)
+                    layer.active_inorganic_unbalanced_counter,
+                    layer.mean_phosphorus_sorption_parameter,
+                    balance,
+                )
+                phosphorus_mineralized = min(
+                    layer.active_inorganic_phosphorus_content, phosphorus_mineralized
+                )
             elif balance > 0:
                 layer.active_inorganic_unbalanced_counter = 0
-                if layer.previous_phosphorus_balance is not None and layer.previous_phosphorus_balance < balance:
+                if (
+                    layer.previous_phosphorus_balance is not None
+                    and layer.previous_phosphorus_balance < balance
+                ):
                     layer.labile_inorganic_unbalanced_counter = 0
                 layer.labile_inorganic_unbalanced_counter += 1
 
                 phosphorus_mineralized = self._calculate_phosphorus_sorption(
-                    layer.labile_inorganic_unbalanced_counter, layer.mean_phosphorus_sorption_parameter, balance)
-                phosphorus_mineralized = min(layer.labile_inorganic_phosphorus_content, phosphorus_mineralized)
+                    layer.labile_inorganic_unbalanced_counter,
+                    layer.mean_phosphorus_sorption_parameter,
+                    balance,
+                )
+                phosphorus_mineralized = min(
+                    layer.labile_inorganic_phosphorus_content, phosphorus_mineralized
+                )
                 phosphorus_mineralized *= -1
             else:
                 layer.labile_inorganic_unbalanced_counter = 0
@@ -87,15 +116,24 @@ class PhosphorusMineralization:
 
             layer.previous_phosphorus_balance = balance
 
-            stable_to_active_mineralization_amount = self._determine_stable_to_active_phosphorus_mineralization(
-                layer.stable_inorganic_phosphorus_content, layer.active_inorganic_phosphorus_content)
-            layer.stable_inorganic_phosphorus_content -= stable_to_active_mineralization_amount
-            layer.active_inorganic_phosphorus_content += stable_to_active_mineralization_amount
+            stable_to_active_mineralization_amount = (
+                self._determine_stable_to_active_phosphorus_mineralization(
+                    layer.stable_inorganic_phosphorus_content,
+                    layer.active_inorganic_phosphorus_content,
+                )
+            )
+            layer.stable_inorganic_phosphorus_content -= (
+                stable_to_active_mineralization_amount
+            )
+            layer.active_inorganic_phosphorus_content += (
+                stable_to_active_mineralization_amount
+            )
 
     # --- Static methods ---
     @staticmethod
-    def _recompute_mean_phosphorus_sorption_parameter(mean_sorption_parameter: float,
-                                                      current_sorption_parameter: float) -> float:
+    def _recompute_mean_phosphorus_sorption_parameter(
+        mean_sorption_parameter: float, current_sorption_parameter: float
+    ) -> float:
         """Recalculates the mean sorption parameter based on current day's condition.
 
         Parameters
@@ -128,13 +166,18 @@ class PhosphorusMineralization:
 
         """
         days_to_average_over = 365
-        weighted_sum_to_average = (days_to_average_over - 1) * mean_sorption_parameter + current_sorption_parameter
-        new_mean_phosphorus_sorption_parameter = weighted_sum_to_average / days_to_average_over
+        weighted_sum_to_average = (
+            days_to_average_over - 1
+        ) * mean_sorption_parameter + current_sorption_parameter
+        new_mean_phosphorus_sorption_parameter = (
+            weighted_sum_to_average / days_to_average_over
+        )
         return max(0.05, min(0.7, new_mean_phosphorus_sorption_parameter))
 
     @staticmethod
-    def _determine_phosphorus_imbalance(labile_phosphorus: float, active_phosphorus: float,
-                                        sorption_parameter: float) -> float:
+    def _determine_phosphorus_imbalance(
+        labile_phosphorus: float, active_phosphorus: float, sorption_parameter: float
+    ) -> float:
         """Calculates the imbalance of phosphorus between the labile and active inorganic pools.
 
         Parameters
@@ -162,11 +205,16 @@ class PhosphorusMineralization:
         the two pools are balanced.
 
         """
-        return labile_phosphorus - (active_phosphorus * (sorption_parameter / (1 - sorption_parameter)))
+        return labile_phosphorus - (
+            active_phosphorus * (sorption_parameter / (1 - sorption_parameter))
+        )
 
     @staticmethod
-    def _calculate_phosphorus_desorption(active_inorganic_unbalanced_counter: int, sorption_parameter: float,
-                                         phosphorus_balance: float) -> float:
+    def _calculate_phosphorus_desorption(
+        active_inorganic_unbalanced_counter: int,
+        sorption_parameter: float,
+        phosphorus_balance: float,
+    ) -> float:
         """Calculates how much phosphorus should be desorped in the given soil layer.
 
         Parameters
@@ -195,7 +243,7 @@ class PhosphorusMineralization:
 
         """
         base = PhosphorusMineralization._determine_desorption_base(sorption_parameter)
-        desorption_factor = base * (active_inorganic_unbalanced_counter ** -0.32)
+        desorption_factor = base * (active_inorganic_unbalanced_counter**-0.32)
         amount_transferred = desorption_factor * phosphorus_balance * -1
         return amount_transferred
 
@@ -227,8 +275,11 @@ class PhosphorusMineralization:
         return (-1 * sorption_parameter) + 0.8
 
     @staticmethod
-    def _calculate_phosphorus_sorption(labile_inorganic_unbalanced_counter: int, sorption_parameter: float,
-                                       phosphorus_balance: float) -> float:
+    def _calculate_phosphorus_sorption(
+        labile_inorganic_unbalanced_counter: int,
+        sorption_parameter: float,
+        phosphorus_balance: float,
+    ) -> float:
         """Calculates how much phosphorus should be sorped in the given soil layer.
 
         Parameters
@@ -258,7 +309,7 @@ class PhosphorusMineralization:
         """
         scalar = PhosphorusMineralization._determine_sorption_scalar(sorption_parameter)
         exponent = PhosphorusMineralization._determine_sorption_exponent(scalar)
-        sorption_factor = scalar * (labile_inorganic_unbalanced_counter ** exponent)
+        sorption_factor = scalar * (labile_inorganic_unbalanced_counter**exponent)
         amount_transferred = sorption_factor * phosphorus_balance
         return amount_transferred
 
@@ -314,8 +365,9 @@ class PhosphorusMineralization:
         return (-0.238 * log(sorption_scalar)) - 1.126
 
     @staticmethod
-    def _determine_stable_to_active_phosphorus_mineralization(stable_phosphorus: float,
-                                                              active_phosphorus: float) -> float:
+    def _determine_stable_to_active_phosphorus_mineralization(
+        stable_phosphorus: float, active_phosphorus: float
+    ) -> float:
         """Determines how much phosphorus should be transferred from the stable pool to the active pool.
 
         Parameters

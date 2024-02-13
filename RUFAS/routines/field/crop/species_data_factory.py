@@ -1,23 +1,44 @@
 from enum import Enum
 import dataclasses
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaHay, AlfalfaSilage, AlfalfaBaleage
+from RUFAS.routines.field.crop.crop_configurations.alfalfa import (
+    AlfalfaHay,
+    AlfalfaSilage,
+    AlfalfaBaleage,
+)
 from RUFAS.routines.field.crop.crop_configurations.cereal_rye import (
-    CerealRyeHay, CerealRyeGrain, CerealRyeSilage, CerealRyeBaleage
+    CerealRyeHay,
+    CerealRyeGrain,
+    CerealRyeSilage,
+    CerealRyeBaleage,
 )
 from RUFAS.routines.field.crop.crop_configurations.corn import CornGrain, CornSilage
-from RUFAS.routines.field.crop.crop_configurations.soybean import SoybeanHay, SoybeanGrain
-from RUFAS.routines.field.crop.crop_configurations.tall_fescue import TallFescueHay, TallFescueSilage, TallFescueBaleage
+from RUFAS.routines.field.crop.crop_configurations.soybean import (
+    SoybeanHay,
+    SoybeanGrain,
+)
+from RUFAS.routines.field.crop.crop_configurations.tall_fescue import (
+    TallFescueHay,
+    TallFescueSilage,
+    TallFescueBaleage,
+)
 from RUFAS.routines.field.crop.crop_configurations.triticale import (
-    TriticaleHay, TriticaleGrain, TriticaleSilage, TriticaleBaleage
+    TriticaleHay,
+    TriticaleGrain,
+    TriticaleSilage,
+    TriticaleBaleage,
 )
 from RUFAS.routines.field.crop.crop_configurations.winter_wheat import (
-    WinterWheatHay, WinterWheatGrain, WinterWheatSilage, WinterWheatBaleage
+    WinterWheatHay,
+    WinterWheatGrain,
+    WinterWheatSilage,
+    WinterWheatBaleage,
 )
 
 
 class CropSpecies(Enum):
     """Enum of all the crop types supported by RUFAS"""
+
     ALFALFA_HAY = "alfalfa_hay"
     ALFALFA_SILAGE = "alfalfa_silage"
     ALFALFA_BALEAGE = "alfalfa_baleage"
@@ -47,8 +68,11 @@ class CropSpeciesDataFactory:
     Creates a species data object from a CropSpecies enum.
 
     """
+
     @staticmethod
-    def create_species_data(species: CropSpecies = CropSpecies("corn_grain"), **kwargs) -> CropData:
+    def create_species_data(
+        species: CropSpecies = CropSpecies("corn_grain"), **kwargs
+    ) -> CropData:
         """
         Creates a species data object from a CropSpecies enum with species defaults and the optional ability to modify
         additional attributes.
@@ -108,11 +132,13 @@ class CropSpeciesDataFactory:
                 if attribute in attr_list:
                     setattr(species_instance, attribute, value)
                 else:
-                    raise AttributeError(f"{attribute} is not a valid attribute of CropData")
+                    raise AttributeError(
+                        f"{attribute} is not a valid attribute of CropData"
+                    )
 
             # set new name to indicate that the class has been altered.
             name_key_absent = "name" not in kwargs.keys()
-            id_is_only_key = (len(kwargs) == 1 and "id" in kwargs.keys())
+            id_is_only_key = len(kwargs) == 1 and "id" in kwargs.keys()
             # If only the id is being changed, the crop is still a default so its name should not be changed
             if name_key_absent and not id_is_only_key:
                 species_instance.name = "altered" + species_instance.name

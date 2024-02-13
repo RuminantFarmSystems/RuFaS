@@ -29,6 +29,7 @@ class PlantCategory(Enum):
         Represents tree-type plants.
 
     """
+
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
@@ -372,6 +373,7 @@ class CropData:
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
     """
+
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     name: Optional[str] = "default generic annual crop"
@@ -568,20 +570,28 @@ class CropData:
         Initialize all attributes with defaults that depend on other attributes after the object has been initialized.
         """
         # Set dormancy loss
-        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL
+            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
+        ):
             self.dormancy_loss_fraction = 0.1
         elif self.plant_category == PlantCategory.TREE:
             self.dormancy_loss_fraction = 0.3
 
         # Set perennial status
-        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.TREE:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL
+            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.TREE
+        ):
             self.is_perennial = True
 
         # set Fixation status
-        if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
-                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME
+            or self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME
+        ):
             self.is_nitrogen_fixer = True
 
     @property
@@ -607,7 +617,12 @@ class CropData:
             True if the plant is in its growing season, False otherwise.
 
         """
-        return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
+        return (
+            not self.is_mature
+            and not self.is_dormant
+            and self.is_alive
+            and self.is_growing
+        )
 
     @property
     def do_harvest_index_override(self) -> bool:
@@ -650,7 +665,9 @@ class CropData:
         SWAT Theoretical documentation eqn. 2:2.1.1
 
         """
-        return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
+        return self.max_canopy_water_capacity * (
+            self.leaf_area_index / self.max_leaf_area_index
+        )
 
     @property
     def heat_fraction(self) -> float:

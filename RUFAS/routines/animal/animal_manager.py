@@ -24,7 +24,9 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
+from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
+    PurchasedFeedEmissionsEstimator,
+)
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
@@ -49,8 +51,7 @@ class AnimalManager:
         AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
         AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
-        AnimalCombination.GROWING_AND_CLOSE_UP:
-            AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+        AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     @classmethod
@@ -84,8 +85,15 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time,
-                 feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None):
+    def __init__(
+        self,
+        data,
+        config,
+        feed: Feed,
+        weather: Weather,
+        time: Time,
+        feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
+    ):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -141,7 +149,9 @@ class AnimalManager:
         self.animal_to_pen_id_map = {}
 
         # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
-        self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
+        self.set_animal_grouping_scenario(
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
+        )
 
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
@@ -161,7 +171,8 @@ class AnimalManager:
         self.p_conc = {"calf": 0, "heiferI": 0, "heiferII": 0, "heiferIII": 0, "cow": 0}
 
         self.phosphorus_concentration_by_animal_class = {
-            animal_type: 0.0 for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            animal_type: 0.0
+            for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]
         }
 
         # housing type: barn or pasture
@@ -178,13 +189,17 @@ class AnimalManager:
         self.formulation_interval = data["ration"]["formulation_interval"]
 
         self.methane_model = data["methane_model"]
-        self.methane_mitigation_method = data["methane_mitigation"]["methane_mitigation_method"]
-        self.methane_mitigation_additive_amount = data["methane_mitigation"]["methane_mitigation_additive_amount"]
+        self.methane_mitigation_method = data["methane_mitigation"][
+            "methane_mitigation_method"
+        ]
+        self.methane_mitigation_additive_amount = data["methane_mitigation"][
+            "methane_mitigation_additive_amount"
+        ]
 
-        self.init_pens(data['pen_information'], data['manure_management_scenarios'])
+        self.init_pens(data["pen_information"], data["manure_management_scenarios"])
 
         if self.simulate_animals:
-            self.init_animals(data['herd_information'])
+            self.init_animals(data["herd_information"])
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -192,8 +207,9 @@ class AnimalManager:
 
         self._print_animal_num_warnings(data["herd_information"])
 
-        self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = \
+        self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
             feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
+        )
 
     @property
     def animals_by_type(self):
@@ -205,7 +221,9 @@ class AnimalManager:
             Cow: self.cows,
         }
 
-    def init_pens(self, all_pen_data: list, manure_management_scenarios: Dict[str, Any]) -> None:
+    def init_pens(
+        self, all_pen_data: list, manure_management_scenarios: Dict[str, Any]
+    ) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -221,9 +239,13 @@ class AnimalManager:
         # Initialize pens from all_pen_data
         for pen_data in all_pen_data:
             pen_data["pen_id"] = pen_data.pop("id")
-            pen_data["animal_combination"] = AnimalCombination[pen_data.pop("animal_combination")]
+            pen_data["animal_combination"] = AnimalCombination[
+                pen_data.pop("animal_combination")
+            ]
 
-            manure_management_scenario_id = pen_data.pop("manure_management_scenario_id")
+            manure_management_scenario_id = pen_data.pop(
+                "manure_management_scenario_id"
+            )
             manure_management_scenario = [
                 scenario
                 for scenario in manure_management_scenarios
@@ -231,9 +253,12 @@ class AnimalManager:
             ][0]
             pen_data["bedding_type"] = manure_management_scenario["bedding_type"]
             pen_data["manure_handling"] = manure_management_scenario["manure_handler"]
-            pen_data["manure_separator"] = manure_management_scenario["manure_separator"]
-            pen_data["manure_separator_after_digestion"] = \
-                manure_management_scenario["manure_separator_after_digestion"]
+            pen_data["manure_separator"] = manure_management_scenario[
+                "manure_separator"
+            ]
+            pen_data["manure_separator_after_digestion"] = manure_management_scenario[
+                "manure_separator_after_digestion"
+            ]
             pen_data["manure_storage"] = manure_management_scenario["manure_treatment"]
 
             pen = Pen(**pen_data)
@@ -255,8 +280,13 @@ class AnimalManager:
             A dictionary containing information about the herd.
         """
 
-        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(herd_data)
+        (
+            self.calves,
+            self.heiferIs,
+            self.heiferIIs,
+            self.heiferIIIs,
+            self.cows,
+        ) = self.life_cycle_manager.initialize_herd(herd_data)
 
     def _print_animal_num_warnings(self, herd_data: Dict[str, Any]) -> None:
         """
@@ -292,7 +322,9 @@ class AnimalManager:
             for key in animal_keys:
                 if herd_data[key] != 0:
                     om.add_warning(
-                        f"invalid_{key}_warning", f"Warning: simulate_animals is false, but {key} is not.", info_map
+                        f"invalid_{key}_warning",
+                        f"Warning: simulate_animals is false, but {key} is not.",
+                        info_map,
                     )
                     counter += 1
             om.add_log(
@@ -331,15 +363,21 @@ class AnimalManager:
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
+            heiferI.set_nutrient_rqmts(
+                current_temperature, self.ANIMAL_GROUPING_SCENARIO
+            )
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
+            heiferII.set_nutrient_rqmts(
+                current_temperature, self.ANIMAL_GROUPING_SCENARIO
+            )
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
+            heiferIII.set_nutrient_rqmts(
+                current_temperature, self.ANIMAL_GROUPING_SCENARIO
+            )
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
@@ -408,7 +446,8 @@ class AnimalManager:
         for cow in self.cows:
             latest_pen = cow.pen_history[-1].pen
             cow.set_nutrient_rqmts(
-                self.ANIMAL_GROUPING_SCENARIO, nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc
+                self.ANIMAL_GROUPING_SCENARIO,
+                nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
             )
 
     def reset_milk_production_reduction(self) -> None:
@@ -420,7 +459,10 @@ class AnimalManager:
 
         """
         for pen in self.all_pens:
-            if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
+            if (
+                pen.animal_combination.name == "LAC_COW"
+                or pen.animal_combination.name == "CLOSE_UP"
+            ):
                 for animal in list(pen.animals_in_pen.values()):
                     animal.milk_production_reduction = 0.0
 
@@ -487,15 +529,17 @@ class AnimalManager:
         for index, pen in enumerate(self.all_pens):
             for key in pen.ration:
                 if key != "status" and key != "objective":
-                    pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
+                    pen.ration[key] = (
+                        pen.ration[key] / prior_pen_populations[index]
+                    ) * len(pen.animals_in_pen)
 
     def daily_update_id_map(
-            self,
-            animals_added: List[AnimalBase],
-            animals_removed: List[AnimalBase],
-            calves_born: List[Calf],
-            feed: Feed,
-            current_temperature: float,
+        self,
+        animals_added: List[AnimalBase],
+        animals_removed: List[AnimalBase],
+        calves_born: List[Calf],
+        feed: Feed,
+        current_temperature: float,
     ) -> None:
         """
         Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
@@ -571,12 +615,20 @@ class AnimalManager:
             candidate_pens = self.pens_by_animal_combination[group]
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-            new_pen_population = (pen_for_insert.stocking_density * pen_for_insert.num_stalls) + 1
-            pen_for_insert.stocking_density = new_pen_population / pen_for_insert.num_stalls
+            new_pen_population = (
+                pen_for_insert.stocking_density * pen_for_insert.num_stalls
+            ) + 1
+            pen_for_insert.stocking_density = (
+                new_pen_population / pen_for_insert.num_stalls
+            )
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(
-                animal, animal_p_conc, feed, current_temperature, original_pen_populations[pen_for_insert.id]
+                animal,
+                animal_p_conc,
+                feed,
+                current_temperature,
+                original_pen_populations[pen_for_insert.id],
             )
 
         self.calculate_pen_rations(original_pen_populations)
@@ -622,7 +674,9 @@ class AnimalManager:
         return list(filter(lambda cow: cow.is_lactating, cows))
 
     @classmethod
-    def _group_pens_by_animal_combination(cls, all_pens: List[Pen]) -> Dict[AnimalCombination, List[Pen]]:
+    def _group_pens_by_animal_combination(
+        cls, all_pens: List[Pen]
+    ) -> Dict[AnimalCombination, List[Pen]]:
         """
         Group a list of pens by animal combination.
 
@@ -644,7 +698,9 @@ class AnimalManager:
         return pen_group_by_animal_combination
 
     @classmethod
-    def _calc_max_animal_spaces_per_pen(cls, num_stalls: int, max_stocking_density: float) -> int:
+    def _calc_max_animal_spaces_per_pen(
+        cls, num_stalls: int, max_stocking_density: float
+    ) -> int:
         """
         Calculate the maximum number of animal spaces available per pen.
 
@@ -675,7 +731,9 @@ class AnimalManager:
         """
 
         if num_stalls < 0 or max_stocking_density < 0:
-            raise ValueError("The number of stalls and maximum stocking density must be greater than or equal to 0.")
+            raise ValueError(
+                "The number of stalls and maximum stocking density must be greater than or equal to 0."
+            )
 
         return int(num_stalls * max_stocking_density)
 
@@ -699,12 +757,18 @@ class AnimalManager:
         """
         max_animal_spaces = 0
         for pen in pens:
-            max_animal_spaces += cls._calc_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density)
+            max_animal_spaces += cls._calc_max_animal_spaces_per_pen(
+                pen.num_stalls, pen.max_stocking_density
+            )
         return num_animals - max_animal_spaces
 
     @classmethod
     def _create_default_pen(
-            cls, pen_id: int, animal_combination: AnimalCombination, num_stalls: int, max_stocking_density: float
+        cls,
+        pen_id: int,
+        animal_combination: AnimalCombination,
+        num_stalls: int,
+        max_stocking_density: float,
     ) -> Pen:
         """
         Create a default Pen object with the given parameters.
@@ -756,7 +820,11 @@ class AnimalManager:
         )
 
     def _create_default_pens_for_potential_space_shortage(
-            self, num_animals: int, pens: List[Pen], animal_combination: AnimalCombination, start_pen_id=0
+        self,
+        num_animals: int,
+        pens: List[Pen],
+        animal_combination: AnimalCombination,
+        start_pen_id=0,
     ) -> List[Pen]:
         """
         Create a list of default pens to accommodate potential animal space shortage.
@@ -779,17 +847,23 @@ class AnimalManager:
 
         """
 
-        animal_space_shortage = self._calc_animal_space_shortage(num_animals=num_animals, pens=pens)
+        animal_space_shortage = self._calc_animal_space_shortage(
+            num_animals=num_animals, pens=pens
+        )
         new_default_pens: List[Pen] = []
 
         if animal_space_shortage > 0:
-            num_stalls_per_pen = self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
+            num_stalls_per_pen = self.DEFAULT_NUM_STALLS_BY_COMBINATION[
+                animal_combination
+            ]
             max_stocking_density = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
 
             max_animal_spaces_per_default_pen = self._calc_max_animal_spaces_per_pen(
                 num_stalls=num_stalls_per_pen, max_stocking_density=max_stocking_density
             )
-            num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
+            num_new_default_pens = math.ceil(
+                animal_space_shortage / max_animal_spaces_per_default_pen
+            )
             for i in range(num_new_default_pens):
                 new_default_pens.append(
                     self._create_default_pen(
@@ -842,7 +916,9 @@ class AnimalManager:
 
     @classmethod
     def _allocate_animals_to_pens_helper(
-            cls, animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], pens: List[Pen]
+        cls,
+        animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+        pens: List[Pen],
     ) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
@@ -867,7 +943,10 @@ class AnimalManager:
         allocation_plan = cls.plan_animal_allocation(
             num_animals=len(animals),
             max_spaces_in_pens=[
-                cls._calc_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density) for pen in pens
+                cls._calc_max_animal_spaces_per_pen(
+                    pen.num_stalls, pen.max_stocking_density
+                )
+                for pen in pens
             ],
         )
 
@@ -879,10 +958,10 @@ class AnimalManager:
 
     @classmethod
     def execute_allocation_plan(
-            cls,
-            allocation_plan: List[int],
-            animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
-            animal_pens: List[Pen],
+        cls,
+        allocation_plan: List[int],
+        animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+        animal_pens: List[Pen],
     ) -> None:
         """
         Execute an allocation plan to distribute animals into pens according to the given plan.
@@ -915,9 +994,13 @@ class AnimalManager:
         """
 
         if len(allocation_plan) != len(animal_pens):
-            raise ValueError("The length of the allocation plan must match the number of pens.")
+            raise ValueError(
+                "The length of the allocation plan must match the number of pens."
+            )
         elif sum(allocation_plan) != len(animals):
-            raise ValueError("The sum of the allocation plan must match the number of animals.")
+            raise ValueError(
+                "The sum of the allocation plan must match the number of animals."
+            )
 
         for i, count in enumerate(allocation_plan):
             animal_combination = animal_pens[i].animal_combination
@@ -925,7 +1008,9 @@ class AnimalManager:
             animals = animals[count:]
 
     @classmethod
-    def plan_animal_allocation(cls, num_animals: int, max_spaces_in_pens: List[int]) -> List[int]:
+    def plan_animal_allocation(
+        cls, num_animals: int, max_spaces_in_pens: List[int]
+    ) -> List[int]:
         """
         Make an allocation plan to move animals to pens and match pen density as closely as possible
          to the overall density.
@@ -989,16 +1074,23 @@ class AnimalManager:
 
         """
         num_pens_for_combination = len(max_spaces_in_pens)
-        overall_density = cls._calc_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
+        overall_density = cls._calc_density(
+            num_animals=num_animals, num_spaces=sum(max_spaces_in_pens)
+        )
 
         if overall_density > 1.0:
-            raise ValueError("The number of animals cannot exceed the total number of spaces.")
+            raise ValueError(
+                "The number of animals cannot exceed the total number of spaces."
+            )
 
         num_animals_in_pens = [0] * num_pens_for_combination
-        allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
+        allocation_limits = [
+            math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens
+        ]
         # Sort pens by allocation limit, then by index
         sorted_pen_indices = sorted(
-            range(num_pens_for_combination), key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx)
+            range(num_pens_for_combination),
+            key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx),
         )
 
         for i in sorted_pen_indices[: num_pens_for_combination - 1]:
@@ -1022,7 +1114,9 @@ class AnimalManager:
         """
 
         self._sort_animals_before_allocation()
-        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
+        self.pens_by_animal_combination = self._group_pens_by_animal_combination(
+            self.all_pens
+        )
         animals_by_combination = collections.defaultdict(list)
         for animal in [
             *self.calves,
@@ -1031,7 +1125,9 @@ class AnimalManager:
             *self.heiferIIIs,
             *self.cows,
         ]:
-            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(
+                animal
+            )
             animals_by_combination[animal_combination].append(animal)
 
         for animal_combination, animals in animals_by_combination.items():
@@ -1043,7 +1139,9 @@ class AnimalManager:
             )
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+            self._allocate_animals_to_pens_helper(
+                animals, self.pens_by_animal_combination[animal_combination]
+            )
 
         self.fully_update_animal_to_pen_id_map()
 
@@ -1109,7 +1207,9 @@ class AnimalManager:
         """
         return sum(cow.estimated_daily_milk_produced for cow in cows)
 
-    def gather_pen_history(self, animal_type_list: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
+    def gather_pen_history(
+        self, animal_type_list: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]
+    ) -> None:
         """
         Updates pen history data for a given animal type.
 
@@ -1124,7 +1224,9 @@ class AnimalManager:
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
             classes_in_pen = self.all_pens[current_pen_id].classes_in_pen
-            animal.update_pen_history(current_pen_id, self.simulation_day, classes_in_pen)
+            animal.update_pen_history(
+                current_pen_id, self.simulation_day, classes_in_pen
+            )
 
     def record_pen_history(self) -> None:
         """
@@ -1178,7 +1280,9 @@ class AnimalManager:
         return self.life_cycle_manager.initial_herd_summary
 
     @classmethod
-    def _calc_phosphorus_concentration(cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> float:
+    def _calc_phosphorus_concentration(
+        cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]
+    ) -> float:
         """
         Calculate the phosphorus concentration of a group of animals.
 
@@ -1217,7 +1321,9 @@ class AnimalManager:
 
         for animal_type in self.phosphorus_concentration_by_animal_class:
             animals = self.animals_by_type[animal_type]
-            self.phosphorus_concentration_by_animal_class[animal_type] = self._calc_phosphorus_concentration(animals)
+            self.phosphorus_concentration_by_animal_class[
+                animal_type
+            ] = self._calc_phosphorus_concentration(animals)
 
     def _calc_ration_at_interval(self, feed: Feed) -> None:
         """
@@ -1240,22 +1346,29 @@ class AnimalManager:
         for pen in self.all_pens:
             if pen.is_populated:
                 pen.subset_class_feeds(feed)
-                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
+                    pen.allocated_feeds
+                )
 
                 ration_per_animal = {}
                 ration_vals = {}
 
-                while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
+                while (
+                    "status" not in ration_per_animal
+                    or ration_per_animal["status"].lower() != "optimal"
+                ):
                     if pen.animal_combination == AnimalCombination.CALF:
                         ration_per_animal = CalfRationManager.optimize()
-                        ration_vals = {'ME_total': 0}
+                        ration_vals = {"ME_total": 0}
                     else:
                         ration_per_animal, ration_vals = RationManager.formulate_ration(
                             pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
                         )
 
                 # recording ration nutrition information in pen
-                nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
+                nutrient_amount, nutrient_conc = RationReporter.report_ration(
+                    ration_per_animal, feed.available_feeds
+                )
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals["ME_total"]
@@ -1267,7 +1380,9 @@ class AnimalManager:
 
                 for animal in list(pen.animals_in_pen.values()):
                     animal.set_ration(ration_per_animal, nutrient_amount["dm"])
-                    animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
+                    animal.set_p_intake(
+                        nutrient_amount["phosphorus"], nutrient_conc["phosphorus"]
+                    )
 
                 ration_per_pen = {}
                 num_animals = len(pen.animals_in_pen)
@@ -1371,15 +1486,15 @@ class AnimalManager:
             *self.heiferIIIs,
             *self.cows,
         ]:
-            snapshot["animal_combination_by_id"][animal.id] = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(
-                animal
-            )
+            snapshot["animal_combination_by_id"][
+                animal.id
+            ] = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         return snapshot
 
     def _handle_removed_animals_after_update(
-            self,
-            animals_snapshot_before_update: Dict[str, set | Dict],
-            animals_snapshot_after_update: Dict[str, set | Dict],
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
     ) -> None:
         """
         Dict[str, Dict[Union[Calf | HeiferI | HeiferII | HeiferIII]]]
@@ -1412,18 +1527,19 @@ class AnimalManager:
         removed_animals = set()
         for animal_type_name in animal_class_names:
             removed_animals.update(
-                animals_snapshot_before_update[animal_type_name] - animals_snapshot_after_update[animal_type_name]
+                animals_snapshot_before_update[animal_type_name]
+                - animals_snapshot_after_update[animal_type_name]
             )
 
         for animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(animal)
 
     def _handle_animals_with_unchanged_class_and_changed_combination(
-            self,
-            animals_snapshot_before_update: Dict[str, set | Dict],
-            animals_snapshot_after_update: Dict[str, set | Dict],
-            feed: Feed,
-            current_temperature: float,
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
+        feed: Feed,
+        current_temperature: float,
     ):
         """
         Handle animals that didn't change their classes but changed their animal combination.
@@ -1460,13 +1576,14 @@ class AnimalManager:
         animals_with_unchanged_class = set()
         for animal_class_name in animal_class_names:
             animals_with_unchanged_class.update(
-                animals_snapshot_before_update[animal_class_name] & animals_snapshot_after_update[animal_class_name]
+                animals_snapshot_before_update[animal_class_name]
+                & animals_snapshot_after_update[animal_class_name]
             )
         animals_with_unchanged_class_and_changed_combination = set()
         for animal in animals_with_unchanged_class:
             if (
-                    animals_snapshot_before_update["animal_combination_by_id"][animal.id]
-                    != animals_snapshot_after_update["animal_combination_by_id"][animal.id]
+                animals_snapshot_before_update["animal_combination_by_id"][animal.id]
+                != animals_snapshot_after_update["animal_combination_by_id"][animal.id]
             ):
                 animals_with_unchanged_class_and_changed_combination.add(animal)
 
@@ -1475,11 +1592,11 @@ class AnimalManager:
             self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_graduated_animals(
-            self,
-            animals_snapshot_before_update: Dict[str, set | Dict],
-            animals_snapshot_after_update: Dict[str, set | Dict],
-            feed: Feed,
-            current_temperature: float,
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
+        feed: Feed,
+        current_temperature: float,
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -1503,14 +1620,17 @@ class AnimalManager:
         graduated_animals = set()
         for animal_class_name in ["heiferIs", "heiferIIs", "heiferIIIs", "cows"]:
             graduated_animals.update(
-                animals_snapshot_after_update[animal_class_name] - animals_snapshot_before_update[animal_class_name]
+                animals_snapshot_after_update[animal_class_name]
+                - animals_snapshot_before_update[animal_class_name]
             )
         for animal in graduated_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_newly_added_animals(
-            self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], feed: Feed,
-            current_temperature: float
+        self,
+        new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+        feed: Feed,
+        current_temperature: float,
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -1529,7 +1649,9 @@ class AnimalManager:
             self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
             self.animals_by_type[type(animal)].append(animal)
 
-    def _remove_animal_from_pen_and_id_map(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
+    def _remove_animal_from_pen_and_id_map(
+        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+    ) -> None:
         """
         Removes animal from its current pen, and removes it from the pen id map.
 
@@ -1544,7 +1666,10 @@ class AnimalManager:
         del self.animal_to_pen_id_map[animal.id]
 
     def _add_animal_to_pen_and_id_map(
-            self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed, current_temperature: float
+        self,
+        animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow],
+        feed: Feed,
+        current_temperature: float,
     ) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
@@ -1559,9 +1684,12 @@ class AnimalManager:
             The temperature on the current day.
 
         """
-        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(
+            animal
+        )
         pen_with_min_stocking_density = min(
-            self.pens_by_animal_combination[animal_combination], key=lambda p: p.current_stocking_density
+            self.pens_by_animal_combination[animal_combination],
+            key=lambda p: p.current_stocking_density,
         )
         pen_with_min_stocking_density.add_animal(
             animal,
@@ -1572,7 +1700,9 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
+    def collect_manure_excretions_output_data(
+        self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict
+    ):
         pen.classes_in_pen = self._determine_classes_in_pen(pen)
         pen.calc_total_manure(
             feed,
@@ -1610,22 +1740,42 @@ class AnimalManager:
             current_temperature = current_conditions.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
 
-            animals_added, animals_removed, calves_born, *rest = self.life_cycle_manager.daily_update(
-                self.simulation_day, self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows
+            (
+                animals_added,
+                animals_removed,
+                calves_born,
+                *rest,
+            ) = self.life_cycle_manager.daily_update(
+                self.simulation_day,
+                self.calves,
+                self.heiferIs,
+                self.heiferIIs,
+                self.heiferIIIs,
+                self.cows,
             )
 
             animals_snapshot_after_update = self._get_animals_snapshot()
 
-            self._handle_removed_animals_after_update(animals_snapshot_before_update, animals_snapshot_after_update)
+            self._handle_removed_animals_after_update(
+                animals_snapshot_before_update, animals_snapshot_after_update
+            )
             self._handle_animals_with_unchanged_class_and_changed_combination(
-                animals_snapshot_before_update, animals_snapshot_after_update, feed, current_temperature
+                animals_snapshot_before_update,
+                animals_snapshot_after_update,
+                feed,
+                current_temperature,
             )
 
             self._handle_graduated_animals(
-                animals_snapshot_before_update, animals_snapshot_after_update, feed, current_temperature
+                animals_snapshot_before_update,
+                animals_snapshot_after_update,
+                feed,
+                current_temperature,
             )
 
-            self._handle_newly_added_animals([*animals_added, *calves_born], feed, current_temperature)
+            self._handle_newly_added_animals(
+                [*animals_added, *calves_born], feed, current_temperature
+            )
 
             self._record_animal_counts()
             self._record_culling_stats()
@@ -1646,7 +1796,9 @@ class AnimalManager:
                 self.clear_pens()
                 self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)
-                AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
+                AnimalModuleReporter.report_ration_interval_data(
+                    self, feed, self.simulation_day
+                )
                 self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
@@ -1655,13 +1807,21 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
-            AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
+                self.collect_manure_excretions_output_data(
+                    pen, feed, manure_excretions_output_data
+                )
+            AnimalModuleReporter.report_animal_module_manure(
+                manure_excretions_output_data
+            )
 
-            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
+            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(
+                self.cows
+            )
             AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
 
-    def _record_animal_events(self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
+    def _record_animal_events(
+        self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]
+    ) -> None:
         """
         Record the events of the animals.
 
@@ -1675,11 +1835,16 @@ class AnimalManager:
         None
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self._record_animal_events.__name__}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_animal_events.__name__,
+        }
         for animal in animals:
-            om.add_variable(f'{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}',
-                            animal.events,
-                            info_map)
+            om.add_variable(
+                f"{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}",
+                animal.events,
+                info_map,
+            )
 
     def _record_animal_counts(self) -> None:
         """
@@ -1690,115 +1855,244 @@ class AnimalManager:
         None
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self._record_animal_counts.__name__}
-        om.add_variable('sim_day', self.simulation_day, info_map)
-        om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
-                        len(self.heiferIIIs) + len(self.cows), info_map)
-        om.add_variable('num_calves', len(self.calves), info_map)
-        om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
-        om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
-        om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
-        om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
-        om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
-        om.add_variable('num_cows', len(self.cows), info_map)
-        om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
-        om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
-        om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
-        om.add_variable('num_cow_parity_4+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_animal_counts.__name__,
+        }
+        om.add_variable("sim_day", self.simulation_day, info_map)
+        om.add_variable(
+            "num_animals",
+            len(self.calves)
+            + len(self.heiferIs)
+            + len(self.heiferIIs)
+            + len(self.heiferIIIs)
+            + len(self.cows),
+            info_map,
+        )
+        om.add_variable("num_calves", len(self.calves), info_map)
+        om.add_variable("num_heiferIs", len(self.heiferIs), info_map)
+        om.add_variable("num_heiferIIs", len(self.heiferIIs), info_map)
+        om.add_variable("num_heiferIIIs", len(self.heiferIIIs), info_map)
+        om.add_variable(
+            "num_lactating_cows",
+            len([cow for cow in self.cows if cow.is_lactating]),
+            info_map,
+        )
+        om.add_variable(
+            "num_dry_cows",
+            len([cow for cow in self.cows if not cow.is_lactating]),
+            info_map,
+        )
+        om.add_variable("num_cows", len(self.cows), info_map)
+        om.add_variable(
+            "num_cow_parity_1",
+            self.life_cycle_manager.num_cow_for_parity["1"],
+            info_map,
+        )
+        om.add_variable(
+            "num_cow_parity_2",
+            self.life_cycle_manager.num_cow_for_parity["2"],
+            info_map,
+        )
+        om.add_variable(
+            "num_cow_parity_3",
+            self.life_cycle_manager.num_cow_for_parity["3"],
+            info_map,
+        )
+        om.add_variable(
+            "num_cow_parity_4+",
+            self.life_cycle_manager.num_cow_for_parity["greater_than_3"],
+            info_map,
+        )
 
     def _record_heiferIIs_conception_rate(self) -> None:
         """
         Record the conception rate of heiferIIs.
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self._record_heiferIIs_conception_rate.__name__}
-        om.add_variable('heiferII_total_num_ai_performed', HeiferII.stats['num_ai_performed'], info_map)
-        om.add_variable('heiferII_total_num_successful_conceptions',
-                        HeiferII.stats['num_successful_conceptions'], info_map)
-        heiferII_overall_conception_rate = (HeiferII.stats['num_successful_conceptions'] / HeiferII.stats[
-            'num_ai_performed']) if HeiferII.stats['num_ai_performed'] > 0 else 0
-        om.add_variable('heiferII_overall_conception_rate', heiferII_overall_conception_rate, info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_heiferIIs_conception_rate.__name__,
+        }
+        om.add_variable(
+            "heiferII_total_num_ai_performed",
+            HeiferII.stats["num_ai_performed"],
+            info_map,
+        )
+        om.add_variable(
+            "heiferII_total_num_successful_conceptions",
+            HeiferII.stats["num_successful_conceptions"],
+            info_map,
+        )
+        heiferII_overall_conception_rate = (
+            (
+                HeiferII.stats["num_successful_conceptions"]
+                / HeiferII.stats["num_ai_performed"]
+            )
+            if HeiferII.stats["num_ai_performed"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_overall_conception_rate",
+            heiferII_overall_conception_rate,
+            info_map,
+        )
 
-        om.add_variable('heiferII_num_ai_performed_in_ED', HeiferII.stats['num_ai_performed_in_ED'], info_map)
-        om.add_variable('heiferII_num_successful_conceptions_in_ED',
-                        HeiferII.stats['num_successful_conceptions_in_ED'], info_map)
-        ed_conception_rate = (HeiferII.stats['num_successful_conceptions_in_ED'] / HeiferII.stats[
-            'num_ai_performed_in_ED']) if HeiferII.stats['num_ai_performed_in_ED'] > 0 else 0
-        om.add_variable('heiferII_ED_conception_rate', ed_conception_rate, info_map)
+        om.add_variable(
+            "heiferII_num_ai_performed_in_ED",
+            HeiferII.stats["num_ai_performed_in_ED"],
+            info_map,
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_ED",
+            HeiferII.stats["num_successful_conceptions_in_ED"],
+            info_map,
+        )
+        ed_conception_rate = (
+            (
+                HeiferII.stats["num_successful_conceptions_in_ED"]
+                / HeiferII.stats["num_ai_performed_in_ED"]
+            )
+            if HeiferII.stats["num_ai_performed_in_ED"] > 0
+            else 0
+        )
+        om.add_variable("heiferII_ED_conception_rate", ed_conception_rate, info_map)
 
-        om.add_variable('heiferII_num_ai_performed_in_TAI', HeiferII.stats['num_ai_performed_in_TAI'], info_map)
-        om.add_variable('heiferII_num_successful_conceptions_in_TAI',
-                        HeiferII.stats['num_successful_conceptions_in_TAI'], info_map)
-        tai_conception_rate = (HeiferII.stats['num_successful_conceptions_in_TAI'] / HeiferII.stats[
-            'num_ai_performed_in_TAI']) if HeiferII.stats['num_ai_performed_in_TAI'] > 0 else 0
-        om.add_variable('heiferII_TAI_conception_rate', tai_conception_rate, info_map)
+        om.add_variable(
+            "heiferII_num_ai_performed_in_TAI",
+            HeiferII.stats["num_ai_performed_in_TAI"],
+            info_map,
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_TAI",
+            HeiferII.stats["num_successful_conceptions_in_TAI"],
+            info_map,
+        )
+        tai_conception_rate = (
+            (
+                HeiferII.stats["num_successful_conceptions_in_TAI"]
+                / HeiferII.stats["num_ai_performed_in_TAI"]
+            )
+            if HeiferII.stats["num_ai_performed_in_TAI"] > 0
+            else 0
+        )
+        om.add_variable("heiferII_TAI_conception_rate", tai_conception_rate, info_map)
 
-        om.add_variable('heiferII_num_ai_performed_in_SynchED', HeiferII.stats['num_ai_performed_in_SynchED'], info_map)
-        om.add_variable('heiferII_num_successful_conceptions_in_SynchED',
-                        HeiferII.stats['num_successful_conceptions_in_SynchED'], info_map)
-        synch_ed_conception_rate = (HeiferII.stats['num_successful_conceptions_in_SynchED'] / HeiferII.stats[
-            'num_ai_performed_in_SynchED']) if HeiferII.stats['num_ai_performed_in_SynchED'] > 0 else 0
-        om.add_variable('heiferII_SynchED_conception_rate', synch_ed_conception_rate, info_map)
+        om.add_variable(
+            "heiferII_num_ai_performed_in_SynchED",
+            HeiferII.stats["num_ai_performed_in_SynchED"],
+            info_map,
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_SynchED",
+            HeiferII.stats["num_successful_conceptions_in_SynchED"],
+            info_map,
+        )
+        synch_ed_conception_rate = (
+            (
+                HeiferII.stats["num_successful_conceptions_in_SynchED"]
+                / HeiferII.stats["num_ai_performed_in_SynchED"]
+            )
+            if HeiferII.stats["num_ai_performed_in_SynchED"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_SynchED_conception_rate", synch_ed_conception_rate, info_map
+        )
 
     def _record_cows_conception_rate(self) -> None:
         """
         Record the conception rate of cows.
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self._record_cows_conception_rate.__name__}
-        om.add_variable('cow_total_num_ai_performed', Cow.stats['num_ai_performed'], info_map)
-        om.add_variable('cow_total_num_successful_conceptions',
-                        Cow.stats['num_successful_conceptions'], info_map)
-        cow_overall_conception_rate = (Cow.stats['num_successful_conceptions'] /
-                                       Cow.stats['num_ai_performed']) if Cow.stats['num_ai_performed'] > 0 else 0
-        om.add_variable('cow_overall_conception_rate', cow_overall_conception_rate, info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_cows_conception_rate.__name__,
+        }
+        om.add_variable(
+            "cow_total_num_ai_performed", Cow.stats["num_ai_performed"], info_map
+        )
+        om.add_variable(
+            "cow_total_num_successful_conceptions",
+            Cow.stats["num_successful_conceptions"],
+            info_map,
+        )
+        cow_overall_conception_rate = (
+            (Cow.stats["num_successful_conceptions"] / Cow.stats["num_ai_performed"])
+            if Cow.stats["num_ai_performed"] > 0
+            else 0
+        )
+        om.add_variable(
+            "cow_overall_conception_rate", cow_overall_conception_rate, info_map
+        )
 
     def _record_culling_stats(self) -> None:
         """
         Record the culling stats of cows.
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self._record_culling_stats.__name__}
-        om.add_variable('num_cows_by_death_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.DEATH_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_low_prod_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.LOW_PROD_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_lameness_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.LAMENESS_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_injury_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.INJURY_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_mastitis_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.MASTITIS_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_disease_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.DISEASE_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_udder_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.UDDER_CULL
-                        ],
-                        info_map)
-        om.add_variable('num_cows_by_unknown_cull',
-                        self.life_cycle_manager.cull_reason_stats_range[
-                            animal_constants.UNKNOWN_CULL
-                        ],
-                        info_map)
-        om.add_variable('total_num_cows_culled',
-                        sum(self.life_cycle_manager.cull_reason_stats_range.values()),
-                        info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_culling_stats.__name__,
+        }
+        om.add_variable(
+            "num_cows_by_death_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.DEATH_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_low_prod_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.LOW_PROD_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_lameness_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.LAMENESS_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_injury_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.INJURY_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_mastitis_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.MASTITIS_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_disease_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.DISEASE_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_udder_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.UDDER_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "num_cows_by_unknown_cull",
+            self.life_cycle_manager.cull_reason_stats_range[
+                animal_constants.UNKNOWN_CULL
+            ],
+            info_map,
+        )
+        om.add_variable(
+            "total_num_cows_culled",
+            sum(self.life_cycle_manager.cull_reason_stats_range.values()),
+            info_map,
+        )

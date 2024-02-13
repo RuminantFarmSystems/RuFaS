@@ -2,10 +2,7 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 @dataclass(kw_only=True)
@@ -13,6 +10,7 @@ class Alfalfa(CropData):
     """
     Crop data class with default values for alfalfa.
     """
+
     species: str = "alfalfa"
     name: str = "default alfalfa"
     plant_code: str = "ALFA"
@@ -82,6 +80,7 @@ class AlfalfaSilage(Alfalfa):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "alfalfa_silage"
     name: str = "alfalfa silage"
 
@@ -141,6 +140,7 @@ class AlfalfaBaleage(AlfalfaSilage):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
+
     species: str = "alfalfa_baleage"
     name: str = "alfalfa baleage"
 
@@ -186,6 +186,7 @@ class AlfalfaHay(Alfalfa):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
+
     species: str = "alfalfa_hay"
     name: str = "alfalfa hay"
 

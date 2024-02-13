@@ -171,7 +171,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_weather.assert_called_once_with({}, mock_config)
     patch_for_time.assert_called_once_with(mock_config)
     patch_for_feed_manager.assert_called_once()
-    patch_for_state.assert_called_once_with(mock_config, mock_weather, mock_time, mock_feed_manager)
+    patch_for_state.assert_called_once_with(
+        mock_config, mock_weather, mock_time, mock_feed_manager
+    )
 
 
 @pytest.mark.parametrize(

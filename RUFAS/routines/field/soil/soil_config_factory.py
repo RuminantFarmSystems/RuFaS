@@ -10,14 +10,18 @@ based on the CropSpeciesDataFactory model, and should contain all equivalent fun
 
 class SoilConfiguration(Enum):
     """Enum of all currently support soil configurations"""
+
     GENERIC = "generic"
     # TODO: implement additional soil types
 
 
 class SoilConfigFactory:
     @staticmethod
-    def create_soil_data(field_size: float, config: SoilConfiguration = SoilConfiguration("generic"),
-                         **kwargs) -> SoilData:
+    def create_soil_data(
+        field_size: float,
+        config: SoilConfiguration = SoilConfiguration("generic"),
+        **kwargs,
+    ) -> SoilData:
         """
         Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
             optional ability to modify attributes
@@ -35,9 +39,7 @@ class SoilConfigFactory:
         SoilData
             A Soildata object
         """
-        configuration_by_type = {
-            SoilConfiguration.GENERIC: SoilData
-        }
+        configuration_by_type = {SoilConfiguration.GENERIC: SoilData}
         config_class = configuration_by_type[config]
         config_instance = config_class(field_size=field_size)
 
@@ -50,6 +52,8 @@ class SoilConfigFactory:
                 if attribute in attribute_list:
                     setattr(config_instance, attribute, value)
                 else:
-                    raise AttributeError(f"{attribute} is not a valid attribute of SoilData")
+                    raise AttributeError(
+                        f"{attribute} is not a valid attribute of SoilData"
+                    )
 
         return config_instance
