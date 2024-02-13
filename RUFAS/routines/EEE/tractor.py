@@ -84,7 +84,7 @@ class Tractor:
 
     def calculate_axel_power(self, implement: TractorImplement) -> float:
         """
-        Calculates total Axle Power (kW) required by tractor wheels to move the tractor (and implement if applicable)
+        Calculates total Axle Power (kW) required by tractor wheels to move the tractor (and implement if applicable).
         Implements Helper Function 413  in EEE Functions file.
         """
         return (self.mass_kg + implement.mass_kg) * self.speed_km_hr * 9.8 * 0.08 * 1.1 * 1.2 / 3600
