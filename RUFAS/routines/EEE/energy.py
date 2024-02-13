@@ -58,7 +58,7 @@ class EnergyEstimator:
         float
             Diesel Consumption for Tractor-Implement (l/ton)
         """
-        total_power_needed_kW = self._calculate_total_power_needed(tractor)
+        total_power_needed_kW = self._calculate_total_power_needed(tractor, crop_yield, field_production_size)
         x = total_power_needed_kW / tractor.power_available_kW  # helper function 411
         specific_fuel_consumption_liter_per_kWh = (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)  # helper function 410
         tractor_implement_operation_time_hr = 0  # TODO get the correct value
@@ -71,7 +71,12 @@ class EnergyEstimator:
         )
         return diesel_consumption_tractor_implement_liter_per_ton
 
-    def _calculate_total_power_needed(self, tractor: Tractor) -> float:
+    def _calculate_total_power_needed(
+        self,
+        tractor: Tractor,
+        crop_yield_ton_per_ha: float,
+        field_production_size_ha: float,
+    ) -> float:
         """
         Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
         Implements Helper Function 412  in EEE Functions file.
@@ -79,5 +84,7 @@ class EnergyEstimator:
         tractor_implement = TractorImplement()  # TODO get the correct value
         tactor_axel_power = tractor.calculate_axel_power(tractor_implement)
         tractor_implement_drawbar_power = tractor_implement.calculate_drawbar_power()
-        tractor_implement_PTO_power_needed = 0  # TODO get the correct value
+        tractor_implement_PTO_power_needed = tractor_implement.calculate_needed_PTO(
+            crop_yield_ton_per_ha, field_production_size_ha
+        )
         return tactor_axel_power + tractor_implement_drawbar_power + tractor_implement_PTO_power_needed
