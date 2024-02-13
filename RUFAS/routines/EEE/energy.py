@@ -2,6 +2,7 @@ from RUFAS.output_manager import OutputManager
 from math import sqrt
 
 from .tractor import TractorSpecs
+from .tractor_implement import TractorImplement
 
 om = OutputManager()
 
@@ -57,7 +58,7 @@ class EnergyEstimator:
         float
             Diesel Consumption for Tractor-Implement (l/ton)
         """
-        total_power_needed_kW = self._calculate_total_power_needed()
+        total_power_needed_kW = self._calculate_total_power_needed(tractor_specs)
         x = total_power_needed_kW / tractor_specs.power_available_kW  # helper function 411
         specific_fuel_consumption_liter_per_kWh = (2.64 * x) + 3.91 - 0.203 * sqrt(738 * x + 172)  # helper function 410
         tractor_implement_operation_time_hr = 0  # TODO get the correct value
@@ -70,8 +71,9 @@ class EnergyEstimator:
         )
         return diesel_consumption_tractor_implement_liter_per_ton
 
-    def _calculate_total_power_needed(self) -> float:
-        tactor_axel_power = 0  # TODO get the correct value
+    def _calculate_total_power_needed(self, tractor_specs: TractorSpecs) -> float:
+        tractor_implement = TractorImplement()  # TODO get the correct value
+        tactor_axel_power = tractor_specs.calculate_axel_power(tractor_implement)
         tractor_implement_drawbar_power = 0  # TODO get the correct value
         tractor_implement_PTO_power_needed = 0  # TODO get the correct value
         return tactor_axel_power + tractor_implement_drawbar_power + tractor_implement_PTO_power_needed

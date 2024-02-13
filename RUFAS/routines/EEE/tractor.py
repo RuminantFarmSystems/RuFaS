@@ -1,4 +1,5 @@
 from enum import Enum
+from .tractor_implement import TractorImplement
 
 
 class TractorSize(Enum):
@@ -31,9 +32,7 @@ class TractorSpecs:
             If neither `tractor_size` nor `herd_size` is provided.
         """
         if not tractor_size and not herd_size:
-            raise ValueError(
-                "At least one of `tractor_size` or `herd_size` must be given."
-            )
+            raise ValueError("At least one of `tractor_size` or `herd_size` must be given.")
         self.tractor_size = tractor_size or self.herd_size_to_tractor_size(herd_size)
 
     def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
@@ -82,3 +81,10 @@ class TractorSpecs:
         # TODO get these values from IM
         """Constant 598 in EEE Functions file"""
         return 10.0
+
+    def calculate_axel_power(self, implement: TractorImplement) -> float:
+        """
+        Calculates total Axle Power (kW) required by tractor wheels to move the tractor (and implement if applicable)
+        Implements Helper Function 413  in EEE Functions file.
+        """
+        return (self.mass_kg + implement.mass_kg) * self.speed_km_hr * 9.8 * 0.08 * 1.1 * 1.2 / 3600
