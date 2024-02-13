@@ -97,11 +97,11 @@ def mock_time() -> Time:
 
 def test_weather_init(mock_weather_input: dict, mock_config: Config) -> None:
     """Tests that subroutines are called appropriately when Weather instance in initialized."""
-    with patch(
-        "RUFAS.weather.Weather._calculate_average_annual_temperature"
-    ) as avg, patch("RUFAS.output_manager.OutputManager.add_variable") as add, patch(
-        "RUFAS.weather.Weather._get_latitude"
-    ) as latitude:
+    with (
+        patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg,
+        patch("RUFAS.output_manager.OutputManager.add_variable") as add,
+        patch("RUFAS.weather.Weather._get_latitude") as latitude,
+    ):
         Weather(mock_weather_input, mock_config)
         avg.assert_called_once()
         add.assert_called_once()
@@ -115,9 +115,7 @@ def test_weather_init(mock_weather_input: dict, mock_config: Config) -> None:
         ([-4.55, -3.22, -1.05, -0.3, 1.44, 3.99, 8.6], 0.7014285714285712),
     ],
 )
-def test_calculate_average_annual_temperature(
-    avg_daily_temperatures: list[float], expected: float
-) -> None:
+def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
     """Tests that the annual average air temperature is correctly calculated based on average daily temperatures."""
     actual = Weather._calculate_average_annual_temperature(avg_daily_temperatures)
     assert actual == expected
@@ -208,17 +206,19 @@ def test_get_current_day_conditions_error(
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
-    with patch(
-        "RUFAS.util.Utility.day_to_month_conversion",
-        new_callable=MagicMock,
-        return_value=3,
-    ), patch(
-        "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
-        new_callable=MagicMock,
-        return_value=10.0,
-    ), pytest.raises(
-        IndexError
-    ) as e:
+    with (
+        patch(
+            "RUFAS.util.Utility.day_to_month_conversion",
+            new_callable=MagicMock,
+            return_value=3,
+        ),
+        patch(
+            "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
+            new_callable=MagicMock,
+            return_value=10.0,
+        ),
+        pytest.raises(IndexError) as e,
+    ):
         mock_weather.get_current_day_conditions(mocked_time)
     assert str(e.value) == expected
 
@@ -229,13 +229,14 @@ def test_record_weather(
     mock_time: Time,
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
-    with patch(
-        "RUFAS.output_manager.OutputManager.add_variable"
-    ) as add_var, patch.object(
-        mock_weather,
-        "get_current_day_conditions",
-        return_value=mock_current_day_conditions,
-    ) as mock_current_day_conditions:
+    with (
+        patch("RUFAS.output_manager.OutputManager.add_variable") as add_var,
+        patch.object(
+            mock_weather,
+            "get_current_day_conditions",
+            return_value=mock_current_day_conditions,
+        ) as mock_current_day_conditions,
+    ):
         mock_weather.record_weather(mock_time)
         assert mock_current_day_conditions.call_count == 1
         assert add_var.call_count == 9
@@ -252,14 +253,14 @@ def test_get_latitude(
     mock_weather: Weather,
 ) -> None:
     """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
-    with patch(
-        "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
-        return_value=field_keys,
-    ) as keys, patch(
-        "RUFAS.input_manager.InputManager.get_data", return_value=field_data
-    ) as data, patch.object(
-        om, "add_warning"
-    ) as warning:
+    with (
+        patch(
+            "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
+            return_value=field_keys,
+        ) as keys,
+        patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data,
+        patch.object(om, "add_warning") as warning,
+    ):
         actual = mock_weather._get_latitude()
 
         keys.assert_called_once_with("field_properties")

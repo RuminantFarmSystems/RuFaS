@@ -62,9 +62,7 @@ class CurrentDayConditions:
             self.rainfall = self.precipitation
 
     @staticmethod
-    def determine_daylength(
-        day_number: int, geographic_latitude: float, year: int
-    ) -> float:
+    def determine_daylength(day_number: int, geographic_latitude: float, year: int) -> float:
         """
         Calculates the day length for the field based on its day and latitude.
 
@@ -88,12 +86,8 @@ class CurrentDayConditions:
         """
         geographic_latitude = math.radians(geographic_latitude)
         month = Utility.day_to_month_conversion(day_number, year)
-        solar_declination_radians = (
-            CurrentDayConditions.calculate_solar_declination_radians(day_number)
-        )
-        tangent_product = -math.tan(solar_declination_radians) * math.tan(
-            geographic_latitude
-        )
+        solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
+        tangent_product = -math.tan(solar_declination_radians) * math.tan(geographic_latitude)
         is_polar_solstice = abs(tangent_product) > 1
         if is_polar_solstice:
             is_summer = 6 <= month <= 9
@@ -107,9 +101,7 @@ class CurrentDayConditions:
             else:
                 return 24
         else:
-            return (
-                2 * math.acos(tangent_product)
-            ) / GeneralConstants.EARTH_ANGULAR_VELOCITY
+            return (2 * math.acos(tangent_product)) / GeneralConstants.EARTH_ANGULAR_VELOCITY
 
     @staticmethod
     def calculate_solar_declination_radians(day_number: int) -> float:

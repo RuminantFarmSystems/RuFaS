@@ -21,9 +21,7 @@ class DummyDefaultEnumNoDefault(DefaultEnum):
         (DummyDefaultEnumNoDefault, DummyDefaultEnumNoDefault.SUCCESS),
     ],
 )
-def test_get_default_type(
-    enum_type: DefaultEnum, expected_default: DefaultEnum
-) -> None:
+def test_get_default_type(enum_type: DefaultEnum, expected_default: DefaultEnum) -> None:
     """Unit test for function get_default_type() in file default_enum.py"""
 
     assert enum_type.get_default_type() is expected_default
@@ -40,9 +38,7 @@ def test_get_default_type(
         (DummyDefaultEnumNoDefault, "dummy", DummyDefaultEnumNoDefault.SUCCESS),
     ],
 )
-def test_get_type(
-    enum_type: DefaultEnum, lookup_member: str, expected_type: DefaultEnum
-) -> None:
+def test_get_type(enum_type: DefaultEnum, lookup_member: str, expected_type: DefaultEnum) -> None:
     """Unit test for function get_type() in file default_enum.py"""
 
     assert enum_type.get_type(lookup_member) is expected_type

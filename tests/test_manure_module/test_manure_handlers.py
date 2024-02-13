@@ -151,15 +151,11 @@ def test_manure_handler_config() -> None:
 
     # Assert
     assert manure_handler_config.manure_handler_type == ManureHandlerType.FLUSH_SYSTEM
-    assert manure_handler_config.cleaning_water_use_rate == approx(
-        cleaning_water_use_rate
-    )
+    assert manure_handler_config.cleaning_water_use_rate == approx(cleaning_water_use_rate)
     assert manure_handler_config.minutes_per_cleaning == minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == daily_tillage_frequency
-    assert manure_handler_config.cleaning_water_recycle_fraction == approx(
-        cleaning_water_recycle_fraction
-    )
+    assert manure_handler_config.cleaning_water_recycle_fraction == approx(cleaning_water_recycle_fraction)
 
 
 # Test ManureHandlerType
@@ -247,9 +243,7 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     )
     mock_manure_handler_config = mocker.MagicMock(auto_spec=ManureHandlerConfig)
     mock_manure_handler_config.cleaning_water_use_rate = cleaning_water_use_rate
-    mock_manure_handler_config.cleaning_water_recycle_fraction = (
-        cleaning_water_recycle_fraction
-    )
+    mock_manure_handler_config.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
     mock_manure_handler = BaseManureHandler(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
@@ -258,17 +252,12 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     )
 
     # Act
-    cleaning_water_volume_in_main_barn = (
-        mock_manure_handler.calc_cleaning_water_volume_in_main_barn(
-            num_animals=num_animals
-        )
+    cleaning_water_volume_in_main_barn = mock_manure_handler.calc_cleaning_water_volume_in_main_barn(
+        num_animals=num_animals
     )
 
     # Assert
-    assert (
-        cleaning_water_volume_in_main_barn
-        == expected_cleaning_water_volume_in_main_barn
-    )
+    assert cleaning_water_volume_in_main_barn == expected_cleaning_water_volume_in_main_barn
 
 
 def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
@@ -294,9 +283,7 @@ def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
     )
 
     # Act
-    current_day_avg_tempC = (
-        mock_manure_handler._get_current_day_average_temperature_in_celsius()
-    )
+    current_day_avg_tempC = mock_manure_handler._get_current_day_average_temperature_in_celsius()
 
     # Assert
     assert current_day_avg_tempC == expected_current_day_avg_tempC
@@ -360,9 +347,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig),
         name="test",
     )
-    mock_manure_handler.milking_parlor = mock_milking_parlor = mocker.MagicMock(
-        autospec=MilkingParlor
-    )
+    mock_manure_handler.milking_parlor = mock_milking_parlor = mocker.MagicMock(autospec=MilkingParlor)
     mock_milking_parlor.calc_total_water_volume_used_in_milking_parlor.return_value = (
         total_water_volume_in_milking_parlor
     ) = 31.0
@@ -380,9 +365,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
 
     # Act
-    manure_handler_daily_output = mock_manure_handler.daily_update(
-        pen=mock_pen, bedding=mock_bedding, sim_day=sim_day
-    )
+    manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=mock_bedding, sim_day=sim_day)
 
     # Assert
     patch_for_calc_housing_ammonia_emission.assert_called_once_with(
@@ -411,27 +394,17 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
     assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(VSd)
-    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(
-        VSnd
-    )
+    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(VSnd)
     assert manure_handler_daily_output.liquid_manure_phosphorus == approx(P)
     assert manure_handler_daily_output.liquid_manure_potassium == approx(K)
-    assert manure_handler_daily_output.housing_methane == approx(
-        housing_methane_emission
-    )
-    assert manure_handler_daily_output.housing_carbon_dioxide == approx(
-        housing_carbon_dioxide_emission
-    )
-    assert manure_handler_daily_output.housing_ammonia == approx(
-        housing_ammonia_emission
-    )
+    assert manure_handler_daily_output.housing_methane == approx(housing_methane_emission)
+    assert manure_handler_daily_output.housing_carbon_dioxide == approx(housing_carbon_dioxide_emission)
+    assert manure_handler_daily_output.housing_ammonia == approx(housing_ammonia_emission)
     assert manure_handler_daily_output.manure_volume == approx(manure_volume)
     assert manure_handler_daily_output.cleaning_water_volume == approx(
         cleaning_water_volume_in_main_barn * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
-    assert manure_handler_daily_output.total_bedding_volume == approx(
-        total_bedding_volume
-    )
+    assert manure_handler_daily_output.total_bedding_volume == approx(total_bedding_volume)
     assert manure_handler_daily_output.total_bedding_mass == approx(total_bedding_mass)
     assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -461,22 +434,16 @@ def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None
         name="test",
     )
 
-    manure_handler_daily_output = mock_manure_handler.daily_update(
-        pen=mock_pen, bedding=mock_bedding, sim_day=-1
-    )
+    manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=mock_bedding, sim_day=-1)
 
     assert manure_handler_daily_output.simulation_day == -1
     assert manure_handler_daily_output.pen_id == -1
     assert manure_handler_daily_output.manure_urea == approx(0.0)
-    assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (
-        approx(0.0)
-    )
+    assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (approx(0.0))
     assert manure_handler_daily_output.liquid_manure_nitrogen == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(0.0)
     assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(0.0)
-    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(
-        0.0
-    )
+    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_phosphorus == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_potassium == approx(0.0)
     assert manure_handler_daily_output.housing_methane == approx(0.0)
@@ -486,7 +453,5 @@ def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None
     assert manure_handler_daily_output.cleaning_water_volume == approx(0.0)
     assert manure_handler_daily_output.total_bedding_volume == approx(0.0)
     assert manure_handler_daily_output.total_bedding_mass == approx(0.0)
-    assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(
-        0.0
-    )
+    assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(0.0)
     assert manure_handler_daily_output.tempC == approx(0.0)

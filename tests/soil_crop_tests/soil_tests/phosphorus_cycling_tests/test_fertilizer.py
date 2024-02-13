@@ -8,9 +8,7 @@ from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
 
 
 # --- Static method tests ---
-@pytest.mark.parametrize(
-    "cover_factor,days", [(0.5333, 20), (0.6667, 60), (0.8, 4), (0.5333, 1_000)]
-)
+@pytest.mark.parametrize("cover_factor,days", [(0.5333, 20), (0.6667, 60), (0.8, 4), (0.5333, 1_000)])
 def test_determine_fraction_phosphorus_remaining(cover_factor, days):
     """Tests that the fraction of phosphorus remaining in the available pool after absorption by soil is correctly
     calculated."""
@@ -46,9 +44,7 @@ def test_determine_phosphorus_distribution_factor(rainfall, runoff):
         (100421, 0.075, 0.3485781, 9183),
     ],
 )
-def test_determine_dissolved_phosphorus_concentration(
-    phosphorus, frac_released, distribution_factor, total_rainfall
-):
+def test_determine_dissolved_phosphorus_concentration(phosphorus, frac_released, distribution_factor, total_rainfall):
     """Tests that the concentration of dissolved phosphorus is runoff is correctly calculated."""
     observe = Fertilizer._determine_dissolved_phosphorus_concentration(
         phosphorus, frac_released, distribution_factor, total_rainfall
@@ -116,18 +112,12 @@ def test_absorb_phosphorus_from_available_pool(
         fert._absorb_phosphorus_from_available_pool(field_size)
 
     add_phos.assert_called_once_with(absorbed_phos, field_size)
-    determine_fraction.assert_called_with(
-        fert.data.cover_factor, days_since_application
-    )
+    determine_fraction.assert_called_with(fert.data.cover_factor, days_since_application)
     assert fert.data.available_phosphorus_pool == expected_remaining_phosphorus
 
 
-@pytest.mark.parametrize(
-    "phosphorus_added,field_size", [(100, 1.33), (20.22, 2.4), (300.1, 0.5)]
-)
-def test_add_phosphorus_to_soil_profile(
-    phosphorus_added: float, field_size: float
-) -> None:
+@pytest.mark.parametrize("phosphorus_added,field_size", [(100, 1.33), (20.22, 2.4), (300.1, 0.5)])
+def test_add_phosphorus_to_soil_profile(phosphorus_added: float, field_size: float) -> None:
     """Tests that added phosphorus is correctly partitioned between the top two soil layers."""
     data = SoilData(field_size=field_size)
     fertilizer = Fertilizer(soil_data=data)
@@ -188,13 +178,9 @@ def test_leach_phosphorus(
         "absorbed_phosphorus": adsorbed_phosphorus_kg,
     }
 
-    observed = fert._determine_leached_phosphorus(
-        rainfall, runoff, field_size, pool_amount
-    )
+    observed = fert._determine_leached_phosphorus(rainfall, runoff, field_size, pool_amount)
 
-    fert._determine_phosphorus_distribution_factor.assert_called_once_with(
-        rainfall, runoff
-    )
+    fert._determine_phosphorus_distribution_factor.assert_called_once_with(rainfall, runoff)
     fert._determine_dissolved_phosphorus_concentration.assert_called_once_with(
         pool_amount_mg, fert.data.solubilizing_factor, 0.05, rainfall_liters
     )
@@ -202,8 +188,7 @@ def test_leach_phosphorus(
 
 
 @pytest.mark.parametrize(
-    "rainfall,runoff,field_size,rain_events,full_available_pool,available_pool,"
-    "days_since_application",
+    "rainfall,runoff,field_size,rain_events,full_available_pool,available_pool," "days_since_application",
     [
         (0, 0, 1, 0, 100, 100, 0),  # Day of application, no rain
         (13, 0, 1.8, 1, 100, 100, 0),  # Day of application, rain but no runoff
@@ -256,9 +241,7 @@ def test_update_before_and_at_first_rain(
     }
     with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, patch.object(
         fert, "_absorb_phosphorus_from_available_pool"
-    ) as absorb, patch.object(
-        fert, "_determine_leached_phosphorus", return_value=phos_leached
-    ) as leach_phos:
+    ) as absorb, patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos:
         fert._update_before_and_at_first_rain(rainfall, runoff, field_size)
 
     if not rainfall and not days_since_application:
@@ -310,12 +293,8 @@ def test_update_after_first_rain(
     fert = Fertilizer(data)
 
     phos_leached = {
-        "runoff_phosphorus": (
-            0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)
-        ),
-        "absorbed_phosphorus": (
-            0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)
-        ),
+        "runoff_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
+        "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
     }
 
     with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, patch.object(
@@ -331,23 +310,16 @@ def test_update_after_first_rain(
     elif rainfall and not runoff:
         add_phos.assert_called_once_with(expected_absorbed_phos, field_size)
         assert leach_phos.call_count == 0
-        assert fert.data.recalcitrant_phosphorus_pool == (
-            recalcitrant_pool - expected_absorbed_phos
-        )
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool - expected_absorbed_phos)
     else:
         add_phos.assert_called_once_with(0.5 * expected_absorbed_phos, field_size)
-        leach_phos.assert_called_once_with(
-            rainfall, runoff, field_size, recalcitrant_pool
-        )
-        assert fert.data.recalcitrant_phosphorus_pool == (
-            recalcitrant_pool - expected_absorbed_phos
-        )
+        leach_phos.assert_called_once_with(rainfall, runoff, field_size, recalcitrant_pool)
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool - expected_absorbed_phos)
 
 
 # --- Top-level routine tests ---
 @pytest.mark.parametrize(
-    "available_pool,full_available_pool,recalcitrant_pool,rain_events,days_since_application,"
-    "added_phosphorus",
+    "available_pool,full_available_pool,recalcitrant_pool,rain_events,days_since_application," "added_phosphorus",
     [
         (35.495, 80, 28.4, 0, 4, 75),
         (0, 70, 17.8, 1, 5, 60),
@@ -385,16 +357,9 @@ def test_add_fertilizer_phosphorus(
         assert fert.data.days_since_application == days_since_application
         assert fert.data.rain_events_after_fertilizer_application == rain_events
     else:
-        assert fert.data.available_phosphorus_pool == (
-            0.75 * added_phosphorus + available_pool
-        )
-        assert (
-            fert.data.full_available_phosphorus_pool
-            == fert.data.available_phosphorus_pool
-        )
-        assert fert.data.recalcitrant_phosphorus_pool == (
-            0.25 * added_phosphorus + recalcitrant_pool
-        )
+        assert fert.data.available_phosphorus_pool == (0.75 * added_phosphorus + available_pool)
+        assert fert.data.full_available_phosphorus_pool == fert.data.available_phosphorus_pool
+        assert fert.data.recalcitrant_phosphorus_pool == (0.25 * added_phosphorus + recalcitrant_pool)
         assert fert.data.days_since_application == 0
         assert fert.data.rain_events_after_fertilizer_application == 0
 
@@ -437,9 +402,7 @@ def test_do_fertilizer_phosphorus_operations(
         assert fert.data.rain_events_after_fertilizer_application == rain_events + 1
         rain_events += 1
     if rain_events == 0 or (rainfall and rain_events == 1):
-        fert._update_before_and_at_first_rain.assert_called_with(
-            rainfall, runoff, field_size
-        )
+        fert._update_before_and_at_first_rain.assert_called_with(rainfall, runoff, field_size)
         fert._update_after_first_rain.assert_not_called()
     elif rain_events >= 2:
         fert._update_before_and_at_first_rain.assert_not_called()

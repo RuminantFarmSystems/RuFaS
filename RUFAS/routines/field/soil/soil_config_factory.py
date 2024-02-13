@@ -52,8 +52,6 @@ class SoilConfigFactory:
                 if attribute in attribute_list:
                     setattr(config_instance, attribute, value)
                 else:
-                    raise AttributeError(
-                        f"{attribute} is not a valid attribute of SoilData"
-                    )
+                    raise AttributeError(f"{attribute} is not a valid attribute of SoilData")
 
         return config_instance

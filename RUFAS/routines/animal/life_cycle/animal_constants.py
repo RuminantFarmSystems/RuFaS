@@ -22,9 +22,7 @@ ESTRUS_DAY_SCHEDULED_NOTE = "estrus day scheduled"
 
 AI_DAY_SCHEDULED_NOTE = "AI day scheduled"
 AI_PERFORMED_NOTE = "AI performed"
-TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = (
-    "TAI after estrus not detected in SynchED"
-)
+TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = "TAI after estrus not detected in SynchED"
 REBREEDING_NOTE = "rebreeding start"
 SETTING_REPRO_PROGRAM_NOTE = "setting repro program"
 
@@ -32,17 +30,11 @@ ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE = (
-    "estrus occurred before the end of the voluntary waiting period"
-)
+ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE = "estrus occurred before the end of the voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
-ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE = (
-    "estrus not detected between VWP and OvSynch start day"
-)
-NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE = (
-    "No ED instituted before OvSynch in ED-TAI"
-)
+ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE = "estrus not detected between VWP and OvSynch start day"
+NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE = "No ED instituted before OvSynch in ED-TAI"
 CANCEL_ESTRUS_DETECTION_NOTE = "canceled estrus detection"
 
 # TAI injections

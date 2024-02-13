@@ -3,6 +3,7 @@ This module will contain the classes and methods needed to apply global sensitiv
 
 The workhorse of this module is the SALib python package (Herman et al. 2023): https://salib.readthedocs.io/en/latest/
 """
+
 from __future__ import annotations
 
 import os
@@ -142,9 +143,7 @@ class SensitivityAnalysis:
         self.objective_function: Callable = fun
         self.parameter_names: List[str] = pars
         self.parameter_bounds: List[Tuple[float, float]] = bounds
-        self.sensitivity_method: SupportedSensitivityMethods = (
-            SupportedSensitivityMethods(method)
-        )
+        self.sensitivity_method: SupportedSensitivityMethods = SupportedSensitivityMethods(method)
         self.parameter_groups: Optional[List[str]] = groups
         self.output_names: Optional[List[str]] = outputs
         self.sample_n: int = sample_n
@@ -255,17 +254,11 @@ class SensitivityAnalysis:
         This is a wrapper for `problem.sample()`. This method is entirely serialized and, therefore, ignores `n_cores`.
         """
         if self.sensitivity_method == SupportedSensitivityMethods.FAST:
-            self.problem.sample(
-                func=fast_sampler.sample, N=self.sample_n, *args, **kwargs
-            )
+            self.problem.sample(func=fast_sampler.sample, N=self.sample_n, *args, **kwargs)
         if self.sensitivity_method == SupportedSensitivityMethods.SOBOL:
-            self.problem.sample(
-                func=sobol_sampler.sample, N=self.sample_n, *args, **kwargs
-            )
+            self.problem.sample(func=sobol_sampler.sample, N=self.sample_n, *args, **kwargs)
         if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
-            self.problem.sample(
-                func=morris_sampler.sample, N=self.sample_n, *args, **kwargs
-            )
+            self.problem.sample(func=morris_sampler.sample, N=self.sample_n, *args, **kwargs)
 
         # add column names to the sample array (does not work, for some reason)
         # self.problem.samples.dtype = {
@@ -324,17 +317,11 @@ class SensitivityAnalysis:
         #   analyze(..., nprocs=1) will try to run the parallel version.
         if self.parallel_processors > 1:
             if self.sensitivity_method == SupportedSensitivityMethods.FAST:
-                self.problem.analyze(
-                    fast.analyze, nprocs=self.parallel_processors, *args, **kwargs
-                )
+                self.problem.analyze(fast.analyze, nprocs=self.parallel_processors, *args, **kwargs)
             if self.sensitivity_method == SupportedSensitivityMethods.SOBOL:
-                self.problem.analyze(
-                    sobol.analyze, nprocs=self.parallel_processors, *args, **kwargs
-                )
+                self.problem.analyze(sobol.analyze, nprocs=self.parallel_processors, *args, **kwargs)
             if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
-                self.problem.analyze(
-                    morris.analyze, nprocs=self.parallel_processors, *args, **kwargs
-                )
+                self.problem.analyze(morris.analyze, nprocs=self.parallel_processors, *args, **kwargs)
         else:
             if self.sensitivity_method == SupportedSensitivityMethods.FAST:
                 self.problem.analyze(fast.analyze, *args, **kwargs)
@@ -387,9 +374,7 @@ if __name__ == "__main__":
     # -- More complex: Oakley 2004 --
     weights = numpy.array(
         [
-            [1.0] * 5
-            + [0.1] * 5
-            + [0.01] * 5,  # first 5 params have strong main effects, others are weaker
+            [1.0] * 5 + [0.1] * 5 + [0.01] * 5,  # first 5 params have strong main effects, others are weaker
             [0.5] * 5 + [0.05] * 5 + [0.005] * 5,
             [0.2] * 5 + [0.02] * 5 + [0.002] * 5,
         ]
@@ -399,9 +384,7 @@ if __name__ == "__main__":
     numpy.random.seed(210)
     for i in range(15):
         for j in range(i + 1, 15, 1):
-            cor = numpy.random.rand().__round__(
-                2
-            )  # random correlations among parameters
+            cor = numpy.random.rand().__round__(2)  # random correlations among parameters
             correlation_matrix[i, j] = cor
             correlation_matrix[j, i] = cor
 

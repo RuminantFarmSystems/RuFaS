@@ -63,29 +63,17 @@ def test_determine_root_depth(maxd, heatfrac):
 )
 def test_develop_roots(maxd: int, heatfrac: float) -> None:
     """Integration test for main root development function develop_roots()."""
-    with patch.object(
-        CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac
-    ):
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
         # ---- perennial crop ----
-        data_perennial = CropData(
-            max_root_depth=maxd, plant_category=PlantCategory("perennial")
-        )
+        data_perennial = CropData(max_root_depth=maxd, plant_category=PlantCategory("perennial"))
         rd = RootDevelopment(data_perennial)
         rd.develop_roots()
-        assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(
-            heatfrac
-        )
+        assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
         assert data_perennial.root_depth == maxd
 
         # ---- annual crop ----
-        data_annual = CropData(
-            max_root_depth=maxd, plant_category=PlantCategory("warm_annual")
-        )
+        data_annual = CropData(max_root_depth=maxd, plant_category=PlantCategory("warm_annual"))
         rd = RootDevelopment(data_annual)
         rd.develop_roots()
-        assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(
-            heatfrac
-        )
-        assert data_annual.root_depth == RootDevelopment._determine_root_depth(
-            maxd, heatfrac
-        )
+        assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
+        assert data_annual.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)

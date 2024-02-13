@@ -52,14 +52,10 @@ class AnimalGroupingScenario(Enum):
 
         self._value_ = value
 
-        self._animal_combination_by_animal_type: Dict[
-            AnimalType, AnimalCombination
-        ] = {}
+        self._animal_combination_by_animal_type: Dict[AnimalType, AnimalCombination] = {}
         for animal_combination, animal_types in self.value.items():
             for animal_type in animal_types:
-                self._animal_combination_by_animal_type[
-                    animal_type
-                ] = animal_combination
+                self._animal_combination_by_animal_type[animal_type] = animal_combination
 
     # Currently, we don't have subtypes for calves, heiferIs, heiferIIs, and heiferIIIs.
     def _get_calf_type(self, calf: Calf) -> AnimalType:
@@ -151,18 +147,16 @@ class AnimalGroupingScenario(Enum):
         """
 
         cow_subtype_by_scenario = {
-            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: AnimalType.LAC_COW
-            if cow.is_lactating
-            else AnimalType.DRY_COW,
-            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: AnimalType.LAC_COW
-            if cow.is_lactating
-            else AnimalType.DRY_COW,
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
         }
         return cow_subtype_by_scenario[self]
 
-    def get_animal_type(
-        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-    ) -> AnimalType:
+    def get_animal_type(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalType:
         """
         Get the animal type of the given animal.
 
@@ -188,9 +182,7 @@ class AnimalGroupingScenario(Enum):
             animal
         )  # type: ignore
 
-    def find_animal_combination(
-        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-    ) -> AnimalCombination:
+    def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalCombination:
         """
         Find the animal combination that the given animal belongs to.
 

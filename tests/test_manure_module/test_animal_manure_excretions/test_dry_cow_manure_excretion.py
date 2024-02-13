@@ -53,10 +53,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
 
     urine = 15.4
     total_manure_excreted = total_manure_excreted = (
-        0.00711 * body_weight
-        + 0.324 * CP_concentration
-        + 0.259 * NDF_concentration
-        + 8.05
+        0.00711 * body_weight + 0.324 * CP_concentration + 0.259 * NDF_concentration + 8.05
     )
     total_solids = 0.178 * dry_matter_intake + 2.733
 
@@ -65,16 +62,10 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     organic_matter_intake = dry_matter_intake * (100 - ASH_concentration) / 100
 
     total_volatile_solids = (
-        -1.201
-        + 0.402 * organic_matter_intake
-        + 0.036 * NDF_concentration
-        - 0.024 * CP_concentration
+        -1.201 + 0.402 * organic_matter_intake + 0.036 * NDF_concentration - 0.024 * CP_concentration
     )
     degradable_volatile_solids = (
-        -1.017
-        + 0.364 * organic_matter_intake
-        + 0.029 * NDF_concentration
-        - 0.023 * CP_concentration
+        -1.017 + 0.364 * organic_matter_intake + 0.029 * NDF_concentration - 0.023 * CP_concentration
     )
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
     manure_nitrogen = (
@@ -91,37 +82,19 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
-    urinary_nitrogen_concentration = (
-        urine_nitrogen * GeneralConstants.KG_TO_GRAMS
-    ) / urine
+    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
     urine_urea_nitrogen_concentration_lower_bound = 2
     urine_urea_nitrogen_concentration_upper_bound = 12
-    if (
-        urine_urea_nitrogen_concentration
-        < urine_urea_nitrogen_concentration_lower_bound
-    ):
-        urine_urea_nitrogen_concentration = (
-            urine_urea_nitrogen_concentration_lower_bound
-        )
-    elif (
-        urine_urea_nitrogen_concentration
-        > urine_urea_nitrogen_concentration_upper_bound
-    ):
-        urine_urea_nitrogen_concentration = (
-            urine_urea_nitrogen_concentration_upper_bound
-        )
+    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
+    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
     else:
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (
-        tan_percent_of_urea / 100
-    ) * urine_urea_nitrogen_concentration
-    potassium = (
-        dry_matter_intake
-        * (potassium_concentration / 100)
-        * GeneralConstants.KG_TO_GRAMS
-    )
+    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
     methane_emission = 0.0
     if methane_model == "Mills":
@@ -129,27 +102,15 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
             45.98
             - 45.98
             * math.exp(
-                -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                * metabolizable_energy_intake
-                * 4.184
+                -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045) * metabolizable_energy_intake * 4.184
             )
         ) / 0.05565
     else:
-        soluble_residue = (
-            (100 - ASH_concentration)
-            - NDF_concentration
-            - CP_concentration
-            - EE_concentration
-        )
+        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
         gross_energy_concentration = (
-            0.263 * CP_concentration
-            + 0.522 * EE_concentration
-            + 0.198 * NDF_concentration
-            + 0.160 * soluble_residue
+            0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
         )
-        methane_emission = (
-            0.065 * gross_energy_concentration * dry_matter_intake
-        ) / 0.05565
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565
 
     total_phosphorus_excreted = 5.0
     inorganic_phosphorus_fraction = 0.4
@@ -182,9 +143,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     )
 
     # Assert
-    patch_for_ration_report.assert_called_once_with(
-        mock_ration_formulation, mock_feed.available_feeds
-    )
+    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=daily_milk_production,
         total_manure_excreted=total_manure_excreted,
@@ -201,21 +160,11 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)
     assert manure_excretion_values["total_solids"] == approx(total_solids)
-    assert manure_excretion_values["degradable_volatile_solids"] == approx(
-        degradable_volatile_solids
-    )
-    assert manure_excretion_values["non_degradable_volatile_solids"] == approx(
-        non_degradable_volatile_solids
-    )
-    assert manure_excretion_values["inorganic_phosphorus_fraction"] == approx(
-        inorganic_phosphorus_fraction
-    )
-    assert manure_excretion_values["organic_phosphorus_fraction"] == approx(
-        organic_phosphorus_fraction
-    )
+    assert manure_excretion_values["degradable_volatile_solids"] == approx(degradable_volatile_solids)
+    assert manure_excretion_values["non_degradable_volatile_solids"] == approx(non_degradable_volatile_solids)
+    assert manure_excretion_values["inorganic_phosphorus_fraction"] == approx(inorganic_phosphorus_fraction)
+    assert manure_excretion_values["organic_phosphorus_fraction"] == approx(organic_phosphorus_fraction)
     assert manure_excretion_values["phosphorus"] == approx(manure_phosphorus_excreted)
-    assert manure_excretion_values["phosphorus_fraction"] == approx(
-        manure_phosphorus_fraction
-    )
+    assert manure_excretion_values["phosphorus_fraction"] == approx(manure_phosphorus_fraction)
     assert manure_excretion_values["potassium"] == approx(potassium)
     assert manure_excretion_values["enteric_methane_g"] == approx(methane_emission)

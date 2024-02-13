@@ -70,9 +70,7 @@ class CropSpeciesDataFactory:
     """
 
     @staticmethod
-    def create_species_data(
-        species: CropSpecies = CropSpecies("corn_grain"), **kwargs
-    ) -> CropData:
+    def create_species_data(species: CropSpecies = CropSpecies("corn_grain"), **kwargs) -> CropData:
         """
         Creates a species data object from a CropSpecies enum with species defaults and the optional ability to modify
         additional attributes.
@@ -132,9 +130,7 @@ class CropSpeciesDataFactory:
                 if attribute in attr_list:
                     setattr(species_instance, attribute, value)
                 else:
-                    raise AttributeError(
-                        f"{attribute} is not a valid attribute of CropData"
-                    )
+                    raise AttributeError(f"{attribute} is not a valid attribute of CropData")
 
             # set new name to indicate that the class has been altered.
             name_key_absent = "name" not in kwargs.keys()

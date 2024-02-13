@@ -65,9 +65,7 @@ def main():
             cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
-        sys.stdout.write(
-            "Unexpected early termination of the simulation. Please see logs for details.\n"
-        )
+        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
 
 
 def run_rufas(
@@ -150,9 +148,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(
-            metadata_files, exclude_info_maps, format_option, verbose, output_dir
-        )
+        run_validation(metadata_files, exclude_info_maps, format_option, verbose, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -265,9 +261,7 @@ def run_validation(
             f"Validating data for {str(metadata_file['path'])}...\n",
             info_map,
         )
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), False
-        )
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
             output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
         else:
@@ -276,9 +270,7 @@ def run_validation(
                 f"Data not valid for {metadata_file['path']}.\n\n",
                 info_map,
             )
-        output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 def initialize_herd(
@@ -328,18 +320,14 @@ def initialize_herd(
         random.seed(simulation_config.seed)
         numpy.random.seed(simulation_config.seed)
 
-    output_manager.add_log(
-        "Herd initialization start", "Initializing herd data...\n", info_map
-    )
+    output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
         init_herd=init_herd,
         save_animals=save_animals,
         save_animals_path=save_animals_dir,
     )
     herd_factory.initialize_herd()
-    output_manager.add_log(
-        "Herd initialization complete", "Herd data initialized.\n", info_map
-    )
+    output_manager.add_log("Herd initialization complete", "Herd data initialized.\n", info_map)
 
     if terminate_simulation_post_herd_generation:
         output_manager.add_log(
@@ -413,13 +401,9 @@ def execute_simulations(
             info_map,
         )
         output_manager.set_metadata_prefix(metadata_file["prefix"])
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), True
-        )
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log(
-                "Validation complete", "Data is valid. \nSimulating...\n", info_map
-            )
+            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
             simulation_config = Config(input_manager.get_data("config"))
             try:
                 initialize_herd(
@@ -459,9 +443,7 @@ def execute_simulations(
             graphics_dir,
             csv_dir,
         )
-        output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):

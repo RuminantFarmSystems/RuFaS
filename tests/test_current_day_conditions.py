@@ -54,17 +54,14 @@ from RUFAS.util import Utility
         ),
     ],
 )
-def test_current_weather_snowfall(
-    snow_fall: int, rainfall: int, actual: CurrentDayConditions
-) -> None:
+def test_current_weather_snowfall(snow_fall: int, rainfall: int, actual: CurrentDayConditions) -> None:
     """Tests that precipitation falls either as snow or rain correctly."""
     assert actual.snowfall == snow_fall
     assert actual.rainfall == rainfall
 
 
 @pytest.mark.parametrize(
-    "day_number, geographic_latitude, is_winter,"
-    " polar_location, northern_hemisphere, expected, year",
+    "day_number, geographic_latitude, is_winter," " polar_location, northern_hemisphere, expected, year",
     [
         (15, 43.073, True, False, True, 9, 2023),
         # Madison example, no polar day or night possible
@@ -109,9 +106,7 @@ def test_determine_daylength(
             "RUFAS.util.Utility.day_to_month_conversion",
             wraps=Utility.day_to_month_conversion,
         ) as mocked_month_conversion:
-            observed = CurrentDayConditions.determine_daylength(
-                day_number, geographic_latitude, year
-            )
+            observed = CurrentDayConditions.determine_daylength(day_number, geographic_latitude, year)
             tolerance = 0.1 if not polar_location else 0.0
             assert expected == pytest.approx(observed, tolerance)
             assert mocked_radian_calculation.call_count == 1

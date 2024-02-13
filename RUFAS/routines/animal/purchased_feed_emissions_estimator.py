@@ -39,9 +39,7 @@ class PurchasedFeedEmissionsEstimator:
 
         self.missing_feed_ids: list[str] = []
 
-    def create_daily_purchased_feed_emissions_report(
-        self, daily_feed_totals: dict[str, float]
-    ) -> dict[str, float]:
+    def create_daily_purchased_feed_emissions_report(self, daily_feed_totals: dict[str, float]) -> dict[str, float]:
         """
         Reports the total emissions from the feeds given to a pen.
 
@@ -171,9 +169,7 @@ class PurchasedFeedEmissionsEstimator:
             f"Tried calling the FCC's FIPS county code API, all {max_attempts} failed.",
             info_map,
         )
-        raise requests.exceptions.RequestException(
-            "Could not obtain FIPS county code from FCC API."
-        )
+        raise requests.exceptions.RequestException("Could not obtain FIPS county code from FCC API.")
 
     @staticmethod
     def _get_geographic_coordinates() -> (float, float) or None:
@@ -210,11 +206,7 @@ class PurchasedFeedEmissionsEstimator:
         county_codes = feed_emissions_data["county_code"]
         emissions_index = county_codes.index(self.FIPS_county_code)
 
-        feed_keys = [
-            key for key in feed_emissions_data.keys() if key != "FIPS_county_code"
-        ]
-        feed_emissions_dict = {
-            key: feed_emissions_data[key][emissions_index] for key in feed_keys
-        }
+        feed_keys = [key for key in feed_emissions_data.keys() if key != "FIPS_county_code"]
+        feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict

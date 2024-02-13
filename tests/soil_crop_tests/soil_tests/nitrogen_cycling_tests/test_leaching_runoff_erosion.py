@@ -18,26 +18,18 @@ from RUFAS.routines.field.soil.layer_data import LayerData
     "nitrogen,soil_lost,enrichment_ratio",
     [(56, 1.2, 0.98), (34.556, 0.556, 1.022), (90.0294, 2.334, 1.035)],
 )
-def test_determine_erosion_nitrogen_loss_content(
-    nitrogen: float, soil_lost: float, enrichment_ratio: float
-) -> None:
+def test_determine_erosion_nitrogen_loss_content(nitrogen: float, soil_lost: float, enrichment_ratio: float) -> None:
     """Tests that the mass of nitrogen lost to erosion is calculated correctly."""
-    observed = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(
-        nitrogen, soil_lost, enrichment_ratio
-    )
+    observed = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(nitrogen, soil_lost, enrichment_ratio)
     expected = nitrogen * soil_lost * enrichment_ratio * 0.001
     assert pytest.approx(observed) == expected
 
 
-@pytest.mark.parametrize(
-    "daily_soil_lost", [5, 100, 35.8]  # lower values  # higher values  # arbitrary
-)
+@pytest.mark.parametrize("daily_soil_lost", [5, 100, 35.8])  # lower values  # higher values  # arbitrary
 def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     """Tests that the enrichment ratio was calculated correctly"""
     expected = exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
-    assert expected == LeachingRunoffErosion._determine_enrichment_ratio(
-        daily_soil_lost
-    )
+    assert expected == LeachingRunoffErosion._determine_enrichment_ratio(daily_soil_lost)
 
 
 @pytest.mark.parametrize(
@@ -55,25 +47,15 @@ def test_calculate_eroded_organic_nitrogen(
     """Tests that the amount of organic nitrogen lost to eroded sediment is calculated correctly."""
     LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=26)
     LeachingRunoffErosion._determine_enrichment_ratio = MagicMock(return_value=2.5)
-    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content = MagicMock(
-        return_value=33
-    )
+    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content = MagicMock(return_value=33)
 
-    observed = LeachingRunoffErosion._calculate_eroded_organic_nitrogen(
-        nitrogen, density, depth, area, sediment
-    )
+    observed = LeachingRunoffErosion._calculate_eroded_organic_nitrogen(nitrogen, density, depth, area, sediment)
     expected_sediment_per_ha = sediment / area
     expected_lost_nitrogen = min(nitrogen, 33)
 
-    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(
-        nitrogen, density, depth, area
-    )
-    LeachingRunoffErosion._determine_enrichment_ratio.assert_called_once_with(
-        expected_sediment_per_ha
-    )
-    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(
-        26, expected_sediment_per_ha, 2.5
-    )
+    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(nitrogen, density, depth, area)
+    LeachingRunoffErosion._determine_enrichment_ratio.assert_called_once_with(expected_sediment_per_ha)
+    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(26, expected_sediment_per_ha, 2.5)
     assert observed == expected_lost_nitrogen
 
 
@@ -102,18 +84,14 @@ def test_calculate_nitrogen_removed_by_water(
 
     with patch.object(
         LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration
-    ) as conc, patch.object(
-        LayerData, "determine_soil_nutrient_area_density", return_value=n_density
-    ) as density:
+    ) as conc, patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=n_density) as density:
         actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
             nitrogen, water, coefficient, bulk_density, thickness, field_size
         )
 
         assert actual == expected
         conc.assert_called_once_with(nitrogen, bulk_density, thickness, field_size)
-        density.assert_called_once_with(
-            pytest.approx(expected_conc_lost), bulk_density, thickness, field_size
-        )
+        density.assert_called_once_with(pytest.approx(expected_conc_lost), bulk_density, thickness, field_size)
 
 
 @pytest.mark.parametrize(
@@ -132,9 +110,7 @@ def test_erode_nitrogen(
     field_size: float,
 ) -> None:
     """Tests that nitrogen is properly eroded from the surface of the field."""
-    layer = LayerData(
-        top_depth=0, bottom_depth=20, field_size=field_size, bulk_density=1.6
-    )
+    layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, bulk_density=1.6)
     layer.nitrate_content = nitrates
     layer.ammonium_content = ammonium
     layer.active_organic_nitrogen_content = active
@@ -205,9 +181,7 @@ def test_leach_nitrogen() -> None:
 
     incorp.data.set_vectorized_layer_attribute("nitrate_content", [40] * 4)
     incorp.data.set_vectorized_layer_attribute("ammonium_content", [35] * 4)
-    incorp.data.set_vectorized_layer_attribute(
-        "active_organic_nitrogen_content", [15] * 4
-    )
+    incorp.data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [15] * 4)
     incorp.data.set_vectorized_layer_attribute("percolated_water", [3.5, 0, 3.5, 3.5])
 
     expected_nitrogen_removed_calls = []
@@ -241,13 +215,9 @@ def test_leach_nitrogen() -> None:
         ]
         expected_nitrogen_removed_calls.extend(new_calls)
 
-    LeachingRunoffErosion._calculate_nitrogen_removed_by_water = MagicMock(
-        return_value=10
-    )
+    LeachingRunoffErosion._calculate_nitrogen_removed_by_water = MagicMock(return_value=10)
 
-    with patch.object(
-        incorp, "_calculate_nitrogen_removed_by_water", return_value=10
-    ) as leach_n:
+    with patch.object(incorp, "_calculate_nitrogen_removed_by_water", return_value=10) as leach_n:
         incorp._leach_nitrogen(field_size)
 
         leach_n.assert_has_calls(expected_nitrogen_removed_calls)

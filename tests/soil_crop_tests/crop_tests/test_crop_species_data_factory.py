@@ -82,16 +82,12 @@ def test_species_factory_defaults():
     assert generic.yield_phosphorus_fraction == 0.00309
 
     # check that setting the crop ID works and doesn't trigger the "altered" crop name
-    generic_id = CropSpeciesDataFactory.create_species_data(
-        CropSpecies("corn_silage"), id=1530
-    )
+    generic_id = CropSpeciesDataFactory.create_species_data(CropSpecies("corn_silage"), id=1530)
     assert generic_id.id == 1530
     assert generic_id.name == "corn silage"
 
     # ---- winter wheat ----
-    winter_wheat = CropSpeciesDataFactory.create_species_data(
-        CropSpecies("winter_wheat_hay"), id=1000
-    )
+    winter_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("winter_wheat_hay"), id=1000)
     assert winter_wheat.species == "winter_wheat_hay"
     assert winter_wheat.name == "winter_wheat hay"
     assert winter_wheat.id == 1000
@@ -120,9 +116,7 @@ def test_species_factory_defaults():
     assert winter_wheat.yield_phosphorus_fraction == 0.00233
 
     # ---- cereal rye ----
-    cereal_rye = CropSpeciesDataFactory.create_species_data(
-        CropSpecies("cereal_rye_baleage"), id=123
-    )
+    cereal_rye = CropSpeciesDataFactory.create_species_data(CropSpecies("cereal_rye_baleage"), id=123)
     assert cereal_rye.species == "cereal_rye_baleage"
     assert cereal_rye.name == "cereal_rye baleage"
     assert cereal_rye.id == 123

@@ -51,9 +51,7 @@ class WaterDynamics:
         """
         self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
-        self.data.cumulative_potential_evapotranspiration += (
-            potential_evapotranspiration
-        )
+        self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
         self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(
             self.data.cumulative_evaporation, self.data.cumulative_transpiration
         )
@@ -87,9 +85,7 @@ class WaterDynamics:
         canopy.
 
         """
-        more_canopy_water_than_demand = (
-            self.data.canopy_water >= potential_evapotranspiration
-        )
+        more_canopy_water_than_demand = self.data.canopy_water >= potential_evapotranspiration
         if more_canopy_water_than_demand:
             self.data.canopy_water -= potential_evapotranspiration
             return potential_evapotranspiration
@@ -98,9 +94,7 @@ class WaterDynamics:
             self.data.canopy_water = 0
             return amount_evaporated
 
-    def set_maximum_transpiration(
-        self, potential_evapotranspiration_adjusted: float
-    ) -> None:
+    def set_maximum_transpiration(self, potential_evapotranspiration_adjusted: float) -> None:
         """
         Sets the maximum transpiration based on the adjusted potential evapotranspiration of this day.
 
@@ -119,9 +113,7 @@ class WaterDynamics:
         )
 
     @staticmethod
-    def _determine_maximum_transpiration(
-        leaf_area_index, potential_evapotranspiration_adjusted: float
-    ) -> float:
+    def _determine_maximum_transpiration(leaf_area_index, potential_evapotranspiration_adjusted: float) -> float:
         """
         Calculates the maximum transpiration for a given day.
 
@@ -148,9 +140,7 @@ class WaterDynamics:
             return potential_evapotranspiration_adjusted
 
     @staticmethod
-    def _determine_evapotranspiration(
-        evaporation: float, transpiration: float
-    ) -> float:
+    def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
         """
         Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day? issue #1256
 
@@ -197,8 +187,6 @@ class WaterDynamics:
 
         """
         if cumulative_potential_evapotranspiration != 0:
-            return 100 * (
-                cumulative_evapotranspiration / cumulative_potential_evapotranspiration
-            )
+            return 100 * (cumulative_evapotranspiration / cumulative_potential_evapotranspiration)
         else:
             return 0
