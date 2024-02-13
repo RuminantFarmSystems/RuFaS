@@ -486,10 +486,10 @@ class InputManager:
         return (variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED) or \
                (variable_modifiability == variable_modifiability.REQUIRED_AND_UNLOCKED)
 
-    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
+    def _log_missing_data(self, variable_properties: Dict[str, Any], var_name: str) \
             -> None:
         """
-        Handles missing data for a variable, logging errors or warnings based on the context of initialization or
+        Handles logging for missing data for a variable, logging errors or warnings based on the context of initialization or
         runtime updates.
 
         Parameters
