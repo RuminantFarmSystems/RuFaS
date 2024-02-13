@@ -523,7 +523,7 @@ class InputManager:
         }
         if not is_initialization:
             om.add_error(
-                "Validation: key not found in data -- value required to update variable during runtime",
+                "missing required data",
                 f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
                 info_map)
             raise KeyError(f"Key {var_name} not found in data. A value is required for to update variable "
