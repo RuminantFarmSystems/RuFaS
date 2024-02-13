@@ -1,2 +1,5 @@
 class TractorImplement:
-    pass
+    @property
+    def mass_kg(self) -> float:
+        # TODO implement
+        return 0
