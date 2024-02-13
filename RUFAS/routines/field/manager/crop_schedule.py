@@ -36,6 +36,31 @@ class CropSchedule(Schedule):
     pattern_repeat : int, optional
         Number of times the specified crop planting and harvesting pattern should be repeated, by default 0.
 
+    Attributes
+    ----------
+    crop_reference : str
+        Identifier for the crop associated with this schedule.
+    planting_years : List[int]
+        List of years for each planting event.
+    planting_days : List[int]
+        Corresponding Julian days for planting.
+    planting_skip : int
+        Number of years to skip between planting events.
+    harvest_years : List[int]
+        List of years for each harvesting event.
+    harvest_days : List[int]
+        Corresponding Julian days for harvesting.
+    harvest_operations : List[HarvestOperation]
+        Enumerated list of operations to perform at harvest.
+    heat_scheduled : bool
+        Flag indicating if heat unit scheduling is utilized for harvesting decisions.
+
+    Notes
+    -----
+    This class extends the `Schedule` class, adding specific functionality for managing agricultural crop schedules.
+    It involves detailed tracking and management of planting and harvesting events, including optional heat scheduling
+    for advanced crop management.
+
     """
 
     def __init__(
