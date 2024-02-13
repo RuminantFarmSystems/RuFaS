@@ -28,7 +28,7 @@
       "scenario_id": 3,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "rotary screen",
+      "manure_separator": "none",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "slurry storage outdoor"
     }
@@ -178,7 +178,7 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 365,
+      "storage_time_period": 30,
       "freeboard_input": 0.3048
     },
     {
@@ -197,7 +197,8 @@
       "methane_generation_ratio": 0.65,
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
-      "anaerobic_digestion_temperature_celsius": 37.5
+      "anaerobic_digestion_temperature_celsius": 37.5,
+      "storage_time_period": 30
     },
     {
       "manure_treatment_type": "composted bedded pack barn",
@@ -210,7 +211,7 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 365,
+      "storage_time_period": 30,
       "freeboard_input": 0.3048
     },
     {
