@@ -7,6 +7,9 @@ om = OutputManager()
 
 
 class FieldDataReporter:
+    """
+    This class is responsible for reporting
+    """
     def __init__(self, fields: List[Field]):
         self.fields = fields
 
