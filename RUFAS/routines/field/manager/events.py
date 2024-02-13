@@ -15,24 +15,29 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 class Event:
+    """
+    Class that will facilitate scheduling of different management operations.
+
+    Parameters
+    ----------
+    year : int, default 1
+        Year of the simulation on which the event should occur.
+    day : int, default 120
+        Julian day of the year on which the event should occur.
+
+    Attributes
+    ----------
+    year : int
+        Year of the simulation on which the event should occur.
+    day : int
+        Julian day of the year on which the event should occur.
+
+    Notes
+    -----
+    An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
+
+    """
     def __init__(self, year: int = 1, day: int = 120):
-        """Creates a new Event instance.
-
-        An Event object determines when an event should occur, relative to the start of the RuFaS simulation.
-        An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
-
-        Parameters
-        ----------
-        year : int, default=1
-            Year of the simulation on which the event should occur
-        day : int, default=120
-            (julian) day of the year on which the event should occur
-
-        Returns
-        -------
-        event : Event
-            an Event instance
-        """
         self.year = year
         self.day = day
 
@@ -65,19 +70,19 @@ class Event:
 
 
 class PlantingEvent(Event):
+    """
+    A child of Event class that dictates when a crop will be planted and how it will eventually be
+    harvested.
+
+    Parameters
+    ----------
+    crop_reference : str
+        Name of the crop to be planted in the ground.
+    heat_scheduled_harvest : bool, default=False
+        Flag indicating if the crop will be harvested when it has a certain amount of heat units.
+
+    """
     def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
-        """
-        Initializes a Planting Event, which dictates when a crop will be planted and tells the plant how it will
-        eventually be harvested.
-
-        Parameters
-        ----------
-        crop_reference : str
-            Name of the crop to be planted in the ground.
-        heat_scheduled_harvest : bool, default=False
-            Flag indicating if the crop will be harvested when it has a certain amount of heat units.
-
-        """
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
@@ -95,6 +100,17 @@ class PlantingEvent(Event):
 
 
 class HarvestEvent(Event):
+    """
+    A child of Event class that determines when (and how) a harvest operation should occur for a crop.
+
+    Parameters
+    ----------
+    crop_reference : str
+        Name of the crop to be harvested.
+    operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
+        A harvest operation from the Harvest Operations enum.
+
+    """
     def __init__(
         self,
         crop_reference: str,
@@ -102,18 +118,6 @@ class HarvestEvent(Event):
         day: int = 240,
         operation: HarvestOperation = HarvestOperation.HARVEST_KILL
     ):
-        """Creates a new HarvestEvent instance, which is a child of the Event class.
-
-        A HarvestEvent object determines when (and how) a harvest operation should occur for a crop.
-
-        Parameters
-        ----------
-        crop_reference : str
-            Name of the crop to be harvested.
-        operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
-            A harvest operation from the Harvest Operations enum.
-
-        """
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.operation = operation
@@ -131,20 +135,21 @@ class HarvestEvent(Event):
 
 
 class TillageEvent(Event):
+    """
+    A child of Event class that defines a tillage application to be applied on a specific day of a year.
+
+    Parameters
+    ----------
+    tillage_depth : float
+        The lowest depth the tilling implement reaches (mm).
+    incorporation_fraction : float
+        Fraction of soil surface pool incorporated into the soil profile (unitless).
+    mixing_fraction : float
+        Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
+
+    """
     def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
                  day: int = 160):
-        """
-        Creates a new TillageEvent instance, which defines a tillage application to be applied on a specific day of a
-        year.
-        Parameters
-        ----------
-        tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
-        incorporation_fraction : float
-            Fraction of soil surface pool incorporated into the soil profile (unitless)
-        mixing_fraction : float
-            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
-        """
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
@@ -164,32 +169,31 @@ class TillageEvent(Event):
 
 
 class ManureEvent(Event):
+    """
+    A child of Event class that defines how manure much manure such be requested and applied to a field.
+
+    Parameters
+    ----------
+    year : int
+        Year in which this manure application occurs.
+    day : int
+        Day in which this manure application occurs.
+    nitrogen_mass : float
+        Minimum mass of nitrogen that should be contained in this manure application (kg).
+    phosphorus_mass : float
+        Minimum mass of phosphorus that should be contained in this manure application (kg).
+    manure_type : ManureType
+        The type of manure for which the application request will be made.
+    field_coverage : float
+        Fraction of the field covered by this manure application (unitless).
+    application_depth : float
+        Depth that manure is injected into the soil at (mm).
+    surface_remainder_fraction : float
+        Fraction of manure applied that remains on the soil surface (unitless).
+
+    """
     def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
                  field_coverage: float, application_depth: float, surface_remainder_fraction: float):
-        """
-        Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
-        field.
-
-        Parameters
-        ----------
-        year : int
-            Year in which this manure application occurs.
-        day : int
-            Day in which this manure application occurs.
-        nitrogen_mass : float
-            Minimum mass of nitrogen that should be contained in this manure application (kg)
-        phosphorus_mass : float
-            Minimum mass of phosphorus that should be contained in this manure application (kg)
-        manure_type : ManureType
-            The type of manure for which the application request will be made.
-        field_coverage : float
-            Fraction of the field covered by this manure application (unitless)
-        application_depth : float
-            Depth that manure is injected into the soil at (mm)
-        surface_remainder_fraction : float
-            Fraction of manure applied that remains on the soil surface (unitless)
-
-        """
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
@@ -216,29 +220,28 @@ class ManureEvent(Event):
 
 
 class FertilizerEvent(Event):
+    """
+    A child of Event class that defines the parameters of a single fertilizer application.
+
+    Parameters
+    ----------
+    mix_name : str
+        Name of the fertilizer mix being used.
+    year : int
+        Year in which this application occurs.
+    day : int
+        Day on which this application occurs.
+    nitrogen_mass : float
+        Minimum mass of nitrogen that should be in this application (kg).
+    phosphorus_mass : float
+        Minimum mass of phosphorus that should be in this application (kg).
+    depth : float
+        Depth at which fertilizer is injected into the soil.
+    surface_remainder_fraction : float
+        Fraction of fertilizer that remains on the soil surface after application.
+    """
     def __init__(self, mix_name: str, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, depth: float,
                  surface_remainder_fraction: float):
-        """
-        Creates a new FertilizerEvent instance, which defines the parameters of a single fertilizer application.
-
-        Parameters
-        ----------
-        mix_name : str
-            Name of the fertilizer mix being used.
-        year : int
-            Year in which this application occurs.
-        day : int
-            Day on which this application occurs.
-        nitrogen_mass : float
-            Minimum mass of nitrogen that should be in this application (kg)
-        phosphorus_mass : float
-            Minimum mass of phosphorus that should be in this application (kg)
-        depth : float
-            Depth at which fertilizer is injected into the soil.
-        surface_remainder_fraction : float
-            Fraction of fertilizer that remains on the soil surface after application.
-
-        """
         super().__init__(year=year, day=day)
         self.mix_name = mix_name
         self.nitrogen_mass = nitrogen_mass
