@@ -73,7 +73,7 @@ class Time:
 
         Returns
         -------
-        Int
+        int
             The length of the simulation in days.
         """
         sim_length = 0
