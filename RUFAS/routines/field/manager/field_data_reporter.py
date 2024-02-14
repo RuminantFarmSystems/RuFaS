@@ -16,116 +16,179 @@ class FieldDataReporter:
         for field in self.fields:
             info_map["suffix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
-            om.add_variable("current_residue", field.field_data.current_residue, info_map)
-            om.add_variable("transpiration", field.field_data.transpiration, info_map)
-            om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
-            om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
-            om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
+            om.add_variable("current_residue", field.field_data.current_residue,
+                            dict(info_map, **{"data_origin": [("Field", "_cycle_water")]}))
+            om.add_variable("transpiration", field.field_data.transpiration,
+                            dict(info_map, **{"data_origin": [("FieldData", "")]}))
+            om.add_variable("max_transpiration", field.field_data.max_transpiration,
+                            dict(info_map, **{"data_origin": [("FieldData", "")]}))
+            om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration,
+                            dict(info_map, **{"data_origin": [("Field", "_cycle_water")]}))
+            om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval,
+                            dict(info_map, **{"data_origin": [("Field", "_determine_watering_amount")]}))
 
             # ----------------------------adding soil data
             om.add_variable("water_evaporated", field.soil.data.water_evaporated,
-                            info_map)
-            om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
-            om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
-            om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, info_map)
-            om.add_variable("snow_content", field.soil.data.snow_content, info_map)
-            om.add_variable("snow_melt", field.soil.data.snow_melt_amount, info_map)
-            om.add_variable("current_day_snow_temperature", field.soil.data.current_day_snow_temperature, info_map)
-            om.add_variable("water_sublimated", field.soil.data.water_sublimated, info_map)
+                            dict(info_map, **{"data_origin": [("Evaporation", "evaporate")]}))
+            om.add_variable("eroded_sediment", field.soil.data.eroded_sediment,
+                            dict(info_map, **{"data_origin": [("SoilErosion", "erode")]}))
+            om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff,
+                            dict(info_map, **{"data_origin": [("Infiltration", "infiltrate")]}))
+            om.add_variable("infiltrated_water", field.soil.data.infiltrated_water,
+                            dict(info_map, **{"data_origin": [("Infiltration", "infiltrate")]}))
+            om.add_variable("snow_content", field.soil.data.snow_content,
+                            dict(info_map, **{"data_origin": [("Snow", "update_snow"), ("Snow", "sublimate")]}))
+            om.add_variable("snow_melt", field.soil.data.snow_melt_amount,
+                            dict(info_map, **{"data_origin": [("Snow", "update_snow")]}))
+            om.add_variable("current_day_snow_temperature", field.soil.data.current_day_snow_temperature,
+                            dict(info_map, **{"data_origin": [("Snow", "update_snow")]}))
+            om.add_variable("water_sublimated", field.soil.data.water_sublimated,
+                            dict(info_map, **{"data_origin": [("Snow", "sublimate")]}))
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("SoilData", "")]}))
             om.add_variable("full_available_phosphorus_pool",
                             field.soil.data.full_available_phosphorus_pool,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "add_fertilizer_phosphorus")]}))
             om.add_variable("available_phosphorus_pool",
                             field.soil.data.available_phosphorus_pool,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "_update_before_and_at_first_rain"),
+                                                              ("Fertilizer", "add_fertilizer_phosphorus"),
+                                                              ("Fertilizer", "_absorb_phosphorus_from_available_pool")
+                                                              ]}))
             om.add_variable("recalcitrant_phosphorus_pool",
                             field.soil.data.recalcitrant_phosphorus_pool,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "_update_after_first_rain"),
+                                                              ("Fertilizer", "add_fertilizer_phosphorus")]}))
             om.add_variable("runoff_fertilizer_phosphorus",
                             field.soil.data.runoff_fertilizer_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "do_fertilizer_phosphorus_operations"),
+                                                              ("Fertilizer", "_update_before_and_at_first_rain"),
+                                                              ("Fertilizer", "_update_after_first_rain")]}))
             om.add_variable("days_since_application",
                             field.soil.data.days_since_application,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "do_fertilizer_phosphorus_operations"),
+                                                              ("Fertilizer", "add_fertilizer_phosphorus")]}))
             om.add_variable("rain_events_after_fertilizer_application",
                             field.soil.data.rain_events_after_fertilizer_application,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Fertilizer", "do_fertilizer_phosphorus_operations"),
+                                                              ("Fertilizer", "add_fertilizer_phosphorus")]}))
             om.add_variable("machine_manure_dry_mass",
                             field.soil.data.machine_manure_dry_mass,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("machine_manure_applied_mass",
                             field.soil.data.machine_manure_applied_mass,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_machine_manure")]}))
             om.add_variable("machine_manure_field_coverage",
                             field.soil.data.machine_manure_field_coverage,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update")
+                                                              ]}))
             om.add_variable("machine_manure_moisture_factor",
                             field.soil.data.machine_manure_moisture_factor,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "_adjust_manure_moisture_factor")]}))
             om.add_variable("machine_water_extractable_inorganic_phosphorus",
                             field.soil.data.machine_water_extractable_inorganic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("machine_water_extractable_organic_phosphorus",
                             field.soil.data.machine_water_extractable_organic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("machine_stable_inorganic_phosphorus",
                             field.soil.data.machine_stable_inorganic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("machine_stable_organic_phosphorus",
                             field.soil.data.machine_stable_organic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "_apply_solid_machine_manure"),
+                                                              ("ManureApplication", "_apply_liquid_machine_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("machine_organic_phosphorus_runoff", field.soil.data.machine_organic_phosphorus_runoff,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("machine_inorganic_phosphorus_runoff", field.soil.data.machine_inorganic_phosphorus_runoff,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("grazing_manure_dry_mass",
                             field.soil.data.grazing_manure_dry_mass,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("grazing_manure_applied_mass",
                             field.soil.data.grazing_manure_applied_mass,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure")]}))
             om.add_variable("grazing_manure_field_coverage",
                             field.soil.data.grazing_manure_field_coverage,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("grazing_manure_moisture_factor",
                             field.soil.data.grazing_manure_moisture_factor,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "_adjust_manure_moisture_factor")]}))
             om.add_variable("grazing_water_extractable_inorganic_phosphorus",
                             field.soil.data.grazing_water_extractable_inorganic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("grazing_water_extractable_organic_phosphorus",
                             field.soil.data.grazing_water_extractable_organic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("grazing_stable_inorganic_phosphorus",
                             field.soil.data.grazing_stable_inorganic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("ManureApplication", "apply_grazing_manure"),
+                                                              ("Manure", "daily_manure_update")]}))
             om.add_variable("grazing_organic_phosphorus_runoff", field.soil.data.grazing_organic_phosphorus_runoff,
-                            info_map)
+                            dict(info_map, **{"data_origin": [("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
             om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
-                            info_map)
-            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
-            om.add_variable("nitrate_runoff", field.soil.data.nitrate_runoff, info_map)
-            om.add_variable("ammonium_runoff", field.soil.data.ammonium_runoff, info_map)
-            om.add_variable("eroded_fresh_organic_nitrogen", field.soil.data.eroded_fresh_organic_nitrogen, info_map)
-            om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen, info_map)
-            om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen, info_map)
+                            dict(info_map, **{"data_origin": [("Manure", "daily_manure_update"),
+                                                              ("Manure", "_leach_and_update_phosphorus_pools")]}))
+            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff,
+                            dict(info_map, **{"data_origin": [("SolublePhosphorus", "daily_update_routine")]}))
+            om.add_variable("nitrate_runoff", field.soil.data.nitrate_runoff,
+                            dict(info_map, **{"data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]}))
+            om.add_variable("ammonium_runoff", field.soil.data.ammonium_runoff,
+                            dict(info_map, **{"data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]}))
+            om.add_variable("eroded_fresh_organic_nitrogen", field.soil.data.eroded_fresh_organic_nitrogen,
+                            dict(info_map, **{"data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]}))
+            om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen,
+                            dict(info_map, **{"data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]}))
+            om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen,
+                            dict(info_map, **{"data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]}))
 
-            om.add_variable("profile_carbon_total", field.soil.data.profile_carbon_total, info_map)
-            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
-            om.add_variable("profile_nitrates_total", field.soil.data.profile_nitrates_total, info_map)
-            om.add_variable("profile_ammonium_total", field.soil.data.profile_ammonium_total, info_map)
+            om.add_variable("profile_carbon_total", field.soil.data.profile_carbon_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_carbon_total")]}))
+            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_carbon_emissions")]}))
+            om.add_variable("profile_nitrates_total", field.soil.data.profile_nitrates_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_nitrates_total")]}))
+            om.add_variable("profile_ammonium_total", field.soil.data.profile_ammonium_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_ammonium_total")]}))
             om.add_variable("profile_active_organic_nitrogen_total",
-                            field.soil.data.profile_active_organic_nitrogen_total, info_map)
+                            field.soil.data.profile_active_organic_nitrogen_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_active_organic_nitrogen_total")]}))
             om.add_variable("profile_stable_organic_nitrogen_total",
-                            field.soil.data.profile_stable_organic_nitrogen_total, info_map)
+                            field.soil.data.profile_stable_organic_nitrogen_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_stable_organic_nitrogen_total")]}))
             om.add_variable("profile_fresh_organic_nitrogen_total",
-                            field.soil.data.profile_fresh_organic_nitrogen_total, info_map)
+                            field.soil.data.profile_fresh_organic_nitrogen_total,
+                            dict(info_map, **{"data_origin": [("SoilData", "profile_fresh_organic_nitrogen_total")]}))
 
             # Adding vadose zone layer data
             info_map["suffix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
