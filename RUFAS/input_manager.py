@@ -1198,6 +1198,18 @@ class InputManager:
             return add_variable_success
 
     def dump_get_data_logs(self, path: Path) -> None:
+        """
+        Dumps the stored get data logs to a JSON file at the specified path.
+
+        Parameters
+        ----------
+        path : Path
+            The directory path where the JSON file will be saved.
+
+        Returns
+        -------
+        None
+        """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
