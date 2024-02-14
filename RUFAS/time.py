@@ -79,7 +79,6 @@ class Time:
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                # check for leap year
                 if Utility.is_leap_year(self.start_year_int):
                     sim_length += self.leap_year_length - self.start_day
                 else:
