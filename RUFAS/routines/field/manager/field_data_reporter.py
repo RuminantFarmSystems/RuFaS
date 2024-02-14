@@ -193,23 +193,87 @@ class FieldDataReporter:
             # Adding vadose zone layer data
             info_map["suffix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
-                            field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
+                            field.soil.data.vadose_zone_layer.active_organic_nitrogen_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "_initialize_nitrogen_pools"),
+                                                              ("CropManagement", "_distribute_residue_nutrients"),
+                                                              ("FertilizerApplication", "apply_fertilizer"),
+                                                              ("FertilizerApplication", "_apply_subsurface_fertilizer"),
+                                                              ("ManureApplication", "_add_nitrogen_to_soil_layer"),
+                                                              ("HumusMineralization", "mineralize_organic_nitrogen"),
+                                                              ("LeachingRunoffErosion", "_erode_nitrogen"),
+                                                              ("LeachingRunoffErosion", "_leach_nitrogen"),
+                                                              ("MineralizationDecomposition",
+                                                               "mineralize_and_decompose_nitrogen"),
+                                                              ("MineralizationDecomposition",
+                                                               "_correct_fresh_organic_nitrogen_pools"),
+                                                              ("SoilData", "__post_init__")
+                                                              ]}))
             om.add_variable("stable_organic_nitrogen_content",
-                            field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content, info_map)
+                            field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "_initialize_nitrogen_pools"),
+                                                              ("ManureApplication", "_add_nitrogen_to_soil_layer"),
+                                                              ("HumusMineralization", "mineralize_organic_nitrogen"),
+                                                              ("LeachingRunoffErosion", "_erode_nitrogen"),
+                                                              ("SoilData", "__post_init__")
+                                                              ]}))
             om.add_variable("nitrate_content",
-                            field.soil.data.vadose_zone_layer.nitrate_content, info_map)
+                            field.soil.data.vadose_zone_layer.nitrate_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "_initialize_nitrogen_pools"),
+                                                              ("FertilizerApplication", "apply_fertilizer"),
+                                                              ("FertilizerApplication", "_apply_subsurface_fertilizer"),
+                                                              ("ManureApplication", "_add_nitrogen_to_soil_layer"),
+                                                              ("Denitrification", "denitrify"),
+                                                              ("LeachingRunoffErosion", "_erode_nitrogen"),
+                                                              ("LeachingRunoffErosion", "_leach_nitrogen"),
+                                                              ("MineralizationDecomposition",
+                                                               "mineralize_and_decompose_nitrogen"),
+                                                              ("NitrificationVolatilization",
+                                                               "do_daily_nitrification_and_volatilization"),
+                                                              ]}))
             om.add_variable("fresh_organic_nitrogen_content",
-                            field.soil.data.vadose_zone_layer.fresh_organic_nitrogen_content, info_map)
+                            field.soil.data.vadose_zone_layer.fresh_organic_nitrogen_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "_initialize_nitrogen_pools"),
+                                                              ("CropManagement", "_transfer_residue"),
+                                                              ("CropManagement", "_distribute_residue_nutrients"),
+                                                              ("FertilizerApplication", "apply_fertilizer"),
+                                                              ("FertilizerApplication", "_apply_subsurface_fertilizer"),
+                                                              ("LeachingRunoffErosion", "_erode_nitrogen"),
+                                                              ("MineralizationDecomposition",
+                                                               "mineralize_and_decompose_nitrogen"),
+                                                              ("MineralizationDecomposition",
+                                                               "_correct_fresh_organic_nitrogen_pools")
+                                                              ]}))
             om.add_variable("water_content",
-                            field.soil.data.vadose_zone_layer.water_content, info_map)
+                            field.soil.data.vadose_zone_layer.water_content,
+                            dict(info_map, **{"data_origin": [("Evaporation", "evaporate"),
+                                                              ("LayerData", "__post_init__"),
+                                                              ("Percolation", "percolate"),
+                                                              ("Percolation", "_percolate_excess_water")
+                                                              ]}))
             om.add_variable("labile_inorganic_phosphorus_content",
-                            field.soil.data.vadose_zone_layer.labile_inorganic_phosphorus_content, info_map)
+                            field.soil.data.vadose_zone_layer.labile_inorganic_phosphorus_content,
+                            dict(info_map, **{"data_origin": [("CropManagement", "_transfer_residue"),
+                                                              ("CropManagement", "_distribute_residue_nutrients"),
+                                                              ("FertilizerApplication", "_apply_subsurface_fertilizer"),
+                                                              ("LayerData", "__post_init__"),
+                                                              ("LayerData", "add_to_labile_phosphorus"),
+                                                              ("PhosphorusMineralization", "mineralize_phosphorus"),
+                                                              ("SolublePhosphorus", "daily_update_routine")
+                                                              ]}))
             om.add_variable("active_inorganic_phosphorus_content",
-                            field.soil.data.vadose_zone_layer.active_inorganic_phosphorus_content, info_map)
+                            field.soil.data.vadose_zone_layer.active_inorganic_phosphorus_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "__post_init__"),
+                                                              ("LayerData", "add_to_labile_phosphorus"),
+                                                              ("PhosphorusMineralization", "mineralize_phosphorus")
+                                                              ]}))
             om.add_variable("stable_inorganic_phosphorus_content",
-                            field.soil.data.vadose_zone_layer.stable_inorganic_phosphorus_content, info_map)
+                            field.soil.data.vadose_zone_layer.stable_inorganic_phosphorus_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "__post_init__"),
+                                                              ("PhosphorusMineralization", "mineralize_phosphorus")
+                                                              ]}))
             om.add_variable("fresh_organic_phosphorus_content",
-                            field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content, info_map)
+                            field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content,
+                            dict(info_map, **{"data_origin": [("LayerData", "")]}))
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
