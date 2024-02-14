@@ -1206,9 +1206,6 @@ class InputManager:
         path : Path
             The directory path where the JSON file will be saved.
 
-        Returns
-        -------
-        None
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
