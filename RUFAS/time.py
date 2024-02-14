@@ -1,29 +1,21 @@
-from typing import List
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.config import Config
+from RUFAS.util import Utility
 
+im = InputManager()
 om = OutputManager()
 
 
 class Time:
-    def __init__(self, config: Config):
+    def __init__(self):
         """
-        Description:
-            This object is responsible for creating and tracking time in the simulation.
-        Args:
-            config: instance of the Config class containing information necessary
-                to initialize time
+        This object is responsible for creating and tracking time in the simulation.
         """
 
-        calendar_year: int = config.start_year
-        # number of years
-
-        self.start_year: int = calendar_year
-        self.calendar_year: int = calendar_year
-        self.years: List[List[int]] = config.years
+        self._init_time_config()
+        self.calendar_year: int = self.start_year_int
         self.year: int = 1  # current year
-        self.leap_year_length: int = config.leap_year_length
-        self.year_length: int = config.year_length
+        self.simulation_length = self._calc_sim_length()
 
         # finds the first non-null day of the first year
         for i in range(0, len(self.years[0])):
@@ -33,6 +25,69 @@ class Time:
                 self.day = self.years[0][i]
                 break
         self.index = 0
+
+    def _init_time_config(self) -> None:
+        """
+        Initializes the time configuration for the instance by parsing the config data from InputManager pool.
+
+        Returns
+        -------
+        None
+        """
+        config_data = im.get_data("config")
+        self.start_full_date: list[str] = config_data["start_date"].split(":")
+        self.end_full_date: list[str] = config_data["end_date"].split(":")
+        self.start_year_int: int = int(self.start_full_date[0])
+        self.end_year_int: int = int(self.end_full_date[0])
+        self.start_day: int = int(self.start_full_date[1])
+        self.end_day: int = int(self.end_full_date[1])
+
+        self.leap_year_length = 366
+        self.year_length = 365
+
+        self.years: list[list[int]] = []
+
+        for year in range(self.start_year_int, self.end_year_int + 1):
+            if year == self.start_year_int == self.end_year_int:
+                days = [None for _ in range(1, self.start_day)]
+                days += [_ for _ in range(self.start_day, self.end_day + 1)]
+            elif year == self.start_year_int:
+                days = [None for _ in range(1, self.start_day)]
+                if Utility.is_leap_year(year):
+                    days += (_ for _ in range(self.start_day, self.leap_year_length + 1))
+                else:
+                    days += (_ for _ in range(self.start_day, self.year_length + 1))
+            elif year == self.end_year_int:
+                days = [_ for _ in range(1, self.end_day + 1)]
+            else:
+                if Utility.is_leap_year(year):
+                    days = [_ for _ in range(1, self.leap_year_length + 1)]
+                else:
+                    days = [_ for _ in range(1, self.year_length + 1)]
+
+            self.years.append(days)
+
+    def _calc_sim_length(self) -> int:
+        """
+        Calculates and returns the length of the simulation in days.
+
+        Returns
+        -------
+        Int
+            The length of the simulation in days.
+        """
+        sim_length = 0
+        for i in range(len(self.years)):
+            if i == 0:
+                # check for leap year
+                if Utility.is_leap_year(self.start_year_int):
+                    sim_length += self.leap_year_length - self.start_day
+                else:
+                    sim_length += self.year_length - self.start_day
+            else:
+                sim_length += len(self.years[i])
+
+        return sim_length + 1
 
     def to_str(self):
         """
