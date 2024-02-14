@@ -27,8 +27,12 @@ class HeatUnits:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def absorb_heat_units(self, mean_air_temperature: float = None,
-                          min_air_temperature: float = None, max_air_temperature: float = None) -> None:
+    def absorb_heat_units(
+        self,
+        mean_air_temperature: float = None,
+        min_air_temperature: float = None,
+        max_air_temperature: float = None,
+    ) -> None:
         """
         Main function for absorbing heat units during a day and accumulating them.
 
@@ -55,12 +59,15 @@ class HeatUnits:
         self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
 
         if self.data.use_heat_unit_temperature:
-            self.data.maximum_heat_unit_temperature = \
-                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.data.maximum_temperature)
-            self.data.minimum_heat_unit_temperature = \
-                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.data.minimum_temperature)
-            self.data.heat_unit_temperature = \
-                (self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature) / 2
+            self.data.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
+                max_air_temperature, self.data.maximum_temperature
+            )
+            self.data.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
+                min_air_temperature, self.data.minimum_temperature
+            )
+            self.data.heat_unit_temperature = (
+                self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature
+            ) / 2
 
         if self.data.use_heat_unit_temperature or mean_air_temperature is None:
             use_temp = self.data.heat_unit_temperature
@@ -110,8 +117,9 @@ class HeatUnits:
 
         """
         if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.data.new_heat_units = self._determine_new_heat_units(self.data.heat_unit_temperature,
-                                                                      self.data.minimum_temperature)
+            self.data.new_heat_units = self._determine_new_heat_units(
+                self.data.heat_unit_temperature, self.data.minimum_temperature
+            )
         else:  # main method
             self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
 
@@ -122,9 +130,12 @@ class HeatUnits:
         self.data.accumulated_heat_units += self.data.new_heat_units
 
     # TODO: add these warnings to output manager at a later date.
-    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
-                                            min_air_temperature: float = None,
-                                            max_air_temperature: float = None) -> None:
+    def _check_absorb_heat_for_input_errors(
+        self,
+        mean_air_temperature: float = None,
+        min_air_temperature: float = None,
+        max_air_temperature: float = None,
+    ) -> None:
         """
         Raises errors if inputs given for absorb_heat_units don't make sense with the value of the
         use_heat_unit_temperature attribute.
@@ -147,8 +158,10 @@ class HeatUnits:
 
         """
         if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
-            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
-                             " when use_heat_unit_temperature is True")
+            raise ValueError(
+                "min_air_temperature and max_air_temperature must be provided"
+                + " when use_heat_unit_temperature is True"
+            )
         if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
             raise ValueError("mean_air_temperature must be provided when use_heat_unit_temperature is False")
 

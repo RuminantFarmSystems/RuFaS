@@ -42,20 +42,17 @@ class FieldManager:
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
 
     """
+
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__
+            "function": self.__init__.__name__,
         }
 
         self.fields: List[Field] = []
         fields = im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning(
-                "No field input files.",
-                "No fields will be simulated.",
-                info_map
-            )
+            om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         for field in fields:
             new_field = self._setup_field(field, manure_manager, feed_manager)
@@ -123,8 +120,10 @@ class FieldManager:
         supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
-        available_fertilizer_mixes, fertilizer_schedule = FieldManager._setup_fertilizer_schedule(
-            fertilizer_configuration)
+        (
+            available_fertilizer_mixes,
+            fertilizer_schedule,
+        ) = FieldManager._setup_fertilizer_schedule(fertilizer_configuration)
         fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
 
         manure_configuration = field_configuration_data.get("manure_management_specification")
@@ -146,19 +145,35 @@ class FieldManager:
         soil_configuration = field_configuration_data.get("soil_specification")
         soil_profile = FieldManager._setup_soil(soil_configuration, field_size)
 
-        field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
-                               longitude=longitude, minimum_daylength=minimum_daylength,
-                               seasonal_high_water_table=seasonal_high_water_table,
-                               watering_amount_in_liters=watering_amount_in_liters, watering_interval=watering_interval,
-                               supplement_manure_nutrient_deficiencies=supplement_manure)
+        field_data = FieldData(
+            name=field_name,
+            field_size=field_size,
+            absolute_latitude=absolute_latitude,
+            longitude=longitude,
+            minimum_daylength=minimum_daylength,
+            seasonal_high_water_table=seasonal_high_water_table,
+            watering_amount_in_liters=watering_amount_in_liters,
+            watering_interval=watering_interval,
+            supplement_manure_nutrient_deficiencies=supplement_manure,
+        )
 
-        return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
-                     harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
-                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
-                     manure_manager=manure_manager, feed_manager=feed_manager)
+        return Field(
+            field_data=field_data,
+            soil=soil_profile,
+            plantings=all_planting_events,
+            harvestings=all_harvest_events,
+            tillage_events=tillage_events,
+            fertilizer_events=fertilizer_events,
+            fertilizer_mixes=available_fertilizer_mixes,
+            manure_events=manure_events,
+            manure_manager=manure_manager,
+            feed_manager=feed_manager,
+        )
 
     @staticmethod
-    def _setup_fertilizer_schedule(fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
+    def _setup_fertilizer_schedule(
+        fertilizer_schedule: str,
+    ) -> Tuple[Dict, FertilizerSchedule]:
         """
         Sets up the fertilizer schedule and the list of available fertilizer mixes.
 
@@ -180,7 +195,7 @@ class FieldManager:
             available_fertilizer_mixes[mix.get("name")] = {
                 "N": mix.get("N"),
                 "P": mix.get("P"),
-                "K": mix.get("K")
+                "K": mix.get("K"),
             }
 
         fertilizer_application_schedule = FertilizerSchedule(
@@ -193,7 +208,7 @@ class FieldManager:
             application_depths=fertilizer_data.get("application_depths"),
             surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
             pattern_skip=fertilizer_data.get("pattern_skip"),
-            pattern_repeat=fertilizer_data.get("pattern_repeat")
+            pattern_repeat=fertilizer_data.get("pattern_repeat"),
         )
 
         return available_fertilizer_mixes, fertilizer_application_schedule
@@ -257,7 +272,7 @@ class FieldManager:
             mixing_fractions=tillage_schedule_data.get("mixing_fractions"),
             tillage_depths=tillage_schedule_data.get("tillage_depths"),
             pattern_skip=tillage_schedule_data.get("pattern_skip"),
-            pattern_repeat=tillage_schedule_data.get("pattern_repeat")
+            pattern_repeat=tillage_schedule_data.get("pattern_repeat"),
         )
         return tillage_schedule_instance
 
@@ -285,17 +300,19 @@ class FieldManager:
                 heat_scheduled_harvest = False
             else:
                 heat_scheduled_harvest = True
-            new_schedule = CropSchedule(name=f"crop_schedule_{index}",
-                                        crop_reference=rotation.get("crop_species"),
-                                        planting_years=rotation.get("planting_years"),
-                                        planting_days=rotation.get("planting_days"),
-                                        harvest_years=rotation.get("harvest_years"),
-                                        harvest_days=rotation.get("harvest_days"),
-                                        harvest_operations=rotation.get("harvest_operations"),
-                                        use_heat_scheduling=heat_scheduled_harvest,
-                                        pattern_repeat=rotation.get("pattern_repeat"),
-                                        planting_skip=rotation.get("planting_skip"),
-                                        harvesting_skip=rotation.get("harvesting_skip"))
+            new_schedule = CropSchedule(
+                name=f"crop_schedule_{index}",
+                crop_reference=rotation.get("crop_species"),
+                planting_years=rotation.get("planting_years"),
+                planting_days=rotation.get("planting_days"),
+                harvest_years=rotation.get("harvest_years"),
+                harvest_days=rotation.get("harvest_days"),
+                harvest_operations=rotation.get("harvest_operations"),
+                use_heat_scheduling=heat_scheduled_harvest,
+                pattern_repeat=rotation.get("pattern_repeat"),
+                planting_skip=rotation.get("planting_skip"),
+                harvesting_skip=rotation.get("harvesting_skip"),
+            )
             schedules.append(new_schedule)
         return schedules
 
@@ -341,7 +358,7 @@ class FieldManager:
             "second_moisture_condition_parameter",
             "average_subbasin_slope",
             "slope_length",
-            "albedo"
+            "albedo",
         ]
 
         for value in expected_values:
@@ -405,7 +422,7 @@ class FieldManager:
             "ammonium_volatilization_cation_exchange_factor",
             "denitrification_rate_coefficient",
             "denitrification_threshold_water_content",
-            "residue_fresh_organic_mineralization_rate"
+            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:
