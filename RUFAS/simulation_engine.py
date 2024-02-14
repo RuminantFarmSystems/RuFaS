@@ -44,7 +44,7 @@ class SimulationEngine:
         The ManureManager object that sets up and manages different manure management components including manure
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
-        The FieldManager object that manages al fields in the simulation.
+        The FieldManager object that manages all fields in the simulation.
 
     Methods
     -------
