@@ -1870,6 +1870,15 @@
         "maximum": 1.0
       }
     },
+    "implements": {
+      "type": "array",
+      "description": "List of tillage implements which will be used to execute the tillage operations.",
+      "default": [],
+      "properties": {
+        "type": "string",
+        "pattern": "^(subsoiler|moldboard-plow|coulter-chisel-plow|disk-harrow|cultivator|seedbed-conditioner)$"
+      }
+    },
     "pattern_repeat": {
       "type": "number",
       "description": "Number of times that this tillage schedule should be repeated.",
