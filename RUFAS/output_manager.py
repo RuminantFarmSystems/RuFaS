@@ -494,7 +494,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str) -> str:
+    def generate_file_name(self, base_name: str, extension: str) -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
@@ -776,7 +776,7 @@ class OutputManager(object):
                     )
             report_file_path = os.path.join(
                 save_path,
-                self._generate_file_name(f"report_{filter_file}", "csv"),
+                self.generate_file_name(f"report_{filter_file}", "csv"),
             )
             if report_generator.reports:
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
@@ -803,14 +803,14 @@ class OutputManager(object):
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
             file_path = os.path.join(
                 save_path,
-                self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+                self.generate_file_name(f"saved_variables_{filter_file}", "json"),
             )
             self.dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = os.path.join(
                 csv_dir,
-                self._generate_file_name(f"saved_variables_{filter_file}", "csv"),
+                self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
             )
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
@@ -874,28 +874,30 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        json_file_path = os.path.join(
+            path, self.generate_file_name("all_variables", "json")
+        )
         self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("logs", "json"))
+        file_path = os.path.join(path, self.generate_file_name("logs", "json"))
         self.dict_to_file_json(self.logs_pool, file_path)
 
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
+        file_path = os.path.join(path, self.generate_file_name("warnings", "json"))
         self.dict_to_file_json(self.warnings_pool, file_path)
 
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("errors", "json"))
+        file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
@@ -982,7 +984,9 @@ class OutputManager(object):
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
-        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
+        file_path = os.path.join(
+            path, self.generate_file_name("variable_names", "txt")
+        )
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
