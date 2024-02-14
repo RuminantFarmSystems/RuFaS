@@ -186,8 +186,7 @@ class SimulationEngine:
 
     def annual_reset(self):
         """
-        Description:
-            Resets all annual variables that require reset
+        Resets all annual variables that require reset.
         """
         self.field_manager.annual_update_routine()
 
