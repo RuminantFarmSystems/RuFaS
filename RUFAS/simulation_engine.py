@@ -201,12 +201,12 @@ class SimulationEngine:
         config_data: Dict[str, Any] = im.get_data("config")
         weather_data = im.get_data("weather")
 
-        if data_config.get("set_seed"):
-            random.seed(data_config["random_seed"])
-            numpy.random.seed(data_config["random_seed"])
+        if config_data.get("set_seed"):
+            random.seed(config_data["random_seed"])
+            numpy.random.seed(config_data["random_seed"])
 
         self.time = Time()
-        self.weather = Weather(data_weather, self.time)
+        self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
         feed_class_config = im.get_data("feed")

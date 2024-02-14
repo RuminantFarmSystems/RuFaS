@@ -416,15 +416,15 @@ class Utility:
         }
 
     @staticmethod
-    def is_leap_year(year: int):
+    def is_leap_year(year: int) -> bool:
         """
         Helper method determines if the given year is a leap year
-        
+
         Parameters
         ----------
-        int
+        year: int
             The year.
-        
+
         Returns
         -------
         bool
