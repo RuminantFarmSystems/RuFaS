@@ -2,6 +2,7 @@ from typing import Optional
 
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.tillage_implements_enum import TillageImplement
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -73,6 +74,7 @@ class TillageApplication:
         tillage_depth: float,
         incorporation_fraction: float,
         mixing_fraction: float,
+        implement: TillageImplement,
         year: int,
         day: int,
     ) -> None:
@@ -83,15 +85,17 @@ class TillageApplication:
         Parameters
         ----------
         tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
+            The lowest depth the tilling implement reaches (mm).
         incorporation_fraction : float
-            Fraction of soil surface pool incorporated into the soil profile (unitless)
+            Fraction of soil surface pool incorporated into the soil profile (unitless).
         mixing_fraction : float
-            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
+        implement : TillageImplement
+            The tillage implement used to execute this application.
         year : int
-            Year of the time object
+            Year of the time object.
         day : int
-            Day of the time object
+            Day of the time object.
 
         References
         ----------
@@ -104,7 +108,6 @@ class TillageApplication:
         does not go deeper than the bottom of the soil profile.
 
         """
-        # TODO: increase functionality and features - issue #538
 
         vadose_zone_tilled = tillage_depth > self.soil_data.soil_layers[-1].bottom_depth
         if vadose_zone_tilled:
@@ -155,7 +158,7 @@ class TillageApplication:
         for pool in pools_to_till_in_soil:
             offset_top_layer = pool in pools_to_offset_top_layer
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction, offset_top_layer)
-        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
+        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, implement, year, day)
 
     def _mix_soil_layers(
         self,
@@ -288,6 +291,7 @@ class TillageApplication:
         tillage_depth: float,
         incorporation_fraction: float,
         mixing_fraction: float,
+        implement: TillageImplement,
         year: int,
         day: int,
     ) -> None:
@@ -302,6 +306,8 @@ class TillageApplication:
             Fraction of soil surface pool incorporated into the soil profile (unitless)
         mixing_fraction : float
             Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+        implement : TillageImplement
+            The tillage implement used to execute this application.
         year : int
             Year in which this harvest occurred.
         day : int
@@ -318,6 +324,7 @@ class TillageApplication:
             "tillage_depth": tillage_depth,
             "incorporation_fraction": incorporation_fraction,
             "mixing_fraction": mixing_fraction,
+            "implement": implement,
             "year": year,
             "day": day,
         }
