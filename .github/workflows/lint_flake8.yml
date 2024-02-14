@@ -42,6 +42,7 @@ jobs:
       run: |
         black --line-length=120 ${{ env.FILES }}
     - name: Commit and push formatting changes
+      if: ${{ github.ref != 'refs/heads/main' }}
       env:
         BRANCH_NAME: ${{ github.head_ref || github.ref }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
