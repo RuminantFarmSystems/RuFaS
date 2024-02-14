@@ -862,3 +862,33 @@ def test_combine(
     mock_list_dir.assert_called_once_with(saved_csv_working_folder)
 
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
+def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
+    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_normal_case():
+    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
+    expected_output = [
+        {"id": 1, "name": "Alice", "age": 25},
+        {"id": 2, "name": "Bob", "age": 30},
+        {"id": 3, "name": "Charlie", "age": 35},
+    ]
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_empty_input():
+    input_dict = {}
+    expected_output = []
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_unequal_length():
+    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob"]}  # This list is shorter than the others.
+    with pytest.raises(ValueError):
+        Utility.convert_dict_of_lists_to_list_of_dicts(input_dict)
+
+
+def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists():
+    input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
+    expected_output = [{"id": 1, "name": "Alice", "age": 25}]
+    assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
