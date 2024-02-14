@@ -149,8 +149,10 @@ class HeiferI(Calf):
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
         if divisor == 0:
             divisor = 1
-        return max((0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
-                   AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE)
+        return max(
+            (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
+            AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
+        )
 
     def update(self, sim_day):
         """
