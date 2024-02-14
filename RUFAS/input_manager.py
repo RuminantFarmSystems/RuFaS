@@ -781,7 +781,7 @@ class InputManager:
                                 self.__pool)
 
             timestamp = Utility.get_timestamp(include_millis=True)
-            self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() gets called for {element_hierarchy}."
+            self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
 
             return deepcopy(data_value)
 
