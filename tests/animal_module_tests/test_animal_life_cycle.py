@@ -33,6 +33,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 @fixture
@@ -1642,13 +1643,22 @@ def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
     assert heiferI.p_req == p_req
 
 
-@pytest.mark.parametrize("preg_day, days_born", [(300, 300), (300, 500), (100, 900)])
-def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day, days_born) -> None:
+@pytest.mark.parametrize(
+    "preg_day, days_born, body_weight, mature_body_weight, expected",
+    [
+        (300, 300, 100, 700, 273.6),
+        (300, 500, 100, 700, 1.368),
+        (520, 500, 100, 700, 13.68),
+        (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE),
+    ],
+)
+def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day: int, days_born: int,
+                                        body_weight: int, mature_body_weight: int, expected: int) -> None:
     """Unit test for the function get_non_preg_bw_change in file routines/animal/life_cycle/heiferI.py."""
 
     heiferI = mocker.MagicMock(autospec=HeiferI)
-    heiferI.body_weight = 1000.0
-    heiferI.mature_body_weight = 1200.0
+    heiferI.body_weight = body_weight
+    heiferI.mature_body_weight = mature_body_weight
     heiferI.daily_growth = 1.0
     heiferI.days_born = days_born
     heifer_repro_method = "TAI"
@@ -1669,12 +1679,8 @@ def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day, days_bo
         "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config",
         animal_base_config,
     )
-    weight = HeiferI.get_non_preg_bw_change(heiferI)
-    divisor = abs(preg_day - days_born)
-    if divisor == 0:
-        divisor = 1
-    calc_weight = (0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight) / divisor
-    assert weight == calc_weight
+    weight_change = HeiferI.get_non_preg_bw_change(heiferI)
+    assert weight_change == approx(expected)
 
 
 def test_heiferI_get_heiferI_values(mocker: MockerFixture) -> None:
