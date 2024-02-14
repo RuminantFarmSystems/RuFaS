@@ -3,12 +3,43 @@ from typing import List
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import TillageEvent
 
-"""
-This module contains `TillageSchedule`, a `Schedule` child class that defines when and how a field will be tilled.
-"""
-
 
 class TillageSchedule(Schedule):
+    """
+    A `Schedule` child class that defines when and how a field will be tilled.
+
+    Parameters
+    ----------
+    name : str
+        Name of this tillage schedule.
+    years : List[int]
+        Year(s) in which tillage will happen.
+    days : List[int]
+        Julian day(s) on which tillage will happen.
+    tillage_depths : List[float]
+        The lowest depth(s) the tilling implement reaches (mm).
+    incorporation_fractions : List[float]
+        Fraction(s) of soil surface pool incorporated into the soil profile (unitless).
+    mixing_fractions : List[float]
+        Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless).
+    pattern_skip : int, default=0
+        Number of years to skip between tillage schedule repetitions.
+    pattern_repeat : int, default=0
+        Number of times the specified tillage schedule should be repeated.
+
+    Attributes
+    ----------
+    tillage_depths : List[float]
+        Elongated list of tillage depths to ensure a depth value for each application year, representing how deep the
+        tilling implement will go.
+    incorporation_fractions : List[float]
+        Elongated list of incorporation fractions to ensure an incorporation value for each application year, indicating
+        how much of the surface soil is mixed into the profile.
+    mixing_fractions : List[float]
+        Elongated list of mixing fractions to ensure a mixing value for each application year, reflecting the degree of
+        soil mixing during tillage.
+
+    """
 
     def __init__(self, name: str, years: List[int], days: List[int], tillage_depths: List[float],
                  incorporation_fractions: List[float], mixing_fractions: List[float], pattern_skip: int = 0,
