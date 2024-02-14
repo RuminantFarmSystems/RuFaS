@@ -11,6 +11,7 @@ from RUFAS.routines.field.manager.events import (
 )
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.routines.tillage_implements_enum import TillageImplement
 
 
 @pytest.mark.parametrize(
@@ -161,28 +162,88 @@ def test_harvest_event_hash(harvest_event: HarvestEvent, expected: float) -> Non
     "tillage_event1,tillage_event2,expected",
     [
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.SUBSOILER,
+            ),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.SUBSOILER,
+            ),
             True,
         ),
         (
-            TillageEvent(tillage_depth=10.24, incorporation_fraction=0.77, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=10.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.MOLDBOARD_PLOW,
+            ),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.MOLDBOARD_PLOW,
+            ),
             False,
         ),
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.87,
+                mixing_fraction=0.131,
+                implement=TillageImplement.COULTER_CHISEL_PLOW,
+            ),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.COULTER_CHISEL_PLOW,
+            ),
             False,
         ),
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.87, mixing_fraction=0.131),
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.214),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.87,
+                mixing_fraction=0.131,
+                implement=TillageImplement.DISK_HARROW,
+            ),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.214,
+                implement=TillageImplement.DISK_HARROW,
+            ),
+            False,
+        ),
+        (
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.DISK_HARROW,
+            ),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.SEEDBED_CONDITIONER,
+            ),
             False,
         ),
         (
             2,
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.CULTIVATOR,
+            ),
             False,
         ),
     ],
@@ -197,8 +258,13 @@ def test_tillage_event_equality(tillage_event1, tillage_event2, expected: bool) 
     "tillage_event,expected",
     [
         (
-            TillageEvent(tillage_depth=9.24, incorporation_fraction=0.77, mixing_fraction=0.131),
-            hash((1, 160, 9.24, 0.77, 0.131)),
+            TillageEvent(
+                tillage_depth=9.24,
+                incorporation_fraction=0.77,
+                mixing_fraction=0.131,
+                implement=TillageImplement.CULTIVATOR,
+            ),
+            hash((1, 160, 9.24, 0.77, 0.131, TillageImplement.CULTIVATOR)),
         )
     ],
 )
