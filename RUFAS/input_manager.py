@@ -3,10 +3,14 @@ from functools import reduce
 import json
 import os
 import re
+from pathlib import Path
 
 import pandas as pd
+
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict, List, Union, Callable
+
+from RUFAS.util import Utility
 
 om = OutputManager()
 
@@ -30,6 +34,7 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
         self.__properties_used: Dict[str, Any] = {}
+        self.__get_data_logs_pool: Dict[str, str] = {}
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
@@ -774,6 +779,10 @@ class InputManager:
         try:
             data_value = reduce(lambda d, key: d[key], element_hierarchy,
                                 self.__pool)
+
+            timestamp = Utility.get_timestamp(include_millis=True)
+            self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() gets called for {element_hierarchy}."
+
             return deepcopy(data_value)
 
         except KeyError as key_error:
@@ -1187,3 +1196,20 @@ class InputManager:
                 eager_termination=eager_termination,
                 is_variable_dict=False)
             return add_variable_success
+
+    def dump_get_data_logs(self, path: Path) -> None:
+        """
+        Dumps the stored get data logs to a JSON file at the specified path.
+
+        Parameters
+        ----------
+        path : Path
+            The directory path where the JSON file will be saved.
+
+        Returns
+        -------
+        None
+        """
+        file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
+        file_path = os.path.join(path, file_name)
+        om.dict_to_file_json(self.__get_data_logs_pool, file_path)
