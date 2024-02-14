@@ -40,7 +40,7 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    # TODO: Same TODOs as in dry_cow_manure_excretion.py
+    # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
     nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']

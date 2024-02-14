@@ -21,13 +21,13 @@ class ManureConstants:
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
 
-    LIQUID_MANURE_DENSITY = 990.0
+    LIQUID_MANURE_DENSITY = 1000
     """The density of liquid manure (kg/:math:`m^3`)."""
 
-    SLURRY_MANURE_DENSITY = 1400
+    SLURRY_MANURE_DENSITY = 990
     """The density of slurry manure (kg/:math:`m^3`)."""
 
-    SOLID_MANURE_DENSITY = 1250
+    SOLID_MANURE_DENSITY = 700
     """The density of solid manure (kg/:math:`m^3`)."""
 
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE = 0.5
@@ -63,4 +63,14 @@ class ManureConstants:
     COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR = 0.01
     """
     The constant factor for indirect N2O emissions lost due to leaching and NH3.
+    """
+
+    METHANE_TO_VOLATILE_SOLIDS_FACTOR = 3
+    """
+    The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3.
+    """
+
+    LIQUID_MANURE_SOLIDS_FRACTION = 0.05
+    """
+    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed
     """
