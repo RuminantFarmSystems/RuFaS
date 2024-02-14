@@ -23,7 +23,7 @@ om = OutputManager()
 
 class FieldManager:
     """
-    Manages the initialization and simulation of field instances within the simulation environment.This class is
+    Manages the initialization and simulation of field instances within the simulation environment. This class is
     responsible for creating `Field` instances based on input data, managing these fields across the simulation
     lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
 
