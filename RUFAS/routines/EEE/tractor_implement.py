@@ -1,5 +1,10 @@
 from enum import Enum
 from typing import List
+from RUFAS.util import Utility
+from RUFAS.input_manager import InputManager
+
+
+input_manager = InputManager()
 
 
 class OperationType(Enum):
@@ -39,6 +44,8 @@ class TractorImplement:
     ) -> None:
         self.operation_event = operation_event
         self.crop_type = crop_type
+        constants = input_manager.get_data("EEE_constants.constants")
+        self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
 
     def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:  # noqa C901
         """
@@ -93,11 +100,11 @@ class TractorImplement:
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
         Implements Helper Functions 418a and 418b  in EEE Functions file.
         """
-        field_efficiency = 0.90  # Constant 587 in EEE Functions file # TODO get the value from IM
+        field_efficiency = self.constants_by_ID[587]["Value"]  # Constant 587 in EEE Functions file
         if crop_yield_ton_per_ha:  # TODO this is not correct, the decision should be made based on operation type
             crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
             return crop_yield_kg_per_ha / self.throughput * 1000 * field_efficiency
-        field_speed_km_per_hr = 10.00  # Constant 585 in EEE Functions file # TODO get the value from IM
+        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
         return 0.1 * field_speed_km_per_hr * self.width_m * field_efficiency
 
     def calculate_operation_time_hr(
@@ -115,7 +122,7 @@ class TractorImplement:
         requires a transfer of tractor power to its wheel drives for this purpose.
         Implements Helper Function 414  in EEE Functions file.
         """
-        field_speed_km_per_hr = 10.00  # Constant 585 in EEE Functions file # TODO get the value from IM
+        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
         functional_draft = self.calculate_functional_draft()
         return functional_draft * field_speed_km_per_hr * 1.2 / 3600
 
