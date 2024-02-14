@@ -387,41 +387,28 @@ def test_populate_pool_invalid(
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
 
 
-def test_populate_pool_partial_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
-                                       input_manager_original_method_states: Dict[str, Callable], ):
+def test_populate_pool_partial_invalid(
+    mock_input_manager: InputManager,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    input_manager_original_method_states: Dict[str, Callable],
+):
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
     mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._validate_dict_element = MagicMock(side_effect=[
-        {"fixed_elements": 1,
-         "valid_elements": 1,
-         "total_elements": 1,
-         "invalid_elements": 0,
-         "is_valid": True
-         },
-        {"fixed_elements": 0,
-         "valid_elements": 0,
-         "total_elements": 1,
-         "invalid_elements": 1,
-         "is_valid": False
-         }
-    ])
-    mock_input_manager._validate_tabular_element = MagicMock(side_effect=[
-        {"fixed_elements": 1,
-         "valid_elements": 1,
-         "total_elements": 1,
-         "invalid_elements": 0,
-         "is_valid": True
-         },
-        {"fixed_elements": 0,
-         "valid_elements": 0,
-         "total_elements": 1,
-         "invalid_elements": 1,
-         "is_valid": False
-         }
-    ])
+    mock_input_manager._validate_dict_element = MagicMock(
+        side_effect=[
+            {"fixed_elements": 1, "valid_elements": 1, "total_elements": 1, "invalid_elements": 0, "is_valid": True},
+            {"fixed_elements": 0, "valid_elements": 0, "total_elements": 1, "invalid_elements": 1, "is_valid": False},
+        ]
+    )
+    mock_input_manager._validate_tabular_element = MagicMock(
+        side_effect=[
+            {"fixed_elements": 1, "valid_elements": 1, "total_elements": 1, "invalid_elements": 0, "is_valid": True},
+            {"fixed_elements": 0, "valid_elements": 0, "total_elements": 1, "invalid_elements": 1, "is_valid": False},
+        ]
+    )
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -437,14 +424,16 @@ def test_populate_pool_partial_invalid(mock_input_manager: InputManager, mock_me
         assert "element3" in mock_input_manager._InputManager__pool["file2"]
         assert "element4" not in mock_input_manager._InputManager__pool["file2"]
 
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
 
 
-def test_populate_pool_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
-                                         input_manager_original_method_states: Dict[str, Callable], ):
+def test_populate_pool_eager_termination(
+    mock_input_manager: InputManager,
+    mock_metadata: Dict[str, Dict[str, Any]],
+    input_manager_original_method_states: Dict[str, Callable],
+):
     """Unit test for invalid data with eager termination for function
     _populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
