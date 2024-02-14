@@ -493,7 +493,7 @@ class Utility:
         -----
         The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
         If you need to keep the original list and dictionaries intact, make a copy before calling this function.
-        
+
         Example
         -------
         Given a list of dictionaries like this:
