@@ -17,16 +17,31 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
-"""
-This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
-the `SimulationEngine` for executing daily and annual routines in the field module.
-"""
-
 im = InputManager()
 om = OutputManager()
 
 
 class FieldManager:
+    """
+    Manages the initialization and simulation of field instances within the simulation environment. This class is
+    responsible for creating `Field` instances based on input data, managing these fields across the simulation
+    lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
+
+    Parameters
+    ----------
+    manure_manager : ManureManager
+        An instance of `ManureManager` responsible for managing manure-related activities and data across the fields.
+    feed_manager : FeedManager
+        An instance of `FeedManager` responsible for managing feed-related activities and data across the fields.
+
+    Attributes
+    ----------
+    fields : List[Field]
+        A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
+    output_gatherer : FieldDataReporter
+        An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+
+    """
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
