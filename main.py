@@ -11,10 +11,9 @@ from pathlib import Path
 import sys
 import random
 import traceback
-from typing import List
+from typing import List, Dict, Any
 import numpy
 
-from RUFAS.config import Config
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
@@ -267,7 +266,7 @@ def run_validation(
 
 
 def initialize_herd(
-        simulation_config: Config,
+        simulation_config: Dict[str, Any],
         init_herd: bool = False,
         save_animals: bool = False,
         save_animals_dir: Path = Path("output/"),
@@ -278,8 +277,8 @@ def initialize_herd(
 
     Parameters
     ----------
-    simulation_config : Config
-        Config object containing parameters and settings for the simulation.
+    simulation_config : Dict[str, Any]
+        Dictionary object containing parameters and settings for the simulation.
     init_herd: bool
         User input indicating whether to initialize herd with simulation.
     save_animals: bool
@@ -309,9 +308,9 @@ def initialize_herd(
     }
     output_manager = OutputManager()
 
-    if simulation_config.set_seed:
-        random.seed(simulation_config.seed)
-        numpy.random.seed(simulation_config.seed)
+    if "set_seed" in simulation_config.keys() and simulation_config["set_seed"]:
+        random.seed(simulation_config["random_seed"])
+        numpy.random.seed(simulation_config["random_seed"])
 
     output_manager.add_log(
         "Herd initialization start",
@@ -406,7 +405,7 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
-            simulation_config = Config(input_manager.get_data("config"))
+            simulation_config = input_manager.get_data("config")
             try:
                 initialize_herd(simulation_config=simulation_config,
                                 init_herd=init_herd,

@@ -7,13 +7,12 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
-from RUFAS.config import is_leap_year
 
 
 class Utility:
     @staticmethod
     def convert_list_of_dicts_to_dict_of_lists(
-        list_of_dicts: List[Dict[str, Any]]
+            list_of_dicts: List[Dict[str, Any]]
     ) -> Dict[str, List[Any]]:
         """
         Convert a list of dictionaries into a dictionary of lists.
@@ -75,7 +74,7 @@ class Utility:
 
     @staticmethod
     def read_json_file(
-        file_path: Path
+            file_path: Path
     ) -> Dict[Any, Any]:
         """
         Description:
@@ -115,7 +114,7 @@ class Utility:
 
     @staticmethod
     def calc_average(
-        num_values: int, cur_avg: float, new_value: float
+            num_values: int, cur_avg: float, new_value: float
     ) -> Tuple[int, float]:
         """
         Calculate the new average given the number of values,
@@ -348,8 +347,8 @@ class Utility:
         non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
         leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
-        cumulative_days_in_months = \
-            leap_cumulative_days_in_months if is_leap_year(calendar_year) else non_leap_cumulative_days_in_months
+        cumulative_days_in_months = leap_cumulative_days_in_months if Utility.is_leap_year(calendar_year) else \
+            non_leap_cumulative_days_in_months
 
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
@@ -411,7 +410,26 @@ class Utility:
                 if not any(re.search(pattern, key) for pattern in filter_patterns)
             }
         return {
-                key: data_pool[key]
-                for key in data_pool.keys()
-                if any(re.search(pattern, key) for pattern in filter_patterns)
-            }
+            key: data_pool[key]
+            for key in data_pool.keys()
+            if any(re.search(pattern, key) for pattern in filter_patterns)
+        }
+
+    @staticmethod
+    def is_leap_year(year: int):
+        """
+        Description:
+            Helper method determines if the given year is a leap year
+        Args:
+            year: an int of the year
+        Returns:
+            bool: True if the year is a leap year
+        """
+        if year % 400 == 0:
+            return True
+        elif year % 100 == 0:
+            return False
+        elif year % 4 == 0:
+            return True
+        else:
+            return False
