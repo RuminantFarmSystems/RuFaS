@@ -201,7 +201,7 @@ class SimulationEngine:
         data_config: Dict[str, Any] = im.get_data("config")
         data_weather = im.get_data("weather")
 
-        if "set_seed" in data_config.keys() and data_config["set_seed"]:
+        if data_config.get("set_seed"):
             random.seed(data_config["random_seed"])
             numpy.random.seed(data_config["random_seed"])
 
