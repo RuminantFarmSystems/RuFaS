@@ -57,7 +57,7 @@ class FertilizerSchedule(Schedule):
 
     Notes
     -----
-    - Application depths and surface remainder fractions are intended to have defaults of [0.0] and [1.0] respectively,
+    Application depths and surface remainder fractions are intended to have defaults of [0.0] and [1.0] respectively,
       but these are not specified directly in the function signature to avoid using mutable default arguments.
 
     """
