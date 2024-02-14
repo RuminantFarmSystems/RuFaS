@@ -42,6 +42,45 @@ class Utility:
     @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
+        Convert a dictionary of lists into a list of dictionaries.
+
+        Parameters
+        ----------
+        dict_of_lists : Dict[str, List[Any]]
+            A dictionary with string keys and list of values.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            A list of dictionaries, where each dictionary represents a "row" with keys
+            from the original dictionary and values corresponding to the values at the
+            same index in the input lists.
+        Raises
+        ------
+        ValueError
+            If the lists within the dictionary do not all have the same length, which is
+            necessary to ensure each dictionary in the resulting list can be constructed
+            with the same keys and corresponding values.
+        """
+        if not dict_of_lists:
+            return []
+
+        list_lengths = [len(list_) for list_ in dict_of_lists.values()]
+        if len(set(list_lengths)) != 1:
+            raise ValueError("All lists in the dictionary must have the same length.")
+
+        result_length = list_lengths[0]
+        result = []
+
+        for i in range(result_length):
+            row_dict = {key: dict_of_lists[key][i] for key in dict_of_lists}
+            result.append(row_dict)
+
+        return result
+
+    @staticmethod
+    def get_base_dir():
+        """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of
         dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
         while non-numeric segments indicate dictionary keys.
