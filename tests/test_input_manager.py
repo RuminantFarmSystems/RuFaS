@@ -1,11 +1,11 @@
 from functools import reduce
 import json
+from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from mock import MagicMock, Mock, mock_open, patch
 import pandas as pd
 import pytest
-from path import Path
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager

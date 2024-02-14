@@ -3,9 +3,9 @@ from functools import reduce
 import json
 import os
 import re
+from pathlib import Path
 
 import pandas as pd
-from path import Path
 
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict, List, Union, Callable
