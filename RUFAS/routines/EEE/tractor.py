@@ -1,5 +1,10 @@
 from enum import Enum
 from .tractor_implement import TractorImplement
+from RUFAS.util import Utility
+from RUFAS.input_manager import InputManager
+
+
+input_manager = InputManager()
 
 
 class TractorSize(Enum):
@@ -34,6 +39,8 @@ class Tractor:
         if not tractor_size and not herd_size:
             raise ValueError("At least one of `tractor_size` or `herd_size` must be given.")
         self.tractor_size = tractor_size or self.herd_size_to_tractor_size(herd_size)
+        constants = input_manager.get_data("EEE_constants.constants")
+        self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
 
     def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
         """
@@ -51,12 +58,11 @@ class Tractor:
 
     @property
     def PTO_kW(self) -> float:
-        # TODO get these values from IM
         """Constants 589, 592, 595 in EEE Functions file"""
         pto_mapping = {
-            TractorSize.SMALL: 55.93,
-            TractorSize.MEDIUM: 208.42,
-            TractorSize.LARGE: 328.11,
+            TractorSize.SMALL: self.constants_by_ID[589]["Value"],
+            TractorSize.MEDIUM: self.constants_by_ID[592]["Value"],
+            TractorSize.LARGE: self.constants_by_ID[595]["Value"],
         }
         return pto_mapping[self.tractor_size]
 
@@ -67,20 +73,18 @@ class Tractor:
 
     @property
     def mass_kg(self) -> float:
-        # TODO get these values from IM
         """Constants 591, 594, 597 in EEE Functions file"""
         mass_mapping = {
-            TractorSize.SMALL: 8_400.0,
-            TractorSize.MEDIUM: 12_700.0,
-            TractorSize.LARGE: 20_856.0,
+            TractorSize.SMALL: self.constants_by_ID[591]["Value"],
+            TractorSize.MEDIUM: self.constants_by_ID[594]["Value"],
+            TractorSize.LARGE: self.constants_by_ID[597]["Value"],
         }
         return mass_mapping[self.tractor_size]
 
     @property
     def speed_km_hr(self) -> float:
-        # TODO get these values from IM
         """Constant 598 in EEE Functions file"""
-        return 10.0
+        return self.constants_by_ID[598]["Value"]
 
     def calculate_axel_power(self, implement: TractorImplement) -> float:
         """
