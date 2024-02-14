@@ -5,7 +5,6 @@ from mock import patch
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.config import Config
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from main import (
     CaseInsensitiveArgumentAction,
@@ -306,12 +305,12 @@ def test_initialize_herd(
         add_log_count: int
 ) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
-    mock_simulation_config = mocker.MagicMock(auto_spec=Config)
+    mock_simulation_config = {}
     mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
 
     mock_output_manager.add_log.return_value = None
-    mock_simulation_config.set_seed = set_seed
-    mock_simulation_config.seed = seed
+    mock_simulation_config["set_seed"] = set_seed
+    mock_simulation_config["random_seed"] = seed
     mock_herd_factory.initialize_herd.return_value = None
 
     patch_random_seed = mocker.patch("random.seed", return_value=None)
@@ -375,14 +374,12 @@ def test_execute_simulations(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_config = mocker.MagicMock(auto_spec=Config)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    mocker.patch("main.Config", return_value=mock_config)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"
@@ -474,14 +471,12 @@ def test_execute_simulations_raises_exception(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_config = mocker.MagicMock(auto_spec=Config)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    mocker.patch("main.Config", return_value=mock_config)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"

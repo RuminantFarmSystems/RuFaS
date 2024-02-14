@@ -2,7 +2,6 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
-from RUFAS.config import Config
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
@@ -29,13 +28,7 @@ om = OutputManager()
 
 @pytest.fixture
 def mock_time() -> Time:
-    config = Config({
-        "start_date": "1:1",
-        "end_date": "1:10",
-        "set_seed": False,
-        "random_seed": 42,
-    })
-    return Time(config)
+    return MagicMock(auto_spec=Time)
 
 
 @pytest.fixture
