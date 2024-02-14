@@ -157,9 +157,9 @@ class ReportGenerator:
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
 
     def generate_report(
-            self,
-            filter_content: Dict[str, Any],
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
+        self,
+        filter_content: Dict[str, Any],
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generates a report specified by the given filter content.
@@ -205,8 +205,8 @@ class ReportGenerator:
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}"
-                    if len(individual_report_name) > 0 else col)
+                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                )
                 self.reports[column_name] = {"values": values}
 
         except (KeyError, ValueError) as e:
@@ -271,9 +271,9 @@ class ReportGenerator:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
     def _perform_aggregations(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            filter_content: Dict[str, Any]
+        self,
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filter_content: Dict[str, Any],
     ) -> Dict[str, List[Any]]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
@@ -304,7 +304,10 @@ class ReportGenerator:
         """
 
         try:
-            horizontal_agg_key, vertical_agg_key = self._extract_and_check_aggregation_keys(filter_content)
+            (
+                horizontal_agg_key,
+                vertical_agg_key,
+            ) = self._extract_and_check_aggregation_keys(filter_content)
             report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
         except ValueError:
             raise
@@ -323,24 +326,23 @@ class ReportGenerator:
         if horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
             loop_list = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list,
-                                                                         horizontal_aggregator)
+            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list, horizontal_aggregator)
 
         if vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
             vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
 
-        aggregate_report = self._combine_aggregate_report_data(horizontally_aggregated,
-                                                               vertically_aggregated,
-                                                               filter_content)
+        aggregate_report = self._combine_aggregate_report_data(
+            horizontally_aggregated, vertically_aggregated, filter_content
+        )
 
         return aggregate_report
 
     def _combine_aggregate_report_data(
-            self,
-            horizontally_aggregated: List[float] | None,
-            vertically_aggregated: Dict[str, List[float]] | None,
-            filter_content: Dict[str, Any]
+        self,
+        horizontally_aggregated: List[float] | None,
+        vertically_aggregated: Dict[str, List[float]] | None,
+        filter_content: Dict[str, Any],
     ) -> Dict[str, List[float]] | None:
         """
         Combines horizontally and vertically aggregated data based on specified aggregation criteria
@@ -391,10 +393,7 @@ class ReportGenerator:
 
         return None
 
-    def _extract_and_check_aggregation_keys(
-            self,
-            filter_content: Dict[str, Any]
-    ) -> tuple[str | None, str | None]:
+    def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
         """
         Extracts horizontal and vertical aggregation keys from the filter content and validates them against
         supported aggregation types.
@@ -429,9 +428,11 @@ class ReportGenerator:
         return horizontal_agg_key, vertical_agg_key
 
     def _apply_horizontal_aggregation(
-            self,
-            report_data: Dict[str, List[float]], loop_list: List[str],
-            aggregator: Callable[[List[float]], float]) -> List[float]:
+        self,
+        report_data: Dict[str, List[float]],
+        loop_list: List[str],
+        aggregator: Callable[[List[float]], float],
+    ) -> List[float]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -467,9 +468,9 @@ class ReportGenerator:
         return aggregated_data
 
     def _apply_vertical_aggregation(
-            self,
-            report_data: Dict[str, List[float]],
-            aggregator: Callable[[List[float]], float]
+        self,
+        report_data: Dict[str, List[float]],
+        aggregator: Callable[[List[float]], float],
     ) -> Dict[str, List[float]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
@@ -494,9 +495,10 @@ class ReportGenerator:
         return aggregate_data_dict
 
     def _prepare_report_data_with_constants(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            filter_content: Dict[str, Any]) -> Dict[str, List[Any]]:
+        self,
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filter_content: Dict[str, Any],
+    ) -> Dict[str, List[Any]]:
         """
         Processes and structures a filtered data pool for report generation.
 
@@ -535,9 +537,7 @@ class ReportGenerator:
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
             if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
-                raise KeyError(
-                    "Can't generate report, use 'variables' arg to select items from data"
-                )
+                raise KeyError("Can't generate report, use 'variables' arg to select items from data")
             if is_data_in_dict:
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
@@ -558,10 +558,7 @@ class ReportGenerator:
 
         return report_data
 
-    def _add_constants_to_report_data(
-            self,
-            report_data: Dict[str, List[Any]],
-            filter_content: Dict[str, Any]) -> None:
+    def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
         """
         Add constants to the report data.
 
@@ -600,9 +597,9 @@ class ReportGenerator:
             report_data[name] = [value] * max_length
 
     def _validate_constants(
-            self,
-            existing_reports: Dict[str, List[Any]],
-            constants_config: Dict[str, int | float]
+        self,
+        existing_reports: Dict[str, List[Any]],
+        constants_config: Dict[str, int | float],
     ) -> None:
         """
         Validates the names and values of the constants in the constants_config.
