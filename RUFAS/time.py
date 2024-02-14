@@ -1,3 +1,4 @@
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
@@ -38,8 +39,8 @@ class Time:
         self.start_day: int = int(self.start_full_date[1])
         self.end_day: int = int(self.end_full_date[1])
 
-        self.leap_year_length = 366
-        self.year_length = 365
+        self.leap_year_length = GeneralConstants.LEAP_YEAR_LENGTH
+        self.year_length = GeneralConstants.YEAR_LENGTH
 
         self.years: list[list[int]] = []
 
