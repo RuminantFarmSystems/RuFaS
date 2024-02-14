@@ -29,10 +29,6 @@ class Time:
     def _init_time_config(self) -> None:
         """
         Initializes the time configuration for the instance by parsing the config data from InputManager pool.
-
-        Returns
-        -------
-        None
         """
         config_data = im.get_data("config")
         self.start_full_date: list[str] = config_data["start_date"].split(":")
