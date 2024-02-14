@@ -1,16 +1,9 @@
-from enum import Enum
 from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-
+from .enums import TractorSize
 
 input_manager = InputManager()
-
-
-class TractorSize(Enum):
-    SMALL = "Small"
-    MEDIUM = "Medium"
-    LARGE = "Large"
 
 
 class Tractor:
