@@ -184,7 +184,7 @@ class SimulationEngine:
 
         self._run_post_annual_routines()
 
-    def annual_reset(self):
+    def annual_reset(self) -> None:
         """
         Resets all annual variables that require reset.
         """
