@@ -19,3 +19,4 @@ tqdm
 mypy
 pyright
 pyre-check
+pytype
