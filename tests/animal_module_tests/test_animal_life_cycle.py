@@ -1652,8 +1652,9 @@ def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
         (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE),
     ],
 )
-def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture, preg_day: int, days_born: int,
-                                        body_weight: int, mature_body_weight: int, expected: int) -> None:
+def test_heiferI_get_non_preg_bw_change(
+    mocker: MockerFixture, preg_day: int, days_born: int, body_weight: int, mature_body_weight: int, expected: int
+) -> None:
     """Unit test for the function get_non_preg_bw_change in file routines/animal/life_cycle/heiferI.py."""
 
     heiferI = mocker.MagicMock(autospec=HeiferI)
