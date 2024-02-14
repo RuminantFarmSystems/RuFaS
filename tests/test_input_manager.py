@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List
 from mock import MagicMock, Mock, mock_open, patch
 import pandas as pd
 import pytest
+from path import Path
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
@@ -1936,27 +1937,27 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
 
 @pytest.mark.parametrize("data,expected_keys", [
     ({
-        "key_1": {"properties": "properties_1"},
-        "key_2": {"properties": "properties_2"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "target_properties"},
-        "key_5": {"properties": "target_properties"},
+         "key_1": {"properties": "properties_1"},
+         "key_2": {"properties": "properties_2"},
+         "key_3": {"properties": "target_properties"},
+         "key_4": {"properties": "target_properties"},
+         "key_5": {"properties": "target_properties"},
      }, ["key_3", "key_4", "key_5"]
-     ),
+    ),
     ({
-        "key_1": {"properties": "target_properties"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "properties_4"},
-        "key_5": {"properties": "properties_5"}
+         "key_1": {"properties": "target_properties"},
+         "key_2": {"properties": "value"},
+         "key_3": {"properties": "target_properties"},
+         "key_4": {"properties": "properties_4"},
+         "key_5": {"properties": "properties_5"}
      }, ["key_1", "key_3"]
-     ),
+    ),
     ({
-        "key_1": {"properties": "value"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "value"}
+         "key_1": {"properties": "value"},
+         "key_2": {"properties": "value"},
+         "key_3": {"properties": "value"}
      }, []
-     ),
+    ),
     ({}, [])
 ])
 def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], expected_keys: list[str],
@@ -2503,3 +2504,19 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
         mock_input_manager._metadata_properties_exist = \
             input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+
+
+def test_dump_get_data_logs(mock_input_manager: InputManager,
+                            input_manager_original_method_states: Dict[str, Callable]) -> None:
+    mock_input_manager._InputManager__get_data_logs_pool = {
+        "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
+        "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
+        "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
+    }
+    with patch("RUFAS.output_manager.OutputManager.generate_file_name") as mock_generate_file_name:
+        with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
+            with patch("os.path.join", return_value="dummy_path"):
+                mock_input_manager.dump_get_data_logs(path=MagicMock(auto_spec=Path))
+
+    mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")

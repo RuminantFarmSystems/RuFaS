@@ -601,7 +601,7 @@ def output_manager_original_method_states(
         "dict_to_file_json": mock_output_manager.dict_to_file_json,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
         "_filter_variables_pool": mock_output_manager._filter_variables_pool,
-        "_generate_file_name": mock_output_manager._generate_file_name,
+        "generate_file_name": mock_output_manager.generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_handle_log_output": mock_output_manager._handle_log_output,
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
@@ -670,7 +670,7 @@ def test_dump_all_nondata_pools(
 
 
 def test_generate_file_name(mocker: MockerFixture) -> None:
-    """Unit test for function _generate_file_name in file output_manager.py"""
+    """Unit test for function generate_file_name in file output_manager.py"""
     timestamp = "18-Jan-2023_Wed_22-38-14"
     base_name = "dummy_name"
     extension = "ext"
@@ -681,7 +681,7 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     with patch('RUFAS.output_manager.Utility.get_timestamp') as mock_method:
         mock_method.return_value = timestamp
         assert (
-                om._generate_file_name(base_name, extension)
+                om.generate_file_name(base_name, extension)
                 == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
         )
 
@@ -692,7 +692,7 @@ def test_dump_variables(
 ) -> None:
     """Test case for function dump_variables in output_manager.py"""
     filtered_info_maps_dict = {}
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock(
         return_value=filtered_info_maps_dict
@@ -701,14 +701,14 @@ def test_dump_variables(
     mock_output_manager.dump_variables("dummy_path", False)
 
     mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager._generate_file_name.assert_called_once_with(
+    mock_output_manager.generate_file_name.assert_called_once_with(
         "all_variables", "json"
     )
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
 
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock(
         return_value=filtered_info_maps_dict
@@ -717,7 +717,7 @@ def test_dump_variables(
     mock_output_manager.dump_variables("dummy_path", True)
 
     mock_output_manager._exclude_info_maps.assert_called_once()
-    mock_output_manager._generate_file_name.assert_called_once_with(
+    mock_output_manager.generate_file_name.assert_called_once_with(
         "all_variables", "json"
     )
     mock_output_manager.dict_to_file_json.assert_called_once_with(
@@ -725,8 +725,8 @@ def test_dump_variables(
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states[
         "dict_to_file_json"
@@ -741,19 +741,19 @@ def test_dump_logs(
         output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_logs in output_manager.py"""
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
     mock_output_manager.dump_logs("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("logs", "json")
+    mock_output_manager.generate_file_name.assert_called_once_with("logs", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.logs_pool, os.path.join("dummy_path", "dummy_name")
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states[
         "dict_to_file_json"
@@ -765,19 +765,19 @@ def test_dump_warnings(
         output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_warnings in output_manager.py"""
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
     mock_output_manager.dump_warnings("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("warnings", "json")
+    mock_output_manager.generate_file_name.assert_called_once_with("warnings", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name")
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states[
         "dict_to_file_json"
@@ -789,19 +789,19 @@ def test_dump_errors(
         output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_errors in output_manager.py"""
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
     mock_output_manager.dump_errors("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("errors", "json")
+    mock_output_manager.generate_file_name.assert_called_once_with("errors", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name")
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states[
         "dict_to_file_json"
@@ -918,14 +918,14 @@ def test_dump_variable_names_and_contexts(
     }
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
     mock_output_manager.dump_variable_names_and_contexts(
         "dummy_path", exclude_info_maps, format_option
     )
 
-    mock_output_manager._generate_file_name.assert_called_once_with(
+    mock_output_manager.generate_file_name.assert_called_once_with(
         "variable_names", "txt"
     )
     mock_output_manager._list_to_file_txt.assert_called_once_with(
@@ -933,8 +933,8 @@ def test_dump_variable_names_and_contexts(
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
@@ -959,14 +959,14 @@ def test_dump_variable_names_and_contexts_no_values(
     ]
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
     mock_output_manager.dump_variable_names_and_contexts(
         "dummy_path", False, format_option="verbose"
     )
 
-    mock_output_manager._generate_file_name.assert_called_once_with(
+    mock_output_manager.generate_file_name.assert_called_once_with(
         "variable_names", "txt"
     )
     mock_output_manager._list_to_file_txt.assert_called_once_with(
@@ -974,8 +974,8 @@ def test_dump_variable_names_and_contexts_no_values(
     )
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
@@ -1568,7 +1568,7 @@ def test_save_results(
     # Arrange
     csvs_dir = "output/CSVs/"
     mock_output_manager.variables_pool = {}
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock(
         return_value=filter_content
     )
@@ -1630,8 +1630,8 @@ def test_save_results(
     mock_output_manager._list_filter_files_in_dir = (
         output_manager_original_method_states["_list_filter_files_in_dir"]
     )
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager._load_filter_file_content = (
         output_manager_original_method_states["_load_filter_file_content"]
@@ -1666,7 +1666,7 @@ def test_save_results_report_generation(
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock(
         return_value=filter_content
     )
@@ -1712,8 +1712,8 @@ def test_save_results_report_generation(
     mock_output_manager._list_filter_files_in_dir = (
         output_manager_original_method_states["_list_filter_files_in_dir"]
     )
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
+    mock_output_manager.generate_file_name = output_manager_original_method_states[
+        "generate_file_name"
     ]
     mock_output_manager._load_filter_file_content = (
         output_manager_original_method_states["_load_filter_file_content"]
@@ -1741,7 +1741,7 @@ def test_route_save_functions_csv(
         "graphics_dir",
         Path("output/CSVs/")
     )
-    variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
+    variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
@@ -1759,7 +1759,7 @@ def test_route_save_functions_json(
         output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager._generate_file_name = MagicMock(return_value="filename.json")
+    mock_output_manager.generate_file_name = MagicMock(return_value="filename.json")
     mock_output_manager._route_save_functions(
         "json_file",
         "save_path",
