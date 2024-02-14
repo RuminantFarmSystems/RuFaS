@@ -107,11 +107,11 @@ class GraphGenerator:
         self.metadata_prefix = metadata_prefix
 
     def generate_graph(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            graph_details: Dict[str, str | List[str]],
-            filter_file_name: str,
-            graphics_dir: Path,
+        self,
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        graph_details: Dict[str, str | List[str]],
+        filter_file_name: str,
+        graphics_dir: Path,
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
@@ -161,13 +161,12 @@ class GraphGenerator:
             # Only reorder prepared data if the legend is provided and the number of legend items matches the number of
             # filters and each filter must be present in the prepared data. At least one of these conditions
             # should fail when regexes or dictionary filters are used.
-            if len(graph_details.get("legend", [])) == len(graph_details["filters"]) and \
-                    all([k in prepared_data.keys() for k in graph_details["filters"]]):
+            if len(graph_details.get("legend", [])) == len(graph_details["filters"]) and all(
+                [k in prepared_data.keys() for k in graph_details["filters"]]
+            ):
                 prepared_data = {k: prepared_data[k] for k in graph_details["filters"]}
 
-            self._draw_graph(
-                graph_details["type"], prepared_data, list(prepared_data.keys())
-            )
+            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
                 graph_details["legend"] = list(prepared_data.keys())
@@ -179,7 +178,7 @@ class GraphGenerator:
             raise
 
     def _validate_graph_filter(
-            self, graph_details: Dict[str, str | List[str]]
+        self, graph_details: Dict[str, str | List[str]]
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
@@ -218,18 +217,18 @@ class GraphGenerator:
                     {
                         "warning": f"Can't plot data for {filter_key}",
                         "message": f"Invalid filter file key '{filter_key}' does not match"
-                                   "any optional keys. "
-                                   f"Please see Graph Generator wiki for a list of valid filter"
-                                   "keys.",
+                        "any optional keys. "
+                        f"Please see Graph Generator wiki for a list of valid filter"
+                        "keys.",
                         "info_map": info_map,
                     }
                 )
         return graph_filter_validation_logs
 
     def _prepare_plot_data(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            graph_details: Dict[str, str | List[str]],
+        self,
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        graph_details: Dict[str, str | List[str]],
     ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle and records logs, warnings, and errors for
@@ -285,8 +284,8 @@ class GraphGenerator:
                     key
                     for key, value in filtered_data.items()
                     if not (
-                            isinstance(value, (int, float))
-                            or (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value))
+                        isinstance(value, (int, float))
+                        or (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value))
                     )
                 ]
                 for key in non_int_float_keys:
@@ -316,10 +315,10 @@ class GraphGenerator:
         return prepared_pool, log_pool
 
     def _draw_graph(
-            self,
-            graph_type: str,
-            data: Dict[str, List[int | float]],
-            selected_variables: Optional[List[str]] = None,
+        self,
+        graph_type: str,
+        data: Dict[str, List[int | float]],
+        selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -369,10 +368,10 @@ class GraphGenerator:
                 AXES_SETTERS[attrib](fig.axes[0], value)
 
     def _save_graph(
-            self,
-            graph_details: Dict[str, str],
-            filter_file_name: str,
-            graphics_dir: Path,
+        self,
+        graph_details: Dict[str, str],
+        filter_file_name: str,
+        graphics_dir: Path,
     ) -> str:
         """
         Save the generated graph to a file.
@@ -411,10 +410,10 @@ class GraphGenerator:
             raise
 
     def _generate_graph_path(
-            self,
-            graph_details: Dict[str, str],
-            filter_file_name: str,
-            graphics_dir: Path,
+        self,
+        graph_details: Dict[str, str],
+        filter_file_name: str,
+        graphics_dir: Path,
     ) -> Path:
         """
         Generate the full path for the output graph and create parent folders if necessary.
