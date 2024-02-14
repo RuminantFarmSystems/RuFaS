@@ -190,7 +190,7 @@ class SimulationEngine:
         """
         self.field_manager.annual_update_routine()
 
-    def annual_mass_balance(self, time):
+    def annual_mass_balance(self, time) -> None:
         pass
 
     def _initialize_simulation(self) -> None:
