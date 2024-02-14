@@ -811,6 +811,7 @@ class Field:
                 event.tillage_depth,
                 event.incorporation_fraction,
                 event.mixing_fraction,
+                event.implement,
                 time.calendar_year,
                 time.day,
             )
