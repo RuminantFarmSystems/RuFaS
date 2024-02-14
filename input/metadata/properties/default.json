@@ -3955,7 +3955,7 @@
   "tractor_dataset_properties": {
     "ID": {
       "type": "number",
-      "description": "Unique integer identifier for"
+      "description": "Unique integer identifier for the data entry"
     },
     "Crop Type or Tillage Implement": {
       "type": "string",
