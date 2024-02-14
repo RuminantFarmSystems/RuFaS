@@ -438,7 +438,6 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
-        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
