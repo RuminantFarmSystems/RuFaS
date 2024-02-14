@@ -931,8 +931,7 @@ class InputManager:
         element_hierarchy = data_address.split(".")
 
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy,
-                                self.__pool)
+            data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool)
 
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."

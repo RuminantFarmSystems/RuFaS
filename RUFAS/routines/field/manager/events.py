@@ -37,6 +37,7 @@ class Event:
     An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
 
     """
+
     def __init__(self, year: int = 1, day: int = 120):
         self.year = year
         self.day = day
@@ -82,6 +83,7 @@ class PlantingEvent(Event):
         Flag indicating if the crop will be harvested when it has a certain amount of heat units.
 
     """
+
     def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
@@ -114,6 +116,7 @@ class HarvestEvent(Event):
         A harvest operation from the Harvest Operations enum.
 
     """
+
     def __init__(
         self,
         crop_reference: str,
@@ -154,8 +157,10 @@ class TillageEvent(Event):
         Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
 
     """
-    def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
-                 day: int = 160):
+
+    def __init__(
+        self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1, day: int = 160
+    ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
@@ -209,8 +214,18 @@ class ManureEvent(Event):
         Fraction of manure applied that remains on the soil surface (unitless).
 
     """
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
-                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
+
+    def __init__(
+        self,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        manure_type: ManureType,
+        field_coverage: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+    ):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
@@ -270,8 +285,17 @@ class FertilizerEvent(Event):
     surface_remainder_fraction : float
         Fraction of fertilizer that remains on the soil surface after application.
     """
-    def __init__(self, mix_name: str, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, depth: float,
-                 surface_remainder_fraction: float):
+
+    def __init__(
+        self,
+        mix_name: str,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        depth: float,
+        surface_remainder_fraction: float,
+    ):
         super().__init__(year=year, day=day)
         self.mix_name = mix_name
         self.nitrogen_mass = nitrogen_mass

@@ -435,18 +435,9 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_results(
-            output_dir,
-            filters_dir,
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-            csv_dir
-        )
+        output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
-        output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 

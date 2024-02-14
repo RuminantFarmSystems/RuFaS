@@ -874,9 +874,7 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        json_file_path = os.path.join(
-            path, self.generate_file_name("all_variables", "json")
-        )
+        json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
         self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
@@ -984,9 +982,7 @@ class OutputManager(object):
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
-        file_path = os.path.join(
-            path, self.generate_file_name("variable_names", "txt")
-        )
+        file_path = os.path.join(path, self.generate_file_name("variable_names", "txt"))
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(

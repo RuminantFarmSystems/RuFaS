@@ -42,6 +42,7 @@ class FieldManager:
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
 
     """
+
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,

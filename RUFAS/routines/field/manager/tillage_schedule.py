@@ -41,9 +41,17 @@ class TillageSchedule(Schedule):
 
     """
 
-    def __init__(self, name: str, years: List[int], days: List[int], tillage_depths: List[float],
-                 incorporation_fractions: List[float], mixing_fractions: List[float], pattern_skip: int = 0,
-                 pattern_repeat: int = 0):
+    def __init__(
+        self,
+        name: str,
+        years: List[int],
+        days: List[int],
+        tillage_depths: List[float],
+        incorporation_fractions: List[float],
+        mixing_fractions: List[float],
+        pattern_skip: int = 0,
+        pattern_repeat: int = 0,
+    ):
         """
         Initializes a schedule for tilling.
 

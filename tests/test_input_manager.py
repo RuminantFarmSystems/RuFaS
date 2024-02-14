@@ -3419,8 +3419,9 @@ def test_add_tabular_variable_to_pool_invalid_data(
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
-def test_dump_get_data_logs(mock_input_manager: InputManager,
-                            input_manager_original_method_states: Dict[str, Callable]) -> None:
+def test_dump_get_data_logs(
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable]
+) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
         "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
