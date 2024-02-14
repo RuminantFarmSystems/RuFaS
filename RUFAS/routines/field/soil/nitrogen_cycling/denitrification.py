@@ -9,7 +9,6 @@ This module handles the denitrification of nitrogen in the nitrates pool, based 
 
 
 class Denitrification:
-
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """Initializes the SoilData object that this module will work with, or creates one if none is provided.
 
@@ -45,22 +44,29 @@ class Denitrification:
         """
         self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
-            nutrient_is_below_threshold = layer.nutrient_cycling_water_factor < \
-                                          layer.denitrification_threshold_water_content
+            nutrient_is_below_threshold = (
+                layer.nutrient_cycling_water_factor < layer.denitrification_threshold_water_content
+            )
             if nutrient_is_below_threshold:
                 continue
 
-            nitrified_nitrates = self._calculate_denitrification_amount(layer.nitrate_content,
-                                                                        layer.denitrification_rate_coefficient,
-                                                                        layer.nutrient_cycling_temp_factor,
-                                                                        layer.soil_overall_carbon_fraction * 100)
+            nitrified_nitrates = self._calculate_denitrification_amount(
+                layer.nitrate_content,
+                layer.denitrification_rate_coefficient,
+                layer.nutrient_cycling_temp_factor,
+                layer.soil_overall_carbon_fraction * 100,
+            )
             layer.nitrate_content -= nitrified_nitrates
             layer.nitrous_oxide_emissions = nitrified_nitrates
             layer.annual_nitrous_oxide_emissions_total += nitrified_nitrates
 
     @staticmethod
-    def _calculate_denitrification_amount(nitrate_content: float, denitrification_rate_coefficient: float,
-                                          temp_factor: float, percent_organic_carbon_content: float) -> float:
+    def _calculate_denitrification_amount(
+        nitrate_content: float,
+        denitrification_rate_coefficient: float,
+        temp_factor: float,
+        percent_organic_carbon_content: float,
+    ) -> float:
         """Calculates the amount of nitrate lost to denitrification.
 
         Parameters
