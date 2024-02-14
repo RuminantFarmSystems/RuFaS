@@ -271,3 +271,30 @@ def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists():
     input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
+
+
+def test_convert_list_to_dict_by_key_basic():
+    list_of_dicts = [
+        {"ID": 1, "value": 2, "other_keys": "other values"},
+        {"ID": 3, "value": 4, "other_keys": "other values"},
+    ]
+    expected_output = {1: {"value": 2, "other_keys": "other values"}, 3: {"value": 4, "other_keys": "other values"}}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
+
+
+def test_convert_list_to_dict_by_key_empty_list():
+    list_of_dicts = []
+    expected_output = {}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
+
+
+def test_convert_list_to_dict_by_key_missing_key():
+    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
+    with pytest.raises(KeyError):
+        Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
+
+
+def test_convert_list_to_dict_by_key_different_key():
+    list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
+    expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
+    assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
