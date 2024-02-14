@@ -440,6 +440,7 @@ def execute_simulations(
             graphics_dir,
             csv_dir
         )
+        input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
         )
