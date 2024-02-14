@@ -25,9 +25,7 @@ from .sample_crop_data import sample_crop_data
         (CropCategory.GRASS, CropType.MEADOW_FESCUE),
     ],
 )
-def test_valid_category_type_combinations(
-    category: CropCategory, crop_type: CropType
-) -> None:
+def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     try:
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
     except ValueError:
@@ -43,17 +41,13 @@ def test_valid_category_type_combinations(
         (CropCategory.SOY, CropType.HIGH_MOISTURE),
     ],
 )
-def test_invalid_category_type_combinations(
-    category: CropCategory, crop_type: CropType
-) -> None:
+def test_invalid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     with pytest.raises(ValueError):
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 def test_attributes() -> None:
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.dry_matter_digestibility == sample_crop_data["dry_matter_digestibility"]

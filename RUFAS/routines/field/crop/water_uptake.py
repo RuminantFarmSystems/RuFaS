@@ -30,6 +30,7 @@ class WaterUptake:
     "Water Uptake By Plants" section of SWAT (5:2.2.1)
 
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         self.crop_data = crop_data or CropData()
 
@@ -50,25 +51,31 @@ class WaterUptake:
         wilting_points = soil_data.get_vectorized_layer_attribute("wilting_point_content")
 
         self.crop_data.potential_water_uptakes = self._find_stratified_max_water_uptakes(
-            root_depth=self.crop_data.root_depth, max_transpiration=self.crop_data.max_transpiration,
-            upper_depths=top_depths, lower_depths=bottom_depths,
-            water_distro_parameter=self.crop_data.water_distro_parameter
+            root_depth=self.crop_data.root_depth,
+            max_transpiration=self.crop_data.max_transpiration,
+            upper_depths=top_depths,
+            lower_depths=bottom_depths,
+            water_distro_parameter=self.crop_data.water_distro_parameter,
         )
         self.crop_data.unmet_water_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
             uptake_potentials=self.crop_data.potential_water_uptakes,
-            nutrient_availabilities=water_availabilities
+            nutrient_availabilities=water_availabilities,
         )
         self.crop_data.potential_water_uptakes = self._adjust_water_uptakes(
-            potential_uptakes=self.crop_data.potential_water_uptakes, unmet_demands=self.crop_data.unmet_water_demands,
-            uptake_compensation=self.crop_data.water_compensation_factor)
+            potential_uptakes=self.crop_data.potential_water_uptakes,
+            unmet_demands=self.crop_data.unmet_water_demands,
+            uptake_compensation=self.crop_data.water_compensation_factor,
+        )
         self.crop_data.potential_water_uptakes = self._reduce_efficiency_of_uptake(
             potential_uptakes=self.crop_data.potential_water_uptakes,
             water_availabilities=water_availabilities,
-            available_capacities=water_capacities
+            available_capacities=water_capacities,
         )
         self.crop_data.actual_water_uptakes = self._take_up_water(
-            potential_uptakes=self.crop_data.potential_water_uptakes, water_availabilities=water_availabilities,
-            wilting_points=wilting_points)
+            potential_uptakes=self.crop_data.potential_water_uptakes,
+            water_availabilities=water_availabilities,
+            wilting_points=wilting_points,
+        )
 
         self.extract_water_from_soil(soil_data)
 
@@ -108,8 +115,11 @@ class WaterUptake:
         self.crop_data.actual_water_uptakes = extracts
 
     @staticmethod
-    def _take_up_water(potential_uptakes: List[float], water_availabilities: List[float],
-                       wilting_points: List[float]) -> List[float]:
+    def _take_up_water(
+        potential_uptakes: List[float],
+        water_availabilities: List[float],
+        wilting_points: List[float],
+    ) -> List[float]:
         """
         Calculates the actual water taken up by the plant for each soil layer.
 
@@ -157,8 +167,11 @@ class WaterUptake:
         return min(potential, available_water - wilting_point_water)
 
     @staticmethod
-    def _reduce_efficiency_of_uptake(potential_uptakes: List[float], water_availabilities: List[float],
-                                     available_capacities: List[float]) -> List[float]:
+    def _reduce_efficiency_of_uptake(
+        potential_uptakes: List[float],
+        water_availabilities: List[float],
+        available_capacities: List[float],
+    ) -> List[float]:
         """
         Returns the potential water uptake for each layer after correcting for availability-dependent uptake
         efficiency.
@@ -194,8 +207,9 @@ class WaterUptake:
         return [WaterUptake._correct_layer_for_efficiency(pot, avail, cap) for pot, avail, cap in zipped]
 
     @staticmethod
-    def _correct_layer_for_efficiency(potential_uptake: float, available_water: float,
-                                      available_capacity: float) -> float:
+    def _correct_layer_for_efficiency(
+        potential_uptake: float, available_water: float, available_capacity: float
+    ) -> float:
         """
         Adjusts the potential water uptake from a layer by the uptake efficiency that is concentration-dependent.
 
@@ -219,15 +233,18 @@ class WaterUptake:
         SWAT 5:2.2.4, 5:2.2.5
 
         """
-        if available_water < available_capacity*0.25:
+        if available_water < available_capacity * 0.25:
             fraction = available_water / (0.25 * available_capacity)
             return potential_uptake * exp(5 * (fraction - 1))
         # else
         return potential_uptake
 
     @staticmethod
-    def _adjust_water_uptakes(potential_uptakes: List[float], unmet_demands: List[float],
-                              uptake_compensation: float) -> List[float]:
+    def _adjust_water_uptakes(
+        potential_uptakes: List[float],
+        unmet_demands: List[float],
+        uptake_compensation: float,
+    ) -> List[float]:
         """
         Adjusts the potential water uptakes for each layer based on drawing from deeper layers when possible.
 
@@ -264,8 +281,13 @@ class WaterUptake:
         return adjusted
 
     @staticmethod
-    def _find_stratified_max_water_uptakes(root_depth: float, max_transpiration: float, water_distro_parameter: float,
-                                           upper_depths: List[float], lower_depths: List[float]) -> List[float]:
+    def _find_stratified_max_water_uptakes(
+        root_depth: float,
+        max_transpiration: float,
+        water_distro_parameter: float,
+        upper_depths: List[float],
+        lower_depths: List[float],
+    ) -> List[float]:
         """
         Calculates the crop's maximum water uptake from each soil layer during the current day.
 
@@ -302,17 +324,23 @@ class WaterUptake:
 
         potential_uptakes = []
         for upper, lower in zip(upper_depths, lower_depths):
-            top_potential = WaterUptake._determine_max_water_uptake_to_depth(root_depth, upper, max_transpiration,
-                                                                             water_distro_parameter)
-            bottom_potential = WaterUptake._determine_max_water_uptake_to_depth(root_depth, lower, max_transpiration,
-                                                                                water_distro_parameter)
+            top_potential = WaterUptake._determine_max_water_uptake_to_depth(
+                root_depth, upper, max_transpiration, water_distro_parameter
+            )
+            bottom_potential = WaterUptake._determine_max_water_uptake_to_depth(
+                root_depth, lower, max_transpiration, water_distro_parameter
+            )
             potential_uptakes.append(bottom_potential - top_potential)
 
         return potential_uptakes
 
     @staticmethod
-    def _determine_max_water_uptake_to_depth(root_depth: float, depth: float, max_transpiration: float,
-                                             water_distro_parameter: float) -> float:
+    def _determine_max_water_uptake_to_depth(
+        root_depth: float,
+        depth: float,
+        max_transpiration: float,
+        water_distro_parameter: float,
+    ) -> float:
         """
         Calculate the amount of maximum amount water that can possibly be taken up by the plant under ideal
         conditions.
