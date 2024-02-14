@@ -124,9 +124,7 @@ class AnimalManager:
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
 
         # if False, there are no animals being simulated on the farm
-        self.simulate_animals = (
-            config_data["simulate_animals"] if "simulate_animals" in config_data.keys() else True
-        )
+        self.simulate_animals = config_data.get("simulate_animals", True)
 
         # list of all the animals in the simulation
         self.calves = []
