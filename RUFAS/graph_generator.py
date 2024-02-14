@@ -107,14 +107,21 @@ class GraphGenerator:
         self.metadata_prefix = metadata_prefix
 
     def generate_graph(
-        self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        graph_details: Dict[str, str | List[str]],
-        filter_file_name: str,
-        graphics_dir: Path,
+            self,
+            filtered_pool: Dict[str, Dict[str, List[Any]]],
+            graph_details: Dict[str, str | List[str]],
+            filter_file_name: str,
+            graphics_dir: Path,
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
+
+        Notes
+        -----
+        When the user wants to specify the legend order, it is required that literal filters be used
+        and the order of the filters in the graph_details["filters"] list match the order of the legend list.
+        When dictionary variables or regex patterns are used in the filtering process, the order of the data
+        is unpredictable, and therefore it is not recommended to use the legend parameter.
 
         Parameters
         ----------
@@ -150,8 +157,14 @@ class GraphGenerator:
                 return all_logs
 
             fig, _ = plt.subplots()
-            prepared_data = {k: prepared_data[k] for k in graph_details["filters"]
-                             if k in prepared_data.keys()}
+
+            # Only reorder prepared data if the legend is provided and the number of legend items matches the number of
+            # filters and each filter must be present in the prepared data. At least one of these conditions
+            # should fail when regexes or dictionary filters are used.
+            if len(graph_details.get("legend", [])) == len(graph_details["filters"]) and \
+                    all([k in prepared_data.keys() for k in graph_details["filters"]]):
+                prepared_data = {k: prepared_data[k] for k in graph_details["filters"]}
+
             self._draw_graph(
                 graph_details["type"], prepared_data, list(prepared_data.keys())
             )
@@ -191,7 +204,7 @@ class GraphGenerator:
             if required_key not in graph_details.keys():
                 graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
                                                      "message": f"Required key '{required_key}' not in your graph "
-                                                     "filter file.",
+                                                                "filter file.",
                                                      "info_map": info_map})
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
@@ -201,9 +214,9 @@ class GraphGenerator:
             if filter_key not in optional_graph_filter_keys:
                 graph_filter_validation_logs.append({"warning": f"Can't plot data for {filter_key}",
                                                      "message": f"Invalid filter file key '{filter_key}' does not match"
-                                                     "any optional keys. "
-                                                     f"Please see Graph Generator wiki for a list of valid filter"
-                                                     "keys.",
+                                                                "any optional keys. "
+                                                                f"Please see Graph Generator wiki for a list of valid filter"
+                                                                "keys.",
                                                      "info_map": info_map})
         return graph_filter_validation_logs
 
@@ -256,7 +269,7 @@ class GraphGenerator:
                     key for key, value in filtered_data.items()
                     if not (isinstance(value, (int, float)) or
                             (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value)))
-                            ]
+                ]
                 for key in non_int_float_keys:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": f"{key} key contains data that is non-numerical and can't be graphed.",
@@ -276,10 +289,10 @@ class GraphGenerator:
         return prepared_pool, log_pool
 
     def _draw_graph(
-        self,
-        graph_type: str,
-        data: Dict[str, List[int | float]],
-        selected_variables: Optional[List[str]] = None,
+            self,
+            graph_type: str,
+            data: Dict[str, List[int | float]],
+            selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -311,7 +324,7 @@ class GraphGenerator:
                 plot_function(value)
 
     def _customize_graph(
-        self, fig: Figure, customization_details: Dict[str, Any]
+            self, fig: Figure, customization_details: Dict[str, Any]
     ) -> None:
         """
         Apply customizations to the graph.
@@ -331,10 +344,10 @@ class GraphGenerator:
                 AXES_SETTERS[attrib](fig.axes[0], value)
 
     def _save_graph(
-        self,
-        graph_details: Dict[str, str],
-        filter_file_name: str,
-        graphics_dir: Path,
+            self,
+            graph_details: Dict[str, str],
+            filter_file_name: str,
+            graphics_dir: Path,
     ) -> str:
         """
         Save the generated graph to a file.
@@ -377,10 +390,10 @@ class GraphGenerator:
             raise
 
     def _generate_graph_path(
-        self,
-        graph_details: Dict[str, str],
-        filter_file_name: str,
-        graphics_dir: Path,
+            self,
+            graph_details: Dict[str, str],
+            filter_file_name: str,
+            graphics_dir: Path,
     ) -> Path:
         """
         Generate the full path for the output graph and create parent folders if necessary.
