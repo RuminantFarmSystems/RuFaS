@@ -157,7 +157,7 @@ class GraphGenerator:
                 graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
-
+            matplotlib.pyplot.close()
             return all_logs
         except Exception:
             raise
