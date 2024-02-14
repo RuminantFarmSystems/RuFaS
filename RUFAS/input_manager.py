@@ -245,6 +245,8 @@ class InputManager:
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
+            validated_data = {}
             for metadata_property in metadata_properties.keys():
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
@@ -263,12 +265,14 @@ class InputManager:
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
-                    self.__pool[file_blob_key] = filtered_input_data
+                    validated_data[metadata_property] = filtered_input_data[metadata_property]
                 else:
                     if not eager_termination:
                         invalid_elements_counter += element_counter_and_validity["invalid_elements"]
                     else:
                         return False
+            if validated_data:
+                self.__pool[file_blob_key] = validated_data
 
         om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
         om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
