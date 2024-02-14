@@ -469,3 +469,54 @@ class Utility:
             for key in data_pool.keys()
             if any(re.search(pattern, key) for pattern in filter_patterns)
         }
+
+    @staticmethod
+    def convert_list_to_dict_by_key(list_of_dicts: List[Dict[str, Any]], id_key: str) -> Dict[Any, Dict[str, Any]]:
+        """
+        Convert a list of dictionaries into a dictionary keyed by a specified identifier,
+        where each value is the original dictionary minus the identifier key.
+
+        Parameters
+        ----------
+        list_of_dicts : List[Dict[str, Any]]
+            A list of dictionaries, each containing a unique identifier and other data.
+        id_key : str
+            The key in each dictionary to use as the unique identifier.
+
+        Returns
+        -------
+        Dict[Any, Dict[str, Any]]
+            A dictionary where each key is the unique identifier from the list and each
+            value is the corresponding dictionary minus the identifier key.
+
+        Notes
+        -----
+        The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
+        If you need to keep the original list and dictionaries intact, make a copy before calling this function.
+        
+        Example
+        -------
+        Given a list of dictionaries like this:
+        [
+            {"ID": 1, "value": 2, "other_keys": "other values"},
+            {"ID": 3, "value": 4, "other_keys": "other values"}
+        ]
+        And using 'ID' as the id_key:
+
+        convert_list_to_dict_by_key(list_of_dicts, 'ID')
+
+        Would return:
+        {
+            1: {"value": 2, "other_keys": "other values"},
+            3: {"value": 4, "other_keys": "other values"}
+        }
+        """
+        result = {}
+        for dict_ in list_of_dicts:
+            if id_key in dict_:
+                id_value = dict_.pop(id_key)
+                result[id_value] = dict_
+            else:
+                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+
+        return result
