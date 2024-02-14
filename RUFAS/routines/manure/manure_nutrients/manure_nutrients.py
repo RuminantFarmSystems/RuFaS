@@ -121,9 +121,10 @@ class ManureNutrients:
 
         summed_attributes = {
             field.name: getattr(self, field.name) + getattr(other, field.name)
-            for field in fields(self) if field.name != "manure_type"
+            for field in fields(self)
+            if field.name != "manure_type"
         }
-        summed_attributes['manure_type'] = self.manure_type
+        summed_attributes["manure_type"] = self.manure_type
 
         return ManureNutrients(**summed_attributes)
 
@@ -158,7 +159,7 @@ class ManureNutrients:
         multiplied_attributes = {
             field.name: getattr(self, field.name) * scalar for field in fields(self) if field.name != "manure_type"
         }
-        multiplied_attributes['manure_type'] = self.manure_type
+        multiplied_attributes["manure_type"] = self.manure_type
 
         return ManureNutrients(**multiplied_attributes)
 

@@ -72,11 +72,13 @@ class BiomassAllocation:
         # intercept light
         self.data.usable_light = self._intercept_radiation(light, self.data.light_extinction, self.data.leaf_area_index)
         # accumulate biomass
-        self.data.biomass_growth_max = self._determine_max_accumulation(self.data.usable_light,
-                                                                        self.data.light_use_efficiency)
+        self.data.biomass_growth_max = self._determine_max_accumulation(
+            self.data.usable_light, self.data.light_use_efficiency
+        )
         self.data.previous_biomass = self.data.biomass
-        self.data.biomass_growth = self._determine_accumulated_biomass(self.data.growth_factor,
-                                                                       self.data.biomass_growth_max)
+        self.data.biomass_growth = self._determine_accumulated_biomass(
+            self.data.growth_factor, self.data.biomass_growth_max
+        )
         self.data.biomass += self.data.biomass_growth
 
     def partition_biomass(self) -> None:
@@ -87,8 +89,9 @@ class BiomassAllocation:
         -------
         None
         """
-        self.data.above_ground_biomass = self._determine_above_ground_biomass(self.data.root_fraction,
-                                                                              self.data.biomass)
+        self.data.above_ground_biomass = self._determine_above_ground_biomass(
+            self.data.root_fraction, self.data.biomass
+        )
         self.data.root_biomass = self._determine_below_ground_biomass(self.data.root_fraction, self.data.biomass)
 
     @staticmethod

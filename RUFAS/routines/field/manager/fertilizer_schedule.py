@@ -103,8 +103,9 @@ class FertilizerSchedule(Schedule):
 
         valid_years = self._validate_years(self.years)
         if not valid_years:
-            raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
-                                            f"'{self.years}'.")
+            raise ValueError(
+                error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
+            )
 
         valid_days = self._validate_days(self.years, self.days)
         if not valid_days:
@@ -112,33 +113,46 @@ class FertilizerSchedule(Schedule):
 
         valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
         if not valid_nitrogen_masses:
-            raise ValueError(error_header + f"expected all nitrogen masses to be in >= 0, received "
-                                            f"'{self.nitrogen_masses}'.")
+            raise ValueError(
+                error_header + f"expected all nitrogen masses to be in >= 0, received " f"'{self.nitrogen_masses}'."
+            )
 
         valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
         if not valid_phosphorus_masses:
-            raise ValueError(error_header + f"expected all phosphorus masses to be >= 0, received "
-                                            f"'{self.phosphorus_masses}'.")
+            raise ValueError(
+                error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
+            )
 
         valid_depths = self._determine_if_all_non_negative_values(self.application_depths)
         if not valid_depths:
-            raise ValueError(error_header + f"expected all application depths to be >= 0, received "
-                                            f"'{self.application_depths}'.")
+            raise ValueError(
+                error_header + f"expected all application depths to be >= 0, received " f"'{self.application_depths}'."
+            )
 
         valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
         if not valid_fractions:
-            raise ValueError(error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
-                                            f"received '{self.surface_remainder_fractions}'.")
+            raise ValueError(
+                error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
+                f"received '{self.surface_remainder_fractions}'."
+            )
 
-        equal_fertilizer_parameters = len(self.years) == len(self.days) == len(self.mix_names) == \
-            len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(self.application_depths) == \
-            len(self.surface_remainder_fractions)
+        equal_fertilizer_parameters = (
+            len(self.years)
+            == len(self.days)
+            == len(self.mix_names)
+            == len(self.nitrogen_masses)
+            == len(self.phosphorus_masses)
+            == len(self.application_depths)
+            == len(self.surface_remainder_fractions)
+        )
         if not equal_fertilizer_parameters:
-            raise ValueError(error_header + f"expected equal numbers of fertilizer application parameters, received "
-                                            f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
-                                            f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
-                                            f"phosphorus masses, '{self.application_depths}' application depths, and "
-                                            f"'{self.surface_remainder_fractions}' surface remainder fractions.")
+            raise ValueError(
+                error_header + f"expected equal numbers of fertilizer application parameters, received "
+                f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
+                f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
+                f"phosphorus masses, '{self.application_depths}' application depths, and "
+                f"'{self.surface_remainder_fractions}' surface remainder fractions."
+            )
 
     def generate_fertilizer_events(self) -> List[FertilizerEvent]:
         """
@@ -157,13 +171,29 @@ class FertilizerSchedule(Schedule):
         all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
         all_depths = self.application_depths * (self.pattern_repeat + 1)
         all_surface_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
-        all_events = list(zip(all_mix_names, all_years, all_days, all_nitrogen_masses, all_phosphorus_masses,
-                              all_depths, all_surface_fractions))
+        all_events = list(
+            zip(
+                all_mix_names,
+                all_years,
+                all_days,
+                all_nitrogen_masses,
+                all_phosphorus_masses,
+                all_depths,
+                all_surface_fractions,
+            )
+        )
 
         fertilizer_events = []
         for event in all_events:
-            new_event = FertilizerEvent(mix_name=event[0], year=event[1], day=event[2], nitrogen_mass=event[3],
-                                        phosphorus_mass=event[4], depth=event[5], surface_remainder_fraction=event[6])
+            new_event = FertilizerEvent(
+                mix_name=event[0],
+                year=event[1],
+                day=event[2],
+                nitrogen_mass=event[3],
+                phosphorus_mass=event[4],
+                depth=event[5],
+                surface_remainder_fraction=event[6],
+            )
             fertilizer_events.append(new_event)
         return fertilizer_events
 

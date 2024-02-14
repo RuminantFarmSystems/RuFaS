@@ -2,15 +2,13 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 @dataclass(kw_only=True)
 class TallFescue(CropData):
     """crop data class with default values for tall fescue"""
+
     species: str = "tall_fescue"
     name: str = "default tall_fescue"
     plant_code: str = "FESC"
@@ -78,6 +76,7 @@ class TallFescueSilage(TallFescue):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "tall_fescue_silage"
     name: str = "tall_fescue silage"
 
@@ -137,6 +136,7 @@ class TallFescueBaleage(TallFescueSilage):
     Tall fescue baleage currently has the same harvest and quality properties as Tall Fescue silage.
 
     """
+
     species: str = "tall_fescue_baleage"
     name: str = "tall_fescue baleage"
 
@@ -178,6 +178,7 @@ class TallFescueHay(TallFescue):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "tall_fescue_hay"
     name: str = "tall_fescue hay"
 
