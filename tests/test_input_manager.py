@@ -1,5 +1,6 @@
 from functools import reduce
 import json
+from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from mock import MagicMock, Mock, mock_open, patch
@@ -321,6 +322,62 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
         assert add_warning.call_count == 0
         assert "file1" not in mock_input_manager._InputManager__pool
         assert "file2" not in mock_input_manager._InputManager__pool
+
+    mock_input_manager._populate_pool = \
+        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+
+
+def test_populate_pool_partial_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
+                                       input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data for function _populate_pool in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata
+
+    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
+    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
+    mock_input_manager._validate_dict_element = MagicMock(side_effect=[
+        {"fixed_elements": 1,
+         "valid_elements": 1,
+         "total_elements": 1,
+         "invalid_elements": 0,
+         "is_valid": True
+         },
+        {"fixed_elements": 0,
+         "valid_elements": 0,
+         "total_elements": 1,
+         "invalid_elements": 1,
+         "is_valid": False
+         }
+    ])
+    mock_input_manager._validate_tabular_element = MagicMock(side_effect=[
+        {"fixed_elements": 1,
+         "valid_elements": 1,
+         "total_elements": 1,
+         "invalid_elements": 0,
+         "is_valid": True
+         },
+        {"fixed_elements": 0,
+         "valid_elements": 0,
+         "total_elements": 1,
+         "invalid_elements": 1,
+         "is_valid": False
+         }
+    ])
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            result = mock_input_manager._populate_pool(eager_termination=False)
+
+        assert result is False
+        assert add_log.call_count == 4
+        assert add_warning.call_count == 0
+        assert "file1" in mock_input_manager._InputManager__pool
+        assert "file2" in mock_input_manager._InputManager__pool
+        assert "element1" in mock_input_manager._InputManager__pool["file1"]
+        assert "element2" not in mock_input_manager._InputManager__pool["file1"]
+        assert "element3" in mock_input_manager._InputManager__pool["file2"]
+        assert "element4" not in mock_input_manager._InputManager__pool["file2"]
 
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
@@ -1935,28 +1992,34 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize("data,expected_keys", [
-    ({
-        "key_1": {"properties": "properties_1"},
-        "key_2": {"properties": "properties_2"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "target_properties"},
-        "key_5": {"properties": "target_properties"},
-     }, ["key_3", "key_4", "key_5"]
-     ),
-    ({
-        "key_1": {"properties": "target_properties"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "target_properties"},
-        "key_4": {"properties": "properties_4"},
-        "key_5": {"properties": "properties_5"}
-     }, ["key_1", "key_3"]
-     ),
-    ({
-        "key_1": {"properties": "value"},
-        "key_2": {"properties": "value"},
-        "key_3": {"properties": "value"}
-     }, []
-     ),
+    (
+            {
+                "key_1": {"properties": "properties_1"},
+                "key_2": {"properties": "properties_2"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "target_properties"},
+                "key_5": {"properties": "target_properties"},
+            },
+            ["key_3", "key_4", "key_5"]
+    ),
+    (
+            {
+                "key_1": {"properties": "target_properties"},
+                "key_2": {"properties": "value"},
+                "key_3": {"properties": "target_properties"},
+                "key_4": {"properties": "properties_4"},
+                "key_5": {"properties": "properties_5"}
+            },
+            ["key_1", "key_3"]
+    ),
+    (
+            {
+                "key_1": {"properties": "value"},
+                "key_2": {"properties": "value"},
+                "key_3": {"properties": "value"}
+            },
+            []
+    ),
     ({}, [])
 ])
 def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], expected_keys: list[str],
@@ -2503,3 +2566,19 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
         mock_input_manager._metadata_properties_exist = \
             input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+
+
+def test_dump_get_data_logs(mock_input_manager: InputManager,
+                            input_manager_original_method_states: Dict[str, Callable]) -> None:
+    mock_input_manager._InputManager__get_data_logs_pool = {
+        "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
+        "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
+        "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
+    }
+    with patch("RUFAS.output_manager.OutputManager.generate_file_name") as mock_generate_file_name:
+        with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
+            with patch("os.path.join", return_value="dummy_path"):
+                mock_input_manager.dump_get_data_logs(path=MagicMock(auto_spec=Path))
+
+    mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")

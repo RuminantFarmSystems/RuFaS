@@ -3,10 +3,14 @@ from functools import reduce
 import json
 import os
 import re
+from pathlib import Path
 
 import pandas as pd
+
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict, List, Union, Callable
+
+from RUFAS.util import Utility
 
 om = OutputManager()
 
@@ -30,6 +34,7 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
         self.__properties_used: Dict[str, Any] = {}
+        self.__get_data_logs_pool: Dict[str, str] = {}
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
@@ -240,6 +245,8 @@ class InputManager:
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
+            validated_data = {}
             for metadata_property in metadata_properties.keys():
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
@@ -258,12 +265,14 @@ class InputManager:
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
-                    self.__pool[file_blob_key] = filtered_input_data
+                    validated_data[metadata_property] = filtered_input_data[metadata_property]
                 else:
                     if not eager_termination:
                         invalid_elements_counter += element_counter_and_validity["invalid_elements"]
                     else:
                         return False
+            if validated_data:
+                self.__pool[file_blob_key] = validated_data
 
         om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
         om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
@@ -774,6 +783,10 @@ class InputManager:
         try:
             data_value = reduce(lambda d, key: d[key], element_hierarchy,
                                 self.__pool)
+
+            timestamp = Utility.get_timestamp(include_millis=True)
+            self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
+
             return deepcopy(data_value)
 
         except KeyError as key_error:
@@ -1187,3 +1200,17 @@ class InputManager:
                 eager_termination=eager_termination,
                 is_variable_dict=False)
             return add_variable_success
+
+    def dump_get_data_logs(self, path: Path) -> None:
+        """
+        Dumps the stored get data logs to a JSON file at the specified path.
+
+        Parameters
+        ----------
+        path : Path
+            The directory path where the JSON file will be saved.
+
+        """
+        file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
+        file_path = os.path.join(path, file_name)
+        om.dict_to_file_json(self.__get_data_logs_pool, file_path)
