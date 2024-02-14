@@ -5,6 +5,7 @@ from typing_extensions import NotRequired
 
 class HerdInfoTypedDict(TypedDict):
     """List of expected keys for herd information dictionary"""
+
     calf_num: int
     heiferI_num: int
     heiferII_num: int
@@ -17,6 +18,7 @@ class HerdInfoTypedDict(TypedDict):
 
 class PenTypedDict(TypedDict):
     """List of expected keys for pen information dictionary"""
+
     id: int
     animal_combination: str
     vertical_dist_to_milking_parlor: float
@@ -48,6 +50,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
 
 class CalfValuesTypedDict(TypedDict):
     """List of expected keys for calf values dictionary"""
+
     id: int
     breed: str
     birth_date: int
@@ -62,6 +65,7 @@ class CalfValuesTypedDict(TypedDict):
 
 class HeiferIValuesTypedDict(TypedDict):
     """List of expected keys for heifer I values dictionary"""
+
     id: int
     breed: str
     birth_date: int
@@ -112,6 +116,7 @@ class AnimalConfigTypedDict(TypedDict):
     compared to the structure of the JSON object.
 
     """
+
     # management decisions
     breeding_start_day_h: int
     heifer_repro_cull_time: int

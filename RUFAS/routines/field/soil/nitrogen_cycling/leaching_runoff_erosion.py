@@ -1,7 +1,10 @@
 from typing import Optional
 from math import exp, log
 
-from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_LITERS,
+)
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 
@@ -28,7 +31,6 @@ ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 5e-8
 
 
 class LeachingRunoffErosion:
-
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
@@ -85,13 +87,21 @@ class LeachingRunoffErosion:
 
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_nitrogen_removed_by_water(
-                surface_layer.nitrate_content, self.data.accumulated_runoff, NITRATE_RUNOFF_COEFFICIENT,
-                surface_layer.bulk_density, surface_layer.layer_thickness, field_size
+                surface_layer.nitrate_content,
+                self.data.accumulated_runoff,
+                NITRATE_RUNOFF_COEFFICIENT,
+                surface_layer.bulk_density,
+                surface_layer.layer_thickness,
+                field_size,
             )
 
             ammonium_lost_to_runoff = self._calculate_nitrogen_removed_by_water(
-                surface_layer.ammonium_content, self.data.accumulated_runoff, AMMONIUM_RUNOFF_COEFFICIENT,
-                surface_layer.bulk_density, surface_layer.layer_thickness, field_size
+                surface_layer.ammonium_content,
+                self.data.accumulated_runoff,
+                AMMONIUM_RUNOFF_COEFFICIENT,
+                surface_layer.bulk_density,
+                surface_layer.layer_thickness,
+                field_size,
             )
 
             surface_layer.nitrate_content -= nitrates_lost_to_runoff
@@ -104,14 +114,26 @@ class LeachingRunoffErosion:
 
         if self.data.eroded_sediment > 0.0:
             fresh_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
-                surface_layer.fresh_organic_nitrogen_content, surface_layer.bulk_density,
-                surface_layer.layer_thickness, field_size, self.data.eroded_sediment)
+                surface_layer.fresh_organic_nitrogen_content,
+                surface_layer.bulk_density,
+                surface_layer.layer_thickness,
+                field_size,
+                self.data.eroded_sediment,
+            )
             stable_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
-                surface_layer.stable_organic_nitrogen_content, surface_layer.bulk_density,
-                surface_layer.layer_thickness, field_size, self.data.eroded_sediment)
+                surface_layer.stable_organic_nitrogen_content,
+                surface_layer.bulk_density,
+                surface_layer.layer_thickness,
+                field_size,
+                self.data.eroded_sediment,
+            )
             active_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
-                surface_layer.active_organic_nitrogen_content, surface_layer.bulk_density,
-                surface_layer.layer_thickness, field_size, self.data.eroded_sediment)
+                surface_layer.active_organic_nitrogen_content,
+                surface_layer.bulk_density,
+                surface_layer.layer_thickness,
+                field_size,
+                self.data.eroded_sediment,
+            )
 
             surface_layer.fresh_organic_nitrogen_content -= fresh_organic_nitrogen_lost
             self.data.eroded_fresh_organic_nitrogen = fresh_organic_nitrogen_lost
@@ -155,22 +177,34 @@ class LeachingRunoffErosion:
                 nitrogen_percolated_to_next_layer = {
                     "nitrates": 0,
                     "ammonium": 0,
-                    "active_organic": 0
+                    "active_organic": 0,
                 }
                 percolated_nitrogen.append(nitrogen_percolated_to_next_layer)
                 continue
 
             nitrates_lost = self._calculate_nitrogen_removed_by_water(
-                layer.nitrate_content, layer.percolated_water, NITRATE_PERCOLATION_COEFFICIENT, layer.bulk_density,
-                layer.layer_thickness, field_size
+                layer.nitrate_content,
+                layer.percolated_water,
+                NITRATE_PERCOLATION_COEFFICIENT,
+                layer.bulk_density,
+                layer.layer_thickness,
+                field_size,
             )
             ammonium_lost = self._calculate_nitrogen_removed_by_water(
-                layer.ammonium_content, layer.percolated_water, AMMONIUM_PERCOLATION_COEFFICIENT, layer.bulk_density,
-                layer.layer_thickness, field_size
+                layer.ammonium_content,
+                layer.percolated_water,
+                AMMONIUM_PERCOLATION_COEFFICIENT,
+                layer.bulk_density,
+                layer.layer_thickness,
+                field_size,
             )
             active_organic_nitrogen_lost = self._calculate_nitrogen_removed_by_water(
-                layer.active_organic_nitrogen_content, layer.percolated_water,
-                ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT, layer.bulk_density, layer.layer_thickness, field_size
+                layer.active_organic_nitrogen_content,
+                layer.percolated_water,
+                ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
+                layer.bulk_density,
+                layer.layer_thickness,
+                field_size,
             )
 
             layer.nitrate_content -= nitrates_lost
@@ -184,7 +218,7 @@ class LeachingRunoffErosion:
             nitrogen_percolated_to_next_layer = {
                 "nitrates": nitrates_lost,
                 "ammonium": ammonium_lost,
-                "active_organic": active_organic_nitrogen_lost
+                "active_organic": active_organic_nitrogen_lost,
             }
             percolated_nitrogen.append(nitrogen_percolated_to_next_layer)
 
@@ -198,9 +232,11 @@ class LeachingRunoffErosion:
             current_layer.active_organic_nitrogen_content += amounts_leached_into_layer.get("active_organic")
 
     @staticmethod
-    def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,
-                                                 daily_soil_lost: float,
-                                                 enrichment_ratio: float) -> float:
+    def _determine_erosion_nitrogen_loss_content(
+        nitrogen_erosion_concentration: float,
+        daily_soil_lost: float,
+        enrichment_ratio: float,
+    ) -> float:
         """This method determines nitrogen mass loss in erosion
 
         Parameters
@@ -251,8 +287,13 @@ class LeachingRunoffErosion:
         return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
 
     @staticmethod
-    def _calculate_eroded_organic_nitrogen(nitrogen_content: float, bulk_density: float, layer_thickness: float,
-                                           field_size: float, eroded_sediment: float) -> float:
+    def _calculate_eroded_organic_nitrogen(
+        nitrogen_content: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
+        eroded_sediment: float,
+    ) -> float:
         """This method calculates how much organic nitrogen is lost from the field via eroded sediment.
 
         Parameters
@@ -279,23 +320,24 @@ class LeachingRunoffErosion:
         used on any other layers of soil.
 
         """
-        nitrogen_concentration = LayerData.determine_soil_nutrient_concentration(nitrogen_content, bulk_density,
-                                                                                 layer_thickness, field_size)
+        nitrogen_concentration = LayerData.determine_soil_nutrient_concentration(
+            nitrogen_content, bulk_density, layer_thickness, field_size
+        )
         sediment_content_loss = eroded_sediment / field_size
         enrichment_ratio = LeachingRunoffErosion._determine_enrichment_ratio(sediment_content_loss)
-        nitrogen_lost = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(nitrogen_concentration,
-                                                                                       sediment_content_loss,
-                                                                                       enrichment_ratio)
+        nitrogen_lost = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(
+            nitrogen_concentration, sediment_content_loss, enrichment_ratio
+        )
         return min(nitrogen_content, nitrogen_lost)
 
     @staticmethod
     def _calculate_nitrogen_removed_by_water(
-            nitrogen_content: float,
-            water_amount: float,
-            extraction_coefficient: float,
-            bulk_density: float,
-            layer_thickness: float,
-            field_size: float,
+        nitrogen_content: float,
+        water_amount: float,
+        extraction_coefficient: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
     ) -> float:
         """
         Calculates how much nitrogen is lost from the given pool on the current day.
@@ -332,23 +374,18 @@ class LeachingRunoffErosion:
         SurPhos model.
 
         """
-        water_amount_in_liters = \
+        water_amount_in_liters = (
             water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+        )
 
         nitrogen_content_in_mg_per_kg = LayerData.determine_soil_nutrient_concentration(
-            nitrogen_content,
-            bulk_density,
-            layer_thickness,
-            field_size
+            nitrogen_content, bulk_density, layer_thickness, field_size
         )
 
         nitrogen_leached_in_mg_per_kg = nitrogen_content_in_mg_per_kg * extraction_coefficient * water_amount_in_liters
 
         nitrogen_leached_in_kg_per_ha = LayerData.determine_soil_nutrient_area_density(
-            nitrogen_leached_in_mg_per_kg,
-            bulk_density,
-            layer_thickness,
-            field_size
+            nitrogen_leached_in_mg_per_kg, bulk_density, layer_thickness, field_size
         )
 
         return min(nitrogen_content, nitrogen_leached_in_kg_per_ha)
