@@ -28,5 +28,5 @@ jobs:
 
       - name: Run Pyre-Check
         run: |
-          pyre init --noninteractive
-          pyre --noninteractive check
+          pyre init
+          pyre check
