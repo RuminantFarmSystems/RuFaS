@@ -27,5 +27,5 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Pytype
-        run: pytype
+        run: pytype --config=.pytype.cfg
         continue-on-error: true
