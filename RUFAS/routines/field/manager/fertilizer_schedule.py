@@ -62,9 +62,19 @@ class FertilizerSchedule(Schedule):
 
     """
 
-    def __init__(self, name: str, mix_names: List[str], years: List[int], days: List[int], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], application_depths: List[float] = None,
-                 surface_remainder_fractions: List[float] = None, pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(
+        self,
+        name: str,
+        mix_names: List[str],
+        years: List[int],
+        days: List[int],
+        nitrogen_masses: List[float],
+        phosphorus_masses: List[float],
+        application_depths: List[float] = None,
+        surface_remainder_fractions: List[float] = None,
+        pattern_skip: int = 0,
+        pattern_repeat: int = 0,
+    ):
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.mix_names = self._elongate_list(mix_names, len(years))

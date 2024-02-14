@@ -21,6 +21,7 @@ class FieldDataReporter:
         A list of Field instances.
 
     """
+
     def __init__(self, fields: List[Field]):
         self.fields = fields
 

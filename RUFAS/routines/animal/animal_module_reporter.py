@@ -282,7 +282,7 @@ class AnimalModuleReporter:
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_pen_manure_properties.__name__,
-            "data_origin": [("Pen", "calc_total_manure")]
+            "data_origin": [("Pen", "calc_total_manure")],
         }
         for manure_property, manure_value in pen.manure.items():
             om.add_variable(
@@ -516,7 +516,7 @@ class AnimalModuleReporter:
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_305d_milk.__name__,
-            "data_origin": [("Cow", "update_milk_production_history")]
+            "data_origin": [("Cow", "update_milk_production_history")],
         }
         milk_history_list = [cow.latest_milk_production_305days for cow in animal_manager.cows if cow.is_lactating]
         nonzero_milk_history_list = [x for x in milk_history_list if x != 0.0]

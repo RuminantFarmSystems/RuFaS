@@ -56,11 +56,20 @@ class ManureSchedule(Schedule):
 
     """
 
-    def __init__(self, name: str, years: List[int], days: List[int], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], manure_types: List[ManureType], field_coverages: List[float],
-                 application_depths: Optional[List[float]] = None,
-                 surface_remainder_fractions: Optional[List[float]] = None, pattern_skip: int = 0,
-                 pattern_repeat: int = 0):
+    def __init__(
+        self,
+        name: str,
+        years: List[int],
+        days: List[int],
+        nitrogen_masses: List[float],
+        phosphorus_masses: List[float],
+        manure_types: List[ManureType],
+        field_coverages: List[float],
+        application_depths: Optional[List[float]] = None,
+        surface_remainder_fractions: Optional[List[float]] = None,
+        pattern_skip: int = 0,
+        pattern_repeat: int = 0,
+    ):
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
@@ -144,13 +153,21 @@ class ManureSchedule(Schedule):
 
         valid_surface_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
         if not valid_surface_fractions:
-            raise ValueError(error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
-                                            f"received '{self.surface_remainder_fractions}'.")
+            raise ValueError(
+                error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
+                f"received '{self.surface_remainder_fractions}'."
+            )
 
-        equal_manure_application_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) \
-            == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(
-            self.application_depths) \
-            == len(self.surface_remainder_fractions) == len(self.manure_types)
+        equal_manure_application_parameters = (
+            len(self.years)
+            == len(self.days)
+            == len(self.nitrogen_masses)
+            == len(self.nitrogen_masses)
+            == len(self.phosphorus_masses)
+            == len(self.application_depths)
+            == len(self.surface_remainder_fractions)
+            == len(self.manure_types)
+        )
         if not equal_manure_application_parameters:
             raise ValueError(
                 error_header + f"expected equal number of manure application parameters, received "
