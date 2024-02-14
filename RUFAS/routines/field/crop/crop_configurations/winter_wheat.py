@@ -2,10 +2,7 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 @dataclass(kw_only=True)
@@ -13,6 +10,7 @@ class WinterWheat(CropData):
     """
     Crop data class with default values for winter wheat.
     """
+
     species: str = "winter_wheat"
     name: str = "default winter_wheat"
     plant_code: str = "WWHT"
@@ -80,6 +78,7 @@ class WinterWheatGrain(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "winter_wheat_grain"
     name: str = "winter_wheat grain"
 
@@ -135,6 +134,7 @@ class WinterWheatSilage(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "winter_wheat_silage"
     name: str = "winter_wheat silage"
 
@@ -194,6 +194,7 @@ class WinterWheatBaleage(WinterWheatSilage):
     Winter Wheat baleage currently has the same harvest and quality properties as Winter Wheat silage.
 
     """
+
     species: str = "winter_wheat_baleage"
     name: str = "winter_wheat baleage"
 
@@ -235,6 +236,7 @@ class WinterWheatHay(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "winter_wheat_hay"
     name: str = "winter_wheat hay"
 
