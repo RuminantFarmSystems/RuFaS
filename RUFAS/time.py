@@ -44,22 +44,17 @@ class Time:
         self.years: list[list[int]] = []
 
         for year in range(self.start_year_int, self.end_year_int + 1):
+            year_length = self.year_length if not Utility.is_leap_year(year) else self.leap_year_length
             if year == self.start_year_int == self.end_year_int:
                 days = [None for _ in range(1, self.start_day)]
                 days += [_ for _ in range(self.start_day, self.end_day + 1)]
             elif year == self.start_year_int:
                 days = [None for _ in range(1, self.start_day)]
-                if Utility.is_leap_year(year):
-                    days += (_ for _ in range(self.start_day, self.leap_year_length + 1))
-                else:
-                    days += (_ for _ in range(self.start_day, self.year_length + 1))
+                days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year_int:
                 days = [_ for _ in range(1, self.end_day + 1)]
             else:
-                if Utility.is_leap_year(year):
-                    days = [_ for _ in range(1, self.leap_year_length + 1)]
-                else:
-                    days = [_ for _ in range(1, self.year_length + 1)]
+                days = [_ for _ in range(1, year_length)]
 
             self.years.append(days)
 
