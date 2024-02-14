@@ -53,7 +53,6 @@ jobs:
         git add -A
         git commit -m "Apply Black Formatting" --allow-empty
         git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-
         CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
         git push -f origin HEAD:$CLEAN_BRANCH_NAME
     - name: Lint with flake8
