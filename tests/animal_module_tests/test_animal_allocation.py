@@ -493,7 +493,9 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
             else (
                 AnimalCombination.GROWING
                 if animal in heiferIs + heiferIIs
-                else AnimalCombination.CLOSE_UP if animal in heiferIIIs + dry_cows else AnimalCombination.LAC_COW
+                else AnimalCombination.CLOSE_UP
+                if animal in heiferIIIs + dry_cows
+                else AnimalCombination.LAC_COW
             )
         ),
     )

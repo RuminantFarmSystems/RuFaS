@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TillageImplement(Enum):
     """
     Defines the supported tillage implements for RuFaS.
@@ -20,6 +21,7 @@ class TillageImplement(Enum):
         Seedbed conditioner.
 
     """
+
     SUBSOILER = "subsoiler"
     MOLDBOARD_PLOW = "moldboard-plow"
     COULTER_CHISEL_PLOW = "coulter-chisel-plow"

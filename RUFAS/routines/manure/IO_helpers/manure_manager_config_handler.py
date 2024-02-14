@@ -232,10 +232,9 @@ class ManureManagerConfigHandler:
         return manure_separator_config_by_manure_separator_type
 
     @classmethod
-    def _process_manure_treatment_configs(cls, manure_treatment_json_configs: List[Dict]) -> Dict[
-        ManureTreatmentType,
-        Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
-    ]:
+    def _process_manure_treatment_configs(
+        cls, manure_treatment_json_configs: List[Dict]
+    ) -> Dict[ManureTreatmentType, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
         There is one special case that involves a combination of anaerobic digestion and anaerobic
@@ -276,8 +275,10 @@ class ManureManagerConfigHandler:
                 manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION],
                 manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_LAGOON],
             )
-            manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] = (
-                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR]
-            ) = combo_config
+            manure_treatment_config_by_type[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
+            ] = manure_treatment_config_by_type[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
+            ] = combo_config
 
         return manure_treatment_config_by_type
