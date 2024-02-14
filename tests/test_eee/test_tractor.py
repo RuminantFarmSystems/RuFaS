@@ -1,5 +1,7 @@
 import pytest
-from RUFAS.routines.EEE.tractor import Tractor, TractorSize
+from unittest.mock import patch
+from RUFAS.routines.EEE.tractor import Tractor
+from RUFAS.routines.EEE.enums import TractorSize
 
 
 @pytest.mark.parametrize(
@@ -12,13 +14,15 @@ from RUFAS.routines.EEE.tractor import Tractor, TractorSize
         (3000, TractorSize.LARGE),
     ],
 )
-def test_herd_size_to_tractor_size(herd_size, expected_size):
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_herd_size_to_tractor_size(_, herd_size, expected_size):
     specs = Tractor(None, herd_size)
     assert specs.tractor_size == expected_size
 
 
 @pytest.mark.parametrize("tractor_size", list(TractorSize))
-def test_tractor_size_initialization(tractor_size):
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_tractor_size_initialization(_, tractor_size):
     specs = Tractor(tractor_size, None)
     assert specs.tractor_size == tractor_size
 
@@ -42,7 +46,13 @@ def test_herd_size_negative_value_error(herd_size):
         (TractorSize.LARGE, 328.11),
     ],
 )
-def test_pto_kW(tractor_size, expected_pto_kW):
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_pto_kW(mock_get_data, tractor_size, expected_pto_kW):
+    mock_get_data.return_value = [
+        {"ID": 589, "Value": 55.93},
+        {"ID": 592, "Value": 208.42},
+        {"ID": 595, "Value": 328.11},
+    ]
     specs = Tractor(tractor_size, None)
     assert specs.PTO_kW == expected_pto_kW
 
@@ -55,7 +65,13 @@ def test_pto_kW(tractor_size, expected_pto_kW):
         (TractorSize.LARGE, 328.11 / 1.4),
     ],
 )
-def test_power_available_kW(tractor_size, expected_power_available_kW):
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_power_available_kW(mock_get_data, tractor_size, expected_power_available_kW):
+    mock_get_data.return_value = [
+        {"ID": 589, "Value": 55.93},
+        {"ID": 592, "Value": 208.42},
+        {"ID": 595, "Value": 328.11},
+    ]
     specs = Tractor(tractor_size, None)
     assert specs.power_available_kW == expected_power_available_kW
 
@@ -68,11 +84,19 @@ def test_power_available_kW(tractor_size, expected_power_available_kW):
         (TractorSize.LARGE, 20856.0),
     ],
 )
-def test_mass_kg(tractor_size, expected_mass_kg):
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_mass_kg(mock_get_data, tractor_size, expected_mass_kg):
+    mock_get_data.return_value = [
+        {"ID": 591, "Value": 8400.0},
+        {"ID": 594, "Value": 12700.0},
+        {"ID": 597, "Value": 20856.0},
+    ]
     specs = Tractor(tractor_size, None)
     assert specs.mass_kg == expected_mass_kg
 
 
-def test_speed_km_hr():
+@patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
+def test_speed_km_hr(mock_get_data):
+    mock_get_data.return_value = [{"ID": 598, "Value": 10.0}]
     specs = Tractor(TractorSize.SMALL, None)  # Any tractor size would do
     assert specs.speed_km_hr == 10.0
