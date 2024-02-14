@@ -28,3 +28,9 @@ class TillageImplement(Enum):
     DISK_HARROW = "disk-harrow"
     CULTIVATOR = "cultivator"
     SEEDBED_CONDITIONER = "seedbed-conditioner"
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return repr(self.value)
