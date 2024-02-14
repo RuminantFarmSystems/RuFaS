@@ -8,13 +8,16 @@ from unittest.mock import MagicMock, patch, PropertyMock
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-@pytest.mark.parametrize("old,new", [
-    (None, 1),  # no start
-    (0, 1),  # start = 0
-    (1, 2),  # start = 0
-    (2, 1),  # start > new
-    (133.26, 149.4)  # arbitrary
-])
+@pytest.mark.parametrize(
+    "old,new",
+    [
+        (None, 1),  # no start
+        (0, 1),  # start = 0
+        (1, 2),  # start = 0
+        (2, 1),  # start > new
+        (133.26, 149.4),  # arbitrary
+    ],
+)
 def test_shift_phosphorus_time(old, new):
     """ensure shift_phosphorus_time correctly copies current phosphorus value to previous_phosphorus"""
     data = CropData(previous_phosphorus=old, phosphorus=new)
@@ -23,12 +26,15 @@ def test_shift_phosphorus_time(old, new):
     assert data.previous_phosphorus == new
 
 
-@pytest.mark.parametrize("root_depth,depths,expect", [
-    (1.5, [0, 1, 2, 3], [4, 1]),
-    (2.6, [0, 1, 2, 3], [4, 0]),
-    (0.3, [0, 0.5, 1, 2, 3], [5, 3]),
-    (28.4, [18.2, 21.6, 100.4], [3, 0])
-])
+@pytest.mark.parametrize(
+    "root_depth,depths,expect",
+    [
+        (1.5, [0, 1, 2, 3], [4, 1]),
+        (2.6, [0, 1, 2, 3], [4, 0]),
+        (0.3, [0, 0.5, 1, 2, 3], [5, 3]),
+        (28.4, [18.2, 21.6, 100.4], [3, 0]),
+    ],
+)
 def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth, depths, expect):
     """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
     data = CropData(root_depth=root_depth)
@@ -39,13 +45,16 @@ def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth, depths, 
     assert data.inaccessible_soil_layers == expect[1]
 
 
-@pytest.mark.parametrize("deepest,layers", [
-    (1, [1, 2, 3, 4]),  # one layer
-    (2, [1, 2, 3, 4]),  # two layers
-    (3, [1, 2, 3, 4]),  # three layers
-    (4, [1, 2, 3, 4]),  # four layers
-    (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
-])
+@pytest.mark.parametrize(
+    "deepest,layers",
+    [
+        (1, [1, 2, 3, 4]),  # one layer
+        (2, [1, 2, 3, 4]),  # two layers
+        (3, [1, 2, 3, 4]),  # three layers
+        (4, [1, 2, 3, 4]),  # four layers
+        (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
+    ],
+)
 def test_access_layers(deepest, layers):
     """check that soil layers are accessed correctly with access_layers()"""
     data = CropData(accessible_soil_layers=deepest)
@@ -53,16 +62,19 @@ def test_access_layers(deepest, layers):
     assert incorp.access_layers(layers) == layers[slice(deepest)]
 
 
-@pytest.mark.parametrize("uptakes,phosphates", [
-    ([1], [1]),  # start
-    ([1], [0]),  # no nitrates
-    ([0], [1]),  # no uptakes
-    ([0.5], [1]),  # uptakes < nitrates
-    ([1.2], [1]),  # uptakes > nitrates
-    ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
-    ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
-    ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
-])
+@pytest.mark.parametrize(
+    "uptakes,phosphates",
+    [
+        ([1], [1]),  # start
+        ([1], [0]),  # no nitrates
+        ([0], [1]),  # no uptakes
+        ([0.5], [1]),  # uptakes < nitrates
+        ([1.2], [1]),  # uptakes > nitrates
+        ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
+        ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
+        ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
+    ],
+)
 def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
     """check that layer_nitrates were correctly updated by extract_phosphorus_from_soil_layers"""
     nitrates_copy = phosphates.copy()
@@ -76,12 +88,15 @@ def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
     assert phosphates == remaining
 
 
-@pytest.mark.parametrize("uptakes", [
-    [1],  # one layer
-    [1, 1, 1, 1],  # four layers
-    [81.2, 0],  # arbitrary with zero
-    [15.3, 18.2, 4, 20.33]
-])
+@pytest.mark.parametrize(
+    "uptakes",
+    [
+        [1],  # one layer
+        [1, 1, 1, 1],  # four layers
+        [81.2, 0],  # arbitrary with zero
+        [15.3, 18.2, 4, 20.33],
+    ],
+)
 def test_tally_total_phosphorus_uptake(uptakes):
     """check that total phosphorus was correctly summed by tally_total_phosphorus_uptake"""
     data = CropData(actual_phosphorus_uptakes=uptakes)
@@ -106,9 +121,7 @@ def test_extend_phosphate_uptakes_to_full_profile(layers: int) -> None:
         assert data.actual_phosphorus_uptakes == pre_actual_phosphorus
 
 
-@pytest.mark.parametrize("depths,phosphates", [
-    ([.5, 1, 10, 20], [0.5, 0.8, 5, 10])
-])
+@pytest.mark.parametrize("depths,phosphates", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
 def test_uptake_phosphorus(phosphates, depths):
     """check that uptake_phosphorus() correctly called functions and variables were updated as expected"""
     # initialize crop and run method
@@ -132,15 +145,15 @@ def test_uptake_phosphorus(phosphates, depths):
     # check assertions
     incorp.find_deepest_accessible_soil_layer.assert_called_once_with(depths)
 
-    NitrogenIncorporation.determine_layer_nutrient_uptake_potential.assert_called_once_with([1, 2, 3],
-                                                                                            17.5, 35.0, 0.32)
+    NitrogenIncorporation.determine_layer_nutrient_uptake_potential.assert_called_once_with([1, 2, 3], 17.5, 35.0, 0.32)
     assert data.layer_phosphorus_potentials == [3.25, 6.33, 7.10]
 
     NitrogenIncorporation.determine_layer_nutrient_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
     assert data.unmet_phosphorus_demands == [12, 15, 17]
 
-    NitrogenIncorporation.determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10],
-                                                                                  [1, 2, 3])
+    NitrogenIncorporation.determine_layer_nutrient_uptake.assert_called_once_with(
+        [12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3]
+    )
     assert data.phosphorus_requests == [8.9, 9.9, 13.12]
 
     NitrogenIncorporation.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
@@ -151,16 +164,24 @@ def test_uptake_phosphorus(phosphates, depths):
     incorp.tally_total_phosphorus_uptake.assert_called_once()
 
 
-@pytest.mark.parametrize("phosphates,depths,gate", [
-    ([.5, .3, .2], [1, 2, 5], True),
-    ([.5, .3, .2], [1, 2, 5], False)
-])
+@pytest.mark.parametrize(
+    "phosphates,depths,gate",
+    [([0.5, 0.3, 0.2], [1, 2, 5], True), ([0.5, 0.3, 0.2], [1, 2, 5], False)],
+)
 def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool) -> None:
     """Check that incorporate_phosphorus() correctly called functions and variables were updated as expected."""
     # initialize object
-    data = CropData(half_mature_heat_fraction=.54, mature_heat_fraction=0.99, emergence_phosphorus_fraction=0.71,
-                    half_mature_phosphorus_fraction=0.68, near_mature_phosphorus_fraction=0.62,
-                    mature_phosphorus_fraction=0.60, biomass=122.8, previous_phosphorus=0, biomass_growth_max=999)
+    data = CropData(
+        half_mature_heat_fraction=0.54,
+        mature_heat_fraction=0.99,
+        emergence_phosphorus_fraction=0.71,
+        half_mature_phosphorus_fraction=0.68,
+        near_mature_phosphorus_fraction=0.62,
+        mature_phosphorus_fraction=0.60,
+        biomass=122.8,
+        previous_phosphorus=0,
+        biomass_growth_max=999,
+    )
     soil = SoilData(field_size=1.55)
     del soil.soil_layers[3]
     top_depths = [0] + depths[:2]

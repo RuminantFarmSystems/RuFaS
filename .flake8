@@ -4,3 +4,4 @@ show-source = True
 statistics = True
 max-line-length = 120
 max-complexity = 10
+ignore = E203, W503

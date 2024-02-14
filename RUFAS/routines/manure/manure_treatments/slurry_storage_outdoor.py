@@ -17,7 +17,9 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -33,9 +35,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     """
 
-    def __init__(
-        self, weather, time, manure_treatment_config: ManureTreatmentConfig
-    ) -> None:
+    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
@@ -80,11 +80,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         if self._current_manure_treatment_daily_input:
-            return (
-                self.treatment_volume
-                + self.freeboard_volume
-                + self.precipitation_volume
-            )
+            return self.treatment_volume + self.freeboard_volume + self.precipitation_volume
         return 0.0
 
     @property
@@ -116,10 +112,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         a = 3 * self.pit_depth
         b = -4 * self.pit_slope * self.pit_depth**2
-        c = (
-            4 * (self.pit_slope**2) * (self.pit_depth**3) / 3
-            - self.treatment_volume
-        )
+        c = 4 * (self.pit_slope**2) * (self.pit_depth**3) / 3 - self.treatment_volume
         return a, b, c
 
     @property
@@ -165,8 +158,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return (
             self.pit_length * self.pit_width * self.pit_depth
-            - (self.pit_slope * (self.pit_depth**2))
-            * (self.pit_length + self.pit_width)
+            - (self.pit_slope * (self.pit_depth**2)) * (self.pit_length + self.pit_width)
             + (4 * self.pit_slope * (self.pit_depth**3) / 3)
         )
 
@@ -190,9 +182,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return self.freeboard_input * self.pit_surface_area
 
-    def calc_methane_emission(
-        self, accumulated_liquid_manure_total_solids: float
-    ) -> Tuple[float, float]:
+    def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> Tuple[float, float]:
         """Calculates the CH4 emission from the outdoor slurry storage treatment system.
 
         Args:
@@ -261,9 +251,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         self._accumulate_daily_output(daily_output)
 
-        methane_loss = self.calc_methane_emission(
-            self._accumulated_output.liquid_manure_total_solids
-        )
+        methane_loss = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_solids)
         ammonia_loss = self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
@@ -274,14 +262,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.storage_ammonia = ammonia_loss
         daily_output.storage_methane = methane_loss
 
-        new_daily_output_liquid_manure_total_solids = max(
-            daily_output.liquid_manure_total_solids - methane_loss, 0.0
-        )
+        new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
 
-        new_daily_output_liquid_manure_nitrogen = max(
-            daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0
-        )
+        new_daily_output_liquid_manure_nitrogen = max(daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0)
         daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
         new_daily_output_liquid_manure_total_ammoniacal_nitrogen = max(
@@ -295,17 +279,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         new_accumulated_liquid_manure_total_solids = max(
             self._accumulated_output.liquid_manure_total_solids - methane_loss, 0.0
         )
-        self._accumulated_output.liquid_manure_total_solids = (
-            new_accumulated_liquid_manure_total_solids
-        )
+        self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
         new_accumulated_liquid_manure_nitrogen = max(
-           self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
+            self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
-        self._accumulated_output.liquid_manure_nitrogen = (
-            new_accumulated_liquid_manure_nitrogen
-        )
+        self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
-            self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
+            self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss,
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
@@ -314,7 +295,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
             manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
             manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen
+            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
