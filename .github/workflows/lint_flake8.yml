@@ -39,6 +39,7 @@ jobs:
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Format code with Black
+      if: ${{ github.ref != 'refs/heads/main' }}
       run: |
         black --line-length=120 ${{ env.FILES }}
     - name: Commit and push formatting changes
