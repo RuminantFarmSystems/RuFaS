@@ -29,6 +29,7 @@ class PlantCategory(Enum):
         Represents tree-type plants.
 
     """
+
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
@@ -372,6 +373,7 @@ class CropData:
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
     """
+
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     name: Optional[str] = "default generic annual crop"
@@ -574,14 +576,19 @@ class CropData:
             self.dormancy_loss_fraction = 0.3
 
         # Set perennial status
-        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.TREE:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL
+            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.TREE
+        ):
             self.is_perennial = True
 
         # set Fixation status
-        if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
-                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME
+            or self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME
+        ):
             self.is_nitrogen_fixer = True
 
     @property
