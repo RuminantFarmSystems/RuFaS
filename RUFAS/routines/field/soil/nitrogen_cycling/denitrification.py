@@ -25,6 +25,10 @@ class Denitrification:
     data : SoilData
         The SoilData object used for tracking denitrification.
 
+    Notes
+    -----
+    The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
+    SoilData object is not provided.
     """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
