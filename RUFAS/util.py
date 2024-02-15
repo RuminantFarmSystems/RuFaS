@@ -38,6 +38,45 @@ class Utility:
         return result
 
     @staticmethod
+    def convert_dict_of_lists_to_list_of_dicts(dict_of_lists: Dict[str, List[Any]]) -> List[Dict[str, Any]]:
+        """
+        Convert a dictionary of lists into a list of dictionaries.
+
+        Parameters
+        ----------
+        dict_of_lists : Dict[str, List[Any]]
+            A dictionary with string keys and list of values.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            A list of dictionaries, where each dictionary represents a "row" with keys
+            from the original dictionary and values corresponding to the values at the
+            same index in the input lists.
+        Raises
+        ------
+        ValueError
+            If the lists within the dictionary do not all have the same length, which is
+            necessary to ensure each dictionary in the resulting list can be constructed
+            with the same keys and corresponding values.
+        """
+        if not dict_of_lists:
+            return []
+
+        list_lengths = [len(list_) for list_ in dict_of_lists.values()]
+        if len(set(list_lengths)) != 1:
+            raise ValueError("All lists in the dictionary must have the same length.")
+
+        result_length = list_lengths[0]
+        result = []
+
+        for i in range(result_length):
+            row_dict = {key: dict_of_lists[key][i] for key in dict_of_lists}
+            result.append(row_dict)
+
+        return result
+
+    @staticmethod
     def get_base_dir():
         """
         Gets the base directory as reference for all relative paths.
@@ -430,3 +469,54 @@ class Utility:
             for key in data_pool.keys()
             if any(re.search(pattern, key) for pattern in filter_patterns)
         }
+
+    @staticmethod
+    def convert_list_to_dict_by_key(list_of_dicts: List[Dict[str, Any]], id_key: str) -> Dict[Any, Dict[str, Any]]:
+        """
+        Convert a list of dictionaries into a dictionary keyed by a specified identifier,
+        where each value is the original dictionary minus the identifier key.
+
+        Parameters
+        ----------
+        list_of_dicts : List[Dict[str, Any]]
+            A list of dictionaries, each containing a unique identifier and other data.
+        id_key : str
+            The key in each dictionary to use as the unique identifier.
+
+        Returns
+        -------
+        Dict[Any, Dict[str, Any]]
+            A dictionary where each key is the unique identifier from the list and each
+            value is the corresponding dictionary minus the identifier key.
+
+        Notes
+        -----
+        The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
+        If you need to keep the original list and dictionaries intact, make a copy before calling this function.
+
+        Example
+        -------
+        Given a list of dictionaries like this:
+        [
+            {"ID": 1, "value": 2, "other_keys": "other values"},
+            {"ID": 3, "value": 4, "other_keys": "other values"}
+        ]
+        And using 'ID' as the id_key:
+
+        convert_list_to_dict_by_key(list_of_dicts, 'ID')
+
+        Would return:
+        {
+            1: {"value": 2, "other_keys": "other values"},
+            3: {"value": 4, "other_keys": "other values"}
+        }
+        """
+        result = {}
+        for dict_ in list_of_dicts:
+            if id_key in dict_:
+                id_value = dict_.pop(id_key)
+                result[id_value] = dict_
+            else:
+                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+
+        return result
