@@ -3525,33 +3525,31 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Name of the unique manure handler config."
-          },
-          "manure_handler_type": {
-            "type": "string",
-            "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
-          },
-          "cleaning_water_use_rate": {
-            "type": "number"
-          },
-          "minutes_per_cleaning": {
-            "type": "number",
-            "minimum": 0
-          },
-          "cleanings_per_day": {
-            "type": "number",
-            "minimum": 0
-          },
-          "cleaning_water_recycle_fraction": {
-            "type": "number",
-            "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
-            "minimum": 0.0,
-            "maximum": 1.0
-          }
+        "name": {
+          "type": "string",
+          "description": "Name of the unique manure handler config."
+        },
+        "manure_handler_type": {
+          "type": "string",
+          "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+        },
+        "cleaning_water_use_rate": {
+          "type": "number"
+        },
+        "minutes_per_cleaning": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cleanings_per_day": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cleaning_water_recycle_fraction": {
+          "type": "number",
+          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     },
@@ -3591,53 +3589,80 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "properties": {
-          "manure_treatment_type": {
-            "type": "string",
-            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
-          },
-          "total_solids_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "volatile_solids_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "nitrogen_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "phosphorus_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "potassium_removal_efficiency_for_treatment": {
-            "type": "number"
-          },
-          "storage_time_period": {
-            "type": "number"
-          },
-          "freeboard_input": {
-            "type": "number"
-          },
-          "composting_type": {
-            "type": "string",
-            "description": "Composting Type -- The type of composting.",
-            "pattern": "^(intensive windrow|passive windrow|static pile)$",
-            "default": "intensive windrow"
-          },
-          "last_compost_turning_or_addition": {
-            "type": "number",
-            "description": "The number of days since the last turning or addition event (day)",
-            "default": 1
-          },
-          "manure_cover": {
-            "type": "string",
-            "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-            "pattern": "(cover|no cover|N/A)",
-            "default": "no cover"
-          }
+        "manure_treatment_type": {
+          "type": "string",
+          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+        },
+        "total_solids_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Total solids removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "volatile_solids_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Volatile solids removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "nitrogen_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Nitrogen removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Total ammoniacal nitrogen removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "phosphorus_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Phosphorus removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "potassium_removal_efficiency_for_treatment": {
+          "type": "number",
+          "description": "Potassium removal efficiency for the manure storage and treatment system.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "storage_time_period": {
+          "type": "number",
+          "description": "Storage Time Period -- The number of days that manure is stored before it is removed from the system (day).",
+          "default": 120,
+          "minimum": 0
+        },
+        "freeboard_input": {
+          "type": "number",
+          "description": "Freeboard -- Empty storage space above the manure in the treatment system.",
+          "default": 0.0
+        },
+        "composting_type": {
+          "type": "string",
+          "description": "Composting Type -- The type of composting.",
+          "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "default": "intensive windrow"
+        },
+        "last_compost_turning_or_addition": {
+          "type": "number",
+          "description": "The number of days since the last turning or addition event (day)",
+          "default": 1
+        },
+        "manure_cover": {
+          "type": "string",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|no cover|N/A)",
+          "default": "no cover"
         }
       }
     }
