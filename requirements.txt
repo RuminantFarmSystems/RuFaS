@@ -20,3 +20,4 @@ mypy
 pyright
 pyre-check
 pytype
+black
