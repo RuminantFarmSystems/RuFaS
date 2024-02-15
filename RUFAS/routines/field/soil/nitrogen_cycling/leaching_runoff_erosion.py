@@ -8,21 +8,6 @@ from RUFAS.routines.field.crop_and_soil_constants import (
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 
-
-"""
-This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
-on SWAT sections 4:2.1, 2
-"""
-
-"""
-These coefficients were determined empirically by calibrating RuFaS with data from an experiment conducted by Pete Vadas
-and J. Mark Powell at the USDA.
-
-Reference:
-Vadas, P. A., & Powell, J. M. (2019). Nutrient mass balance and fate in dairy cattle lots with different surface
-materials. Transactions of the ASABE, 62(1), 131–138. https://doi.org/10.13031/trans.12901
-
-"""
 NITRATE_RUNOFF_COEFFICIENT = 1e-8
 AMMONIUM_RUNOFF_COEFFICIENT = 8e-6
 NITRATE_PERCOLATION_COEFFICIENT = 6e-8
@@ -31,19 +16,39 @@ ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 5e-8
 
 
 class LeachingRunoffErosion:
+    """
+    Manages the movement and loss of nitrogen through erosion and leaching within the soil profile, aligning with SWAT
+    sections 4:2.1, 2.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track nitrogen leaching and runoff in the soil profile, creates
+        new one if one is not provided.
+    field_size : float, optional
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+        not provided (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        Stores the SoilData object for tracking nitrogen movement processes.
+
+    References
+    ----------
+    Vadas, P. A., & Powell, J. M. (2019). Nutrient mass balance and fate in dairy cattle lots with different surface
+    materials. Transactions of the ASABE, 62(1), 131–138. https://doi.org/10.13031/trans.12901. This study's findings
+    are instrumental in calibrating the coefficients used in this module for accurate simulation of nitrogen loss
+    dynamics.
+
+    Notes
+    -----
+    The empirical coefficients were calibrated using RuFaS with data from a study by Pete Vadas and J. Mark Powell at
+    the USDA, focusing on nutrient mass balance and fate in dairy cattle lots with different surface materials.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track nitrogen leaching and runoff in the soil profile, creates
-            new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def leach_runoff_and_erode_nitrogen(self, field_size: float) -> None:
@@ -64,12 +69,13 @@ class LeachingRunoffErosion:
         self._leach_nitrogen(field_size)
 
     def _erode_nitrogen(self, field_size: float) -> None:
-        """This method handles the erosion of nitrogen and updating the soil profile accordingly.
+        """
+        This method handles the erosion of nitrogen and updating the soil profile accordingly.
 
         Parameters
         ----------
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -233,25 +239,26 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _determine_erosion_nitrogen_loss_content(
-        nitrogen_erosion_concentration: float,
-        daily_soil_lost: float,
-        enrichment_ratio: float,
+            nitrogen_erosion_concentration: float,
+            daily_soil_lost: float,
+            enrichment_ratio: float,
     ) -> float:
-        """This method determines nitrogen mass loss in erosion
+        """
+        This method determines nitrogen mass loss in erosion.
 
         Parameters
         ----------
         nitrogen_erosion_concentration: float
-            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil (mg / kg)
+            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil (mg / kg).
         daily_soil_lost: float
-            daily soil loss (Metric Tons / ha)
+            daily soil loss (Metric Tons / ha).
         enrichment_ratio: float
-            Enrichment ratio (unitless)
+            Enrichment ratio (unitless).
 
         Returns
         -------
         float
-            nitrogen mass loss in erosion (kg/ha)
+            nitrogen mass loss in erosion (kg/ha).
 
         References
         ----------
@@ -262,17 +269,18 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _determine_enrichment_ratio(daily_soil_lost: float) -> float:
-        """This method determines the enrichment ratio
+        """
+        This method determines the enrichment ratio.
 
         Parameters
         ----------
         daily_soil_lost: float
-            daily soil loss (Metric Tons/ha)
+            daily soil loss (Metric Tons/ha).
 
         Returns
         -------
         float
-            enrichment ratio (unitless)
+            enrichment ratio (unitless).
 
         References
         ----------
@@ -288,31 +296,32 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _calculate_eroded_organic_nitrogen(
-        nitrogen_content: float,
-        bulk_density: float,
-        layer_thickness: float,
-        field_size: float,
-        eroded_sediment: float,
+            nitrogen_content: float,
+            bulk_density: float,
+            layer_thickness: float,
+            field_size: float,
+            eroded_sediment: float,
     ) -> float:
-        """This method calculates how much organic nitrogen is lost from the field via eroded sediment.
+        """
+        This method calculates how much organic nitrogen is lost from the field via eroded sediment.
 
         Parameters
         ----------
         nitrogen_content : float
-            Nitrogen content of the given pool of the top soil layer (kg / ha)
+            Nitrogen content of the given pool of the top soil layer (kg / ha).
         bulk_density : float
-            The density of the top soil layer (Megagrams / cubic meter)
+            The density of the top soil layer (Megagrams / cubic meter).
         layer_thickness : float
-            The thickness of the top layer of soil (mm)
+            The thickness of the top layer of soil (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         eroded_sediment : float
-            Amount of sediment that was eroded from the field on the current day (metric tons)
+            Amount of sediment that was eroded from the field on the current day (metric tons).
 
         Returns
         -------
         float
-            Amount of nitrogen lost to erosion from the given organic pool in the top soil layer (kg / ha)
+            Amount of nitrogen lost to erosion from the given organic pool in the top soil layer (kg / ha).
 
         Notes
         -----
@@ -332,12 +341,12 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _calculate_nitrogen_removed_by_water(
-        nitrogen_content: float,
-        water_amount: float,
-        extraction_coefficient: float,
-        bulk_density: float,
-        layer_thickness: float,
-        field_size: float,
+            nitrogen_content: float,
+            water_amount: float,
+            extraction_coefficient: float,
+            bulk_density: float,
+            layer_thickness: float,
+            field_size: float,
     ) -> float:
         """
         Calculates how much nitrogen is lost from the given pool on the current day.
@@ -375,7 +384,7 @@ class LeachingRunoffErosion:
 
         """
         water_amount_in_liters = (
-            water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+                water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
         )
 
         nitrogen_content_in_mg_per_kg = LayerData.determine_soil_nutrient_concentration(
