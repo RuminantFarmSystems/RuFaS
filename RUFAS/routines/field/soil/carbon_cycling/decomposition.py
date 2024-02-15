@@ -98,7 +98,7 @@ class Decomposition:
         Returns
         -------
         float
-            Moisture effect (unitless).
+            Moisture factor (unitless).
 
         Notes
         -----
