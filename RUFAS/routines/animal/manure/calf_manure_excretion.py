@@ -2,17 +2,20 @@ from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
+from RUFAS.routines.animal.manure.general_manure import (
+    calculate_phosphorus_excretion_values,
+)
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 
-def manure_calculations(ration_formulation,
-                        feed,
-                        body_weight: float,
-                        fecal_phosphorus: float,
-                        urine_phosphorus_required: float,
-                        methane_model: str) \
-        -> Tuple[float, AnimalManureExcretions]:
+def manure_calculations(
+    ration_formulation,
+    feed,
+    body_weight: float,
+    fecal_phosphorus: float,
+    urine_phosphorus_required: float,
+    methane_model: str,
+) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a calf with information from the ration formulation.
 
     Parameters
@@ -39,10 +42,9 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
-        ration_formulation, feed.available_feeds)
-    dry_matter_intake = nutrient_amounts['dm']
-    CP_concentration = nutrient_concentrations['CP']
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    dry_matter_intake = nutrient_amounts["dm"]
+    CP_concentration = nutrient_concentrations["CP"]
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the calf, kg [A.3A.A.1]
@@ -66,8 +68,7 @@ def manure_calculations(ration_formulation,
 
     # Nitrogen excretion
     # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
-    manure_nitrogen = (112.55 * dry_matter_intake *
-                       (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
+    manure_nitrogen = (112.55 * dry_matter_intake * (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
 
     # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
     urine_nitrogen = 0.45 * manure_nitrogen
@@ -75,22 +76,27 @@ def manure_calculations(ration_formulation,
     # Methane emissions, g/day [A.3A.C.1]
     methane_emission = 0.0
     if methane_model:
-        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+        methane_emission = (0.013 * (body_weight**0.75) * 4.184) / 0.05565
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=0,
         total_manure_excreted=total_manure_excreted,
         fecal_phosphorus=fecal_phosphorus,
-        urine_phosphorus_required=urine_phosphorus_required
+        urine_phosphorus_required=urine_phosphorus_required,
     )
 
-    (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
-     manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
+    (
+        total_phosphorus_excreted,
+        inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction,
+        manure_phosphorus_excreted,
+        manure_phosphorus_fraction,
+    ) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-        urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation
+        urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation GitHub Issue # 1216
         urine=urine,
-        # TODO: Implement with correct equation
+        # TODO: Implement with correct equation GitHub Issue # 1216
         total_ammoniacal_nitrogen_concentration=0.14,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
@@ -105,7 +111,7 @@ def manure_calculations(ration_formulation,
         phosphorus=manure_phosphorus_excreted,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=0,
-        enteric_methane_g=methane_emission
+        enteric_methane_g=methane_emission,
     )
 
     return total_phosphorus_excreted, manure_excretion_values

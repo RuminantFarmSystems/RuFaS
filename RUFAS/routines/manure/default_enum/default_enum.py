@@ -30,10 +30,7 @@ class DefaultEnum(Enum):
         for member in cls:
             if member.name.upper() == lookup_name.strip().upper():
                 return member
-            elif (
-                type(member.value) is str
-                and member.value.upper() == lookup_name.strip().upper()
-            ):
+            elif type(member.value) is str and member.value.upper() == lookup_name.strip().upper():
                 return member
 
         return cls.get_default_type()
@@ -42,12 +39,15 @@ class DefaultEnum(Enum):
     def get_default_type(cls) -> DefaultEnum:
         """Returns either the DEFAULT member if it exists or the first member.
 
-        Raises:
-            IndexError: If the enum has no members.
+        Raises
+        ------
+        IndexError
+            If the enum has no members.
 
-        Returns:
-            The DEFAULT member of this enum class if it exists. Otherwise, the
-                first member is returned.
+        Returns
+        -------
+        DefaultEnum
+            The DEFAULT member of this enum class if it exists. Otherwise, the first member is returned.
 
         """
         if hasattr(cls, "DEFAULT"):

@@ -41,6 +41,7 @@ class CurrentDayConditions:
     will be revisited for a more accurate implementation post v1
 
     """
+
     incoming_light: Optional[float] = None
     min_air_temperature: Optional[float] = None
     mean_air_temperature: Optional[float] = None
@@ -121,4 +122,4 @@ class CurrentDayConditions:
         ----------
         SWAT 1:1.1.2
         """
-        return math.asin(0.4*(math.sin((2*math.pi/365)*(day_number-82))))
+        return math.asin(0.4 * (math.sin((2 * math.pi / 365) * (day_number - 82))))

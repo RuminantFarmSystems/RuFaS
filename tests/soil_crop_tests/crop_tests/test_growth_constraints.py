@@ -5,24 +5,27 @@ from math import exp
 
 
 # ---- helper function tests ----
-@pytest.mark.parametrize(("act", "opt"), [
-    (0, 0),  # all 1
-    (1, 1),  # all 0
-    (1, 0),  # both 0
-    (0, 1),  # 0 nitrogen
-    (-1, 1),  # negative nitrogen
-    (1, -1),  # negative optimal
-    (90.3, 130.1),  # arbitrary act < opt
-    (78.1, 32.55),  # negative act > opt
-    (200.3, 200.3),  # arbitrary act = opt
-    (190.53, 190.54),  # almost equal
-])
+@pytest.mark.parametrize(
+    ("act", "opt"),
+    [
+        (0, 0),  # all 1
+        (1, 1),  # all 0
+        (1, 0),  # both 0
+        (0, 1),  # 0 nitrogen
+        (-1, 1),  # negative nitrogen
+        (1, -1),  # negative optimal
+        (90.3, 130.1),  # arbitrary act < opt
+        (78.1, 32.55),  # negative act > opt
+        (200.3, 200.3),  # arbitrary act = opt
+        (190.53, 190.54),  # almost equal
+    ],
+)
 def test_calc_nutrient_stress(act, opt):
     """ensure that nitrogen scaling factor is correctly calculated by calc_nitrogen_stress_scaling_factor()."""
     if opt == 0:
         stress = 0
     else:
-        phi = max(0., (200 * ((act / opt) - 0.5)))
+        phi = max(0.0, (200 * ((act / opt) - 0.5)))
         stress = 1 - (phi / (phi + exp(3.535 - (0.02597 * phi))))
 
     if stress > 1:
@@ -31,14 +34,17 @@ def test_calc_nutrient_stress(act, opt):
     assert GrowthConstraints._determine_nutrient_stress(stored=act, optimal=opt) == stress
 
 
-@pytest.mark.parametrize(("uptake", "trans"), [
-    (20, 40),  # arbitrary int
-    (0, 0),  # zeroes
-    (1, 1),  # ones
-    (-1, -1),  # negative
-    (26.8, 34.1),  # arbitrary floats
-    (32.55, 18.2)  # trans < uptake
-])
+@pytest.mark.parametrize(
+    ("uptake", "trans"),
+    [
+        (20, 40),  # arbitrary int
+        (0, 0),  # zeroes
+        (1, 1),  # ones
+        (-1, -1),  # negative
+        (26.8, 34.1),  # arbitrary floats
+        (32.55, 18.2),  # trans < uptake
+    ],
+)
 def test_calc_water_stress(uptake, trans):
     """ensure water stress is correctly calculated with calc_water_stress()"""
     if trans == 0:
@@ -54,22 +60,25 @@ def test_calc_water_stress(uptake, trans):
     assert GrowthConstraints._determine_water_stress(uptake, trans) == w_stress
 
 
-@pytest.mark.parametrize("air,mini,opt", [
-    (1, 1, 1),  # all 1 (A)
-    (1, 0, 0),  # air 1 (D)
-    (0, 1, 0),  # min 1 (A)
-    (0, 0, 1),  # opt 1 (A)
-    (0, 0, 0),  # all 0 (A)
-    (0.5, 0, 1),  # min < air < opt (B)
-    (1, 0, 1),  # min < air = opt (B)
-    (1.5, 0, 1),  # opt < air < 2*opt - min (C)
-    (2, 0, 1),  # opt < air = 2*opt - min (C)
-    (3, 0, 1),  # opt < air > 2*opt - min (D)
-    (5.6, 12.2, 25.5),  # arbitrary (A)
-    (15.8, 12.2, 25.5),  # arbitrary (B)
-    (36.7, 12.2, 25.5),  # arbitrary (C)
-    (39.9, 12.2, 25.5),  # arbitrary (D)
-])
+@pytest.mark.parametrize(
+    "air,mini,opt",
+    [
+        (1, 1, 1),  # all 1 (A)
+        (1, 0, 0),  # air 1 (D)
+        (0, 1, 0),  # min 1 (A)
+        (0, 0, 1),  # opt 1 (A)
+        (0, 0, 0),  # all 0 (A)
+        (0.5, 0, 1),  # min < air < opt (B)
+        (1, 0, 1),  # min < air = opt (B)
+        (1.5, 0, 1),  # opt < air < 2*opt - min (C)
+        (2, 0, 1),  # opt < air = 2*opt - min (C)
+        (3, 0, 1),  # opt < air > 2*opt - min (D)
+        (5.6, 12.2, 25.5),  # arbitrary (A)
+        (15.8, 12.2, 25.5),  # arbitrary (B)
+        (36.7, 12.2, 25.5),  # arbitrary (C)
+        (39.9, 12.2, 25.5),  # arbitrary (D)
+    ],
+)
 def test_calc_temperature_stress(air, mini, opt):
     """ensure temperature stress is correctly calculated with calc_temperature_stress()"""
     top = -0.1054 * ((opt - air) ** 2)
@@ -80,27 +89,37 @@ def test_calc_temperature_stress(air, mini, opt):
         expect = 1
     if mini < air <= opt:  # B
         expect = 1 - exp(top / ((air - mini) ** 2))
-    if opt < air <= dbl:  # C
-        expect = 1 - exp(top / ((dbl - mini) ** 2))
-    if air > dbl:  # D
+    if opt < air < dbl:  # C
+        expect = 1 - exp(top / ((dbl - air) ** 2))
+    if air >= dbl:  # D
         expect = 1
 
     assert GrowthConstraints._determine_temperature_stress(air_temp=air, min_temp=mini, optimal_temp=opt) == expect
 
 
-@pytest.mark.parametrize("w_stress,t_stress,n_stress,p_stress", [
-    (1, 1, 1, 1),  # all 1
-    (.8, .7, .6, .5),  # water limited
-    (.8, .82, .6, .5),  # temperature limited
-    (.8, .7, .9, .5),  # nitrogen limited
-    (.8, .7, .6, 0.93),  # phosphorus limited
-    (0, 0, 0, 0),  # no limits
-])
+@pytest.mark.parametrize(
+    "w_stress,t_stress,n_stress,p_stress",
+    [
+        (1, 1, 1, 1),  # all 1
+        (0.8, 0.7, 0.6, 0.5),  # water limited
+        (0.8, 0.82, 0.6, 0.5),  # temperature limited
+        (0.8, 0.7, 0.9, 0.5),  # nitrogen limited
+        (0.8, 0.7, 0.6, 0.93),  # phosphorus limited
+        (0, 0, 0, 0),  # no limits
+    ],
+)
 def test_calc_growth_factor(w_stress, t_stress, n_stress, p_stress):
     limiting_factor = max(w_stress, t_stress, n_stress, p_stress)
     expect = 1 - limiting_factor
-    assert GrowthConstraints._determine_growth_factor(water_stress=w_stress, temperature_stress=t_stress,
-                                                      nitrogen_stress=n_stress, phosphorus_stress=p_stress) == expect
+    assert (
+        GrowthConstraints._determine_growth_factor(
+            water_stress=w_stress,
+            temperature_stress=t_stress,
+            nitrogen_stress=n_stress,
+            phosphorus_stress=p_stress,
+        )
+        == expect
+    )
 
 
 # ---- member function tests ----
@@ -178,19 +197,28 @@ def test_calc_growth_factor(w_stress, t_stress, n_stress, p_stress):
 #     assert data.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
 
 
-@pytest.mark.parametrize("trans,temp", [
-    (0, 0),  # all zero
-    (18.8, 10.4),  # trans < uptake; temp < min
-    (18.8, 19.7),  # trans < uptake; temp > min
-    (18.8, 26.3),  # trans < uptake; temp > opt
-    (27.1, 19.7),  # trans > uptake; temp > min
-])
+@pytest.mark.parametrize(
+    "trans,temp",
+    [
+        (0, 0),  # all zero
+        (18.8, 10.4),  # trans < uptake; temp < min
+        (18.8, 19.7),  # trans < uptake; temp > min
+        (18.8, 26.3),  # trans < uptake; temp > opt
+        (27.1, 19.7),  # trans > uptake; temp > min
+    ],
+)
 def test_constrain_growth(trans, temp):
     """integration test: check that the growth factor is properly determined"""
     # initialize with arbitrary crop values
-    data = CropData(water_uptake=22.33, nitrogen=38.7, optimal_nitrogen=77.1,
-                    phosphorus=12.9, optimal_phosphorus=31.2, minimum_temperature=12.8,
-                    optimal_temperature=24.0)
+    data = CropData(
+        water_uptake=22.33,
+        nitrogen=38.7,
+        optimal_nitrogen=77.1,
+        phosphorus=12.9,
+        optimal_phosphorus=31.2,
+        minimum_temperature=12.8,
+        optimal_temperature=24.0,
+    )
     gc = GrowthConstraints(data)
     gc.constrain_growth(trans, temp)
 

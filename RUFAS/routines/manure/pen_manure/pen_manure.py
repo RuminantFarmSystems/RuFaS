@@ -74,7 +74,7 @@ class PenManure:
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
-        self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
+        self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
 
         # Zero out any negative field
         # TODO: This is a temporary fix. Need to find out why negative values are being generated
@@ -87,9 +87,7 @@ class PenManure:
                 setattr(self, fld.name, 0)
 
     @classmethod
-    def get_instance(
-        cls, animal_manure: AnimalManureExcretions, num_animals: int
-    ) -> PenManure:
+    def get_instance(cls, animal_manure: AnimalManureExcretions, num_animals: int) -> PenManure:
         """
         Create a PenManure object based on the information given in the manure data.
 
@@ -109,11 +107,10 @@ class PenManure:
         """
         manure_mass = animal_manure["manure_mass"]  # kg
         manure_volume = (
-            manure_mass / ManureConstants.MANURE_DENSITY
+            manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
         ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
-            animal_manure["total_ammoniacal_nitrogen_concentration"]  # g/L
-            * manure_volume  # L
+            animal_manure["total_ammoniacal_nitrogen_concentration"] / num_animals * manure_volume  # g/L  # L
         ) * GeneralConstants.GRAMS_TO_KG  # kg
 
         if num_animals == 0:
@@ -123,28 +120,18 @@ class PenManure:
             urea=animal_manure["urea"] / num_animals,
             urine=animal_manure["urine"],
             urine_nitrogen=animal_manure["urine_nitrogen"],
-            urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"]
-            * ManureConstants.URINE_TAN_FACTOR,
+            urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
             manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
             nitrogen=animal_manure["manure_nitrogen"],
             manure_mass=manure_mass,
             total_solids=animal_manure["total_solids"],
             degradable_volatile_solids=animal_manure["degradable_volatile_solids"],
-            non_degradable_volatile_solids=animal_manure[
-                "non_degradable_volatile_solids"
-            ],
-            inorganic_phosphorus_fraction=animal_manure["inorganic_phosphorus_fraction"]
+            non_degradable_volatile_solids=animal_manure["non_degradable_volatile_solids"],
+            inorganic_phosphorus_fraction=animal_manure["inorganic_phosphorus_fraction"] / num_animals,
+            organic_phosphorus_fraction=animal_manure["organic_phosphorus_fraction"] / num_animals,
+            non_water_inorganic_phosphorus_fraction=animal_manure["non_water_inorganic_phosphorus_fraction"]
             / num_animals,
-            organic_phosphorus_fraction=animal_manure["organic_phosphorus_fraction"]
-            / num_animals,
-            non_water_inorganic_phosphorus_fraction=animal_manure[
-                "non_water_inorganic_phosphorus_fraction"
-            ]
-            / num_animals,
-            non_water_organic_phosphorus_fraction=animal_manure[
-                "non_water_organic_phosphorus_fraction"
-            ]
-            / num_animals,
+            non_water_organic_phosphorus_fraction=animal_manure["non_water_organic_phosphorus_fraction"] / num_animals,
             phosphorus=animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure["phosphorus_fraction"] / num_animals,
             potassium=animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,

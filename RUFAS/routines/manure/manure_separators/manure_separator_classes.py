@@ -15,7 +15,33 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 
 
 class ManureSeparatorType(DefaultEnum):
-    """Enumerates the different types of manure separators."""
+    """Enumerates the different types of manure separators.
+
+    Attributes
+    ----------
+    ROTARY_SCREEN : str
+        The rotary screen method of manure separation.
+    SCREW_PRESS : str
+        The screw press method of manure separation.
+    BELT_PRESS : str
+        The belt press method of manure separation.
+    DECANTING_CENTRIFUGE : str
+        The decanting centrifuge method of manure separation.
+    MOVING_DISC_PRESS : str
+        The moving disc press method of manure separation.
+    SLOPE_SCREEN : str
+        The slope screen method of manure separation.
+    MECHANICAL_SAND_SEPARATOR : str
+        The mechanical sand separator method of sand-manure separation.
+    SAND_LANE_MANURE_SEPARATION : str
+        The sand lane method of sand-manure separation.
+
+    Notes
+    -----
+    The default organic separator is ROTARY_SCREEN.
+    The default sand lane separation method is SAND_LANE_MANURE_SEPARATION.
+
+    """
 
     ROTARY_SCREEN = "rotary screen"
     SCREW_PRESS = "screw press"
@@ -56,9 +82,7 @@ class BaseManureSeparator:
         """
         self.config = manure_separator_config
 
-    def daily_update(
-        self, manure_separator_daily_input: LiquidManurePortionProtocol
-    ) -> ManureSeparatorDailyOutput:
+    def daily_update(self, manure_separator_daily_input: LiquidManurePortionProtocol) -> ManureSeparatorDailyOutput:
         """Calculates the daily output of the manure separator.
 
         Notes:
@@ -115,10 +139,7 @@ class BaseManureSeparator:
             ),
             liquid_manure_total_ammoniacal_nitrogen=(
                 manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen
-                * (
-                    1
-                    - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_separator
-                )
+                * (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_separator)
             ),
             liquid_manure_phosphorus=(
                 manure_separator_daily_input.liquid_manure_phosphorus
@@ -290,9 +311,7 @@ class DefaultManureSeparatorConfigFactory:
     )
 
     @classmethod
-    def get_instance(
-        cls, manure_separator_type: ManureSeparatorType
-    ) -> ManureSeparatorConfig:
+    def get_instance(cls, manure_separator_type: ManureSeparatorType) -> ManureSeparatorConfig:
         """Return a default manure separator configuration data instance for the given separator type.
 
         Args:
@@ -303,15 +322,11 @@ class DefaultManureSeparatorConfigFactory:
 
         """
 
-        manure_separator_config_by_type: Dict[
-            ManureSeparatorType, ManureSeparatorConfig
-        ] = {
+        manure_separator_config_by_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {
             ManureSeparatorType.ROTARY_SCREEN: cls.ROTARY_SCREEN_CONFIG,
             ManureSeparatorType.SCREW_PRESS: cls.SCREW_PRESS_CONFIG,
         }
-        return manure_separator_config_by_type.get(
-            manure_separator_type, ManureSeparatorConfig()
-        )
+        return manure_separator_config_by_type.get(manure_separator_type, ManureSeparatorConfig())
 
 
 class ManureSeparatorFactory:
@@ -334,9 +349,7 @@ class ManureSeparatorFactory:
             An instance of a specific subtype of BaseManureSeparator.
 
         """
-        manure_separator_class_by_type: Dict[
-            ManureSeparatorType, Type[BaseManureSeparator]
-        ] = {
+        manure_separator_class_by_type: Dict[ManureSeparatorType, Type[BaseManureSeparator]] = {
             ManureSeparatorType.BELT_PRESS: BeltPress,
             ManureSeparatorType.DECANTING_CENTRIFUGE: DecantingCentrifuge,
             ManureSeparatorType.MOVING_DISC_PRESS: MovingDiscPress,
@@ -353,7 +366,5 @@ class ManureSeparatorFactory:
         if custom_manure_separator_config:
             return manure_separator_class(custom_manure_separator_config)
         else:
-            default_manure_separator_config = (
-                DefaultManureSeparatorConfigFactory.get_instance(manure_separator_type)
-            )
+            default_manure_separator_config = DefaultManureSeparatorConfigFactory.get_instance(manure_separator_type)
             return manure_separator_class(default_manure_separator_config)

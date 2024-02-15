@@ -11,10 +11,16 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import (
+    HormoneDeliverySchedule,
+)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
+    HeiferReproProtocolEnum,
+)
 from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
+    manure_calculations,
+)
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
@@ -122,8 +128,7 @@ class HeiferII(HeiferI):
             divisor = self.gestation_length - self.days_in_preg
             if divisor == 0:
                 divisor = 1
-            target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight -
-                                      0.96 * self.body_weight) / divisor
+            target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor
 
             # BW change due to conceptus
             if self.days_in_preg == self.gestation_length:
@@ -132,7 +137,7 @@ class HeiferII(HeiferI):
             elif self.days_in_preg > 50:
                 conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
                 conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
-                conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
+                conceptus_growth = 3 * conceptus_param**3 * (self.days_in_preg - 50) ** 2
                 self.conceptus_weight += conceptus_growth
             else:
                 conceptus_growth = 0
@@ -235,8 +240,14 @@ class HeiferII(HeiferI):
         }
         return values
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {},
-                           metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
+    def set_nutrient_rqmts(
+        self,
+        temp,
+        animal_grouping_scenario,
+        nutrient_conc: dict = {},
+        metabolizable_energy: float = 15.625,
+        previous_DMI: float = 10.0,
+    ):
         """
         Calculates this heiferII's nutrient requirements.
         """
@@ -244,34 +255,36 @@ class HeiferII(HeiferI):
             metabolizable_energy = 15.625
         if previous_DMI == 0.0:
             previous_DMI = 10.0
-        if nutrient_conc and nutrient_conc['dm'] != 0.0:
-            NDF_conc = nutrient_conc['NDF'] / 100
-            TDN_conc = nutrient_conc['TDN'] / 100
+        if nutrient_conc and nutrient_conc["dm"] != 0.0:
+            NDF_conc = nutrient_conc["NDF"] / 100
+            TDN_conc = nutrient_conc["TDN"] / 100
             net_energy_diet_concentration = (metabolizable_energy * 0.64) / previous_DMI
         else:
             NDF_conc = 0.3
             TDN_conc = 0.7
             net_energy_diet_concentration = 1.0
         req = AnimalRequirements()
-        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
-                                             mature_body_weight=self.mature_body_weight,
-                                             day_of_pregnancy=self.days_in_preg,
-                                             animal_type=animal_grouping_scenario.get_animal_type(self),
-                                             body_condition_score_5=3,
-                                             previous_temperature=temp,
-                                             average_daily_gain_heifer=self.daily_growth,
-                                             NDF_conc=NDF_conc,
-                                             TDN_conc=TDN_conc,
-                                             net_energy_diet_concentration=net_energy_diet_concentration,
-                                             days_born=self.days_born)
-        self.NEmaint_requirement = animal_requirements['NEmaint_requirement']
-        self.NEg_requirement = animal_requirements['NEg_requirement']
-        self.NEpreg_requirement = animal_requirements['NEpreg_requirement']
-        self.NEl_requirement = animal_requirements['NEl_requirement']
-        self.MP_requirement = animal_requirements['MP_requirement']
-        self.Ca_requirement = animal_requirements['Ca_requirement']
-        self.P_requirement = animal_requirements['P_requirement']
-        self.DMIest_requirement = animal_requirements['DMIest_requirement']
+        animal_requirements = req.calc_rqmts(
+            body_weight=self.body_weight,
+            mature_body_weight=self.mature_body_weight,
+            day_of_pregnancy=self.days_in_preg,
+            animal_type=animal_grouping_scenario.get_animal_type(self),
+            body_condition_score_5=3,
+            previous_temperature=temp,
+            average_daily_gain_heifer=self.daily_growth,
+            NDF_conc=NDF_conc,
+            TDN_conc=TDN_conc,
+            net_energy_diet_concentration=net_energy_diet_concentration,
+            days_born=self.days_born,
+        )
+        self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
+        self.NEg_requirement = animal_requirements["NEg_requirement"]
+        self.NEpreg_requirement = animal_requirements["NEpreg_requirement"]
+        self.NEl_requirement = animal_requirements["NEl_requirement"]
+        self.MP_requirement = animal_requirements["MP_requirement"]
+        self.Ca_requirement = animal_requirements["Ca_requirement"]
+        self.P_requirement = animal_requirements["P_requirement"]
+        self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -284,7 +297,12 @@ class HeiferII(HeiferI):
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+            self.ration_formulation,
+            feed,
+            self.body_weight,
+            p_feces_excrt,
+            p_urine,
+            methane_model,
         )
 
     def phosphorus_rqmts(self, DMI):
@@ -302,10 +320,10 @@ class HeiferII(HeiferI):
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
-                (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (self.body_weight ** (-0.22)))
-                * self.daily_growth
-                / 0.96
-                * 1000
+            (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
+            * self.daily_growth
+            / 0.96
+            * 1000
         )
 
         # absorbed P retained for fetal growth (g) (A.1C-F.E.4)
@@ -378,8 +396,10 @@ class HeiferII(HeiferI):
                 self.days_in_preg += 1
                 self.preg_update(sim_day)
             # prior to calving, heifer move to replacement group (heiferIII)
-            if self.days_in_preg != 0 and self.days_in_preg >= self.gestation_length -\
-                    AnimalBase.config["prefresh_day"]:
+            if (
+                self.days_in_preg != 0
+                and self.days_in_preg >= self.gestation_length - AnimalBase.config["prefresh_day"]
+            ):
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.log_event(self.days_born, sim_day, const.HEIFERII_TO_III)
@@ -390,9 +410,15 @@ class HeiferII(HeiferI):
 
         return cull_stage, third_stage
 
-    def _simulate_estrus(self, start_day: int, sim_day: int, estrus_note: str,
-                         avg_estrus_cycle: float, std_estrus_cycle: float,
-                         max_cycle_length: float = math.inf) -> None:
+    def _simulate_estrus(
+        self,
+        start_day: int,
+        sim_day: int,
+        estrus_note: str,
+        avg_estrus_cycle: float,
+        std_estrus_cycle: float,
+        max_cycle_length: float = math.inf,
+    ) -> None:
         """
         Calculate and set the next estrus day for the animal.
 
@@ -416,12 +442,11 @@ class HeiferII(HeiferI):
         None
         """
 
-        estrus_cycle = truncnorm.rvs(-const.STDI, const.STDI,
-                                     avg_estrus_cycle, std_estrus_cycle)
+        estrus_cycle = truncnorm.rvs(-const.STDI, const.STDI, avg_estrus_cycle, std_estrus_cycle)
         if abs(estrus_cycle) >= max_cycle_length:
             estrus_cycle = max_cycle_length - 1
         self.estrus_day = int(start_day + abs(estrus_cycle))
-        self.log_event(self.days_born, sim_day, f'{estrus_note} on day {self.estrus_day}')
+        self.log_event(self.days_born, sim_day, f"{estrus_note} on day {self.estrus_day}")
 
     @staticmethod
     def _compare_randomized_rate_less_than(reference_rate: float) -> bool:
@@ -468,7 +493,7 @@ class HeiferII(HeiferI):
             The average estrus cycle length for heifers (days).
         """
 
-        return AnimalBase.config['avg_estrus_cycle_heifer']
+        return AnimalBase.config["avg_estrus_cycle_heifer"]
 
     @staticmethod
     def get_std_estrus_cycle() -> float:
@@ -481,7 +506,7 @@ class HeiferII(HeiferI):
             The standard deviation of the estrus cycle length for heifers (days).
         """
 
-        return AnimalBase.config['std_estrus_cycle_heifer']
+        return AnimalBase.config["std_estrus_cycle_heifer"]
 
     @staticmethod
     def get_avg_estrus_cycle_after_pgf() -> int:
@@ -494,7 +519,7 @@ class HeiferII(HeiferI):
             The average estrus cycle length for heifers and cows after PGF (days).
         """
 
-        return AnimalBase.config['avg_estrus_cycle_after_pgf']
+        return AnimalBase.config["avg_estrus_cycle_after_pgf"]
 
     @staticmethod
     def get_std_estrus_cycle_after_pgf() -> float:
@@ -507,7 +532,7 @@ class HeiferII(HeiferI):
             The standard deviation of the estrus cycle length for heifers and cows after PGF (days).
         """
 
-        return AnimalBase.config['std_estrus_cycle_after_pgf']
+        return AnimalBase.config["std_estrus_cycle_after_pgf"]
 
     def get_general_estrus_detection_rate(self) -> float:
         """
@@ -519,7 +544,7 @@ class HeiferII(HeiferI):
             The general estrus detection rate for heifers.
         """
 
-        return self.get_user_defined_repro_data('estrus_detection_rate')
+        return self.get_user_defined_repro_data("estrus_detection_rate")
 
     @staticmethod
     def _get_user_defined_synch_ed_estrus_detection_rate() -> float:
@@ -532,7 +557,7 @@ class HeiferII(HeiferI):
             The user-defined estrus detection rate for heifers used in the SynchED protocol.
         """
 
-        return HeiferII.get_user_defined_repro_sub_properties()['estrus_detection_rate']
+        return HeiferII.get_user_defined_repro_sub_properties()["estrus_detection_rate"]
 
     @staticmethod
     def _get_default_synch_ed_estrus_detection_rate() -> float:
@@ -545,8 +570,9 @@ class HeiferII(HeiferI):
             The default estrus detection rate for heifers used in the SynchED protocol.
         """
 
-        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            HeiferReproProtocolEnum.SynchED.value]['default_sub_properties']['estrus_detection_rate']
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[HeiferReproProtocolEnum.SynchED.value][
+            "default_sub_properties"
+        ]["estrus_detection_rate"]
 
     def _get_user_defined_or_default_synch_ed_estrus_detection_rate(self) -> float:
         """
@@ -573,7 +599,7 @@ class HeiferII(HeiferI):
             The general conception rate for heifers.
         """
 
-        return self.get_user_defined_repro_data('estrus_conception_rate')
+        return self.get_user_defined_repro_data("estrus_conception_rate")
 
     @staticmethod
     def get_user_defined_tai_conception_rate() -> float:
@@ -588,7 +614,7 @@ class HeiferII(HeiferI):
             The specific conception rate for heifers used in the TAI protocol.
         """
 
-        return HeiferII.get_user_defined_repro_sub_properties()['conception_rate']
+        return HeiferII.get_user_defined_repro_sub_properties()["conception_rate"]
 
     @staticmethod
     def _get_default_TAI_conception_rate() -> float:
@@ -605,8 +631,9 @@ class HeiferII(HeiferI):
             The default conception rate for heifers used in the TAI protocol.
         """
 
-        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            HeiferReproProtocolEnum.TAI.value]['default_sub_properties']['conception_rate']
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[HeiferReproProtocolEnum.TAI.value][
+            "default_sub_properties"
+        ]["conception_rate"]
 
     def _get_user_defined_or_default_TAI_conception_rate(self) -> float:
         """
@@ -671,8 +698,13 @@ class HeiferII(HeiferI):
         if not self.is_pregnant:
             self.ED_days += 1
         if self.days_born == self._get_breeding_start_day():
-            self._simulate_estrus(self._get_breeding_start_day(), sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                                  self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+            self._simulate_estrus(
+                self._get_breeding_start_day(),
+                sim_day,
+                const.ESTRUS_DAY_SCHEDULED_NOTE,
+                self.get_avg_estrus_cycle(),
+                self.get_std_estrus_cycle(),
+            )
         elif self.days_born == self.estrus_day:
             self._handle_generic_estrus_detection(sim_day)
 
@@ -691,13 +723,15 @@ class HeiferII(HeiferI):
         self._handle_estrus_detection(
             sim_day,
             on_estrus_detected=self._handle_estrus_detected,
-            on_estrus_not_detected=self._handle_estrus_not_detected
+            on_estrus_not_detected=self._handle_estrus_not_detected,
         )
 
-    def _handle_estrus_detection(self, sim_day: int,
-                                 on_estrus_detected: Callable[[int], None],
-                                 on_estrus_not_detected: Callable[[int], None]
-                                 ) -> None:
+    def _handle_estrus_detection(
+        self,
+        sim_day: int,
+        on_estrus_detected: Callable[[int], None],
+        on_estrus_not_detected: Callable[[int], None],
+    ) -> None:
         """
         A skeletal method for handling estrus detection that needs to be provided with the
         appropriate functions to call when estrus is detected and when estrus is not detected.
@@ -719,14 +753,20 @@ class HeiferII(HeiferI):
         self.log_event(self.days_born, sim_day, const.ESTRUS_OCCURRED_NOTE)
         is_estrus_detected = self._detect_estrus(self.get_general_estrus_detection_rate())
         if is_estrus_detected:
-            self.log_event(self.days_born, sim_day,
-                           f'{const.ESTRUS_DETECTED_NOTE}, '
-                           f'with estrus detection rate at {self.get_general_estrus_detection_rate()}')
+            self.log_event(
+                self.days_born,
+                sim_day,
+                f"{const.ESTRUS_DETECTED_NOTE}, "
+                f"with estrus detection rate at {self.get_general_estrus_detection_rate()}",
+            )
             on_estrus_detected(sim_day)
         else:
-            self.log_event(self.days_born, sim_day,
-                           f'{const.ESTRUS_NOT_DETECTED_NOTE}, '
-                           f'with estrus detection rate at {self.get_general_estrus_detection_rate()}')
+            self.log_event(
+                self.days_born,
+                sim_day,
+                f"{const.ESTRUS_NOT_DETECTED_NOTE}, "
+                f"with estrus detection rate at {self.get_general_estrus_detection_rate()}",
+            )
             on_estrus_not_detected(sim_day)
 
     def _handle_estrus_detected(self, sim_day: int) -> None:
@@ -745,7 +785,11 @@ class HeiferII(HeiferI):
 
         self.conception_rate = self.get_general_conception_rate()
         self.ai_day = self.days_born + 1
-        self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
+        self.log_event(
+            self.days_born,
+            sim_day,
+            f"{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
+        )
 
     def _handle_estrus_not_detected(self, sim_day: int) -> None:
         """
@@ -761,8 +805,13 @@ class HeiferII(HeiferI):
         None
         """
 
-        self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                              self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+        self._simulate_estrus(
+            self.days_born,
+            sim_day,
+            const.ESTRUS_DAY_SCHEDULED_NOTE,
+            self.get_avg_estrus_cycle(),
+            self.get_std_estrus_cycle(),
+        )
 
     def _deliver_hormones(self, hormones: list[str], delivery_day: int, sim_day: int) -> None:
         """
@@ -783,17 +832,17 @@ class HeiferII(HeiferI):
         """
 
         for hormone in hormones:
-            if hormone == 'GnRH':
+            if hormone == "GnRH":
                 self.GnRH_injections += 1
                 event = const.INJECT_GNRH
-            elif hormone == 'PGF':
+            elif hormone == "PGF":
                 self.PGF_injections += 1
                 event = const.INJECT_PGF
-            elif hormone == 'CIDR':
+            elif hormone == "CIDR":
                 event = const.INJECT_CIDR
                 self.CIDR_injections += 1
             else:
-                raise ValueError(f'Invalid hormone: {hormone}')
+                raise ValueError(f"Invalid hormone: {hormone}")
 
             self.log_event(delivery_day, sim_day, event)
 
@@ -815,18 +864,22 @@ class HeiferII(HeiferI):
 
         actions = schedule.get(self.days_born)
         if actions is not None:
-            if actions.get('deliver_hormones') is not None:
-                self._deliver_hormones(actions['deliver_hormones'], self.days_born, sim_day)
-                del actions['deliver_hormones']
+            if actions.get("deliver_hormones") is not None:
+                self._deliver_hormones(actions["deliver_hormones"], self.days_born, sim_day)
+                del actions["deliver_hormones"]
 
-            if actions.get('set_ai_day', False):
+            if actions.get("set_ai_day", False):
                 self.ai_day = self.days_born
-                self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
-                del actions['set_ai_day']
+                self.log_event(
+                    self.days_born,
+                    sim_day,
+                    f"{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
+                )
+                del actions["set_ai_day"]
 
-            if actions.get('set_conception_rate', False):
+            if actions.get("set_conception_rate", False):
                 self.conception_rate = self._TAI_conception_rate
-                del actions['set_conception_rate']
+                del actions["set_conception_rate"]
 
             if not actions:
                 del schedule[self.days_born]
@@ -842,7 +895,7 @@ class HeiferII(HeiferI):
             The day of the heifer's life when breeding starts.
         """
 
-        return AnimalBase.config['breeding_start_day_h']
+        return AnimalBase.config["breeding_start_day_h"]
 
     @staticmethod
     def get_user_defined_repro_data(attribute: str) -> Any:
@@ -865,10 +918,10 @@ class HeiferII(HeiferI):
             If the attribute is not a valid attribute.
         """
 
-        if attribute not in AnimalBase.config['heifers']:
-            raise KeyError(f'Invalid heifer repro config attribute: {attribute}')
+        if attribute not in AnimalBase.config["heifers"]:
+            raise KeyError(f"Invalid heifer repro config attribute: {attribute}")
 
-        return AnimalBase.config['heifers'][attribute]
+        return AnimalBase.config["heifers"][attribute]
 
     @staticmethod
     def get_user_defined_repro_protocol() -> str:
@@ -881,7 +934,7 @@ class HeiferII(HeiferI):
             The reproduction protocol for heifers defined by the user.
         """
 
-        return AnimalBase.config['heifer_repro_method']
+        return AnimalBase.config["heifer_repro_method"]
 
     @staticmethod
     def get_user_defined_repro_sub_protocol() -> str:
@@ -894,7 +947,7 @@ class HeiferII(HeiferI):
             The reproduction sub protocol for heifers defined by the user.
         """
 
-        return HeiferII.get_user_defined_repro_data('repro_sub_protocol')
+        return HeiferII.get_user_defined_repro_data("repro_sub_protocol")
 
     @staticmethod
     def _get_default_repro_sub_protocol(protocol: str) -> str:
@@ -917,7 +970,7 @@ class HeiferII(HeiferI):
             The default reproduction sub protocol for heifers for the given reproduction protocol.
         """
 
-        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol]['default_sub_protocol']
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol]["default_sub_protocol"]
 
     def _get_user_defined_or_default_repro_sub_protocol(self) -> str:
         """
@@ -952,7 +1005,7 @@ class HeiferII(HeiferI):
             The reproduction sub properties for heifers defined by the user.
         """
 
-        return HeiferII.get_user_defined_repro_data('repro_sub_properties')
+        return HeiferII.get_user_defined_repro_data("repro_sub_properties")
 
     def execute_tai_protocol(self, sim_day: int) -> None:
         """
@@ -969,8 +1022,11 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(),
-                                          self.days_born)
+            self._set_up_hormone_schedule(
+                "heifers",
+                self._get_user_defined_or_default_repro_sub_protocol(),
+                self.days_born,
+            )
             self._TAI_conception_rate = self._get_user_defined_or_default_TAI_conception_rate()
 
         if self._hormone_schedule:
@@ -994,16 +1050,23 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(),
-                                          self.days_born)
+            self._set_up_hormone_schedule(
+                "heifers",
+                self._get_user_defined_or_default_repro_sub_protocol(),
+                self.days_born,
+            )
 
         self._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
 
         if self.days_born == self.estrus_day:
             self._handle_synch_ed_estrus_detection(sim_day)
 
-    def _set_up_hormone_schedule(self, animal_category: Literal['heifers', 'cows'],
-                                 repro_sub_protocol: str, start_from: int) -> None:
+    def _set_up_hormone_schedule(
+        self,
+        animal_category: Literal["heifers", "cows"],
+        repro_sub_protocol: str,
+        start_from: int,
+    ) -> None:
         """
         Set up the hormone delivery schedule for the heifer. Used in TAI and SynchED protocols.
 
@@ -1019,14 +1082,19 @@ class HeiferII(HeiferI):
         Returns
         -------
         None
+
+        Raises
+        ------
+        Exception
+            If there is no hormone delivery schedule for the animal category.
+
         """
 
         self._hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
             animal_category, repro_sub_protocol, start_from
         )
         if self._hormone_schedule is None:
-            raise Exception(f'No hormone delivery schedule for {animal_category} - '
-                            f'{repro_sub_protocol}')
+            raise Exception(f"No hormone delivery schedule for {animal_category} - " f"{repro_sub_protocol}")
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(self, sim_day: int) -> None:
         """
@@ -1047,10 +1115,14 @@ class HeiferII(HeiferI):
         if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
             if not self._hormone_schedule:
-                self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                                      self.get_avg_estrus_cycle_after_pgf(),
-                                      self.get_std_estrus_cycle_after_pgf(),
-                                      max_cycle_length=14)
+                self._simulate_estrus(
+                    self.days_born,
+                    sim_day,
+                    const.ESTRUS_DAY_SCHEDULED_NOTE,
+                    self.get_avg_estrus_cycle_after_pgf(),
+                    self.get_std_estrus_cycle_after_pgf(),
+                    max_cycle_length=14,
+                )
 
     def _handle_synch_ed_estrus_detection(self, sim_day: int) -> None:
         """
@@ -1074,7 +1146,11 @@ class HeiferII(HeiferI):
             self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
             self.conception_rate = self.get_user_defined_tai_conception_rate()
             self.ai_day = self.days_born + 1
-            self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
+            self.log_event(
+                self.days_born,
+                sim_day,
+                f"{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
+            )
         else:
             self._handle_estrus_not_detected_in_synch_ed(sim_day)
 
@@ -1093,13 +1169,18 @@ class HeiferII(HeiferI):
         """
 
         self.log_event(self.days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE)
-        self.log_event(self.days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
+        self.log_event(
+            self.days_born,
+            sim_day,
+            const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE,
+        )
         internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            self._get_user_defined_or_default_repro_sub_protocol()]['when_estrus_not_detected']
+            self._get_user_defined_or_default_repro_sub_protocol()
+        ]["when_estrus_not_detected"]
 
-        self._set_repro_program(sim_day, internal_fallback_protocol['repro_protocol'])
-        self._set_up_hormone_schedule('heifers', internal_fallback_protocol['repro_sub_protocol'], self.days_born)
-        self._TAI_conception_rate = internal_fallback_protocol['repro_sub_properties']['conception_rate']
+        self._set_repro_program(sim_day, internal_fallback_protocol["repro_protocol"])
+        self._set_up_hormone_schedule("heifers", internal_fallback_protocol["repro_sub_protocol"], self.days_born)
+        self._TAI_conception_rate = internal_fallback_protocol["repro_sub_properties"]["conception_rate"]
         self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
     def _set_repro_program(self, sim_day: int, repro_program: str) -> None:
@@ -1116,19 +1197,29 @@ class HeiferII(HeiferI):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            If the reproduction program is not valid.
+
         """
 
-        if repro_program not in [HeiferReproProtocolEnum.ED.value,
-                                 HeiferReproProtocolEnum.TAI.value,
-                                 HeiferReproProtocolEnum.SynchED.value]:
-            raise ValueError(f'Invalid repro program: {repro_program}')
+        if repro_program not in [
+            HeiferReproProtocolEnum.ED.value,
+            HeiferReproProtocolEnum.TAI.value,
+            HeiferReproProtocolEnum.SynchED.value,
+        ]:
+            raise ValueError(f"Invalid repro program: {repro_program}")
 
         if self.repro_program == repro_program:
             return
 
-        self.log_event(self.days_born, sim_day,
-                       f'{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} '
-                       f'to {repro_program}')
+        self.log_event(
+            self.days_born,
+            sim_day,
+            f"{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} " f"to {repro_program}",
+        )
         self.repro_program = repro_program
 
     def open(self, sim_day: int) -> None:
@@ -1149,8 +1240,13 @@ class HeiferII(HeiferI):
 
         self.log_event(self.abortion_day, sim_day, const.REBREEDING_NOTE)
         self._set_repro_program(sim_day, HeiferReproProtocolEnum.ED.value)
-        self._simulate_estrus(self.abortion_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                              self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+        self._simulate_estrus(
+            self.abortion_day,
+            sim_day,
+            const.ESTRUS_DAY_SCHEDULED_NOTE,
+            self.get_avg_estrus_cycle(),
+            self.get_std_estrus_cycle(),
+        )
 
     @property
     def is_pregnant(self):
@@ -1180,7 +1276,11 @@ class HeiferII(HeiferI):
         """
 
         self.log_event(self.days_born, sim_day, const.AI_PERFORMED_NOTE)
-        self.log_event(self.days_born, sim_day, const.INSEMINATED_W_BASE + AnimalBase.config["semen_type"])
+        self.log_event(
+            self.days_born,
+            sim_day,
+            const.INSEMINATED_W_BASE + AnimalBase.config["semen_type"],
+        )
         self.semen_num += 1
         self.AI_times += 1
         self._increment_ai_counts()
@@ -1211,10 +1311,10 @@ class HeiferII(HeiferI):
         None
         """
 
-        self.stats['num_ai_performed'] += 1
-        self.stats['num_ai_performed_in_ED'] += 1 if self.repro_program == 'ED' else 0
-        self.stats['num_ai_performed_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
-        self.stats['num_ai_performed_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
+        self.stats["num_ai_performed"] += 1
+        self.stats["num_ai_performed_in_ED"] += 1 if self.repro_program == "ED" else 0
+        self.stats["num_ai_performed_in_TAI"] += 1 if self.repro_program == "TAI" else 0
+        self.stats["num_ai_performed_in_SynchED"] += 1 if self.repro_program == "SynchED" else 0
 
     def _increment_successful_conceptions(self) -> None:
         """
@@ -1234,10 +1334,10 @@ class HeiferII(HeiferI):
         None
         """
 
-        self.stats['num_successful_conceptions'] += 1
-        self.stats['num_successful_conceptions_in_ED'] += 1 if self.repro_program == 'ED' else 0
-        self.stats['num_successful_conceptions_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
-        self.stats['num_successful_conceptions_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
+        self.stats["num_successful_conceptions"] += 1
+        self.stats["num_successful_conceptions_in_ED"] += 1 if self.repro_program == "ED" else 0
+        self.stats["num_successful_conceptions_in_TAI"] += 1 if self.repro_program == "TAI" else 0
+        self.stats["num_successful_conceptions_in_SynchED"] += 1 if self.repro_program == "SynchED" else 0
 
     def _handle_successful_conception(self, sim_day: int):
         """
@@ -1272,8 +1372,13 @@ class HeiferII(HeiferI):
 
         self.log_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
         self._set_repro_program(sim_day, HeiferReproProtocolEnum.ED.value)
-        self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                              self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+        self._simulate_estrus(
+            self.days_born,
+            sim_day,
+            const.ESTRUS_DAY_SCHEDULED_NOTE,
+            self.get_avg_estrus_cycle(),
+            self.get_std_estrus_cycle(),
+        )
 
     @staticmethod
     def _calculate_gestation_length() -> int:
@@ -1286,12 +1391,17 @@ class HeiferII(HeiferI):
             The gestation length of the heifer (days).
 
         """
-        return int(truncnorm.rvs(-const.STDI, const.STDI,
-                                 AnimalBase.config["avg_gestation_len"],
-                                 AnimalBase.config["std_gestation_len"]))
+        return int(
+            truncnorm.rvs(
+                -const.STDI,
+                const.STDI,
+                AnimalBase.config["avg_gestation_len"],
+                AnimalBase.config["std_gestation_len"],
+            )
+        )
 
     @staticmethod
-    def _calculate_calf_birth_weight(breed: Literal['HO', 'JE']) -> float:
+    def _calculate_calf_birth_weight(breed: Literal["HO", "JE"]) -> float:
         """
         Calculate the birth weight of the calf.
 
@@ -1306,9 +1416,12 @@ class HeiferII(HeiferI):
             The birth weight of the calf.
         """
 
-        return truncnorm.rvs(-const.STDI, const.STDI,
-                             AnimalBase.config[f"birth_weight_avg_{breed.lower()}"],
-                             AnimalBase.config[f"birth_weight_std_{breed.lower()}"])
+        return truncnorm.rvs(
+            -const.STDI,
+            const.STDI,
+            AnimalBase.config[f"birth_weight_avg_{breed.lower()}"],
+            AnimalBase.config[f"birth_weight_std_{breed.lower()}"],
+        )
 
     def _initialize_pregnancy_parameters(self) -> None:
         """
@@ -1345,20 +1458,20 @@ class HeiferII(HeiferI):
                 "loss_rate": AnimalBase.config["preg_loss_rate_1"],
                 "on_preg_loss": const.PREG_LOSS_BEFORE_1,
                 "on_preg": const.PREG_CHECK_1_PREG,
-                "on_not_preg": const.PREG_CHECK_1_NOT_PREG
+                "on_not_preg": const.PREG_CHECK_1_NOT_PREG,
             },
             {
                 "day": AnimalBase.config["preg_check_day_2"],
                 "loss_rate": AnimalBase.config["preg_loss_rate_2"],
                 "on_preg_loss": const.PREG_LOSS_BTWN_1_AND_2,
-                "on_preg": const.PREG_CHECK_2_PREG
+                "on_preg": const.PREG_CHECK_2_PREG,
             },
             {
                 "day": AnimalBase.config["preg_check_day_3"],
                 "loss_rate": AnimalBase.config["preg_loss_rate_3"],
                 "on_preg_loss": const.PREG_LOSS_BTWN_2_AND_3,
-                "on_preg": const.PREG_CHECK_3_PREG
-            }
+                "on_preg": const.PREG_CHECK_3_PREG,
+            },
         ]
 
         for preg_check_config in preg_check_configs:

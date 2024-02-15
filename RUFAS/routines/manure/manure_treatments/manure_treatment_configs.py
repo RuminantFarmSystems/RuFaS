@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Union, Tuple
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
@@ -68,6 +69,11 @@ class ManureTreatmentConfig:
 
     last_compost_turning_or_addition:
         Number of days since last compot turning or addition activity.
+
+    manure_cover: str
+        Indicates the presence or absence of a cover in the manure treatment or storage system.
+        When used in the case of a slurry storage system (underfloor or outdoors) the cover
+        refers to the presence of a natural crust.
     """
 
     total_solids_removal_efficiency_for_treatment: float = 0.0
@@ -93,23 +99,25 @@ class ManureTreatmentConfig:
 
     composting_type: str = "intensive windrow"
     last_compost_turning_or_addition: int = 1
+    manure_cover: str = ManureCoverEnum.NO_COVER.value
 
 
 class DefaultManureTreatmentConfigFactory:
     """Class for creating default manure treatment configuration data."""
 
     SLURRY_STORAGE_UNDERFLOOR_CONFIG = ManureTreatmentConfig(
-        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        total_solids_removal_efficiency_for_treatment=0.0,  # Previously set between 10-30%
         volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
         nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
         phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
-        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        total_solids_removal_efficiency_for_treatment=0.0,  # Previously set between 10-30%
         volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
         nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
@@ -117,6 +125,7 @@ class DefaultManureTreatmentConfigFactory:
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
         freeboard_input=0.3048,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     ANAEROBIC_DIGESTION_CONFIG = ManureTreatmentConfig(
@@ -128,13 +137,14 @@ class DefaultManureTreatmentConfigFactory:
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
         hydraulic_retention_time=25,  # 25 -30 days
         sludge_accumulation_period=1.0,  # Sludge accumulation period 1-5 years
-        sludge_accumulation_volume_fraction=0.03,  # Sludge Accumulation volume fraction 2-4% of VS loaded
+        sludge_accumulation_volume_fraction=0.0,  # Previous Sludge Accumulation volume fraction 2-4% of VS loaded
         top_cover_volume_fraction=0.2,  # Should be between 10-30%
         biogas_generation_ratio=0.38,  # 0.23 to 0.39 kg CH4/kg VS
         methane_generation_ratio=0.65,  # 0.5-0.65 according to spreadsheet
         evaporation_fraction=0.02,  # 2-5% of Wastewater Volume
         anaerobic_digestion_temperature_set_point=37.5,
         anaerobic_digestion_temperature_celsius=37.5,
+        manure_cover=ManureCoverEnum.NOT_APPLICABLE.value,
     )
 
     ANAEROBIC_LAGOON_CONFIG = ManureTreatmentConfig(
@@ -146,10 +156,11 @@ class DefaultManureTreatmentConfigFactory:
         potassium_removal_efficiency_for_treatment=0.2,  # Between 20-30%
         hydraulic_retention_time=365,  # 180 - 365 days
         sludge_accumulation_period=10.0,  # Sludge accumulation period 5-20 years
-        sludge_accumulation_volume_fraction=0.00251,
+        sludge_accumulation_volume_fraction=0.0,
         # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
         storage_time_period=365,
         freeboard_input=0.3048,
+        manure_cover=ManureCoverEnum.NO_COVER.value,
     )
 
     COMPOST_BEDDED_PACK_BARN_CONFIG = ManureTreatmentConfig()
@@ -159,9 +170,7 @@ class DefaultManureTreatmentConfigFactory:
     @classmethod
     def get_instance(
         cls, treatment_type: ManureTreatmentType
-    ) -> Union[
-        ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
-    ]:
+    ) -> Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
         """Return a default manure treatment configuration data instance for the given treatment type.
 
         Args:
@@ -186,6 +195,6 @@ class DefaultManureTreatmentConfigFactory:
             ),
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
             ManureTreatmentType.OPEN_LOTS: cls.OPEN_LOTS_CONFIG,
-            ManureTreatmentType.COMPOSTING: cls.COMPOSTING_CONFIG
+            ManureTreatmentType.COMPOSTING: cls.COMPOSTING_CONFIG,
         }
         return manure_treatment_config_by_type[treatment_type]

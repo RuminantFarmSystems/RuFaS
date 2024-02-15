@@ -824,9 +824,9 @@
           "default": "open air barn"
         },
         "pen_type": {
-          "description": "Pen Type select one) -- The type of stalls the pen has",
           "type": "string",
-          "pattern": "^{freestall|tiestall|drylot}$",
+          "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
+          "pattern": "^{freestall|tiestall|open lot|compost bedded pack barn}$",
           "default": "freestall"
         },
         "max_stocking_density": {
@@ -1555,9 +1555,7 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
-          "default": [
-            "harvest_kill"
-          ],
+          "default": ["harvest_kill"],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
@@ -2768,7 +2766,7 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined percentage values.",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
         "minimum": 0,
         "maximum": 1
       },
@@ -2811,6 +2809,11 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "minimum": 1
     },
+    "Fd_Category": {
+      "type": "string",
+      "description": "Feed Category.",
+      "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+    },
     "feed_type": {
       "type": "string",
       "description": "The general type or category of the feed.",
@@ -2826,20 +2829,20 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 625
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP -- Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 625,
       "default": 0
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP - Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 625,
       "default": 0
     },
     "EE": {
@@ -2853,21 +2856,21 @@
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "ash": {
@@ -2887,15 +2890,15 @@
     "PAF": {
       "type": "number",
       "description": "Processing adjustment factor.",
-      "minimum": 0.87,
+      "minimum": 0,
       "maximum": 1.04,
-      "default": 0
+      "default": 0.87
     },
     "TDN": {
       "type": "number",
       "description": "Total digestible nutrients (% DM).",
       "minimum": 0,
-      "maximum": 184,
+      "maximum": 625,
       "default": 0
     },
     "N_A": {
@@ -2923,7 +2926,6 @@
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
       "minimum": 0,
-      "maximum": 30,
       "default": 0
     },
     "dRUP": {
@@ -2937,49 +2939,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "DE": {
@@ -3003,9 +3005,9 @@
     },
     "starch": {
       "type": "number",
-      "description": "Starch (%)",
+      "description": "Starch (% DM)",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "limit": {
@@ -3053,7 +3055,7 @@
       "type": "number",
       "description": "Crude protein content of the feed (% DM).",
       "minimum": 0,
-      "maximum": 288
+      "maximum": 625
     },
     "N_A": {
       "type": "number",
@@ -3076,8 +3078,7 @@
     "Kd": {
       "type": "number",
       "description": "Feed degradation rate of B fraction (% h).",
-      "minimum": 0,
-      "maximum": 30
+      "minimum": 0
     },
     "RUP": {
       "type": "number",
@@ -3099,51 +3100,51 @@
     },
     "ADICP": {
       "type": "number",
-      "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "ADICP (% DM) -- Acid detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 8,
+      "maximum": 625,
       "default": 0
     },
     "NDICP": {
       "type": "number",
-      "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
+      "description": "NDICP (% DM) -- Neutral detergent insoluble nitrogen multiplied by 6.25.",
       "minimum": 0,
-      "maximum": 12,
+      "maximum": 625,
       "default": 0
     },
     "ADF": {
       "type": "number",
       "description": "Acid detergent fiber (% DM)",
       "minimum": 0,
-      "maximum": 66,
+      "maximum": 100,
       "default": 0
     },
     "NDF": {
       "type": "number",
       "description": "Neutral detergent fiber (% DM).",
       "minimum": 0,
-      "maximum": 85,
+      "maximum": 100,
       "default": 0
     },
     "NDF48": {
       "type": "number",
       "description": "In vitro 48-hour digestibility (% NDF).",
       "minimum": 0,
-      "maximum": 89,
+      "maximum": 100,
       "default": 0
     },
     "lignin": {
       "type": "number",
       "description": "Acid detergent lignin (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "starch": {
       "type": "number",
       "description": "Starch (%).",
       "minimum": 0,
-      "maximum": 80,
+      "maximum": 100,
       "default": 0
     },
     "WSC": {
@@ -3178,49 +3179,49 @@
       "type": "number",
       "description": "Calcium (% DM).",
       "minimum": 0,
-      "maximum": 72,
+      "maximum": 100,
       "default": 0
     },
     "phosphorus": {
       "type": "number",
       "description": "Phosphorus (% DM).",
       "minimum": 0,
-      "maximum": 32,
+      "maximum": 100,
       "default": 0
     },
     "magnesium": {
       "type": "number",
       "description": "Magnesium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "potassium": {
       "type": "number",
       "description": "Potassium (% DM).",
       "minimum": 0,
-      "maximum": 57,
+      "maximum": 100,
       "default": 0
     },
     "sodium": {
       "type": "number",
       "description": "Sodium (% DM).",
       "minimum": 0,
-      "maximum": 40,
+      "maximum": 100,
       "default": 0
     },
     "chlorine": {
       "type": "number",
       "description": "Chlorine (% DM).",
       "minimum": 0,
-      "maximum": 67,
+      "maximum": 100,
       "default": 0
     },
     "sulfur": {
       "type": "number",
       "description": "Sulphur (% DM).",
       "minimum": 0,
-      "maximum": 25,
+      "maximum": 100,
       "default": 0
     },
     "copper": {
@@ -3474,8 +3475,7 @@
         },
         "manure_handler": {
           "type": "string",
-          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
@@ -3525,28 +3525,33 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "manure_handler_type": {
-          "type": "string",
-          "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-          "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
-        },
-        "cleaning_water_use_rate": {
-          "type": "number",
-          "default": 0.0
-        },
-        "minutes_per_cleaning": {
-          "type": "number",
-          "default": 0.0
-        },
-        "cleanings_per_day": {
-          "type": "number",
-          "default": 0
-        },
-        "cleaning_water_recycle_fraction": {
-          "type": "number",
-          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
-          "minimum": 0.0,
-          "maximum": 1.0
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the unique manure handler config."
+          },
+          "manure_handler_type": {
+            "type": "string",
+            "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
+          },
+          "cleaning_water_use_rate": {
+            "type": "number"
+          },
+          "minutes_per_cleaning": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cleanings_per_day": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cleaning_water_recycle_fraction": {
+            "type": "number",
+            "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
         }
       }
     },
@@ -3586,42 +3591,53 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "manure_treatment_type": {
-          "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
-        },
-        "total_solids_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "volatile_solids_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "nitrogen_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "phosphorus_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "potassium_removal_efficiency_for_treatment": {
-          "type": "number",
-          "default": 0.0
-        },
-        "storage_time_period": {
-          "type": "number",
-          "default": 0
-        },
-        "freeboard_input": {
-          "type": "number",
-          "default": 0.0
+        "properties": {
+          "manure_treatment_type": {
+            "type": "string",
+            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+          },
+          "total_solids_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "volatile_solids_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "nitrogen_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "phosphorus_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "potassium_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "storage_time_period": {
+            "type": "number"
+          },
+          "freeboard_input": {
+            "type": "number"
+          },
+          "composting_type": {
+            "type": "string",
+            "description": "Composting Type -- The type of composting.",
+            "pattern": "^(intensive windrow|passive windrow|static pile)$",
+            "default": "intensive windrow"
+          },
+          "last_compost_turning_or_addition": {
+            "type": "number",
+            "description": "The number of days since the last turning or addition event (day)",
+            "default": 1
+          },
+          "manure_cover": {
+            "type": "string",
+            "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+            "pattern": "(cover|no cover|N/A)",
+            "default": "no cover"
+          }
         }
       }
     }
@@ -3942,38 +3958,117 @@
       "default": 0
     }
   },
-  "feed_quality_properties": {
-    "rufas_id": {
+  "tractor_dataset_properties": {
+    "ID": {
       "type": "number",
-      "description": "Unique integer identifier for feeds used within the RuFaS model.",
-      "minimum": 1
+      "description": "Unique integer identifier for the data entry"
     },
-    "quality_id": {
-      "type": "number",
-      "description": "Quality ID",
-      "minimum": 1
-    },
-    "status": {
+    "Crop Type or Tillage Implement": {
       "type": "string",
-      "description": "Status",
-      "pattern": "(immature|mid-maturity|mature)"
+      "default": "untitled"
     },
-    "differentiating_nutrient": {
+    "Tractor Size": {
       "type": "string",
-      "description": "Differentiating Nutrient",
-      "pattern": "(DM|NDF)"
+      "description": "The categorical size of the tractor",
+      "pattern": "(small|medium|large)",
+      "default": "medium"
     },
-    "low_percent": {
+    "Operation": { "type": "string" },
+    "Depth": {
       "type": "number",
-      "description": "Low Percent",
+      "description": "How deep in the soil the implement goes",
       "minimum": 0,
-      "maximum": 100
+      "maximum": 10,
+      "default": 0
     },
-    "high_percent": {
+    "Tractor Implement": {
+      "type": "string",
+      "description": "The implement that is attached to the tractor"
+    },
+    "Tractor A (unitless)": {
       "type": "number",
-      "description": "High Percent",
-      "minimum": 0,
-      "maximum": 100
+      "description": "Parameter A as described in the scientific references",
+      "default": 0
+    },
+    "Tractor B (unitless)": {
+      "type": "number",
+      "description": "Parameter B as described in the scientific references",
+      "default": 0
+    },
+    "Tractor C (unitless)": {
+      "type": "number",
+      "description": "Parameter C as described in the scientific references",
+      "default": 0
+    },
+    "Tractor Implement Width (m)": {
+      "type": "number",
+      "description": "The width of the implement in meters",
+      "default": 0,
+      "minimum": 0
+    },
+    "Tractor Implement Mass (kg)": {
+      "type": "number",
+      "description": "The mass of the implement in kg",
+      "default": 0,
+      "minimum": 0
+    },
+    "Tractor E (unitless)": {
+      "type": "number",
+      "description": "Parameter E as described in the scientific references",
+      "default": 0
+    },
+    "Tractor F (unitless)": {
+      "type": "number",
+      "description": "Parameter F as described in the scientific references",
+      "default": 0
+    },
+    "Tractor G (unitless)": {
+      "type": "number",
+      "description": "Parameter G as described in the scientific references",
+      "default": 0
+    },
+    "is depth relevant": {
+      "type": "bool",
+      "description": "true if depth is relevant for attachment operation, otherwise false"
+    },
+    "Max Throughput (tons dm/hour)": {
+      "type": "number",
+      "description": "The maximum throughput of the implement (tons dm/hour)",
+      "default": 0
+    }
+  },
+  "EEE_constants_properties": {
+    "constants": {
+      "type": "array",
+      "description": "The constants used in EEE module.",
+      "properties": {
+        "type": "object",
+        "ID": {
+          "type": "number"
+        },
+        "Grouping": {
+          "type": "string",
+          "default": ""
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string",
+          "default": ""
+        },
+        "Value": {
+          "type": "number"
+        },
+        "Unit": {
+          "type": "string",
+          "default": "unitless"
+        },
+        "Notes and remarks": {
+          "type": "string",
+          "default": ""
+        }
+      }
     }
   }
 }

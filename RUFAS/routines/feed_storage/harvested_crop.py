@@ -66,6 +66,12 @@ class HarvestedCrop:
     def __post_init__(self):
         """
         Validates that the type of the crop is consistent with its category.
+
+        Raises
+        ------
+        ValueError
+            If the crop type is not valid for the crop category.
+
         """
         category_to_type = {
             CropCategory.SMALL_GRAIN: [
@@ -92,6 +98,4 @@ class HarvestedCrop:
         }
 
         if self.type not in category_to_type[self.category]:
-            raise ValueError(
-                f"{self.type} is not a valid type for the category {self.category}."
-            )
+            raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")

@@ -108,9 +108,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_phosphorus: float = 0.0
     liquid_manure_potassium: float = 0.0
     daily_final_manure_volume: float = 0.0
-    liquid_manure_daily_volume: float = (
-        0.0  # To satisfy the LiquidManurePortionProtocol
-    )
+    liquid_manure_daily_volume: float = 0.0  # To satisfy the LiquidManurePortionProtocol
 
     storage_methane: float = 0.0
     storage_ammonia: float = 0.0
@@ -178,9 +176,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         if not isinstance(other, ManureTreatmentDailyOutput):
             raise TypeError("Other must be of type ManureTreatmentDailyOutput.")
 
-        return ManureTreatmentDailyOutput(
-            *[attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))]
-        )
+        return ManureTreatmentDailyOutput(*[attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))])
 
     def clone(self) -> ManureTreatmentDailyOutput:
         """Returns a clone of this object.

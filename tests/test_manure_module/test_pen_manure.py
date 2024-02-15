@@ -31,23 +31,23 @@ def test_pen_manure_init() -> None:
 
     # Arrange
     manure_data = {
-        'urea': 1.0,
-        'urine': 2.0,
-        'urine_total_ammoniacal_nitrogen': 3.0,
-        'manure_total_ammoniacal_nitrogen': 4.0,
-        'nitrogen': 5.0,
-        'manure_mass': 6.0,
-        'total_solids': 7.0,
-        'degradable_volatile_solids': 8.0,
-        'non_degradable_volatile_solids': 9.0,
-        'inorganic_phosphorus_fraction': 10.0,
-        'organic_phosphorus_fraction': 11.0,
-        'non_water_inorganic_phosphorus_fraction': 12.0,
-        'non_water_organic_phosphorus_fraction': 13.0,
-        'phosphorus': 14.0,
-        'phosphorus_fraction': 15.0,
-        'potassium': 16.0,
-        'enteric_methane_kg': 17.0
+        "urea": 1.0,
+        "urine": 2.0,
+        "urine_total_ammoniacal_nitrogen": 3.0,
+        "manure_total_ammoniacal_nitrogen": 4.0,
+        "nitrogen": 5.0,
+        "manure_mass": 6.0,
+        "total_solids": 7.0,
+        "degradable_volatile_solids": 8.0,
+        "non_degradable_volatile_solids": 9.0,
+        "inorganic_phosphorus_fraction": 10.0,
+        "organic_phosphorus_fraction": 11.0,
+        "non_water_inorganic_phosphorus_fraction": 12.0,
+        "non_water_organic_phosphorus_fraction": 13.0,
+        "phosphorus": 14.0,
+        "phosphorus_fraction": 15.0,
+        "potassium": 16.0,
+        "enteric_methane_kg": 17.0,
     }
 
     # Act
@@ -112,13 +112,15 @@ def test_pen_manure_init() -> None:
         phosphorus=phosphorus,
         phosphorus_fraction=phosphorus_fraction,
         potassium=potassium,
-        enteric_methane_g=enteric_methane_g
+        enteric_methane_g=enteric_methane_g,
     )
     num_animals = 2
     expected_total_ammoniacal_nitrogen = (
-            total_ammoniacal_nitrogen_concentration *
-            manure_mass * GeneralConstants.KG_TO_GRAMS /
-            ManureConstants.MANURE_DENSITY
+        total_ammoniacal_nitrogen_concentration
+        / num_animals
+        * manure_mass
+        * GeneralConstants.KG_TO_GRAMS
+        / ManureConstants.MANURE_DENSITY
     ) * GeneralConstants.GRAMS_TO_KG
     expected_urine_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
 
@@ -126,24 +128,25 @@ def test_pen_manure_init() -> None:
     manure = PenManure.get_instance(animal_manure, num_animals)
 
     # Assert
-    assert manure.urea == approx(animal_manure['urea'] / num_animals)
-    assert manure.urine == approx(animal_manure['urine'])
-    assert manure.urine_nitrogen == approx(animal_manure['urine_nitrogen'])
+    assert manure.urea == approx(animal_manure["urea"] / num_animals)
+    assert manure.urine == approx(animal_manure["urine"])
+    assert manure.urine_nitrogen == approx(animal_manure["urine_nitrogen"])
     assert manure.urine_total_ammoniacal_nitrogen == approx(expected_urine_ammoniacal_nitrogen)
     assert manure.manure_total_ammoniacal_nitrogen == approx(expected_total_ammoniacal_nitrogen)
-    assert manure.nitrogen == approx(animal_manure['manure_nitrogen'])
-    assert manure.manure_mass == approx(animal_manure['manure_mass'])
-    assert manure.total_solids == approx(animal_manure['total_solids'])
-    assert manure.degradable_volatile_solids == approx(animal_manure['degradable_volatile_solids'])
-    assert manure.non_degradable_volatile_solids == approx(animal_manure['non_degradable_volatile_solids'])
-    assert manure.inorganic_phosphorus_fraction == approx(animal_manure['inorganic_phosphorus_fraction'] / num_animals)
-    assert manure.organic_phosphorus_fraction == approx(animal_manure['organic_phosphorus_fraction'] / num_animals)
-    assert manure.non_water_inorganic_phosphorus_fraction == \
-        approx(animal_manure['non_water_inorganic_phosphorus_fraction'] / num_animals)
-    assert manure.non_water_organic_phosphorus_fraction == approx(animal_manure
-                                                                  ['non_water_organic_phosphorus_fraction']
-                                                                  / num_animals)
-    assert manure.phosphorus == approx(animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG)
-    assert manure.phosphorus_fraction == approx(animal_manure['phosphorus_fraction'] / num_animals)
-    assert manure.potassium == approx(animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG)
-    assert manure.enteric_methane_kg == approx(animal_manure['enteric_methane_g'] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.nitrogen == approx(animal_manure["manure_nitrogen"])
+    assert manure.manure_mass == approx(animal_manure["manure_mass"])
+    assert manure.total_solids == approx(animal_manure["total_solids"])
+    assert manure.degradable_volatile_solids == approx(animal_manure["degradable_volatile_solids"])
+    assert manure.non_degradable_volatile_solids == approx(animal_manure["non_degradable_volatile_solids"])
+    assert manure.inorganic_phosphorus_fraction == approx(animal_manure["inorganic_phosphorus_fraction"] / num_animals)
+    assert manure.organic_phosphorus_fraction == approx(animal_manure["organic_phosphorus_fraction"] / num_animals)
+    assert manure.non_water_inorganic_phosphorus_fraction == approx(
+        animal_manure["non_water_inorganic_phosphorus_fraction"] / num_animals
+    )
+    assert manure.non_water_organic_phosphorus_fraction == approx(
+        animal_manure["non_water_organic_phosphorus_fraction"] / num_animals
+    )
+    assert manure.phosphorus == approx(animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.phosphorus_fraction == approx(animal_manure["phosphorus_fraction"] / num_animals)
+    assert manure.potassium == approx(animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.enteric_methane_kg == approx(animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG)

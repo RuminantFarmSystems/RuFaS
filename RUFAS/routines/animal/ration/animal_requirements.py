@@ -93,7 +93,7 @@ class AnimalRequirements:
         milk: List[float],
         CP_milk: List[float],
         milk_production_reduction: List[float],
-        calc_method: str = "mean"
+        calc_method: str = "mean",
     ) -> None:
         """
         This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats
@@ -179,40 +179,42 @@ class AnimalRequirements:
         recalc : boolean
             True if requirements need to be recalculated since grouping
         """
-        requirements_lists = {'NEmaint_requirement': [],
-                              'NEa_requirement': [],
-                              'NEg_requirement': [],
-                              'NEpreg_requirement': [],
-                              'NEl_requirement': [],
-                              'MP_requirement': [],
-                              'Ca_requirement': [],
-                              'P_requirement': [],
-                              'DMIest_requirement': [],
-                              'BW': [],
-                              'milk': [0],
-                              'milk_production_reduction': [0],
-                              'CP_milk': [0]
-                              }
+        requirements_lists = {
+            "NEmaint_requirement": [],
+            "NEa_requirement": [],
+            "NEg_requirement": [],
+            "NEpreg_requirement": [],
+            "NEl_requirement": [],
+            "MP_requirement": [],
+            "Ca_requirement": [],
+            "P_requirement": [],
+            "DMIest_requirement": [],
+            "BW": [],
+            "milk": [0],
+            "milk_production_reduction": [0],
+            "CP_milk": [0],
+        }
         if recalc:
             requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
         else:
             requirements_lists = self.use_existing_requirements(pen, animal_grouping_scenario, requirements_lists)
 
-        self.calc_pen_requirements(requirements_lists['NEmaint_requirement'],
-                                   requirements_lists['NEa_requirement'],
-                                   requirements_lists['NEg_requirement'],
-                                   requirements_lists['NEpreg_requirement'],
-                                   requirements_lists['NEl_requirement'],
-                                   requirements_lists['MP_requirement'],
-                                   requirements_lists['Ca_requirement'],
-                                   requirements_lists['P_requirement'],
-                                   requirements_lists['DMIest_requirement'],
-                                   requirements_lists['BW'],
-                                   requirements_lists['milk'],
-                                   requirements_lists['CP_milk'],
-                                   requirements_lists['milk_production_reduction'],
-                                   "mean"
-                                   )
+        self.calc_pen_requirements(
+            requirements_lists["NEmaint_requirement"],
+            requirements_lists["NEa_requirement"],
+            requirements_lists["NEg_requirement"],
+            requirements_lists["NEpreg_requirement"],
+            requirements_lists["NEl_requirement"],
+            requirements_lists["MP_requirement"],
+            requirements_lists["Ca_requirement"],
+            requirements_lists["P_requirement"],
+            requirements_lists["DMIest_requirement"],
+            requirements_lists["BW"],
+            requirements_lists["milk"],
+            requirements_lists["CP_milk"],
+            requirements_lists["milk_production_reduction"],
+            "mean",
+        )
 
         avg_nutrient_rqmts = {
             "NEmaint_requirement": self.NEmaint_requirement,
@@ -267,7 +269,11 @@ class AnimalRequirements:
                     previous_temperature=15,
                     average_daily_gain_heifer=animal.daily_growth,
                 )
-            elif animal_type in [AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+            elif animal_type in [
+                AnimalType.HEIFER_II,
+                AnimalType.HEIFER_III,
+                AnimalType.DRY_COW,
+            ]:
                 req = self.calc_rqmts(
                     body_weight=animal.body_weight,
                     mature_body_weight=animal.mature_body_weight,
@@ -311,24 +317,26 @@ class AnimalRequirements:
                 # calculating the activity requirement for energy
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)
                 NEa_val = self.energy_activity_rqmts(
-                    animal.body_weight, pen.housing_type, (math.sqrt(animal.DVD**2 + animal.DHD**2))
+                    animal.body_weight,
+                    pen.housing_type,
+                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
-                requirements_lists['milk'].append(animal.estimated_daily_milk_produced)
-                requirements_lists['milk_production_reduction'].append(animal.milk_production_reduction)
-                requirements_lists['CP_milk'].append(animal.CP_milk)
+                requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
+                requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
+                requirements_lists["CP_milk"].append(animal.CP_milk)
             else:
                 NEa_val = 0
 
-            requirements_lists['NEmaint_requirement'].append(req["NEmaint_requirement"])
-            requirements_lists['NEa_requirement'].append(NEa_val)
-            requirements_lists['NEg_requirement'].append(req["NEg_requirement"])
-            requirements_lists['NEpreg_requirement'].append(req["NEpreg_requirement"])
-            requirements_lists['NEl_requirement'].append(req["NEl_requirement"])
-            requirements_lists['MP_requirement'].append(req["MP_requirement"])
-            requirements_lists['Ca_requirement'].append(req["Ca_requirement"])
-            requirements_lists['P_requirement'].append(req["P_requirement"])
-            requirements_lists['DMIest_requirement'].append(req["DMIest_requirement"])
-            requirements_lists['BW'].append(animal.body_weight)
+            requirements_lists["NEmaint_requirement"].append(req["NEmaint_requirement"])
+            requirements_lists["NEa_requirement"].append(NEa_val)
+            requirements_lists["NEg_requirement"].append(req["NEg_requirement"])
+            requirements_lists["NEpreg_requirement"].append(req["NEpreg_requirement"])
+            requirements_lists["NEl_requirement"].append(req["NEl_requirement"])
+            requirements_lists["MP_requirement"].append(req["MP_requirement"])
+            requirements_lists["Ca_requirement"].append(req["Ca_requirement"])
+            requirements_lists["P_requirement"].append(req["P_requirement"])
+            requirements_lists["DMIest_requirement"].append(req["DMIest_requirement"])
+            requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
     def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
@@ -360,24 +368,26 @@ class AnimalRequirements:
             if animal_type in [AnimalType.LAC_COW]:
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)
                 NEa_val = self.energy_activity_rqmts(
-                    animal.body_weight, pen.housing_type, (math.sqrt(animal.DVD**2 + animal.DHD**2))
+                    animal.body_weight,
+                    pen.housing_type,
+                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
-                requirements_lists['milk'].append(animal.estimated_daily_milk_produced)
-                requirements_lists['milk_production_reduction'].append(animal.milk_production_reduction)
-                requirements_lists['CP_milk'].append(animal.CP_milk)
+                requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
+                requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
+                requirements_lists["CP_milk"].append(animal.CP_milk)
             else:
                 NEa_val = 0
 
-            requirements_lists['NEmaint_requirement'].append(animal.NEmaint_requirement)
-            requirements_lists['NEa_requirement'].append(NEa_val)
-            requirements_lists['NEg_requirement'].append(animal.NEg_requirement)
-            requirements_lists['NEpreg_requirement'].append(animal.NEpreg_requirement)
-            requirements_lists['NEl_requirement'].append(animal.NEl_requirement)
-            requirements_lists['MP_requirement'].append(animal.MP_requirement)
-            requirements_lists['Ca_requirement'].append(animal.Ca_requirement)
-            requirements_lists['P_requirement'].append(animal.P_requirement)
-            requirements_lists['DMIest_requirement'].append(animal.DMIest_requirement)
-            requirements_lists['BW'].append(animal.body_weight)
+            requirements_lists["NEmaint_requirement"].append(animal.NEmaint_requirement)
+            requirements_lists["NEa_requirement"].append(NEa_val)
+            requirements_lists["NEg_requirement"].append(animal.NEg_requirement)
+            requirements_lists["NEpreg_requirement"].append(animal.NEpreg_requirement)
+            requirements_lists["NEl_requirement"].append(animal.NEl_requirement)
+            requirements_lists["MP_requirement"].append(animal.MP_requirement)
+            requirements_lists["Ca_requirement"].append(animal.Ca_requirement)
+            requirements_lists["P_requirement"].append(animal.P_requirement)
+            requirements_lists["DMIest_requirement"].append(animal.DMIest_requirement)
+            requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
     def calc_rqmts(
@@ -400,7 +410,7 @@ class AnimalRequirements:
         NDF_conc: float | None = 0.3,
         TDN_conc: float | None = 0.7,
         net_energy_diet_concentration: float | None = 1.0,
-        days_born: float | None = None
+        days_born: float | None = None,
     ) -> Dict[str, float]:
         """
         Calculates the dietary requirements of a single animal.
@@ -497,7 +507,7 @@ class AnimalRequirements:
                 milk_production,
                 milk_fat,
                 net_energy_diet_concentration,
-                days_born
+                days_born,
             )
             metabolizable_protein_requirement = self.calculate_NRC_protein_requirements(
                 body_weight,
@@ -552,11 +562,27 @@ class AnimalRequirements:
             ) = self.calculate_NASEM_energy_maintenance_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
             )
-            net_energy_growth, average_daily_gain, frame_weight_gain = self.calculate_NASEM_energy_growth_requirements(
-                body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
+            (
+                net_energy_growth,
+                average_daily_gain,
+                frame_weight_gain,
+            ) = self.calculate_NASEM_energy_growth_requirements(
+                body_weight,
+                mature_body_weight,
+                average_daily_gain_heifer,
+                animal_type,
+                parity,
+                calving_interval,
             )
-            net_energy_pregnancy, gravid_uterine_weight_gain = self.calculate_NASEM_energy_pregnancy_requirements(
-                lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight
+            (
+                net_energy_pregnancy,
+                gravid_uterine_weight_gain,
+            ) = self.calculate_NASEM_energy_pregnancy_requirements(
+                lactating,
+                day_of_pregnancy,
+                days_in_milk,
+                gravid_uterine_weight,
+                uterine_weight,
             )
             metabolizable_protein_requirement = self.calculate_NASEM_protein_requirements(
                 lactating,
@@ -594,9 +620,7 @@ class AnimalRequirements:
                 {AnimalBase.config['nutrient_standard']} \
                 not supported"
             info_map = {"function": self.calc_rqmts}
-            om.add_error(
-                "nutrient_standard_error", nutrient_standard_error, info_map
-            )
+            om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
         # Requirements summary dictionary
         return {
             "NEmaint_requirement": net_energy_maintenance,
@@ -663,7 +687,11 @@ class AnimalRequirements:
             conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             net_energy_maintenance = 0.08 * (body_weight - conceptus_weight) ** 0.75
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+        ]:
             body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
             net_energy_maintenance = (body_weight - conceptus_weight) ** (0.75) * (
                 0.086 * (0.8 + (body_condition_score_9 - 1) * 0.05)
@@ -809,7 +837,11 @@ class AnimalRequirements:
                 average_daily_gain = 0.0
         # [A.Heifer.A.12]
         # Average Daily Gain (kg)
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+        ]:
             average_daily_gain = max(average_daily_gain_heifer, 0.0)
         # [A.Cow.A.12]-[A.Heifer.A.13]
         # Equivalent empty weight gain (kg)
@@ -881,7 +913,11 @@ class AnimalRequirements:
                 average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
             else:
                 average_daily_gain = 0.0
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+        ]:
             average_daily_gain = max(average_daily_gain_heifer, 0.0)
         else:
             average_daily_gain = 0.0
@@ -1222,7 +1258,12 @@ class AnimalRequirements:
         if animal_type in [AnimalType.LAC_COW]:
             # [A.Cow.B.7]
             metabolizable_protein_requirement = MPm + MPg + MPpreg + MPlact
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ]:
             # [A.Heifer.B.6]
             metabolizable_protein_requirement = MPm + MPg + MPpreg
         return metabolizable_protein_requirement
@@ -1284,7 +1325,7 @@ class AnimalRequirements:
         NPMilk: Net protein in milk, or milk true protein yield, g
         TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
 
-        # TODO Consider inclusion of equations for estimating requirement for Non-Essential Aminoacids (NEAA)
+        # TODO Include equations for estimating requirement for Non-Essential Aminoacids (NEAA) GitHub Issue #1210
 
         References
         ----------
@@ -1362,7 +1403,11 @@ class AnimalRequirements:
             Ca_maint = 0.031 * body_weight + 0.08 * (body_weight / 100)
         elif animal_type in [AnimalType.DRY_COW]:
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+        ]:
             # [A.Heifer.C.1]
             # Calcium maintenance requirement (g)
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
@@ -1386,7 +1431,12 @@ class AnimalRequirements:
             # [A.Cow.C.5]
             # Total calcium requirement (g)
             calcium_requirement = Ca_maint + Ca_growth + Ca_preg + Ca_lact
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ]:
             # [A.Heifer.C.4]
             # Total calcium requirement (g)
             calcium_requirement = Ca_maint + Ca_growth + Ca_preg
@@ -1516,7 +1566,12 @@ class AnimalRequirements:
             P_lact = 0.9 * milk_production
         if animal_type in [AnimalType.LAC_COW]:
             phosphorus_requirement = P_growth + P_preg + P_lact + P_maint
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ]:
             phosphorus_requirement = P_growth + P_preg + P_maint
         return phosphorus_requirement
 
@@ -1575,7 +1630,12 @@ class AnimalRequirements:
         """
         if animal_type in [AnimalType.LAC_COW]:
             P_Maint = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
-        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+        elif animal_type in [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ]:
             P_Maint = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
         else:
             P_Maint = 0.0
@@ -1605,7 +1665,7 @@ class AnimalRequirements:
         milk_production: float,
         milk_fat: float,
         net_energy_diet_concentration: float,
-        days_born: float
+        days_born: float,
     ) -> float:
         """Calculates dry matter intake according to NRC (2001).
 
@@ -1665,9 +1725,7 @@ class AnimalRequirements:
             else:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
-                body_weight**0.75
-                * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use)
-                / DivFact
+                body_weight**0.75 * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use) / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)

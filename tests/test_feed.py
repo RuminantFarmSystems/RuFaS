@@ -94,11 +94,6 @@ def test_reset_feed_data():
     pass
 
 
-def test_get_feeds_split_by_maturity():
-    """Unit test for function get_feeds_split_by_maturity in file routines/feed/feed.py"""
-    pass
-
-
 def test_get_all_feed_units():
     """Unit test for function get_all_feed_units in file routines/feed/feed.py"""
     pass
@@ -106,16 +101,6 @@ def test_get_all_feed_units():
 
 def test_get_purchased_feed_ids():
     """Unit test for function get_purchased_feed_ids in file routines/feed/feed.py"""
-    pass
-
-
-def test_get_feed_id():
-    """Unit test for function get_feed_id in file routines/feed/feed.py"""
-    pass
-
-
-def test_get_feed_quality():
-    """Unit test for function get_feed_quality in file routines/feed/feed.py"""
     pass
 
 
@@ -168,9 +153,8 @@ def test_degrade_protein():
 def feed(mocker: MockerFixture) -> Feed:
     """Returns an uninitialized Feed object"""
 
-    mocker.patch('RUFAS.routines.feed.Feed.__init__',
-                 return_value=None)
-    return Feed(data=mocker.MagicMock(), nutrient_standard='NASEM')
+    mocker.patch("RUFAS.routines.feed.Feed.__init__", return_value=None)
+    return Feed(data=mocker.MagicMock(), nutrient_standard="NASEM")
 
 
 def test_get_quality_specific_feed_costs(mocker: MockerFixture, feed: Feed) -> None:
@@ -185,25 +169,18 @@ def test_get_quality_specific_feed_costs(mocker: MockerFixture, feed: Feed) -> N
         2: [2],
         26: [26],
         34: [36],
-        52: [54]
+        52: [54],
     }
-    mocker.patch.object(feed, 'get_quality_specific_purchased_feed_ids',
-                        input_feed_id_to_quality_specific_feed_id_dict.__getitem__)
-    feed.feed_costs = {
-        '2': 0.17,
-        '26': 0.1,
-        '34': 0.01,
-        '52': 0.15
-    }
+    mocker.patch.object(
+        feed,
+        "get_quality_specific_purchased_feed_ids",
+        input_feed_id_to_quality_specific_feed_id_dict.__getitem__,
+    )
+    feed.feed_costs = {"2": 0.17, "26": 0.1, "34": 0.01, "52": 0.15}
 
     # Act
     updated_costs = feed.get_quality_specific_feed_costs(input_feed_ids)
 
     # Assert
-    expected_updated_costs = {
-        '2': 0.17,
-        '26': 0.1,
-        '36': 0.01,
-        '54': 0.15
-    }
+    expected_updated_costs = {"2": 0.17, "26": 0.1, "36": 0.01, "54": 0.15}
     assert updated_costs == expected_updated_costs

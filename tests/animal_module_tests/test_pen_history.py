@@ -4,12 +4,12 @@ from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 
 
 @pytest.mark.parametrize(
-    'start_date, end_date, pen, classes_in_pen',
+    "start_date, end_date, pen, classes_in_pen",
     [
-        (1, 10, 'pen1', ['class1', 'class2']),
-        (5, 20, 'pen2', ['class3']),
-        (100, 200, 'pen3', ['class1', 'class2', 'class3']),
-    ]
+        (1, 10, "pen1", ["class1", "class2"]),
+        (5, 20, "pen2", ["class3"]),
+        (100, 200, "pen3", ["class1", "class2", "class3"]),
+    ],
 )
 def test_pen_history_initialization(start_date: int, end_date: int, pen, classes_in_pen: list[str]) -> None:
     """
@@ -22,7 +22,7 @@ def test_pen_history_initialization(start_date: int, end_date: int, pen, classes
     pen_history = PenHistory(start_date, end_date, pen, classes_in_pen)
 
     # Assert
-    assert pen_history.start_date == start_date, 'start_date not initialized correctly'
-    assert pen_history.end_date == end_date, 'end_date not initialized correctly'
-    assert pen_history.pen == pen, 'pen not initialized correctly'
-    assert pen_history.classes_in_pen == classes_in_pen, 'classes_in_pen not initialized correctly'
+    assert pen_history.start_date == start_date, "start_date not initialized correctly"
+    assert pen_history.end_date == end_date, "end_date not initialized correctly"
+    assert pen_history.pen == pen, "pen not initialized correctly"
+    assert pen_history.classes_in_pen == classes_in_pen, "classes_in_pen not initialized correctly"

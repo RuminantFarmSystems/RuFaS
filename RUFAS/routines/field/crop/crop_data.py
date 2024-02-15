@@ -29,6 +29,7 @@ class PlantCategory(Enum):
         Represents tree-type plants.
 
     """
+
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
@@ -146,7 +147,7 @@ class CropData:
         Proportion of biomass in roots (unitless).
     usable_light : Optional[float]
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth_max : Optional[float]
+    biomass_growth_max : float, default 0.0
         Upper limit of biomass accumulation for the day (kg/ha).
     biomass_growth : Optional[float]
         Biomass accumulated during the day (kg/ha).
@@ -156,13 +157,13 @@ class CropData:
         Above ground plant biomass excluding roots (kg/ha).
     root_biomass : Optional[float]
         Biomass stored in roots (kg/ha).
-    nitrogen : float
+    nitrogen : float, default 0.0
         Nitrogen stored in plant biomass (kg/ha).
-    optimal_nitrogen : float
+    optimal_nitrogen : float, default 0.0
         Optimal amount of nitrogen for current growth stage (kg/ha).
-    phosphorus : float
+    phosphorus : float, default 0.0
         Phosphorus stored in plant biomass (kg/ha).
-    optimal_phosphorus : float
+    optimal_phosphorus : float, default 0.0
         Optimal amount of phosphorus for current growth stage (kg/ha).
     water_stress : float
         Water stress for the day (unitless).
@@ -349,15 +350,15 @@ class CropData:
         Amount of the desired crop product to be removed from the field (kg/ha).
     dry_matter_yield_collected : Optional[float], default None
         Dry matter mass collected at harvest (kg/ha).
-    yield_residue : Optional[float], default None
+    yield_residue : float, default 0.0
         Amount of dry matter residue created; unharvested yield (kg/ha).
     yield_nitrogen : Optional[float], default None
         Nitrogen contained in the harvested yield (kg/ha).
     yield_phosphorus : Optional[float], default None
         Phosphorus contained in the harvested yield (kg/ha).
-    residue_nitrogen : Optional[float], default None
+    residue_nitrogen : float, default 0.0
         Amount of nitrogen in the residue from this plant (kg/ha).
-    residue_phosphorus : Optional[float], default None
+    residue_phosphorus : float, default 0.0
         Amount of phosphorus in the residue from this plant (kg/ha).
     dormancy_loss_fraction : Optional[float], default None
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
@@ -372,6 +373,7 @@ class CropData:
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
     """
+
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     name: Optional[str] = "default generic annual crop"
@@ -441,17 +443,17 @@ class CropData:
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
     usable_light: Optional[float] = None
-    biomass_growth_max: Optional[float] = None
+    biomass_growth_max: float = 0.0
     biomass_growth: Optional[float] = None
     previous_biomass: Optional[float] = None
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
 
     # ---- growth constraints
-    nitrogen: float = 35
-    optimal_nitrogen: float = 100
-    phosphorus: float = 20
-    optimal_phosphorus: float = 80
+    nitrogen: float = 0.0
+    optimal_nitrogen: float = 0.0
+    phosphorus: float = 0.0
+    optimal_phosphorus: float = 0.0
     water_stress: float = 0.0
     temp_stress: Optional[float] = None
     nitrogen_stress: Optional[float] = None
@@ -553,11 +555,11 @@ class CropData:
     cut_biomass: Optional[float] = None
     wet_yield_collected: Optional[float] = None
     dry_matter_yield_collected: Optional[float] = None
-    yield_residue: Optional[float] = None
+    yield_residue: float = 0.0
     yield_nitrogen: Optional[float] = None
     yield_phosphorus: Optional[float] = None
-    residue_nitrogen: Optional[float] = None
-    residue_phosphorus: Optional[float] = None
+    residue_nitrogen: float = 0.0
+    residue_phosphorus: float = 0.0
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None
@@ -574,14 +576,19 @@ class CropData:
             self.dormancy_loss_fraction = 0.3
 
         # Set perennial status
-        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.TREE:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL
+            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.TREE
+        ):
             self.is_perennial = True
 
         # set Fixation status
-        if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
-                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME
+            or self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME
+        ):
             self.is_nitrogen_fixer = True
 
     @property
