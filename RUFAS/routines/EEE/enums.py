@@ -10,13 +10,13 @@ class TractorSize(Enum):
 class OperationType(Enum):
     PLANTING = "Planting"
     TILLING = "Tilling"
-    LIQUID_MANURE_APPLICATION_SURFACE = "Liquid Manure Application: Surface"
-    LIQUID_MANURE_APPLICATION_BELOW_SURFACE = "Liquid Manure Application: Below Surface"
-    FERTILIZER_APPLICATION_SURFACE = "Fertilizer Application: Surface"
-    FERTILIZER_APPLICATION_BELOW_SURFACE = "Fertilizer Application: Below Surface"
+    LIQUID_MANURE_APPLICATION_SURFACE = "Liquid Manure Application - Surface"
+    LIQUID_MANURE_APPLICATION_BELOW_SURFACE = "Liquid Manure Application - Below Surface"
+    FERTILIZER_APPLICATION_SURFACE = "Fertilizer Application - Surface"
+    FERTILIZER_APPLICATION_BELOW_SURFACE = "Fertilizer Application - Below Surface"
     MOWING = "Mowing"
     COLLECTION = "Collection"
-    WINDROWING = "windrowing"
+    WINDROWING = "Windrowing"
 
 
 class CropType(Enum):
