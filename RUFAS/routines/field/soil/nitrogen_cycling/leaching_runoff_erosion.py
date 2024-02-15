@@ -239,9 +239,9 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _determine_erosion_nitrogen_loss_content(
-            nitrogen_erosion_concentration: float,
-            daily_soil_lost: float,
-            enrichment_ratio: float,
+        nitrogen_erosion_concentration: float,
+        daily_soil_lost: float,
+        enrichment_ratio: float,
     ) -> float:
         """
         This method determines nitrogen mass loss in erosion.
@@ -296,11 +296,11 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _calculate_eroded_organic_nitrogen(
-            nitrogen_content: float,
-            bulk_density: float,
-            layer_thickness: float,
-            field_size: float,
-            eroded_sediment: float,
+        nitrogen_content: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
+        eroded_sediment: float,
     ) -> float:
         """
         This method calculates how much organic nitrogen is lost from the field via eroded sediment.
@@ -341,12 +341,12 @@ class LeachingRunoffErosion:
 
     @staticmethod
     def _calculate_nitrogen_removed_by_water(
-            nitrogen_content: float,
-            water_amount: float,
-            extraction_coefficient: float,
-            bulk_density: float,
-            layer_thickness: float,
-            field_size: float,
+        nitrogen_content: float,
+        water_amount: float,
+        extraction_coefficient: float,
+        bulk_density: float,
+        layer_thickness: float,
+        field_size: float,
     ) -> float:
         """
         Calculates how much nitrogen is lost from the given pool on the current day.
@@ -384,7 +384,7 @@ class LeachingRunoffErosion:
 
         """
         water_amount_in_liters = (
-                water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+            water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
         )
 
         nitrogen_content_in_mg_per_kg = LayerData.determine_soil_nutrient_concentration(
