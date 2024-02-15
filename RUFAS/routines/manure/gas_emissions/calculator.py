@@ -337,7 +337,7 @@ class GasEmissionsCalculator:
 
             :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`, and
 
-            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`.
+            :math:`barn\\_area` is the total barn area based on the pen type and number of stalls in :math:`m^2`.
 
         Parameters
         ----------
@@ -381,7 +381,7 @@ class GasEmissionsCalculator:
 
             :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`, and
 
-            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`.
+            :math:`barn\\_area` is the total barn area based on the pen type and number of stalls in :math:`m^2`.
 
         Parameters
         ----------
