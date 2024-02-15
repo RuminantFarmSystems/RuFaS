@@ -319,7 +319,7 @@ class GasEmissionsCalculator:
         return modified_hours * (max_temp - min_temp) / 2 + (max_temp + min_temp) / 2
 
     @classmethod
-    def housing_methane_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
+    def housing_methane_emission(cls, barn_area: float, barn_temp: float) -> float:
         """
         Calculate housing methane emissions from manure handlers.
 
@@ -343,8 +343,6 @@ class GasEmissionsCalculator:
 
         Parameters
         ----------
-        num_animals : int
-            Number of animals in the pen (unitless).
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
@@ -358,19 +356,16 @@ class GasEmissionsCalculator:
         Raises
         ------
         ValueError
-            If the number of animals or barn area is less than 0.
+            If the barn area is less than 0.
 
         """
-        if num_animals < 0:
-            raise ValueError("Number of animals must be greater than or equal to 0.")
-
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return num_animals * max(0.0, 0.13 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.13 * barn_temp) * barn_area / 1000
 
     @classmethod
-    def housing_carbon_dioxide_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
+    def housing_carbon_dioxide_emission(cls, barn_area: float, barn_temp: float) -> float:
         """
         Calculate carbon dioxide housing emission.
 
@@ -394,8 +389,6 @@ class GasEmissionsCalculator:
 
         Parameters
         ----------
-        num_animals : int
-            Number of animals in the pen (unitless).
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
@@ -412,13 +405,10 @@ class GasEmissionsCalculator:
             If the number of animals or barn area is less than 0.
 
         """
-        if num_animals < 0:
-            raise ValueError("Number of animals must be greater than or equal to 0.")
-
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
     @classmethod
     def housing_ammonia_emission(
