@@ -376,12 +376,10 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         temp=current_day_avg_tempC,
     )
     patch_for_calc_housing_methane_emission.assert_called_once_with(
-        num_animals=num_animals,
         barn_area=barn_area_from_pen_type,
         barn_temp=current_day_avg_tempC,
     )
     patch_for_calc_housing_carbon_dioxide_emission.assert_called_once_with(
-        num_animals=num_animals,
         barn_area=barn_area_from_pen_type,
         barn_temp=current_day_avg_tempC,
     )
