@@ -1,30 +1,34 @@
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module contains all necessary methods for updating all kinds of carbon in the field, based on the
-pseudocode soil documentation.
-
-References
--------
-pseudocode_soil S.6.C.1 to S.6.C.13
-"""
-
 
 class PoolGasPartition:
+    """
+    Manages the partitioning of carbon between different soil pools and the atmosphere,
+    contributing to the overall carbon cycling within a field.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
+        provided.
+    field_size : float, optional
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+        not provided (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
+        provided.
+
+    References
+    -------
+    pseudocode_soil S.6.C.1 to S.6.C.13
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
-            provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def partition_pool_gas(self):
@@ -265,9 +269,10 @@ class PoolGasPartition:
         float
             Updated passive carbon stored in the soil (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.13.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.13.
+
         """
         return (
             passive_carbon_amount
@@ -308,9 +313,10 @@ class PoolGasPartition:
         float
             Updated slow carbon stored in the soil (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.12.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.12.
+
         """
         return (
             slow_carbon_amount
@@ -341,9 +347,10 @@ class PoolGasPartition:
         float
             Plant carbon decomposed into the active carbon pool (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.11.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.11.
+
         """
         return plant_metabolic_active_carbon_remaining + plant_structural_active_carbon_remaining
 
@@ -367,9 +374,10 @@ class PoolGasPartition:
         float
             Soil carbon decomposed into the active carbon pool (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.11.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.11.
+
         """
         return soil_metabolic_active_carbon_remaining + soil_structural_active_carbon_remaining
 
@@ -405,9 +413,10 @@ class PoolGasPartition:
         float
             Updated active carbon stored in the soil (kg/ha).
 
-        Notes
+        References
         -----
-        This function follows pseudocode_soil Reference: S.6.C.11.
+        pseudocode_soil Reference: S.6.C.11.
+
         """
         return (
             active_carbon_amount
@@ -437,9 +446,10 @@ class PoolGasPartition:
         float
             Passive carbon decomposed into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.10.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.10.
+
         """
         return passive_carbon_decomposition_amount * (1 - passive_carbon_loss_rate)
 
@@ -462,9 +472,10 @@ class PoolGasPartition:
         float
             Passive carbon lost as CO2 during decomposition (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.10.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.10.
+
         """
         return passive_carbon_decomposition_amount * passive_carbon_loss_rate
 
@@ -492,9 +503,10 @@ class PoolGasPartition:
         float
             Slow carbon decomposed into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.9.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.9.
+
         """
         return slow_carbon_decomposition_amount * (1 - slow_carbon_loss_rate - slow_carbon_passive_decompose_rate)
 
@@ -517,9 +529,10 @@ class PoolGasPartition:
         float
             Slow carbon lost as CO2 during decomposition (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.9.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.9.
+
         """
         return slow_carbon_decomposition_amount * slow_carbon_loss_rate
 
@@ -542,9 +555,10 @@ class PoolGasPartition:
         float
             Slow carbon decomposed into passive carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.9.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.9.
+
         """
         return slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
 
@@ -565,9 +579,10 @@ class PoolGasPartition:
         float
             Active carbon decomposed into passive carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.8.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.8.
+
         """
         return active_carbon_decomposition_amount * 0.004
 
@@ -591,9 +606,10 @@ class PoolGasPartition:
         float
             Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.7.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.7.
+
         """
         return active_carbon_decomposition_amount * carbon_lost_adjusted_factor
 
@@ -617,9 +633,10 @@ class PoolGasPartition:
         float
             Active carbon decomposed into slow carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.7.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.7.
+
         """
         return active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
 
@@ -638,9 +655,10 @@ class PoolGasPartition:
         float
             Adjusted factor of CO2 loss from the decomposition of active carbon.
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.6.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.6.
+
         """
         return 0.85 - 0.68 * silt_clay_content
 
@@ -670,9 +688,10 @@ class PoolGasPartition:
         float
             Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.5.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.5.
+
         """
         return (
             decomposition_moisture_effect
@@ -708,9 +727,10 @@ class PoolGasPartition:
         float
             Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.4.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.4.
+
         """
         return (
             decomposition_moisture_effect
@@ -746,9 +766,10 @@ class PoolGasPartition:
         float
             Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.3.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.3.
+
         """
         return active_carbon_decomposition_rate * moisture_effect * temperature_effect * active_carbon
 
@@ -773,9 +794,10 @@ class PoolGasPartition:
         float
             Rate at which active carbon is decomposed into slow or passive carbon and CO2 (unitless).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.2.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.2.
+
         """
         return max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
 
@@ -799,9 +821,10 @@ class PoolGasPartition:
         float
             Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
 
@@ -826,9 +849,10 @@ class PoolGasPartition:
         float
             Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
 
@@ -853,9 +877,10 @@ class PoolGasPartition:
         float
             Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_structural_active_carbon_usage * structural_active_carbon_loss_rate
 
@@ -880,9 +905,10 @@ class PoolGasPartition:
         float
             Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
 
@@ -907,9 +933,10 @@ class PoolGasPartition:
         float
             Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
 
@@ -934,9 +961,10 @@ class PoolGasPartition:
         float
             Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return plant_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
 
@@ -961,9 +989,10 @@ class PoolGasPartition:
         float
             Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
 
@@ -988,9 +1017,10 @@ class PoolGasPartition:
         float
             Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
 
@@ -1015,9 +1045,10 @@ class PoolGasPartition:
         float
             Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_structural_active_carbon_usage * structural_active_carbon_loss_rate
 
@@ -1042,9 +1073,10 @@ class PoolGasPartition:
         float
             Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
 
@@ -1069,9 +1101,10 @@ class PoolGasPartition:
         float
             Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
 
@@ -1096,8 +1129,9 @@ class PoolGasPartition:
         float
             Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
 
-        Notes
-        -----
-        This function follows pseudocode_soil Reference: S.6.C.1.
+        References
+        ----------
+        pseudocode_soil Reference: S.6.C.1.
+
         """
         return soil_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
