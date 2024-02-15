@@ -6,8 +6,10 @@ from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
 
 
 from typing import Optional
-from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
+)
 
 """
 This module contains all necessary methods for updating all kinds of aggregated carbon in the field and also calls all
@@ -79,7 +81,7 @@ class CarbonCycling:
 
     def _soil_carbon_aggregation(self, field_size: float) -> None:
         """
-        This method updates aggregated attributes throughout the module
+        This method updates aggregated attributes throughout the module.
 
         Parameters
         ----------
@@ -89,44 +91,51 @@ class CarbonCycling:
         """
         for layer in self.data.soil_layers:
             soil_volume = self._determine_soil_volume(layer.layer_thickness, field_size)
-            soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume)*MEGAGRAMS_TO_KILOGRAMS
-            soil_active_carbon_fraction = self._determine_soil_active_carbon_fraction(layer.active_carbon_amount,
-                                                                                      soil_mass, field_size)
-            soil_slow_carbon_fraction = self._determine_soil_slow_carbon_fraction(layer.slow_carbon_amount,
-                                                                                  soil_mass, field_size)
-            soil_passive_carbon_fraction = self._determine_soil_passive_carbon_fraction(layer.passive_carbon_amount,
-                                                                                        soil_mass, field_size)
+            soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume) * MEGAGRAMS_TO_KILOGRAMS
+            soil_active_carbon_fraction = self._determine_soil_active_carbon_fraction(
+                layer.active_carbon_amount, soil_mass, field_size
+            )
+            soil_slow_carbon_fraction = self._determine_soil_slow_carbon_fraction(
+                layer.slow_carbon_amount, soil_mass, field_size
+            )
+            soil_passive_carbon_fraction = self._determine_soil_passive_carbon_fraction(
+                layer.passive_carbon_amount, soil_mass, field_size
+            )
             layer.soil_overall_carbon_fraction = self._determine_soil_overall_carbon_fraction(
                 soil_active_carbon_fraction,
                 soil_slow_carbon_fraction,
-                soil_passive_carbon_fraction)
-            layer.total_soil_carbon_amount = self._determine_total_soil_carbon_amount(layer.active_carbon_amount,
-                                                                                      layer.slow_carbon_amount,
-                                                                                      layer.passive_carbon_amount)
+                soil_passive_carbon_fraction,
+            )
+            layer.total_soil_carbon_amount = self._determine_total_soil_carbon_amount(
+                layer.active_carbon_amount,
+                layer.slow_carbon_amount,
+                layer.passive_carbon_amount,
+            )
             total_plant_carbon_CO2_loss = self._determine_total_plant_carbon_CO2_loss(
                 layer.plant_metabolic_active_carbon_loss,
                 layer.plant_structural_active_carbon_loss,
-                layer.plant_structural_slow_carbon_loss
+                layer.plant_structural_slow_carbon_loss,
             )
             total_soil_carbon_CO2_loss = self._determine_total_soil_carbon_CO2_loss(
                 layer.soil_metabolic_active_carbon_loss,
                 layer.soil_structural_active_carbon_loss,
-                layer.soil_structural_slow_carbon_loss
+                layer.soil_structural_slow_carbon_loss,
             )
             layer.annual_decomposition_carbon_CO2_lost = self._determine_total_decomposition_carbon_CO2_lost(
                 layer.active_carbon_to_slow_loss,
                 layer.slow_carbon_co2_lost_amount,
-                layer.passive_carbon_co2_lost_amount
+                layer.passive_carbon_co2_lost_amount,
             )
             layer.annual_carbon_CO2_lost = self._determine_total_carbon_CO2_lost(
                 total_plant_carbon_CO2_loss,
                 total_soil_carbon_CO2_loss,
-                layer.annual_decomposition_carbon_CO2_lost)
+                layer.annual_decomposition_carbon_CO2_lost,
+            )
 
     @staticmethod
     def _determine_soil_volume(layer_thickness: float, field_size: float) -> float:
         """
-        This method calculates the soil volume
+        This method calculates the soil volume.
 
         Parameters
         ----------
@@ -146,7 +155,7 @@ class CarbonCycling:
     @staticmethod
     def _determine_soil_mass(bulk_density: float, soil_volume: float) -> float:
         """
-        This method calculates the mass of soil
+        This method calculates the mass of soil.
 
         Parameters
         ----------
@@ -168,7 +177,7 @@ class CarbonCycling:
                                                soil_mass: float,
                                                field_size: float) -> float:
         """
-        This method calculates the fraction of active carbon in the soil
+        This method calculates the fraction of active carbon in the soil.
 
         Parameters
         ----------
@@ -189,14 +198,14 @@ class CarbonCycling:
         pseudoode_soil S.6.D.2
 
         """
-        return active_carbon_amount*field_size/soil_mass
+        return active_carbon_amount * field_size / soil_mass
 
     @staticmethod
     def _determine_soil_slow_carbon_fraction(slow_carbon_amount: float,
                                              soil_mass: float,
                                              field_size: float) -> float:
         """
-        This method calculates the fraction of slow carbon in the soil
+        This method calculates the fraction of slow carbon in the soil.
 
         Parameters
         ----------
@@ -217,14 +226,14 @@ class CarbonCycling:
         pseudoode_soil S.6.D.2
 
         """
-        return slow_carbon_amount*field_size/soil_mass
+        return slow_carbon_amount * field_size / soil_mass
 
     @staticmethod
     def _determine_soil_passive_carbon_fraction(passive_carbon_amount: float,
                                                 soil_mass: float,
                                                 field_size: float) -> float:
         """
-        This method calculates the fraction of passive carbon in the soil
+        This method calculates the fraction of passive carbon in the soil.
 
         Parameters
         ----------
@@ -254,7 +263,7 @@ class CarbonCycling:
                                                 soil_slow_carbon_fraction: float,
                                                 soil_passive_carbon_fraction: float) -> float:
         """
-        This method calculates the total fraction of carbon in the soil
+        This method calculates the total fraction of carbon in the soil.
 
         Parameters
         ----------
@@ -282,7 +291,7 @@ class CarbonCycling:
                                             slow_carbon_amount: float,
                                             passive_carbon_amount: float) -> float:
         """
-        This method calculates the total amount of soil carbon
+        This method calculates the total amount of soil carbon.
 
         Parameters
         ----------
@@ -310,7 +319,7 @@ class CarbonCycling:
                                                plant_structural_active_carbon_loss: float,
                                                plant_structural_slow_carbon_loss: float) -> float:
         """
-        This method calculates the total amount plant carbon lost as CO2
+        This method calculates the total amount plant carbon lost as CO2.
 
         Parameters
         ----------
@@ -331,15 +340,16 @@ class CarbonCycling:
         pseudoode_soil S.6.D.5
 
         """
-        return plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + \
-            plant_structural_slow_carbon_loss
+        return (
+            plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + plant_structural_slow_carbon_loss
+        )
 
     @staticmethod
     def _determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss: float,
                                               soil_structural_active_carbon_loss: float,
                                               soil_structural_slow_carbon_loss: float) -> float:
         """
-        This method calculates the total amount soil carbon lost as CO2
+        This method calculates the total amount soil carbon lost as CO2.
 
         Parameters
         ----------
@@ -360,15 +370,14 @@ class CarbonCycling:
         pseudoode_soil S.6.D.5
 
         """
-        return soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + \
-            soil_structural_slow_carbon_loss
+        return soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + soil_structural_slow_carbon_loss
 
     @staticmethod
     def _determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_loss: float,
                                                        slow_carbon_co2_lost_amount: float,
                                                        passive_carbon_co2_lost_amount: float) -> float:
         """
-        This method calculates the total amount of carbon lost as CO2 during decomposition
+        This method calculates the total amount of carbon lost as CO2 during decomposition.
 
         Parameters
         ----------
@@ -396,7 +405,7 @@ class CarbonCycling:
                                          total_soil_carbon_CO2_loss: float,
                                          total_decomposition_carbon_CO2_lost: float) -> float:
         """
-        This method calculates the total amount of carbon lost as CO2
+        This method calculates the total amount of carbon lost as CO2.
 
         Parameters
         ----------

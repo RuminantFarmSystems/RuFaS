@@ -15,10 +15,12 @@ class DummyDefaultEnumNoDefault(DefaultEnum):
 
 
 @pytest.mark.parametrize(
-        "enum_type, expected_default",
-        [(DummyDefaultEnumWithDefault, DummyDefaultEnumWithDefault.SUCCESS),
-         (DummyDefaultEnumNoDefault, DummyDefaultEnumNoDefault.SUCCESS),
-         ])
+    "enum_type, expected_default",
+    [
+        (DummyDefaultEnumWithDefault, DummyDefaultEnumWithDefault.SUCCESS),
+        (DummyDefaultEnumNoDefault, DummyDefaultEnumNoDefault.SUCCESS),
+    ],
+)
 def test_get_default_type(enum_type: DefaultEnum, expected_default: DefaultEnum) -> None:
     """Unit test for function get_default_type() in file default_enum.py"""
 
@@ -26,14 +28,16 @@ def test_get_default_type(enum_type: DefaultEnum, expected_default: DefaultEnum)
 
 
 @pytest.mark.parametrize(
-        "enum_type, lookup_member, expected_type",
-        [(DummyDefaultEnumWithDefault, 'success', DummyDefaultEnumWithDefault.SUCCESS),
-         (DummyDefaultEnumWithDefault, 'failed', DummyDefaultEnumWithDefault.FAILED),
-         (DummyDefaultEnumWithDefault, 'dummy', DummyDefaultEnumWithDefault.DEFAULT),
-         (DummyDefaultEnumNoDefault, 'success', DummyDefaultEnumNoDefault.SUCCESS),
-         (DummyDefaultEnumNoDefault, 'failed', DummyDefaultEnumNoDefault.FAILED),
-         (DummyDefaultEnumNoDefault, 'dummy', DummyDefaultEnumNoDefault.SUCCESS),
-         ])
+    "enum_type, lookup_member, expected_type",
+    [
+        (DummyDefaultEnumWithDefault, "success", DummyDefaultEnumWithDefault.SUCCESS),
+        (DummyDefaultEnumWithDefault, "failed", DummyDefaultEnumWithDefault.FAILED),
+        (DummyDefaultEnumWithDefault, "dummy", DummyDefaultEnumWithDefault.DEFAULT),
+        (DummyDefaultEnumNoDefault, "success", DummyDefaultEnumNoDefault.SUCCESS),
+        (DummyDefaultEnumNoDefault, "failed", DummyDefaultEnumNoDefault.FAILED),
+        (DummyDefaultEnumNoDefault, "dummy", DummyDefaultEnumNoDefault.SUCCESS),
+    ],
+)
 def test_get_type(enum_type: DefaultEnum, lookup_member: str, expected_type: DefaultEnum) -> None:
     """Unit test for function get_type() in file default_enum.py"""
 
@@ -48,4 +52,4 @@ def test_get_type_no_members() -> None:
     """Unit test for function get_type() in file default_enum.py"""
 
     with pytest.raises(IndexError):
-        DummyDefaultEnumWithNoMembers.get_type('dummy')
+        DummyDefaultEnumWithNoMembers.get_type("dummy")
