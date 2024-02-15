@@ -1,15 +1,6 @@
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module contains all necessary methods for updating all kinds of carbon in the field, based on the
-pseudocode soil documentation.
-
-References
--------
-pseudocode_soil S.6.C.1 to S.6.C.13
-"""
-
 
 class PoolGasPartition:
     """
