@@ -1,7 +1,7 @@
 from typing import List
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-from .enums import FieldOperationEvent, CropType, OperationType
+from .enums import FieldOperationEvent, CropType, OperationType, TractorSize
 
 input_manager = InputManager()
 
@@ -10,12 +10,42 @@ class TractorImplement:
     def __init__(
         self,
         operation_event: FieldOperationEvent,
-        crop_type: CropType | None = None,
+        crop_type: CropType,
+        tractor_size: TractorSize,
     ) -> None:
         self.operation_event = operation_event
         self.crop_type = crop_type
         constants = input_manager.get_data("EEE_constants.constants")
         self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
+
+    def determine_implement_parameters(
+        self, crop_type: CropType, tractor_size: TractorSize, operation_type: OperationType
+    ) -> None:
+        """
+        Assign a tractor implement based on the operation, tractor size, and crop type where applicable. Not all
+        operations are depended on crop type.
+        Implements Helper Function 419 in EEE Functions file.
+        """
+        dataset_raw = input_manager.get_data("tractor_dataset")
+        dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
+        for data_entry in dataset:
+            if (
+                data_entry.get("Crop Type or Tillage Implement").lower() == crop_type.value.lower()
+                and data_entry.get("Tractor Size").lower() == tractor_size.value.lower()
+                and data_entry.get("Operation").lower() == operation_type.value.lower()
+            ):
+                self.implement_name = data_entry["Tractor Implement"]
+                self.A = data_entry["Tractor A (unitless)"]
+                self.B = data_entry["Tractor B (unitless)"]
+                self.C = data_entry["Tractor C (unitless)"]
+                self.E = data_entry["Tractor E (unitless)"]
+                self.F = data_entry["Tractor F (unitless)"]
+                self.G = data_entry["Tractor G (unitless)"]
+                self.width_m = data_entry["Tractor Implement Width (m)"]
+                self.mass_kg = data_entry["Tractor Implement Mass (kg)"]
+                self.throughput = data_entry["Max Throughput (tons dm/hour)"]
+                self.is_depth_relevant = data_entry["is depth relevant"]
+                break
 
     def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:  # noqa C901
         """
@@ -49,21 +79,6 @@ class TractorImplement:
             return [OperationType.PLANTING]
         elif self.operation_event == FieldOperationEvent.TILLING:
             return [OperationType.TILLING]
-
-    @property
-    def mass_kg(self) -> float:
-        # TODO implement
-        return 0
-
-    @property
-    def width_m(self) -> float:
-        # TODO implement
-        return 0
-
-    @property
-    def throughput(self) -> float:
-        # TODO implement
-        return 0
 
     def field_capacity_ha_per_hr(self, crop_yield_ton_per_ha: float | None) -> float:
         """
@@ -123,14 +138,12 @@ class TractorImplement:
         Calculates PTO_Power (kW) from the tractor to power the implement's operation.
         Implements Helper Function 415  in EEE Functions file.
         """
-        E = 0  # TODO get the correct value
-        F = 0  # TODO get the correct value
-        G = 0  # TODO get the correct value
-        (
-            E
-            + (F * self.width_m)
+
+        return (
+            self.E
+            + (self.F * self.width_m)
             + (
-                G
+                self.G
                 * crop_yield_ton_per_ha
                 * field_production_size_ha
                 / self.calculate_operation_time_hr(field_production_size_ha, crop_yield_ton_per_ha)
