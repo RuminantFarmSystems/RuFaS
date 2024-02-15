@@ -105,14 +105,6 @@ class PenManure:
             A PenManure object.
 
         """
-        manure_mass = animal_manure["manure_mass"]  # kg
-        manure_volume = (
-            manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
-        ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
-        total_ammoniacal_nitrogen = (
-            animal_manure["total_ammoniacal_nitrogen_concentration"] / num_animals * manure_volume  # g/L  # L
-        ) * GeneralConstants.GRAMS_TO_KG  # kg
-
         if num_animals == 0:
             return cls()
 
@@ -121,9 +113,9 @@ class PenManure:
             urine=animal_manure["urine"],
             urine_nitrogen=animal_manure["urine_nitrogen"],
             urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
-            manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
+            manure_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
             nitrogen=animal_manure["manure_nitrogen"],
-            manure_mass=manure_mass,
+            manure_mass=animal_manure["manure_mass"],
             total_solids=animal_manure["total_solids"],
             degradable_volatile_solids=animal_manure["degradable_volatile_solids"],
             non_degradable_volatile_solids=animal_manure["non_degradable_volatile_solids"],
