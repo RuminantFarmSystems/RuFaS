@@ -279,9 +279,7 @@ class InputManager:
                 missing_required_property_keys,
                 property_keys_with_default_values,
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
-            self._log_missing_keys(
-                missing_required_property_keys, property_keys_with_default_values
-            )
+            self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
 
             validated_data = {}
