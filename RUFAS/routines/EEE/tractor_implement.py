@@ -18,7 +18,9 @@ class TractorImplement:
         self.crop_type = crop_type
         self.tractor_size = tractor_size
         constants = input_manager.get_data("EEE_constants.constants")
-        self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
+        constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
+        self.field_speed_km_per_hr = constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
+        self.field_efficiency = constants_by_ID[587]["Value"]  # Constant 587 in EEE Functions file
         self.determine_implement_parameters()
 
     def determine_implement_parameters(self) -> None:
@@ -54,12 +56,10 @@ class TractorImplement:
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
         Implements Helper Functions 418a and 418b  in EEE Functions file.
         """
-        field_efficiency = self.constants_by_ID[587]["Value"]  # Constant 587 in EEE Functions file
         if crop_yield_ton_per_ha:  # TODO this is not correct, the decision should be made based on operation type
             crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
-            return crop_yield_kg_per_ha / self.throughput * 1000 * field_efficiency
-        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
-        return 0.1 * field_speed_km_per_hr * self.width_m * field_efficiency
+            return crop_yield_kg_per_ha / self.throughput * 1000 * self.field_efficiency
+        return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency
 
     def calculate_operation_time_hr(
         self, field_production_size_ha: float, crop_yield_ton_per_ha: float | None
@@ -76,9 +76,8 @@ class TractorImplement:
         requires a transfer of tractor power to its wheel drives for this purpose.
         Implements Helper Function 414  in EEE Functions file.
         """
-        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
         functional_draft = self.calculate_functional_draft()
-        return functional_draft * field_speed_km_per_hr * 1.2 / 3600
+        return functional_draft * self.field_speed_km_per_hr * 1.2 / 3600
 
     def calculate_functional_draft(self) -> float:
         """
@@ -88,11 +87,10 @@ class TractorImplement:
         """
         fi = 0  # TODO
         effective_depth = self.depth_cm if self.is_depth_relevant else 1
-        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
         return (
             self.width_m * effective_depth * fi * self.A
-            + self.B * field_speed_km_per_hr
-            + self.C * field_speed_km_per_hr**2
+            + self.B * self.field_speed_km_per_hr
+            + self.C * self.field_speed_km_per_hr**2
         )  # The parentheses did not match in in EEE Functions file, this is my best guestimation
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
