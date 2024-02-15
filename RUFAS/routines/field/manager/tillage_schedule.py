@@ -41,6 +41,8 @@ class TillageSchedule(Schedule):
     mixing_fractions : List[float]
         Elongated list of mixing fractions to ensure a mixing value for each application year, reflecting the degree of
         soil mixing during tillage.
+    implements : List[TillageImplement]
+        Elongated list of the tillage implements that will be used to execute the scheduled tillage operations.
 
     """
 
