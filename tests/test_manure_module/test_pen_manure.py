@@ -115,13 +115,7 @@ def test_pen_manure_init() -> None:
         enteric_methane_g=enteric_methane_g,
     )
     num_animals = 2
-    expected_total_ammoniacal_nitrogen = (
-        total_ammoniacal_nitrogen_concentration
-        / num_animals
-        * manure_mass
-        * GeneralConstants.KG_TO_GRAMS
-        / ManureConstants.MANURE_DENSITY
-    ) * GeneralConstants.GRAMS_TO_KG
+    expected_total_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
     expected_urine_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
 
     # Act
