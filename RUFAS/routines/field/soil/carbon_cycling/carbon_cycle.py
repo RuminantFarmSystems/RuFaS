@@ -19,7 +19,7 @@ class CarbonCycling:
 
     Parameters
     ----------
-    soil_data : Optional[SoilData], default=None
+    soil_data : Optional[SoilData], default None
         An instance of `SoilData` containing initial soil properties and state. If not provided,
         a default instance with initialized values is used.
 
