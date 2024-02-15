@@ -1549,9 +1549,7 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
-          "default": [
-            "harvest_kill"
-          ],
+          "default": ["harvest_kill"],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
@@ -3952,6 +3950,119 @@
       "description": "Irrigation (mm H2O).",
       "type": "number",
       "default": 0
+    }
+  },
+  "tractor_dataset_properties": {
+    "ID": {
+      "type": "number",
+      "description": "Unique integer identifier for the data entry"
+    },
+    "Crop Type or Tillage Implement": {
+      "type": "string",
+      "default": "untitled"
+    },
+    "Tractor Size": {
+      "type": "string",
+      "description": "The categorical size of the tractor",
+      "pattern": "(small|medium|large)",
+      "default": "medium"
+    },
+    "Operation": { "type": "string" },
+    "Depth": {
+      "type": "number",
+      "description": "How deep in the soil the implement goes",
+      "minimum": 0,
+      "maximum": 10,
+      "default": 0
+    },
+    "Tractor Implement": {
+      "type": "string",
+      "description": "The implement that is attached to the tractor"
+    },
+    "Tractor A (unitless)": {
+      "type": "number",
+      "description": "Parameter A as described in the scientific references",
+      "default": 0
+    },
+    "Tractor B (unitless)": {
+      "type": "number",
+      "description": "Parameter B as described in the scientific references",
+      "default": 0
+    },
+    "Tractor C (unitless)": {
+      "type": "number",
+      "description": "Parameter C as described in the scientific references",
+      "default": 0
+    },
+    "Tractor Implement Width (m)": {
+      "type": "number",
+      "description": "The width of the implement in meters",
+      "default": 0,
+      "minimum": 0
+    },
+    "Tractor Implement Mass (kg)": {
+      "type": "number",
+      "description": "The mass of the implement in kg",
+      "default": 0,
+      "minimum": 0
+    },
+    "Tractor E (unitless)": {
+      "type": "number",
+      "description": "Parameter E as described in the scientific references",
+      "default": 0
+    },
+    "Tractor F (unitless)": {
+      "type": "number",
+      "description": "Parameter F as described in the scientific references",
+      "default": 0
+    },
+    "Tractor G (unitless)": {
+      "type": "number",
+      "description": "Parameter G as described in the scientific references",
+      "default": 0
+    },
+    "is depth relevant": {
+      "type": "bool",
+      "description": "true if depth is relevant for attachment operation, otherwise false"
+    },
+    "Max Throughput (tons dm/hour)": {
+      "type": "number",
+      "description": "The maximum throughput of the implement (tons dm/hour)",
+      "default": 0
+    }
+  },
+  "EEE_constants_properties": {
+    "constants": {
+      "type": "array",
+      "description": "The constants used in EEE module.",
+      "properties": {
+        "type": "object",
+        "ID": {
+          "type": "number"
+        },
+        "Grouping": {
+          "type": "string",
+          "default": ""
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string",
+          "default": ""
+        },
+        "Value": {
+          "type": "number"
+        },
+        "Unit": {
+          "type": "string",
+          "default": "unitless"
+        },
+        "Notes and remarks": {
+          "type": "string",
+          "default": ""
+        }
+      }
     }
   }
 }

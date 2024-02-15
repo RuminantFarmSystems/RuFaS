@@ -38,9 +38,7 @@ class ManureTreatmentType(DefaultEnum):
     ANAEROBIC_LAGOON = "anaerobic lagoon"
     ANAEROBIC_DIGESTION = "anaerobic digestion"
     ANAEROBIC_DIGESTION_AND_LAGOON = "anaerobic digestion and lagoon"
-    ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR = (
-        "anaerobic digestion and lagoon with separator"
-    )
+    ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR = "anaerobic digestion and lagoon with separator"
     COMPOSTING = "composting"
     COMPOST_BEDDED_PACK_BARN = "compost bedded pack barn"
     OPEN_LOTS = "open lots"

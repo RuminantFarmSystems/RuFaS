@@ -98,6 +98,4 @@ class HarvestedCrop:
         }
 
         if self.type not in category_to_type[self.category]:
-            raise ValueError(
-                f"{self.type} is not a valid type for the category {self.category}."
-            )
+            raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
