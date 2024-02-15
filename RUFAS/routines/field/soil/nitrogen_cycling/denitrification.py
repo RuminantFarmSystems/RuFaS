@@ -9,27 +9,29 @@ This module handles the denitrification of nitrogen in the nitrates pool, based 
 
 
 class Denitrification:
+    """
+    A class to handle the denitrification process of nitrogen in the nitrates pool, as outlined in SWAT section 3:1.4.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track the denitrification of nitrates in the soil profile.
+        If not provided, a new SoilData object will be created.
+    field_size : float, optional
+        The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object used for tracking denitrification.
+
+    """
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """Initializes the SoilData object that this module will work with, or creates one if none is provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track the denitrification of nitrates in the soil profile,
-            creates new one if one is not provided.
-        field_size : float, optional
-            Size of the field (ha)
-
-        Notes
-        -----
-        The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
-        SoilData object is not provided.
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def denitrify(self) -> None:
-        """Conducts the daily denitrification operations.
+        """
+        Conducts the daily denitrification operations.
 
         References
         ----------
@@ -67,7 +69,8 @@ class Denitrification:
         temp_factor: float,
         percent_organic_carbon_content: float,
     ) -> float:
-        """Calculates the amount of nitrate lost to denitrification.
+        """
+        Calculates the amount of nitrate lost to denitrification.
 
         Parameters
         ----------
