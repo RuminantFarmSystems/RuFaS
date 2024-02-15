@@ -26,6 +26,7 @@ class Decomposition:
         and other relevant data for simulating decomposition.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
