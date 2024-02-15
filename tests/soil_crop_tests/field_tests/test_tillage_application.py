@@ -8,6 +8,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.field.tillage_application import om
+from RUFAS.routines.tillage_implements_enum import TillageImplement
 from RUFAS.routines.manure.manure_manager import ManureManager
 
 
@@ -165,15 +166,17 @@ def test_mix_soil_layers(
 
 
 @pytest.mark.parametrize(
-    "till_depth,incorp_frac,mix_frac, year, day",
+    "till_depth,incorp_frac,mix_frac,implement,year,day",
     [
-        (30, 0.12, 0.33, 1998, 7),
-        (57.8, 0.05, 0.2, 2001, 7),
-        (150, 0.23, 0.19, 2000, 9),
-        (5000, 0.44, 0.51, 2023, 31),
+        (30, 0.12, 0.33, TillageImplement.CULTIVATOR, 1998, 7),
+        (57.8, 0.05, 0.2, TillageImplement.DISK_HARROW, 2001, 7),
+        (150, 0.23, 0.19, TillageImplement.SEEDBED_CONDITIONER, 2000, 9),
+        (5000, 0.44, 0.51, TillageImplement.SUBSOILER, 2023, 31),
     ],
 )
-def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
+def test_record_tillage(
+    till_depth: float, incorp_frac: float, mix_frac: float, implement: TillageImplement, year: int, day: int
+) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
 
@@ -187,26 +190,29 @@ def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, 
         "tillage_depth": till_depth,
         "incorporation_fraction": incorp_frac,
         "mixing_fraction": mix_frac,
+        "implement": implement,
         "year": year,
         "day": day,
     }
 
     with patch.object(om, "add_variable") as add_var:
-        till_app._record_tillage(till_depth, incorp_frac, mix_frac, year, day)
+        till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
 
         add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
 
 
 @pytest.mark.parametrize(
-    "till_depth,incorp_frac,mix_frac, year, day",
+    "till_depth,incorp_frac,mix_frac,implement,year,day",
     [
-        (30, 0.12, 0.33, 1998, 7),
-        (57.8, 0.05, 0.2, 2001, 7),
-        (150, 0.23, 0.19, 2000, 9),
-        (5000, 0.44, 0.51, 2023, 31),
+        (30, 0.12, 0.33, TillageImplement.SUBSOILER, 1998, 7),
+        (57.8, 0.05, 0.2, TillageImplement.DISK_HARROW, 2001, 7),
+        (150, 0.23, 0.19, TillageImplement.SEEDBED_CONDITIONER, 2000, 9),
+        (5000, 0.44, 0.51, TillageImplement.COULTER_CHISEL_PLOW, 2023, 31),
     ],
 )
-def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
+def test_till_soil(
+    till_depth: float, incorp_frac: float, mix_frac: float, implement: TillageImplement, year: int, day: int
+) -> None:
     """Tests that soil is tilled correctly."""
     field_data_1 = FieldData(name="field1", field_size=1.5)
 
@@ -215,13 +221,14 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
     till_app._remove_amount_incorporated = MagicMock(return_value=8)
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
     till_app._mix_soil_layers = MagicMock()
+    till_app._record_tillage = MagicMock()
     bottom_of_soil_profile = till_app.soil_data.soil_layers[-1].bottom_depth
     if till_depth > bottom_of_soil_profile:
         expected_till_depth = bottom_of_soil_profile
     else:
         expected_till_depth = till_depth
 
-    till_app.till_soil(till_depth, incorp_frac, mix_frac, year, day)
+    till_app.till_soil(till_depth, incorp_frac, mix_frac, implement, year, day)
 
     remove_calls = [
         call(till_app.soil_data, "available_phosphorus_pool", incorp_frac),
@@ -270,3 +277,4 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
         call("passive_carbon_amount", expected_till_depth, mix_frac, True),
     ]
     till_app._mix_soil_layers.assert_has_calls(mix_calls)
+    till_app._record_tillage.assert_called_once_with(expected_till_depth, incorp_frac, mix_frac, implement, year, day)

@@ -9,8 +9,7 @@ presently growing in a field will be harvested.
 """
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-
-
+from RUFAS.routines.tillage_implements_enum import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
@@ -155,16 +154,25 @@ class TillageEvent(Event):
         Fraction of soil surface pool incorporated into the soil profile (unitless).
     mixing_fraction : float
         Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
+    implement : TillageImplement
+        Tillage implement that is being used to execute this tillage application.
 
     """
 
     def __init__(
-        self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1, day: int = 160
+        self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        implement: TillageImplement,
+        year: int = 1,
+        day: int = 160,
     ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
         self.mixing_fraction = mixing_fraction
+        self.implement = implement
 
     def __eq__(self, other):
         """Overrides the equality operator for TillageEvent objects."""
@@ -174,19 +182,14 @@ class TillageEvent(Event):
                 and other.tillage_depth == self.tillage_depth
                 and other.incorporation_fraction == self.incorporation_fraction
                 and other.mixing_fraction == self.mixing_fraction
+                and other.implement == self.implement
             )
         return False
 
     def __hash__(self):
         """Overrides the hash method for TillageEvent objects."""
         return hash(
-            (
-                self.year,
-                self.day,
-                self.tillage_depth,
-                self.incorporation_fraction,
-                self.mixing_fraction,
-            )
+            (self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction, self.implement)
         )
 
 
