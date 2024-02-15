@@ -9,15 +9,6 @@ from typing import Optional
 from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS
 
-"""
-This module contains all necessary methods for updating all kinds of aggregated carbon in the field and also calls all
-other routines in this module, based on the pseudocode soil documentation.
-
-References
--------
-pseudocode_soil S.6.D.1 to S.6.D.7
-"""
-
 
 class CarbonCycling:
     """
