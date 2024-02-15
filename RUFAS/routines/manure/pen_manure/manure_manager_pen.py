@@ -128,7 +128,7 @@ class ManureManagerPen:
         Returns
         -------
         float
-            Barn area per animal (:math:`m^2/animal`).
+            Barn surface area (:math:`m^2`).
 
         Raises
         ------
