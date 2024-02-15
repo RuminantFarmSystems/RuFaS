@@ -279,7 +279,7 @@ class InputManager:
                 missing_required_property_keys,
                 property_keys_with_default_values,
             ) = self._add_default_values_to_missing_properties(input_data, metadata_properties)
-            self._log_missing_keys_and_keys_with_default_values(
+            self._log_missing_keys_(
                 missing_required_property_keys, property_keys_with_default_values
             )
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
@@ -359,7 +359,7 @@ class InputManager:
 
         return filtered_input_data
 
-    def _log_missing_keys_and_keys_with_default_values(
+    def _log_missing_keys_(
         self, missing_required_property_keys: List[str], property_keys_with_default_values: List[Tuple[str, Any]]
     ) -> None:
         """
@@ -384,7 +384,7 @@ class InputManager:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._log_missing_keys_and_keys_with_default_values.__name__,
+            "function": self._log_missing_keys_.__name__,
         }
         if missing_required_property_keys:
             for key in missing_required_property_keys:

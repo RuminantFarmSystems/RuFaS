@@ -326,7 +326,7 @@ def test_populate_pool_valid(
         "_add_default_values_to_missing_properties",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_and_keys_with_default_values")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -373,7 +373,7 @@ def test_populate_pool_invalid(
         "_add_default_values_to_missing_properties",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_and_keys_with_default_values")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -418,7 +418,7 @@ def test_populate_pool_partial_invalid(
         "_add_default_values_to_missing_properties",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_and_keys_with_default_values")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -463,7 +463,7 @@ def test_populate_pool_eager_termination(
         "_add_default_values_to_missing_properties",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_and_keys_with_default_values")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -3538,14 +3538,14 @@ def test_add_tabular_variable_to_pool_invalid_data(
         ),
     ],
 )
-def test_log_missing_keys_and_keys_with_default_values(
+def test_log_missing_keys(
     missing_keys: List[str],
     keys_with_defaults: List[Tuple[str, Any]],
     expected_calls: Dict[str, Tuple[str, str]],
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for the _log_missing_keys_and_keys_with_default_values method of the InputManager class.
+    Unit test for the _log_missing_keys_ method of the InputManager class.
     """
 
     # Arrange
@@ -3554,7 +3554,7 @@ def test_log_missing_keys_and_keys_with_default_values(
     mock_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    input_manager._log_missing_keys_and_keys_with_default_values(missing_keys, keys_with_defaults)
+    input_manager._log_missing_keys_(missing_keys, keys_with_defaults)
 
     # Assert
     for call_args in expected_calls["error_calls"]:
