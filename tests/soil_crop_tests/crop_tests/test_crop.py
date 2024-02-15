@@ -5,10 +5,7 @@ import pytest
 from unittest.mock import MagicMock
 
 
-@pytest.mark.parametrize("in_growing_system", [
-    True,
-    False
-])
+@pytest.mark.parametrize("in_growing_system", [True, False])
 def test_grow_crop(in_growing_system: bool) -> None:
     mocked_soil_data = MagicMock(SoilData)
     mocked_crop_data = MagicMock(CropData)
