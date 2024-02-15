@@ -3484,15 +3484,22 @@ def test_add_tabular_variable_to_pool_invalid_data(
                 "error_calls": [
                     (
                         "Validation: missing required property keys",
-                        "Missing required property keys: missingKey1, missingKey2.",
-                    )
+                        "Missing required property key: missingKey1.",
+                    ),
+                    (
+                        "Validation: missing required property keys",
+                        "Missing required property key: missingKey2.",
+                    ),
                 ],
                 "warning_calls": [
                     (
                         "Validation: missing required property keys",
-                        "Default values used for required property keys that were missing: "
-                        "(keyWithDefault1 => value1), (keyWithDefault2 => value2).",
-                    )
+                        "Default value used for required property key that was missing: " "keyWithDefault1 => value1.",
+                    ),
+                    (
+                        "Validation: missing required property keys",
+                        "Default value used for required property key that was missing: " "keyWithDefault2 => value2.",
+                    ),
                 ],
             },
         ),
@@ -3504,8 +3511,12 @@ def test_add_tabular_variable_to_pool_invalid_data(
                 "error_calls": [
                     (
                         "Validation: missing required property keys",
-                        "Missing required property keys: missingKey1, missingKey2.",
-                    )
+                        "Missing required property key: missingKey1.",
+                    ),
+                    (
+                        "Validation: missing required property keys",
+                        "Missing required property key: missingKey2.",
+                    ),
                 ],
                 "warning_calls": [],
             },
@@ -3519,9 +3530,9 @@ def test_add_tabular_variable_to_pool_invalid_data(
                 "warning_calls": [
                     (
                         "Validation: missing required property keys",
-                        "Default values used for required property keys that were missing: "
-                        "(keyWithDefault => defaultValue).",
-                    )
+                        "Default value used for required property key that was missing: "
+                        "keyWithDefault => defaultValue.",
+                    ),
                 ],
             },
         ),
