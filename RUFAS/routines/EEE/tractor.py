@@ -1,7 +1,8 @@
+from typing import List
 from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-from .enums import TractorSize
+from .enums import TractorSize, FieldOperationEvent, OperationType, CropType
 
 input_manager = InputManager()
 
@@ -12,7 +13,14 @@ class Tractor:
     The tractor's specifications are determined based on its size or the size of the herd it is intended to work with.
     """
 
-    def __init__(self, tractor_size: TractorSize | None = None, herd_size: int | None = None) -> None:
+    def __init__(
+        self,
+        operation_event: FieldOperationEvent,
+        crop_type: CropType,
+        tractor_size: TractorSize | None = None,
+        herd_size: int | None = None,
+        application_depth: float | None = None,
+    ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
         If `tractor_size` is not provided, the size is inferred using the `herd_size` argument.
@@ -31,7 +39,14 @@ class Tractor:
         """
         if not tractor_size and not herd_size:
             raise ValueError("At least one of `tractor_size` or `herd_size` must be given.")
+        self.operation_event = operation_event
+        self.crop_type = crop_type
         self.tractor_size = tractor_size or self.herd_size_to_tractor_size(herd_size)
+        self.operation_types = self.determine_operation_type(application_depth)
+        self.implements = [
+            TractorImplement(operation_event, operation_type, crop_type, self.tractor_size)
+            for operation_type in self.operation_types
+        ]
         constants = input_manager.get_data("EEE_constants.constants")
         self.constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
 
@@ -48,6 +63,39 @@ class Tractor:
             return TractorSize.MEDIUM
         else:
             return TractorSize.LARGE
+
+    def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:  # noqa C901
+        """
+        Assigns a specific field operation based on the general name for the operation and the crop type for harvest
+        operations or depth for nutrient application.
+        Implements Helper Function 421 in EEE Functions file.
+        """
+        if self.operation_event == FieldOperationEvent.HARVEST:
+            if self.crop_type in [
+                CropType.ALFALFA_HAY,
+                CropType.ALFALFA_SILAGE,
+                CropType.ALFALFA_BALEAGE,
+                CropType.TALL_FESCUE_HAY,
+                CropType.TALL_FESCUE_SILAGE,
+                CropType.TALL_FESCUE_BALEAGE,
+            ]:
+                return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
+            else:
+                return [OperationType.COLLECTION]
+        elif self.operation_event == FieldOperationEvent.FERTILIZER_APPLICATION:
+            if application_depth == 0:
+                return [OperationType.FERTILIZER_APPLICATION_SURFACE]
+            elif application_depth > 0:
+                return [OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE]
+        elif self.operation_event == FieldOperationEvent.MANURE_APPLICATION:
+            if application_depth == 0:
+                return [OperationType.LIQUID_MANURE_APPLICATION_SURFACE]
+            elif application_depth > 0:
+                return [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE]
+        elif self.operation_event == FieldOperationEvent.PLANTING:
+            return [OperationType.PLANTING]
+        elif self.operation_event == FieldOperationEvent.TILLING:
+            return [OperationType.TILLING]
 
     @property
     def PTO_kW(self) -> float:
