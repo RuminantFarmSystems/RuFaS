@@ -2,7 +2,9 @@ from typing import Dict
 
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class GasEmissionConstants:
@@ -248,38 +250,35 @@ class GasEmissionConstants:
     FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.5,
         CompostingType.PASSIVE_WINDROW: 0.45,
-        CompostingType.INTENSIVE_WINDROW: 0.5
+        CompostingType.INTENSIVE_WINDROW: 0.5,
     }
 
     FRACTION_NITROGEN_LOST_TO_LEACHING: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
 
     FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
 
-    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (
-        Dict)[ManureTreatmentType, Dict[str, float]] = {
+    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (Dict)[ManureTreatmentType, Dict[str, float]] = {
         ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.ANAEROBIC_LAGOON: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
-        ManureTreatmentType.ANAEROBIC_DIGESTION: {
-            ManureCoverEnum.NOT_APPLICABLE.value: 0.0006
-        }
+        ManureTreatmentType.ANAEROBIC_DIGESTION: {ManureCoverEnum.NOT_APPLICABLE.value: 0.0006},
     }
     """
     Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage

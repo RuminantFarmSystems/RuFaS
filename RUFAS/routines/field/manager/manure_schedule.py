@@ -56,11 +56,20 @@ class ManureSchedule(Schedule):
 
     """
 
-    def __init__(self, name: str, years: List[int], days: List[int], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], manure_types: List[ManureType], field_coverages: List[float],
-                 application_depths: Optional[List[float]] = None,
-                 surface_remainder_fractions: Optional[List[float]] = None, pattern_skip: int = 0,
-                 pattern_repeat: int = 0):
+    def __init__(
+        self,
+        name: str,
+        years: List[int],
+        days: List[int],
+        nitrogen_masses: List[float],
+        phosphorus_masses: List[float],
+        manure_types: List[ManureType],
+        field_coverages: List[float],
+        application_depths: Optional[List[float]] = None,
+        surface_remainder_fractions: Optional[List[float]] = None,
+        pattern_skip: int = 0,
+        pattern_repeat: int = 0,
+    ):
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
@@ -102,8 +111,9 @@ class ManureSchedule(Schedule):
 
         valid_years = self._validate_years(self.years)
         if not valid_years:
-            raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
-                                            f"'{self.years}'.")
+            raise ValueError(
+                error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
+            )
 
         valid_days = self._validate_days(self.years, self.days)
         if not valid_days:
@@ -111,46 +121,63 @@ class ManureSchedule(Schedule):
 
         valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
         if not valid_nitrogen_masses:
-            raise ValueError(error_header + f"expected all nitrogen masses to be >= 0, received "
-                                            f"'{self.nitrogen_masses}'.")
+            raise ValueError(
+                error_header + f"expected all nitrogen masses to be >= 0, received " f"'{self.nitrogen_masses}'."
+            )
 
         valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
         if not valid_phosphorus_masses:
-            raise ValueError(error_header + f"expected all phosphorus masses to be >= 0, received "
-                                            f"'{self.phosphorus_masses}'.")
+            raise ValueError(
+                error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
+            )
 
         valid_manure_types = all(isinstance(manure_type, ManureType) for manure_type in self.manure_types)
         if not valid_manure_types:
-            raise ValueError(error_header + f"expected all manure types to be valid ManureTypes, received "
-                                            f"'{self.manure_types}'.")
+            raise ValueError(
+                error_header + f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'."
+            )
 
         valid_coverage_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.field_coverages)
         if not valid_coverage_fractions:
-            raise ValueError(error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
-                                            f"received '{self.field_coverages}'.")
+            raise ValueError(
+                error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
+                f"received '{self.field_coverages}'."
+            )
 
         valid_depths = all(depth >= 0.0 for depth in self.application_depths)
         if not valid_depths:
-            raise ValueError(error_header + f"expected all manure application depths to be >= 0, received "
-                                            f"'{self.application_depths}'.")
+            raise ValueError(
+                error_header + f"expected all manure application depths to be >= 0, received "
+                f"'{self.application_depths}'."
+            )
 
         valid_surface_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
         if not valid_surface_fractions:
-            raise ValueError(error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
-                                            f"received '{self.surface_remainder_fractions}'.")
+            raise ValueError(
+                error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
+                f"received '{self.surface_remainder_fractions}'."
+            )
 
-        equal_manure_application_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) \
-            == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(
-            self.application_depths) \
-            == len(self.surface_remainder_fractions) == len(self.manure_types)
+        equal_manure_application_parameters = (
+            len(self.years)
+            == len(self.days)
+            == len(self.nitrogen_masses)
+            == len(self.nitrogen_masses)
+            == len(self.phosphorus_masses)
+            == len(self.application_depths)
+            == len(self.surface_remainder_fractions)
+            == len(self.manure_types)
+        )
         if not equal_manure_application_parameters:
-            raise ValueError(error_header + f"expected equal number of manure application parameters, received "
-                                            f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
-                                            f"nitrogen masses, '{self.phosphorus_masses}' phosphorus masses, "
-                                            f"'{self.field_coverages}' field coverage fractions, "
-                                            f"'{self.application_depths}' application depths, '{self.manure_types}' "
-                                            f"manure types and '{self.surface_remainder_fractions}' surface "
-                                            f"remainder fractions.")
+            raise ValueError(
+                error_header + f"expected equal number of manure application parameters, received "
+                f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
+                f"nitrogen masses, '{self.phosphorus_masses}' phosphorus masses, "
+                f"'{self.field_coverages}' field coverage fractions, "
+                f"'{self.application_depths}' application depths, '{self.manure_types}' "
+                f"manure types and '{self.surface_remainder_fractions}' surface "
+                f"remainder fractions."
+            )
 
     def generate_manure_events(self) -> List[ManureEvent]:
         """
@@ -170,15 +197,31 @@ class ManureSchedule(Schedule):
         all_field_coverages = self.field_coverages * (self.pattern_repeat + 1)
         all_application_depths = self.application_depths * (self.pattern_repeat + 1)
         all_surface_remainder_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
-        all_manure_application_events = list(zip(all_years, all_days, all_nitrogen_masses, all_phosphorus_masses,
-                                                 all_manure_types, all_field_coverages, all_application_depths,
-                                                 all_surface_remainder_fractions))
+        all_manure_application_events = list(
+            zip(
+                all_years,
+                all_days,
+                all_nitrogen_masses,
+                all_phosphorus_masses,
+                all_manure_types,
+                all_field_coverages,
+                all_application_depths,
+                all_surface_remainder_fractions,
+            )
+        )
 
         manure_application_events = []
         for event in all_manure_application_events:
-            new_event = ManureEvent(year=event[0], day=event[1], nitrogen_mass=event[2], phosphorus_mass=event[3],
-                                    manure_type=event[4], field_coverage=event[5], application_depth=event[6],
-                                    surface_remainder_fraction=event[7])
+            new_event = ManureEvent(
+                year=event[0],
+                day=event[1],
+                nitrogen_mass=event[2],
+                phosphorus_mass=event[3],
+                manure_type=event[4],
+                field_coverage=event[5],
+                application_depth=event[6],
+                surface_remainder_fraction=event[7],
+            )
             manure_application_events.append(new_event)
         return manure_application_events
 

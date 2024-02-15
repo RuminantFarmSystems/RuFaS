@@ -3,8 +3,12 @@ from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
-from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import (
+    PhosphorusMineralization,
+)
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
+    SolublePhosphorus,
+)
 
 """
 This module contains the composite class for phosphorus cycling, which contains and manages all the necessary all
@@ -13,7 +17,6 @@ necessary aspects for managing phosphorus in and on top of a soil profile.
 
 
 class PhosphorusCycling:
-
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
@@ -41,7 +44,13 @@ class PhosphorusCycling:
         self.soluble_phosphorus = SolublePhosphorus(self.data)
         """Process component that controls the movement of phosphorus between layers of soil."""
 
-    def cycle_phosphorus(self, rainfall: float, runoff: float, field_size: float, mean_air_temperature: float) -> None:
+    def cycle_phosphorus(
+        self,
+        rainfall: float,
+        runoff: float,
+        field_size: float,
+        mean_air_temperature: float,
+    ) -> None:
         """This method calls all daily routines that manage phosphorus on the soil surface and in the soil profile.
 
         Parameters

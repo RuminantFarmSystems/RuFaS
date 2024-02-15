@@ -23,6 +23,7 @@ class RootDevelopment:
         like root depth, growth rates, and environmental conditions affecting root expansion.
 
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         # data reference
         self.data = crop_data or CropData()  # defaults if not given

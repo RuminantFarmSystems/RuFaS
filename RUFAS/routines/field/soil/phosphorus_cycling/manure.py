@@ -2,9 +2,15 @@ from typing import Optional, Dict
 from math import exp, sqrt
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import MILLIMETERS_TO_CENTIMETERS, KILOGRAMS_TO_GRAMS, \
-    KILOGRAMS_TO_MILLIGRAMS, HECTARES_TO_SQUARE_CENTIMETERS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    MILLIMETERS_TO_CENTIMETERS,
+    KILOGRAMS_TO_GRAMS,
+    KILOGRAMS_TO_MILLIGRAMS,
+    HECTARES_TO_SQUARE_CENTIMETERS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_LITERS,
+    MILLIGRAMS_TO_KILOGRAMS,
+)
 
 """
 This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
@@ -12,7 +18,6 @@ This module adds and tracks manure phosphorus dynamics based on the SurPhos mode
 
 
 class Manure:
-
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
@@ -28,8 +33,13 @@ class Manure:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def daily_manure_update(self, rainfall: float, runoff: float, field_size: float,
-                            mean_air_temperature: float) -> None:
+    def daily_manure_update(
+        self,
+        rainfall: float,
+        runoff: float,
+        field_size: float,
+        mean_air_temperature: float,
+    ) -> None:
         """This method conducts daily operations on manure including decomposition, assimilation into soil, etc.
 
         Parameters
@@ -73,24 +83,42 @@ class Manure:
 
         # Calculate phosphorus mineralization between pools
         mineralized_machine_stable_organic = self._determine_mineralized_surface_phosphorus(
-            self.data.machine_stable_organic_phosphorus, 0.01, temperature_factor,
-            self.data.machine_manure_moisture_factor)
+            self.data.machine_stable_organic_phosphorus,
+            0.01,
+            temperature_factor,
+            self.data.machine_manure_moisture_factor,
+        )
         mineralized_machine_stable_inorganic = self._determine_mineralized_surface_phosphorus(
-            self.data.machine_stable_inorganic_phosphorus, 0.0025, temperature_factor,
-            self.data.machine_manure_moisture_factor)
+            self.data.machine_stable_inorganic_phosphorus,
+            0.0025,
+            temperature_factor,
+            self.data.machine_manure_moisture_factor,
+        )
         mineralized_machine_water_extractable_organic = self._determine_mineralized_surface_phosphorus(
-            self.data.machine_water_extractable_organic_phosphorus, 0.1, temperature_factor,
-            self.data.machine_manure_moisture_factor)
+            self.data.machine_water_extractable_organic_phosphorus,
+            0.1,
+            temperature_factor,
+            self.data.machine_manure_moisture_factor,
+        )
 
         mineralized_grazing_stable_organic = self._determine_mineralized_surface_phosphorus(
-            self.data.grazing_stable_organic_phosphorus, 0.01, temperature_factor,
-            self.data.grazing_manure_moisture_factor)
+            self.data.grazing_stable_organic_phosphorus,
+            0.01,
+            temperature_factor,
+            self.data.grazing_manure_moisture_factor,
+        )
         mineralized_grazing_stable_inorganic = self._determine_mineralized_surface_phosphorus(
-            self.data.grazing_stable_inorganic_phosphorus, 0.0025, temperature_factor,
-            self.data.grazing_manure_moisture_factor)
+            self.data.grazing_stable_inorganic_phosphorus,
+            0.0025,
+            temperature_factor,
+            self.data.grazing_manure_moisture_factor,
+        )
         mineralized_grazing_water_extractable_organic = self._determine_mineralized_surface_phosphorus(
-            self.data.grazing_water_extractable_organic_phosphorus, 0.1, temperature_factor,
-            self.data.grazing_manure_moisture_factor)
+            self.data.grazing_water_extractable_organic_phosphorus,
+            0.1,
+            temperature_factor,
+            self.data.grazing_manure_moisture_factor,
+        )
 
         # Calculate manure assimilation from soil surface into profile
         assimilated_manure_changes = self._determine_assimilated_surface_manure(temperature_factor, field_size)
@@ -105,78 +133,130 @@ class Manure:
         else:
             machine_assimilation_ratio = 0
         assimilated_machine_stable_organic = self._determine_assimilated_phosphorus_amount(
-            machine_assimilation_ratio, self.data.machine_stable_organic_phosphorus)
+            machine_assimilation_ratio, self.data.machine_stable_organic_phosphorus
+        )
         assimilated_machine_stable_inorganic = self._determine_assimilated_phosphorus_amount(
-            machine_assimilation_ratio, self.data.machine_stable_inorganic_phosphorus)
+            machine_assimilation_ratio,
+            self.data.machine_stable_inorganic_phosphorus,
+        )
         assimilated_machine_water_extractable_organic = self._determine_assimilated_phosphorus_amount(
-            machine_assimilation_ratio, self.data.machine_water_extractable_organic_phosphorus)
+            machine_assimilation_ratio,
+            self.data.machine_water_extractable_organic_phosphorus,
+        )
         assimilated_machine_water_extractable_inorganic = self._determine_assimilated_phosphorus_amount(
-            machine_assimilation_ratio, self.data.machine_water_extractable_inorganic_phosphorus)
+            machine_assimilation_ratio,
+            self.data.machine_water_extractable_inorganic_phosphorus,
+        )
 
         if self.data.grazing_manure_dry_mass > 0:
             grazing_assimilation_ratio = assimilated_grazing_mass / self.data.grazing_manure_dry_mass
         else:
             grazing_assimilation_ratio = 0
         assimilated_grazing_stable_organic = self._determine_assimilated_phosphorus_amount(
-            grazing_assimilation_ratio, self.data.grazing_stable_organic_phosphorus)
+            grazing_assimilation_ratio, self.data.grazing_stable_organic_phosphorus
+        )
         assimilated_grazing_stable_inorganic = self._determine_assimilated_phosphorus_amount(
-            grazing_assimilation_ratio, self.data.grazing_stable_inorganic_phosphorus)
+            grazing_assimilation_ratio,
+            self.data.grazing_stable_inorganic_phosphorus,
+        )
         assimilated_grazing_water_extractable_organic = self._determine_assimilated_phosphorus_amount(
-            grazing_assimilation_ratio, self.data.grazing_water_extractable_organic_phosphorus)
+            grazing_assimilation_ratio,
+            self.data.grazing_water_extractable_organic_phosphorus,
+        )
         assimilated_grazing_water_extractable_inorganic = self._determine_assimilated_phosphorus_amount(
-            grazing_assimilation_ratio, self.data.grazing_water_extractable_inorganic_phosphorus)
+            grazing_assimilation_ratio,
+            self.data.grazing_water_extractable_inorganic_phosphorus,
+        )
 
         # Set machine attributes
-        self.data.machine_manure_dry_mass = \
-            max(0.0, self.data.machine_manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass)
-        self.data.machine_manure_field_coverage = \
-            max(0.0,
-                self.data.machine_manure_field_coverage - assimilated_machine_coverage - decomposed_machine_coverage)
-        self.data.machine_stable_organic_phosphorus = \
-            max(0.0, self.data.machine_stable_organic_phosphorus - assimilated_machine_stable_organic -
-                mineralized_machine_stable_organic)
-        self.data.machine_stable_inorganic_phosphorus = \
-            max(0.0, self.data.machine_stable_inorganic_phosphorus - assimilated_machine_stable_inorganic -
-                mineralized_machine_stable_inorganic)
-        self.data.machine_water_extractable_organic_phosphorus = \
-            max(0.0, self.data.machine_water_extractable_organic_phosphorus -
-                assimilated_machine_water_extractable_organic - mineralized_machine_water_extractable_organic)
-        self.data.machine_water_extractable_inorganic_phosphorus = \
-            max(0.0, self.data.machine_water_extractable_inorganic_phosphorus -
-                assimilated_machine_water_extractable_inorganic)
+        self.data.machine_manure_dry_mass = max(
+            0.0,
+            self.data.machine_manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass,
+        )
+        self.data.machine_manure_field_coverage = max(
+            0.0,
+            self.data.machine_manure_field_coverage - assimilated_machine_coverage - decomposed_machine_coverage,
+        )
+        self.data.machine_stable_organic_phosphorus = max(
+            0.0,
+            self.data.machine_stable_organic_phosphorus
+            - assimilated_machine_stable_organic
+            - mineralized_machine_stable_organic,
+        )
+        self.data.machine_stable_inorganic_phosphorus = max(
+            0.0,
+            self.data.machine_stable_inorganic_phosphorus
+            - assimilated_machine_stable_inorganic
+            - mineralized_machine_stable_inorganic,
+        )
+        self.data.machine_water_extractable_organic_phosphorus = max(
+            0.0,
+            self.data.machine_water_extractable_organic_phosphorus
+            - assimilated_machine_water_extractable_organic
+            - mineralized_machine_water_extractable_organic,
+        )
+        self.data.machine_water_extractable_inorganic_phosphorus = max(
+            0.0,
+            self.data.machine_water_extractable_inorganic_phosphorus - assimilated_machine_water_extractable_inorganic,
+        )
 
-        self.data.machine_water_extractable_inorganic_phosphorus += mineralized_machine_water_extractable_organic + \
-            (0.75 * mineralized_machine_stable_organic) + mineralized_machine_stable_inorganic
-        self.data.machine_water_extractable_organic_phosphorus += (0.25 * mineralized_machine_stable_organic)
+        self.data.machine_water_extractable_inorganic_phosphorus += (
+            mineralized_machine_water_extractable_organic
+            + (0.75 * mineralized_machine_stable_organic)
+            + mineralized_machine_stable_inorganic
+        )
+        self.data.machine_water_extractable_organic_phosphorus += 0.25 * mineralized_machine_stable_organic
 
         # Set grazing attributes
-        self.data.grazing_manure_dry_mass = \
-            max(0.0, self.data.grazing_manure_dry_mass - assimilated_grazing_mass - decomposed_grazing_mass)
-        self.data.grazing_manure_field_coverage = \
-            max(0.0,
-                self.data.grazing_manure_field_coverage - assimilated_grazing_coverage - decomposed_grazing_coverage)
-        self.data.grazing_stable_organic_phosphorus = \
-            max(0.0, self.data.grazing_stable_organic_phosphorus - assimilated_grazing_stable_organic -
-                mineralized_grazing_stable_organic)
-        self.data.grazing_stable_inorganic_phosphorus = \
-            max(0.0, self.data.grazing_stable_inorganic_phosphorus - assimilated_grazing_stable_inorganic -
-                mineralized_grazing_stable_inorganic)
-        self.data.grazing_water_extractable_organic_phosphorus = \
-            max(0.0, self.data.grazing_water_extractable_organic_phosphorus -
-                assimilated_grazing_water_extractable_organic - mineralized_grazing_water_extractable_organic)
-        self.data.grazing_water_extractable_inorganic_phosphorus = \
-            max(0.0, self.data.grazing_water_extractable_inorganic_phosphorus -
-                assimilated_grazing_water_extractable_inorganic)
+        self.data.grazing_manure_dry_mass = max(
+            0.0,
+            self.data.grazing_manure_dry_mass - assimilated_grazing_mass - decomposed_grazing_mass,
+        )
+        self.data.grazing_manure_field_coverage = max(
+            0.0,
+            self.data.grazing_manure_field_coverage - assimilated_grazing_coverage - decomposed_grazing_coverage,
+        )
+        self.data.grazing_stable_organic_phosphorus = max(
+            0.0,
+            self.data.grazing_stable_organic_phosphorus
+            - assimilated_grazing_stable_organic
+            - mineralized_grazing_stable_organic,
+        )
+        self.data.grazing_stable_inorganic_phosphorus = max(
+            0.0,
+            self.data.grazing_stable_inorganic_phosphorus
+            - assimilated_grazing_stable_inorganic
+            - mineralized_grazing_stable_inorganic,
+        )
+        self.data.grazing_water_extractable_organic_phosphorus = max(
+            0.0,
+            self.data.grazing_water_extractable_organic_phosphorus
+            - assimilated_grazing_water_extractable_organic
+            - mineralized_grazing_water_extractable_organic,
+        )
+        self.data.grazing_water_extractable_inorganic_phosphorus = max(
+            0.0,
+            self.data.grazing_water_extractable_inorganic_phosphorus - assimilated_grazing_water_extractable_inorganic,
+        )
 
-        self.data.grazing_water_extractable_inorganic_phosphorus += mineralized_grazing_water_extractable_organic + \
-            (0.75 * mineralized_grazing_stable_organic) + mineralized_grazing_stable_inorganic
-        self.data.grazing_water_extractable_organic_phosphorus += (0.25 * mineralized_grazing_stable_organic)
+        self.data.grazing_water_extractable_inorganic_phosphorus += (
+            mineralized_grazing_water_extractable_organic
+            + (0.75 * mineralized_grazing_stable_organic)
+            + mineralized_grazing_stable_inorganic
+        )
+        self.data.grazing_water_extractable_organic_phosphorus += 0.25 * mineralized_grazing_stable_organic
 
         # Add assimilated phosphorus to the soil profile
-        total_assimilated_phosphorus = assimilated_machine_stable_organic + assimilated_machine_stable_inorganic + \
-            assimilated_machine_water_extractable_organic + assimilated_machine_water_extractable_inorganic + \
-            assimilated_grazing_stable_organic + assimilated_grazing_stable_inorganic + \
-            assimilated_grazing_water_extractable_organic + assimilated_grazing_water_extractable_inorganic
+        total_assimilated_phosphorus = (
+            assimilated_machine_stable_organic
+            + assimilated_machine_stable_inorganic
+            + assimilated_machine_water_extractable_organic
+            + assimilated_machine_water_extractable_inorganic
+            + assimilated_grazing_stable_organic
+            + assimilated_grazing_stable_inorganic
+            + assimilated_grazing_water_extractable_organic
+            + assimilated_grazing_water_extractable_inorganic
+        )
         self._add_infiltrated_phosphorus_to_soil(total_assimilated_phosphorus, field_size)
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -194,50 +274,69 @@ class Manure:
 
         """
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-            machine_organic_results = \
-                self._determine_phosphorus_leached_from_surface(rainfall, runoff, field_size,
-                                                                self.data.machine_manure_dry_mass,
-                                                                self.data.machine_manure_field_coverage,
-                                                                self.data.machine_water_extractable_organic_phosphorus,
-                                                                True)
-            self.data.machine_water_extractable_organic_phosphorus = \
-                machine_organic_results["new_phosphorus_pool_amount"]
+            machine_organic_results = self._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.data.machine_manure_dry_mass,
+                self.data.machine_manure_field_coverage,
+                self.data.machine_water_extractable_organic_phosphorus,
+                True,
+            )
+            self.data.machine_water_extractable_organic_phosphorus = machine_organic_results[
+                "new_phosphorus_pool_amount"
+            ]
             self.data.machine_organic_phosphorus_runoff = machine_organic_results["runoff_phosphorus"]
             self.data.annual_runoff_machine_manure_organic_phosphorus += machine_organic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
 
-            machine_inorganic_results = \
-                self._determine_phosphorus_leached_from_surface(
-                    rainfall, runoff, field_size, self.data.machine_manure_dry_mass,
-                    self.data.machine_manure_field_coverage, self.data.machine_water_extractable_inorganic_phosphorus,
-                    False)
-            self.data.machine_water_extractable_inorganic_phosphorus = \
-                machine_inorganic_results["new_phosphorus_pool_amount"]
+            machine_inorganic_results = self._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.data.machine_manure_dry_mass,
+                self.data.machine_manure_field_coverage,
+                self.data.machine_water_extractable_inorganic_phosphorus,
+                False,
+            )
+            self.data.machine_water_extractable_inorganic_phosphorus = machine_inorganic_results[
+                "new_phosphorus_pool_amount"
+            ]
             self.data.machine_inorganic_phosphorus_runoff = machine_inorganic_results["runoff_phosphorus"]
-            self.data.annual_runoff_machine_manure_inorganic_phosphorus += \
-                machine_inorganic_results["runoff_phosphorus"]
+            self.data.annual_runoff_machine_manure_inorganic_phosphorus += machine_inorganic_results[
+                "runoff_phosphorus"
+            ]
             self._add_infiltrated_phosphorus_to_soil(machine_inorganic_results["infiltrated_phosphorus"], field_size)
 
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
-            grazer_organic_results = \
-                self._determine_phosphorus_leached_from_surface(rainfall, runoff, field_size,
-                                                                self.data.grazing_manure_dry_mass,
-                                                                self.data.grazing_manure_field_coverage,
-                                                                self.data.grazing_water_extractable_organic_phosphorus,
-                                                                True)
-            self.data.grazing_water_extractable_organic_phosphorus = \
-                grazer_organic_results["new_phosphorus_pool_amount"]
+            grazer_organic_results = self._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.data.grazing_manure_dry_mass,
+                self.data.grazing_manure_field_coverage,
+                self.data.grazing_water_extractable_organic_phosphorus,
+                True,
+            )
+            self.data.grazing_water_extractable_organic_phosphorus = grazer_organic_results[
+                "new_phosphorus_pool_amount"
+            ]
             self.data.grazing_organic_phosphorus_runoff = grazer_organic_results["runoff_phosphorus"]
             self.data.annual_runoff_grazing_manure_organic_phosphorus += grazer_organic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(grazer_organic_results["infiltrated_phosphorus"], field_size)
 
-            grazer_inorganic_results = \
-                self._determine_phosphorus_leached_from_surface(
-                    rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
-                    self.data.grazing_manure_field_coverage, self.data.grazing_water_extractable_inorganic_phosphorus,
-                    False)
-            self.data.grazing_water_extractable_inorganic_phosphorus = \
-                grazer_inorganic_results["new_phosphorus_pool_amount"]
+            grazer_inorganic_results = self._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.data.grazing_manure_dry_mass,
+                self.data.grazing_manure_field_coverage,
+                self.data.grazing_water_extractable_inorganic_phosphorus,
+                False,
+            )
+            self.data.grazing_water_extractable_inorganic_phosphorus = grazer_inorganic_results[
+                "new_phosphorus_pool_amount"
+            ]
             self.data.grazing_inorganic_phosphorus_runoff = grazer_inorganic_results["runoff_phosphorus"]
             self.data.annual_runoff_grazing_manure_inorganic_phosphorus += grazer_inorganic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(grazer_inorganic_results["infiltrated_phosphorus"], field_size)
@@ -278,18 +377,24 @@ class Manure:
 
         """
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-            change_in_machine_manure_moisture = \
-                self._determine_moisture_change(rainfall, self.data.machine_manure_moisture_factor,
-                                                self.data.machine_manure_dry_mass,
-                                                self.data.machine_manure_applied_mass, temperature_factor)
+            change_in_machine_manure_moisture = self._determine_moisture_change(
+                rainfall,
+                self.data.machine_manure_moisture_factor,
+                self.data.machine_manure_dry_mass,
+                self.data.machine_manure_applied_mass,
+                temperature_factor,
+            )
             self.data.machine_manure_moisture_factor += change_in_machine_manure_moisture
             self.data.machine_manure_moisture_factor = min(0.9, max(self.data.machine_manure_moisture_factor, 0.0))
 
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
-            change_in_grazing_manure_moisture = \
-                self._determine_moisture_change(rainfall, self.data.grazing_manure_moisture_factor,
-                                                self.data.grazing_manure_dry_mass,
-                                                self.data.grazing_manure_applied_mass, temperature_factor)
+            change_in_grazing_manure_moisture = self._determine_moisture_change(
+                rainfall,
+                self.data.grazing_manure_moisture_factor,
+                self.data.grazing_manure_dry_mass,
+                self.data.grazing_manure_applied_mass,
+                temperature_factor,
+            )
             self.data.grazing_manure_moisture_factor += change_in_grazing_manure_moisture
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
@@ -315,30 +420,45 @@ class Manure:
                 surface (unitless)
 
         """
-        manure_dry_matter_decomposition_rate = \
-            max(0.0, self._determine_dry_matter_decomposition_rate(temperature_factor))
-        decomposed_machine_manure_mass_change, decomposed_machine_manure_coverage_change = 0, 0
+        manure_dry_matter_decomposition_rate = max(
+            0.0, self._determine_dry_matter_decomposition_rate(temperature_factor)
+        )
+        (
+            decomposed_machine_manure_mass_change,
+            decomposed_machine_manure_coverage_change,
+        ) = (0, 0)
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             decomposed_machine_manure_mass_change = min(
                 (self.data.machine_manure_dry_mass * manure_dry_matter_decomposition_rate),
-                self.data.machine_manure_dry_mass)
+                self.data.machine_manure_dry_mass,
+            )
             decomposed_machine_manure_coverage_change = min(
-                (decomposed_machine_manure_mass_change / self.data.machine_manure_dry_mass) *
-                self.data.machine_manure_field_coverage, self.data.machine_manure_field_coverage)
+                (decomposed_machine_manure_mass_change / self.data.machine_manure_dry_mass)
+                * self.data.machine_manure_field_coverage,
+                self.data.machine_manure_field_coverage,
+            )
 
-        decomposed_grazing_manure_mass_change, decomposed_grazing_manure_coverage_change = 0, 0
+        (
+            decomposed_grazing_manure_mass_change,
+            decomposed_grazing_manure_coverage_change,
+        ) = (0, 0)
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             decomposed_grazing_manure_mass_change = min(
                 (self.data.grazing_manure_dry_mass * manure_dry_matter_decomposition_rate),
-                self.data.machine_manure_dry_mass)
+                self.data.machine_manure_dry_mass,
+            )
             decomposed_grazing_manure_coverage_change = min(
-                (decomposed_grazing_manure_mass_change / self.data.grazing_manure_dry_mass) *
-                self.data.grazing_manure_field_coverage, self.data.grazing_manure_field_coverage)
+                (decomposed_grazing_manure_mass_change / self.data.grazing_manure_dry_mass)
+                * self.data.grazing_manure_field_coverage,
+                self.data.grazing_manure_field_coverage,
+            )
 
-        return_dict = {"decomposed_machine_manure_mass_change": decomposed_machine_manure_mass_change,
-                       "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change,
-                       "decomposed_grazing_manure_mass_change": decomposed_grazing_manure_mass_change,
-                       "decomposed_grazing_manure_coverage_change": decomposed_grazing_manure_coverage_change}
+        return_dict = {
+            "decomposed_machine_manure_mass_change": decomposed_machine_manure_mass_change,
+            "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change,
+            "decomposed_grazing_manure_mass_change": decomposed_grazing_manure_mass_change,
+            "decomposed_grazing_manure_coverage_change": decomposed_grazing_manure_coverage_change,
+        }
         return return_dict
 
     def _determine_assimilated_surface_manure(self, temperature_factor: float, field_size: float) -> Dict:
@@ -366,35 +486,62 @@ class Manure:
         assimilated_machine_manure, machine_manure_coverage = 0, 0
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             machine_manure_cover_area = self.data.machine_manure_field_coverage * field_size
-            assimilated_machine_manure = max(0.0, self._determine_dry_manure_matter_assimilation(
-                self.data.machine_manure_moisture_factor, temperature_factor, machine_manure_cover_area, False))
+            assimilated_machine_manure = max(
+                0.0,
+                self._determine_dry_manure_matter_assimilation(
+                    self.data.machine_manure_moisture_factor,
+                    temperature_factor,
+                    machine_manure_cover_area,
+                    False,
+                ),
+            )
             assimilated_machine_manure = min(self.data.machine_manure_dry_mass, assimilated_machine_manure)
-            machine_manure_coverage = max(0.0, (assimilated_machine_manure / self.data.machine_manure_dry_mass) *
-                                          self.data.machine_manure_field_coverage)
+            machine_manure_coverage = max(
+                0.0,
+                (assimilated_machine_manure / self.data.machine_manure_dry_mass)
+                * self.data.machine_manure_field_coverage,
+            )
             machine_manure_coverage = min(machine_manure_coverage, self.data.machine_manure_field_coverage)
 
         assimilated_grazing_manure, grazing_manure_coverage = 0, 0
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             grazing_manure_cover_area = self.data.grazing_manure_field_coverage * field_size
-            assimilated_grazing_manure = max(0.0, self._determine_dry_manure_matter_assimilation(
-                self.data.grazing_manure_moisture_factor, temperature_factor, grazing_manure_cover_area, True))
+            assimilated_grazing_manure = max(
+                0.0,
+                self._determine_dry_manure_matter_assimilation(
+                    self.data.grazing_manure_moisture_factor,
+                    temperature_factor,
+                    grazing_manure_cover_area,
+                    True,
+                ),
+            )
             assimilated_grazing_manure = min(self.data.grazing_manure_dry_mass, assimilated_grazing_manure)
-            grazing_manure_coverage = max(0.0, (assimilated_grazing_manure / self.data.grazing_manure_dry_mass) *
-                                          self.data.grazing_manure_field_coverage)
+            grazing_manure_coverage = max(
+                0.0,
+                (assimilated_grazing_manure / self.data.grazing_manure_dry_mass)
+                * self.data.grazing_manure_field_coverage,
+            )
             grazing_manure_coverage = min(grazing_manure_coverage, self.data.grazing_manure_field_coverage)
 
-        return_dict = {"assimilated_machine_manure": assimilated_machine_manure,
-                       "machine_manure_coverage": machine_manure_coverage,
-                       "assimilated_grazing_manure": assimilated_grazing_manure,
-                       "grazing_manure_coverage": grazing_manure_coverage}
+        return_dict = {
+            "assimilated_machine_manure": assimilated_machine_manure,
+            "machine_manure_coverage": machine_manure_coverage,
+            "assimilated_grazing_manure": assimilated_grazing_manure,
+            "grazing_manure_coverage": grazing_manure_coverage,
+        }
         return return_dict
 
     # --- Static Methods ---
     @staticmethod
-    def _determine_phosphorus_leached_from_surface(rainfall: float, runoff: float, field_size: float,
-                                                   manure_dry_mass: float, field_coverage: float,
-                                                   water_extractable_phosphorus: float, is_organic: bool) \
-            -> Dict[str, float]:
+    def _determine_phosphorus_leached_from_surface(
+        rainfall: float,
+        runoff: float,
+        field_size: float,
+        manure_dry_mass: float,
+        field_coverage: float,
+        water_extractable_phosphorus: float,
+        is_organic: bool,
+    ) -> Dict[str, float]:
         """This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
             between runoff and soil infiltration, and how much phosphorus remains in the given pool.
 
@@ -435,34 +582,44 @@ class Manure:
 
         """
         area_covered_by_manure = field_coverage * field_size
-        rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(rainfall, manure_dry_mass,
-                                                                                      area_covered_by_manure)
+        rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(
+            rainfall, manure_dry_mass, area_covered_by_manure
+        )
 
         distribution_factor = Manure._determine_phosphorus_distribution_factor(rainfall, runoff)
 
         if is_organic:
             water_extractable_phosphorus_leached = Manure._determine_water_extractable_organic_phosphorus_leached(
-                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True
+            )
         else:
             water_extractable_phosphorus_leached = Manure._determine_water_extractable_inorganic_phosphorus_leached(
-                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True
+            )
 
         water_extractable_phosphorus_leached = min(water_extractable_phosphorus, water_extractable_phosphorus_leached)
 
         runoff_dissolved_phosphorus_concentration = Manure._determine_water_extractable_phosphorus_runoff_concentration(
-            water_extractable_phosphorus_leached, rainfall, field_size, distribution_factor)
+            water_extractable_phosphorus_leached,
+            rainfall,
+            field_size,
+            distribution_factor,
+        )
 
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
-        phosphorus_lost_to_runoff_in_kg = (runoff_dissolved_phosphorus_concentration * runoff_in_liters) * \
-            MILLIGRAMS_TO_KILOGRAMS
+        phosphorus_lost_to_runoff_in_kg = (
+            runoff_dissolved_phosphorus_concentration * runoff_in_liters
+        ) * MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
         new_phosphorus_pool_amount = water_extractable_phosphorus - water_extractable_phosphorus_leached
-        return_dict = {"new_phosphorus_pool_amount": new_phosphorus_pool_amount,
-                       "infiltrated_phosphorus": infiltrated_phosphorus,
-                       "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg}
+        return_dict = {
+            "new_phosphorus_pool_amount": new_phosphorus_pool_amount,
+            "infiltrated_phosphorus": infiltrated_phosphorus,
+            "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg,
+        }
         return return_dict
 
     @staticmethod
@@ -485,8 +642,12 @@ class Manure:
         return min(phosphorus_amount, max(0.0, assimilation_ratio * phosphorus_amount))
 
     @staticmethod
-    def _determine_mineralized_surface_phosphorus(phosphorus_amount: float, rate: float, temperature_factor: float,
-                                                  moisture_factor: float) -> float:
+    def _determine_mineralized_surface_phosphorus(
+        phosphorus_amount: float,
+        rate: float,
+        temperature_factor: float,
+        moisture_factor: float,
+    ) -> float:
         """Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
             current day from the given pool.
 
@@ -539,8 +700,9 @@ class Manure:
         SurPhos [2], pseudocode_soil [S.5.D.I.1]
 
         """
-        calculated_temperature_factor = ((2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)) \
-            / (32 ** 4)
+        calculated_temperature_factor = (
+            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
+        ) / (32**4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -562,11 +724,15 @@ class Manure:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor ** 0.5)
+        return 0.003 * (temperature_factor**0.5)
 
     @staticmethod
-    def _determine_dry_manure_matter_assimilation(moisture_factor: float, temperature_factor: float,
-                                                  manure_cover_area: float, is_dung: bool) -> float:
+    def _determine_dry_manure_matter_assimilation(
+        moisture_factor: float,
+        temperature_factor: float,
+        manure_cover_area: float,
+        is_dung: bool,
+    ) -> float:
         """Calculates the mass of dry manure matter applied by machine assimilated into the soil that day
 
         Parameters
@@ -593,15 +759,20 @@ class Manure:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor ** 0.1
+            temperature_term = temperature_factor**0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
         return (30 * exponential_term) * temperature_term * manure_cover_area
 
     @staticmethod
-    def _determine_moisture_change(rainfall: float, current_moisture: float, current_mass: float, original_mass: float,
-                                   temperature_factor: float) -> float:
+    def _determine_moisture_change(
+        rainfall: float,
+        current_moisture: float,
+        current_mass: float,
+        original_mass: float,
+        temperature_factor: float,
+    ) -> float:
         """This function determines the daily change in the moisture factor of the maure based on the current days
             precipitation conditions.
 
@@ -635,8 +806,9 @@ class Manure:
         return (-0.3 * current_moisture) + 0.27
 
     @staticmethod
-    def _determine_rain_manure_dry_matter_ratio(rainfall: float, manure_dry_matter: float,
-                                                manure_coverage: float) -> float:
+    def _determine_rain_manure_dry_matter_ratio(
+        rainfall: float, manure_dry_matter: float, manure_coverage: float
+    ) -> float:
         """Calculates the ratio of rainfall to manure dry matter currently on the field.
 
         Parameters
@@ -664,9 +836,11 @@ class Manure:
         return (rain_in_centimeters / dry_matter_in_grams) * coverage_in_square_centimeters
 
     @staticmethod
-    def _determine_water_extractable_inorganic_phosphorus_leached(manure_water_extractable_inorganic_phosphorus: float,
-                                                                  rainfall_to_dry_manure_ratio: float,
-                                                                  is_from_cow: bool) -> float:
+    def _determine_water_extractable_inorganic_phosphorus_leached(
+        manure_water_extractable_inorganic_phosphorus: float,
+        rainfall_to_dry_manure_ratio: float,
+        is_from_cow: bool,
+    ) -> float:
         """Determines the amount of water extractable inorganic phosphorus leached by rainfall
 
         Parameters
@@ -702,9 +876,11 @@ class Manure:
         return max(0.0, first_term * manure_water_extractable_inorganic_phosphorus)
 
     @staticmethod
-    def _determine_water_extractable_organic_phosphorus_leached(manure_water_extractable_organic_phosphorus: float,
-                                                                rainfall_to_dry_manure_ratio: float,
-                                                                is_from_cow: bool) -> float:
+    def _determine_water_extractable_organic_phosphorus_leached(
+        manure_water_extractable_organic_phosphorus: float,
+        rainfall_to_dry_manure_ratio: float,
+        is_from_cow: bool,
+    ) -> float:
         """Determines the amount of water extractable organic phosphorus leached by rainfall
 
         Parameters
@@ -729,7 +905,10 @@ class Manure:
 
         """
         result = Manure._determine_water_extractable_inorganic_phosphorus_leached(
-            manure_water_extractable_organic_phosphorus, rainfall_to_dry_manure_ratio, is_from_cow)
+            manure_water_extractable_organic_phosphorus,
+            rainfall_to_dry_manure_ratio,
+            is_from_cow,
+        )
         return result / 0.6
 
     @staticmethod
@@ -757,9 +936,12 @@ class Manure:
         return (runoff / rainfall) ** 0.225
 
     @staticmethod
-    def _determine_water_extractable_phosphorus_runoff_concentration(manure_leached: float, rainfall: float,
-                                                                     field_size: float,
-                                                                     distribution_factor: float) -> float:
+    def _determine_water_extractable_phosphorus_runoff_concentration(
+        manure_leached: float,
+        rainfall: float,
+        field_size: float,
+        distribution_factor: float,
+    ) -> float:
         """Calculates the concentration of water extractable phosphorus in runoff on the current day.
 
         Parameters
@@ -781,5 +963,10 @@ class Manure:
         """
         manure_leached_in_mg = manure_leached * KILOGRAMS_TO_MILLIGRAMS
         field_size_in_square_mm = field_size * HECTARES_TO_SQUARE_MILLIMETERS
-        return manure_leached_in_mg * (1 / rainfall) * (1 / field_size_in_square_mm) * \
-            (1 / CUBIC_MILLIMETERS_TO_LITERS) * distribution_factor
+        return (
+            manure_leached_in_mg
+            * (1 / rainfall)
+            * (1 / field_size_in_square_mm)
+            * (1 / CUBIC_MILLIMETERS_TO_LITERS)
+            * distribution_factor
+        )
