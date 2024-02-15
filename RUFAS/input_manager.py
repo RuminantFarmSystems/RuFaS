@@ -274,14 +274,13 @@ class InputManager:
 
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
-            input_data, missing_required_property_keys, property_keys_with_default_values = \
-                self._add_default_values_to_missing_properties(
-                    input_data,
-                    metadata_properties
-                )
-            self._log_missing_keys_and_keys_with_default_values(
+            (
+                input_data,
                 missing_required_property_keys,
-                property_keys_with_default_values
+                property_keys_with_default_values,
+            ) = self._add_default_values_to_missing_properties(input_data, metadata_properties)
+            self._log_missing_keys_and_keys_with_default_values(
+                missing_required_property_keys, property_keys_with_default_values
             )
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
 
@@ -361,9 +360,7 @@ class InputManager:
         return filtered_input_data
 
     def _log_missing_keys_and_keys_with_default_values(
-            self,
-            missing_required_property_keys: List[str],
-            property_keys_with_default_values: List[Tuple[str, Any]]
+        self, missing_required_property_keys: List[str], property_keys_with_default_values: List[Tuple[str, Any]]
     ) -> None:
         """
         Logs warnings and errors for missing required properties and properties where default values were applied.
@@ -390,20 +387,22 @@ class InputManager:
             "function": self._log_missing_keys_and_keys_with_default_values.__name__,
         }
         if missing_required_property_keys:
-            om.add_error("Validation: missing required property keys",
-                         f"Missing required property keys: {', '.join(missing_required_property_keys)}.",
-                         info_map)
+            for key in missing_required_property_keys:
+                om.add_error(
+                    "Validation: missing required property keys",
+                    f"Missing required property key: {key}.",
+                    info_map,
+                )
         if property_keys_with_default_values:
-            stringified_default_values = [f"({key} => {value})" for key, value in property_keys_with_default_values]
-            om.add_warning("Validation: missing required property keys",
-                           f"Default values used for required property keys that were missing: "
-                           f"{', '.join(stringified_default_values)}.",
-                           info_map)
+            for key, value in property_keys_with_default_values:
+                om.add_warning(
+                    "Validation: missing required property keys",
+                    f"Default value used for required property key that was missing: {key} => {value}.",
+                    info_map,
+                )
 
     def _add_default_values_to_missing_properties(
-            self,
-            input_data: Dict[str, Any],
-            metadata_properties: Dict[str, Any]
+        self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]]:
         """
         Recursively adds default values to missing properties in the input data based on metadata properties.
@@ -445,12 +444,12 @@ class InputManager:
         missing_required_property_keys: List[str] = []
         property_keys_with_default_values: List[Tuple[str, Any]] = []
         for property_key, property_details in metadata_properties.items():
-            if property_key in ['type', 'description', 'default']:
+            if property_key in ["type", "description", "default"]:
                 continue
             if property_key not in input_data:
-                if 'default' in property_details:
-                    input_data[property_key] = property_details['default']
-                    property_keys_with_default_values.append((property_key, property_details['default']))
+                if "default" in property_details:
+                    input_data[property_key] = property_details["default"]
+                    property_keys_with_default_values.append((property_key, property_details["default"]))
                 else:
                     missing_required_property_keys.append(property_key)
                     continue
@@ -458,40 +457,44 @@ class InputManager:
             # Even if the property key is present or fulfilled with a default value,
             # we still need to check if it's a nested object/array and add default values
             # to missing properties in the nested object/array
-            if property_details['type'] == 'object':
+            if property_details["type"] == "object":
                 nested_input_data = input_data[property_key]
                 nested_metadata_properties = metadata_properties[property_key]
-                input_data[property_key], nested_missing_required_property_keys, \
-                    nested_property_keys_with_default_values = \
-                    self._add_default_values_to_missing_properties(
-                        nested_input_data,
-                        nested_metadata_properties,
-                    )
+                (
+                    input_data[property_key],
+                    nested_missing_required_property_keys,
+                    nested_property_keys_with_default_values,
+                ) = self._add_default_values_to_missing_properties(
+                    nested_input_data,
+                    nested_metadata_properties,
+                )
                 missing_required_property_keys.extend(
-                    [f'{property_key}.{key}' for key in nested_missing_required_property_keys]
+                    [f"{property_key}.{key}" for key in nested_missing_required_property_keys]
                 )
                 property_keys_with_default_values.extend(
-                    [(f'{property_key}.{key}', value) for key, value in nested_property_keys_with_default_values]
+                    [(f"{property_key}.{key}", value) for key, value in nested_property_keys_with_default_values]
                 )
 
-            elif property_details['type'] == 'array':
-                input_data[property_key], nested_missing_required_property_keys, \
-                    nested_property_keys_with_default_values = \
-                    self._add_default_values_to_array_properties(
-                        input_data,
-                        property_key,
-                        property_details,
-                    )
+            elif property_details["type"] == "array":
+                (
+                    input_data[property_key],
+                    nested_missing_required_property_keys,
+                    nested_property_keys_with_default_values,
+                ) = self._add_default_values_to_array_properties(
+                    input_data,
+                    property_key,
+                    property_details,
+                )
                 missing_required_property_keys.extend(nested_missing_required_property_keys)
                 property_keys_with_default_values.extend(nested_property_keys_with_default_values)
 
         return input_data, missing_required_property_keys, property_keys_with_default_values
 
     def _add_default_values_to_array_properties(
-            self,
-            input_data: Dict[str, Any],
-            property_key: str,
-            property_details: Dict[str, Any],
+        self,
+        input_data: Dict[str, Any],
+        property_key: str,
+        property_details: Dict[str, Any],
     ) -> Tuple[List[Any], List[str], List[Tuple[str, Any]]]:
         """
         Processes an array property to add default values to its elements based on metadata properties.
@@ -532,39 +535,38 @@ class InputManager:
 
         missing_required_property_keys: List[str] = []
         property_keys_with_default_values: List[Tuple[str, Any]] = []
-        nested_metadata_properties = property_details['properties']
+        nested_metadata_properties = property_details["properties"]
         nested_input_data = input_data[property_key]
         updated_array = []
 
         if len(nested_input_data) == 0:
-            if 'default' in nested_metadata_properties:
-                nested_input_data = [nested_metadata_properties['default']]
-                property_keys_with_default_values.append((f'{property_key}[0]', nested_metadata_properties['default']))
+            if "default" in nested_metadata_properties:
+                nested_input_data = [nested_metadata_properties["default"]]
+                property_keys_with_default_values.append((f"{property_key}[0]", nested_metadata_properties["default"]))
             else:
-                missing_required_property_keys.append(f'{property_key}[0]')
+                missing_required_property_keys.append(f"{property_key}[0]")
 
         for idx, element in enumerate(nested_input_data):
-            if nested_metadata_properties['type'] == 'array':
-                element, nested_missing_keys, nested_keys_with_default = \
-                    self._add_default_values_to_array_properties(
-                        {f'{property_key}[{idx}]': element},
-                        f'{property_key}[{idx}]',
-                        nested_metadata_properties,
-                    )
+            if nested_metadata_properties["type"] == "array":
+                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_array_properties(
+                    {f"{property_key}[{idx}]": element},
+                    f"{property_key}[{idx}]",
+                    nested_metadata_properties,
+                )
                 updated_array.append(element)
                 missing_required_property_keys.extend(nested_missing_keys)
                 property_keys_with_default_values.extend(nested_keys_with_default)
-            elif nested_metadata_properties['type'] == 'object':
-                element, nested_missing_keys, nested_keys_with_default = \
-                    self._add_default_values_to_missing_properties(
-                        element,
-                        nested_metadata_properties
-                    )
-                updated_array.append(element)
-                missing_required_property_keys.extend([f'{property_key}[{idx}].{key}' for key in nested_missing_keys])
-                property_keys_with_default_values.extend(
-                    [(f'{property_key}[{idx}].{key}', value) for key, value in nested_keys_with_default]
+
+            elif nested_metadata_properties["type"] == "object":
+                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_missing_properties(
+                    element, nested_metadata_properties
                 )
+                updated_array.append(element)
+                missing_required_property_keys.extend([f"{property_key}[{idx}].{key}" for key in nested_missing_keys])
+                property_keys_with_default_values.extend(
+                    [(f"{property_key}[{idx}].{key}", value) for key, value in nested_keys_with_default]
+                )
+
             else:
                 updated_array.append(element)
 
