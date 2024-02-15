@@ -3,10 +3,6 @@ from math import exp
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module handles the denitrification of nitrogen in the nitrates pool, based on SWAT section 3:1.4.
-"""
-
 
 class Denitrification:
     """
@@ -29,6 +25,7 @@ class Denitrification:
     -----
     The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
     SoilData object is not provided.
+
     """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
