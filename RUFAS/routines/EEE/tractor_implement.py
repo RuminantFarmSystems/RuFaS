@@ -83,25 +83,27 @@ class TractorImplement:
         """
         return field_production_size_ha / self.field_capacity_ha_per_hr(crop_yield_ton_per_ha)
 
-    def calculate_drawbar_power(self) -> float:
+    def calculate_drawbar_power(self, clay_percent: float) -> float:
         """
         Calculates Drawbar Power (kW) which is the power required by the implement for propulsion forward if it
         requires a transfer of tractor power to its wheel drives for this purpose.
         Implements Helper Function 414  in EEE Functions file.
         """
-        functional_draft = self.calculate_functional_draft()
+        functional_draft = self.calculate_functional_draft(clay_percent)
         return functional_draft * self.field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self) -> float:
+    def calculate_functional_draft(self, clay_percent: float) -> float:
         """
         Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
         minor tillage tools operated at shallow depths.
-        Implements Helper Function 417  in EEE Functions file.
+        Implements Helper Functions 417 and 421  in EEE Functions file.
         """
-        fi = 0  # TODO
+        soil_texture_adjustment = (
+            3 if clay_percent < 20 else 2 if clay_percent < 50 else 1 if clay_percent <= 100 else "Invalid"
+        )
         effective_depth = self.depth_cm if self.is_depth_relevant else 1
         return (
-            self.width_m * effective_depth * fi * self.A
+            self.width_m * effective_depth * soil_texture_adjustment * self.A
             + self.B * self.field_speed_km_per_hr
             + self.C * self.field_speed_km_per_hr**2
         )  # The parentheses did not match in in EEE Functions file, this is my best guestimation
