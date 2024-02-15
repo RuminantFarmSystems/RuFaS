@@ -278,8 +278,8 @@ class InputManager:
                 input_data,
                 missing_required_property_keys,
                 property_keys_with_default_values,
-            ) = self._add_default_values_to_missing_properties(input_data, metadata_properties)
-            self._log_missing_keys_(
+            ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
+            self._log_missing_keys(
                 missing_required_property_keys, property_keys_with_default_values
             )
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
@@ -359,7 +359,7 @@ class InputManager:
 
         return filtered_input_data
 
-    def _log_missing_keys_(
+    def _log_missing_keys(
         self, missing_required_property_keys: List[str], property_keys_with_default_values: List[Tuple[str, Any]]
     ) -> None:
         """
@@ -384,7 +384,7 @@ class InputManager:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._log_missing_keys_.__name__,
+            "function": self._log_missing_keys.__name__,
         }
         if missing_required_property_keys:
             for key in missing_required_property_keys:
@@ -401,7 +401,7 @@ class InputManager:
                     info_map,
                 )
 
-    def _add_default_values_to_missing_properties(
+    def _add_default_values_to_missing_inputs(
         self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]]:
         """
@@ -415,13 +415,11 @@ class InputManager:
         validate if the default values are semantically correct. It only checks if the input data is complete
         and fills in missing values with defaults where necessary.
 
-        Implementation Details
-        ----------------------
         The method iterates through each key in the metadata properties, checking for its presence in the input data.
         If a key is missing and a default value is specified, that default is added to the input data. For nested
         objects and arrays, the method recursively calls itself, adjusting the path to reflect the nested structure.
         This approach allows for detailed tracking of missing properties and the application of defaults at any depth
-        of the input data structure. For arrays, a separate helper method, `_add_default_values_to_array_properties`,
+        of the input data structure. For arrays, a separate helper method, `_add_default_values_to_array_inputs`,
         is used to handle the specific nuances associated with array elements, including nested arrays
         and objects within arrays.
 
@@ -454,9 +452,6 @@ class InputManager:
                     missing_required_property_keys.append(property_key)
                     continue
 
-            # Even if the property key is present or fulfilled with a default value,
-            # we still need to check if it's a nested object/array and add default values
-            # to missing properties in the nested object/array
             if property_details["type"] == "object":
                 nested_input_data = input_data[property_key]
                 nested_metadata_properties = metadata_properties[property_key]
@@ -464,7 +459,7 @@ class InputManager:
                     input_data[property_key],
                     nested_missing_required_property_keys,
                     nested_property_keys_with_default_values,
-                ) = self._add_default_values_to_missing_properties(
+                ) = self._add_default_values_to_missing_inputs(
                     nested_input_data,
                     nested_metadata_properties,
                 )
@@ -480,7 +475,7 @@ class InputManager:
                     input_data[property_key],
                     nested_missing_required_property_keys,
                     nested_property_keys_with_default_values,
-                ) = self._add_default_values_to_array_properties(
+                ) = self._add_default_values_to_array_inputs(
                     input_data,
                     property_key,
                     property_details,
@@ -490,7 +485,7 @@ class InputManager:
 
         return input_data, missing_required_property_keys, property_keys_with_default_values
 
-    def _add_default_values_to_array_properties(
+    def _add_default_values_to_array_inputs(
         self,
         input_data: Dict[str, Any],
         property_key: str,
@@ -506,11 +501,9 @@ class InputManager:
         checking that each element within the array is appropriately processed according to its type,
         as defined in the metadata properties.
 
-        Implementation Details
-        ----------------------
         The method first checks if the array is empty and if a default value should be applied at the array level.
         It then iterates through each element of the array. Based on the element's type (object, array, or simple type),
-        it either calls `_add_default_values_to_missing_properties` for nested objects or itself recursively for nested
+        it either calls `_add_default_values_to_missing_inputs` for nested objects or itself recursively for nested
         arrays, applying default values as specified in the metadata. This allows for deep traversal of nested arrays
         and objects. If the elements of the array have simple types, the method simply adds the default value to the
         element if it is missing.
@@ -548,7 +541,7 @@ class InputManager:
 
         for idx, element in enumerate(nested_input_data):
             if nested_metadata_properties["type"] == "array":
-                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_array_properties(
+                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_array_inputs(
                     {f"{property_key}[{idx}]": element},
                     f"{property_key}[{idx}]",
                     nested_metadata_properties,
@@ -558,7 +551,7 @@ class InputManager:
                 property_keys_with_default_values.extend(nested_keys_with_default)
 
             elif nested_metadata_properties["type"] == "object":
-                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_missing_properties(
+                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_missing_inputs(
                     element, nested_metadata_properties
                 )
                 updated_array.append(element)

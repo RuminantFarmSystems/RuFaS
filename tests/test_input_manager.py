@@ -323,10 +323,10 @@ def test_populate_pool_valid(
     }
     mocker.patch.object(
         mock_input_manager,
-        "_add_default_values_to_missing_properties",
+        "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -370,10 +370,10 @@ def test_populate_pool_invalid(
     }
     mocker.patch.object(
         mock_input_manager,
-        "_add_default_values_to_missing_properties",
+        "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -415,10 +415,10 @@ def test_populate_pool_partial_invalid(
     )
     mocker.patch.object(
         mock_input_manager,
-        "_add_default_values_to_missing_properties",
+        "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -460,10 +460,10 @@ def test_populate_pool_eager_termination(
     }
     mocker.patch.object(
         mock_input_manager,
-        "_add_default_values_to_missing_properties",
+        "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys_")
+    mocker.patch.object(mock_input_manager, "_log_missing_keys")
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -3545,7 +3545,7 @@ def test_log_missing_keys(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for the _log_missing_keys_ method of the InputManager class.
+    Unit test for the _log_missing_keys method of the InputManager class.
     """
 
     # Arrange
@@ -3554,7 +3554,7 @@ def test_log_missing_keys(
     mock_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    input_manager._log_missing_keys_(missing_keys, keys_with_defaults)
+    input_manager._log_missing_keys(missing_keys, keys_with_defaults)
 
     # Assert
     for call_args in expected_calls["error_calls"]:
@@ -3634,20 +3634,20 @@ def test_log_missing_keys(
         ),
     ],
 )
-def test_add_default_values_to_missing_properties(
+def test_add_default_values_to_missing_inputs(
     input_data: Dict[str, Any],
     metadata_properties: Dict[str, Any],
     expected_output: Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]],
 ) -> None:
     """
-    Unit test for the _add_default_values_to_missing_properties method of the InputManager class.
+    Unit test for the _add_default_values_to_missing_inputs method of the InputManager class.
     """
 
     # Arrange
     input_manager = InputManager()
 
     # Act
-    output = input_manager._add_default_values_to_missing_properties(input_data, metadata_properties)
+    output = input_manager._add_default_values_to_missing_inputs(input_data, metadata_properties)
 
     # Assert
     assert output == expected_output
@@ -3694,21 +3694,21 @@ def test_add_default_values_to_missing_properties(
         ({"arrayProp": []}, "arrayProp", {"properties": {"type": "number"}}, ([], ["arrayProp[0]"], [])),
     ],
 )
-def test_add_default_values_to_array_properties(
+def test_add_default_values_to_array_inputs(
     input_data: Dict[str, Any],
     property_key: str,
     property_details: Dict[str, Any],
     expected_output: Tuple[List[Any], List[str], List[Tuple[str, Any]]],
 ) -> None:
     """
-    Unit test for the _add_default_values_to_array_properties method of the InputManager class.
+    Unit test for the _add_default_values_to_array_inputs method of the InputManager class.
     """
 
     # Arrange
     input_manager = InputManager()
 
     # Act
-    output = input_manager._add_default_values_to_array_properties(input_data, property_key, property_details)
+    output = input_manager._add_default_values_to_array_inputs(input_data, property_key, property_details)
 
     # Assert
     assert output == expected_output
