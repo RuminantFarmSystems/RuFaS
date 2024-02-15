@@ -53,6 +53,7 @@ class CarbonCycling:
     invoking various routines related to carbon flux and storage.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
@@ -173,9 +174,9 @@ class CarbonCycling:
         return bulk_density * soil_volume
 
     @staticmethod
-    def _determine_soil_active_carbon_fraction(active_carbon_amount: float,
-                                               soil_mass: float,
-                                               field_size: float) -> float:
+    def _determine_soil_active_carbon_fraction(
+        active_carbon_amount: float, soil_mass: float, field_size: float
+    ) -> float:
         """
         This method calculates the fraction of active carbon in the soil.
 
@@ -201,9 +202,7 @@ class CarbonCycling:
         return active_carbon_amount * field_size / soil_mass
 
     @staticmethod
-    def _determine_soil_slow_carbon_fraction(slow_carbon_amount: float,
-                                             soil_mass: float,
-                                             field_size: float) -> float:
+    def _determine_soil_slow_carbon_fraction(slow_carbon_amount: float, soil_mass: float, field_size: float) -> float:
         """
         This method calculates the fraction of slow carbon in the soil.
 
@@ -229,9 +228,9 @@ class CarbonCycling:
         return slow_carbon_amount * field_size / soil_mass
 
     @staticmethod
-    def _determine_soil_passive_carbon_fraction(passive_carbon_amount: float,
-                                                soil_mass: float,
-                                                field_size: float) -> float:
+    def _determine_soil_passive_carbon_fraction(
+        passive_carbon_amount: float, soil_mass: float, field_size: float
+    ) -> float:
         """
         This method calculates the fraction of passive carbon in the soil.
 
@@ -259,9 +258,9 @@ class CarbonCycling:
         return passive_carbon_amount * field_size / soil_mass
 
     @staticmethod
-    def _determine_soil_overall_carbon_fraction(soil_active_carbon_fraction: float,
-                                                soil_slow_carbon_fraction: float,
-                                                soil_passive_carbon_fraction: float) -> float:
+    def _determine_soil_overall_carbon_fraction(
+        soil_active_carbon_fraction: float, soil_slow_carbon_fraction: float, soil_passive_carbon_fraction: float
+    ) -> float:
         """
         This method calculates the total fraction of carbon in the soil.
 
@@ -287,9 +286,9 @@ class CarbonCycling:
         return soil_active_carbon_fraction + soil_passive_carbon_fraction + soil_slow_carbon_fraction
 
     @staticmethod
-    def _determine_total_soil_carbon_amount(active_carbon_amount: float,
-                                            slow_carbon_amount: float,
-                                            passive_carbon_amount: float) -> float:
+    def _determine_total_soil_carbon_amount(
+        active_carbon_amount: float, slow_carbon_amount: float, passive_carbon_amount: float
+    ) -> float:
         """
         This method calculates the total amount of soil carbon.
 
@@ -315,9 +314,11 @@ class CarbonCycling:
         return active_carbon_amount + slow_carbon_amount + passive_carbon_amount
 
     @staticmethod
-    def _determine_total_plant_carbon_CO2_loss(plant_metabolic_active_carbon_loss: float,
-                                               plant_structural_active_carbon_loss: float,
-                                               plant_structural_slow_carbon_loss: float) -> float:
+    def _determine_total_plant_carbon_CO2_loss(
+        plant_metabolic_active_carbon_loss: float,
+        plant_structural_active_carbon_loss: float,
+        plant_structural_slow_carbon_loss: float,
+    ) -> float:
         """
         This method calculates the total amount plant carbon lost as CO2.
 
@@ -345,9 +346,11 @@ class CarbonCycling:
         )
 
     @staticmethod
-    def _determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss: float,
-                                              soil_structural_active_carbon_loss: float,
-                                              soil_structural_slow_carbon_loss: float) -> float:
+    def _determine_total_soil_carbon_CO2_loss(
+        soil_metabolic_active_carbon_loss: float,
+        soil_structural_active_carbon_loss: float,
+        soil_structural_slow_carbon_loss: float,
+    ) -> float:
         """
         This method calculates the total amount soil carbon lost as CO2.
 
@@ -373,9 +376,9 @@ class CarbonCycling:
         return soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + soil_structural_slow_carbon_loss
 
     @staticmethod
-    def _determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_loss: float,
-                                                       slow_carbon_co2_lost_amount: float,
-                                                       passive_carbon_co2_lost_amount: float) -> float:
+    def _determine_total_decomposition_carbon_CO2_lost(
+        active_carbon_to_slow_loss: float, slow_carbon_co2_lost_amount: float, passive_carbon_co2_lost_amount: float
+    ) -> float:
         """
         This method calculates the total amount of carbon lost as CO2 during decomposition.
 
@@ -401,9 +404,11 @@ class CarbonCycling:
         return active_carbon_to_slow_loss + slow_carbon_co2_lost_amount + passive_carbon_co2_lost_amount
 
     @staticmethod
-    def _determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss: float,
-                                         total_soil_carbon_CO2_loss: float,
-                                         total_decomposition_carbon_CO2_lost: float) -> float:
+    def _determine_total_carbon_CO2_lost(
+        total_plant_carbon_CO2_loss: float,
+        total_soil_carbon_CO2_loss: float,
+        total_decomposition_carbon_CO2_lost: float,
+    ) -> float:
         """
         This method calculates the total amount of carbon lost as CO2.
 
