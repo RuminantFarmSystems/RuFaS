@@ -8,7 +8,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.field.tillage_application import om
-from RUFAS.routines.tillage_implements_enum import TillageImplement
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_manager import ManureManager
 
 

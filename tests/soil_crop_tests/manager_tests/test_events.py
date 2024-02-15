@@ -11,7 +11,7 @@ from RUFAS.routines.field.manager.events import (
 )
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.tillage_implements_enum import TillageImplement
+from RUFAS.routines.EEE.enums import TillageImplement
 
 
 @pytest.mark.parametrize(

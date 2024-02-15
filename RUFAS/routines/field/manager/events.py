@@ -9,7 +9,7 @@ presently growing in a field will be harvested.
 """
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.tillage_implements_enum import TillageImplement
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 

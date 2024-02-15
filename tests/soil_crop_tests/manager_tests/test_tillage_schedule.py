@@ -3,7 +3,7 @@ from typing import List
 
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.manager.events import TillageEvent
-from RUFAS.routines.tillage_implements_enum import TillageImplement
+from RUFAS.routines.EEE.enums import TillageImplement
 
 
 @pytest.mark.parametrize(
