@@ -1,4 +1,3 @@
-from typing import List
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from .enums import FieldOperationEvent, CropType, OperationType, TractorSize
@@ -46,6 +45,7 @@ class TractorImplement:
                 self.width_m = data_entry["Tractor Implement Width (m)"]
                 self.mass_kg = data_entry["Tractor Implement Mass (kg)"]
                 self.throughput = data_entry["Max Throughput (tons dm/hour)"]
+                self.depth_cm = data_entry["Depth"]
                 self.is_depth_relevant = data_entry["is depth relevant"]
                 break
 
@@ -80,27 +80,20 @@ class TractorImplement:
         functional_draft = self.calculate_functional_draft()
         return functional_draft * field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self, crop_type: CropType) -> float:  # TODO implement
+    def calculate_functional_draft(self) -> float:
         """
         Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
         minor tillage tools operated at shallow depths.
         Implements Helper Function 417  in EEE Functions file.
         """
-        """
-        self.width_m*[(Operation Depth)*I(Operation Depth)+(1-I(Operation Depth)]*(Fi)*[A + B*(Field Speed)+ C *[(Field Speed)^2)]
-                      
-
-        2) Operation Type  in {planting,tilling, liquid manure -surface, liquid manure - below surface, fertilizer, mowing, windrowing, collection} [HF #421] 
-        3) Fi soil texture adjustment parameter (unitless)  {HF #422} 
-        4) Operation Depth (cm) [C&S for tillage and manure application] [Dataset Tractor for planting]
-        5) A (unitless) [Dataset Tractor (Value(Tractor Implement), Column F)]
-        6) B (unitless) [Dataset Tractor (Value(Tractor Implement), Column G)]
-        7) C (unitless) [Dataset Tractor (Value(Tractor Implement), Column H)]
-        8) Field Speed (km/h) [Constant # 585]
-        9) Tractor Implement Width (m) [Dataset Tractor (Value(Tractor Implement), Column G)]
-        10) I(Operation Depth) (unitless) [=1 if there is Operation Depth, =0 else]
-        """
-        pass
+        fi = 0  # TODO
+        effective_depth = self.depth_cm if self.is_depth_relevant else 1
+        field_speed_km_per_hr = self.constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
+        return (
+            self.width_m * effective_depth * fi * self.A
+            + self.B * field_speed_km_per_hr
+            + self.C * field_speed_km_per_hr**2
+        )  # The parentheses did not match in in EEE Functions file, this is my best guestimation
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
         """
