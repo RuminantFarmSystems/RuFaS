@@ -329,17 +329,15 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CH_4} = num\\_animals \\times max(0, 0.13 * T_{barn}) \\times barn\\_area / 1000
+            E_{CH_4} = max(0, 0.13 * T_{barn}) \\times barn\\_area / 1000
 
         where:
 
             :math:`E_{CH_4}` is the methane housing emission in kg :math:`CH_4/day`,
 
-            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`,
+            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`, and
 
-            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`, and
-
-            :math:`num\\_animals` is the number of animals in the pen.
+            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`.
 
         Parameters
         ----------
@@ -375,17 +373,15 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CO_2} = num\\_animals \\times max(0, 0.0065 + 0.0192 * T_{barn}) \\times barn\\_area / 1000
+            E_{CO_2} = max(0, 0.0065 + 0.0192 * T_{barn}) \\times barn\\_area / 1000
 
         where:
 
             :math:`E_{CO_2}` is the carbon dioxide housing emission in kg :math:`CO_2/day`,
 
-            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`,
+            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`, and
 
-            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`, and
-
-            :math:`num\\_animals` is the number of animals in the pen.
+            :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`.
 
         Parameters
         ----------
