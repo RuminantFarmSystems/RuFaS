@@ -901,6 +901,7 @@ def test_setup_manure_schedule(
                     100,
                     100,
                 ],
+                "implements": ["subsoiler"],
             },
             TillageSchedule(
                 name="tillage_schedule",
@@ -1084,6 +1085,7 @@ def test_setup_manure_schedule(
                     100,
                     100,
                 ],
+                implements=["subsoiler"],
             ),
         ),
         (
@@ -1093,6 +1095,7 @@ def test_setup_manure_schedule(
                 "incorporation_fractions": [0.95],
                 "mixing_fractions": [0.95],
                 "tillage_depths": [150],
+                "implements": ["cultivator"],
                 "pattern_repeat": 0,
                 "pattern_skip": 0,
             },
@@ -1103,6 +1106,7 @@ def test_setup_manure_schedule(
                 incorporation_fractions=[0.95],
                 mixing_fractions=[0.95],
                 tillage_depths=[150],
+                implements=["cultivator"],
                 pattern_skip=0,
                 pattern_repeat=0,
             ),
