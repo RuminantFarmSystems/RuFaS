@@ -515,7 +515,7 @@ class ResiduePartition:
         decomposition_temperature_effect: float
             Temperature effect on decomposition factor (unitless).
         plant_structural_carbon_amount: float
-            Pant structural carbon amount(kg/ha).
+            Plant structural carbon amount (kg/ha).
 
         Returns
         -------
