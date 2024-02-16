@@ -3,6 +3,7 @@ from enum import Enum
 
 class HarvestOperation(Enum):
     """Enum of the supported harvest operations"""
+
     HARVEST_KILL = "harvest_kill"
     HARVEST_ONLY = "harvest_only"
     KILL_ONLY = "kill_only"

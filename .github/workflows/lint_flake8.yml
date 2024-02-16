@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies and run lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Linting
+name: Formatting and Linting
 
 on:
   push:
@@ -27,7 +27,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Get all added or modified files
       run: |
@@ -39,6 +38,23 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
+    - name: Format code with Black
+      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+      run: |
+        black --line-length=120 ${{ env.FILES }}
+    - name: Commit and push formatting changes
+      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+      env:
+        BRANCH_NAME: ${{ github.head_ref || github.ref }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add -A
+        git commit -m "Apply Black Formatting" --allow-empty
+        git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+        CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
+        git push -f origin HEAD:$CLEAN_BRANCH_NAME
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
