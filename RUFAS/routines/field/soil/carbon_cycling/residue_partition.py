@@ -21,7 +21,7 @@ class ResiduePartition:
     ----------
     data : SoilData
         The SoilData object used by this module to track residue in the soil profile.
-    
+
     References
     -------
     pseudocode_soil S.6.B
