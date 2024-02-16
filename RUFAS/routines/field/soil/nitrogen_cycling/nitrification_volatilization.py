@@ -11,10 +11,10 @@ class NitrificationVolatilization:
 
     Parameters
     ----------
-    soil_data : Optional[SoilData]
+    soil_data : SoilData, optional
         The SoilData object used by this module for tracking the nitrification and volatilization of ammonium in the
         soil. If not provided, a new SoilData object will be instantiated.
-    field_size : Optional[float]
+    field_size : float, optional
         The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.
 
     Attributes
