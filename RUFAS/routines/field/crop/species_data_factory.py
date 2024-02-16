@@ -1,4 +1,3 @@
-# from enum import Enum
 import dataclasses
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
