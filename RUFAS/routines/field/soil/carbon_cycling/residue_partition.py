@@ -632,7 +632,7 @@ class ResiduePartition:
 
         Notes
         -----
-        the referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        The referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
         mention of biomass unit.
 
         """
