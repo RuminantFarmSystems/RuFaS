@@ -29,6 +29,3 @@ class TillageImplement(Enum):
 
     def __str__(self):
         return self.value
-
-    def __repr__(self):
-        return repr(self.value)

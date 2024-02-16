@@ -130,11 +130,10 @@ class TillageSchedule(Schedule):
         )
         if not equal_tillage_parameters:
             raise ValueError(
-                error_header + f"expected number of years, days, depths, incorporation and mixing "
-                f"fractions to be equal, received '{self.years}' years, '{self.days}' days,"
-                f" '{self.tillage_depths}' tillage depths, '{self.incorporation_fractions}'"
-                f" incorporation fractions, '{self.mixing_fractions}' mixing fractions and '{self.implements}' "
-                f"implements."
+                error_header + f"expected number of years, days, depths, incorporation and mixing fractions to be "
+                f"equal, received '{self.years}' years, '{self.days}' days,  '{self.tillage_depths}' tillage depths, "
+                f"'{self.incorporation_fractions}' incorporation fractions, '{self.mixing_fractions}' mixing fractions "
+                f"and '{[str(implement) for implement in self.implements]}' implements."
             )
 
     def generate_tillage_events(self) -> List[TillageEvent]:
