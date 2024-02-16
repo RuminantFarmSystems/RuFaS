@@ -52,7 +52,7 @@ class CropData:
 
     Attributes
     ----------
-    species : Optional[CropSpecies]
+    species : CropSpecies, default None
         The species of the crop.
     name : Optional[str]
         The name of this specific crop instance.
@@ -376,7 +376,7 @@ class CropData:
     """
 
     # ID variables (SWAT Table A-1 ish)
-    species: Optional[CropSpecies] = None
+    species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
     plant_code: Optional[str] = None
