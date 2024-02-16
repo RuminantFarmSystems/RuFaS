@@ -307,11 +307,9 @@ class CropManagement:
             "class": self.__class__.__name__,
             "function": self._record_yield.__name__,
             "suffix": f"field='{field_name}'",
-            "field_size": field_size,
-            "species": f"'{self.data.species}'",
         }
         value = {
-            "crop": self.data.name,
+            "crop": self.data.species,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
             "nitrogen": nitrogen_harvested,
@@ -323,6 +321,7 @@ class CropManagement:
                 "day": self.data.planting_day,
             },
             "harvest_date": {"year": year, "day": day},
+            "field_size": field_size,
         }
         om.add_variable("harvest_yield", value, info_map)
 
