@@ -15,11 +15,6 @@ from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import (
     HumusMineralization,
 )
 
-"""
-This module contains the composite class for nitrogen cycling, which contains and manages all the necessary elements for
-managing nitrogen in the soil profile.
-"""
-
 
 class NitrogenCycling:
     """
