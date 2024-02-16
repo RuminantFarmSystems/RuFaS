@@ -22,6 +22,7 @@ class MineralizationDecomposition:
         The SoilData object used by this module to track nitrogen mineralization and decomposition.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
