@@ -21,6 +21,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop_and_soil_constants import (
     LITERS_TO_CUBIC_MILLIMETERS,
@@ -596,69 +597,67 @@ def test_plant_crop(
     assert field.crops[0].data.species == expected_crop.data.species
     assert field.crops[0].data.planting_year == year
     assert field.crops[0].data.planting_day == day
-    field._record_planting.assert_called_once_with(
-        crop_reference, heat_scheduled, expected_crop.data.species, year, day
-    )
+    field._record_planting.assert_called_once_with(heat_scheduled, expected_crop.data.species, year, day)
 
 
 @pytest.mark.parametrize(
-    "crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map," "expected_value",
+    "heat_scheduled,species,year,day,field_name,field_size,expected_info_map,expected_value",
     [
         (
-            "ref_1",
             False,
-            "species_1",
+            CropSpecies.CORN_GRAIN,
             1993,
             100,
             "name_1",
             1.3,
-            {"suffix": "field='name_1'", "field_size": 1.3, "species": "species_1"},
+            {"suffix": "field='name_1'"},
             {
-                "crop_reference": "ref_1",
+                "crop": CropSpecies.CORN_GRAIN,
                 "heat_scheduled_harvest": False,
                 "date": {"year": 1993, "day": 100},
+                "field_size": 1.3,
+                "average_clay_percent": 40.0,
             },
         ),
         (
-            "ref_2",
             True,
-            "custom_alien_species",
+            CropSpecies.WINTER_WHEAT_GRAIN,
             1996,
             120,
             "name_2",
             2.55,
             {
                 "suffix": "field='name_2'",
-                "field_size": 2.55,
-                "species": "custom_alien_species",
             },
             {
-                "crop_reference": "ref_2",
+                "crop": CropSpecies.WINTER_WHEAT_GRAIN,
                 "heat_scheduled_harvest": True,
                 "date": {"year": 1996, "day": 120},
+                "field_size": 2.55,
+                "average_clay_percent": 40.0,
             },
         ),
         (
-            "ref_3",
             False,
-            "custom_corn",
+            CropSpecies.SOYBEAN_GRAIN,
             2008,
             122,
             "name_3",
             0.95,
-            {"suffix": "field='name_3'", "field_size": 0.95, "species": "custom_corn"},
+            {"suffix": "field='name_3'"},
             {
-                "crop_reference": "ref_3",
+                "crop": CropSpecies.SOYBEAN_GRAIN,
                 "heat_scheduled_harvest": False,
                 "date": {"year": 2008, "day": 122},
+                "field_size": 0.95,
+                "average_clay_percent": 40.0,
             },
         ),
     ],
 )
 def test_record_planting(
-    crop_reference: str,
     heat_scheduled: bool,
-    species: str,
+    species: CropSpecies,
     year: int,
     day: int,
     field_name: str,
@@ -671,10 +670,19 @@ def test_record_planting(
         field_data=FieldData(name=field_name, field_size=field_size),
         manure_manager=MagicMock(ManureManager),
     )
-    field._record_planting(crop_reference, heat_scheduled, species, year, day)
+    with patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=40.0,
+    ) as clay:
+        field._record_planting(heat_scheduled, species, year, day)
+
+        clay.assert_called_once()
 
     actual = om.variables_pool[f"Field._plant_crop.crop_planting.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
+    print(actual["values"])
+    print(expected_value)
     assert actual["values"].__contains__(expected_value)
 
 
@@ -940,7 +948,7 @@ def test_make_supported_crop(species: str, specs: dict):
     """ensure that supported crops are properly created."""
     # check that attributes are correct
     crop = Field._make_supported_crop(species, **specs)
-    assert crop.data.species == species
+    assert crop.data.species == CropSpecies(species)
     for key, val in specs.items():
         assert getattr(crop.data, key) == val
 
@@ -1331,22 +1339,28 @@ def test_record_fertilizer_application(
         manure_manager=MagicMock(ManureManager),
     )
 
-    field._record_fertilizer_application(
-        mix_name,
-        total_mass,
-        nitrogen_mass,
-        phosphorus_mass,
-        potassium_mass,
-        depth,
-        remainder,
-        year,
-        day,
-    )
+    with patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=10.0,
+    ) as clay:
+        field._record_fertilizer_application(
+            mix_name,
+            total_mass,
+            nitrogen_mass,
+            phosphorus_mass,
+            potassium_mass,
+            depth,
+            remainder,
+            year,
+            day,
+        )
+
+        clay.assert_called_once()
 
     expected_info_map = {
         "suffix": f"field='{field_name}'",
         "mix_name": mix_name,
-        "field_size": field_size,
     }
     expected_value = {
         "mass": total_mass,
@@ -1357,7 +1371,10 @@ def test_record_fertilizer_application(
         "surface_remainder_fraction": remainder,
         "year": year,
         "day": day,
+        "field_size": field_size,
+        "average_clay_percent": 10.0,
     }
+
     actual = om.variables_pool[f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
@@ -1765,7 +1782,7 @@ def test_execute_manure_application_with_invalid_args(
             1.0,
             1991,
             75,
-            {"suffix": "field='test_1'", "field_size": 1.3},
+            {"suffix": "field='test_1'"},
             {
                 "dry_matter_mass": 100,
                 "dry_matter_fraction": 0.1,
@@ -1777,6 +1794,8 @@ def test_execute_manure_application_with_invalid_args(
                 "potassium": 12.5,
                 "year": 1991,
                 "day": 75,
+                "field_size": 1.3,
+                "average_clay_percent": 10.0,
             },
             12.5,
         ),
@@ -1792,7 +1811,7 @@ def test_execute_manure_application_with_invalid_args(
             0.85,
             1994,
             200,
-            {"suffix": "field='test_2'", "field_size": 2.4},
+            {"suffix": "field='test_2'"},
             {
                 "dry_matter_mass": 144.6,
                 "dry_matter_fraction": 0.3,
@@ -1804,6 +1823,8 @@ def test_execute_manure_application_with_invalid_args(
                 "potassium": 14.55,
                 "year": 1994,
                 "day": 200,
+                "field_size": 2.4,
+                "average_clay_percent": 10.0,
             },
             14.55,
         ),
@@ -1819,7 +1840,7 @@ def test_execute_manure_application_with_invalid_args(
             0.7,
             2009,
             150,
-            {"suffix": "field='test_3'", "field_size": 0.66},
+            {"suffix": "field='test_3'"},
             {
                 "dry_matter_mass": 266.5,
                 "dry_matter_fraction": 0.44,
@@ -1831,6 +1852,8 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 100.5,
                 "phosphorus": 78.0,
                 "potassium": None,
+                "field_size": 0.66,
+                "average_clay_percent": 10.0,
             },
             None,
         ),
@@ -1858,18 +1881,25 @@ def test_record_manure_application(
         manure_manager=MagicMock(ManureManager),
     )
 
-    field._record_manure_application(
-        dry_mass,
-        dry_fraction,
-        coverage,
-        nitrogen,
-        phosphorus,
-        depth,
-        remainder,
-        year,
-        day,
-        potassium,
-    )
+    with patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=10.0,
+    ) as clay:
+        field._record_manure_application(
+            dry_mass,
+            dry_fraction,
+            coverage,
+            nitrogen,
+            phosphorus,
+            depth,
+            remainder,
+            year,
+            day,
+            potassium,
+        )
+
+        clay.assert_called_once()
 
     actual = om.variables_pool[
         f"{Field.__name__}.{Field._record_manure_application.__name__}.manure_application.field='{field_name}'"

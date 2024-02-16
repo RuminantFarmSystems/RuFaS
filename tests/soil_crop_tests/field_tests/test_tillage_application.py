@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, call, patch, PropertyMock
 from typing import List
 
 from RUFAS.routines.field.field.field import Field
@@ -180,11 +180,11 @@ def test_record_tillage(
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
 
+    expected_clay_percent = 25.0
     expected_info_map = {
         "class": TillageApplication.__name__,
         "function": TillageApplication._record_tillage.__name__,
         "suffix": "field='field1'",
-        "field_size": 1.5,
     }
     expected_value = {
         "tillage_depth": till_depth,
@@ -193,12 +193,19 @@ def test_record_tillage(
         "implement": implement,
         "year": year,
         "day": day,
+        "field_size": 1.5,
+        "average_clay_percent": expected_clay_percent,
     }
 
-    with patch.object(om, "add_variable") as add_var:
+    with patch.object(om, "add_variable") as add_var, patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=expected_clay_percent,
+    ) as clay:
         till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
 
         add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
+        clay.assert_called_once()
 
 
 @pytest.mark.parametrize(
