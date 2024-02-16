@@ -56,23 +56,10 @@ class TractorImplement:
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
         Implements Helper Functions 418a and 418b  in EEE Functions file.
         """
-        if self.operation_type in [
-            OperationType.TILLING,
-            OperationType.PLANTING,
-            OperationType.MOWING,
-            OperationType.WINDROWING,
-        ]:
-            return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency
-        if self.operation_type in [
-            OperationType.COLLECTION,
-            OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
-            OperationType.FERTILIZER_APPLICATION_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
-        ]:
+        if self.operation_type == OperationType.COLLECTION:
             crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
             return crop_yield_kg_per_ha / self.throughput * 1000 * self.field_efficiency
-        return 0
+        return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency
 
     def calculate_operation_time_hr(
         self, field_production_size_ha: float, crop_yield_ton_per_ha: float | None
