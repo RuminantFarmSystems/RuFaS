@@ -55,8 +55,7 @@ class RationManager:
         else:
             previous_ration = None
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination,
-            previous_ration
+            req, available_feeds, pen.animal_combination, previous_ration
         )
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
@@ -246,7 +245,7 @@ class RationManager:
         fixed_ration = False
         num_reattempts = 0
         constraints_failed_list = []
-        if hasattr(pen, 'ration_per_animal'):
+        if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
         else:
             previous_ration = None
@@ -307,8 +306,7 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination,
-                                                          previous_ration)
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
