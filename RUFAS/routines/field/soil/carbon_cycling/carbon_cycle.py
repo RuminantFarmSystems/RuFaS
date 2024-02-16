@@ -418,7 +418,7 @@ class CarbonCycling:
 
         References
         -------
-        pseudoode_soil S.6.D.7
+        pseudocode_soil S.6.D.7
 
         """
         return total_decomposition_carbon_CO2_lost + total_plant_carbon_CO2_loss + total_soil_carbon_CO2_loss
