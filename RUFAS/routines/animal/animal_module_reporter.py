@@ -298,9 +298,11 @@ class AnimalModuleReporter:
         }
         for manure_property, manure_value in pen.manure.items():
             if f"pen.calc_total_manure.pen_{pen.id}_daily_{str(manure_property)}" in om.variables_pool:
-                current_length = len(om.variables_pool[f"pen.calc_total_manure.pen_"
-                                                       f"{pen.id}_daily_"
-                                                       f"{str(manure_property)}"].values())
+                current_length = len(
+                    om.variables_pool[
+                        f"pen.calc_total_manure.pen_" f"{pen.id}_daily_" f"{str(manure_property)}"
+                    ].values()
+                )
                 if current_length < simulation_day:
                     missing_days = simulation_day - current_length
                     for day in range(0, missing_days):
