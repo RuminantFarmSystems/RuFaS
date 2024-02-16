@@ -62,7 +62,7 @@ class ResiduePartition:
         Parameters
         ----------
         rainfall: float
-            amount of rain (mm).
+            Amount of rain (mm).
 
         """
         layer = self.data.soil_layers[0]
