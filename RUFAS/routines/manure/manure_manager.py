@@ -82,7 +82,6 @@ class ManureManager:
     """
 
     def __init__(self, pen_list, weather, time, manure_manager_config):
-
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
 
@@ -138,7 +137,6 @@ class ManureManager:
         return self._daily_output_per_pen
 
     def configure_manure_manager_components(self, pen_list) -> None:
-
         """Configures the manure manager components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
@@ -727,10 +725,7 @@ class ManureManager:
         )
 
 
-def simulate_daily_manure_manager(
-        manure_manager: ManureManager, penlist, simulation_day
-) -> None:
-
+def simulate_daily_manure_manager(manure_manager: ManureManager, penlist, simulation_day) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 
     There is no strict reason why this function is needed. It is simply to make the code

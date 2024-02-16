@@ -223,10 +223,7 @@ def test_create_default_pens_for_potential_space_shortage(
         new_default_pen = mocker.MagicMock(spec=Pen)
         mock_new_default_pens.append(new_default_pen)
     patch_for_create_duplicate_pen = mocker.patch.object(
-        AnimalManager,
-        '_create_duplicate_pen',
-        side_effect=mock_new_default_pens
-
+        AnimalManager, "_create_duplicate_pen", side_effect=mock_new_default_pens
     )
 
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
@@ -248,12 +245,8 @@ def test_create_default_pens_for_potential_space_shortage(
 
     # Assert
     assert new_default_pens == mock_new_default_pens
-    patch_for_calc_animal_space_shortage.assert_called_once_with(
-        num_animals=num_animals,
-        pens=mock_pens
-    )
+    patch_for_calc_animal_space_shortage.assert_called_once_with(num_animals=num_animals, pens=mock_pens)
     patch_for_create_duplicate_pen.assert_has_calls(
-
         [
             mocker.call(
                 pen_id=start_pen_id + i,
