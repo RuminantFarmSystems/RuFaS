@@ -4,9 +4,9 @@
     "heiferI_num": 440,
     "heiferII_num": 380,
     "heiferIII_num_springers": 50,
-    "cow_num": 1000,
+    "cow_num": 1500,
     "replace_num": 5000,
-    "herd_num": 1000,
+    "herd_num": 1500,
     "breed": "HO"
   },
   "herd_initialization": {
