@@ -136,13 +136,11 @@ class BaseManureHandler:
 
         if pen.pen_type in ["freestall", "tiestall"]:
             housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
-                num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,
                 barn_temp=self._get_current_day_average_temperature_in_celsius(),
             )
 
             housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
-                num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,
                 barn_temp=self._get_current_day_average_temperature_in_celsius(),
             )
