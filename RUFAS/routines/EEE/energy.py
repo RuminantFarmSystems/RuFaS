@@ -29,10 +29,11 @@ class EnergyEstimator:
         )  # TODO get the correct value, how do we determine this? based on dataset or herdsize?
         herd_size: int = 750  # TODO get the correct value
         application_depth: float = 10  # TODO get the correct value
+        clay_percent = 0   # TODO get the correct value
         tractor = Tractor(operation_event, crop_type, tractor_size, herd_size, application_depth)
         estimator = EnergyEstimator()
         diesel_consumption_tractor_implement_liter_per_ton = estimator.calculate_diesel_consumption(
-            crop_yield, field_production_size, tractor
+            crop_yield, field_production_size, tractor, clay_percent,
         )
         variable_info_map = {"unit": "liter/tone", "tractor_size": tractor.tractor_size}
         om.add_variable(
@@ -46,6 +47,7 @@ class EnergyEstimator:
         crop_yield: float,
         field_production_size: float,
         tractor: Tractor,
+        clay_percent: float,
     ) -> float:
         """
         General estimate  how diesel fuel consumption is estimated for a given attachment type and tractor size.
@@ -69,7 +71,7 @@ class EnergyEstimator:
         diesel_consumption_tractor_implement_liter_per_ton = 0
         for implement in tractor.implements:
             total_power_needed_kW = self._calculate_total_power_needed(
-                tractor, implement, crop_yield, field_production_size
+                tractor, implement, crop_yield, field_production_size, clay_percent,
             )
             x = total_power_needed_kW / tractor.power_available_kW  # helper function 411
             specific_fuel_consumption_liter_per_kWh = (
@@ -93,13 +95,14 @@ class EnergyEstimator:
         implement: TractorImplement,
         crop_yield_ton_per_ha: float,
         field_production_size_ha: float,
+        clay_percent: float,
     ) -> float:
         """
         Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
         Implements Helper Function 412  in EEE Functions file.
         """
         tactor_axel_power = tractor.calculate_axel_power(implement)
-        tractor_implement_drawbar_power = implement.calculate_drawbar_power()
+        tractor_implement_drawbar_power = implement.calculate_drawbar_power(clay_percent)
         tractor_implement_PTO_power_needed = implement.calculate_needed_PTO(
             crop_yield_ton_per_ha, field_production_size_ha
         )
