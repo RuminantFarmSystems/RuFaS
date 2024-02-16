@@ -8,26 +8,29 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     KILOGRAMS_TO_MILLIGRAMS,
 )
 
-"""
-This module incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied
-to the soil surface being absorbed into the soil and/or removed from the field by runoff.
-"""
-
 
 class Fertilizer:
+    """
+    Incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied to the
+    soil surface, tracking its absorption into the soil and/or removal from the field by runoff.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track all activity within the soil profile, creates new one if
+        one is not provided.
+    field_size : float, optional
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+        not provided (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        Holds the SoilData object for tracking Phosphorus leaching and other related processes.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track all activity within the soil profile, creates new one if
-            one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def do_fertilizer_phosphorus_operations(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -43,9 +46,6 @@ class Fertilizer:
         field_size : float
             Size of the field (ha).
 
-        Returns
-        -------
-        None
         """
         if rainfall > 0:
             self.data.rain_events_after_fertilizer_application += 1
@@ -74,9 +74,6 @@ class Fertilizer:
         field_size : float
             Size of the field (ha).
 
-        Returns
-        -------
-        None
         """
         no_phosphorus_absorbed = (
             self.data.rain_events_after_fertilizer_application == self.data.days_since_application == 0
@@ -125,9 +122,6 @@ class Fertilizer:
         field_size : float
             Size of the field (ha).
 
-        Returns
-        -------
-        None
         """
         if rainfall == 0:
             return
@@ -163,6 +157,7 @@ class Fertilizer:
         rain_events_after_fertilizer_application to 0, and adds the new phosphorus to the available and recalcitrant
         pools. It also updates the starting available phosphorus value to the new available phosphorus pool value.
         If the amount of fertilizer to be added is zero, no pool or counters will be modified.
+
         """
         if fertilizer_phosphorus_applied == 0:
             return
@@ -187,6 +182,7 @@ class Fertilizer:
         labile pool in the soil. It determines the fraction of the available phosphorus pool that should remain after
         phosphorus is absorbed into the soil and then calls another method to add the determined amount of phosphorus to
         the labile pool of the top layer of soil.
+
         """
         sorption_percent = self._determine_fraction_phosphorus_remaining(
             self.data.cover_factor, self.data.days_since_application
@@ -223,6 +219,7 @@ class Fertilizer:
         -------
         dict
             Dictionary with amounts of phosphorus lost to runoff and soil absorption (both in kg).
+
         """
         phosphorus_in_mg = phosphorus_pool * KILOGRAMS_TO_MILLIGRAMS
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
@@ -298,6 +295,7 @@ class Fertilizer:
         Notes
         -------
         The minimum fraction that can be returned is 0.
+
         """
         return max(0, -0.16 * log(days_since_application) + cover_factor)
 
@@ -323,6 +321,7 @@ class Fertilizer:
         References
         ----------
         pseudocode_soil [S.5.C.II.2], SurPhos [15]
+
         """
         return 0.034 * exp(3.4 * (runoff / rainfall))
 
@@ -355,5 +354,6 @@ class Fertilizer:
         References
         ----------
         pseudocode_soil [S.5.C.II.3], SurPhos [16]
+
         """
         return (fertilizer_phosphorus * fraction_phosphorus_released * distribution_factor) / total_rainfall
