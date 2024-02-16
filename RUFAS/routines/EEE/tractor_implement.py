@@ -33,7 +33,7 @@ class TractorImplement:
         dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
         for data_entry in dataset:
             if (
-                data_entry.get("Crop Type or Tillage Implement").lower() == self.crop_type.value.lower()
+                data_entry.get("Crop Type or Tillage Implement").lower() in [self.crop_type.value.lower(), "none"]
                 and data_entry.get("Tractor Size").lower() == self.tractor_size.value.lower()
                 and data_entry.get("Operation").lower() == self.operation_type.value.lower()
             ):
@@ -56,23 +56,10 @@ class TractorImplement:
         Calculates the Field Capacity for a specific crop, field operation and tractor implement.
         Implements Helper Functions 418a and 418b  in EEE Functions file.
         """
-        if self.operation_type in [
-            OperationType.TILLING,
-            OperationType.PLANTING,
-            OperationType.MOWING,
-            OperationType.WINDROWING,
-        ]:
-            return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency
-        if self.operation_type in [
-            OperationType.COLLECTION,
-            OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
-            OperationType.FERTILIZER_APPLICATION_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
-            OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
-        ]:
+        if self.operation_type == OperationType.COLLECTION:  # 418b
             crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
             return crop_yield_kg_per_ha / self.throughput * 1000 * self.field_efficiency
-        return 0
+        return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency  # 418a
 
     def calculate_operation_time_hr(
         self, field_production_size_ha: float, crop_yield_ton_per_ha: float | None
@@ -83,25 +70,27 @@ class TractorImplement:
         """
         return field_production_size_ha / self.field_capacity_ha_per_hr(crop_yield_ton_per_ha)
 
-    def calculate_drawbar_power(self) -> float:
+    def calculate_drawbar_power(self, clay_percent: float) -> float:
         """
         Calculates Drawbar Power (kW) which is the power required by the implement for propulsion forward if it
         requires a transfer of tractor power to its wheel drives for this purpose.
         Implements Helper Function 414  in EEE Functions file.
         """
-        functional_draft = self.calculate_functional_draft()
+        functional_draft = self.calculate_functional_draft(clay_percent)
         return functional_draft * self.field_speed_km_per_hr * 1.2 / 3600
 
-    def calculate_functional_draft(self) -> float:
+    def calculate_functional_draft(self, clay_percent: float) -> float:
         """
         Calculatse Functional draft in Newtons, the force required for pulling various planting implements and
         minor tillage tools operated at shallow depths.
-        Implements Helper Function 417  in EEE Functions file.
+        Implements Helper Functions 417 and 421  in EEE Functions file.
         """
-        fi = 0  # TODO
+        soil_texture_adjustment = (
+            3 if clay_percent < 20 else 2 if clay_percent < 50 else 1 if clay_percent <= 100 else "Invalid"
+        )
         effective_depth = self.depth_cm if self.is_depth_relevant else 1
         return (
-            self.width_m * effective_depth * fi * self.A
+            self.width_m * effective_depth * soil_texture_adjustment * self.A
             + self.B * self.field_speed_km_per_hr
             + self.C * self.field_speed_km_per_hr**2
         )  # The parentheses did not match in in EEE Functions file, this is my best guestimation
