@@ -1,5 +1,6 @@
 from typing import List
 
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import TillageEvent
 
@@ -22,6 +23,8 @@ class TillageSchedule(Schedule):
         Fraction(s) of soil surface pool incorporated into the soil profile (unitless).
     mixing_fractions : List[float]
         Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless).
+    implements : List[str]
+        Implements that are used to execute the tillage applications in this schedule.
     pattern_skip : int, default=0
         Number of years to skip between tillage schedule repetitions.
     pattern_repeat : int, default=0
@@ -38,6 +41,8 @@ class TillageSchedule(Schedule):
     mixing_fractions : List[float]
         Elongated list of mixing fractions to ensure a mixing value for each application year, reflecting the degree of
         soil mixing during tillage.
+    implements : List[TillageImplement]
+        Elongated list of the tillage implements that will be used to execute the scheduled tillage operations.
 
     """
 
@@ -49,37 +54,18 @@ class TillageSchedule(Schedule):
         tillage_depths: List[float],
         incorporation_fractions: List[float],
         mixing_fractions: List[float],
+        implements: List[str],
         pattern_skip: int = 0,
         pattern_repeat: int = 0,
     ):
-        """
-        Initializes a schedule for tilling.
-
-        Parameters
-        ----------
-        name : str
-            Name of this tillage schedule.
-        years : List[int]
-            Year(s) in which tillage will happen.
-        days : List[int]
-            Julian day(s) on which tillage will happen.
-        tillage_depths : List[float]
-            The lowest depth(s) the tilling implement reaches (mm)
-        incorporation_fractions : List[float]
-            Fraction(s) of soil surface pool incorporated into the soil profile (unitless)
-        mixing_fractions : List[float]
-            Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless)
-        pattern_skip : int, default=0
-            Number of years to skip between amendment schedule repetitions.
-        pattern_repeat : int, default=0
-            Number of times the specified amendment schedule should be repeated.
-
-        """
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.tillage_depths = self._elongate_list(tillage_depths, len(years))
         self.incorporation_fractions = self._elongate_list(incorporation_fractions, len(years))
         self.mixing_fractions = self._elongate_list(mixing_fractions, len(years))
+
+        self.implements = [TillageImplement(implement) for implement in implements]
+        self.implements = self._elongate_list(self.implements, len(years))
 
         self._validate_tillage_parameters()
 
@@ -140,14 +126,15 @@ class TillageSchedule(Schedule):
             == len(self.tillage_depths)
             == len(self.incorporation_fractions)
             == len(self.mixing_fractions)
+            == len(self.implements)
         )
         if not equal_tillage_parameters:
             raise ValueError(
                 error_header + f"expected number of years, days, depths, incorporation and mixing "
                 f"fractions to be equal, received '{self.years}' years, '{self.days}' days,"
                 f" '{self.tillage_depths}' tillage depths, '{self.incorporation_fractions}'"
-                f" incorporation fractions, and '{self.mixing_fractions}' mixing "
-                f"fractions."
+                f" incorporation fractions, '{self.mixing_fractions}' mixing fractions and '{self.implements}' "
+                f"implements."
             )
 
     def generate_tillage_events(self) -> List[TillageEvent]:
@@ -165,11 +152,13 @@ class TillageSchedule(Schedule):
         all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
         all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)
         all_mixing_fractions = self.mixing_fractions * (self.pattern_repeat + 1)
+        all_implements = self.implements * (self.pattern_repeat + 1)
         all_tillage_events = list(
             zip(
                 all_tillage_depths,
                 all_incorporation_fractions,
                 all_mixing_fractions,
+                all_implements,
                 all_tilling_years,
                 all_tilling_days,
             )
@@ -181,8 +170,9 @@ class TillageSchedule(Schedule):
                 tillage_depth=event[0],
                 incorporation_fraction=event[1],
                 mixing_fraction=event[2],
-                year=event[3],
-                day=event[4],
+                implement=event[3],
+                year=event[4],
+                day=event[5],
             )
             tillage_events.append(new_tillage_event)
         return tillage_events
