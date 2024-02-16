@@ -177,6 +177,7 @@
   ],
   "manure_handler_configs": [
     {
+      "name": "flush system",
       "manure_handler_type": "flush system",
       "cleaning_water_use_rate": 757.0,
       "minutes_per_cleaning": 8,
@@ -185,6 +186,7 @@
       "cleaning_water_recycle_fraction": 0.80
     },
     {
+      "name": "manual scraping",
       "manure_handler_type": "manual scraping",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
@@ -193,6 +195,7 @@
       "cleaning_water_recycle_fraction": 0.10
     },
     {
+      "name": "alley scraper",
       "manure_handler_type": "alley scraper",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
@@ -201,6 +204,7 @@
       "cleaning_water_recycle_fraction": 0.10
     },
     {
+      "name": "tillage",
       "manure_handler_type": "tillage",
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
@@ -209,6 +213,7 @@
       "cleaning_water_recycle_fraction": 0.0
     },
     {
+      "name": "harrowing",
       "manure_handler_type": "harrowing",
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,

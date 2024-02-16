@@ -3,6 +3,7 @@ from typing import Protocol
 
 class LiquidManurePortionProtocol(Protocol):
     """List of expected attributes for the liquid manure portion."""
+
     simulation_day: int
     pen_id: int
     liquid_manure_total_ammoniacal_nitrogen: float

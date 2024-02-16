@@ -22,9 +22,9 @@ class AnimalType(Enum):
 
     """
 
-    CALF = 'Calf'
-    HEIFER_I = 'HeiferI'
-    HEIFER_II = 'HeiferII'
-    HEIFER_III = 'HeiferIII'
-    DRY_COW = 'DryCow'
-    LAC_COW = 'LacCow'
+    CALF = "Calf"
+    HEIFER_I = "HeiferI"
+    HEIFER_II = "HeiferII"
+    HEIFER_III = "HeiferIII"
+    DRY_COW = "DryCow"
+    LAC_COW = "LacCow"
