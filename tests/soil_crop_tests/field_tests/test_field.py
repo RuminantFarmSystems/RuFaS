@@ -8,7 +8,6 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.crop.species_data_factory import CropSpecies
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import (
     Event,

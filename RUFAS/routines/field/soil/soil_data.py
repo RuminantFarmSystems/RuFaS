@@ -652,7 +652,7 @@ class SoilData:
         emissions_from_slow = sum(self.get_vectorized_layer_attribute("slow_carbon_co2_lost_amount"))
         emissions_from_passive = sum(self.get_vectorized_layer_attribute("passive_carbon_co2_lost_amount"))
         return emissions_from_active + emissions_from_slow + emissions_from_passive
-    
+
     @property
     def average_clay_percent(self) -> float:
         """
