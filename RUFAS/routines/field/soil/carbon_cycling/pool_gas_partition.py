@@ -414,7 +414,7 @@ class PoolGasPartition:
             Updated active carbon stored in the soil (kg/ha).
 
         References
-        -----
+        ----------
         pseudocode_soil Reference: S.6.C.11.
 
         """
