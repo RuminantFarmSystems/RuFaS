@@ -478,7 +478,6 @@ class Field:
             "function": self._record_fertilizer_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "mix_name": mix_name,
-            "field_size": self.field_data.field_size,
         }
         value = {
             "mass": total_mass,
@@ -489,6 +488,7 @@ class Field:
             "surface_remainder_fraction": surface_remainder_fraction,
             "year": year,
             "day": day,
+            "field_size": self.field_data.field_size,
         }
         om.add_variable("fertilizer_application", value, info_map)
 
@@ -691,7 +691,6 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "field_size": self.field_data.field_size,
         }
         value = {
             "dry_matter_mass": dry_matter_mass,
@@ -704,6 +703,7 @@ class Field:
             "potassium": potassium,
             "day": day,
             "year": year,
+            "field_size": self.field_data.field_size,
         }
         om.add_variable("manure_application", value, info_map)
 
@@ -1018,13 +1018,13 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._plant_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "field_size": self.field_data.field_size,
             "species": species,
         }
         value = {
             "crop_reference": crop_reference,
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "date": {"year": year, "day": day},
+            "field_size": self.field_data.field_size,
         }
         om.add_variable("crop_planting", value, info_map)
 
