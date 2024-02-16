@@ -327,5 +327,6 @@ class TillageApplication:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil_data.average_clay_percent,
         }
         om.add_variable("tillage_record", value, info_map)

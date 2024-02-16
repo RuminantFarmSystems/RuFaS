@@ -489,6 +489,7 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("fertilizer_application", value, info_map)
 
@@ -704,6 +705,7 @@ class Field:
             "day": day,
             "year": year,
             "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("manure_application", value, info_map)
 
@@ -1025,6 +1027,7 @@ class Field:
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "date": {"year": year, "day": day},
             "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("crop_planting", value, info_map)
 
