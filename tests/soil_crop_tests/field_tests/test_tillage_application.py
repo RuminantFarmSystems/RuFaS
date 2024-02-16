@@ -197,11 +197,14 @@ def test_record_tillage(
         "average_clay_percent": expected_clay_percent,
     }
 
-    with patch.object(om, "add_variable") as add_var, patch(
-        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
-        new_callable=PropertyMock,
-        return_value=expected_clay_percent,
-    ) as clay:
+    with (
+        patch.object(om, "add_variable") as add_var,
+        patch(
+            "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+            new_callable=PropertyMock,
+            return_value=expected_clay_percent,
+        ) as clay,
+    ):
         till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
 
         add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
