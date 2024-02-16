@@ -884,7 +884,8 @@ class RationOptimizer:
         return tribounds
 
     def optimize(
-        self, animal_combination, available_feeds: Dict, ration_config: RationConfig
+        self, animal_combination, available_feeds: Dict, ration_config: RationConfig,
+        previous_ration=None
     ) -> OptimizeResult:
         """
         Calls the objective function and constraint functions and formulates
@@ -912,10 +913,20 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        n = len(ration_config.price_list)
-        x0 = [1]
-        for i in range(n - 1):
-            x0.append(random.random() * 10)
+        if previous_ration:
+            prev_ration = previous_ration.copy()
+            del prev_ration['status']
+            del prev_ration['objective']
+            x0 = []
+            for key in prev_ration:
+                x0.append(prev_ration[key] / 3)
+                x0.append(prev_ration[key] / 3)
+                x0.append(prev_ration[key] / 3)
+        else:
+            n = len(ration_config.price_list)
+            x0 = [1]
+            for i in range(n - 1):
+                x0.append(random.random() * 10)
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.is_udr:
             bnds = self.make_user_bounds(
@@ -957,6 +968,7 @@ class RationOptimizer:
         requirements: AnimalRequirements,
         available_feeds: Dict,
         animal_combination,
+        previous_ration=None
     ):
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -1034,7 +1046,8 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(
-                    animal_combination, available_feeds, ration_config
+                    animal_combination, available_feeds, ration_config,
+                    previous_ration
                 )
             except Exception as e:  # noqa
                 i -= 1
