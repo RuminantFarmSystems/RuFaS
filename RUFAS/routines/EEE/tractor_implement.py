@@ -47,7 +47,9 @@ class TractorImplement:
                 self.width_m = data_entry["Tractor Implement Width (m)"]
                 self.mass_kg = data_entry["Tractor Implement Mass (kg)"]
                 self.throughput = data_entry["Max Throughput (tons dm/hour)"]
-                self.depth_cm = data_entry["Depth"]
+                self.depth_cm = data_entry[
+                    "Depth"
+                ]  # TODO get the value from S&C if operation is tilling or manure or fertizlier applications
                 self.is_depth_relevant = data_entry["is depth relevant"]
                 break
 
