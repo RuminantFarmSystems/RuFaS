@@ -5,6 +5,7 @@ from typing import Optional, List, Any
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 class PlantCategory(Enum):
@@ -51,7 +52,7 @@ class CropData:
 
     Attributes
     ----------
-    species : Optional[str]
+    species : CropSpecies, default None
         The species of the crop.
     name : Optional[str]
         The name of this specific crop instance.
@@ -375,7 +376,7 @@ class CropData:
     """
 
     # ID variables (SWAT Table A-1 ish)
-    species: Optional[str] = "generic"
+    species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
     plant_code: Optional[str] = None
