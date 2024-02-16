@@ -54,7 +54,7 @@ def test_species_factory_defaults():
     """
     # ---- default argument crop ----
     generic = CropSpeciesDataFactory.create_species_data()
-    assert generic.species == "corn_grain"
+    assert generic.species == CropSpecies.CORN_GRAIN
     assert generic.name == "corn grain"
     assert generic.id is None
     assert generic.plant_code == "CORN"
@@ -88,7 +88,7 @@ def test_species_factory_defaults():
 
     # ---- winter wheat ----
     winter_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("winter_wheat_hay"), id=1000)
-    assert winter_wheat.species == "winter_wheat_hay"
+    assert winter_wheat.species == CropSpecies.WINTER_WHEAT_HAY
     assert winter_wheat.name == "winter_wheat hay"
     assert winter_wheat.id == 1000
     assert winter_wheat.plant_code == "WWHT"
@@ -117,7 +117,7 @@ def test_species_factory_defaults():
 
     # ---- cereal rye ----
     cereal_rye = CropSpeciesDataFactory.create_species_data(CropSpecies("cereal_rye_baleage"), id=123)
-    assert cereal_rye.species == "cereal_rye_baleage"
+    assert cereal_rye.species == CropSpecies.CEREAL_RYE_BALEAGE
     assert cereal_rye.name == "cereal_rye baleage"
     assert cereal_rye.id == 123
     assert cereal_rye.plant_code == "RYE"
