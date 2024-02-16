@@ -1,5 +1,5 @@
-import os
 import datetime
+import os
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Tuple
 
@@ -116,6 +116,13 @@ class GraphGenerator:
         """
         Generate a graph based on filtered data and graph details.
 
+        Notes
+        -----
+        When the user wants to specify the legend order, it is required that literal filters be used
+        and the order of the filters in the graph_details["filters"] list match the order of the legend list.
+        When dictionary variables or regex patterns are used in the filtering process, the order of the data
+        is unpredictable, and therefore it is not recommended to use the legend parameter.
+
         Parameters
         ----------
         filtered_pool : Dict[str, Dict[str, List[Any]]]
@@ -150,8 +157,16 @@ class GraphGenerator:
                 return all_logs
 
             fig, _ = plt.subplots()
-            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
-            self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
+
+            # Only reorder prepared data if the legend is provided and the number of legend items matches the number of
+            # filters and each filter must be present in the prepared data. At least one of these conditions
+            # should fail when regexes or dictionary filters are used.
+            if len(graph_details.get("legend", [])) == len(graph_details["filters"]) and all(
+                [k in prepared_data.keys() for k in graph_details["filters"]]
+            ):
+                prepared_data = {k: prepared_data[k] for k in graph_details["filters"]}
+
+            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
                 graph_details["legend"] = list(prepared_data.keys())
