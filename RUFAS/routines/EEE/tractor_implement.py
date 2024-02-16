@@ -33,7 +33,7 @@ class TractorImplement:
         dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
         for data_entry in dataset:
             if (
-                data_entry.get("Crop Type or Tillage Implement").lower() == self.crop_type.value.lower()
+                data_entry.get("Crop Type or Tillage Implement").lower() in [self.crop_type.value.lower(), "none"]
                 and data_entry.get("Tractor Size").lower() == self.tractor_size.value.lower()
                 and data_entry.get("Operation").lower() == self.operation_type.value.lower()
             ):
