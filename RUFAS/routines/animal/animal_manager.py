@@ -35,6 +35,8 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
+from RUFAS.routines.manure.manure_manager import ManureManager
+
 om = OutputManager()
 
 
@@ -84,6 +86,7 @@ class AnimalManager:
         config.update(data["from_literature"]["culling"])
         config.update(data["from_literature"]["life_cycle"])
         return config
+
 
     def __init__(
         self,
@@ -196,7 +199,7 @@ class AnimalManager:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens()
+            self.allocate_animals_to_pens(weather, time, manure_manager_config)
 
         self._print_animal_num_warnings(data["herd_information"])
 
@@ -781,6 +784,51 @@ class AnimalManager:
             max_stocking_density=max_stocking_density,
         )
 
+    @classmethod
+    def _create_duplicate_pen(
+            cls, pen_id: int, animal_combination: AnimalCombination, num_stalls: int, max_stocking_density: float,
+            reference_pen: Pen
+    ) -> Pen:
+        """
+        Create a default Pen object with the given parameters.
+
+        Parameters
+        ----------
+        pen_id : int
+            The unique identifier for the pen.
+        animal_combination : AnimalCombination
+            The animal combination for the pen.
+        num_stalls : int
+            The number of stalls in the pen.
+        max_stocking_density : float
+            The maximum stocking density for the pen.
+        reference_pen : Pen
+            Pen object that has more animals than available space.
+
+        Returns
+        -------
+        Pen
+            A new Pen object with the specified parameters and duplicate values for other attributes of reference pen.
+
+        """
+
+        return Pen(
+            pen_id=pen_id,
+            pen_name=str(pen_id),
+            vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
+            horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
+            number_of_stalls=num_stalls,
+            housing_type=reference_pen.housing_type,
+            bedding_type=reference_pen.bedding_type,
+            pen_type=reference_pen.pen_type,
+            manure_handling=reference_pen.manure_handling,
+            manure_separator=reference_pen.manure_separator,
+            manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
+            manure_storage=reference_pen.manure_storage,
+            animal_combination=animal_combination,
+            max_stocking_density=max_stocking_density,
+        )
+
     def _create_default_pens_for_potential_space_shortage(
         self,
         num_animals: int,
@@ -822,11 +870,12 @@ class AnimalManager:
             num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
             for i in range(num_new_default_pens):
                 new_default_pens.append(
-                    self._create_default_pen(
+                    self._create_duplicate_pen(
                         pen_id=start_pen_id + i,
                         animal_combination=animal_combination,
                         num_stalls=num_stalls_per_pen,
                         max_stocking_density=max_stocking_density,
+                        reference_pen=pens[0]
                     )
                 )
 
@@ -1042,7 +1091,7 @@ class AnimalManager:
 
         return num_animals_in_pens
 
-    def allocate_animals_to_pens(self) -> None:
+    def allocate_animals_to_pens(self, weather, time, manure_manager) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -1077,6 +1126,7 @@ class AnimalManager:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+            ManureManager.configure_manure_manager_components(manure_manager, new_default_pens)
 
         self.fully_update_animal_to_pen_id_map()
 
@@ -1621,7 +1671,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time, manure_manager):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1699,7 +1749,7 @@ class AnimalManager:
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
-                self.allocate_animals_to_pens()
+                self.allocate_animals_to_pens(weather, time, manure_manager)
                 self._calc_ration_at_interval(feed)
                 AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
                 self.calc_avg_growth()
