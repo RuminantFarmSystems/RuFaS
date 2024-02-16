@@ -541,6 +541,8 @@ def test_flush_pools() -> None:
     assert om.logs_pool == {}
     assert om.warnings_pool == {}
     assert om.errors_pool == {}
+    assert om.error_log_file_paths == []
+    assert om.warning_log_file_paths == []
 
 
 @pytest.fixture
@@ -698,6 +700,7 @@ def test_dump_warnings(
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name")
     )
+    assert mock_output_manager.warning_log_file_paths == [Path("dummy_path") / "dummy_name"]
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
@@ -718,6 +721,7 @@ def test_dump_errors(
     mock_output_manager.dict_to_file_json.assert_called_once_with(
         mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name")
     )
+    assert mock_output_manager.error_log_file_paths == [Path("dummy_path") / "dummy_name"]
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
