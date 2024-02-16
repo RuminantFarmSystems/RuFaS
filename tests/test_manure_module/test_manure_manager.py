@@ -24,13 +24,11 @@ def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
     mock_animal_manager.simulation_day = mocker.MagicMock()
 
     # Act
-    simulate_daily_manure_manager(mock_manure_manager,
-                                  mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
+    simulate_daily_manure_manager(mock_manure_manager, mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
 
     # Assert
     mock_manure_manager.daily_update.assert_called_once_with(
-        mock_animal_manager.all_pens,
-        mock_animal_manager.simulation_day
+        mock_animal_manager.all_pens, mock_animal_manager.simulation_day
     )
 
 
@@ -53,8 +51,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         return_value=mock_manure_nutrient_manager,
     )
     patch_forconfigure_manure_manager_components = mocker.patch(
-        "RUFAS.routines.manure.manure_manager.ManureManager."
-        "configure_manure_manager_components",
+        "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
     )
 
@@ -118,12 +115,13 @@ def test_data_property(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    'manure_separator',
-    ['none',
-     'test_manure_separator',
-     ])
-def testconfigure_manure_manager_components(manure_separator: str,
-                                            mocker: MockFixture) -> None:
+    "manure_separator",
+    [
+        "none",
+        "test_manure_separator",
+    ],
+)
+def testconfigure_manure_manager_components(manure_separator: str, mocker: MockFixture) -> None:
     """Unit test for configure_manure_manager_components() in manure_manager.py"""
 
     # Arrange

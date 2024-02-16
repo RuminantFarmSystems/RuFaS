@@ -85,13 +85,15 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
 
     # Assert
     simulation_engine.state.animal_manager.daily_updates.assert_called_once_with(
-        simulation_engine.state.feed, simulation_engine.weather, simulation_engine.time,
-        simulation_engine.state.manure_manager
+        simulation_engine.state.feed,
+        simulation_engine.weather,
+        simulation_engine.time,
+        simulation_engine.state.manure_manager,
     )
     patch_for_simulate_daily_manure_manager.assert_called_once_with(
         simulation_engine.state.manure_manager,
         simulation_engine.state.animal_manager.all_pens,
-        simulation_engine.state.animal_manager.simulation_day
+        simulation_engine.state.animal_manager.simulation_day,
     )
     simulation_engine.state.field_manager.daily_update_routine.assert_called_once_with(
         simulation_engine.weather, simulation_engine.time

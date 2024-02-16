@@ -87,7 +87,6 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-
     def __init__(
         self,
         data,
@@ -786,8 +785,12 @@ class AnimalManager:
 
     @classmethod
     def _create_duplicate_pen(
-            cls, pen_id: int, animal_combination: AnimalCombination, num_stalls: int, max_stocking_density: float,
-            reference_pen: Pen
+        cls,
+        pen_id: int,
+        animal_combination: AnimalCombination,
+        num_stalls: int,
+        max_stocking_density: float,
+        reference_pen: Pen,
     ) -> Pen:
         """
         Create a default Pen object with the given parameters.
@@ -875,7 +878,7 @@ class AnimalManager:
                         animal_combination=animal_combination,
                         num_stalls=num_stalls_per_pen,
                         max_stocking_density=max_stocking_density,
-                        reference_pen=pens[0]
+                        reference_pen=pens[0],
                     )
                 )
 
