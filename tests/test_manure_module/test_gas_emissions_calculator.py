@@ -746,9 +746,7 @@ def test_volatile_solid_components(
         (1.0, 20.0, 0.004848, None),
         (10.0, 20.0, 0.004848, None),
         # Edge case: Zero total volatile solids
-        (0.0, 20.0, ValueError,
-         "Total volatile solids must be positive. Total volatile solids provided: 0.0"
-         ),
+        (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Case when temperature is not provided, default should be used
         (1.0, None, 0.004848, None),
         # Exception case: Negative total volatile solids
