@@ -249,7 +249,7 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         nitrogen_erosion_concentration: float
-            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil (mg / kg).
+            The soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil (mg / kg).
         daily_soil_lost: float
             daily soil loss (Metric Tons / ha).
         enrichment_ratio: float
