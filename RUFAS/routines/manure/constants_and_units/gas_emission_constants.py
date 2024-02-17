@@ -24,10 +24,10 @@ class GasEmissionConstants:
     Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
     methane emission (unitless)."""
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 43.33
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
     """Natural log of the Arrhenius constant (unitless)."""
 
-    ACTIVATION_ENERGY: float = 112700.0
+    ACTIVATION_ENERGY: float = 81_000.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
