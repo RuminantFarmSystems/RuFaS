@@ -94,6 +94,16 @@ class Decomposition:
         ----------
         water_factor : float
             Relative water saturation (%).
+        a_term : float, default 0.55
+            Coarse in defac row 3, column N
+        b_term : float, default 1.7
+            Coarse in defac row 4, column N
+        c_term : float, default -0.007
+            Coarse in defac row 5, column
+        first_exponent : float, default 6.648115
+            First exponent in defac spreadsheet
+        second_exponent : float, default 3.22
+            Second exponent in defac spreadsheet
 
         Returns
         -------
