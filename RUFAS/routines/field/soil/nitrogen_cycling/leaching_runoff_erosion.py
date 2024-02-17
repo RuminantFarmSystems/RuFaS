@@ -275,7 +275,7 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         daily_soil_lost: float
-            daily soil loss (Metric Tons/ha).
+            Daily soil loss (Metric Tons/ha).
 
         Returns
         -------
