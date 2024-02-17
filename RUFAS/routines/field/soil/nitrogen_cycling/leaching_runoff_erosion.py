@@ -280,7 +280,7 @@ class LeachingRunoffErosion:
         Returns
         -------
         float
-            enrichment ratio (unitless).
+            Enrichment ratio (unitless).
 
         References
         ----------
