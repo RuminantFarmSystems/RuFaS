@@ -15,6 +15,6 @@ class ManureCoverEnum(Enum):
         The enum member that indicates the absence of a cover in the manure treatment or storage system.
     """
 
-    COVER = 'cover'
-    NO_COVER = 'no cover'
-    NOT_APPLICABLE = 'N/A'
+    COVER = "cover"
+    NO_COVER = "no cover"
+    NOT_APPLICABLE = "N/A"
