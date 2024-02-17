@@ -645,10 +645,10 @@ def test_housing_ammonia_emission(
     "temp, expected, error_message",
     [
         # Standard case
-        (20.0, 0.05443994340019855, None),
+        (20.0, 0.13078635869235153, None),
         # Edge cases: Lower and upper bound temperatures
-        (-40.0, 3.6974151606958807e-07, None),
-        (60.0, 14.031085750034068, None),
+        (-40.0, 2.5245953154632027e-05, None),
+        (60.0, 7.071745539498552, None),
         # Exception case: Temperature outside the defined range
         (
             -41.0,
@@ -743,18 +743,20 @@ def test_volatile_solid_components(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 4.848, None),
-        (10.0, 20.0, 4.848, None),
+        (1.0, 20.0, 0.004848, None),
+        (10.0, 20.0, 0.004848, None),
         # Edge case: Zero total volatile solids
-        (0.0, 20.0, 0.0, None),
+        (0.0, 20.0, ValueError,
+         "Total volatile solids must be positive. Total volatile solids provided: 0.0"
+         ),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 4.848, None),
+        (1.0, None, 0.004848, None),
         # Exception case: Negative total volatile solids
         (
             -1.0,
             20.0,
             ValueError,
-            "Total volatile solids must be greater than 0. Total volatile solids provided: -1.0",
+            "Total volatile solids must be positive. Total volatile solids provided: -1.0",
         ),
     ],
 )
