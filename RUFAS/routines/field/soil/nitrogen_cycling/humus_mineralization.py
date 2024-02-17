@@ -5,30 +5,33 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
 )
 
-"""
-This module handles the mineralization operations for the active and stable organic nitrogen pools, based on SWAT
-section 3:1.2.1.
-"""
-
 
 class HumusMineralization:
+    """
+    Handles the mineralization operations for the active and stable organic nitrogen pools, as detailed in SWAT section
+    3:1.2.1.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module for tracking the mineralization of organic nitrogen in the soil. If not
+        provided, a new SoilData object will be instantiated.
+    field_size : float, optional
+        The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.
+
+    Attributes
+    ----------
+    data : SoilData
+        Holds the SoilData object for tracking mineralization processes.
+
+    Notes
+    -----
+    The field size is used to initialize a SoilData object for this module to work with, if a pre-configured SoilData
+    object is not provided.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track the mineralization of organic nitrogen, creates new one if
-            one is not provided.
-        field_size : float, optional
-            Size of the field (ha)
-
-        Notes
-        -----
-        The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
-        SoilData object is not provided.
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_organic_nitrogen(self) -> None:
@@ -71,19 +74,20 @@ class HumusMineralization:
     def _determine_intra_organic_mineralization(
         active_organic_nitrogen: float, stable_organic_nitrogen: float
     ) -> float:
-        """Calculates the amount of nitrogen transferred between different organic pools.
+        """
+        Calculates the amount of nitrogen transferred between different organic pools.
 
         Parameters
         ----------
         active_organic_nitrogen : float
-            Active organic nitrogen content of this soil layer (kg / ha)
+            Active organic nitrogen content of this soil layer (kg / ha).
         stable_organic_nitrogen : float
-            Stable organic nitrogen content of this soil layer (kg / ha)
+            Stable organic nitrogen content of this soil layer (kg / ha).
 
         Returns
         -------
         float
-            The amount of nitrogen to transfer from the active to stable pool (kg / ha)
+            The amount of nitrogen to transfer from the active to stable pool (kg / ha).
 
         References
         ----------
@@ -118,24 +122,25 @@ class HumusMineralization:
         water_factor: float,
         humus_active_organic_mineralization_coefficient: float,
     ) -> float:
-        """Calculates phosphorus mineralized from the active inorganic pool that goes to the nitrate pool.
+        """
+        Calculates phosphorus mineralized from the active inorganic pool that goes to the nitrate pool.
 
         Parameters
         ----------
         active_organic_nitrogen : float
-            Active organic nitrogen content of this soil layer (kg / ha)
+            Active organic nitrogen content of this soil layer (kg / ha).
         temperature_factor : float
-            The nutrient cycling temperature factor of this soil layer (unitless)
+            The nutrient cycling temperature factor of this soil layer (unitless).
         water_factor : float
-            The nutrient cycling water factor of this soil layer (unitless)
+            The nutrient cycling water factor of this soil layer (unitless).
         humus_active_organic_mineralization_coefficient : float
-            The rate coefficient for mineralization of the humus active organic nutrients (unitless)
+            The rate coefficient for mineralization of the humus active organic nutrients (unitless).
 
         Returns
         -------
         float
             The amount of phosphorus mineralized from the active inorganic pool to be transferred to the nitrogen pool
-            (kg / ha)
+            (kg / ha).
 
         References
         ----------
