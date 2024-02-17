@@ -45,41 +45,46 @@ def main():
             init_herd=cmd_arguments.init_herd,
             save_animals=cmd_arguments.save_animals,
             save_animals_dir=Path(cmd_arguments.save_animals_dir),
-            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
         )
     except Exception as e:
-        info_map = {"class": "No caller class",
-                    "function": main.__name__,
-                    }
+        info_map = {
+            "class": "No caller class",
+            "function": main.__name__,
+        }
         output_manager = OutputManager()
         error_message = "This terminal error occurred during runtime. "
         error_message += traceback.format_exc()
-        output_manager.add_error(f"Dumping all logs from main.py because of error '{e}'",
-                                 error_message,
-                                 info_map)
+        output_manager.add_error(
+            f"Dumping all logs from main.py because of error '{e}'",
+            error_message,
+            info_map,
+        )
         output_manager.dump_all_nondata_pools(
-            Path(cmd_arguments.output_dir), cmd_arguments.exclude_info_maps, cmd_arguments.format_option
+            Path(cmd_arguments.output_dir),
+            cmd_arguments.exclude_info_maps,
+            cmd_arguments.format_option,
         )
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
 
 
 def run_rufas(
-        load_pool: bool,
-        produce_graphics: bool,
-        format_option: str,
-        verbose: LogVerbosity,
-        clear_output: bool,
-        exclude_info_maps: bool,
-        only_run_validation: bool,
-        graphics_dir: Path,
-        vars_file_path: Path,
-        output_dir: Path,
-        filters_dir: Path,
-        csv_dir: Path,
-        init_herd: bool,
-        save_animals: bool,
-        save_animals_dir: Path,
-        terminate_simulation_post_herd_generation: bool
+    load_pool: bool,
+    produce_graphics: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    clear_output: bool,
+    exclude_info_maps: bool,
+    only_run_validation: bool,
+    graphics_dir: Path,
+    vars_file_path: Path,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path,
+    init_herd: bool,
+    save_animals: bool,
+    save_animals_dir: Path,
+    terminate_simulation_post_herd_generation: bool,
 ) -> None:
     """
     Main function to run RuFaS, with options.
@@ -125,9 +130,17 @@ def run_rufas(
     output_manager.create_directory(output_dir)
 
     if load_pool:
-        run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
-                           produce_graphics, graphics_dir, clear_output, output_dir,
-                           filters_dir, csv_dir)
+        run_load_vars_pool(
+            vars_file_path,
+            exclude_info_maps,
+            format_option,
+            produce_graphics,
+            graphics_dir,
+            clear_output,
+            output_dir,
+            filters_dir,
+            csv_dir,
+        )
         return
 
     if clear_output:
@@ -150,20 +163,20 @@ def run_rufas(
             init_herd,
             save_animals,
             save_animals_dir,
-            terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation,
         )
 
 
 def run_load_vars_pool(
-        vars_file_path: Path,
-        exclude_info_maps: bool,
-        format_option: str,
-        produce_graphics: bool,
-        graphics_dir: Path,
-        clear_output: bool,
-        output_dir: Path,
-        filters_dir: Path,
-        csv_dir: Path
+    vars_file_path: Path,
+    exclude_info_maps: bool,
+    format_option: str,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    clear_output: bool,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path,
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
@@ -201,19 +214,17 @@ def run_load_vars_pool(
         exclude_info_maps,
         produce_graphics,
         graphics_dir,
-        csv_dir
+        csv_dir,
     )
-    output_manager.dump_all_nondata_pools(
-        output_dir, exclude_info_maps, format_option
-    )
+    output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 def run_validation(
-        metadata_files: List[Path],
-        exclude_info_maps: bool,
-        format_option: str,
-        verbose: LogVerbosity,
-        output_dir: Path
+    metadata_files: List[Path],
+    exclude_info_maps: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -250,9 +261,7 @@ def run_validation(
             f"Validating data for {str(metadata_file['path'])}...\n",
             info_map,
         )
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), False
-        )
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
             output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
         else:
@@ -261,17 +270,15 @@ def run_validation(
                 f"Data not valid for {metadata_file['path']}.\n\n",
                 info_map,
             )
-        output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 def initialize_herd(
-        simulation_config: Config,
-        init_herd: bool = False,
-        save_animals: bool = False,
-        save_animals_dir: Path = Path("output/"),
-        terminate_simulation_post_herd_generation: bool = False
+    simulation_config: Config,
+    init_herd: bool = False,
+    save_animals: bool = False,
+    save_animals_dir: Path = Path("output/"),
+    terminate_simulation_post_herd_generation: bool = False,
 ) -> None:
     """
     Initializes a herd based on the provided simulation configuration.
@@ -313,42 +320,37 @@ def initialize_herd(
         random.seed(simulation_config.seed)
         numpy.random.seed(simulation_config.seed)
 
-    output_manager.add_log(
-        "Herd initialization start",
-        "Initializing herd data...\n",
-        info_map
-    )
+    output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
         init_herd=init_herd,
         save_animals=save_animals,
-        save_animals_path=save_animals_dir)
-    herd_factory.initialize_herd()
-    output_manager.add_log(
-        "Herd initialization complete",
-        "Herd data initialized.\n",
-        info_map
+        save_animals_path=save_animals_dir,
     )
+    herd_factory.initialize_herd()
+    output_manager.add_log("Herd initialization complete", "Herd data initialized.\n", info_map)
 
     if terminate_simulation_post_herd_generation:
-        output_manager.add_log("Herd generation only",
-                               "***Only generating herd data, no simulation will follow.***",
-                               info_map)
+        output_manager.add_log(
+            "Herd generation only",
+            "***Only generating herd data, no simulation will follow.***",
+            info_map,
+        )
 
 
 def execute_simulations(
-        metadata_files: List[MetadataPaths],
-        exclude_info_maps: bool,
-        produce_graphics: bool,
-        graphics_dir: Path,
-        format_option: str,
-        verbose: LogVerbosity,
-        output_dir: Path,
-        filters_dir: Path,
-        csv_dir: Path,
-        init_herd: bool,
-        save_animals: bool,
-        save_animals_dir: Path,
-        terminate_simulation_post_herd_generation: bool
+    metadata_files: List[MetadataPaths],
+    exclude_info_maps: bool,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path,
+    init_herd: bool,
+    save_animals: bool,
+    save_animals_dir: Path,
+    terminate_simulation_post_herd_generation: bool,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -399,23 +401,24 @@ def execute_simulations(
             info_map,
         )
         output_manager.set_metadata_prefix(metadata_file["prefix"])
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), True
-        )
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log(
-                "Validation complete", "Data is valid. \nSimulating...\n", info_map
-            )
+            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
             simulation_config = Config(input_manager.get_data("config"))
             try:
-                initialize_herd(simulation_config=simulation_config,
-                                init_herd=init_herd,
-                                save_animals=save_animals,
-                                save_animals_dir=save_animals_dir,
-                                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
+                initialize_herd(
+                    simulation_config=simulation_config,
+                    init_herd=init_herd,
+                    save_animals=save_animals,
+                    save_animals_dir=save_animals_dir,
+                    terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
+                )
             except Exception as e:
-                output_manager.dump_all_nondata_pools(path=output_dir, exclude_info_maps=exclude_info_maps,
-                                                      format_option=format_option)
+                output_manager.dump_all_nondata_pools(
+                    path=output_dir,
+                    exclude_info_maps=exclude_info_maps,
+                    format_option=format_option,
+                )
                 raise e
 
             if not terminate_simulation_post_herd_generation:
@@ -432,17 +435,9 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_results(
-            output_dir,
-            filters_dir,
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-            csv_dir
-        )
-        output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
+        input_manager.dump_get_data_logs(path=output_dir)
+        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
@@ -520,7 +515,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-C",
         "--csv-dir",
         help="The directory for the csv output files to be saved",
-        default="output/CSVs/"
+        default="output/CSVs/",
     )
     parser.add_argument(
         "-I",
@@ -532,14 +527,14 @@ def parse_gnu_args() -> argparse.Namespace:
         "-s",
         "--save_animals",
         help="If the '--init_herd' flag is selected, choose this flag if you want to save the generated herd data into"
-             " a JSON file.",
+        " a JSON file.",
         action="store_true",
     )
     parser.add_argument(
         "-S",
         "--save_animals_dir",
         help="If '--save_animals' flag is selected, use this flag to specify the directory to save the output animal "
-             "population JSON file.",
+        "population JSON file.",
         default="output/",
     )
     parser.add_argument(
