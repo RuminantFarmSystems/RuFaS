@@ -18,19 +18,26 @@ This module adds and tracks manure phosphorus dynamics based on the SurPhos mode
 
 
 class Manure:
+    """
+    This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
+        provided.
+    field_size : float, optional
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+        not provided (ha).
+    Attributes
+    ----------
+    data : SoilData
+        Stores the SoilData object for tracking the dynamics of manure phosphorus, including its distribution,
+         transformation, and potential loss mechanisms.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
-            provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_manure_update(
@@ -40,18 +47,19 @@ class Manure:
         field_size: float,
         mean_air_temperature: float,
     ) -> None:
-        """This method conducts daily operations on manure including decomposition, assimilation into soil, etc.
+        """
+        This method conducts daily operations on manure including decomposition, assimilation into soil, etc.
 
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
         mean_air_temperature : float
-            Mean air temperature on the current day (degrees C)
+            Mean air temperature on the current day (degrees C).
 
         Notes
         -----
@@ -260,17 +268,18 @@ class Manure:
         self._add_infiltrated_phosphorus_to_soil(total_assimilated_phosphorus, field_size)
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
-        """This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
-            that leached phosphorus is distributed, and updates the phosphorus pools based on those values.
+        """
+        This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
+        that leached phosphorus is distributed, and updates the phosphorus pools based on those values.
 
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
 
         """
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
@@ -342,14 +351,15 @@ class Manure:
             self._add_infiltrated_phosphorus_to_soil(grazer_inorganic_results["infiltrated_phosphorus"], field_size)
 
     def _add_infiltrated_phosphorus_to_soil(self, infiltrated_phosphorus_amount: float, field_size: float) -> None:
-        """This method adds phosphorus that was dissolved in rainfall to the soil profile as outlined in SurPhos.
+        """
+        This method adds phosphorus that was dissolved in rainfall to the soil profile as outlined in SurPhos.
 
         Parameters
         ----------
         infiltrated_phosphorus_amount : float
-            The amount of phosphorus to be added to the soil profile (kg)
+            The amount of phosphorus to be added to the soil profile (kg).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
 
         References
         ----------
@@ -366,14 +376,15 @@ class Manure:
         self.data.soil_layers[1].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
     def _adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
-        """Adjusts the moisture factor of manure on the soil surface based on the current day's precipitation level.
+        """
+        Adjusts the moisture factor of manure on the soil surface based on the current day's precipitation level.
 
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
 
         """
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
@@ -399,25 +410,26 @@ class Manure:
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
     def _determine_decomposed_surface_manure(self, temperature_factor: float) -> Dict[str, float]:
-        """This method calculates how much manure in both the machine and grazer-applied pools decompose on a given day,
-            and how much the field coverage changes as a result.
+        """
+        This method calculates how much manure in both the machine and grazer-applied pools decompose on a given day,
+        and how much the field coverage changes as a result.
 
         Parameters
         ----------
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
 
         Returns
         -------
         Dict (keys listed below)
             decomposed_machine_manure_mass_change: change in the mass of machine-applied manure on the field surface
-                decomposed on this day (kg)
+                decomposed on this day (kg).
             decomposed_machine_manure_coverage_change: change in field coverage of machine-applied manure on the field
-                surface (unitless)
+                surface (unitless).
             decomposed_grazing_manure_mass_change: change in the mass of grazer-applied manure on the field surface
-                decomposed on this day (kg)
+                decomposed on this day (kg).
             decomposed_grazing_manure_coverage_change: change in field coverage of machine-applied manure on the field
-                surface (unitless)
+                surface (unitless).
 
         """
         manure_dry_matter_decomposition_rate = max(
@@ -462,25 +474,26 @@ class Manure:
         return return_dict
 
     def _determine_assimilated_surface_manure(self, temperature_factor: float, field_size: float) -> Dict:
-        """Determines how much manure is assimilated into the soil profile and how much the manure coverage is reduced
-            by on the current day.
+        """
+        Determines how much manure is assimilated into the soil profile and how much the manure coverage is reduced
+        by on the current day.
 
         Parameters
         ----------
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
         field_size : float
-            The area of the field (ha)
+            The area of the field (ha).
 
         Returns
         -------
         Dict (keys listed below)
-            assimilated_machine_manure: amount of machine-applied manure that is assimilated on a given day (kg)
+            assimilated_machine_manure: amount of machine-applied manure that is assimilated on a given day (kg).
             machine_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
-                given day (unitless)
+                given day (unitless).
             assimilated_grazing_manure: amount of grazer-applied manure that is assimilated on a given day (kg)
             grazing_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
-                given day (unitless)
+                given day (unitless).
 
         """
         assimilated_machine_manure, machine_manure_coverage = 0, 0
@@ -542,32 +555,33 @@ class Manure:
         water_extractable_phosphorus: float,
         is_organic: bool,
     ) -> Dict[str, float]:
-        """This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
-            between runoff and soil infiltration, and how much phosphorus remains in the given pool.
+        """
+        This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
+        between runoff and soil infiltration, and how much phosphorus remains in the given pool.
 
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
         field_size : float
-            Area of the field (ha)
+            Area of the field (ha).
         manure_dry_mass : float
-            Dry-weight equivalent of manure on the field (kg)
+            Dry-weight equivalent of manure on the field (kg).
         field_coverage : float
-            Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
+            Percent of the field covered by manure, in range [0.0, 1.0] (unitless).
         water_extractable_phosphorus : float
-            The mass of the water extractable phosphorus pool that is being leached from (kg)
+            The mass of the water extractable phosphorus pool that is being leached from (kg).
         is_organic : bool
-            Is the phosphorus being leached organic (True / False)
+            Is the phosphorus being leached organic (True / False).
 
         Returns
         -------
         Dict (keys listed below)
-            new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg)
-            infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg)
-            runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg)
+            new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
+            infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
+            runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).
 
         Notes
         -----
@@ -624,19 +638,20 @@ class Manure:
 
     @staticmethod
     def _determine_assimilated_phosphorus_amount(assimilation_ratio: float, phosphorus_amount: float) -> float:
-        """Calculates the amount of phosphorus that is removed through assimilation on a given day.
+        """
+        Calculates the amount of phosphorus that is removed through assimilation on a given day.
 
         Parameters
         ----------
         assimilation_ratio : float
-            Ratio of manure mass assimilated to amount present before assimilation (unitless)
+            Ratio of manure mass assimilated to amount present before assimilation (unitless).
         phosphorus_amount : float
-            The amount of phosphorus in the pool being removed from (kg)
+            The amount of phosphorus in the pool being removed from (kg).
 
         Returns
         -------
         float
-            The amount of phosphorus removed from the pool (kg)
+            The amount of phosphorus removed from the pool (kg).
 
         """
         return min(phosphorus_amount, max(0.0, assimilation_ratio * phosphorus_amount))
@@ -648,24 +663,25 @@ class Manure:
         temperature_factor: float,
         moisture_factor: float,
     ) -> float:
-        """Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
-            current day from the given pool.
+        """
+        Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
+        current day from the given pool.
 
         Parameters
         ----------
         phosphorus_amount : float
-            The amount of phosphorus in the pool that is being mineralized (kg)
+            The amount of phosphorus in the pool that is being mineralized (kg).
         rate : float
-            The rate factor for the type of phosphorus being mineralized (unitless)
+            The rate factor for the type of phosphorus being mineralized (unitless).
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
         moisture_factor : float
-            The moisture factor of the given manure pool on the current day (unitless)
+            The moisture factor of the given manure pool on the current day (unitless).
 
         Returns
         -------
         float
-            The amount of phosphorus that is mineralized from that pool that is passed (kg)
+            The amount of phosphorus that is mineralized from that pool that is passed (kg).
 
         References
         ----------
@@ -683,17 +699,18 @@ class Manure:
 
     @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
-        """Calculates the temperature factor for the current day
+        """
+        Calculates the temperature factor for the current day
 
         Parameters
         ----------
         mean_air_temperature : float
-            The average air temperature of the current day (degrees celsius).
+            The average air temperature of the current day (degrees Celsius).
 
         Returns
         -------
         float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
 
         References
         ----------
@@ -707,17 +724,18 @@ class Manure:
 
     @staticmethod
     def _determine_dry_matter_decomposition_rate(temperature_factor: float) -> float:
-        """Calculates the rate of manure dry matter decomposition on the current day.
+        """
+        Calculates the rate of manure dry matter decomposition on the current day.
 
         Parameters
         ----------
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
 
         Returns
         -------
         float
-            The rate of manure dry matter decomposition on the current day (unitless)
+            The rate of manure dry matter decomposition on the current day (unitless).
 
         References
         ----------
@@ -733,24 +751,25 @@ class Manure:
         manure_cover_area: float,
         is_dung: bool,
     ) -> float:
-        """Calculates the mass of dry manure matter applied by machine assimilated into the soil that day
+        """
+        Calculates the mass of dry manure matter applied by machine assimilated into the soil that day.
 
         Parameters
         ----------
         moisture_factor : float
-            Manure moisture factor, in range [0.0, 1.0] (unitless)
+            Manure moisture factor, in range [0.0, 1.0] (unitless).
         temperature_factor : float
-            The temperature factor on the current day (unitless)
+            The temperature factor on the current day (unitless).
         manure_cover_area : float
-            Area of the field covered by manure (ha)
+            Area of the field covered by manure (ha).
         is_dung : bool
-            Was the manure being assimilated applied by animals grazing in the field (true / false)
+            Was the manure being assimilated applied by animals grazing in the field (true / false).
 
         Returns
         -------
         float
             The amount of manure dry matter that is assimilated into the soil by macroinvertebrates (bioturbation) on
-            the current day (kg)
+            the current day (kg).
 
         References
         ----------
@@ -773,24 +792,25 @@ class Manure:
         original_mass: float,
         temperature_factor: float,
     ) -> float:
-        """This function determines the daily change in the moisture factor of the maure based on the current days
-            precipitation conditions.
+        """
+        This function determines the daily change in the moisture factor of the maure based on the current days
+        precipitation conditions.
 
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall on the current day (mm)
+            Amount of rainfall on the current day (mm).
         current_moisture : float
-            Current value of the moisture factor (unitless)
+            Current value of the moisture factor (unitless).
         current_mass : float
-            Current mass of dry matter content in the manure (kg)
+            Current mass of dry matter content in the manure (kg).
         original_mass : float
-            The mass of manure dry matter content originally applied to the field (kg)
+            The mass of manure dry matter content originally applied to the field (kg).
 
         Returns
         -------
         float
-            The change the moisture factor of the manure application on this day
+            The change the moisture factor of the manure application on this day.
 
         References
         ----------
@@ -809,21 +829,22 @@ class Manure:
     def _determine_rain_manure_dry_matter_ratio(
         rainfall: float, manure_dry_matter: float, manure_coverage: float
     ) -> float:
-        """Calculates the ratio of rainfall to manure dry matter currently on the field.
+        """
+        Calculates the ratio of rainfall to manure dry matter currently on the field.
 
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall on the current day (mm)
+            Amount of rainfall on the current day (mm).
         manure_dry_matter : float
-            Current mass of manure dry matter on the field (kg)
+            Current mass of manure dry matter on the field (kg).
         manure_coverage : float
-            Area of the field covered by manure (ha)
+            Area of the field covered by manure (ha).
 
         Returns
         -------
         float
-            The ratio of rainfall to manure dry matter currently on the field (cubic cm per g)
+            The ratio of rainfall to manure dry matter currently on the field (cubic cm per g).
 
         References
         ----------
@@ -841,22 +862,23 @@ class Manure:
         rainfall_to_dry_manure_ratio: float,
         is_from_cow: bool,
     ) -> float:
-        """Determines the amount of water extractable inorganic phosphorus leached by rainfall
+        """
+        Determines the amount of water extractable inorganic phosphorus leached by rainfall
 
         Parameters
         ----------
         manure_water_extractable_inorganic_phosphorus : float
-            The amount of water extractable inorganic phosphorus from manure on the field (kg)
+            The amount of water extractable inorganic phosphorus from manure on the field (kg).
         rainfall_to_dry_manure_ratio : float
-            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
+            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram).
         is_from_cow : float
-            Is the water extractable inorganic phosphorus from cow manure (true / false)
+            Is the water extractable inorganic phosphorus from cow manure (true / false).
 
         Returns
         -------
         float
             The amount of water extractable inorganic phosphorus leached from manure on the soil surface by rain on the
-            given day (kg)
+            given day (kg).
 
         References
         ----------
@@ -881,23 +903,24 @@ class Manure:
         rainfall_to_dry_manure_ratio: float,
         is_from_cow: bool,
     ) -> float:
-        """Determines the amount of water extractable organic phosphorus leached by rainfall
+        """
+        Determines the amount of water extractable organic phosphorus leached by rainfall
 
         Parameters
         ----------
         manure_water_extractable_organic_phosphorus : float
-            The amount of water extractable inorganic phosphorus from manure on the field (kg)
+            The amount of water extractable inorganic phosphorus from manure on the field (kg).
         rainfall_to_dry_manure_ratio : float
-            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
+            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram).
         is_from_cow : float
             Is the water extractable inorganic phosphorus from cow manure, and not poultry or swine manure
-                                                                                                        (true / false)
+                                                                                                        (true / false).
 
         Returns
         -------
         float
             The amount of water extractable inorganic phosphorus leached from manure on the soil surface by rain on the
-            given day (kg)
+            given day (kg).
 
         References
         ----------
@@ -913,20 +936,21 @@ class Manure:
 
     @staticmethod
     def _determine_phosphorus_distribution_factor(rainfall: float, runoff: float) -> float:
-        """Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
-            of rainfall to runoff
+        """
+        Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
+        of rainfall to runoff.
 
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall on the current day (mm)
+            Amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
 
         Returns
         -------
         float
-            The ratio of rainfall to runoff adjusted for use in determining dissolved Phosphorus concentrations
+            The ratio of rainfall to runoff adjusted for use in determining dissolved Phosphorus concentrations.
 
         References
         ----------
@@ -942,23 +966,24 @@ class Manure:
         field_size: float,
         distribution_factor: float,
     ) -> float:
-        """Calculates the concentration of water extractable phosphorus in runoff on the current day.
+        """
+        Calculates the concentration of water extractable phosphorus in runoff on the current day.
 
         Parameters
         ----------
         manure_leached : float
-            Mass of water extractable phosphorus leached from surface manure by rain on the current day (kg)
+            Mass of water extractable phosphorus leached from surface manure by rain on the current day (kg).
         rainfall : float
-            Amount of rainfall on the current day (mm)
+            Amount of rainfall on the current day (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         distribution_factor : float
-            Factor accounting for runoff to rainfall ratio on the current day (unitless)
+            Factor accounting for runoff to rainfall ratio on the current day (unitless).
 
         Returns
         -------
         float
-            The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter)
+            The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter).
 
         """
         manure_leached_in_mg = manure_leached * KILOGRAMS_TO_MILLIGRAMS
