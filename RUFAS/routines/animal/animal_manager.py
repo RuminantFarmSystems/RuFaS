@@ -94,6 +94,7 @@ class AnimalManager:
         feed: Feed,
         weather: Weather,
         time: Time,
+        manure_manager_config,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ):
         """
