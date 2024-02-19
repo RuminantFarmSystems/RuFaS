@@ -68,7 +68,7 @@ from RUFAS.routines.EEE.enums import TillageImplement
             [0.5],
             ["disk-harrow"],
             "'test_6': expected number of years, days, depths, incorporation and mixing fractions to be equal, received"
-            " '[1990]' years, '[150, 200]' days, '[100]' tillage depths, '[0.5]' incorporation fractions, '[0.5]' "
+            " '[1990]' years, '[150, 200]' days,  '[100]' tillage depths, '[0.5]' incorporation fractions, '[0.5]' "
             "mixing fractions and '['disk-harrow']' implements.",
         ),
     ],
