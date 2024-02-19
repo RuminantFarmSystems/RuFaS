@@ -743,10 +743,10 @@ def test_volatile_solid_component_fractions(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 0.004848, None),
-        (10.0, 20.0, 0.04848, None),
+        (1.0, 20.0, 0.000202, None),
+        (10.0, 20.0, 0.00202, None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 0.004848, None),
+        (1.0, None, 0.000202, None),
         # Exception case: Zero total volatile solids
         (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
