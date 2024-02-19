@@ -93,12 +93,9 @@ class GasEmissionsCalculator:
         arrhenius_exponent = cls._arrhenius_exponent(temp)
 
         (
-            degradable_volatile_solids,
-            non_degradable_volatile_solids,
-        ) = cls._volatile_solid_components(total_volatile_solids)
-
-        degradable_volatile_solids_fraction = degradable_volatile_solids / total_volatile_solids
-        non_degradable_volatile_solids_fraction = non_degradable_volatile_solids / total_volatile_solids
+            degradable_volatile_solids_fraction,
+            non_degradable_volatile_solids_fraction,
+        ) = cls._volatile_solid_component_fractions(total_volatile_solids)
 
         methane_emission_from_degradable_volatile_solids = (
             (
@@ -180,25 +177,33 @@ class GasEmissionsCalculator:
         )
 
     @classmethod
-    def _volatile_solid_components(cls, total_volatile_solids: float) -> tuple[float, float]:
+    def _volatile_solid_component_fractions(cls, total_volatile_solids: float) -> tuple[float, float]:
         """
-        Calculate the degradable and non-degradable volatile solids.
+        Calculate the degradable and non-degradable volatile solids fractions.
 
         Notes
         -----
-        The degradable and non-degradable volatile solids are calculated as follows:
+        The degradable and non-degradable volatile solids fractions are calculated as follows:
 
         .. math::
 
             VS_d = \\frac{VS \\cdot B_o}{E_{CH_4,pot}}
 
+            VS_d fraction = VS_d / VS
+
             VS_{nd} = VS - VS_d
+
+            VS_{nd} fraction = VS_{nd} / VS
 
         where:
 
             :math:`VS_d` is the degradable volatile solids (kg),
 
+            :math:`VS_d fraction` is the degradable volatile solids fraction (unitless),
+
             :math:`VS_{nd}` is the non-degradable volatile solids (kg),
+
+            :math:`VS_{nd} fraction` is the non-degradable volatile solids fraction (unitless),
 
             :math:`VS` is the total volatile solids (kg),
 
@@ -214,7 +219,7 @@ class GasEmissionsCalculator:
         Returns
         -------
         tuple[float, float]
-            Degradable volatile solids (kg) and non-degradable volatile solids (kg).
+            Degradable volatile solids and non-degradable volatile solids fractions.
 
         Raises
         ------
@@ -222,9 +227,9 @@ class GasEmissionsCalculator:
             If the total volatile solids is negative.
 
         """
-        if total_volatile_solids < 0:
+        if total_volatile_solids <= 0:
             raise ValueError(
-                f"Total volatile solids must be non-negative. Total volatile solids provided: {total_volatile_solids}"
+                f"Total volatile solids must be positive. Total volatile solids provided: {total_volatile_solids}"
             )
 
         degradable_volatile_solids = (
@@ -233,7 +238,11 @@ class GasEmissionsCalculator:
             / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
         )
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
-        return degradable_volatile_solids, non_degradable_volatile_solids
+
+        degradable_volatile_solids_fraction = degradable_volatile_solids / total_volatile_solids
+        non_degradable_volatile_solids_fraction = non_degradable_volatile_solids / total_volatile_solids
+
+        return degradable_volatile_solids_fraction, non_degradable_volatile_solids_fraction
 
     @classmethod
     def _modified_hours(cls, hours: float) -> float:

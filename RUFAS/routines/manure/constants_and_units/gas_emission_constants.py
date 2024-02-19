@@ -25,7 +25,7 @@ class GasEmissionConstants:
     methane emission (unitless)."""
 
     NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
-    """Natural log of the Arrhenius constant (unitless)."""
+    """Natural log of the Arrhenius constant (g :math:`CH_4`/kg manure VS/h)."""
 
     ACTIVATION_ENERGY: float = 81_000.0
     """
