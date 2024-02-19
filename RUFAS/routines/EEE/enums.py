@@ -1,7 +1,12 @@
 from enum import Enum
 
 
-class TillageImplement(Enum):
+class EnumWithStrOverride(Enum):
+    def __str__(self):
+        return self.value
+
+
+class TillageImplement(EnumWithStrOverride):
     SUBSOILER = "subsoiler"
     MOLDBOARD_PLOW = "moldboard-plow"
     COULTER_CHISEL_PLOW = "coulter-chisel-plow"
@@ -9,17 +14,14 @@ class TillageImplement(Enum):
     CULTIVATOR = "cultivator"
     SEEDBED_CONDITIONER = "seedbed-conditioner"
 
-    def __str__(self):
-        return self.value
 
-
-class TractorSize(Enum):
+class TractorSize(EnumWithStrOverride):
     SMALL = "Small"
     MEDIUM = "Medium"
     LARGE = "Large"
 
 
-class OperationType(Enum):
+class OperationType(EnumWithStrOverride):
     PLANTING = "Planting"
     TILLING = "Tilling"
     LIQUID_MANURE_APPLICATION_SURFACE = "Liquid Manure Application - Surface"
@@ -31,7 +33,7 @@ class OperationType(Enum):
     WINDROWING = "Windrowing"
 
 
-class FieldOperationEvent(Enum):
+class FieldOperationEvent(EnumWithStrOverride):
     HARVEST = "harvest"
     FERTILIZER_APPLICATION = "Fertilizer Application"
     MANURE_APPLICATION = "Manure Application"

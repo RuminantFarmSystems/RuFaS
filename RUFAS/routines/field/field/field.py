@@ -1,6 +1,15 @@
 import math
 from math import exp
 from typing import Any, Dict, List, Optional, Sequence
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.field.manure_application import ManureApplication
+from RUFAS.routines.field.manager.events import TillageEvent
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.EEE.enums import FieldOperationEvent
+from RUFAS.time import Time
+from copy import copy
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
@@ -497,6 +506,7 @@ class Field:
             "units": units,
         }
         value = {
+            "event_type": FieldOperationEvent.FERTILIZER_APPLICATION,
             "mass": total_mass,
             "nitrogen": nitrogen_mass,
             "phosphorus": phosphorus_mass,
@@ -739,6 +749,7 @@ class Field:
             "units": units,
         }
         value = {
+            "event_type": FieldOperationEvent.MANURE_APPLICATION,
             "dry_matter_mass": dry_matter_mass,
             "dry_matter_fraction": dry_matter_fraction,
             "field_coverage": field_coverage,
@@ -1136,6 +1147,7 @@ class Field:
             "units": units,
         }
         value = {
+            "event_type": FieldOperationEvent.PLANTING,
             "crop": species,
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "year": year,

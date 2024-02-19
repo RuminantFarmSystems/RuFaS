@@ -1429,7 +1429,7 @@ class OutputManager:
         filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._filter_variables_pool_complex.__name__,
+            "function": self.filter_variables_pool_complex.__name__,
             "filter_name": filter_name,
             "filter_by_exclusion": filter_by_exclusion,
             "use_filter_name": use_filter_name,

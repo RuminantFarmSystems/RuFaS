@@ -10,6 +10,8 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.EEE.enums import FieldOperationEvent
 
 
 class CropManagement:
@@ -427,6 +429,7 @@ class CropManagement:
             "units": units,
         }
         value = {
+            "event_type": FieldOperationEvent.HARVEST,
             "crop": self.data.species,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
