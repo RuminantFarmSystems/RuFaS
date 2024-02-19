@@ -31,15 +31,6 @@ class OperationType(Enum):
     WINDROWING = "Windrowing"
 
 
-class CropType(Enum):
-    ALFALFA_HAY = "alfalfa_hay"
-    ALFALFA_SILAGE = "alfalfa_silage"
-    ALFALFA_BALEAGE = "alfalfa_baleage"
-    TALL_FESCUE_HAY = "tall_fescue_hay"
-    TALL_FESCUE_SILAGE = "tall_fescue_silage"
-    TALL_FESCUE_BALEAGE = "tall_fescue_baleage"
-
-
 class FieldOperationEvent(Enum):
     HARVEST = "harvest"
     FERTILIZER_APPLICATION = "Fertilizer Application"

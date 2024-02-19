@@ -1,9 +1,11 @@
-from RUFAS.output_manager import OutputManager
 from math import sqrt
+
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 from .tractor import Tractor
 from .tractor_implement import TractorImplement
-from .enums import TractorSize, FieldOperationEvent, CropType
+from .enums import TractorSize, FieldOperationEvent
 
 om = OutputManager()
 
@@ -19,11 +21,49 @@ class EnergyEstimator:
             "function": EnergyEstimator.estimate_all.__name__,
             "unit": "unitless",
         }
+        filters = [
+            {
+                "name": "Fertilizer",
+                "use_name": True,
+                "filters": ["Field._record_fertilizer_application.fertilizer_application.field='.*'"],
+                "variables": ["mass", "application_depth", "field_size", "average_clay_percent"],
+            },
+            {
+                "name": "Tillage",
+                "use_name": True,
+                "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
+                "variables": ["tillage_depth", "implement", "field_size", "average_clay_percent"],
+            },
+            {
+                "name": "Manure",
+                "use_name": True,
+                "filters": ["Field._record_manure_application.manure_application.field='.*'"],
+                "variables": [
+                    "dry_matter_mass",
+                    "dry_matter_fraction",
+                    "application_depth",
+                    "field_size",
+                    "average_clay_percent",
+                ],
+            },
+            {
+                "name": "Harvestings",
+                "use_name": True,
+                "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
+                "variables": ["dry_yield", "crop", "field_size"],
+            },
+            {
+                "name": "Plantings",
+                "use_name": True,
+                "filters": ["Field._plant_crop.crop_planting.field='.*'"],
+                "variables": ["crop", "field_size", "average_clay_percent"],
+            },
+        ]
         crop_yield = 0  # TODO get the correct value
         field_production_size = 0  # TODO get the correct value
         herd_size = 0  # TODO get the correct value
         operation_event = FieldOperationEvent.PLANTING  # TODO get the correct value
-        crop_type = CropType.ALFALFA_BALEAGE  # TODO get the correct value
+        crop_type = CropSpecies.ALFALFA_BALEAGE  # TODO get the correct value
         tractor_size = (
             TractorSize.SMALL
         )  # TODO get the correct value, how do we determine this? based on dataset or herdsize?

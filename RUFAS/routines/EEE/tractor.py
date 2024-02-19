@@ -2,7 +2,8 @@ from typing import List
 from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-from .enums import TractorSize, FieldOperationEvent, OperationType, CropType
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from .enums import TractorSize, FieldOperationEvent, OperationType
 
 input_manager = InputManager()
 
@@ -16,7 +17,7 @@ class Tractor:
     def __init__(
         self,
         operation_event: FieldOperationEvent,
-        crop_type: CropType,
+        crop_type: CropSpecies,
         tractor_size: TractorSize | None = None,
         herd_size: int | None = None,
         application_depth: float | None = None,
@@ -72,12 +73,12 @@ class Tractor:
         """
         if self.operation_event == FieldOperationEvent.HARVEST:
             if self.crop_type in [
-                CropType.ALFALFA_HAY,
-                CropType.ALFALFA_SILAGE,
-                CropType.ALFALFA_BALEAGE,
-                CropType.TALL_FESCUE_HAY,
-                CropType.TALL_FESCUE_SILAGE,
-                CropType.TALL_FESCUE_BALEAGE,
+                CropSpecies.ALFALFA_HAY,
+                CropSpecies.ALFALFA_SILAGE,
+                CropSpecies.ALFALFA_BALEAGE,
+                CropSpecies.TALL_FESCUE_HAY,
+                CropSpecies.TALL_FESCUE_SILAGE,
+                CropSpecies.TALL_FESCUE_BALEAGE,
             ]:
                 return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
             else:

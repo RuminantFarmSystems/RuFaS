@@ -1,6 +1,7 @@
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-from .enums import FieldOperationEvent, CropType, OperationType, TractorSize
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from .enums import FieldOperationEvent, OperationType, TractorSize
 
 input_manager = InputManager()
 
@@ -10,7 +11,7 @@ class TractorImplement:
         self,
         operation_event: FieldOperationEvent,
         operation_type: OperationType,
-        crop_type: CropType,
+        crop_type: CropSpecies,
         tractor_size: TractorSize,
     ) -> None:
         self.operation_event = operation_event
