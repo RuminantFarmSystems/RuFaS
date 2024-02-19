@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import collections
 import json
 import os
@@ -96,7 +94,7 @@ class OriginLabel(Enum):
     NONE = "none"
 
 
-class OutputManager(object):
+class OutputManager:
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
     logs, warnings, and errors into separate pools, and populates requested
@@ -1416,7 +1414,7 @@ class OutputManager(object):
 
         self.variables_pool = filtered_pool
 
-    def _filter_variables_pool_complex(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool_complex(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         # TODO
         This is a temp function to extend `_filter_variables_pool` functionality without creating merge conflicts.
