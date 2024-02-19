@@ -10,9 +10,6 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
-    METHANE_EMISSION_COEFFICIENT: float = 24
-    """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
-
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
     Rate correcting factor for degradable volatile solids, used in calculation of slurry storage
@@ -24,10 +21,10 @@ class GasEmissionConstants:
     Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
     methane emission (unitless)."""
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 43.33
-    """Natural log of the Arrhenius constant (unitless)."""
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    """Natural log of the Arrhenius constant (g :math:`CH_4`/kg manure VS/h)."""
 
-    ACTIVATION_ENERGY: float = 112700.0
+    ACTIVATION_ENERGY: float = 81_000.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
