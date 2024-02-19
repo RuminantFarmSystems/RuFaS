@@ -1,0 +1,209 @@
+{
+  "calf_feeds": [202, 216
+  ],
+  "growing_feeds": [51, 187, 154, 200, 3, 301
+  ],
+  "close_up_feeds": [108, 187, 51, 154, 200, 301
+  ],
+  "lac_cow_feeds": [51, 47, 167, 42, 66, 110, 3, 210, 79, 119, 301
+  ],
+  "purchased_feeds": [
+    {
+      "purchased_feed":51,
+      "purchased_feed_cost":0.01
+    },
+    {
+      "purchased_feed":187,
+      "purchased_feed_cost":0.01
+    },
+    {
+      "purchased_feed":154,
+      "purchased_feed_cost":0.5
+    },
+    {
+      "purchased_feed":200,
+      "purchased_feed_cost":0.01
+    },
+    {
+      "purchased_feed":3,
+      "purchased_feed_cost":0.1
+    },
+    {
+      "purchased_feed":301,
+      "purchased_feed_cost":1.0
+    },
+    {
+      "purchased_feed":47,
+      "purchased_feed_cost":0.5
+    },
+    {
+      "purchased_feed":167,
+      "purchased_feed_cost":0.5
+    },
+    {
+      "purchased_feed":42,
+      "purchased_feed_cost":0.1
+    },
+    {
+      "purchased_feed":108,
+      "purchased_feed_cost":0.01
+    },
+    {
+      "purchased_feed":66,
+      "purchased_feed_cost":0.1
+    },
+    {
+      "purchased_feed":110,
+      "purchased_feed_cost":0.01
+    },    {
+      "purchased_feed":210,
+      "purchased_feed_cost":0.1
+    },
+    {
+      "purchased_feed":79,
+      "purchased_feed_cost":1.0
+    },
+    {
+      "purchased_feed":119,
+      "purchased_feed_cost":0.1
+    }
+  ],
+  "farm_grown_feeds": [
+  ],
+  "storage_options": [
+    {
+      "storage_type": "drive over pile",
+      "moisture": "haylage",
+      "additive": "preservative",
+      "packing_density": 14,
+      "inoculation": "homofermentative",
+      "bunk_type": "concrete",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0.35
+    },
+    {
+      "storage_type": "large bales",
+      "moisture": "dry hay",
+      "additive": "none",
+      "packing_density": 14,
+      "inoculation": "none",
+      "bunk_type": "open_floor",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0.88
+    }
+  ],
+  "user_defined_ration_percentages": {
+    "calf": [
+      {
+        "feed_type": 202,
+        "ration_percentage":0.5
+      },
+      {
+        "feed_type":216,
+        "ration_percentage":0.5
+      }
+    ],
+    "growing": [
+      {
+        "feed_type":51,
+        "ration_percentage":0.258
+      },
+      {
+        "feed_type":187,
+        "ration_percentage":0.140
+      },
+      {
+        "feed_type":154,
+        "ration_percentage":0.467
+      },
+      {
+        "feed_type":200,
+        "ration_percentage":0.084
+      },
+      {
+        "feed_type":3,
+        "ration_percentage":0.028
+      },
+      {
+        "feed_type":301,
+        "ration_percentage":0.022
+      }
+    ],
+    "close_up": [
+      {
+        "feed_type":108,
+        "ration_percentage":0.32
+      },
+      {
+        "feed_type":187,
+        "ration_percentage":0.146
+      },
+      {
+        "feed_type":51,
+        "ration_percentage":0.138
+      },
+      {
+        "feed_type":154,
+        "ration_percentage":0.242
+      },
+      {
+        "feed_type":200,
+        "ration_percentage":0.137
+      },
+      {
+        "feed_type":301,
+        "ration_percentage":0.017
+      }
+    ],
+    "lac_cow": [
+      {
+        "feed_type":51,
+        "ration_percentage":0.238
+      },
+      {
+        "feed_type":47,
+        "ration_percentage":0.215
+      },
+      {
+        "feed_type":167,
+        "ration_percentage":0.143
+      },
+      {
+        "feed_type":42,
+        "ration_percentage":0.041
+      },
+      {
+        "feed_type":66,
+        "ration_percentage":0.120
+      },
+      {
+        "feed_type":110,
+        "ration_percentage":0.036
+      },
+      {
+        "feed_type":3,
+        "ration_percentage":0.009
+      },
+      {
+        "feed_type":210,
+        "ration_percentage":0.004
+      },
+      {
+        "feed_type":79,
+        "ration_percentage":0.081
+      },
+      {
+        "feed_type":119,
+        "ration_percentage":0.060
+      },
+      {
+        "feed_type":301,
+        "ration_percentage":0.054
+      }
+    ],
+    "tolerance": 0.1,
+    "milk_reduction_maximum": 0.01
+  }
+}
