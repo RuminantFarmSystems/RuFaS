@@ -40,6 +40,4 @@ class ManureModuleOutputManagerHelper:
 
         for field in fields(dataclass_object):
             if exclude_fields is None or field.name not in exclude_fields:
-                cls._om.add_variable(
-                    field.name, getattr(dataclass_object, field.name), info_maps
-                )
+                cls._om.add_variable(field.name, getattr(dataclass_object, field.name), info_maps)
