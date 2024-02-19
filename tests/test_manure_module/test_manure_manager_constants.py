@@ -46,7 +46,6 @@ def test_gas_emission_constants() -> None:
     """
 
     # Assert
-    assert GasEmissionConstants.METHANE_EMISSION_COEFFICIENT == approx(24)
     assert GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR == approx(1.0)
     assert GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR == approx(0.01)
     assert GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT == approx(31.2)

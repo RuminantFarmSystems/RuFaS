@@ -23,8 +23,8 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CH_4} = 24/1000 \\cdot VS_{d} \\cdot b_{1} \\cdot e^{lnA - \\frac{E}{RT}}
-            + 24/1000 \\cdot VS_{nd} \\cdot b_{2} \\cdot e^{lnA - \\frac{E}{RT}}
+            E_{CH_4} = 1/1000 \\cdot VS_{d} \\cdot b_{1} \\cdot e^{lnA - \\frac{E}{RT}}
+            + 1/1000 \\cdot VS_{nd} \\cdot b_{2} \\cdot e^{lnA - \\frac{E}{RT}}
 
         where:
 
@@ -99,8 +99,7 @@ class GasEmissionsCalculator:
 
         methane_emission_from_degradable_volatile_solids = (
             (
-                GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                * degradable_volatile_solids_fraction
+                degradable_volatile_solids_fraction
                 * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
             )
@@ -109,8 +108,7 @@ class GasEmissionsCalculator:
         )
         methane_emission_from_non_degradable_volatile_solids = (
             (
-                GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                * non_degradable_volatile_solids_fraction
+                non_degradable_volatile_solids_fraction
                 * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
             )
