@@ -46,7 +46,6 @@ def main():
             save_animals=cmd_arguments.save_animals,
             save_animals_dir=Path(cmd_arguments.save_animals_dir),
             terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
-            exceptions=cmd_arguments.exceptions,
         )
     except Exception as e:
         info_map = {
@@ -67,8 +66,6 @@ def main():
             cmd_arguments.format_option,
         )
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
-        if cmd_arguments.exceptions:
-            show_error_warning_file_links()
 
 
 def get_error_warning_counts() -> tuple[int, int]:
@@ -144,7 +141,6 @@ def run_rufas(
     save_animals: bool,
     save_animals_dir: Path,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
 ) -> None:
     """
     Main function to run RuFaS, with options.
@@ -183,8 +179,6 @@ def run_rufas(
         User input indicating the save directory for generated animals.
     terminate_simulation_post_herd_generation: bool
         User input indicating whether to terminate the simulation after herd generation.
-    exceptions: bool
-        Print the links to the error and warning log files.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -226,7 +220,6 @@ def run_rufas(
             save_animals,
             save_animals_dir,
             terminate_simulation_post_herd_generation,
-            exceptions,
         )
 
 
@@ -414,7 +407,6 @@ def execute_simulations(
     save_animals: bool,
     save_animals_dir: Path,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -447,8 +439,6 @@ def execute_simulations(
         User input indicating the save directory for generated animals.
     terminate_simulation_post_herd_generation: bool
         User input indicating whether to terminate the simulation after herd generation.
-    exceptions: bool
-        Print the links to the error and warning log files.
     """
     info_map = {
         "class": "No caller class",
@@ -506,8 +496,6 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
         show_error_warning_counts()
-        if exceptions:
-            show_error_warning_file_links()
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
@@ -611,12 +599,6 @@ def parse_gnu_args() -> argparse.Namespace:
         "-t",
         "--terminate_simulation_post_herd_generation",
         help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-e",
-        "--exceptions",
-        help="Print the links to the error and warning log files",
         action="store_true",
     )
     return parser.parse_args()

@@ -29,7 +29,7 @@ from main import (
 @pytest.mark.parametrize(
     "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, vars_file_path, init_herd, save_animals, save_animals_path,"
-    "terminate_simulation_post_herd_generation, exceptions",
+    "terminate_simulation_post_herd_generation",
     [
         (
             False,
@@ -45,7 +45,6 @@ from main import (
             False,
             "output/",
             False,
-            True,
         ),
         (
             False,
@@ -60,7 +59,6 @@ from main import (
             True,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -77,7 +75,6 @@ from main import (
             True,
             "output/",
             False,
-            True,
         ),
         (
             True,
@@ -93,7 +90,6 @@ from main import (
             True,
             "output/",
             True,
-            False,
         ),
         (
             True,
@@ -108,7 +104,6 @@ from main import (
             False,
             False,
             "output/",
-            True,
             True,
         ),
     ],
@@ -127,7 +122,6 @@ def test_main(
     save_animals: bool,
     save_animals_path: str,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
 ) -> None:
     output_dir = "output/"
     filters_dir = "output/output_filters/"
@@ -149,7 +143,6 @@ def test_main(
             save_animals=save_animals,
             save_animals_dir=save_animals_path,
             terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
-            exceptions=exceptions,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -172,7 +165,6 @@ def test_main(
                 save_animals=save_animals,
                 save_animals_dir=Path(save_animals_path),
                 terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
-                exceptions=exceptions,
             )
 
 
@@ -202,7 +194,7 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, load_pool, vars_file_path, init_herd, save_animals, save_animals_dir, "
-    "terminate_simulation_post_herd_generation, exceptions",
+    "terminate_simulation_post_herd_generation",
     [
         (
             "verbose",
@@ -218,7 +210,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "block",
@@ -233,7 +224,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -250,7 +240,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "basic",
@@ -265,7 +254,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -282,7 +270,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "block",
@@ -297,7 +284,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -314,7 +300,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "basic",
@@ -329,7 +314,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -346,7 +330,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "block",
@@ -361,7 +344,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -378,7 +360,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "basic",
@@ -393,7 +374,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -410,7 +390,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "block",
@@ -425,7 +404,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -442,7 +420,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "basic",
@@ -457,7 +434,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
         (
@@ -474,7 +450,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             "output/",
             False,
-            True,
         ),
         (
             "basic",
@@ -489,7 +464,6 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
             False,
             False,
             "output/",
-            False,
             False,
         ),
     ],
@@ -508,7 +482,6 @@ def test_run_rufas(
     save_animals: bool,
     save_animals_dir: str,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -543,7 +516,6 @@ def test_run_rufas(
         save_animals,
         save_animals_dir,
         terminate_simulation_post_herd_generation,
-        exceptions,
     )
 
     # Assert
@@ -583,7 +555,6 @@ def test_run_rufas(
             save_animals,
             save_animals_dir,
             terminate_simulation_post_herd_generation,
-            exceptions,
         )
 
     if clear_output:
@@ -686,25 +657,25 @@ def test_initialize_herd(
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, exceptions,"
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
     "initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",
     [
-        (False, False, True, False, True, 2, 2, 0, "verbose"),
-        (False, False, False, False, False, 0, 0, 4, "block"),
-        (False, True, True, False, True, 2, 2, 0, "inline"),
-        (False, True, False, False, False, 0, 0, 4, "basic"),
-        (True, False, True, False, True, 2, 2, 0, "verbose"),
-        (True, False, False, False, False, 0, 0, 4, "block"),
-        (True, True, True, False, True, 2, 2, 0, "basic"),
-        (True, True, False, False, False, 0, 0, 4, "inline"),
-        (False, False, True, True, True, 2, 0, 0, "verbose"),
-        (False, False, False, True, False, 0, 0, 4, "block"),
-        (False, True, True, True, True, 2, 0, 0, "inline"),
-        (False, True, False, True, False, 0, 0, 4, "basic"),
-        (True, False, True, True, True, 2, 0, 0, "verbose"),
-        (True, False, False, True, False, 0, 0, 4, "block"),
-        (True, True, True, True, True, 2, 0, 0, "basic"),
-        (True, True, False, True, False, 0, 0, 4, "inline"),
+        (False, False, True, False, 2, 2, 0, "verbose"),
+        (False, False, False, False, 0, 0, 4, "block"),
+        (False, True, True, False, 2, 2, 0, "inline"),
+        (False, True, False, False, 0, 0, 4, "basic"),
+        (True, False, True, False, 2, 2, 0, "verbose"),
+        (True, False, False, False, 0, 0, 4, "block"),
+        (True, True, True, False, 2, 2, 0, "basic"),
+        (True, True, False, False, 0, 0, 4, "inline"),
+        (False, False, True, True, 2, 0, 0, "verbose"),
+        (False, False, False, True, 0, 0, 4, "block"),
+        (False, True, True, True, 2, 0, 0, "inline"),
+        (False, True, False, True, 0, 0, 4, "basic"),
+        (True, False, True, True, 2, 0, 0, "verbose"),
+        (True, False, False, True, 0, 0, 4, "block"),
+        (True, True, True, True, 2, 0, 0, "basic"),
+        (True, True, False, True, 0, 0, 4, "inline"),
     ],
 )
 def test_execute_simulations(
@@ -713,7 +684,6 @@ def test_execute_simulations(
     exlclude_info_maps: bool,
     is_data_valid: bool,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
     initialize_herd_call_count: int,
     simulate_call_count: int,
     add_error_call_count: int,
@@ -767,7 +737,6 @@ def test_execute_simulations(
         save_animals=False,
         save_animals_dir=Path("output/"),
         terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
-        exceptions=exceptions,
     )
 
     # Assert
@@ -794,17 +763,17 @@ def test_execute_simulations(
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, exceptions,"
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
     "initialize_herd_call_count, format_option",
     [
-        (False, False, True, False, True, 2, "verbose"),
-        (False, True, True, False, False, 2, "inline"),
-        (True, False, True, False, True, 2, "verbose"),
-        (True, True, True, False, False, 2, "basic"),
-        (False, False, True, True, True, 2, "verbose"),
-        (False, True, True, True, False, 2, "inline"),
-        (True, False, True, True, True, 2, "verbose"),
-        (True, True, True, True, False, 2, "basic"),
+        (False, False, True, False, 2, "verbose"),
+        (False, True, True, False, 2, "inline"),
+        (True, False, True, False, 2, "verbose"),
+        (True, True, True, False, 2, "basic"),
+        (False, False, True, True, 2, "verbose"),
+        (False, True, True, True, 2, "inline"),
+        (True, False, True, True, 2, "verbose"),
+        (True, True, True, True, 2, "basic"),
     ],
 )
 def test_execute_simulations_raises_exception(
@@ -813,7 +782,6 @@ def test_execute_simulations_raises_exception(
     exlclude_info_maps: bool,
     is_data_valid: bool,
     terminate_simulation_post_herd_generation: bool,
-    exceptions: bool,
     initialize_herd_call_count: int,
     format_option: str,
 ) -> None:
@@ -866,7 +834,6 @@ def test_execute_simulations_raises_exception(
             save_animals=False,
             save_animals_dir=Path("output/"),
             terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
-            exceptions=exceptions,
         )
 
     # Assert
@@ -954,7 +921,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 16
+    assert mock_add_argument.call_count == 15
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -1048,12 +1015,6 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-t",
             "--terminate_simulation_post_herd_generation",
             help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
-            action="store_true",
-        ),
-        mocker.call(
-            "-e",
-            "--exceptions",
-            help="Print the links to the error and warning log files",
             action="store_true",
         ),
     ]
