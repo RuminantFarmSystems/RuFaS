@@ -92,13 +92,10 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         """Calculates total volatile solids and total daily manure volume after initialization."""
 
         self.liquid_manure_total_volatile_solids = (
-            self.manure_degradable_volatile_solids
-            + self.manure_non_degradable_volatile_solids
+            self.manure_degradable_volatile_solids + self.manure_non_degradable_volatile_solids
         )
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
-        self.total_water_volume_in_milking_parlor *= (
-            GeneralConstants.LITERS_TO_CUBIC_METERS
-        )
+        self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
 
         self.total_daily_manure_volume = sum(
             [
