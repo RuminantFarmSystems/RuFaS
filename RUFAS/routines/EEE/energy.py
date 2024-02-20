@@ -1,21 +1,22 @@
 from math import sqrt
 from typing import Any, Dict, List
 
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 from .tractor import Tractor
 from .tractor_implement import TractorImplement
 from .enums import FieldOperationEvent
 
+im = InputManager()
 om = OutputManager()
 
 
 class EnergyEstimator:
     """Class to esitmate energy consumption for various operations on the farm"""
 
-    @classmethod
+    @staticmethod
     def estimate_all() -> None:
         """Runs all estimation functions and performs pre/post processing for them."""
         base_info_map = {
@@ -25,11 +26,13 @@ class EnergyEstimator:
         }
         estimator = EnergyEstimator()
         diesel_conumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
+        total_diesel_consumption_tractor_implement_liter_per_ton = 0
+        herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_conumption_data_list:
             tractor = Tractor(
                 diesel_consumption_data_item["event_type"],
                 diesel_consumption_data_item.get("crop_type"),
-                diesel_consumption_data_item["herd_size"],  # TODO
+                herd_size,
                 diesel_consumption_data_item.get("application_depth"),
             )
 
@@ -45,6 +48,14 @@ class EnergyEstimator:
                 diesel_consumption_tractor_implement_liter_per_ton,
                 {**base_info_map, **variable_info_map},
             )
+            total_diesel_consumption_tractor_implement_liter_per_ton += (
+                diesel_consumption_tractor_implement_liter_per_ton
+            )
+        om.add_variable(
+            "total_diesel_consumption_tractor_implement",
+            total_diesel_consumption_tractor_implement_liter_per_ton,
+            {**base_info_map, **{"unit": "liter/tone"}},
+        )
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> List[Dict[str, Any]]:
         crop_and_soil_filters = [
@@ -133,15 +144,6 @@ class EnergyEstimator:
                         }
                         event_data["operation_event"] = event_type
                         result.append(event_data)
-        herd_filter = {
-            "name": "Herd Size",
-            "use_name": True,
-            "filters": ["AnimalManager._record_animal_counts.num_animals"],
-            "variables": [".*"],
-        }
-
-        herd_data = om.filter_variables_pool_complex(herd_filter)
-        result["herd_size"] = herd_data["Herd Size_0"]["values"][0]
         return result
 
     def calculate_diesel_consumption(
