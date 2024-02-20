@@ -271,6 +271,7 @@ class FieldManager:
             incorporation_fractions=tillage_schedule_data.get("incorporation_fractions"),
             mixing_fractions=tillage_schedule_data.get("mixing_fractions"),
             tillage_depths=tillage_schedule_data.get("tillage_depths"),
+            implements=tillage_schedule_data.get("implements"),
             pattern_skip=tillage_schedule_data.get("pattern_skip"),
             pattern_repeat=tillage_schedule_data.get("pattern_repeat"),
         )

@@ -14,7 +14,7 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 ## Current
 * Deliver Minimum Viable Product (MVP)
 * Payoff the tech debt
-* Establish a positive and inclusive team culture
+* Establish a positive and inclusive team culture.
 
 ## Past
 N/A

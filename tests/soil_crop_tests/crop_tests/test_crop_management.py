@@ -15,6 +15,7 @@ from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 om = OutputManager()
 
@@ -407,16 +408,16 @@ def test_store_harvested_crop(
 @pytest.mark.parametrize(
     "field_name,field_size,species,year,day,mass,dry_mass,nitrogen,phosphorus",
     [
-        ("field_1", 1.8, "alfalfa", 1993, 200, 100, 90, 12.5, 5),
-        ("field_2", 2.33, "corn", 1998, 216, 1500, 1200, 188, 24.5),
-        ("field_2", 2.33, "corn", 1999, 218, 1550, 350, 172, 22.3),
-        ("field_3", 0.98, "soybeans", 2003, 245, 1200, 800, 199, 89.3),
+        ("field_1", 1.8, CropSpecies.ALFALFA_SILAGE, 1993, 200, 100, 90, 12.5, 5),
+        ("field_2", 2.33, CropSpecies.CORN_GRAIN, 1998, 216, 1500, 1200, 188, 24.5),
+        ("field_2", 2.33, CropSpecies.CORN_SILAGE, 1999, 218, 1550, 350, 172, 22.3),
+        ("field_3", 0.98, CropSpecies.SOYBEAN_GRAIN, 2003, 245, 1200, 800, 199, 89.3),
     ],
 )
 def test_record_yield(
     field_name: str,
     field_size: float,
-    species: str,
+    species: CropSpecies,
     year: int,
     day: int,
     mass: float,
@@ -427,7 +428,6 @@ def test_record_yield(
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
 
-    crop_manager.data.name = "test-crop"
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
@@ -440,11 +440,9 @@ def test_record_yield(
         "class": crop_manager.__class__.__name__,
         "function": crop_manager._record_yield.__name__,
         "suffix": f"field='{field_name}'",
-        "field_size": field_size,
-        "species": f"'{species}'",
     }
     expected_value = {
-        "crop": crop_manager.data.name,
+        "crop": species,
         "wet_yield": mass,
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
@@ -453,6 +451,7 @@ def test_record_yield(
         "yield_residue": crop_manager.data.yield_residue,
         "harvest_index": crop_manager.data.harvest_index,
         "harvest_date": {"year": year, "day": day},
+        "field_size": field_size,
     }
 
     with patch.object(om, "add_variable") as add_variable:
