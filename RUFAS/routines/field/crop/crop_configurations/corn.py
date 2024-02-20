@@ -2,15 +2,13 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 @dataclass(kw_only=True)
 class Corn(CropData):
     """Crop data class with default values for corn."""
+
     species: str = "corn"
     name: str = "default corn"
     plant_code: str = "CORN"
@@ -79,6 +77,7 @@ class CornGrain(Corn):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "corn_grain"
     name: str = "corn grain"
 
@@ -135,6 +134,7 @@ class CornSilage(Corn):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+
     species: str = "corn_silage"
     name: str = "corn silage"
 

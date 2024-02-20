@@ -70,15 +70,11 @@ class NutrientRequestResults:
             1.0,
             abs_tol=1e-6,
         ):
-            raise ValueError(
-                "Sum of organic and inorganic nitrogen fractions must be 1."
-            )
+            raise ValueError("Sum of organic and inorganic nitrogen fractions must be 1.")
 
         if not math.isclose(
             self.organic_phosphorus_fraction + self.inorganic_phosphorus_fraction,
             1.0,
             abs_tol=1e-6,
         ):
-            raise ValueError(
-                "Sum of organic and inorganic phosphorus fractions must be 1."
-            )
+            raise ValueError("Sum of organic and inorganic phosphorus fractions must be 1.")
