@@ -203,11 +203,16 @@ class ReportGenerator:
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
 
+            should_graph_report_data = filter_content.get("graph_details")
+            temp_report_data = {}
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
-                )
-                self.reports[column_name] = {"values": values}
+                    f"{individual_report_name}_{col}"
+                    if len(individual_report_name) > 0 else col)
+                temp_report_data[column_name] = {"values": values}
+            if not should_graph_report_data:
+                self.reports.update(temp_report_data)
+                temp_report_data = {}
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__

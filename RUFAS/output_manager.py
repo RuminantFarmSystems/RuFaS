@@ -693,7 +693,7 @@ class OutputManager(object):
         csv_dir: Path,
     ) -> None:
         """
-        Parses the filter files in the given directory and saves the results to the given path.
+        Parses the filter files in the given directory and routes the results to the proper filter handler function.
 
         Notes
         -----
@@ -729,18 +729,12 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
-                self.add_log(
-                    "init_report_generation",
-                    f"Generating report for file: {filter_file}",
-                    info_map,
-                )
             for filter_content in filter_contents:
+                # move next lines until continue to own function: validate filter content
                 info_map["filter_content"] = filter_content
                 if not isinstance(filter_content, dict) or (
                     "filters" not in filter_content.keys() and "cross_references" not in filter_content.keys()
@@ -760,79 +754,74 @@ class OutputManager(object):
                     filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
-
-                if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
-                    log_pool = report_generator.generate_report(filter_content, filtered_pool)
-                    self._route_logs(log_pool)
-                else:
-                    self._route_save_functions(
-                        filter_file,
-                        save_path,
-                        filtered_pool,
-                        produce_graphics,
-                        filter_content,
-                        graphics_dir,
-                        csv_dir,
-                    )
-            report_file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"report_{filter_file}", "csv"),
-            )
-            if report_generator.reports:
-                self._dict_to_file_csv(report_generator.reports, report_file_path)
-                report_generator.clear_reports()
-
-    def _route_save_functions(
-        self,
-        filter_file: str,
-        save_path: Path,
-        filtered_pool: Dict[str, pool_element_type],
-        produce_graphics: bool,
-        filter_content: Dict[str, str | int],
-        graphics_dir: Path,
-        csv_dir: Path,
-    ) -> None:
-        """
-        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
-        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._route_save_functions.__name__,
-        }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-            file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"saved_variables_{filter_file}", "json"),
-            )
-            self.dict_to_file_json(filtered_pool, file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            self.create_directory(csv_dir)
-            variable_csv_file_path = os.path.join(
-                csv_dir,
-                self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
-            )
-            self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
-            self.create_directory(graphics_dir)
-            if produce_graphics:
+                filter_type_to_handler_map = {
+                    "report_": self._handle_report_filter,
+                    "graph_": self._handle_graph_filter,
+                    "csv_": self._handle_csv_filter,
+                    "json_": self._handle_json_filter,
+                }
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
-                    log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
-                    )
-                    self._route_logs(log_pool)
-                except Exception as e:
-                    self.add_error("graph generation exception", str(e), info_map)
-            else:
-                self.add_warning(
-                    "No Graphics",
-                    f"Graphic generation is disabled, skipping {filter_file=}",
-                    info_map,
+                    for prefix, handler_function in filter_type_to_handler_map.items():
+                        if filter_file.startswith(prefix):
+                            handler_function(filter_file, save_path, filtered_pool, produce_graphics,
+                                             filter_content, graphics_dir, csv_dir)
+                except KeyError:
+                    raise KeyError(f"Invalid prefix {filter_file}: "
+                                   f"File name must start with {filter_type_to_handler_map.keys()}")
+
+    def _handle_report_filter(self, filter_file, save_path, filtered_pool, produce_graphics,
+                              filter_content, graphics_dir, csv_dir):
+        report_generator = ReportGenerator()
+        log_pool = report_generator.generate_report(filter_content, filtered_pool)
+        self._route_logs(log_pool)
+        # TODO need to handle report data that should be graphed - prepare_report_data_to_be_graphed()
+        if report_generator.reports:
+            report_file_path = os.path.join(save_path, self.generate_file_name(f"report_{filter_file}", "csv"),)
+            self._dict_to_file_csv(report_generator.reports, report_file_path)
+            report_generator.clear_reports()
+
+    def _handle_graph_filter(self, filter_file, save_path, filtered_pool, produce_graphics,
+                             filter_content, graphics_dir, csv_dir):
+        if produce_graphics:
+            self.create_directory(graphics_dir)
+            try:
+                graph_generator = GraphGenerator(self.__metadata_prefix)
+                log_pool = graph_generator.generate_graph(
+                    filtered_pool,
+                    filter_content,
+                    filter_file,
+                    graphics_dir,
                 )
+                self._route_logs(log_pool)
+            except Exception as e:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self._handle_graph_filter.__name__,
+                }
+                self.add_error("graph generation exception", str(e), info_map)
+        else:
+            self.add_warning(
+                "No Graphics",
+                f"Graphic generation is disabled, skipping {filter_file=}",
+                info_map,
+            )
+
+    def _handle_csv_filter(self, filter_file, save_path, filtered_pool, produce_graphics,
+                           filter_content, graphics_dir, csv_dir):
+        self.create_directory(csv_dir)
+        variable_csv_file_path = os.path.join(
+            csv_dir,
+            self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
+        )
+        self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
+
+    def _handle_json_filter(self, filter_file, save_path, filtered_pool, produce_graphics,
+                            filter_content, graphics_dir, csv_dir):
+        file_path = os.path.join(
+            save_path,
+            self.generate_file_name(f"saved_variables_{filter_file}", "json"),
+        )
+        self.dict_to_file_json(filtered_pool, file_path)
 
     def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
