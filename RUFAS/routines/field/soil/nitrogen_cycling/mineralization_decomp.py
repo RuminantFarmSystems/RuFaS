@@ -5,28 +5,31 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class MineralizationDecomposition:
+    """
+    This module is responsible for nitrogen mineralization and decomposition.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track nitrogen mineralization and decomposition, creates new one
+        if one is not provided.
+    field_size : float, optional
+        Size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object used by this module to track nitrogen mineralization and decomposition.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track nitrogen mineralization and decomposition, creates new one
-            if one is not provided.
-        field_size : float, optional
-            Size of the field (ha)
-
-        Notes
-        -----
-        The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
-        SoilData object is not provided.
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_and_decompose_nitrogen(self) -> None:
-        """Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in
-            the top soil layer.
+        """
+        Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in
+        the top soil layer.
 
         References
         ----------
@@ -92,21 +95,22 @@ class MineralizationDecomposition:
     def _calculate_residue_nutrient_ratio(
         carbon_amount: float, organic_nutrient: float, inorganic_nutrient: float
     ) -> float:
-        """Calculates the ratio carbon to the nutrient passed in the soil layer.
+        """
+        Calculates the ratio carbon to the nutrient passed in the soil layer.
 
         Parameters
         ----------
         carbon_amount : float
-            Amount of carbon in the soil layer (kg / ha)
+            Amount of carbon in the soil layer (kg / ha).
         organic_nutrient : float
-            Amount of organic nutrients in the soil layer (kg / ha)
+            Amount of organic nutrients in the soil layer (kg / ha).
         inorganic_nutrient : float
-            Amount of inorganic nutrients in the soil layer (kg / ha)
+            Amount of inorganic nutrients in the soil layer (kg / ha).
 
         Returns
         -------
         float
-            The residue nutrient ratio for the nutrient passed (unitless)
+            The residue nutrient ratio for the nutrient passed (unitless).
 
         References
         ----------
@@ -130,14 +134,15 @@ class MineralizationDecomposition:
 
     @staticmethod
     def _calculate_nutrient_term_for_residue_composition_factor(nutrient_ratio: float, constant_term: float) -> float:
-        """Calculates terms that used to determine the nutrient cycling composition factor.
+        """
+        Calculates terms that used to determine the nutrient cycling composition factor.
 
         Parameters
         ----------
         nutrient_ratio : float
-            The ratio of carbon to a specific nutrient (unitless)
+            The ratio of carbon to a specific nutrient (unitless).
         constant_term : float
-            The constant term used in this equation (unitless)
+            The constant term used in this equation (unitless).
 
         Returns
         -------
@@ -162,18 +167,19 @@ class MineralizationDecomposition:
 
     @staticmethod
     def _calculate_nutrient_cycling_residue_composition_factor(carbon_nitrogen_ratio, carbon_phosphorus_ratio) -> float:
-        """Calculates the residue composition factor for use in computing the decay rate constant.
+        """
+        Calculates the residue composition factor for use in computing the decay rate constant.
 
         Parameters
         ----------
         carbon_nitrogen_ratio : float
-            Ratio of carbon to nitrogen in this layer of the soil profile (unitless)
+            Ratio of carbon to nitrogen in this layer of the soil profile (unitless).
         carbon_phosphorus_ratio : float
-            Ratio of carbon to phosphorus in this layer of the soil profile (unitless)
+            Ratio of carbon to phosphorus in this layer of the soil profile (unitless).
 
         Returns
         -------
-        The nutrient cycling residue composition factor (unitless)
+        The nutrient cycling residue composition factor (unitless).
 
         References
         ----------
@@ -199,22 +205,23 @@ class MineralizationDecomposition:
         temp_factor: float,
         water_factor,
     ) -> float:
-        """Calculates the decay rate constant for residue.
+        """
+        Calculates the decay rate constant for residue.
 
         Parameters
         ----------
         fresh_organic_residue_mineralization_rate : float
-            Rate coefficient for mineralization of fresh organic nutrients from residue (unitless)
+            Rate coefficient for mineralization of fresh organic nutrients from residue (unitless).
         composition_factor : float
-            Nutrient cycling residue composition factor for the current soil layer (unitless)
+            Nutrient cycling residue composition factor for the current soil layer (unitless).
         temp_factor : float
-            Nutrient cycling temperature factor for the current soil layer (unitless)
+            Nutrient cycling temperature factor for the current soil layer (unitless).
         water_factor : float
-            Nutrient cycling water factor for the current soil layer (unitless)
+            Nutrient cycling water factor for the current soil layer (unitless).
 
         Returns
         -------
-        The decay rate constant for residue decomposition (unitless)
+        The decay rate constant for residue decomposition (unitless).
 
         References
         ----------
@@ -223,7 +230,7 @@ class MineralizationDecomposition:
         Notes
         -----
         The definition for the rate coefficient for mineralization of the residue fresh organic nutrients can be found
-        in the SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page 205)
+        in the SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page 205).
 
         """
         root_term = (temp_factor * water_factor) ** 0.5
