@@ -2091,7 +2091,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
 
     animal_combination = "AnimalCombination.LAC_COW"
 
-    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
+    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination, None)
 
     mock_RationConfig.assert_called_once_with(
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -2124,7 +2124,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     )
 
     ration_optimizer.optimize.assert_called_once_with(
-        animal_combination, mock_available_feeds, mock_RationConfig.return_value
+        animal_combination, mock_available_feeds, mock_RationConfig.return_value, None
     )
 
     ration_optimizer.get_ration_vals.assert_called_once_with(
@@ -2166,7 +2166,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     )
 
     ration_optimizer.optimize.assert_called_with(
-        animal_combination, mock_available_feeds, mock_RationConfig.return_value
+        animal_combination, mock_available_feeds, mock_RationConfig.return_value, None
     )
 
     ration_optimizer.get_ration_vals.assert_called_with(mock_optimize.return_value.x, mock_RationConfig.return_value)
@@ -2209,7 +2209,7 @@ def test_attempt_optimization_raise_exception(
 
     ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
     ration_optimizer.optimize.assert_called_with(
-        animal_combination, mock_available_feeds, mock_RationConfig.return_value
+        animal_combination, mock_available_feeds, mock_RationConfig.return_value, None
     )
 
 
@@ -2533,12 +2533,12 @@ def test_DMI_constraint_upper(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.fixture
-def mock_cow_cons() -> MagicMock():
+def mock_cow_cons() -> MagicMock:
     return MagicMock(name="cow_cons")
 
 
 @pytest.fixture
-def mock_heifer_cons() -> MagicMock():
+def mock_heifer_cons() -> MagicMock:
     return MagicMock(name="heifer_cons")
 
 
