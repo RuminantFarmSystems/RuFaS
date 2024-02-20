@@ -478,7 +478,6 @@ class Field:
             "function": self._record_fertilizer_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "mix_name": mix_name,
-            "field_size": self.field_data.field_size,
         }
         value = {
             "mass": total_mass,
@@ -489,6 +488,8 @@ class Field:
             "surface_remainder_fraction": surface_remainder_fraction,
             "year": year,
             "day": day,
+            "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("fertilizer_application", value, info_map)
 
@@ -691,7 +692,6 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "field_size": self.field_data.field_size,
         }
         value = {
             "dry_matter_mass": dry_matter_mass,
@@ -704,6 +704,8 @@ class Field:
             "potassium": potassium,
             "day": day,
             "year": year,
+            "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("manure_application", value, info_map)
 
@@ -811,6 +813,7 @@ class Field:
                 event.tillage_depth,
                 event.incorporation_fraction,
                 event.mixing_fraction,
+                event.implement,
                 time.calendar_year,
                 time.day,
             )
@@ -981,7 +984,6 @@ class Field:
         self.crops.append(crop)
 
         self._record_planting(
-            crop_reference,
             use_heat_scheduled_harvesting,
             crop.data.species,
             time.calendar_year,
@@ -990,9 +992,8 @@ class Field:
 
     def _record_planting(
         self,
-        crop_reference: str,
         heat_scheduled_harvest: bool,
-        species: str,
+        species: CropSpecies,
         year: int,
         day: int,
     ) -> None:
@@ -1001,12 +1002,10 @@ class Field:
 
         Parameters
         ----------
-        crop_reference : str
-            Name used to get the specifications for the crop to be planted.
         heat_scheduled_harvest : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        species : str
-            Name of the species of the crop being planted.
+        species : CropSpecies
+            CropSpecies enum member used to indicated crop species.
         year : int
             Year in which this crop planting occurs.
         day : int
@@ -1015,15 +1014,15 @@ class Field:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._plant_crop.__name__,
+            "function": self._record_planting.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "field_size": self.field_data.field_size,
-            "species": species,
         }
         value = {
-            "crop_reference": crop_reference,
+            "crop": species,
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "date": {"year": year, "day": day},
+            "field_size": self.field_data.field_size,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("crop_planting", value, info_map)
 
