@@ -26,7 +26,7 @@ class EnergyEstimator:
         estimator = EnergyEstimator()
         diesel_conumption_data = estimator.parse_inputs_for_diesel_consumption_calculation()
         tractor = Tractor(
-            diesel_conumption_data["operation_event"],
+            diesel_conumption_data["event_type"],
             diesel_conumption_data["crop_type"],
             diesel_conumption_data["tractor_size"],
             diesel_conumption_data["herd_size"],

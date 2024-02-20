@@ -17,7 +17,7 @@ class Tractor:
     def __init__(
         self,
         operation_event: FieldOperationEvent,
-        crop_type: CropSpecies,
+        crop_type: CropSpecies | None = None,
         tractor_size: TractorSize | None = None,
         herd_size: int | None = None,
         application_depth: float | None = None,

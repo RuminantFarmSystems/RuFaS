@@ -11,7 +11,7 @@ class TractorImplement:
         self,
         operation_event: FieldOperationEvent,
         operation_type: OperationType,
-        crop_type: CropSpecies,
+        crop_type: CropSpecies | None,
         tractor_size: TractorSize,
     ) -> None:
         self.operation_event = operation_event
@@ -32,9 +32,10 @@ class TractorImplement:
         """
         dataset_raw = input_manager.get_data("tractor_dataset")
         dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
+        crop_name = self.crop_type.value.lower() if self.crop_type else "none"
         for data_entry in dataset:
             if (
-                data_entry.get("Crop Type or Tillage Implement").lower() in [self.crop_type.value.lower(), "none"]
+                data_entry.get("Crop Type or Tillage Implement").lower() in [crop_name, "none"]
                 and data_entry.get("Tractor Size").lower() == self.tractor_size.value.lower()
                 and data_entry.get("Operation").lower() == self.operation_type.value.lower()
             ):
