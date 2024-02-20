@@ -754,6 +754,7 @@ class OutputManager(object):
                     filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
+
                 filter_type_to_handler_map = {
                     "report_": self._handle_report_filter,
                     "graph_": self._handle_graph_filter,
@@ -765,6 +766,7 @@ class OutputManager(object):
                         if filter_file.startswith(prefix):
                             handler_function(filter_file, save_path, filtered_pool, produce_graphics,
                                              filter_content, graphics_dir, csv_dir)
+                            break
                 except KeyError:
                     raise KeyError(f"Invalid prefix {filter_file}: "
                                    f"File name must start with {filter_type_to_handler_map.keys()}")
