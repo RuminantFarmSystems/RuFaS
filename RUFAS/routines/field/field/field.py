@@ -1014,7 +1014,7 @@ class Field:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._plant_crop.__name__,
+            "function": self._record_planting.__name__,
             "suffix": f"field='{self.field_data.name}'",
         }
         value = {
