@@ -81,7 +81,7 @@ class EnergyEstimator:
             {
                 "name": FieldOperationEvent.PLANTING,
                 "use_name": True,
-                "filters": ["Field._plant_crop.crop_planting.field='.*'"],
+                "filters": ["Field._record_planting.crop_planting.field='.*'"],
                 "variables": ["event_type", "crop", "field_size", "average_clay_percent"],
             },
         ]  # TODO remove event type
