@@ -97,11 +97,10 @@ def show_error_warning_counts() -> None:
         sys.stdout.write("No errors or warnings found.\n\n")
         return
 
-    if error_count > 0:
-        sys.stdout.write(f"Error count: {error_count}\n")
-    if warning_count > 0:
-        sys.stdout.write(f"Warning count: {warning_count}\n")
+    errors_label = "error" if error_count == 1 else "errors"
+    warnings_label = "warning" if warning_count == 1 else "warnings"
 
+    sys.stdout.write(f"{error_count} {errors_label} and {warning_count} {warnings_label} found.\n")
     sys.stdout.write("Please see the log files for more details.\n\n")
 
 

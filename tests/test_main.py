@@ -1112,9 +1112,9 @@ def test_get_error_warning_counts(
     "error_count, warning_count, expected_output",
     [
         (0, 0, "No errors or warnings found.\n\n"),
-        (1, 0, "Error count: 1\nPlease see the log files for more details.\n\n"),
-        (0, 1, "Warning count: 1\nPlease see the log files for more details.\n\n"),
-        (1, 1, "Error count: 1\nWarning count: 1\nPlease see the log files for more details.\n\n"),
+        (1, 0, "1 error and 0 warnings found.\nPlease see the log files for more details.\n\n"),
+        (0, 1, "0 errors and 1 warning found.\nPlease see the log files for more details.\n\n"),
+        (1, 1, "1 error and 1 warning found.\nPlease see the log files for more details.\n\n"),
     ],
 )
 def test_show_error_warning_counts(
