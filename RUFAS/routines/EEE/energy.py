@@ -1,4 +1,6 @@
 from math import sqrt
+from typing import Tuple
+import re
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -44,10 +46,7 @@ class EnergyEstimator:
             {**base_info_map, **variable_info_map},
         )
 
-    def parse_inputs_for_diesel_consumption_calculation(self):
-
-        from RUFAS.routines.EEE.enums import FieldOperationEvent
-
+    def parse_inputs_for_diesel_consumption_calculation(self) -> Tuple:
         filters = [
             {
                 "name": FieldOperationEvent.FERTILIZER_APPLICATION,
@@ -94,6 +93,10 @@ class EnergyEstimator:
 
         for filter in filters:
             result = om.filter_variables_pool_complex(filter)
+            
+
+            # Find the maximum number, which is n
+            n = max(numbers) if numbers else -1  # Returns -1 if no numbers found
             first_key, first_value = next(iter(result.items()))
             length = len(first_value)
             key_prefix = first_key.rsplit(".", 1)[0]
@@ -107,6 +110,16 @@ class EnergyEstimator:
                 "Fertilizer Application_0.application_depth": [0.0],
                 "Fertilizer Application_0.field_size": [1.0],
                 "Fertilizer Application_0.average_clay_percent": [20.0],
+                "Fertilizer Application_1.event_type": [FieldOperationEvent.FERTILIZER_APPLICATION],
+                "Fertilizer Application_1.mass": [100.0],
+                "Fertilizer Application_1.application_depth": [0.0],
+                "Fertilizer Application_1.field_size": [1.0],
+                "Fertilizer Application_1.average_clay_percent": [20.0],
+                "Fertilizer Application_2.event_type": [FieldOperationEvent.FERTILIZER_APPLICATION],
+                "Fertilizer Application_2.mass": [100.0],
+                "Fertilizer Application_2.application_depth": [0.0],
+                "Fertilizer Application_2.field_size": [1.0],
+                "Fertilizer Application_2.average_clay_percent": [20.0],
             },
             {
                 "Tillage_0.event_type": [
@@ -191,6 +204,7 @@ class EnergyEstimator:
         herd_size: int = 750  # TODO get the correct value
         application_depth: float = 10  # TODO get the correct value
         clay_percent = 0  # TODO get the correct value
+
 
     def calculate_diesel_consumption(
         self,

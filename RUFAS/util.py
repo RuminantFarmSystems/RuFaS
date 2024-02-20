@@ -79,6 +79,34 @@ class Utility:
         return result
 
     @staticmethod
+    def find_max_index_from_keys(data) -> int | None:
+        """
+        Extracts and returns the maximum index (n) from the keys of the given dictionary.
+        Assumes keys follow the format `<prefix>_<number>.<suffix>` and number >= 0.
+
+        Parameters
+        ----------
+        data: Dict[str, Any]
+            The dictionary whose keys will be analyzed.
+
+        Returns
+        -------
+        int | None
+            The maximum index found among the keys, or None if no numeric index is found.
+        """
+        pattern = re.compile(r"_([0-9]+)\.")
+        max_number = -1
+
+        for key in data.keys():
+            match = pattern.search(key)
+            if match:
+                number = int(match.group(1))
+                if number > max_number:
+                    max_number = number
+
+        return max_number if max_number != -1 else None
+
+    @staticmethod
     def get_base_dir():
         """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of

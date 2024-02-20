@@ -919,3 +919,35 @@ def test_convert_list_to_dict_by_key_different_key():
     list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
     expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
+
+
+def test_find_max_index_from_keys_mixed_single_and_multi_digit_numbers() -> None:
+    data = {
+        "Prefix_0.suffix": ["value"],
+        "Prefix_1.suffix": ["value"],
+        "Prefix_10.suffix": ["value"],
+        "Prefix_2.suffix": ["value"],
+        "Prefix_21.suffix": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) == 21
+
+
+def test_find_max_index_from_keys_no_matching_keys() -> None:
+    data = {
+        "NoPrefixOrNumber.suffix": ["value"],
+        "AnotherWithoutNumber": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) is None
+
+
+def test_find_max_index_from_keys_negative_numbers() -> None:
+    data = {
+        "Prefix_-1.suffix": ["value"],
+        "Prefix_-2.suffix": ["value"],
+    }
+    assert Utility.find_max_index_from_keys(data) is None
+
+
+def test_find_max_index_from_keys_empty_dictionary() -> None:
+    data = {}
+    assert Utility.find_max_index_from_keys(data) is None
