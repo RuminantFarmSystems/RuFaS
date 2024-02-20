@@ -3,13 +3,13 @@ from dataclasses import dataclass
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
 class TallFescue(CropData):
     """crop data class with default values for tall fescue"""
 
-    species: str = "tall_fescue"
     name: str = "default tall_fescue"
     plant_code: str = "FESC"
     scientific_name: str = "Festuca arundinaceae"
@@ -77,7 +77,7 @@ class TallFescueSilage(TallFescue):
 
     """
 
-    species: str = "tall_fescue_silage"
+    species: CropSpecies = CropSpecies.TALL_FESCUE_SILAGE
     name: str = "tall_fescue silage"
 
     storage_type: StorageType = StorageType.BUNKER
@@ -137,7 +137,7 @@ class TallFescueBaleage(TallFescueSilage):
 
     """
 
-    species: str = "tall_fescue_baleage"
+    species: CropSpecies = CropSpecies.TALL_FESCUE_BALEAGE
     name: str = "tall_fescue baleage"
 
     storage_type: StorageType = StorageType.BALEAGE
@@ -179,7 +179,7 @@ class TallFescueHay(TallFescue):
 
     """
 
-    species: str = "tall_fescue_hay"
+    species: CropSpecies = CropSpecies.TALL_FESCUE_HAY
     name: str = "tall_fescue hay"
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED
