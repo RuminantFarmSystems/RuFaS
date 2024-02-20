@@ -1473,7 +1473,7 @@ class OutputManager:
                         results[combined_key] = filtered_value
             else:
                 if use_filter_name:
-                    results[f"{filter_name}_{counter}"] = results[key]
+                    results[f"{filter_name}_{counter}"] = filtered_pool[key]
                 results[key] = filtered_pool[key]
         return results
 
