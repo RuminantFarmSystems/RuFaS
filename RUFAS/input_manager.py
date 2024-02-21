@@ -1094,7 +1094,7 @@ class InputManager:
         om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
 
-    # @lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)
     def get_data(self, data_address: str) -> Any:
         """
         Get the requested data from the pool.
