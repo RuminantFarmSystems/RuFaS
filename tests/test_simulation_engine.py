@@ -53,7 +53,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
 
     # Assert
     patch_for_run_simulation_main_loop.assert_called_once()
-    patch_for_sys_stdout_write.assert_called_once_with("\nSimulation Successful\n\n")
+    patch_for_sys_stdout_write.assert_called_once_with("\nSimulation Completed.\n\n")
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
