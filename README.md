@@ -15,10 +15,13 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 ## Current
 * Deliver Minimum Viable Product (MVP)
 * Payoff the tech debt
-* Establish a positive and inclusive team culture
+* Establish a positive and inclusive team culture.
 
 ## Past
 N/A
+
+# Changelog
+Find the changelog Goolge Sheet [here](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
 
 # Priority Definitions for Project Tasks
 

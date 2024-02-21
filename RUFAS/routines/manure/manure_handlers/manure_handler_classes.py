@@ -130,19 +130,21 @@ class BaseManureHandler:
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
 
-        housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
-            num_animals=pen.num_animals,
-            barn_area=pen.barn_area_from_pen_type,
-            barn_temp=self._get_current_day_average_temperature_in_celsius(),
-        )
-
-        housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
-            num_animals=pen.num_animals,
-            barn_area=pen.barn_area_from_pen_type,
-            barn_temp=self._get_current_day_average_temperature_in_celsius(),
-        )
+        housing_methane_emission = 0.0
+        housing_carbon_dioxide_emission = 0.0
+        housing_ammonia_emission = 0.0
 
         if pen.pen_type in ["freestall", "tiestall"]:
+            housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
+                barn_area=pen.barn_area_from_pen_type,
+                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            )
+
+            housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+                barn_area=pen.barn_area_from_pen_type,
+                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            )
+
             housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
@@ -150,8 +152,6 @@ class BaseManureHandler:
                 urine=pen.manure.urine,  # kg
                 temp=self._get_current_day_average_temperature_in_celsius(),
             )
-        else:
-            housing_ammonia_emission = 0.0
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,

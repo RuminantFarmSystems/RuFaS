@@ -334,32 +334,21 @@ def test_ambient_temp(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "num_animals, barn_area, barn_temp, expected, error_message",
+    "barn_area, barn_temp, expected, error_message",
     [
         (
-            10,
             100.0,
             25.0,
-            10 * (0.0065 + 0.0192 * 25.0) * 100.0 / 1000,
+            (0.0065 + 0.0192 * 25.0) * 100.0 / 1000,
             None,
         ),  # Standard case
-        (0, 100.0, 25.0, 0, None),  # Edge case: no animals
-        (10, 0.0, 25.0, 0, None),  # Edge case: no area
-        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
-        (
-            -1,
-            100.0,
-            25.0,
-            ValueError,
-            "Number of animals must be greater than or equal to 0.",
-        ),
-        # Exception case: negative number of animals
-        (10, -100.0, 25.0, ValueError, "Barn area must be greater than or equal to 0."),
+        (0.0, 25.0, 0, None),  # Edge case: no area
+        (100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        (-100.0, 25.0, ValueError, "Barn area must be greater than or equal to 0."),
         # Exception case: negative barn area
     ],
 )
 def test_housing_carbon_dioxide_emission(
-    num_animals: int,
     barn_area: float,
     barn_temp: float,
     expected: float | Exception,
@@ -375,9 +364,9 @@ def test_housing_carbon_dioxide_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+            GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
@@ -529,32 +518,21 @@ def test_methane_emission_for_anaerobic_lagoon() -> None:
 
 
 @pytest.mark.parametrize(
-    "num_animals, barn_area, barn_temp, expected, error_message",
+    "barn_area, barn_temp, expected, error_message",
     [
         (
-            10,
             100.0,
             30.0,
-            10 * max(0.0, 0.13 * 30.0) * 100.0 / 1000,
+            max(0.0, 0.13 * 30.0) * 100.0 / 1000,
             None,
         ),  # Standard case
-        (0, 100.0, 30.0, 0, None),  # Edge case: no animals
-        (10, 0.0, 30.0, 0, None),  # Edge case: no area
-        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
-        # Exception case: negative number of animals
-        (
-            -1,
-            100.0,
-            30.0,
-            ValueError,
-            "Number of animals must be greater than or equal to 0.",
-        ),
+        (0.0, 30.0, 0, None),  # Edge case: no area
+        (100.0, -20.0, 0, None),  # Edge case: negative barn_temp
         # Exception case: negative barn area
-        (10, -100.0, 30.0, ValueError, "Barn area must be greater than or equal to 0."),
+        (-100.0, 30.0, ValueError, "Barn area must be greater than or equal to 0."),
     ],
 )
 def test_housing_methane_emission(
-    num_animals: int,
     barn_area: float,
     barn_temp: float,
     expected: float | Exception,
@@ -570,9 +548,9 @@ def test_housing_methane_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_methane_emission(num_animals, barn_area, barn_temp)
+            GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_methane_emission(num_animals, barn_area, barn_temp)
+        actual = GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
