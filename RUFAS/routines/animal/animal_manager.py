@@ -1095,7 +1095,7 @@ class AnimalManager:
 
         return num_animals_in_pens
 
-    def allocate_animals_to_pens(self, weather, time, manure_manager) -> None:
+    def allocate_animals_to_pens(self, weather, time, manure_manager_config) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -1130,7 +1130,9 @@ class AnimalManager:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-            ManureManager.configure_manure_manager_components(manure_manager, new_default_pens)
+            mm = ManureManager(new_default_pens, weather, time, manure_manager_config)
+            mm.configure_manure_manager_components(new_default_pens)
+            # ManureManager.configure_manure_manager_components(manure_manager_config,new_default_pens)
 
         self.fully_update_animal_to_pen_id_map()
 
