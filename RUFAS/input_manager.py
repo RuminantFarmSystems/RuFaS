@@ -932,10 +932,10 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_dict_element(
+    def _validate_dict_element(     # noqa
         self,
         element_hierarchy: List[str],
-        properties_blob_key: str,  # noqa
+        properties_blob_key: str,
         input_data: Dict[str, Any],
         eager_termination: bool,
         element_counter_and_validity: Dict[str, int | bool],
@@ -1659,11 +1659,11 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(
+    def _add_variable_to_pool(      # noqa
         self,
         variable_name: str,
         input_data: Dict[str, Any],
-        properties_blob_key: str,  # noqa
+        properties_blob_key: str,
         eager_termination: bool,
         is_variable_dict: bool,
     ) -> bool:
