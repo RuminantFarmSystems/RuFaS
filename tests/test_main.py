@@ -22,7 +22,6 @@ from main import (
     initialize_herd,
     get_error_warning_counts,
     show_error_warning_counts,
-    show_error_warning_file_links,
 )
 
 
@@ -1090,53 +1089,6 @@ def test_show_error_warning_counts(
 
     # Act
     show_error_warning_counts()
-    captured = capsys.readouterr()
-
-    # Assert
-    assert captured.out == expected_output
-
-
-@pytest.mark.parametrize(
-    "error_count, warning_count, error_paths, warning_paths, expected_output",
-    [
-        (0, 0, [], [], ""),
-        (1, 0, [Path("/path/to/error/log.json")], [], "Error log file(s):\n/path/to/error/log.json\n\n"),
-        (0, 1, [], [Path("/path/to/warning/log.json")], "Warning log file(s):\n/path/to/warning/log.json\n\n"),
-        (
-            1,
-            1,
-            [Path("/path/to/error/log.json")],
-            [Path("/path/to/warning/log.json")],
-            "Error log file(s):\n/path/to/error/log.json\n\nWarning log file(s):\n/path/to/warning/log.json\n\n",
-        ),
-    ],
-)
-def test_show_error_warning_file_links(
-    mocker: MockerFixture,
-    capsys: pytest.CaptureFixture,
-    error_count: int,
-    warning_count: int,
-    error_paths: list[Path],
-    warning_paths: list[Path],
-    expected_output: str,
-) -> None:
-    """
-    Unit test for the show_error_warning_file_links() function
-    """
-
-    # Arrange
-    mocker.patch("main.get_error_warning_counts", return_value=(error_count, warning_count))
-    mock_output_manager = mocker.MagicMock()
-    mock_output_manager.error_log_file_paths = [
-        mocker.MagicMock(absolute=mocker.MagicMock(return_value=str(path))) for path in error_paths
-    ]
-    mock_output_manager.warning_log_file_paths = [
-        mocker.MagicMock(absolute=mocker.MagicMock(return_value=str(path))) for path in warning_paths
-    ]
-    mocker.patch("main.OutputManager", return_value=mock_output_manager)
-
-    # Act
-    show_error_warning_file_links()
     captured = capsys.readouterr()
 
     # Assert

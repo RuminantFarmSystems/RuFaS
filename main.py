@@ -7,19 +7,20 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
-from pathlib import Path
-import sys
 import random
+import sys
 import traceback
+from pathlib import Path
 from typing import List
+
 import numpy
 
 from RUFAS.config import Config
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogVerbosity
 
 
 def main():
@@ -99,29 +100,6 @@ def show_error_warning_counts() -> None:
 
     sys.stdout.write(f"{error_count} {errors_label} and {warning_count} {warnings_label} found.\n")
     sys.stdout.write("Please see the log files for more details.\n\n")
-
-
-def show_error_warning_file_links() -> None:
-    """
-    Print the links to the error and warning log files.
-    """
-
-    error_count, warning_count = get_error_warning_counts()
-    if error_count == 0 and warning_count == 0:
-        return
-
-    output_manager = OutputManager()
-    if error_count > 0:
-        sys.stdout.write("Error log file(s):\n")
-        for file_path in output_manager.error_log_file_paths:
-            sys.stdout.write(f"{file_path.absolute()}\n")
-        sys.stdout.write("\n")
-
-    if warning_count > 0:
-        sys.stdout.write("Warning log file(s):\n")
-        for file_path in output_manager.warning_log_file_paths:
-            sys.stdout.write(f"{file_path.absolute()}\n")
-        sys.stdout.write("\n")
 
 
 def run_rufas(
