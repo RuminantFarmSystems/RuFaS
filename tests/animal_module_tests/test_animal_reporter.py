@@ -270,20 +270,20 @@ def test_report_daily_pen_total(mocker: MockerFixture):
     penlist = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
     for i in range(len(penlist)):
         penlist[i].id = i
-        penlist[i].animal_combination.name = 'some_name'
+        penlist[i].animal_combination.name = "some_name"
         penlist[i].animals_in_pen = [i] * i
     AnimalModuleReporter.report_daily_pen_total(penlist)
     for i in range(len(penlist)):
-        assert om.variables_pool[
-            f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"
-        ]["values"] == [i]
+        assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
+            "values"
+        ] == [i]
     for i in range(len(penlist)):
         penlist[i].animals_in_pen = [i] * (i + 1)
     AnimalModuleReporter.report_daily_pen_total(penlist)
     for i in range(1, 2):
-        assert om.variables_pool[
-            f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"
-        ]["values"] == [i, i + 1]
+        assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
+            "values"
+        ] == [i, i + 1]
 
 
 def test_report_animal_module_manure():
