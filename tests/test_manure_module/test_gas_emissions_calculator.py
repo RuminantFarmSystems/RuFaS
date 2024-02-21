@@ -645,10 +645,10 @@ def test_housing_ammonia_emission(
     "temp, expected, error_message",
     [
         # Standard case
-        (20.0, 0.05443994340019855, None),
+        (20.0, 0.13078635869235153, None),
         # Edge cases: Lower and upper bound temperatures
-        (-40.0, 3.6974151606958807e-07, None),
-        (60.0, 14.031085750034068, None),
+        (-40.0, 2.5245953154632027e-05, None),
+        (60.0, 7.071745539498552, None),
         # Exception case: Temperature outside the defined range
         (
             -41.0,
@@ -705,25 +705,25 @@ def test_arrhenius_exponent(
     [
         # Standard case
         (1.0, (0.5, 0.5), None),
-        (45.0, (22.5, 22.5), None),
-        # Edge cases: Zero and very large volatile solids
-        (0.0, (0.0, 0.0), None),
-        (1e6, (5e5, 5e5), None),
+        (45.0, (0.5, 0.5), None),
+        (1e6, (0.5, 0.5), None),
+        # Exception cases: Zero volatile solids
+        (0.0, ValueError, None),
         # Exception case: Negative volatile solids
         (
             -1.0,
             ValueError,
-            "Total volatile solids must be non-negative. Total volatile solids provided: -1.0",
+            "Total volatile solids must be positive. Total volatile solids provided: -1.0",
         ),
     ],
 )
-def test_volatile_solid_components(
+def test_volatile_solid_component_fractions(
     total_volatile_solids: float,
     expected: tuple[float, float] | Exception,
     error_message: str | None,
 ) -> None:
     """
-    Unit test for _volatile_solid_components() method in calculator.py.
+    Unit test for _volatile_solid_component_fractions() method in calculator.py.
 
     This test verifies that the method correctly calculates the degradable and non-degradable
     volatile solids given the total volatile solids. It also checks that the method raises an
@@ -733,9 +733,9 @@ def test_volatile_solid_components(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator._volatile_solid_components(total_volatile_solids)
+            GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
     else:
-        actual = GasEmissionsCalculator._volatile_solid_components(total_volatile_solids)
+        actual = GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
         assert actual == approx(expected, rel=1e-6)
 
 
@@ -743,18 +743,18 @@ def test_volatile_solid_components(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 4.848, None),
-        (10.0, 20.0, 4.848, None),
-        # Edge case: Zero total volatile solids
-        (0.0, 20.0, 0.0, None),
+        (1.0, 20.0, 0.000202, None),
+        (10.0, 20.0, 0.00202, None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 4.848, None),
+        (1.0, None, 0.000202, None),
+        # Exception case: Zero total volatile solids
+        (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
         (
             -1.0,
             20.0,
             ValueError,
-            "Total volatile solids must be greater than 0. Total volatile solids provided: -1.0",
+            "Total volatile solids must be positive. Total volatile solids provided: -1.0",
         ),
     ],
 )
@@ -779,7 +779,7 @@ def test_methane_emission_from_slurry_storage(
         return_value=0.2,  # Dummy return value
     )
     patch_for_volatile_solid_components = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._volatile_solid_components",
+        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._volatile_solid_component_fractions",
         return_value=(1.0, 1.0) if total_volatile_solids != 0.0 else (0.0, 0.0),  # Dummy return value
     )
 
