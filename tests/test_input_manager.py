@@ -1334,12 +1334,16 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(
     }
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        with patch.object(mock_input_manager, "_log_missing_data",
-                          new_callable=MagicMock, return_value=None) as _log_missing_data:
+        with patch.object(
+            mock_input_manager, "_log_missing_data", new_callable=MagicMock, return_value=None
+        ) as _log_missing_data:
             with patch.object(mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False) as fix_data:
                 mock_input_manager._validate_dict_element(
-                    element_hierarchy, properties_blob_key, input_data, eager_termination,
-                    mock_element_counter_and_validity
+                    element_hierarchy,
+                    properties_blob_key,
+                    input_data,
+                    eager_termination,
+                    mock_element_counter_and_validity,
                 )
 
         assert add_error.call_count == 0
