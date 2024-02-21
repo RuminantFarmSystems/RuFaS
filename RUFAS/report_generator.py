@@ -195,6 +195,7 @@ class ReportGenerator:
         event_logs.append(init_event_log)
 
         try:
+            report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
@@ -202,12 +203,29 @@ class ReportGenerator:
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
+            should_graph_report_data = filter_content.get("graph_details")
+            enable_graph_and_report = filter_content.get("graph_and_report", False)
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
-                )
-                self.reports[column_name] = {"values": values}
+                    f"{individual_report_name}_{col}"
+                    if len(individual_report_name) > 0 else col)
+                report_filter_data[column_name] = {"values": values}
+
+            if should_graph_report_data:
+                if enable_graph_and_report:
+                    self.reports.update(report_filter_data)
+            elif not should_graph_report_data:
+                self.reports.update(report_filter_data)
+                report_filter_data = {}
+                if enable_graph_and_report:
+                    warning_event_log = {
+                        "warning": "report_generation_warning",
+                        "message": "Request to graph and report data not fulfilled "
+                        "- no graph_details present in report filter file.",
+                        "info_map": info_map,
+                    }
+                    event_logs.append(warning_event_log)
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
@@ -218,7 +236,7 @@ class ReportGenerator:
             }
             event_logs.append(error_event_log)
 
-        return event_logs
+        return event_logs, report_filter_data, individual_report_name
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """
