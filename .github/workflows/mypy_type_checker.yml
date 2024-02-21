@@ -38,7 +38,7 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           message: "Update mypy badge on README"
-          add: "README.md mypy_report.txt"
+          add: "README.md .github/workflows/mypy_report.txt"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
@@ -46,12 +46,13 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref }} || ${{ github.ref }}
         run: |
           MYPY_ERROR_COUNT=$(grep -c "error:" ./.github/workflows/mypy_report.txt)
-          if [ -n $URL ]; then
+          if [ -n "$URL" ]; then
             curl \
               -X POST $URL \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
-              -d "{\"body\": \"Mypy found $MYPY_ERROR_COUNT errors. [View Mypy Report](https://github.com/${{ github.repository }}/blob/${{ github.head_ref }}/.github/workflows/mypy_report.txt)\"}"
+              -d "{\"body\": \"Mypy found $MYPY_ERROR_COUNT errors. [View Mypy Report](https://github.com/${{ github.repository }}/blob/${{ env.BRANCH_NAME }}/.github/workflows/mypy_report.txt)\"}"
           fi
