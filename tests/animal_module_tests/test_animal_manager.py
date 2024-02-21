@@ -299,10 +299,11 @@ def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str
     feed = MagicMock()
     weather = MagicMock()
     time = MagicMock()
+    manure_manager_config = MagicMock()
     feed_emissions_manager = MagicMock()
 
     input_manager._InputManager__pool = mock_im_pool
-    animal_manager = AnimalManager(data, config, feed, weather, time, feed_emissions_manager)
+    animal_manager = AnimalManager(data, config, feed, weather, time, manure_manager_config, feed_emissions_manager)
     init_pens_patch.stop()
     init_animals_patch.stop()
     init_nutrient_rqmts_patch.stop()
@@ -2548,6 +2549,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_time = mocker.MagicMock()
     mock_time.year = 2023
     mock_time.day = 1
+    mock_manure_manger_config = mocker.MagicMock()
     mock_feed_emissions_manager = MagicMock(PurchasedFeedEmissionsEstimator)
 
     mocker.patch(
@@ -2660,7 +2662,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_sum_daily_milk = mocker.patch.object(AnimalManager, "sum_daily_milk", return_value=sum_daily_milk)
 
     # Act
-    mock_animal_manager.daily_updates(mock_feed, mock_weather, mock_time)
+    mock_animal_manager.daily_updates(mock_feed, mock_weather, mock_time, mock_manure_manger_config)
 
     # Assert
     assert patch_for_end_ration_interval.call_count == 2
