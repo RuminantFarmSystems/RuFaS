@@ -71,6 +71,12 @@ jobs:
             echo "No increase in mypy errors found."
           fi
 
+      - name: Checkout current branch
+        if: github.ref != 'refs/heads/main'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Update Mypy badge
         run: |
           chmod +x ./.github/workflows/update_mypy_badge.sh
