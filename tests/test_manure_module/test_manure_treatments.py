@@ -2554,7 +2554,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         return_value=biogas_energy_content,
     )
 
-    expected_biogas = biogas_generation_ratio * liquid_manure_total_volatile_solids
+    expected_biogas = methane_generation_volume * GasEmissionConstants.METHANE_DENSITY
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
