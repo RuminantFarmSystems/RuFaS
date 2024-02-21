@@ -35,9 +35,10 @@ jobs:
           ./.github/workflows/update_mypy_badge.sh
 
       - name: Commit & Push changes to README
-        uses: actions-js/push@master
+        uses: EndBug/add-and-commit@v7
         with:
           message: "Update mypy badge on README"
+          add: "README.md .github/workflows/mypy_report.txt"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
