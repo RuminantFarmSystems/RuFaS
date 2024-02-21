@@ -5,6 +5,7 @@ from typing import Optional, List, Any
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 class PlantCategory(Enum):
@@ -29,6 +30,7 @@ class PlantCategory(Enum):
         Represents tree-type plants.
 
     """
+
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
@@ -50,7 +52,7 @@ class CropData:
 
     Attributes
     ----------
-    species : Optional[str]
+    species : CropSpecies, default None
         The species of the crop.
     name : Optional[str]
         The name of this specific crop instance.
@@ -372,8 +374,9 @@ class CropData:
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
     """
+
     # ID variables (SWAT Table A-1 ish)
-    species: Optional[str] = "generic"
+    species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
     plant_code: Optional[str] = None
@@ -574,14 +577,19 @@ class CropData:
             self.dormancy_loss_fraction = 0.3
 
         # Set perennial status
-        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.TREE:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL
+            or self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.TREE
+        ):
             self.is_perennial = True
 
         # set Fixation status
-        if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
-                self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
-                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
+        if (
+            self.plant_category == PlantCategory.PERENNIAL_LEGUME
+            or self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME
+            or self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME
+        ):
             self.is_nitrogen_fixer = True
 
     @property

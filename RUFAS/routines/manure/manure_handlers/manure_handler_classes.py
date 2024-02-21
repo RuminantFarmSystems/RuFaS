@@ -65,7 +65,13 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self, name: str, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
+    def __init__(
+        self,
+        name: str,
+        weather: Weather,
+        time: Time,
+        manure_handler_config: ManureHandlerConfig,
+    ):
         """Initialize a BaseManureHandler object.
 
         Parameters
@@ -98,10 +104,9 @@ class BaseManureHandler:
 
         return avg_temp
 
-    def daily_update(self,
-                     pen: ManureManagerPen,
-                     bedding: BaseBedding | None,
-                     sim_day: int) -> ManureHandlerDailyOutput:
+    def daily_update(
+        self, pen: ManureManagerPen, bedding: BaseBedding | None, sim_day: int
+    ) -> ManureHandlerDailyOutput:
         """
         Calculate the daily manure handler output based on input passed from the animal module.
 
@@ -125,21 +130,21 @@ class BaseManureHandler:
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
 
-        housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
-            num_animals=pen.num_animals,
-            barn_area=pen.barn_area_from_pen_type,
-            barn_temp=self._get_current_day_average_temperature_in_celsius(),
-        )
+        housing_methane_emission = 0.0
+        housing_carbon_dioxide_emission = 0.0
+        housing_ammonia_emission = 0.0
 
-        housing_carbon_dioxide_emission = (
-            GasEmissionsCalculator.housing_carbon_dioxide_emission(
-                num_animals=pen.num_animals,
+        if pen.pen_type in ["freestall", "tiestall"]:
+            housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
                 barn_area=pen.barn_area_from_pen_type,
                 barn_temp=self._get_current_day_average_temperature_in_celsius(),
             )
-        )
 
-        if pen.pen_type in ["freestall", "tiestall"]:
+            housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+                barn_area=pen.barn_area_from_pen_type,
+                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            )
+
             housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
@@ -147,8 +152,6 @@ class BaseManureHandler:
                 urine=pen.manure.urine,  # kg
                 temp=self._get_current_day_average_temperature_in_celsius(),
             )
-        else:
-            housing_ammonia_emission = 0.0
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
@@ -157,8 +160,7 @@ class BaseManureHandler:
             liquid_manure_total_ammoniacal_nitrogen=(
                 max(
                     0.0,
-                    pen.manure.manure_total_ammoniacal_nitrogen
-                    - housing_ammonia_emission,
+                    pen.manure.manure_total_ammoniacal_nitrogen - housing_ammonia_emission,
                 )
             ),
             liquid_manure_nitrogen=pen.manure.nitrogen,
@@ -171,19 +173,14 @@ class BaseManureHandler:
             housing_carbon_dioxide=housing_carbon_dioxide_emission,
             housing_ammonia=housing_ammonia_emission,
             manure_volume=pen.manure.manure_volume,
-            cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
-                pen.num_animals),
-            total_bedding_volume=bedding.calc_total_bedding_volume(
-                pen.num_animals) if bedding is not None else 0.0,
-            total_bedding_mass=bedding.calc_total_bedding_mass(
-                pen.num_animals) if bedding is not None else 0.0,
+            cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
+            total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals) if bedding is not None else 0.0,
+            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals) if bedding is not None else 0.0,
             total_water_volume_in_milking_parlor=(
-                self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(
-                    pen.num_lactating_cows
-                )
+                self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
             tempC=self._get_current_day_average_temperature_in_celsius(),
-            num_animals=pen.num_animals
+            num_animals=pen.num_animals,
         )
 
         return daily_output
@@ -201,8 +198,9 @@ class BaseManureHandler:
         Volume of cleaning water needed for the given pen, L.
 
         """
-        cleaning_water_volume = (num_animals * self.config.cleaning_water_use_rate *
-                                 (1-self.config.cleaning_water_recycle_fraction))
+        cleaning_water_volume = (
+            num_animals * self.config.cleaning_water_use_rate * (1 - self.config.cleaning_water_recycle_fraction)
+        )
 
         return cleaning_water_volume
 
@@ -296,11 +294,11 @@ class ManureHandlerFactory:
 
     @classmethod
     def get_manure_handler(
-            cls,
-            configuration_name: str,
-            weather: Weather,
-            time: Time,
-            manure_handler_config: ManureHandlerConfig,
+        cls,
+        configuration_name: str,
+        weather: Weather,
+        time: Time,
+        manure_handler_config: ManureHandlerConfig,
     ) -> BaseManureHandler | FlushSystem | AlleyScraper | ManualScraping | Tillage | Harrowing:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
@@ -321,9 +319,7 @@ class ManureHandlerFactory:
             A new instance of a BaseManureHandler subtype.
 
         """
-        manure_handler_class_by_type: Dict[
-            ManureHandlerType, Type[BaseManureHandler]
-        ] = {
+        manure_handler_class_by_type: Dict[ManureHandlerType, Type[BaseManureHandler]] = {
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,

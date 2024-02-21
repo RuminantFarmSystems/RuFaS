@@ -1,33 +1,39 @@
 import pytest
-from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
+from RUFAS.routines.field.crop.species_data_factory import (
+    CropSpecies,
+    CropSpeciesDataFactory,
+)
 from RUFAS.routines.field.crop.crop_data import PlantCategory
 from dataclasses import asdict
 
 
-@pytest.mark.parametrize("species,expected", [
-    ("alfalfa_hay", CropSpecies.ALFALFA_HAY),
-    ("alfalfa_silage", CropSpecies.ALFALFA_SILAGE),
-    ("alfalfa_baleage", CropSpecies.ALFALFA_BALEAGE),
-    ("cereal_rye_hay", CropSpecies.CEREAL_RYE_HAY),
-    ("cereal_rye_grain", CropSpecies.CEREAL_RYE_GRAIN),
-    ("cereal_rye_silage", CropSpecies.CEREAL_RYE_SILAGE),
-    ("cereal_rye_baleage", CropSpecies.CEREAL_RYE_BALEAGE),
-    ("corn_grain", CropSpecies.CORN_GRAIN),
-    ("corn_silage", CropSpecies.CORN_SILAGE),
-    ("soybean_hay", CropSpecies.SOYBEAN_HAY),
-    ("soybean_grain", CropSpecies.SOYBEAN_GRAIN),
-    ("tall_fescue_hay", CropSpecies.TALL_FESCUE_HAY),
-    ("tall_fescue_silage", CropSpecies.TALL_FESCUE_SILAGE),
-    ("tall_fescue_baleage", CropSpecies.TALL_FESCUE_BALEAGE),
-    ("triticale_hay", CropSpecies.TRITICALE_HAY),
-    ("triticale_grain", CropSpecies.TRITICALE_GRAIN),
-    ("triticale_silage", CropSpecies.TRITICALE_SILAGE),
-    ("triticale_baleage", CropSpecies.TRITICALE_BALEAGE),
-    ("winter_wheat_hay", CropSpecies.WINTER_WHEAT_HAY),
-    ("winter_wheat_grain", CropSpecies.WINTER_WHEAT_GRAIN),
-    ("winter_wheat_silage", CropSpecies.WINTER_WHEAT_SILAGE),
-    ("winter_wheat_baleage", CropSpecies.WINTER_WHEAT_BALEAGE)
-])
+@pytest.mark.parametrize(
+    "species,expected",
+    [
+        ("alfalfa_hay", CropSpecies.ALFALFA_HAY),
+        ("alfalfa_silage", CropSpecies.ALFALFA_SILAGE),
+        ("alfalfa_baleage", CropSpecies.ALFALFA_BALEAGE),
+        ("cereal_rye_hay", CropSpecies.CEREAL_RYE_HAY),
+        ("cereal_rye_grain", CropSpecies.CEREAL_RYE_GRAIN),
+        ("cereal_rye_silage", CropSpecies.CEREAL_RYE_SILAGE),
+        ("cereal_rye_baleage", CropSpecies.CEREAL_RYE_BALEAGE),
+        ("corn_grain", CropSpecies.CORN_GRAIN),
+        ("corn_silage", CropSpecies.CORN_SILAGE),
+        ("soybean_hay", CropSpecies.SOYBEAN_HAY),
+        ("soybean_grain", CropSpecies.SOYBEAN_GRAIN),
+        ("tall_fescue_hay", CropSpecies.TALL_FESCUE_HAY),
+        ("tall_fescue_silage", CropSpecies.TALL_FESCUE_SILAGE),
+        ("tall_fescue_baleage", CropSpecies.TALL_FESCUE_BALEAGE),
+        ("triticale_hay", CropSpecies.TRITICALE_HAY),
+        ("triticale_grain", CropSpecies.TRITICALE_GRAIN),
+        ("triticale_silage", CropSpecies.TRITICALE_SILAGE),
+        ("triticale_baleage", CropSpecies.TRITICALE_BALEAGE),
+        ("winter_wheat_hay", CropSpecies.WINTER_WHEAT_HAY),
+        ("winter_wheat_grain", CropSpecies.WINTER_WHEAT_GRAIN),
+        ("winter_wheat_silage", CropSpecies.WINTER_WHEAT_SILAGE),
+        ("winter_wheat_baleage", CropSpecies.WINTER_WHEAT_BALEAGE),
+    ],
+)
 def test_crop_species_enum(species, expected):
     """ensure that CropSpecies correctly enumerates the accepted species names"""
     crop_species = CropSpecies(species)
@@ -48,7 +54,7 @@ def test_species_factory_defaults():
     """
     # ---- default argument crop ----
     generic = CropSpeciesDataFactory.create_species_data()
-    assert generic.species == "corn_grain"
+    assert generic.species == CropSpecies.CORN_GRAIN
     assert generic.name == "corn grain"
     assert generic.id is None
     assert generic.plant_code == "CORN"
@@ -82,7 +88,7 @@ def test_species_factory_defaults():
 
     # ---- winter wheat ----
     winter_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("winter_wheat_hay"), id=1000)
-    assert winter_wheat.species == "winter_wheat_hay"
+    assert winter_wheat.species == CropSpecies.WINTER_WHEAT_HAY
     assert winter_wheat.name == "winter_wheat hay"
     assert winter_wheat.id == 1000
     assert winter_wheat.plant_code == "WWHT"
@@ -111,7 +117,7 @@ def test_species_factory_defaults():
 
     # ---- cereal rye ----
     cereal_rye = CropSpeciesDataFactory.create_species_data(CropSpecies("cereal_rye_baleage"), id=123)
-    assert cereal_rye.species == "cereal_rye_baleage"
+    assert cereal_rye.species == CropSpecies.CEREAL_RYE_BALEAGE
     assert cereal_rye.name == "cereal_rye baleage"
     assert cereal_rye.id == 123
     assert cereal_rye.plant_code == "RYE"
@@ -139,23 +145,62 @@ def test_species_factory_defaults():
     assert cereal_rye.yield_phosphorus_fraction == 0.00371
 
 
-@pytest.mark.parametrize("species,vars_dict", [
-    ("corn_grain", {"minimum_temperature": -2}),  # reduced temp
-    ("corn_silage", {"minimum_temperature": 3, "second_leaf_fraction_point": 0.93}),  # two changes
-    ("winter_wheat_silage", {"name": "wheat named Susan"}),  # custom name
-    ("winter_wheat_baleage", {"optimal_temperature": 28, "optimal_harvest_index": 0.99,  # 3 changes
-                              "min_harvest_index": 0.98}),
-    ("cereal_rye_hay", {"biomass": 100}),  # change attribute declared only in CropData
-    ("cereal_rye_grain", {"name": "fancy barley",  # custom new variety/subspecies
-                          "plant_code": "FBAR", "scientific_name": "Hordeum vulgare regalis"}),
-    ("tall_fescue_hay", {"plant_category": PlantCategory("perennial")}),  # perennial version of tall fescue
-    ("tall_fescue_silage", {"is_nitrogen_fixer": True}),  # magical nitrogen-fixing grass (egads!)
-    ("alfalfa_baleage", {"yield_nitrogen_fraction": 0.03}),  # this alfalfa has increased nitrogen in harvest
-    ("soybean_grain", {"max_leaf_area_index": 2.4, "light_use_efficiency": 10.8,  # various alterations
-                       "emergence_nitrogen_fraction": 0.06}),
-    ("triticale_silage", {"growth_factor": 0.8, "mature_phosphorus_fraction": 0.01}),  # mixed alterations
-    ("triticale_grain", {"optimal_harvest_index": 1.2}),  # higher tuber yield
-])
+@pytest.mark.parametrize(
+    "species,vars_dict",
+    [
+        ("corn_grain", {"minimum_temperature": -2}),  # reduced temp
+        (
+            "corn_silage",
+            {"minimum_temperature": 3, "second_leaf_fraction_point": 0.93},
+        ),  # two changes
+        ("winter_wheat_silage", {"name": "wheat named Susan"}),  # custom name
+        (
+            "winter_wheat_baleage",
+            {
+                "optimal_temperature": 28,
+                "optimal_harvest_index": 0.99,  # 3 changes
+                "min_harvest_index": 0.98,
+            },
+        ),
+        (
+            "cereal_rye_hay",
+            {"biomass": 100},
+        ),  # change attribute declared only in CropData
+        (
+            "cereal_rye_grain",
+            {
+                "name": "fancy barley",  # custom new variety/subspecies
+                "plant_code": "FBAR",
+                "scientific_name": "Hordeum vulgare regalis",
+            },
+        ),
+        (
+            "tall_fescue_hay",
+            {"plant_category": PlantCategory("perennial")},
+        ),  # perennial version of tall fescue
+        (
+            "tall_fescue_silage",
+            {"is_nitrogen_fixer": True},
+        ),  # magical nitrogen-fixing grass (egads!)
+        (
+            "alfalfa_baleage",
+            {"yield_nitrogen_fraction": 0.03},
+        ),  # this alfalfa has increased nitrogen in harvest
+        (
+            "soybean_grain",
+            {
+                "max_leaf_area_index": 2.4,
+                "light_use_efficiency": 10.8,  # various alterations
+                "emergence_nitrogen_fraction": 0.06,
+            },
+        ),
+        (
+            "triticale_silage",
+            {"growth_factor": 0.8, "mature_phosphorus_fraction": 0.01},
+        ),  # mixed alterations
+        ("triticale_grain", {"optimal_harvest_index": 1.2}),  # higher tuber yield
+    ],
+)
 def test_factory_alterations(species, vars_dict):
     """check that the factory properly creates 'altered' crop species data objects"""
     # setup crop
@@ -174,12 +219,15 @@ def test_factory_alterations(species, vars_dict):
         assert "altered" in crop.name
 
 
-@pytest.mark.parametrize("species,bad_attr", [
-    ("cereal_rye_hay", {"color": "red"}),  # generic
-    ("corn_silage", {"flavor": "corny"}),  # child class
-    ("alfalfa_hay", {"value": 1000, "is_valuable": True}),  # multiple invalids
-    ("soybean_grain", {"name": "Bob", "moustache": True}),  # valid with invalid
-])
+@pytest.mark.parametrize(
+    "species,bad_attr",
+    [
+        ("cereal_rye_hay", {"color": "red"}),  # generic
+        ("corn_silage", {"flavor": "corny"}),  # child class
+        ("alfalfa_hay", {"value": 1000, "is_valuable": True}),  # multiple invalids
+        ("soybean_grain", {"name": "Bob", "moustache": True}),  # valid with invalid
+    ],
+)
 def test_factory_errors(species, bad_attr):
     """check that specifying invalid attributes appropriately raises an error"""
     with pytest.raises(AttributeError) as e:
