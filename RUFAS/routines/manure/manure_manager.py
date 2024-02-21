@@ -209,6 +209,7 @@ class ManureManager:
 
 
         """
+        # if len(pen_list) > self.manure_treatments
         for pen in pen_list:
             self._pen_daily_update(simulation_day, pen)
 

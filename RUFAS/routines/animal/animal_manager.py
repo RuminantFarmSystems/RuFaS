@@ -35,7 +35,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
-from RUFAS.routines.manure.manure_manager import ManureManager
+# from RUFAS.routines.manure.manure_manager import ManureManager
 
 om = OutputManager()
 
@@ -1095,7 +1095,7 @@ class AnimalManager:
 
         return num_animals_in_pens
 
-    def allocate_animals_to_pens(self, weather, time, manure_manager_config) -> None:
+    def allocate_animals_to_pens(self, weather, time, manure_manager) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -1130,8 +1130,8 @@ class AnimalManager:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-            mm = ManureManager(new_default_pens, weather, time, manure_manager_config)
-            mm.configure_manure_manager_components(new_default_pens)
+            # mm = ManureManager(new_default_pens, weather, time, manure_manager_config)
+            # manure_manager.configure_manure_manager_components(new_default_pens)
             # ManureManager.configure_manure_manager_components(manure_manager_config,new_default_pens)
 
         self.fully_update_animal_to_pen_id_map()
