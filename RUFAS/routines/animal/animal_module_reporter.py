@@ -192,6 +192,18 @@ class AnimalModuleReporter:
                 info_map,
             )
 
+    def report_daily_pen_totals(penlist):
+        info_map = {
+            "class": "AnimalModuleReporter",
+            "function": "report_daily_pen_totals",
+        }
+        for pen in penlist:
+            om.add_variable(
+                f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
+                len(pen.animals_in_pen),
+                info_map,
+            )
+
     def report_daily_feed_emissions(
         ration_total: dict[str, float],
         pen_id: int,
@@ -270,7 +282,7 @@ class AnimalModuleReporter:
         }
         om.add_variable("pen_manure_data", pen.manure, info_map)
 
-    def report_pen_manure_properties(pen) -> None:
+    def report_pen_manure_properties(pen, simulation_day: int) -> None:
         """
         Adds pen manure properties to output manager.
 
@@ -285,6 +297,20 @@ class AnimalModuleReporter:
             "data_origin": [("Pen", "calc_total_manure")],
         }
         for manure_property, manure_value in pen.manure.items():
+            if f"pen.calc_total_manure.pen_{pen.id}_daily_{str(manure_property)}" in om.variables_pool:
+                current_length = len(
+                    om.variables_pool[
+                        f"pen.calc_total_manure.pen_" f"{pen.id}_daily_" f"{str(manure_property)}"
+                    ].values()
+                )
+                if current_length < simulation_day:
+                    missing_days = simulation_day - current_length
+                    for day in range(0, missing_days):
+                        om.add_variable(
+                            f"pen_{pen.id}_daily_{str(manure_property)}",
+                            0,
+                            info_map=info_map,
+                        )
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
@@ -545,9 +571,10 @@ class AnimalModuleReporter:
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
         AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
+        AnimalModuleReporter.report_daily_pen_totals(animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
-            AnimalModuleReporter.report_pen_manure_properties(pen)
+            AnimalModuleReporter.report_pen_manure_properties(pen, animal_manager.simulation_day)
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
