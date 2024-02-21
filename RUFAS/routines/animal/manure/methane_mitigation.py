@@ -47,11 +47,16 @@ class NOP(MethaneMitigationMethod):
             The reduction in methane yield.
 
         """
-        NDF_concentration = nutrient_concentrations['NDF']
-        EE_concentration = nutrient_concentrations['EE']
-        starch_concentration = nutrient_concentrations['starch']
-        return -30.8 - 0.226 * (additive_amount - 70.5) + 0.906 * (
-                NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
+        NDF_concentration = nutrient_concentrations["NDF"]
+        EE_concentration = nutrient_concentrations["EE"]
+        starch_concentration = nutrient_concentrations["starch"]
+        return (
+            -30.8
+            - 0.226 * (additive_amount - 70.5)
+            + 0.906 * (NDF_concentration - 32.9)
+            + 3.871 * (EE_concentration - 4.2)
+            - 0.337 * (starch_concentration - 21.1)
+        )
 
 
 class Monensin(MethaneMitigationMethod):
@@ -73,7 +78,7 @@ class Monensin(MethaneMitigationMethod):
             The reduction in methane yield.
 
         """
-        CP_concentration = nutrient_concentrations['CP']
+        CP_concentration = nutrient_concentrations["CP"]
         Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
         Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
         if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
@@ -130,9 +135,11 @@ class MethaneMitigationMethodManager:
     """A class to manage the creation and use of MethaneMitigationMethod subclasses."""
 
     @staticmethod
-    def calculate_methane_mitigation(nutrient_concentrations: dict,
-                                     methane_mitigation_method: str,
-                                     methane_mitigation_additive_amount: float) -> float:
+    def calculate_methane_mitigation(
+        nutrient_concentrations: dict,
+        methane_mitigation_method: str,
+        methane_mitigation_additive_amount: float,
+    ) -> float:
         """Calculate the reduction in methane yield for a given mitigation method.
 
         Parameters
@@ -160,10 +167,10 @@ class MethaneMitigationMethodManager:
 
         # Map friendly names to class names if preferred
         friendly_name_map = {
-            '3-NOP': 'nop',
-            'Monensin': 'monensin',
-            'Essential Oils': 'essentialoils',
-            'Seaweed': 'seaweed'
+            "3-NOP": "nop",
+            "Monensin": "monensin",
+            "Essential Oils": "essentialoils",
+            "Seaweed": "seaweed",
         }
 
         # Translate friendly name to class name if needed
@@ -178,4 +185,5 @@ class MethaneMitigationMethodManager:
         except KeyError:
             raise ValueError(
                 f"{methane_mitigation_method} is not a recognized methane mitigation method. "
-                f"Accepted methods are {list(method_classes.keys()) + list(friendly_name_map.keys())}.")
+                f"Accepted methods are {list(method_classes.keys()) + list(friendly_name_map.keys())}."
+            )

@@ -247,6 +247,7 @@ class SoilData:
     """Root depth of the crop harvested (mm)"""
     crop_yield_nitrogen: float = 0
     """nitrogen contained in the harvested yield (kg/ha)"""
+
     @property
     def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
@@ -281,26 +282,36 @@ class SoilData:
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size,
-                                          residue=self.plant_surface_residue),
-                                LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
-                                LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
-                                LayerData(top_depth=80, bottom_depth=200, field_size=field_size)]
+            self.soil_layers = [
+                LayerData(
+                    top_depth=0,
+                    bottom_depth=20,
+                    field_size=field_size,
+                    residue=self.plant_surface_residue,
+                ),
+                LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
+                LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
+                LayerData(top_depth=80, bottom_depth=200, field_size=field_size),
+            ]
         elif self.soil_layers[0].bottom_depth < 20:
-            raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
-                             f"'{self.soil_layers[0].bottom_depth}'.")
+            raise ValueError(
+                f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                f"'{self.soil_layers[0].bottom_depth}'."
+            )
         elif self.soil_layers[0].bottom_depth > 20:
             self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
             # configures the vadose zone LayerData object based on where the soil profile ends
-            self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
-                                               bottom_depth=10000000,  # bottom depth is 10,000 meters by default
-                                               soil_water_concentration=0,
-                                               saturation_point_water_concentration=inf,
-                                               initial_labile_inorganic_phosphorus_concentration=0,
-                                               initial_soil_nitrate_concentration=0,
-                                               field_size=field_size)
+            self.vadose_zone_layer = LayerData(
+                top_depth=self.soil_layers[-1].bottom_depth,
+                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
+                soil_water_concentration=0,
+                saturation_point_water_concentration=inf,
+                initial_labile_inorganic_phosphorus_concentration=0,
+                initial_soil_nitrate_concentration=0,
+                field_size=field_size,
+            )
             self.vadose_zone_layer.active_organic_nitrogen_content = 0
             self.vadose_zone_layer.stable_organic_nitrogen_content = 0
 
@@ -485,7 +496,7 @@ class SoilData:
         weighted_densities_sum = 0
         weights_sum = 0
         for layer in self.soil_layers:
-            weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
+            weighted_densities_sum += layer.layer_thickness * layer.bulk_density
             weights_sum += layer.layer_thickness
         return weighted_densities_sum / weights_sum
 
@@ -581,8 +592,9 @@ class SoilData:
             return 0.6667
         elif self.cover_type == "GRASSED":
             return 0.8
-        raise ValueError(f"Expected cover type to be \'BARE\', \'RESIDUE_COVER\', or \'GRASSED\', "
-                         f"received: '{self.cover_type}'.")
+        raise ValueError(
+            f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'."
+        )
 
     @property
     def solubilizing_factor(self) -> float:
@@ -618,7 +630,7 @@ class SoilData:
             "structural_litter_amount",
             "active_carbon_amount",
             "slow_carbon_amount",
-            "passive_carbon_amount"
+            "passive_carbon_amount",
         ]
         carbon_total = 0.0
         for pool in carbon_pools:
@@ -636,7 +648,21 @@ class SoilData:
             Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
 
         """
-        emissions_from_active = sum(self.get_vectorized_layer_attribute('active_carbon_to_slow_loss'))
-        emissions_from_slow = sum(self.get_vectorized_layer_attribute('slow_carbon_co2_lost_amount'))
-        emissions_from_passive = sum(self.get_vectorized_layer_attribute('passive_carbon_co2_lost_amount'))
+        emissions_from_active = sum(self.get_vectorized_layer_attribute("active_carbon_to_slow_loss"))
+        emissions_from_slow = sum(self.get_vectorized_layer_attribute("slow_carbon_co2_lost_amount"))
+        emissions_from_passive = sum(self.get_vectorized_layer_attribute("passive_carbon_co2_lost_amount"))
         return emissions_from_active + emissions_from_slow + emissions_from_passive
+
+    @property
+    def average_clay_percent(self) -> float:
+        """
+        Calculates the average percent of soil.
+
+        Returns
+        -------
+        float
+            Average clay percent of the soil (unitless).
+
+        """
+        clay_percentages = self.get_vectorized_layer_attribute("percent_clay_content")
+        return sum(clay_percentages) / len(clay_percentages)

@@ -19,6 +19,7 @@ class GeneralConstants:
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
     """
+
     # Length-related
     MM_TO_M = 0.001
 

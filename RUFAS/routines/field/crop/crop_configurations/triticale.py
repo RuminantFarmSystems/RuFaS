@@ -2,10 +2,8 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
@@ -18,7 +16,7 @@ class Triticale(CropData):
     We use the closest analog data available which is the Durum Wheat data.
 
     """
-    species: str = "triticale"
+
     name: str = "default triticale"
     plant_code: str = "DWHT"
     scientific_name: str = "Triticum durum"
@@ -85,7 +83,8 @@ class TriticaleGrain(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "triticale_grain"
+
+    species: CropSpecies = CropSpecies.TRITICALE_GRAIN
     name: str = "triticale grain"
 
     storage_type: StorageType = StorageType.DRY
@@ -140,7 +139,8 @@ class TriticaleSilage(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "triticale_silage"
+
+    species: CropSpecies = CropSpecies.TRITICALE_SILAGE
     name: str = "triticale silage"
 
     storage_type: StorageType = StorageType.BUNKER
@@ -199,7 +199,8 @@ class TriticaleBaleage(TriticaleSilage):
     Triticale baleage currently has the same harvest and quality properties as Triticale silage.
 
     """
-    species: str = "triticale_baleage"
+
+    species: CropSpecies = CropSpecies.TRITICALE_BALEAGE
     name: str = "triticale baleage"
 
     storage_type: StorageType = StorageType.BALEAGE
@@ -240,7 +241,8 @@ class TriticaleHay(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "triticale_hay"
+
+    species: CropSpecies = CropSpecies.TRITICALE_HAY
     name: str = "triticale hay"
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED
