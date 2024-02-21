@@ -114,8 +114,6 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
-            self.error_log_file_paths: List[Path] = []
-            self.warning_log_file_paths: List[Path] = []
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -892,7 +890,6 @@ class OutputManager(object):
         """
         file_path = os.path.join(path, self.generate_file_name("warnings", "json"))
         self.dict_to_file_json(self.warnings_pool, file_path)
-        self.warning_log_file_paths.append(Path(file_path))
 
     def dump_errors(self, path: str) -> None:
         """
@@ -900,7 +897,6 @@ class OutputManager(object):
         """
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
-        self.error_log_file_paths.append(Path(file_path))
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
@@ -1011,9 +1007,6 @@ class OutputManager(object):
         self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-
-        self.warning_log_file_paths.clear()
-        self.error_log_file_paths.clear()
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
