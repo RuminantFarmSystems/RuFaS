@@ -2888,7 +2888,7 @@ def test_add_variable_to_pool_valid(
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
-
+    mock_input_manager.get_data.cache_clear()
 
 @pytest.mark.parametrize(
     "variable_name, data, properties_blob_key, starting_im_pool, is_dict_variable",
@@ -3044,7 +3044,7 @@ def test_add_variable_to_pool_invalid(
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
-
+    mock_input_manager.get_data.cache_clear()
 
 @pytest.mark.parametrize(
     "variable_name, data, properties_blob_key, starting_im_pool, is_dict_variable",
@@ -3199,7 +3199,7 @@ def test_add_variable_to_pool_eager_termination(
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
-
+    mock_input_manager.get_data.cache_clear()
 
 @pytest.mark.parametrize(
     "variable_name, data, properties_blob_key",
