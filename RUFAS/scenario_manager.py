@@ -46,6 +46,12 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
-                                        "path": Path('input/metadata/default_metadata.json')},
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "run1of4_c1f2_scenario",
+                                        "path": Path('input/metadata/c1f2_metadata.json')},
+                                        {"prefix": "run2of4_c1f2_scenario",
+                                        "path": Path('input/metadata/c1f2_metadata.json')},
+                                        {"prefix": "run3of4_c1f2_scenario",
+                                        "path": Path('input/metadata/c1f2_metadata.json')},
+                                        {"prefix": "run4of4_c1f2_scenario",
+                                        "path": Path('input/metadata/c1f2_metadata.json')},
                                        ]
