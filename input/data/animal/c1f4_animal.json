@@ -7,7 +7,6 @@
 		"cow_num": 9245,
 		"replace_num": 46225,
 		"herd_num": 9245,
-		"herd_init": false,
 		"breed": "HO"
   },
   "herd_initialization": {
@@ -16,15 +15,17 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 420,
+			"breeding_start_day_h": 379,
 			"heifer_repro_method": "ED",
-			"cow_repro_method": "ED",
+			"cow_repro_method": "ED-TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
 			"heifer_repro_cull_time": 550,
 			"do_not_breed_time" : 300,
 			"cull_milk_production": 20,
-			"cow_times_milked_per_day":3 
+			"cow_times_milked_per_day":3,
+			"milk_fat_percent": 3.58,		
+			"milk_protein_percent": 3.03 
 		},
 		"farm_level": {
 			"calf": {
@@ -36,44 +37,32 @@
 				"milk_type": "whole"
 			},
 			"repro": {
-                "voluntary_waiting_period": 50,
+                "voluntary_waiting_period": 60,
 				"conception_rate_decrease": 0.026,
+				"decrease_conception_rate_in_rebreeding": false,
+       			"decrease_conception_rate_by_parity": false,
                 "avg_gestation_len": 278,
 				"std_gestation_len": 6,
-				"prefresh_day": 30,
+				"prefresh_day": 21,
                 "calving_interval": 404,
                 "heifers": {
-                    "estrus_detection_rate": 0.9,
+                    "estrus_detection_rate": 0.95,
                     "estrus_conception_rate": 0.55,
                     "repro_sub_protocol": "5dCG2P",
                     "repro_sub_properties": {
-            "conception_rate": 0.55,
-                    "estrus_detection_rate": 0.9
+            			"conception_rate": 0.55,
+                   		 "estrus_detection_rate": 0.9
                 }
         },
                 "cows": {
                     "estrus_detection_rate": 0.4,
-                    "estrus_conception_rate": 0.35,
-                    "presynch_protocol": "G6G",
-                    "resynch_protocol": "TAIafterPD",
-                    "repro_sub_protocol": "OvSynch 56",
-					"repro_sub_properties": {
-            "conception_rate": 0.45,
-                                        "tai_program_start_day": 0 
-}
-        },
-        "cow_repro_programs": {
-          "estrus_detection_rate": 0.4,
-          "estrus_service_rate": 0.95,
-          "ed_conception_rate": 0.35,
-          "cow_presynch_protocol": "G6G",
-          "cow_TAI_protocol": "OvSynch 56",
-          "ovsynch56_conception_rate": 0.45,
-          "ovsynch48_conception_rate": 0.35,
-          "cosynch72_conception_rate": 0.35,
-          "cosynch5d_conception_rate": 0.35,
-          "cow_resynch_protocol": "TAIafterPD",
-          "tai_program_start_day": 0
+                    "ED_conception_rate": 0.35,
+                    "presynch_program": "PreSynch",
+                    "presynch_program_start_day": 42,
+            		"ovsynch_program": "OvSynch 56",
+					"ovsynch_program_start_day": 70,
+					"ovsynch_program_conception_rate": 0.4,
+					"resynch_program": "TAIafterPD"
                 }
 			},
 			"bodyweight": {
@@ -162,7 +151,7 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 7582,
+			"number_of_stalls": 7600,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.5,
@@ -174,7 +163,7 @@
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 1573,
+			"number_of_stalls": 1600,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.5,
@@ -186,11 +175,11 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 184,
-			"number_of_stalls": 8136,
+			"number_of_stalls": 9000,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.5,
-			"manure_management_scenario_id": 3
+			"manure_management_scenario_id": 2
 		}
 	]
 }
