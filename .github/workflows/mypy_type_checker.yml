@@ -27,17 +27,18 @@ jobs:
 
       - name: Run mypy
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > ../mypy_report.txt 2>&1 || true
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > ./.github/workflows/mypy_report.txt 2>&1 || true
 
       - name: Update Mypy badge
         run: |
+          chmod +x ./.github/workflows/update_mypy_badge.sh
           ./.github/workflows/update_mypy_badge.sh
 
       - name: Commit & Push changes to README
         uses: EndBug/add-and-commit@v7
         with:
           message: "Update mypy badge on README"
-          add: "README.md ../mypy_report.txt"
+          add: "README.md mypy_report.txt"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
@@ -45,7 +46,7 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MYPY_ERROR_COUNT: $(grep -c "error:" ../mypy_report.txt)
+          MYPY_ERROR_COUNT: $(grep -c "error:" ./.github/workflows/mypy_report.txt)
         run: |
           if [ -n ${{ env.URL }} ]; then
             curl \
@@ -53,5 +54,5 @@ jobs:
               $URL \
               -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
               -H "Content-Type: application/json" \
-              -d "{\"body\": \"Mypy found ${{ env.MYPY_ERROR_COUNT }} errors. [Mypy Report](../mypy_report.txt)\"}" ${{ env.URL }}
+              -d "{\"body\": \"Mypy found ${{ env.MYPY_ERROR_COUNT }} errors. [Mypy Report](./.github/workflows/mypy_report.txt)\"}" ${{ env.URL }}
           fi
