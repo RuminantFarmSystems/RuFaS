@@ -76,7 +76,7 @@ class SimulationEngine:
         )
         t_end_sim = timer.time()
 
-        sys.stdout.write("\nSimulation Successful\n\n")
+        sys.stdout.write("\nSimulation Completed.\n\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
