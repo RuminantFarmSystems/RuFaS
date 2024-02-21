@@ -1,5 +1,5 @@
 from copy import deepcopy
-from functools import reduce
+from functools import reduce, lru_cache
 import json
 import os
 import re
@@ -1094,9 +1094,26 @@ class InputManager:
         om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
 
+    # @lru_cache(maxsize=128)
     def get_data(self, data_address: str) -> Any:
         """
         Get the requested data from the pool.
+
+        Notes
+        -----
+        To improve efficiency, the results of this function are cached using the lru_cache decorator.
+        This means that if the function is called with the same arguments, the result will be returned from the cache
+        instead of being recomputed. The cache has a maximum size of 128, meaning that only the 128 most recent calls
+        are cached. If the cache is full, the least recently used result is discarded.
+
+        As with all caching, it is important to be aware of the potential for stale data. If the data in the pool
+        changes after a result has been cached, the cached result may no longer be valid. In this case, it is
+        necessary to clear the cache using the clear_cache method. Currently, the input manager does not allow
+        modifying the data pool after loading, so this is not a concern yet. However, if the input manager is
+        extended to allow modifying the data pool, it will be important to update the cache accordingly.
+
+        Even when the data pool is not stale, an important assumption here is the method's idempotence. For the caching
+        to work as intended, the method must always return the same result when called with the same arguments.
 
         Parameters
         ----------
