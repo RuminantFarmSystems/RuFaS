@@ -77,6 +77,10 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - name: Run mypy on the current branch
+        run: |
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > mypy_current_branch_report.txt 2>&1 || true
+
       - name: Update Mypy badge
         run: |
           chmod +x ./.github/workflows/update_mypy_badge.sh
