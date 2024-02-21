@@ -45,7 +45,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/c1f2_feed_updated.json",
+      "path": "input/data/feed/c1f2_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },

@@ -1,8 +1,8 @@
 {
-  "calf_feeds": [202, 213],
-  "growing_feeds": [31, 91, 108, 135, 144, 136, 137, 248, 251],
-  "close_up_feeds": [91, 108, 118],
-  "lac_cow_feeds": [22, 31, 36, 91, 108, 118, 167, 230, 239, 231, 232, 248, 251],
+  "calf_feeds": [202, 216],
+  "growing_feeds": [31, 91, 108, 230, 239, 231, 232, 248, 251],
+  "close_up_feeds": [91, 108, 167],
+  "lac_cow_feeds": [22, 31, 46, 51, 91, 108, 110, 119, 167, 230, 239, 231, 232, 248, 251],
   "purchased_feeds": [
     {
       "purchased_feed":22,
@@ -13,11 +13,7 @@
       "purchased_feed_cost":0.49
     },
     {
-      "purchased_feed": 36,
-      "purchased_feed_cost": 0.1
-    },
-    {
-      "purchased_feed":118,
+      "purchased_feed":119,
       "purchased_feed_cost":0.38
     },
     {
@@ -50,22 +46,35 @@
     },
     {
       "purchased_feed": 91,
-      "purchased_feed_cost": 0.1
+      "purchased_feed_cost": 0.01
     },
     {
       "purchased_feed": 108,
-      "purchased_feed_cost": 0.1
+      "purchased_feed_cost": 0.01
     },
     {
       "purchased_feed": 202,
-      "purchased_feed_cost": 0.1
+      "purchased_feed_cost": 0.01
     },
     {
-      "purchased_feed": 213,
-      "purchased_feed_cost": 0.1
+      "purchased_feed": 216,
+      "purchased_feed_cost": 0.5
+    },
+    {
+      "purchased_feed": 46,
+      "purchased_feed_cost":0.5 
+    },
+    {
+      "purchased_feed": 51,
+      "purchased_feed_cost": 0.01
+    },
+    {
+      "purchased_feed": 110,
+      "purchased_feed_cost": 0.01
     }
   ],
   "farm_grown_feeds": [
+    1
   ],
   "storage_options": [
     {
