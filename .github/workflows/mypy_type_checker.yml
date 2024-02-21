@@ -77,14 +77,14 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Run mypy on the current branch
-        run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > mypy_current_branch_report.txt 2>&1 || true
+#      - name: Run mypy on the current branch
+#        run: |
+#          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > mypy_current_branch_report.txt 2>&1 || true
 
       - name: Update Mypy badge
         run: |
           chmod +x ./.github/workflows/update_mypy_badge.sh
-          ./.github/workflows/update_mypy_badge.sh
+          ./.github/workflows/update_mypy_badge.sh ${{ steps.set_current_branch_error_count.outputs.error_count }}
 
       - name: Commit & Push changes to README
         uses: EndBug/add-and-commit@v7
@@ -100,7 +100,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
-          MYPY_ERROR_COUNT=$(grep -c "error:" mypy_current_branch_report.txt)
+          MYPY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             curl \
               -X POST $URL \

@@ -1,7 +1,11 @@
 #! /bin/bash
 
-# Count the number of errors from mypy report
-error_count=$(grep -c "error:" mypy_current_branch_report.txt)
+# Pass the mypy error count as an argument
+if [ $# -eq 0 ]; then
+  echo "Please provide the mypy error count as an argument"
+  exit 1
+fi
+error_count=$1
 echo "Mypy errors: $error_count"
 
 # Assign color accordingly
