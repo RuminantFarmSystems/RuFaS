@@ -27,7 +27,7 @@ jobs:
 
       - name: Run mypy on the current branch
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_current_branch_report.txt || true
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee mypy_current_branch_report.txt || true
 
       - name: Checkout main branch
         if: github.ref != 'refs/heads/main'
@@ -44,13 +44,13 @@ jobs:
       - name: Run mypy on the main branch
         if: github.ref != 'refs/heads/main'
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_main_branch_report.txt || true
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee mypy_main_branch_report.txt || true
 
       - name: Compare mypy reports
         if: github.ref != 'refs/heads/main'
         run: |
-          CURRENT_ERRORS=$(grep -c "error:" ./.github/workflows/mypy_current_branch_report.txt)
-          MAIN_ERRORS=$(grep -c "error:" ./.github/workflows/mypy_main_branch_report.txt)
+          CURRENT_ERRORS=$(grep -c "error:" mypy_current_branch_report.txt)
+          MAIN_ERRORS=$(grep -c "error:" mypy_main_branch_report.txt)
           echo "Current branch mypy errors: $CURRENT_ERRORS"
           echo "Main branch mypy errors: $MAIN_ERRORS"
           if [ $CURRENT_ERRORS -gt $MAIN_ERRORS ]; then
@@ -79,7 +79,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
-          MYPY_ERROR_COUNT=$(grep -c "error:" ./.github/workflows/mypy_current_branch_report.txt)
+          MYPY_ERROR_COUNT=$(grep -c "error:" mypy_current_branch_report.txt)
           if [ -n "$URL" ]; then
             curl \
               -X POST $URL \
