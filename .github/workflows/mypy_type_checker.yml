@@ -25,9 +25,40 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run mypy
+      - name: Run mypy on the current branch
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_report.txt || true
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_current_branch_report.txt || true
+
+      - name: Checkout main branch
+        if: github.ref != 'refs/heads/main'
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Install dependencies for main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run mypy on the main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_main_branch_report.txt || true
+
+      - name: Compare mypy reports
+        if: github.ref != 'refs/heads/main'
+        run: |
+          CURRENT_ERRORS=$(grep -c "error:" ./.github/workflows/mypy_current_branch_report.txt)
+          MAIN_ERRORS=$(grep -c "error:" ./.github/workflows/mypy_main_branch_report.txt)
+          echo "Current branch mypy errors: $CURRENT_ERRORS"
+          echo "Main branch mypy errors: $MAIN_ERRORS"
+          if [ $CURRENT_ERRORS -gt $MAIN_ERRORS ]; then
+            echo "Mypy error count has increased from the main branch to the current branch ($MAIN_ERRORS -> $CURRENT_ERRORS)."
+            exit 1
+          else
+            echo "No increase in mypy errors found."
+          fi
 
       - name: Update Mypy badge
         run: |
@@ -48,7 +79,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
-          MYPY_ERROR_COUNT=$(grep -c "error:" ./.github/workflows/mypy_report.txt)
+          MYPY_ERROR_COUNT=$(grep -c "error:" ./.github/workflows/mypy_current_branch_report.txt)
           if [ -n "$URL" ]; then
             curl \
               -X POST $URL \
