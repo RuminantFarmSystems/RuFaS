@@ -742,15 +742,24 @@ class OutputManager(object):
             try:
                 for prefix, handler_function in filter_type_to_handler_map.items():
                     if filter_file.startswith(prefix):
-                        handler_function(filter_file, save_path, produce_graphics, filter_contents,
-                                         graphics_dir, csv_dir, exclude_info_maps)
+                        handler_function(
+                            filter_file,
+                            save_path,
+                            produce_graphics,
+                            filter_contents,
+                            graphics_dir,
+                            csv_dir,
+                            exclude_info_maps,
+                        )
                         break
             except KeyError:
-                raise KeyError(f"Invalid prefix {filter_file}: "
-                               f"File name must start with {filter_type_to_handler_map.keys()}")
+                raise KeyError(
+                    f"Invalid prefix {filter_file}: " f"File name must start with {filter_type_to_handler_map.keys()}"
+                )
 
-    def _handle_report_filter(self, filter_file, save_path, produce_graphics,
-                              filter_contents, graphics_dir, csv_dir, exclude_info_maps):
+    def _handle_report_filter(
+        self, filter_file, save_path, produce_graphics, filter_contents, graphics_dir, csv_dir, exclude_info_maps
+    ):
         report_generator = ReportGenerator()
         for filter_content in filter_contents:
             is_filter_valid = self._validate_filter(filter_content, filter_file)
@@ -761,8 +770,9 @@ class OutputManager(object):
                 filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
-            log_pool, report_data_to_be_graphed, report_name = \
-                report_generator.generate_report(filter_content, filtered_pool)
+            log_pool, report_data_to_be_graphed, report_name = report_generator.generate_report(
+                filter_content, filtered_pool
+            )
             self._route_logs(log_pool)
             if report_data_to_be_graphed:
                 if produce_graphics:
@@ -792,12 +802,16 @@ class OutputManager(object):
                         info_map,
                     )
         if report_generator.reports:
-            report_file_path = os.path.join(save_path, self.generate_file_name(f"report_{filter_file}", "csv"),)
+            report_file_path = os.path.join(
+                save_path,
+                self.generate_file_name(f"report_{filter_file}", "csv"),
+            )
             self._dict_to_file_csv(report_generator.reports, report_file_path)
             report_generator.clear_reports()
 
-    def _handle_graph_filter(self, filter_file, save_path, produce_graphics, filter_contents,
-                             graphics_dir, csv_dir, exclude_info_maps):
+    def _handle_graph_filter(
+        self, filter_file, save_path, produce_graphics, filter_contents, graphics_dir, csv_dir, exclude_info_maps
+    ):
         if produce_graphics:
             self.create_directory(graphics_dir)
             for filter_content in filter_contents:
@@ -831,8 +845,9 @@ class OutputManager(object):
                 info_map,
             )
 
-    def _handle_csv_filter(self, filter_file, save_path, produce_graphics, filter_contents,
-                           graphics_dir, csv_dir, exclude_info_maps):
+    def _handle_csv_filter(
+        self, filter_file, save_path, produce_graphics, filter_contents, graphics_dir, csv_dir, exclude_info_maps
+    ):
         self.create_directory(csv_dir)
         for filter_content in filter_contents:
             is_filter_valid = self._validate_filter(filter_content, filter_file)
@@ -848,8 +863,9 @@ class OutputManager(object):
             )
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
 
-    def _handle_json_filter(self, filter_file, save_path, produce_graphics, filter_contents,
-                            graphics_dir, csv_dir, exclude_info_maps):
+    def _handle_json_filter(
+        self, filter_file, save_path, produce_graphics, filter_contents, graphics_dir, csv_dir, exclude_info_maps
+    ):
         for filter_content in filter_contents:
             is_filter_valid = self._validate_filter(filter_content, filter_file)
             if not is_filter_valid:

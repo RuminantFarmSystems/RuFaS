@@ -208,8 +208,8 @@ class ReportGenerator:
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}"
-                    if len(individual_report_name) > 0 else col)
+                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                )
                 report_filter_data[column_name] = {"values": values}
 
             if should_graph_report_data:
