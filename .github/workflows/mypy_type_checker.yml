@@ -27,7 +27,7 @@ jobs:
 
       - name: Run mypy
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py > ./.github/workflows/mypy_report.txt 2>&1 || true
+          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee ./.github/workflows/mypy_report.txt || true
 
       - name: Update Mypy badge
         run: |
@@ -54,5 +54,5 @@ jobs:
               -X POST $URL \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
-              -d "{\"body\": \"Mypy found $MYPY_ERROR_COUNT errors. [View Mypy Report](https://github.com/${{ github.repository }}/blob/${{ env.BRANCH_NAME }}/.github/workflows/mypy_report.txt)\"}"
+              -d "{\"body\": \"Mypy found $MYPY_ERROR_COUNT errors.\"}"
           fi
