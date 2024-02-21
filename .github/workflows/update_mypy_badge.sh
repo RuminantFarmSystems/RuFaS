@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Count the number of errors from mypy report
-error_count=$(grep -c "error:" ./.github/workflows/mypy_report.txt)
+error_count=$(grep -c "error:" ./.github/workflows/mypy_current_branch_report.txt)
 echo "Mypy errors: $error_count"
 
 # Assign color accordingly
