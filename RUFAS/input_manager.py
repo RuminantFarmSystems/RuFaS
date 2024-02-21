@@ -47,7 +47,8 @@ class InputManager:
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
             self.data_validator = DataValidator()
-        self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
+            self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
+            self.__properties_used: Dict[str, Any] = {}
 
     @property
     def meta_data(self) -> Dict[str, Any]:

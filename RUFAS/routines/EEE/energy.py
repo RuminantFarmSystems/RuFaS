@@ -30,18 +30,19 @@ class EnergyEstimator:
         herd_size = im.get_data("animal.herd_information.herd_num")
         for diesel_consumption_data_item in diesel_conumption_data_list:
             tractor = Tractor(
-                diesel_consumption_data_item["event_type"],
-                diesel_consumption_data_item.get("crop_type"),
-                herd_size,
-                diesel_consumption_data_item.get("application_depth"),
+                operation_event=diesel_consumption_data_item["operation_event"],
+                crop_type=diesel_consumption_data_item.get("crop_type"),
+                herd_size=herd_size,
+                application_depth=diesel_consumption_data_item.get("application_depth"),
+                tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
             )
-
             diesel_consumption_tractor_implement_liter_per_ton = estimator.calculate_diesel_consumption(
-                diesel_consumption_data_item.get("crop_yield", 0),
+                diesel_consumption_data_item.get("crop_yield", 1),
                 diesel_consumption_data_item["field_production_size"],
                 tractor,
                 diesel_consumption_data_item.get("clay_percent", 0),
             )
+            print(f"{diesel_consumption_tractor_implement_liter_per_ton=}")
             variable_info_map = {"unit": "liter/tone", "tractor_size": tractor.tractor_size}
             om.add_variable(
                 "diesel_consumption_tractor_implement",
@@ -66,7 +67,7 @@ class EnergyEstimator:
                 "variables": ["mass", "application_depth", "field_size", "average_clay_percent"],
             },
             {
-                "name": "Tillage",
+                "name": FieldOperationEvent.TILLING,
                 "use_name": True,
                 "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
                 "variables": ["tillage_depth", "implement", "field_size", "average_clay_percent"],
@@ -109,14 +110,14 @@ class EnergyEstimator:
                 "field_production_size": "field_size",
             },
             FieldOperationEvent.MANURE_APPLICATION: {
-                "mass": ".dry_matter_mass",
+                "mass": "dry_matter_mass",
                 "application_depth": "application_depth",
                 "field_production_size": "field_size",
                 "clay_percent": "average_clay_percent",
             },
             FieldOperationEvent.TILLING: {
-                "tillage_depth": "tillage_depth",
-                "implement": "implement",
+                "application_depth": "tillage_depth",
+                "tillage_implement": "implement",
                 "field_production_size": "field_size",
                 "clay_percent": "average_clay_percent",
             },
@@ -133,17 +134,17 @@ class EnergyEstimator:
             first_key_in_pool = next(iter(filtered_pool.keys()))
             for event_type, key_mappings in eee_to_om_key_mapping.items():
                 if first_key_in_pool.startswith(event_type.value):
-                    for index in range(max_index):
+                    for index in range(max_index + 1):
                         key_prefix = f"{event_type}_{index}"
-                        first_key_in_the_map = next(iter(key_mappings.keys()))
-                        length = len(filtered_pool[f"{key_prefix}.{first_key_in_the_map}"])
-                        event_data = {
-                            key_mappings[k]: filtered_pool[f"{key_prefix}.{key_mappings[k]}"][i]
-                            for i in range(length)
-                            for k in key_mappings.keys()
-                        }
-                        event_data["operation_event"] = event_type
-                        result.append(event_data)
+                        _, first_om_key_in_the_map = next(iter(key_mappings.items()))
+                        length = len(filtered_pool[f"{key_prefix}.{first_om_key_in_the_map}"])
+                        for i in range(length):
+                            event_data = {
+                                eee_key: filtered_pool[f"{key_prefix}.{om_key_suffix}"][i]
+                                for eee_key, om_key_suffix in key_mappings.items()
+                            }
+                            event_data["operation_event"] = event_type
+                            result.append(event_data)
         return result
 
     def calculate_diesel_consumption(

@@ -1,7 +1,7 @@
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from .enums import FieldOperationEvent, OperationType, TractorSize
+from .enums import FieldOperationEvent, OperationType, TractorSize, TillageImplement
 
 input_manager = InputManager()
 
@@ -13,18 +13,21 @@ class TractorImplement:
         operation_type: OperationType,
         crop_type: CropSpecies | None,
         tractor_size: TractorSize,
+        tillage_implement: TillageImplement | None,
+        application_depth: float | None,
     ) -> None:
         self.operation_event = operation_event
         self.operation_type = operation_type
         self.crop_type = crop_type
         self.tractor_size = tractor_size
+        self.tillage_implement = tillage_implement
         constants = input_manager.get_data("EEE_constants.constants")
         constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
         self.field_speed_km_per_hr = constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
         self.field_efficiency = constants_by_ID[587]["Value"]  # Constant 587 in EEE Functions file
-        self.determine_implement_parameters()
+        self.determine_implement_parameters(application_depth)
 
-    def determine_implement_parameters(self) -> None:
+    def determine_implement_parameters(self, application_depth: float | None) -> None:
         """
         Assign a tractor implement based on the operation, tractor size, and crop type where applicable. Not all
         operations are depended on crop type.
@@ -32,10 +35,13 @@ class TractorImplement:
         """
         dataset_raw = input_manager.get_data("tractor_dataset")
         dataset = Utility.convert_dict_of_lists_to_list_of_dicts(dataset_raw)
-        crop_name = self.crop_type.value.lower() if self.crop_type else "none"
+        if self.operation_type == OperationType.TILLING:
+            crop_type_or_tillage_implement = self.tillage_implement.value.lower()
+        else:
+            crop_type_or_tillage_implement = self.crop_type.value.lower() if self.crop_type else "none"
         for data_entry in dataset:
             if (
-                data_entry.get("Crop Type or Tillage Implement").lower() in [crop_name, "none"]
+                data_entry.get("Crop Type or Tillage Implement").lower() in [crop_type_or_tillage_implement, "none"]
                 and data_entry.get("Tractor Size").lower() == self.tractor_size.value.lower()
                 and data_entry.get("Operation").lower() == self.operation_type.value.lower()
             ):
@@ -49,11 +55,23 @@ class TractorImplement:
                 self.width_m = data_entry["Tractor Implement Width (m)"]
                 self.mass_kg = data_entry["Tractor Implement Mass (kg)"]
                 self.throughput = data_entry["Max Throughput (tons dm/hour)"]
-                self.depth_cm = data_entry[
-                    "Depth"
-                ]  # TODO get the value from S&C if operation is tilling or manure or fertizlier applications
+                if self.operation_type in [
+                    OperationType.TILLING,
+                    OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE,
+                    OperationType.FERTILIZER_APPLICATION_SURFACE,
+                    OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE,
+                    OperationType.LIQUID_MANURE_APPLICATION_SURFACE,
+                ]:
+                    self.depth_cm = application_depth
+                else:
+                    self.depth_cm = data_entry["Depth"]
                 self.is_depth_relevant = data_entry["is depth relevant"]
                 break
+        else:
+            print("no match for:")
+            print(f"{self.tractor_size.value.lower()=}")
+            print(f"{self.operation_type.value.lower()=}")
+            print(f"{crop_type_or_tillage_implement}")
 
     def field_capacity_ha_per_hr(self, crop_yield_ton_per_ha: float | None) -> float:
         """

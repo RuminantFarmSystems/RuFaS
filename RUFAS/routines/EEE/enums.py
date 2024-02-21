@@ -34,8 +34,8 @@ class OperationType(EnumWithStrOverride):
 
 
 class FieldOperationEvent(EnumWithStrOverride):
-    HARVEST = "harvest"
+    HARVEST = "Harvest"
     FERTILIZER_APPLICATION = "Fertilizer Application"
     MANURE_APPLICATION = "Manure Application"
-    PLANTING = "planting"
-    TILLING = "tilling"
+    PLANTING = "Planting"
+    TILLING = "Tilling"

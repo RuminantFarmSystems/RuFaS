@@ -3,7 +3,7 @@ from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from .enums import TractorSize, FieldOperationEvent, OperationType
+from .enums import TractorSize, FieldOperationEvent, OperationType, TillageImplement
 
 input_manager = InputManager()
 
@@ -21,6 +21,7 @@ class Tractor:
         tractor_size: TractorSize | None = None,
         herd_size: int | None = None,
         application_depth: float | None = None,
+        tillage_implement: TillageImplement | None = None,
     ) -> None:
         """
         Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
@@ -45,7 +46,9 @@ class Tractor:
         self.tractor_size = tractor_size or self.herd_size_to_tractor_size(herd_size)
         self.operation_types = self.determine_operation_type(application_depth)
         self.implements = [
-            TractorImplement(operation_event, operation_type, crop_type, self.tractor_size)
+            TractorImplement(
+                operation_event, operation_type, crop_type, self.tractor_size, tillage_implement, application_depth
+            )
             for operation_type in self.operation_types
         ]
         constants = input_manager.get_data("EEE_constants.constants")
