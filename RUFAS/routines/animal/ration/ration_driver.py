@@ -50,8 +50,12 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
+        if hasattr(pen, "ration_per_animal"):
+            previous_ration = pen.ration_per_animal
+        else:
+            previous_ration = None
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination
+            req, available_feeds, pen.animal_combination, previous_ration
         )
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
@@ -70,13 +74,12 @@ class RationManager:
                         constraints_failed_list.append(constr["fun"].__name__)
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
-
                 req.set_requirements(pen, animal_grouping_scenario, True)
                 (
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 info_map = {
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
@@ -242,9 +245,12 @@ class RationManager:
         fixed_ration = False
         num_reattempts = 0
         constraints_failed_list = []
-
+        if hasattr(pen, "ration_per_animal"):
+            previous_ration = pen.ration_per_animal
+        else:
+            previous_ration = None
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination
+            req, available_feeds, pen.animal_combination, previous_ration
         )
         if pen.animal_combination.name in ["LAC_COW"]:
             failed_constraints = ration_optimizer.find_failed_constraints(
@@ -300,7 +306,7 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
