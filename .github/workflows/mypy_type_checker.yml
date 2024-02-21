@@ -46,7 +46,7 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref }} || ${{ github.ref }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
           MYPY_ERROR_COUNT=$(grep -c "error:" ./.github/workflows/mypy_report.txt)
           if [ -n "$URL" ]; then
