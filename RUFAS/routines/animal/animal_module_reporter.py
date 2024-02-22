@@ -406,8 +406,8 @@ class AnimalModuleReporter:
 
     def report_daily_pen_total(penlist):
         info_map = {
-            "class": "AnimalModuleReporter",
-            "function": "report_daily_pen_total",
+            "class": AnimalModuleReporter.__class__.__name__,
+            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
         }
         for pen in penlist:
             om.add_variable(
