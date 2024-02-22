@@ -4,24 +4,41 @@ from dataclasses import dataclass, fields
 
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
+class FloatWithUnit(Float):
+    def __init__(self, unit: str = "unitless"):
+        super.__init__()
+        self.unit = unit
+
+    def __eq__(self, other) -> bool:
+        if self == other:
+            return True
+        if self == LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
+            return True
+        if self == LogVerbosity.LOGS:
+            return False
+        return False
 
 @dataclass(kw_only=True, frozen=True)
 class ManureNutrients:
     """A class to store the relevant manure nutrient information to be passed to the crop and soil module"""
 
-    nitrogen: float = 0.0
+    nitrogen: FloatWithUnit = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
 
-    phosphorus: float = 0.0
+    phosphorus: FloatWithUnit = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
 
-    potassium: float = 0.0
+    potassium: FloatWithUnit = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
 
-    dry_matter: float = 0.0
+    dry_matter: FloatWithUnit = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
 
-    total_manure_mass: float = 0.0
+    total_manure_mass: FloatWithUnit = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
 
     manure_type: ManureType
