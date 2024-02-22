@@ -328,7 +328,7 @@ class TillageApplication:
             "class": self.__class__.__name__,
             "function": self._record_tillage.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": units
+            "units": units,
         }
         value = {
             "tillage_depth": tillage_depth,

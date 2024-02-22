@@ -322,7 +322,7 @@ class CropManagement:
             "class": self.__class__.__name__,
             "function": self._record_yield.__name__,
             "suffix": f"field='{field_name}'",
-            "units": units
+            "units": units,
         }
         value = {
             "crop": self.data.species,
