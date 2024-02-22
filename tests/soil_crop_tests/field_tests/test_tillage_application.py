@@ -181,10 +181,21 @@ def test_record_tillage(
     till_app = TillageApplication(field_data=field_data_1)
 
     expected_clay_percent = 25.0
+    expected_units = {
+        "tillage_depth": "mm",
+        "incorporation_fraction": "unitless",
+        "mixing_fraction": "unitless",
+        "implement": "unitless",
+        "year": "unitless",
+        "day": "unitless",
+        "field_size": "ha",
+        "average_clay_percent": "unitless",
+    }
     expected_info_map = {
         "class": TillageApplication.__name__,
         "function": TillageApplication._record_tillage.__name__,
         "suffix": "field='field1'",
+        "units": expected_units
     }
     expected_value = {
         "tillage_depth": till_depth,
