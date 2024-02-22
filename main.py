@@ -25,7 +25,6 @@ from RUFAS.simulation_engine import SimulationEngine
 
 def main():
     cmd_arguments = parse_gnu_args()
-
     if cmd_arguments.load_pool:
         load_pool = True
     else:
