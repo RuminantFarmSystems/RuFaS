@@ -56,9 +56,8 @@ class FieldDataReporter:
             )
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, dict(info_map, **{"units": "mm"}))
             om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, dict(info_map, **{"units": "mm"}))
-            # confirm unit
-            om.add_variable("snow_content", field.soil.data.snow_content, dict(info_map, **{"units": "mm H2O"}))
-            om.add_variable("snow_melt", field.soil.data.snow_melt_amount, dict(info_map, **{"units": "mm H2O"}))
+            om.add_variable("snow_content", field.soil.data.snow_content, dict(info_map, **{"units": "mm"}))
+            om.add_variable("snow_melt", field.soil.data.snow_melt_amount, dict(info_map, **{"units": "mm"}))
             om.add_variable(
                 "current_day_snow_temperature",
                 field.soil.data.current_day_snow_temperature,
@@ -221,7 +220,6 @@ class FieldDataReporter:
                 dict(info_map, **{"units": "kg/ha"}),
             )
 
-            # confirm unit
             om.add_variable(
                 "profile_carbon_total", field.soil.data.profile_carbon_total, dict(info_map, **{"units": "kg/ha"})
             )
@@ -509,13 +507,11 @@ class FieldDataReporter:
                     layer.fresh_organic_phosphorus_content,
                     dict(info_map, **{"units": "kg/ha"}),
                 )
-                # confirm unit
                 om.add_variable(
                     "active_inorganic_unbalanced_counter",
                     layer.active_inorganic_unbalanced_counter,
                     dict(info_map, **{"units": "days"}),
                 )
-                # confirm unit
                 om.add_variable(
                     "labile_inorganic_unbalanced_counter",
                     layer.labile_inorganic_unbalanced_counter,
