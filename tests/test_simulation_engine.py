@@ -27,6 +27,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
 
     # Arrange
     patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
+    patch_for_output_manager.get_error_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     patch_for_sys_stdout_write = mocker.patch("RUFAS.simulation_engine.sys.stdout.write")
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
@@ -53,12 +54,14 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
 
     # Assert
     patch_for_run_simulation_main_loop.assert_called_once()
-    patch_for_sys_stdout_write.assert_called_once_with("\nSimulation Completed.\n\n")
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.state.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
+    patch_for_sys_stdout_write.assert_has_calls(
+        [mocker.call("\nSimulation Completed.\n\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
+    )
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:

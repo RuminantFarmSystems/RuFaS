@@ -1845,3 +1845,31 @@ def test_log_verbosity_enum_values() -> None:
     assert LogVerbosity.ERRORS.value == "errors"
     assert LogVerbosity.WARNINGS.value == "warnings"
     assert LogVerbosity.LOGS.value == "logs"
+
+
+@pytest.mark.parametrize(
+    "errors_pool, warnings_pool, expected",
+    [
+        ({}, {}, (0, 0)),
+        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
+        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
+        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
+    ],
+)
+def test_get_error_warning_counts(
+    mocker: MockerFixture,
+    errors_pool: dict[str, dict[str, list]],
+    warnings_pool: dict[str, dict[str, list]],
+    expected: tuple[int, int],
+) -> None:
+    """
+    Unit test for the get_error_warning_counts() method in OutputManager class
+    """
+
+    # Arrange
+    om = OutputManager()
+    mocker.patch.object(om, "errors_pool", errors_pool)
+    mocker.patch.object(om, "warnings_pool", warnings_pool)
+
+    # Act and Assert
+    assert om.get_error_warning_counts() == expected

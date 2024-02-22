@@ -49,4 +49,5 @@ class MetadataPaths(TypedDict):
 
 METADATA_PATHS: List[MetadataPaths] = [
     {"prefix": "default", "path": Path("input/metadata/default_metadata.json")},
+    {"prefix": "multi_crop", "path": Path("input/metadata/multi_crop_metadata.json")},
 ]
