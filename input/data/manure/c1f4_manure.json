@@ -19,7 +19,7 @@
     {
       "scenario_id": 2,
       "bedding_type": "sand",
-      "manure_handler": "flush",
+      "manure_handler": "flush system",
       "manure_separator": "rotary screen",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
