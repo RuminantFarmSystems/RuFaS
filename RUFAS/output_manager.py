@@ -114,6 +114,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self._stdout_queue: List[str] = []
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -1124,3 +1125,44 @@ class OutputManager(object):
             self.add_error("Permission Error", f"{path=}; Exception: {str(e)}", info_map)
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
+
+    def get_error_warning_counts(self) -> tuple[int, int]:
+        """
+        Get the total number of errors and warnings in the output manager's error and warning pools.
+
+        Returns
+        -------
+        tuple[int, int]
+            The total number of errors and warnings in the output manager's error and warning pools.
+        """
+
+        errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
+        warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
+        return errors_count, warnings_count
+
+    def add_to_stdout_queue(self, msg: str) -> None:
+        """
+        Adds a message to the stdout queue.
+
+        Parameters
+        ----------
+        msg : str
+            The message to be added to the stdout queue.
+        """
+
+        self._stdout_queue.append(msg)
+
+    def show_stdout_queue(self) -> None:
+        """
+        Prints all the messages in the stdout queue.
+        """
+
+        for msg in self._stdout_queue:
+            sys.stdout.write(msg)
+
+    def clear_stdout_queue(self) -> None:
+        """
+        Clears the stdout queue.
+        """
+
+        self._stdout_queue.clear()
