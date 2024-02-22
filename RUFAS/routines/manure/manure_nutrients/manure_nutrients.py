@@ -4,6 +4,7 @@ from dataclasses import dataclass, fields
 
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
+
 class FloatWithUnit(Float):
     def __init__(self, unit: str = "unitless"):
         super.__init__()
@@ -21,6 +22,7 @@ class FloatWithUnit(Float):
         if self == LogVerbosity.LOGS:
             return False
         return False
+
 
 @dataclass(kw_only=True, frozen=True)
 class ManureNutrients:
