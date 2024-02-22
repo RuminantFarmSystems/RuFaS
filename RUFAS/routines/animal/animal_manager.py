@@ -1875,8 +1875,9 @@ class AnimalManager:
             if HeiferII.stats["num_ai_performed_in_SynchED"] > 0
             else 0
         )
-        om.add_variable("heiferII_SynchED_conception_rate", synch_ed_conception_rate,
-                        dict(info_map, **{"units": "unitless"}))
+        om.add_variable(
+            "heiferII_SynchED_conception_rate", synch_ed_conception_rate, dict(info_map, **{"units": "unitless"})
+        )
 
     def _record_cows_conception_rate(self) -> None:
         """
@@ -1887,8 +1888,9 @@ class AnimalManager:
             "class": self.__class__.__name__,
             "function": self._record_cows_conception_rate.__name__,
         }
-        om.add_variable("cow_total_num_ai_performed", Cow.stats["num_ai_performed"],
-                        dict(info_map, **{"units": "unitless"}))
+        om.add_variable(
+            "cow_total_num_ai_performed", Cow.stats["num_ai_performed"], dict(info_map, **{"units": "unitless"})
+        )
         om.add_variable(
             "cow_total_num_successful_conceptions",
             Cow.stats["num_successful_conceptions"],
@@ -1899,8 +1901,9 @@ class AnimalManager:
             if Cow.stats["num_ai_performed"] > 0
             else 0
         )
-        om.add_variable("cow_overall_conception_rate", cow_overall_conception_rate,
-                        dict(info_map, **{"units": "unitless"}))
+        om.add_variable(
+            "cow_overall_conception_rate", cow_overall_conception_rate, dict(info_map, **{"units": "unitless"})
+        )
 
     def _record_culling_stats(self) -> None:
         """

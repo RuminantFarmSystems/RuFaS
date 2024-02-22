@@ -303,8 +303,11 @@ class RationManager:
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                 "pen requirements": pen.avg_nutrient_rqmts,
             }
-            om.add_variable(f"failed_constraint_summary_for_pen_{pen.id}", fail_summary,
-                            dict(info_map, **{"units": fail_summary_units}))
+            om.add_variable(
+                f"failed_constraint_summary_for_pen_{pen.id}",
+                fail_summary,
+                dict(info_map, **{"units": fail_summary_units}),
+            )
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
