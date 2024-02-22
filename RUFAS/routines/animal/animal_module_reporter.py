@@ -406,7 +406,7 @@ class AnimalModuleReporter:
 
     def report_daily_pen_total(penlist):
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_pen_total.__name__,
         }
         for pen in penlist:
