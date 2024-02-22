@@ -43,8 +43,8 @@ class State:
         manure_class_config = im.get_data("manure_management")
         animal_class_config = im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
-        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
-        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
+        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time, manure_class_config)
+        self.manure_manager = ManureManager(self.animal_manager.all_pens, weather, time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=feed_manager)
 

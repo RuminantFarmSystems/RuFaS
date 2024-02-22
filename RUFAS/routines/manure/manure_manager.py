@@ -5,7 +5,6 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 
-from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
@@ -82,15 +81,13 @@ class ManureManager:
 
     """
 
-    def __init__(self, animal_manager: AnimalManager, weather, time, manure_manager_config):
+    def __init__(self, pen_list, weather, time, manure_manager_config):
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            A reference to the AnimalManager object that is one of the attributes
-            of the simulation engine object.
+
         weather : Weather
             The Weather object used to initialize State variables.
         time : Time
@@ -111,7 +108,7 @@ class ManureManager:
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
-        self._configure_manure_manager_components(animal_manager)
+        self.configure_manure_manager_components(pen_list)
 
     @property
     def data(self) -> list[dict]:
@@ -139,7 +136,7 @@ class ManureManager:
         """
         return self._daily_output_per_pen
 
-    def _configure_manure_manager_components(self, animal_manager: AnimalManager) -> None:
+    def configure_manure_manager_components(self, pen_list) -> None:
         """Configures the manure manager components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
@@ -147,11 +144,10 @@ class ManureManager:
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            An AnimalManager object obtained from the animal module.
+
 
         """
-        for pen in animal_manager.all_pens:
+        for pen in pen_list:
             mm_pen = ManureManagerPen(pen)
 
             custom_bedding_config = self.manure_manager_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
@@ -202,7 +198,7 @@ class ManureManager:
                 custom_manure_treatment_config=custom_manure_treatment_config,  # type: ignore
             )
 
-    def daily_update(self, animal_manager: AnimalManager) -> None:
+    def daily_update(self, pen_list, simulation_day: int) -> None:
         """Calculates daily output data for each manure manager component for each animal pen.
 
         On the last day of the simulation, all the data generated daily by the manure manager
@@ -210,12 +206,16 @@ class ManureManager:
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            The current state of the AnimalManager object.
+
 
         """
-        for pen in animal_manager.all_pens:
-            self._pen_daily_update(animal_manager.simulation_day, pen)
+        # configure newly created pens (if they exist)
+        number_of_new_pens = len(pen_list) - len(self.manure_treatments)
+        if number_of_new_pens > 0:
+            self.configure_manure_manager_components(pen_list[len(self.manure_treatments):])
+            print('something')
+        for pen in pen_list:
+            self._pen_daily_update(simulation_day, pen)
 
         ManureModuleOutputManagerHelper.add_dataclass_object(
             self._manure_nutrient_manager.get_values(ManureType.LIQUID),
@@ -730,7 +730,7 @@ class ManureManager:
         )
 
 
-def simulate_daily_manure_manager(manure_manager: ManureManager, animal_manager: AnimalManager) -> None:
+def simulate_daily_manure_manager(manure_manager: ManureManager, penlist, simulation_day) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 
     There is no strict reason why this function is needed. It is simply to make the code
@@ -746,4 +746,4 @@ def simulate_daily_manure_manager(manure_manager: ManureManager, animal_manager:
         so the latest data can be passed to the ManureManager object.
 
     """
-    manure_manager.daily_update(animal_manager)
+    manure_manager.daily_update(penlist, simulation_day)
