@@ -3,6 +3,20 @@
     "close_up_feeds": [81,111, 131, 152, 158],
     "lac_cow_feeds": [19, 25, 27, 81, 118, 152, 158],
 
+
+    155 - 202 whole milk
+157 - 216 starter 
+19 - 31 canola 
+51 - 89 grass hay 
+81 - 104 mixed haylage 
+111 - 156 sorghum silage 
+131 - 200 wheat straw 
+152 - 247 ca cloride dihydrate 
+158 - 51 corn silage
+25 - 42 dried corn gluten meal 
+27 - 44 ground corn grain 
+118 - 167 soybean meal 
+
    "purchased_feeds": [
     {
       "purchased_feed": 19,
