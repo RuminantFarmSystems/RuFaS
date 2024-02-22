@@ -319,10 +319,10 @@ class TillageApplication:
             "incorporation_fraction": "unitless",
             "mixing_fraction": "unitless",
             "implement": "unitless",
-            "year": "unitless",
-            "day": "unitless",
+            "year": "year",
+            "day": "day",
             "field_size": "ha",
-            "average_clay_percent": "unitless",
+            "average_clay_percent": "percent",
         }
         info_map = {
             "class": self.__class__.__name__,
