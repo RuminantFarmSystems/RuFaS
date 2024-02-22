@@ -49,7 +49,7 @@ jobs:
       - name: Run mypy on the main branch
         if: github.ref != 'refs/heads/main'
         run: |
-          python -m mypy --install-types --non-interactive --strict RUFAS tests main.py setup.py 2>&1 | tee mypy_main_branch_report.txt || true
+          mypy . 2>&1 | tee mypy_main_branch_report.txt || true
           grep -c "error:" mypy_main_branch_report.txt > mypy_main_branch_error_count.txt
 
       - name: Set main branch error count as output
