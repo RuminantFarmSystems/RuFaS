@@ -299,6 +299,21 @@ class CropManagement:
             Julian day on which this harvest occurred.
 
         """
+        units = {
+            "crop": "unitless",
+            "wet_yield": "kg/ha",
+            "dry_yield": "kg/ha",
+            "nitrogen": "kg/ha",
+            "phosphorus": "kg/ha",
+            "yield_residue": "kg/ha",
+            "harvest_index": "unitless",
+            "planting_date": {
+                "year": "unitless",
+                "day": "unitless",
+            },
+            "harvest_date": {"year": "unitless", "day": "unitless"},
+            "field_size": "ha",
+        }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
         nitrogen_harvested = self.data.yield_nitrogen
@@ -307,6 +322,7 @@ class CropManagement:
             "class": self.__class__.__name__,
             "function": self._record_yield.__name__,
             "suffix": f"field='{field_name}'",
+            "units": units
         }
         value = {
             "crop": self.data.species,
