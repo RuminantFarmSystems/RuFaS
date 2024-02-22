@@ -212,8 +212,8 @@ class ManureManager:
         # configure newly created pens (if they exist)
         number_of_new_pens = len(pen_list) - len(self.manure_treatments)
         if number_of_new_pens > 0:
-            self.configure_manure_manager_components(pen_list[len(self.manure_treatments):])
-            print('something')
+            self.configure_manure_manager_components(pen_list[len(self.manure_treatments) :])
+            print("something")
         for pen in pen_list:
             self._pen_daily_update(simulation_day, pen)
 
