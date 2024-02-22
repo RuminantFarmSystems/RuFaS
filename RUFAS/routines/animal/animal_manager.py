@@ -1738,7 +1738,7 @@ class AnimalManager:
             om.add_variable(
                 f"{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}",
                 animal.events,
-                info_map,
+                dict(info_map, **{"units": "unitless"}),
             )
 
     def _record_animal_counts(self) -> None:
