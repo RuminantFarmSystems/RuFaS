@@ -473,11 +473,24 @@ class Field:
             Julian day on which this fertilizer application is occurring.
 
         """
+        units = {
+            "mass": "kg",
+            "nitrogen": "kg",
+            "phosphorus": "kg",
+            "potassium": "kg",
+            "application_depth": "mm",
+            "surface_remainder_fraction": "unitless",
+            "year": "unitless",
+            "day": "unitless",
+            "field_size": "ha",
+            "average_clay_percent": "unitless",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_fertilizer_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "mix_name": mix_name,
+            "units": units,
         }
         value = {
             "mass": total_mass,
@@ -688,10 +701,25 @@ class Field:
             Mass of potassium in the manure applied (kg)
 
         """
+        units = {
+            "dry_matter_mass": "kg",
+            "dry_matter_fraction": "unitless",
+            "field_coverage": "unitless",
+            "application_depth": "mm",
+            "surface_remainder_fraction": "unitless",
+            "nitrogen": "kg",
+            "phosphorus": "kg",
+            "potassium": "kg",
+            "day": "unitless",
+            "year": "unitless",
+            "field_size": "ha",
+            "average_clay_percent": "unitless",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
+            "units": units,
         }
         value = {
             "dry_matter_mass": dry_matter_mass,
@@ -1012,10 +1040,18 @@ class Field:
             Julian day on which this crop planting occurs.
 
         """
+        units = {
+            "crop": "unitless",
+            "heat_scheduled_harvest": "unitless",
+            "date": {"year": "unitless", "day": "unitless"},
+            "field_size": "ha",
+            "average_clay_percent": "unitless",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_planting.__name__,
             "suffix": f"field='{self.field_data.name}'",
+            "units": units,
         }
         value = {
             "crop": species,
