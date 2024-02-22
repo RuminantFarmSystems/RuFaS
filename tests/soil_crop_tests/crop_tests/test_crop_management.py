@@ -436,7 +436,7 @@ def test_record_yield(
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
-    ecpected_units = {
+    expected_units = {
         "crop": "unitless",
         "wet_yield": "kg/ha",
         "dry_yield": "kg/ha",
