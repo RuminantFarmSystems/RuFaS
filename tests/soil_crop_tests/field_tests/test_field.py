@@ -617,7 +617,7 @@ def test_plant_crop(
                     "date": {"year": "unitless", "day": "unitless"},
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "crop": CropSpecies.CORN_GRAIN,
@@ -642,7 +642,7 @@ def test_plant_crop(
                     "date": {"year": "unitless", "day": "unitless"},
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "crop": CropSpecies.WINTER_WHEAT_GRAIN,
@@ -667,7 +667,7 @@ def test_plant_crop(
                     "date": {"year": "unitless", "day": "unitless"},
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "crop": CropSpecies.SOYBEAN_GRAIN,
@@ -1393,11 +1393,7 @@ def test_record_fertilizer_application(
         "average_clay_percent": "unitless",
     }
 
-    expected_info_map = {
-        "suffix": f"field='{field_name}'",
-        "mix_name": mix_name,
-        "units": expected_units
-    }
+    expected_info_map = {"suffix": f"field='{field_name}'", "mix_name": mix_name, "units": expected_units}
     expected_value = {
         "mass": total_mass,
         "nitrogen": nitrogen_mass,
@@ -1833,7 +1829,7 @@ def test_execute_manure_application_with_invalid_args(
                     "year": "unitless",
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "dry_matter_mass": 100,
@@ -1878,7 +1874,7 @@ def test_execute_manure_application_with_invalid_args(
                     "year": "unitless",
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "dry_matter_mass": 144.6,
@@ -1923,7 +1919,7 @@ def test_execute_manure_application_with_invalid_args(
                     "year": "unitless",
                     "field_size": "ha",
                     "average_clay_percent": "unitless",
-                }
+                },
             },
             {
                 "dry_matter_mass": 266.5,

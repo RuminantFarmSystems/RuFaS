@@ -195,7 +195,7 @@ def test_record_tillage(
         "class": TillageApplication.__name__,
         "function": TillageApplication._record_tillage.__name__,
         "suffix": "field='field1'",
-        "units": expected_units
+        "units": expected_units,
     }
     expected_value = {
         "tillage_depth": till_depth,

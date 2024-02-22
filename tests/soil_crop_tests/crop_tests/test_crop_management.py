@@ -456,7 +456,7 @@ def test_record_yield(
         "class": crop_manager.__class__.__name__,
         "function": crop_manager._record_yield.__name__,
         "suffix": f"field='{field_name}'",
-        "units": ecpected_units
+        "units": ecpected_units,
     }
     expected_value = {
         "crop": species,
