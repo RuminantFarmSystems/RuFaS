@@ -43,12 +43,6 @@ class ManureTreatmentConfig:
     top_cover_volume_fraction:
         Fraction of the total volume of the treatment system that is assumed to be the top cover volume.
 
-    biogas_generation_ratio:
-        Amount of biogas generated from the treatment system.
-
-    methane_generation_ratio:
-        Amount of methane generated from the treatment system (calculated from the amount of biogas generated).
-
     evaporation_fraction:
         Fraction of the liquid portion evaporated from the treatment system.
 
@@ -87,8 +81,6 @@ class ManureTreatmentConfig:
     sludge_accumulation_period: float = 0.0
     sludge_accumulation_volume_fraction: float = 0.0
     top_cover_volume_fraction: float = 0.0
-    biogas_generation_ratio: float = 0.0
-    methane_generation_ratio: float = 0.0
 
     evaporation_fraction: float = 0.0
     anaerobic_digestion_temperature_set_point: float = 0.0
@@ -139,8 +131,6 @@ class DefaultManureTreatmentConfigFactory:
         sludge_accumulation_period=1.0,  # Sludge accumulation period 1-5 years
         sludge_accumulation_volume_fraction=0.0,  # Previous Sludge Accumulation volume fraction 2-4% of VS loaded
         top_cover_volume_fraction=0.2,  # Should be between 10-30%
-        biogas_generation_ratio=0.38,  # 0.23 to 0.39 kg CH4/kg VS
-        methane_generation_ratio=0.65,  # 0.5-0.65 according to spreadsheet
         evaporation_fraction=0.02,  # 2-5% of Wastewater Volume
         anaerobic_digestion_temperature_set_point=37.5,
         anaerobic_digestion_temperature_celsius=37.5,
