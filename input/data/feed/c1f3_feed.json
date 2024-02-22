@@ -5,13 +5,78 @@
     "close_up_feeds": [ 31, 33, 51, 91, 110, 170, 200, 232],
     "lac_cow_feeds": [4, 31, 33, 44, 51, 91, 110, 167, 200, 210, 232],
 
-    "purchased_feeds": [4, 31, 33, 44, 51, 91, 110, 167, 170, 200, 210, 232, 202, 216],
-    "purchased_feeds_costs": {"4": 0.1, "31": 0.5, "33": 0.1, "44": 0.5, "51": 0.01,"91": 0.01, "110" : 0.01, "167": 0.5, "170": 0.5,
-                          "200": 0.01, "210": 0.1, "232": 1.0, "?158" : 0.07, "?159" : 0.01,"202" : 0.01, "216": 0.5},
+    "purchased_feeds": [
+      {
+        "purchased_feed": 4,
+        "purchased_feed_cost": 0.1
+      },
+      {
+        "purchased_feed": 31,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 33,
+        "purchased_feed_cost": 0.1
+      },
+      {
+        "purchased_feed": 44,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 51,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 91,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 110,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 167,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 170,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 200,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 202,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 210,
+        "purchased_feed_cost": 0.1
+      },
+      {
+        "purchased_feed": 232,
+        "purchased_feed_cost": 1.0
+      },
+      {
+        "purchased_feed": 216,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 202,
+        "purchased_feed_cost": 0.01
+      }
+    ],
+      
+
+
+
+
+
     "farm_grown_feeds": [1],
 
-    "storage_options": {
-        "storage_1": {
+    "storage_options": [
+        {
             "storage_type": "bunker",
             "moisture": "direct_cut",
             "additive": "preservative",
@@ -23,7 +88,7 @@
             "initial_dry_matter": 0
         }
 
-    },
+      ],
     "user_defined_ration_percentages": {
         "calf": [      {
             "feed_type": 0,
