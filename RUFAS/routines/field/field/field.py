@@ -490,7 +490,7 @@ class Field:
             "function": self._record_fertilizer_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "mix_name": mix_name,
-            "units": units
+            "units": units,
         }
         value = {
             "mass": total_mass,
@@ -719,7 +719,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": units
+            "units": units,
         }
         value = {
             "dry_matter_mass": dry_matter_mass,
@@ -1051,7 +1051,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_planting.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": units
+            "units": units,
         }
         value = {
             "crop": species,
