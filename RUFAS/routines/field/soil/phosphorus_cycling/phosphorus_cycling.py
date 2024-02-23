@@ -58,13 +58,13 @@ class PhosphorusCycling:
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
         mean_air_temperature : float
-            Mean air temperature on the current day (degrees C)
+            Mean air temperature on the current day (degrees C).
 
         """
         self.manure.daily_manure_update(rainfall, runoff, field_size, mean_air_temperature)
