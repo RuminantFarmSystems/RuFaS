@@ -12,10 +12,6 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     MILLIGRAMS_TO_KILOGRAMS,
 )
 
-"""
-This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
-"""
-
 
 class Manure:
     """
