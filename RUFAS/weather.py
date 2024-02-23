@@ -154,7 +154,8 @@ class Weather:
             "function": self.__init__.__name__,
             "prefix": "Weather",
         }
-        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature,
+                        dict(info_map, **{"units": "°C"}))
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -212,15 +213,15 @@ class Weather:
             "prefix": "Weather",
         }
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable("precipitation", current_weather.precipitation, info_map)
-        om.add_variable("rainfall", current_weather.rainfall, info_map)
-        om.add_variable("snowfall", current_weather.snowfall, info_map)
-        om.add_variable("daylength", current_weather.daylength, info_map)
-        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
-        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
-        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
-        om.add_variable("radiation", current_weather.incoming_light, info_map)
-        om.add_variable("irrigation", current_weather.irrigation, info_map)
+        om.add_variable("precipitation", current_weather.precipitation, dict(info_map, **{"units": "mm"}))
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": "mm"}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": "mm"}))
+        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": "hours"}))
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("radiation", current_weather.incoming_light, dict(info_map, **{"units": "MJ/m^2"}))
+        om.add_variable("irrigation", current_weather.irrigation, dict(info_map, **{"units": "mm"}))
 
     @staticmethod
     def _calculate_average_annual_temperature(
