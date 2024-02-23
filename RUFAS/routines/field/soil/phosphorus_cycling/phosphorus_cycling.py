@@ -38,6 +38,7 @@ class PhosphorusCycling:
         Process component that controls the movement of phosphorus between layers of soil.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
