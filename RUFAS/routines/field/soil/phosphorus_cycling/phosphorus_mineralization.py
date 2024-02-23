@@ -23,6 +23,7 @@ class PhosphorusMineralization:
         The SoilData object that contains data and functionality related to soil and phosphorus properties.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 

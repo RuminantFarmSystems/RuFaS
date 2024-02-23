@@ -29,6 +29,7 @@ class SolublePhosphorus:
         The SoilData object that stores and manages the phosphorus data within the soil profile.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """
         This method initializes the SoilData object that this module will work with, or create one if none provided.
