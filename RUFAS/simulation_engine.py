@@ -74,7 +74,7 @@ class SimulationEngine:
         om.add_variable(
             "available_feeds_on_final_day",
             available_feeds_on_final_day,
-            dict(info_map, **{"units": available_feeds_units})
+            dict(info_map, **{"units": available_feeds_units}),
         )
         t_end_sim = timer.time()
 

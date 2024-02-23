@@ -164,7 +164,7 @@ class Feed:
                 "dry_matter": "kg",
                 "crude_protein": "kg",
                 "carbon_loss": "kg",
-                "crude_protein_loss": "kg"
+                "crude_protein_loss": "kg",
             }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C

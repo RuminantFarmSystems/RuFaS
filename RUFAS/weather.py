@@ -154,8 +154,7 @@ class Weather:
             "function": self.__init__.__name__,
             "prefix": "Weather",
         }
-        om.add_variable("average_annual_temperature", self.__mean_annual_temperature,
-                        dict(info_map, **{"units": "°C"}))
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, dict(info_map, **{"units": "°C"}))
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
