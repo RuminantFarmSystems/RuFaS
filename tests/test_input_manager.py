@@ -25,7 +25,6 @@ def test_input_manager_singleton() -> None:
     """Unit test to ensure InputManager is a singleton"""
     im1 = InputManager()
     im2 = InputManager()
-
     assert im1 is im2
 
     fake_pool = {"a": 1}
