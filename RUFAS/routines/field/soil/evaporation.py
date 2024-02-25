@@ -22,6 +22,7 @@ class Evaporation:
         The SoilData object that stores and manages the water data within the soil profile.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
