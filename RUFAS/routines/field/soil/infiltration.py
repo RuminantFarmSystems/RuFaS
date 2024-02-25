@@ -2,29 +2,32 @@ from math import exp, log
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) section of the SWAT model documentation
-"""
-
 
 class Infiltration:
+    """
+    Simulates the infiltration of water into the soil profile using the 'Runoff Volume: SCS Curve Number Procedure'
+    as described in section 2:1.1 of the SWAT (Soil and Water Assessment Tool) model documentation.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        An instance of SoilData for tracking the water infiltration in the soil profile. If not provided, a new
+        instance will be created with the specified field size.
+    field_size : float, optional
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object that stores and manages the water infiltration data within the soil profile.
+
+    """
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track infiltration of water into the soil profile, creates new
-            one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def infiltrate(self, rainfall: float) -> None:
-        """Main routine for determining runoff and infiltration of soil for a given day.
+        """
+        Main routine for determining runoff and infiltration of soil for a given day.
 
         Parameters
         ----------
@@ -109,6 +112,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.4
+
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = 100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition))
@@ -132,6 +136,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.5
+
         """
         return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
 
@@ -155,6 +160,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.2
+
         """
         return 25.4 * ((1000 / moisture_condition_parameter) - 10)
 
@@ -188,6 +194,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.8
+
         """
         first_top_term = log(
             (field_capacity / (1 - (third_moisture_condition_retention_parameter / max_retention_parameter)))
@@ -225,6 +232,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.7
+
         """
         first_term = log(
             (field_capacity / (1 - (third_moisture_condition_retention_parameter / max_retention_parameter)))
@@ -264,6 +272,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.6
+
         """
         return max_retention_parameter * (
             1
@@ -281,7 +290,7 @@ class Infiltration:
         Parameters
         ----------
         max_retention_parameter : float
-            Maximum retention parameter, calculated from curve number 1
+            Maximum retention parameter, calculated from curve number 1.
             (the driest conditions) (mm).
         retention_parameter : float
             Retention parameter for a given day (mm).
@@ -294,6 +303,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.10
+
         """
         return max_retention_parameter * (1 - exp(-0.000862 * retention_parameter))
 
@@ -323,6 +333,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.12
+
         """
         first_factor = (third_moisture_condition - second_moisture_condition) / 3
         second_factor = 1 - (2 * exp(-13.86 * average_fraction_slope))
@@ -353,6 +364,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.1, 3
+
         """
         if rainfall > (0.2 * retention_parameter):
             return ((rainfall - (0.2 * retention_parameter)) ** 2) / (rainfall + (0.8 * retention_parameter))
@@ -395,6 +407,7 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.9
+
         """
         retention_parameter = previous_retention_parameter - rainfall + runoff
         retention_parameter += potential_evapotranspiration * exp(
@@ -420,5 +433,6 @@ class Infiltration:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:1.1.11
+
         """
         return 25400 / (retention_parameter + 254)
