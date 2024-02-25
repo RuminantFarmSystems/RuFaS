@@ -28,8 +28,8 @@ class LayerData:
     field_size : InitVar[float], optional
         Size of the field (ha). Note: this attribute is only used for initialization. After that, it cannot be used.
     residue : InitVar[float], optional
-        Amount of residue on the soil surface when this soil layer is initialized (kg / ha). Note: this attribute is only
-        used for initialization. After that, it cannot be used.
+        Amount of residue on the soil surface when this soil layer is initialized (kg / ha). Note: this attribute is
+        only used for initialization. After that, it cannot be used.
     top_depth : float, optional
         Top depth of the layer (mm).
     bottom_depth : float, optional
