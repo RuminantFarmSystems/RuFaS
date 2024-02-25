@@ -128,6 +128,7 @@ class LayerData:
     carbon_lost_adjusted_factor: float = 0.0
         Adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6).
     """
+
     field_size: InitVar[float] = None
     """Size of the field (ha)
         Note: this attribute is only used for initialization. After that it cannot be used.
