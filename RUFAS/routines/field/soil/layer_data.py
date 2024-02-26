@@ -272,6 +272,7 @@ class LayerData:
         Total amount of carbon lost as CO2 (kg/ha).
 
     """
+
     field_size: InitVar[float] = None
     residue: InitVar[float] = 0
     top_depth: Optional[float] = None
