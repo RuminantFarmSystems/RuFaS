@@ -917,27 +917,62 @@ class LayerData:
 
     @property
     def excess_water_available(self) -> float:
-        """volume of water available for percolation in the soil layer (mm)
-        SWAT Reference: 2:3.2.1, 2
+        """
+        Calculates the volume of water available for percolation in the soil layer.
+
+        Returns
+        -------
+        float
+            Volume of water available for percolation in the soil layer (mm).
+
+        References
+        ----------
+        SWAT 2:3.2.1, 2
+
         """
         return max(0.0, self.water_content - self.field_capacity_content)
 
     @property
     def acceptable_percolation_amount(self) -> float:
-        """volume of water that can be accepted by layer before reaching saturation (mm)"""
+        """
+        Calculates the volume of water that can be accepted by layer before reaching saturation.
+
+        Returns
+        -------
+        float
+            Volume of water that can be accepted by layer before reaching saturation (mm).
+
+        """
         return max(0.0, self.saturation_content - self.water_content)
 
     @property
     def percent_organic_matter_proportion(self) -> float:
-        """percent organic matter content of this soil layer
+        """
+        Calculates the percent organic matter content of this soil layer.
 
-        SWAT Reference: 4:1.1.4
+        Returns
+        -------
+        float
+            Percent organic matter content of this soil layer (uniteless).
+
+        References
+        ----------
+        SWAT 4:1.1.4
+
         """
         return 1.72 * self.percent_organic_carbon_content
 
     @property
-    def water_factor(self):
-        """relative water saturation (%)"""
+    def water_factor(self) -> float:
+        """
+        Calculates relative water saturation.
+
+        Returns
+        -------
+        float
+            Relative water saturation (%).
+
+        """
 
         # pseudocode_soil S.4.B.1
         if self.water_content <= self.field_capacity_content:
