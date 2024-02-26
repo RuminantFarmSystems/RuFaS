@@ -272,7 +272,6 @@ class LayerData:
         Total amount of carbon lost as CO2 (kg/ha).
 
     """
-
     field_size: InitVar[float] = None
     residue: InitVar[float] = 0
     top_depth: Optional[float] = None
@@ -435,14 +434,15 @@ class LayerData:
     annual_carbon_CO2_lost: Optional[float] = None
 
     def __post_init__(self, field_size: float, residue: float):
-        """Initialize all attributes in the dataclass that depend on other attributes
+        """
+        Initialize all attributes in the dataclass that depend on other attributes.
 
         Parameters
         ----------
         field_size: float
-            Size of the field (ha)
+            Size of the field (ha).
         residue: float
-            Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
+            Amount of residue on the soil surface when this soil layer is initialized (kg / ha).
 
         Raises
         ------
@@ -510,18 +510,19 @@ class LayerData:
         self._initialize_carbon_pools(field_size, residue)
 
     def _initialize_nitrogen_pools(self, field_size: float, residue: float) -> None:
-        """Initializes the nitrogen pools in the soil layer
+        """
+        Initializes the nitrogen pools in the soil layer.
 
         Parameters
         ----------
         field_size: float
-            Size of the field (ha)
+            Size of the field (ha).
         residue: float
-            Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
+            Amount of residue on the soil surface when this soil layer is initialized (kg / ha).
 
         References
         ----------
-        SWAT Theoretical documentation eqn. 3:1.1.1 - 5 and paragraph beneath eqn. 3:1.1.4
+        SWAT Theoretical documentation eqn. 3:1.1.1 - 5 and paragraph beneath eqn. 3:1.1.4.
 
         Notes
         -----
@@ -616,15 +617,16 @@ class LayerData:
             self.metabolic_litter_amount = 0.0
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
-            soil layer.
+        """
+        This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
+        soil layer.
 
         Parameters
         ----------
             phosphorus_to_add : float
-                Amount of phosphorus to add (kg)
+                Amount of phosphorus to add (kg).
             field_size : float
-                Size of the field (ha)
+                Size of the field (ha).
 
         """
         self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
@@ -632,15 +634,16 @@ class LayerData:
         )
 
     def add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
-            soil layer.
+        """
+        This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
+        soil layer.
 
         Parameters
         ----------
             phosphorus_to_add : float
-                Amount of phosphorus to add (kg)
+                Amount of phosphorus to add (kg).
             field_size : float
-                Size of the field (ha)
+                Size of the field (ha).
 
         """
         self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
@@ -649,21 +652,22 @@ class LayerData:
 
     @staticmethod
     def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
-        """This is a generic method to be used by wrapper functions to add phosphorus to any of the phosphorus pools.
+        """
+        This is a generic method to be used by wrapper functions to add phosphorus to any of the phosphorus pools.
 
         Parameters
         ----------
         pool_to_add_to : float
-            The phosphorus pool in this soil layer that is having phosphorus added (kg / ha)
+            The phosphorus pool in this soil layer that is having phosphorus added (kg / ha).
         phosphorus_to_add : float
-            Amount of phosphorus to add (kg)
+            Amount of phosphorus to add (kg).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            The new value of the phosphorus pool that was added to (kg / ha)
+            The new value of the phosphorus pool that was added to (kg / ha).
 
         Notes
         -----
@@ -682,16 +686,17 @@ class LayerData:
         labile_inorganic_phosphorus: float,
         percent_organic_carbon_content: float,
     ) -> float:
-        """Calculates the phosphorus sorption coefficient based on the current soil conditions.
+        """
+        Calculates the phosphorus sorption coefficient based on the current soil conditions.
 
         Parameters
         ----------
         percent_clay_content : float
-            Percent of this soil layer that is clay, expressed in range [0, 100] (unitless)
+            Percent of this soil layer that is clay, expressed in range [0, 100] (unitless).
         labile_inorganic_phosphorus : float
-            Amount of labile inorganic phosphorus in this soil layer (mg / kg soil)
+            Amount of labile inorganic phosphorus in this soil layer (mg / kg soil).
         percent_organic_carbon_content : float
-            Percent of this soil layer that is organic carbon, expressed in range [0, 100] (unitless)
+            Percent of this soil layer that is organic carbon, expressed in range [0, 100] (unitless).
 
         Returns
         -------
@@ -722,23 +727,24 @@ class LayerData:
         layer_thickness: float,
         field_size: float,
     ) -> float:
-        """Calculates the concentration of nutrients in a soil layer.
+        """
+        Calculates the concentration of nutrients in a soil layer.
 
         Parameters
         ----------
         nutrient_content : float
-            Nutrient content of this soil layer (kg / ha)
+            Nutrient content of this soil layer (kg / ha).
         bulk_density : float
-            Bulk density of the soil layer (Megagram / cubic meter)
+            Bulk density of the soil layer (Megagram / cubic meter).
         layer_thickness : float
-            Thickness of the soil layer (mm)
+            Thickness of the soil layer (mm).
         field_size : float
-            Area of the field (ha)
+            Area of the field (ha).
 
         Returns
         -------
         float
-            The concentration of nutrients in the soil layer (mg / kg soil)
+            The concentration of nutrients in the soil layer (mg / kg soil).
 
         """
         soil_volume_in_cubic_meters = (
@@ -755,23 +761,24 @@ class LayerData:
         layer_thickness: float,
         field_size: float,
     ) -> float:
-        """Converts a mass per mass concentration of nutrients in the soil to a mass per area concentration.
+        """
+        Converts a mass per mass concentration of nutrients in the soil to a mass per area concentration.
 
         Parameters
         ----------
         nutrient_concentration : float
-            Nutrient concentration of this soil layer (mg / kg soil)
+            Nutrient concentration of this soil layer (mg / kg soil).
         bulk_density : float
-            Bulk density of the soil layer (Megagram / cubic meter)
+            Bulk density of the soil layer (Megagram / cubic meter).
         layer_thickness : float
-            Thickness of the soil layer (mm)
+            Thickness of the soil layer (mm).
         field_size : float
-            Area of the field (ha)
+            Area of the field (ha).
 
         Returns
         -------
         float
-            The area concentration of nutrients in the soil layer (kg / ha)
+            The area concentration of nutrients in the soil layer (kg / ha).
 
         """
         soil_volume_in_cubic_meters = (
@@ -783,11 +790,17 @@ class LayerData:
 
     @property
     def nutrient_cycling_temp_factor(self) -> float:
-        """The nutrient cycling temperature factor (unitless)
+        """
+        Calculates the nutrient cycling temperature factor.
 
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.1
+
+        Returns
+        -------
+        float
+            Nutrient cycling temperature factor (unitless).
 
         Notes
         -----
@@ -801,11 +814,16 @@ class LayerData:
     @property
     def nutrient_cycling_water_factor(self) -> float:
         """
-        The nutrient cycling water factor (unitless).
+        Calculates the nutrient cycling water factor.
 
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.2
+
+        Returns
+        -------
+        float
+            Nutrient cycling water factor (unitless).
 
         Notes
         -----
@@ -911,7 +929,11 @@ class LayerData:
         """
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
 
-    def do_annual_reset(self):
+    def do_annual_reset(self) -> None:
+        """
+        Reset the pools
+
+        """
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
         self.annual_nitrous_oxide_emissions_total = 0
