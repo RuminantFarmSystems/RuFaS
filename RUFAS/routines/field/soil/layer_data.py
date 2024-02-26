@@ -23,7 +23,7 @@ class LayerData:
     Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData
     objects to represent its soil.
 
-    Parameters
+    Attributes
     ----------
     field_size : InitVar[float], optional
         Size of the field (ha). Note: this attribute is only used for initialization. After that, it cannot be used.
@@ -159,6 +159,26 @@ class LayerData:
         Plant carbon decomposed into the active carbon pool (kg/ha).
     soil_active_decompose_carbon : float, default 0.0
         Soil carbon decomposed into the active carbon pool (kg/ha).
+    initial_labile_inorganic_phosphorus_concentration : float, default None
+        Concentration of labile inorganic phosphorus at the beginning of the simulation (mg/kg soil).
+        Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
+        for soil in the plow layer of cropland.
+    mean_phosphorus_sorption_parameter : float, default None
+        Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it
+        is not sensitive to large immediate changes in the soil chemistry (unitless).
+        Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
+        documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
+        documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
+        user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
+        equation to compute it based off other soil attributes.
+    labile_inorganic_phosphorus_content : float, default 0
+        Labile inorganic phosphorus content of this soil layer (kg/ha).
+    active_inorganic_phosphorus_content : float, default 0
+        Active inorganic phosphorus content of this soil layer (kg/ha).
+    stable_inorganic_phosphorus_content : float, default 0
+        Stable inorganic phosphorus content of this soil layer (kg/ha).
+    fresh_organic_phosphorus_content : float, default 0
+        Fresh organic phosphorus content of this soil layer (kg/ha).
     """
 
     field_size: InitVar[float] = None
