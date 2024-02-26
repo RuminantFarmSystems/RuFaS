@@ -40,6 +40,7 @@ class Percolation:
         References
         ----------
         SWAT sections 2:3.1 and 2
+
         """
         if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
@@ -133,6 +134,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.4
+
         """
         if saturated_hydraulic_conductivity <= 0:
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
@@ -162,6 +164,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.3
+
         """
         return drainable_volume_water * (1 - exp((-1 * time_step) / travel_time))
 
@@ -194,6 +197,7 @@ class Percolation:
         References
         ----------
         SWAT Paragraph in between equations 2:3.2.3, 4
+
         """
         if not is_seasonal_high_water_table:
             return True
@@ -227,6 +231,7 @@ class Percolation:
         References
         ----------
         SWAT Section 2:3.2
+
         """
         if upper_layer.excess_water_available <= 0:
             return 0
