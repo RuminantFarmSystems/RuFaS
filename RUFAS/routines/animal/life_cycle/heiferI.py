@@ -6,6 +6,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 om = OutputManager()
 
@@ -134,12 +135,24 @@ class HeiferI(Calf):
         If the days_born of the animal is equal to 400,
         the difference is set to 1 (otherwise results in a division by 0 error).
 
-        Returns: the daily body weight change for a heifer that is not pregnant
+        Notes
+        -----
+        Calculation is [A.1A.C.6] in pseudocode, itself from  Fox et al. 1999 and NRC 2001.
+        However, for animals over 55% of their mature body weight, the equation results in a negative return.
+        Therefore when the result is negative, the minimum BW change constant is returned instead.
+
+        Returns
+        -------
+        int
+            The daily body weight change for a heifer that is not pregnant.
         """
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
         if divisor == 0:
             divisor = 1
-        return (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor
+        return max(
+            (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
+            AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
+        )
 
     def update(self, sim_day):
         """
