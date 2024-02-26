@@ -1139,30 +1139,3 @@ class OutputManager(object):
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
         return errors_count, warnings_count
-
-    def add_to_stdout_queue(self, msg: str) -> None:
-        """
-        Adds a message to the stdout queue.
-
-        Parameters
-        ----------
-        msg : str
-            The message to be added to the stdout queue.
-        """
-
-        self._stdout_queue.append(msg)
-
-    def show_stdout_queue(self) -> None:
-        """
-        Prints all the messages in the stdout queue.
-        """
-
-        for msg in self._stdout_queue:
-            sys.stdout.write(msg)
-
-    def clear_stdout_queue(self) -> None:
-        """
-        Clears the stdout queue.
-        """
-
-        self._stdout_queue.clear()
