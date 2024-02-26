@@ -793,14 +793,14 @@ class LayerData:
         """
         Calculates the nutrient cycling temperature factor.
 
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 3:1.2.1
-
         Returns
         -------
         float
             Nutrient cycling temperature factor (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.1
 
         Notes
         -----
@@ -816,14 +816,14 @@ class LayerData:
         """
         Calculates the nutrient cycling water factor.
 
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 3:1.2.2
-
         Returns
         -------
         float
             Nutrient cycling water factor (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.2
 
         Notes
         -----
@@ -833,35 +833,85 @@ class LayerData:
         return max(0.05, self.water_content / self.field_capacity_content)
 
     @property
-    def available_water_capacity(self):
-        """available water capacity of the soil layer (mm)
+    def available_water_capacity(self) -> float:
+        """
+        Calculates available water capacity of the soil layer.
 
-        SWAT Equation: 5:2.2.6"""
+        Returns
+        -------
+        float
+            Water capacity of the soil layer (mm).
+
+        References
+        ----------
+        SWAT Equation: 5:2.2.6
+
+        """
         return self.field_capacity_content - self.wilting_point_content
 
     @property
     def layer_thickness(self) -> float:
-        """thickness of soil layer (mm)"""
+        """
+        Calculates the thickness of soil layer.
+
+        Returns
+        -------
+        float
+            Thickness of soil layer (mm).
+
+        """
         return self.bottom_depth - self.top_depth
 
     @property
     def depth_of_layer_center(self) -> float:
-        """depth beneath the surface of the center this layer (mm)"""
+        """
+        Calculates the depth beneath the surface of the center this layer.
+
+        Returns
+        -------
+        float
+            The depth beneath the surface of the center this layer (mm).
+
+        """
         return self.top_depth + (self.layer_thickness / 2)
 
     @property
     def field_capacity_content(self) -> float:
-        """volume of water in layer when at field capacity (mm)"""
+        """
+        Calculates the volume of water in layer when at field capacity.
+
+        Returns
+        -------
+        float
+            Volume of water in layer when at field capacity (mm).
+
+        """
         return self.field_capacity_water_concentration * self.layer_thickness
 
     @property
     def wilting_point_content(self) -> float:
-        """amount of water in layer when at wilting point (mm)"""
+        """
+        Calculates the amount of water in layer when at wilting point.
+
+        Returns
+        -------
+        float
+            Amount of water in layer when at wilting point (mm).
+
+        """
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
     def saturation_content(self) -> float:
-        """volume of water in layer when saturated (mm)"""
+        """
+        Calculates the volume of water in layer when saturated.
+
+        Returns
+        -------
+        float
+            Volume of water in layer when saturated (mm).
+
+        """
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
