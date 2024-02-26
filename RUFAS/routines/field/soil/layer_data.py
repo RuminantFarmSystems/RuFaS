@@ -11,11 +11,6 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
 )
 
-"""
-Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
-to represent its soil
-"""
-
 
 @dataclass
 class LayerData:
