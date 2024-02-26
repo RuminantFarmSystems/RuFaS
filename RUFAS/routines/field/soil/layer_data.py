@@ -11,14 +11,268 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
 )
 
-"""
-Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
-to represent its soil
-"""
-
 
 @dataclass
 class LayerData:
+    """
+    Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData
+    objects to represent its soil.
+
+    Attributes
+    ----------
+    field_size : InitVar[float], optional
+        Size of the field (ha). Note: this attribute is only used for initialization. After that, it cannot be used.
+    residue : InitVar[float], optional
+        Amount of residue on the soil surface when this soil layer is initialized (kg / ha). Note: this attribute is
+        only used for initialization. After that, it cannot be used.
+    top_depth : float, optional
+        Top depth of the layer (mm).
+    bottom_depth : float, optional
+        Bottom depth of the layer (mm).
+    soil_water_concentration : float, optional, default 0.25
+        Soil water concentration of the layer (mm water / mm soil).
+    water_content : float, optional
+        Water present in the layer (mm). This field is initialized based on other parameters.
+    field_capacity_water_concentration : float, optional, default 0.3
+        Water concentration of soil layer at field capacity (mm water / mm soil).
+    wilting_point_water_concentration : float, optional, default 0.2
+        Water concentration of soil layer at wilting point (mm water / mm soil).
+    saturation_point_water_concentration : float, optional, default 0.5
+        Water concentration of soil layer at saturation point (mm water / mm soil).
+    evaporated_water_content : float, optional, default 0.0
+        Amount of water that evaporated out of the layer on the current day (mm).
+    soil_evaporation_compensation_coefficient : float, optional, default 1.0
+        Coefficient that allows the user to modify depth distribution used to meet the soil evaporative demand
+        (unitless).
+    temperature : float, optional, default 15.05
+        Current temperature of this soil layer (degrees Celsius).
+    saturated_hydraulic_conductivity : float, optional, default 9.5
+        Saturated hydraulic conductivity for this layer of soil (mm per hour).
+    percolated_water : float, default 0.0
+        Amount of water that percolated out of the soil layer on the current day (mm).
+    bulk_density : float, default 1.4
+        Bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for
+        calculating this field as well).
+    previous_day_temperature : float, optional, default None
+        Temperature of soil layer on the previous day (degrees C).
+    decomposition_temperature_effect : float, optional, default None
+        Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).
+    percent_organic_carbon_content : float, default 1.2
+        Organic carbon content expressed as percent of soil in this layer (unitless).
+    percent_clay_content : float, default 18.7
+        Clay content expressed as percent of soil in this layer (unitless).
+    percent_sand_content : float, default 14.5
+        Sand content expressed as percent of soil in this layer (unitless).
+    percent_silt_content : float, default 64.5
+        Silt content expressed as percent of soil in this layer (unitless).
+    percent_rock_content : float, default 1
+        Rock content expressed as percent of soil in this layer (unitless).
+    decomposition_moisture_effect : float, default 0.0
+        Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
+    percent_organic_carbon_content : float, default 1.2
+        Organic carbon content expressed as percent of soil in this layer (unitless).
+    percent_clay_content : float, default 18.7
+        Clay content expressed as percent of soil in this layer (unitless).
+    percent_sand_content : float, default 14.5
+        Sand content expressed as percent of soil in this layer (unitless).
+    percent_silt_content : float, default 64.5
+        Silt content expressed as percent of soil in this layer (unitless).
+    percent_rock_content : float, default 1
+        Rock content expressed as percent of soil in this layer (unitless).
+    decomposition_moisture_effect : float, default 0.0
+        Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
+    plant_metabolic_active_carbon_usage : float, default 0.0
+        Plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.).
+    plant_metabolic_active_carbon_loss : float, default 0.0
+        Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    plant_metabolic_active_carbon_remaining : float, default 0.0
+        Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    plant_structural_active_carbon_usage : float, default 0.0
+        Plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
+    plant_structural_active_carbon_loss : float, default 0.0
+        Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    plant_structural_active_carbon_remaining : float, default 0.0
+        Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    plant_structural_slow_carbon_usage : float, default 0.0
+        Plant structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
+    plant_structural_slow_carbon_loss : float, default 0.0
+        Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
+    plant_structural_slow_carbon_remaining : float, default 0.0
+        Plant structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
+    soil_metabolic_active_carbon_usage : float, default 0.0
+        Soil metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.8).
+    soil_metabolic_active_carbon_loss : float, default 0.0
+        Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    soil_metabolic_active_carbon_remaining : float, default 0.0
+        Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    soil_structural_active_carbon_usage : float, default 0.0
+        Soil structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.11).
+    soil_structural_active_carbon_loss : float, default 0.0
+        Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    soil_structural_active_carbon_remaining : float, default 0.0
+        Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    soil_structural_slow_carbon_usage : float, default 0.0
+        Soil structural carbon decomposed into slow carbon after accounting for carbon dioxide loss (kg/ha)
+        (pseudocode_soil S.6.B.II.11).
+    soil_structural_slow_carbon_loss : float, default 0.0
+        Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
+    soil_structural_slow_carbon_remaining : float, default 0.0
+        Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
+    active_carbon_decomposition_rate : float, default 0.0
+        Rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2).
+    carbon_lost_adjusted_factor : float, default 0.0
+        Adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6).
+    active_carbon_decomposition_amount : float, default 0.0
+        Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).
+    active_carbon_amount : float, default None
+        Active carbon stored in the layer (kg/ha).
+    slow_carbon_amount : float, optional, default None
+        Slow carbon stored in the soil (kg/ha).
+    slow_carbon_decomposition_amount : float, default 0.0
+        Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).
+    passive_carbon_decomposition_amount : float, default 0.0
+        Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).
+    passive_carbon_amount : float, optional, default None
+        Passive carbon stored in the soil (kg/ha).
+    active_carbon_to_slow_amount : float, default 0.0
+        Active carbon decomposed into slow carbon (kg/ha).
+    active_carbon_to_slow_loss : float, default 0.0
+        Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).
+    active_carbon_to_passive_amount : float, default 0.0
+        Active carbon decomposed into passive carbon (kg/ha).
+    slow_to_active_carbon_amount : float, default 0.0
+        Slow carbon decomposed into active carbon (kg/ha).
+    slow_carbon_co2_lost_amount : float, default 0.0
+        Slow carbon lost as CO2 during decomposition (kg/ha).
+    slow_to_passive_carbon_amount : float, default 0.0
+        Slow carbon decomposed into passive carbon (kg/ha).
+    passive_to_active_carbon_amount : float, default 0.0
+        Passive carbon decomposed into active carbon (kg/ha).
+    passive_carbon_co2_lost_amount : float, default 0.0
+        Passive carbon lost as CO2 during decomposition (kg/ha).
+    plant_active_decompose_carbon : float, default 0.0
+        Plant carbon decomposed into the active carbon pool (kg/ha).
+    soil_active_decompose_carbon : float, default 0.0
+        Soil carbon decomposed into the active carbon pool (kg/ha).
+    initial_labile_inorganic_phosphorus_concentration : float, default None
+        Concentration of labile inorganic phosphorus at the beginning of the simulation (mg/kg soil).
+        Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
+        for soil in the plow layer of cropland.
+    mean_phosphorus_sorption_parameter : float, default None
+        Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it
+        is not sensitive to large immediate changes in the soil chemistry (unitless).
+        Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
+        documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
+        documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
+        user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
+        equation to compute it based off other soil attributes.
+    labile_inorganic_phosphorus_content : float, default 0
+        Labile inorganic phosphorus content of this soil layer (kg/ha).
+    active_inorganic_phosphorus_content : float, default 0
+        Active inorganic phosphorus content of this soil layer (kg/ha).
+    stable_inorganic_phosphorus_content : float, default 0
+        Stable inorganic phosphorus content of this soil layer (kg/ha).
+    fresh_organic_phosphorus_content : float, default 0
+        Fresh organic phosphorus content of this soil layer (kg/ha).
+    active_inorganic_unbalanced_counter : int, default 0
+        The number of days that the active inorganic phosphorus pool has been greater than it would be when in
+        equilibrium with the labile inorganic phosphorus pool.
+    labile_inorganic_unbalanced_counter : int, default 0
+        The number of days that the labile inorganic phosphorus pool has been greater than it would be when in
+        equilibrium with the active inorganic phosphorus pool.
+    previous_phosphorus_balance : float, default None
+        The phosphorus balance on the previous day (unitless).
+    percolated_phosphorus : float, default 0.0
+        Amount of phosphorus removed from the layer by water percolating out (kg/ha).
+    plant_metabolic_to_soil_carbon_amount : float, default 0.0
+        Metabolic carbon incorporated into soil during tillage (kg/ha).
+    structural_litter_amount : float, default 0.0
+        Amount of plant structural carbon (kg/ha).
+    metabolic_litter_amount : float, default 0.0
+        Plant metabolic carbon amount (hg/ha).
+    tillage_fraction : float, default 0.0
+        Fraction of metabolic carbon incorporated into soil during tillage (unitless).
+    structural_carbon_transfer_amount : float, default 0.0
+        The amount of transfer of structural carbon during tillage (kg/ha).
+    soil_dry_matter_residue_amount : float, default 0.0
+        The amount of soil dry matter residue at harvest (kg/ha).
+    plant_dry_matter_residue_amount : float, default 0.0
+        The amount of plant dry matter residue at harvest (kg/ha).
+    plant_residue_metabolic_fraction : float, default 0.0
+        Fraction of plant residue that is metabolic (unitless).
+    plant_structural_to_slow_or_active_rate : float, default 0.0
+        The rate at which above-ground structural carbon decomposes into slow or active carbon (unitless).
+    weighted_residue_dry_matter_lignin_fraction : float, default 0.0
+        The weighted fraction of lignin amount in residue dry matter (unitless).
+    soil_residue_lignin_fraction : float, default 0.17
+        The fraction of soil residue that's comprised of lignin (unitless).
+    soil_lignin_to_nitrogen_fraction : float, default 0.0
+        Soil lignin to nitrogen fraction (unitless).
+    soil_residue_metabolic_fraction : float, default 0.0
+        The fraction of soil residue that is metabolic (unitless).
+    soil_metabolic_carbon_amount : float, default 0.0
+        Soil metabolic carbon amount (kg/ha).
+    soil_structural_carbon_amount : float, default 0.0
+        Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).
+    soil_structural_to_slow_or_active_rate : float, default 0.0
+        The rate at which below-ground structural carbon decomposes into slow or active carbon (unitless).
+    initial_soil_nitrate_concentration : float, optional, default None
+        Concentration of nitrates in this soil layer at the beginning of the simulation (mg/kg soil).
+    initial_soil_ammonium_concentration : float, optional, default None
+        Concentration of ammonium in this soil layer at the beginning of the simulation (mg/kg soil).
+    nitrate_content : float, optional, default None
+        Nitrate (NO3) content of this soil layer (kg/ha).
+    ammonium_content : float, optional, default None
+        Ammonium (NH4+) content of this soil layer (kg/ha).
+    active_organic_nitrogen_content : float, default 0.0
+        Active organic nitrogen content of this soil layer (kg/ha).
+    stable_organic_nitrogen_content : float, default 0.0
+        Stable organic nitrogen content of this soil layer (kg/ha).
+    fresh_organic_nitrogen_content : float, default 0.0
+        Fresh organic nitrogen content of this soil layer (kg/ha).
+        Note: all layers except the top layer are initialized with 0 fresh organic nitrogen.
+    nitrous_oxide_emissions : float, default 0.0
+        Amount of nitrous oxide emitted from this soil layer on the current day (kg/ha).
+    annual_nitrous_oxide_emissions_total : float, default 0.0
+        Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
+    humus_mineralization_rate_factor : float, default 0.0003
+        Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file, see "CMN" on page 101.
+    denitrification_rate_coefficient : float, default 1.4
+        Controls the rate of denitrification in this layer of soil (unitless).
+        Note: acceptable values for this attribute are in the range [0.0, 3.0].
+        Reference: SWAT Input .BSN file, see "CDN" on page 101.
+    denitrification_threshold_water_content : float, default 1.10
+        Fraction of field capacity water content above which denitrification takes place (unitless).
+        Reference: SWAT Input .BSN file, see "SDNCO" on page 102.
+    residue_fresh_organic_mineralization_rate : float, default 0.05
+        Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
+        205).
+    ammonium_volatilization_cation_exchange_factor : float, default 0.15
+        Exchange factor that accounts for the soil's cation exchange capacity (unitless).
+        Reference: SWAT Theoretical documentation eqn. 3:1.3.5.
+    ammonia_emissions : float, default 0.0
+        Amount of ammonium that volatilized out of the soil layer on the current day (kg/ha).
+    annual_ammonia_emissions_total : float, default 0.0
+        Cumulative total of ammonium volatilized in this year (kg/ha).
+    percolated_nitrates : float, default 0.0
+        Amount of nitrates removed from the soil layer by water percolating out (kg/ha).
+    percolated_ammonium : float, default 0.0
+        Amount of ammonium removed from the soil layer by water percolating out (kg/ha).
+    percolated_active_organic_nitrogen : float, default 0.0
+        Amount of active organic nitrogen removed from the soil layer by water percolating out (kg/ha).
+    soil_overall_carbon_fraction : float, optional, default None
+        The total fraction of carbon in the soil (unitless).
+    total_soil_carbon_amount : float, optional, default None
+        The total amount of soil carbon (kg/ha).
+    annual_decomposition_carbon_CO2_lost : float, optional, default None
+        Amount of total carbon lost as CO2 during decomposition (kg/ha).
+    annual_carbon_CO2_lost : float, optional, default None
+        Total amount of carbon lost as CO2 (kg/ha).
+
+    """
+
     field_size: InitVar[float] = None
     """Size of the field (ha)
         Note: this attribute is only used for initialization. After that it cannot be used.
