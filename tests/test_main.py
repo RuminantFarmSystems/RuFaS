@@ -1035,4 +1035,3 @@ def test_case_insensitive_argument_action():
     for argument in arguments:
         assert hasattr(namespace, argument)
         assert getattr(namespace, argument) == value
-
