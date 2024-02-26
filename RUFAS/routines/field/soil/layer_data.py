@@ -221,13 +221,13 @@ class LayerData:
         Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).
     soil_structural_to_slow_or_active_rate : float, default 0.0
         The rate at which below-ground structural carbon decomposes into slow or active carbon (unitless).
-    initial_soil_nitrate_concentration : Optional[float], default None
+    initial_soil_nitrate_concentration : float, optional, default None
         Concentration of nitrates in this soil layer at the beginning of the simulation (mg/kg soil).
-    initial_soil_ammonium_concentration : Optional[float], default None
+    initial_soil_ammonium_concentration : float, optional, default None
         Concentration of ammonium in this soil layer at the beginning of the simulation (mg/kg soil).
-    nitrate_content : Optional[float], default None
+    nitrate_content : float, optional, default None
         Nitrate (NO3) content of this soil layer (kg/ha).
-    ammonium_content : Optional[float], default None
+    ammonium_content : float, optional, default None
         Ammonium (NH4+) content of this soil layer (kg/ha).
     active_organic_nitrogen_content : float, default 0.0
         Active organic nitrogen content of this soil layer (kg/ha).
