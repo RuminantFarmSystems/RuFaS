@@ -89,7 +89,7 @@ class SimulationEngine:
             },
         )
 
-        error_count, warning_count = om.get_error_warning_counts()
+        error_count, warning_count = om.get_error_and_warning_counts()
         sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
 
     def _run_simulation_main_loop(self) -> None:

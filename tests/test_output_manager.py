@@ -1856,14 +1856,14 @@ def test_log_verbosity_enum_values() -> None:
         ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
     ],
 )
-def test_get_error_warning_counts(
+def test_get_error_and_warning_counts(
     mocker: MockerFixture,
     errors_pool: dict[str, dict[str, list]],
     warnings_pool: dict[str, dict[str, list]],
     expected: tuple[int, int],
 ) -> None:
     """
-    Unit test for the get_error_warning_counts() method in OutputManager class
+    Unit test for the get_error_and_warning_counts() method in OutputManager class
     """
 
     # Arrange
@@ -1872,4 +1872,4 @@ def test_get_error_warning_counts(
     mocker.patch.object(om, "warnings_pool", warnings_pool)
 
     # Act and Assert
-    assert om.get_error_warning_counts() == expected
+    assert om.get_error_and_warning_counts() == expected

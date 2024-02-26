@@ -1126,7 +1126,7 @@ class OutputManager(object):
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
 
-    def get_error_warning_counts(self) -> tuple[int, int]:
+    def get_error_and_warning_counts(self) -> tuple[int, int]:
         """
         Get the total number of errors and warnings in the output manager's error and warning pools.
 

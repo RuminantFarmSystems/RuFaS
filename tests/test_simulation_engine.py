@@ -27,7 +27,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
 
     # Arrange
     patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
-    patch_for_output_manager.get_error_warning_counts.return_value = (1, 2)
+    patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     patch_for_sys_stdout_write = mocker.patch("RUFAS.simulation_engine.sys.stdout.write")
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
