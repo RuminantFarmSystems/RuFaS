@@ -179,6 +179,70 @@ class LayerData:
         Stable inorganic phosphorus content of this soil layer (kg/ha).
     fresh_organic_phosphorus_content : float, default 0
         Fresh organic phosphorus content of this soil layer (kg/ha).
+    active_inorganic_unbalanced_counter : int, default 0
+        The number of days that the active inorganic phosphorus pool has been greater than it would be when in
+        equilibrium with the labile inorganic phosphorus pool.
+    labile_inorganic_unbalanced_counter : int, default 0
+        The number of days that the labile inorganic phosphorus pool has been greater than it would be when in
+        equilibrium with the active inorganic phosphorus pool.
+    previous_phosphorus_balance : float, default None
+        The phosphorus balance on the previous day (unitless).
+    percolated_phosphorus : float, default 0.0
+        Amount of phosphorus removed from the layer by water percolating out (kg/ha).
+    plant_metabolic_to_soil_carbon_amount : float, default 0.0
+        Metabolic carbon incorporated into soil during tillage (kg/ha).
+    structural_litter_amount : float, default 0.0
+        Amount of plant structural carbon (kg/ha).
+    metabolic_litter_amount : float, default 0.0
+        Plant metabolic carbon amount (hg/ha).
+    tillage_fraction : float, default 0.0
+        Fraction of metabolic carbon incorporated into soil during tillage (unitless).
+    structural_carbon_transfer_amount : float, default 0.0
+        The amount of transfer of structural carbon during tillage (kg/ha).
+    soil_dry_matter_residue_amount : float, default 0.0
+        The amount of soil dry matter residue at harvest (kg/ha).
+    plant_dry_matter_residue_amount : float, default 0.0
+        The amount of plant dry matter residue at harvest (kg/ha).
+    plant_residue_metabolic_fraction : float, default 0.0
+        Fraction of plant residue that is metabolic (unitless).
+    plant_structural_to_slow_or_active_rate : float, default 0.0
+        The rate at which above-ground structural carbon decomposes into slow or active carbon (unitless).
+    weighted_residue_dry_matter_lignin_fraction : float, default 0.0
+        The weighted fraction of lignin amount in residue dry matter (unitless).
+    soil_residue_lignin_fraction : float, default 0.17
+        The fraction of soil residue that's comprised of lignin (unitless).
+    soil_lignin_to_nitrogen_fraction : float, default 0.0
+        Soil lignin to nitrogen fraction (unitless).
+    soil_residue_metabolic_fraction : float, default 0.0
+        The fraction of soil residue that is metabolic (unitless).
+    soil_metabolic_carbon_amount : float, default 0.0
+        Soil metabolic carbon amount (kg/ha).
+    soil_structural_carbon_amount : float, default 0.0
+        Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).
+    soil_structural_to_slow_or_active_rate : float, default 0.0
+        The rate at which below-ground structural carbon decomposes into slow or active carbon (unitless).
+    initial_soil_nitrate_concentration : Optional[float], default None
+        Concentration of nitrates in this soil layer at the beginning of the simulation (mg/kg soil).
+    initial_soil_ammonium_concentration : Optional[float], default None
+        Concentration of ammonium in this soil layer at the beginning of the simulation (mg/kg soil).
+    nitrate_content : Optional[float], default None
+        Nitrate (NO3) content of this soil layer (kg/ha).
+    ammonium_content : Optional[float], default None
+        Ammonium (NH4+) content of this soil layer (kg/ha).
+    active_organic_nitrogen_content : float, default 0.0
+        Active organic nitrogen content of this soil layer (kg/ha).
+    stable_organic_nitrogen_content : float, default 0.0
+        Stable organic nitrogen content of this soil layer (kg/ha).
+    fresh_organic_nitrogen_content : float, default 0.0
+        Fresh organic nitrogen content of this soil layer (kg/ha).
+        Note: all layers except the top layer are initialized with 0 fresh organic nitrogen.
+    nitrous_oxide_emissions : float, default 0.0
+        Amount of nitrous oxide emitted from this soil layer on the current day (kg/ha).
+    annual_nitrous_oxide_emissions_total : float, default 0.0
+        Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
+    humus_mineralization_rate_factor : float, default 0.0003
+        Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file, see "CMN" on page 101.
     """
 
     field_size: InitVar[float] = None
