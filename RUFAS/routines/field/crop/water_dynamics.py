@@ -4,6 +4,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 
 # TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
 
+
 class WaterDynamics:
     """
     Manages water dynamics related to crop growth, including water uptake, transpiration, and evaporation.
@@ -21,10 +22,16 @@ class WaterDynamics:
         for the crop.
 
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def cycle_water(self, evaporation: float, transpiration: float, potential_evapotranspiration: float) -> None:
+    def cycle_water(
+        self,
+        evaporation: float,
+        transpiration: float,
+        potential_evapotranspiration: float,
+    ) -> None:
         """
         Executes the daily cycling of water between the plants, soil, and environment.
 
@@ -45,12 +52,14 @@ class WaterDynamics:
         self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
         self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
-        self.data.cumulative_evapotranspiration += \
-            self._determine_evapotranspiration(self.data.cumulative_evaporation,
-                                               self.data.cumulative_transpiration)
+        self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(
+            self.data.cumulative_evaporation, self.data.cumulative_transpiration
+        )
 
-        self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_water_uptake,
-                                                                      self.data.cumulative_potential_evapotranspiration)
+        self.data.water_deficiency = self._determine_water_deficiency(
+            self.data.cumulative_water_uptake,
+            self.data.cumulative_potential_evapotranspiration,
+        )
 
     def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
         """Evaporates water from the canopy.
@@ -99,8 +108,9 @@ class WaterDynamics:
         SWAT Theoretical documentation section 2:2.3.2
 
         """
-        self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
-                                                                            potential_evapotranspiration_adjusted)
+        self.data.max_transpiration = self._determine_maximum_transpiration(
+            self.data.leaf_area_index, potential_evapotranspiration_adjusted
+        )
 
     @staticmethod
     def _determine_maximum_transpiration(leaf_area_index, potential_evapotranspiration_adjusted: float) -> float:
@@ -152,8 +162,10 @@ class WaterDynamics:
         return evaporation + transpiration
 
     @staticmethod
-    def _determine_water_deficiency(cumulative_evapotranspiration: float,
-                                    cumulative_potential_evapotranspiration: float) -> float:
+    def _determine_water_deficiency(
+        cumulative_evapotranspiration: float,
+        cumulative_potential_evapotranspiration: float,
+    ) -> float:
         """
         Calculate water deficiency factor.
 

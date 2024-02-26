@@ -3,6 +3,7 @@
 import random
 import sys
 import time as timer
+from enum import Enum
 from typing import Optional
 
 import numpy
@@ -65,9 +66,17 @@ class SimulationEngine:
         routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation(
             self.state.animal_manager, self.day_counter
         )
+        om.add_variable(
+            "available_feeds_on_final_day",
+            [
+                {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
+                for feed in self.feed_manager.query_available_feeds()
+            ],
+            info_map,
+        )
         t_end_sim = timer.time()
 
-        sys.stdout.write("\nSimulation Successful\n\n")
+        sys.stdout.write("\nSimulation Completed.\n\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
@@ -91,16 +100,10 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         self.day_counter += 1
-        self.state.animal_manager.daily_updates(
-            self.state.feed, self.weather, self.time
-        )
-        simulate_daily_manure_manager(
-            self.state.manure_manager, self.state.animal_manager
-        )
+        self.state.animal_manager.daily_updates(self.state.feed, self.weather, self.time)
+        simulate_daily_manure_manager(self.state.manure_manager, self.state.animal_manager)
         self.state.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(
-            self.state.feed, self.state.field_manager, self.state.animal_manager
-        )
+        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
 
         self.time.record_time()
         self.weather.record_weather(self.time)

@@ -1,7 +1,10 @@
 from typing import Optional
 from dataclasses import dataclass
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    LITERS_TO_CUBIC_MILLIMETERS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+)
 
 
 @dataclass(kw_only=True)
@@ -57,6 +60,7 @@ class FieldData:
     convert_liters_to_millimeters(liter_amount, field_size)
         Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
     """
+
     name: Optional[str] = None
     absolute_latitude: float = 43.5
     longitude: float = -88.6
@@ -93,19 +97,25 @@ class FieldData:
             If the watering interval is < 0.
         """
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
-        self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
-                                                                              self.dormancy_threshold)
+        self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(
+            self.minimum_daylength, self.dormancy_threshold
+        )
 
-        should_water = self.watering_amount_in_liters is not None and self.watering_interval is not None and \
-            self.watering_amount_in_liters != 0.0 and self.watering_interval != 0
+        should_water = (
+            self.watering_amount_in_liters is not None
+            and self.watering_interval is not None
+            and self.watering_amount_in_liters != 0.0
+            and self.watering_interval != 0
+        )
         if should_water:
             if self.watering_amount_in_liters < 0.0:
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
                 raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
 
-            self.watering_amount_in_mm = self.convert_liters_to_millimeters(self.watering_amount_in_liters,
-                                                                            self.field_size)
+            self.watering_amount_in_mm = self.convert_liters_to_millimeters(
+                self.watering_amount_in_liters, self.field_size
+            )
             self.current_water_deficit = self.watering_amount_in_mm
         else:
             self.watering_occurs = False

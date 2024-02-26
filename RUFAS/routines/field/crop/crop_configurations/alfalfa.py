@@ -2,10 +2,8 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
@@ -13,7 +11,7 @@ class Alfalfa(CropData):
     """
     Crop data class with default values for alfalfa.
     """
-    species: str = "alfalfa"
+
     name: str = "default alfalfa"
     plant_code: str = "ALFA"
     scientific_name: str = "Medicago sativa"
@@ -82,7 +80,8 @@ class AlfalfaSilage(Alfalfa):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "alfalfa_silage"
+
+    species: CropSpecies = CropSpecies.ALFALFA_SILAGE
     name: str = "alfalfa silage"
 
     storage_type: StorageType = StorageType.BUNKER
@@ -141,6 +140,8 @@ class AlfalfaBaleage(AlfalfaSilage):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
+
+    species: CropSpecies = CropSpecies.ALFALFA_BALEAGE
     species: str = "alfalfa_baleage"
     name: str = "alfalfa baleage"
 
@@ -186,7 +187,8 @@ class AlfalfaHay(Alfalfa):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
-    species: str = "alfalfa_hay"
+
+    species: CropSpecies = CropSpecies.ALFALFA_HAY
     name: str = "alfalfa hay"
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED
