@@ -42,16 +42,11 @@ class MetadataPaths(TypedDict):
         prefix. The second simulation will run immediately after with no extra input from the user and will
         use the ARL_metadata.json file and save its output files with the "ARL_scenario" prefix.
     """
+
     prefix: str
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "run1of4_c1f4_scenario",
-                                        "path": Path('input/metadata/c1f4_metadata.json')},
-                                        {"prefix": "run2of4_c1f4_scenario",
-                                        "path": Path('input/metadata/c1f4_metadata.json')},
-                                        {"prefix": "run3of4_c1f4_scenario",
-                                        "path": Path('input/metadata/c1f4_metadata.json')},
-                                        {"prefix": "run4of4_c1f4_scenario",
-                                        "path": Path('input/metadata/c1f4_metadata.json')},
-                                       ]
+METADATA_PATHS: List[MetadataPaths] = [
+    {"prefix": "default", "path": Path("input/metadata/default_metadata.json")},
+]
