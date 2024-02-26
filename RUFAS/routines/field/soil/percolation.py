@@ -4,24 +4,28 @@ from math import exp
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the section 'Percolation' (2:3.2) in SWAT
-"""
-
 
 class Percolation:
+    """
+    This class is based on the 'Percolation' section (2:3.2) in SWAT, designed to manage and simulate soil percolation
+    processes. It either accepts an existing SoilData object to work with or creates a new one based on the provided
+    field size.
+
+    Parameters
+    ----------
+    soil_data : Optional[SoilData]
+        The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
+        provided.
+    field_size : Optional[float], default=None
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData instance being used by the Percolation model.
+
+    """
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track percolation, creates new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
@@ -40,6 +44,7 @@ class Percolation:
         References
         ----------
         SWAT sections 2:3.1 and 2
+
         """
         if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
@@ -133,6 +138,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.4
+
         """
         if saturated_hydraulic_conductivity <= 0:
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
@@ -162,6 +168,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.3
+
         """
         return drainable_volume_water * (1 - exp((-1 * time_step) / travel_time))
 
@@ -194,6 +201,7 @@ class Percolation:
         References
         ----------
         SWAT Paragraph in between equations 2:3.2.3, 4
+
         """
         if not is_seasonal_high_water_table:
             return True
@@ -227,6 +235,7 @@ class Percolation:
         References
         ----------
         SWAT Section 2:3.2
+
         """
         if upper_layer.excess_water_available <= 0:
             return 0
