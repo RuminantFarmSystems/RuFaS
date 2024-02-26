@@ -243,6 +243,39 @@ class LayerData:
     humus_mineralization_rate_factor : float, default 0.0003
         Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
         Reference: SWAT Input .BSN file, see "CMN" on page 101.
+    denitrification_rate_coefficient : float, default 1.4
+        Controls the rate of denitrification in this layer of soil (unitless).
+        Note: acceptable values for this attribute are in the range [0.0, 3.0].
+        Reference: SWAT Input .BSN file, see "CDN" on page 101.
+    denitrification_threshold_water_content : float, default 1.10
+        Fraction of field capacity water content above which denitrification takes place (unitless).
+        Reference: SWAT Input .BSN file, see "SDNCO" on page 102.
+    residue_fresh_organic_mineralization_rate : float, default 0.05
+        Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
+        205).
+    ammonium_volatilization_cation_exchange_factor : float, default 0.15
+        Exchange factor that accounts for the soil's cation exchange capacity (unitless).
+        Reference: SWAT Theoretical documentation eqn. 3:1.3.5.
+    ammonia_emissions : float, default 0.0
+        Amount of ammonium that volatilized out of the soil layer on the current day (kg/ha).
+    annual_ammonia_emissions_total : float, default 0.0
+        Cumulative total of ammonium volatilized in this year (kg/ha).
+    percolated_nitrates : float, default 0.0
+        Amount of nitrates removed from the soil layer by water percolating out (kg/ha).
+    percolated_ammonium : float, default 0.0
+        Amount of ammonium removed from the soil layer by water percolating out (kg/ha).
+    percolated_active_organic_nitrogen : float, default 0.0
+        Amount of active organic nitrogen removed from the soil layer by water percolating out (kg/ha).
+    soil_overall_carbon_fraction : float, optional, default None
+        The total fraction of carbon in the soil (unitless).
+    total_soil_carbon_amount : float, optional, default None
+        The total amount of soil carbon (kg/ha).
+    annual_decomposition_carbon_CO2_lost : float, optional, default None
+        Amount of total carbon lost as CO2 during decomposition (kg/ha).
+    annual_carbon_CO2_lost : float, optional, default None
+        Total amount of carbon lost as CO2 (kg/ha).
+
     """
 
     field_size: InitVar[float] = None
