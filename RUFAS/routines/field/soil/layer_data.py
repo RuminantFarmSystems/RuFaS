@@ -74,90 +74,90 @@ class LayerData:
         Rock content expressed as percent of soil in this layer (unitless).
     decomposition_moisture_effect : float, default 0.0
         Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
-    percent_organic_carbon_content: float, default 1.2
+    percent_organic_carbon_content : float, default 1.2
         Organic carbon content expressed as percent of soil in this layer (unitless).
-    percent_clay_content: float, default 18.7
+    percent_clay_content : float, default 18.7
         Clay content expressed as percent of soil in this layer (unitless).
-    percent_sand_content: float, default 14.5
+    percent_sand_content : float, default 14.5
         Sand content expressed as percent of soil in this layer (unitless).
-    percent_silt_content: float, default 64.5
+    percent_silt_content : float, default 64.5
         Silt content expressed as percent of soil in this layer (unitless).
-    percent_rock_content: float, default 1
+    percent_rock_content : float, default 1
         Rock content expressed as percent of soil in this layer (unitless).
-    decomposition_moisture_effect: float, default 0.0
+    decomposition_moisture_effect : float, default 0.0
         Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
-    plant_metabolic_active_carbon_usage: float, default 0.0
+    plant_metabolic_active_carbon_usage : float, default 0.0
         Plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.).
-    plant_metabolic_active_carbon_loss: float, default 0.0
+    plant_metabolic_active_carbon_loss : float, default 0.0
         Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    plant_metabolic_active_carbon_remaining: float, default 0.0
+    plant_metabolic_active_carbon_remaining : float, default 0.0
         Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    plant_structural_active_carbon_usage: float, default 0.0
+    plant_structural_active_carbon_usage : float, default 0.0
         Plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
-    plant_structural_active_carbon_loss: float, default 0.0
+    plant_structural_active_carbon_loss : float, default 0.0
         Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    plant_structural_active_carbon_remaining: float, default 0.0
+    plant_structural_active_carbon_remaining : float, default 0.0
         Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    plant_structural_slow_carbon_usage: float, default 0.0
+    plant_structural_slow_carbon_usage : float, default 0.0
         Plant structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
-    plant_structural_slow_carbon_loss: float, default 0.0
+    plant_structural_slow_carbon_loss : float, default 0.0
         Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
-    plant_structural_slow_carbon_remaining: float, default 0.0
+    plant_structural_slow_carbon_remaining : float, default 0.0
         Plant structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
-    soil_metabolic_active_carbon_usage: float, default 0.0
+    soil_metabolic_active_carbon_usage : float, default 0.0
         Soil metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.8).
-    soil_metabolic_active_carbon_loss: float, default 0.0
+    soil_metabolic_active_carbon_loss : float, default 0.0
         Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    soil_metabolic_active_carbon_remaining: float, default 0.0
+    soil_metabolic_active_carbon_remaining : float, default 0.0
         Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    soil_structural_active_carbon_usage: float, default 0.0
+    soil_structural_active_carbon_usage : float, default 0.0
         Soil structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.11).
-    soil_structural_active_carbon_loss: float, default 0.0
+    soil_structural_active_carbon_loss : float, default 0.0
         Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    soil_structural_active_carbon_remaining: float, default 0.0
+    soil_structural_active_carbon_remaining : float, default 0.0
         Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    soil_structural_slow_carbon_usage: float, default 0.0
+    soil_structural_slow_carbon_usage : float, default 0.0
         Soil structural carbon decomposed into slow carbon after accounting for carbon dioxide loss (kg/ha)
         (pseudocode_soil S.6.B.II.11).
-    soil_structural_slow_carbon_loss: float, default 0.0
+    soil_structural_slow_carbon_loss : float, default 0.0
         Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
-    soil_structural_slow_carbon_remaining: float, default 0.0
+    soil_structural_slow_carbon_remaining : float, default 0.0
         Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
-    active_carbon_decomposition_rate: float, default 0.0
+    active_carbon_decomposition_rate : float, default 0.0
         Rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2).
-    carbon_lost_adjusted_factor: float, default 0.0
+    carbon_lost_adjusted_factor : float, default 0.0
         Adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6).
-    active_carbon_decomposition_amount: float, default 0.0
+    active_carbon_decomposition_amount : float, default 0.0
         Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).
-    active_carbon_amount: float, default None
+    active_carbon_amount : float, default None
         Active carbon stored in the layer (kg/ha).
-    slow_carbon_amount: float, optional, default None
+    slow_carbon_amount : float, optional, default None
         Slow carbon stored in the soil (kg/ha).
-    slow_carbon_decomposition_amount: float, default 0.0
+    slow_carbon_decomposition_amount : float, default 0.0
         Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).
-    passive_carbon_decomposition_amount: float, default 0.0
+    passive_carbon_decomposition_amount : float, default 0.0
         Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).
-    passive_carbon_amount: Optional[float], default None
+    passive_carbon_amount : float, optional, default None
         Passive carbon stored in the soil (kg/ha).
-    active_carbon_to_slow_amount: float, default 0.0
+    active_carbon_to_slow_amount : float, default 0.0
         Active carbon decomposed into slow carbon (kg/ha).
-    active_carbon_to_slow_loss: float, default 0.0
+    active_carbon_to_slow_loss : float, default 0.0
         Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).
-    active_carbon_to_passive_amount: float, default 0.0
+    active_carbon_to_passive_amount : float, default 0.0
         Active carbon decomposed into passive carbon (kg/ha).
-    slow_to_active_carbon_amount: float, default 0.0
+    slow_to_active_carbon_amount : float, default 0.0
         Slow carbon decomposed into active carbon (kg/ha).
-    slow_carbon_co2_lost_amount: float, default 0.0
+    slow_carbon_co2_lost_amount : float, default 0.0
         Slow carbon lost as CO2 during decomposition (kg/ha).
-    slow_to_passive_carbon_amount: float, default 0.0
+    slow_to_passive_carbon_amount : float, default 0.0
         Slow carbon decomposed into passive carbon (kg/ha).
-    passive_to_active_carbon_amount: float, default 0.0
+    passive_to_active_carbon_amount : float, default 0.0
         Passive carbon decomposed into active carbon (kg/ha).
-    passive_carbon_co2_lost_amount: float, default 0.0
+    passive_carbon_co2_lost_amount : float, default 0.0
         Passive carbon lost as CO2 during decomposition (kg/ha).
-    plant_active_decompose_carbon: float, default 0.0
+    plant_active_decompose_carbon : float, default 0.0
         Plant carbon decomposed into the active carbon pool (kg/ha).
-    soil_active_decompose_carbon: float, default 0.0
+    soil_active_decompose_carbon : float, default 0.0
         Soil carbon decomposed into the active carbon pool (kg/ha).
     """
 
