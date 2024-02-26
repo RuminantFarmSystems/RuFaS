@@ -15,20 +15,6 @@
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "slurry storage outdoor"
-    },
-    {
-      "scenario_id": 2,
-      "bedding_type": "",
-      "manure_handler": "",
-      "manure_separator": "",
-      "manure_treatment": ""
-    },
-    {
-      "scenario_id": 3,
-      "bedding_type": "",
-      "manure_handler": "",
-      "manure_separator": "",
-      "manure_treatment": ""
     }
   ],
   "bedding_configs": [
