@@ -123,10 +123,42 @@ class LayerData:
         Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
     soil_structural_slow_carbon_remaining: float, default 0.0
         Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
-    active_carbon_decomposition_rate: float = 0.0
+    active_carbon_decomposition_rate: float, default 0.0
         Rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2).
-    carbon_lost_adjusted_factor: float = 0.0
+    carbon_lost_adjusted_factor: float, default 0.0
         Adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6).
+    active_carbon_decomposition_amount: float, default 0.0
+        Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).
+    active_carbon_amount: float, default None
+        Active carbon stored in the layer (kg/ha).
+    slow_carbon_amount: float, optional, default None
+        Slow carbon stored in the soil (kg/ha).
+    slow_carbon_decomposition_amount: float, default 0.0
+        Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).
+    passive_carbon_decomposition_amount: float, default 0.0
+        Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).
+    passive_carbon_amount: Optional[float], default None
+        Passive carbon stored in the soil (kg/ha).
+    active_carbon_to_slow_amount: float, default 0.0
+        Active carbon decomposed into slow carbon (kg/ha).
+    active_carbon_to_slow_loss: float, default 0.0
+        Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).
+    active_carbon_to_passive_amount: float, default 0.0
+        Active carbon decomposed into passive carbon (kg/ha).
+    slow_to_active_carbon_amount: float, default 0.0
+        Slow carbon decomposed into active carbon (kg/ha).
+    slow_carbon_co2_lost_amount: float, default 0.0
+        Slow carbon lost as CO2 during decomposition (kg/ha).
+    slow_to_passive_carbon_amount: float, default 0.0
+        Slow carbon decomposed into passive carbon (kg/ha).
+    passive_to_active_carbon_amount: float, default 0.0
+        Passive carbon decomposed into active carbon (kg/ha).
+    passive_carbon_co2_lost_amount: float, default 0.0
+        Passive carbon lost as CO2 during decomposition (kg/ha).
+    plant_active_decompose_carbon: float, default 0.0
+        Plant carbon decomposed into the active carbon pool (kg/ha).
+    soil_active_decompose_carbon: float, default 0.0
+        Soil carbon decomposed into the active carbon pool (kg/ha).
     """
 
     field_size: InitVar[float] = None
