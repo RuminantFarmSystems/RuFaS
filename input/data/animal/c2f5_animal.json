@@ -7,7 +7,6 @@
 		"cow_num":2198,
 		"replace_num":10990,
 		"herd_num":2198,
-		"herd_init": false,
 		"breed": "HO"
 	},
 	"herd_initialization": {
@@ -17,14 +16,16 @@
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h":419,
-			"heifer_repro_method": "ED",
-			"cow_repro_method": "ED",
+			"heifer_repro_method": "SynchED",
+			"cow_repro_method": "ED-TAI",
 			"semen_type": "sexed",
 			"days_in_preg_when_dry":220,
 			"heifer_repro_cull_time":520,
 			"do_not_breed_time" :200,
 			"cull_milk_production":29.5,
-			"cow_times_milked_per_day":2
+			"cow_times_milked_per_day":2,
+			"milk_fat_percent": 3.8,
+			"milk_protein_percent": 3.2
 		},
 		"farm_level": {
 			"calf": {
@@ -39,8 +40,10 @@
 				"voluntary_waiting_period":60,
 				"conception_rate_decrease":0.026,
 				"avg_gestation_len":278,
+				"decrease_conception_rate_in_rebreeding": false,
+				"decrease_conception_rate_by_parity": false,
 				"std_gestation_len":6,
-				"prefresh_day":25,
+				"prefresh_day":21,
 				"calving_interval":365,
 				"heifers": {
 					"estrus_detection_rate":0.9,
@@ -53,27 +56,13 @@
 				},
 				"cows": {
 					"estrus_detection_rate": 0.7,
-					"estrus_conception_rate": 0.43,
-					"presynch_protocol": "PreSynch",
-					"resynch_protocol": "PGFatPD",
-					"repro_sub_protocol": "OvSynch 56",
-					"repro_sub_properties": {
-						"conception_rate": 0.43,
-						"tai_program_start_day": 74
-					}
-				},
-				"cow_repro_programs": {
-					"estrus_detection_rate": 0.7,
-					"estrus_service_rate": 0.95,
-					"ed_conception_rate": 0.43,
-					"cow_presynch_protocol": "PreSynch",
-					"cow_TAI_protocol": "OvSynch 56",
-					"ovsynch56_conception_rate": 0.43,
-					"ovsynch48_conception_rate": 0.43,
-					"cosynch72_conception_rate": 0.43,
-					"cosynch5d_conception_rate": 0.43,
-					"cow_resynch_protocol": "PGFatPD",
-					"tai_program_start_day": 74
+					"ED_conception_rate": 0.43,
+					"presynch_program": "PreSynch",
+					"presynch_program_start_day": "45",
+            		"ovsynch_program": "OvSynch 56",
+					"ovsynch_program_start_day": 74,
+					"ovsynch_program_conception_rate": 0.43,
+					"resynch_program": "PGFatPD"
 				}
 			},
 			"bodyweight": {
@@ -282,7 +271,7 @@
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":700,
 			"housing_type": "open air barn",
-			"pen_type": "dry lot",
+			"pen_type": "open lot",
 			"max_stocking_density":2.0,
 			"manure_management_scenario_id":0
 		},
@@ -294,7 +283,7 @@
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":1500,
 			"housing_type": "open air barn",
-			"pen_type": "dry lot",
+			"pen_type": "open lot",
 			"max_stocking_density":2.0,
 			"manure_management_scenario_id":0
 		},
@@ -306,7 +295,7 @@
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":250,
 			"housing_type": "open air barn",
-			"pen_type": "dry lot",
+			"pen_type": "open lot",
 			"max_stocking_density":2.0,
 			"manure_management_scenario_id":0
 		},
@@ -318,7 +307,7 @@
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":1950,
 			"housing_type": "open air barn",
-			"pen_type": "dry lot",
+			"pen_type": "open lot",
 			"max_stocking_density":2.0,
 			"manure_management_scenario_id":0
 		},
