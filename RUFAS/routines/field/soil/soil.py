@@ -97,6 +97,7 @@ class Soil:
             Water content of the snow cover on the current day (mm).
         avg_annual_air_temp : float
             Average annual air temperature (degrees C).
+
         """
         # TODO: if no other daily update methods are added here, this method should be removed and Field should call
         #       this method directly
@@ -152,6 +153,7 @@ class Soil:
         -----
         The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
         profile depend on how much water enters and moves through the soil profile.
+
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
         self.percolation.percolate(has_seasonal_high_water_table)
