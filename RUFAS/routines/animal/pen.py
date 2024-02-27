@@ -300,11 +300,11 @@ class Pen:
         )
 
         # manure attributes are initialized in the reset_manure method
-        self.manure = None
-        self.calf_total = None
-        self.heifer_total = None
-        self.dry_total = None
-        self.lactating_total = None
+        self.manure = {}
+        self.calf_total = {}
+        self.heifer_total = {}
+        self.dry_total = {}
+        self.lactating_total = {}
 
         self.reset_manure()
 
@@ -448,7 +448,7 @@ class Pen:
             manure: Dict[float, int]
                 A dictionary that contains the the accumulated maniure excretion values for all animals
             curr_manure: AnimalManureExcretions
-                A dictionary that contains the manure excretion values as specified
+                A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
                 in the AnimalManureExcretions class definition.
             animal_dict: Dict[float, int]
                 A dictionary that contains the manure excretion values for specific animals in the pen
@@ -499,19 +499,19 @@ class Pen:
         for animal in animals:
             curr_manure = animal.manure_excretion
             if type(animal) == Calf:  # noqa
-                updated_manure, updated_calf = self.manure_sums(manure, curr_manure, calf_total)
+                manure, calf_total = self.manure_sums(manure, curr_manure, calf_total)
             elif type(animal) in [HeiferI, HeiferII, HeiferIII]:  # noqa
-                updated_manure, updated_heifer = self.manure_sums(updated_manure, curr_manure, heifer_total)
+                manure, heifer_total = self.manure_sums(manure, curr_manure, heifer_total)
             elif type(animal) == Cow and not animal.milking:  # noqa
-                updated_manure, updated_dry_total = self.manure_sums(updated_manure, curr_manure, dry_total)
+                manure, dry_total = self.manure_sums(manure, curr_manure, dry_total)
             elif type(animal) == Cow and animal.milking:  # noqa
-                updated_manure, updated_lactating = self.manure_sums(updated_manure, curr_manure, lactating_total)
+                manure, lactating_total = self.manure_sums(manure, curr_manure, lactating_total)
 
-        self.manure = updated_manure
-        self.calf_total = updated_calf
-        self.heifer_total = updated_heifer
-        self.dry_total = updated_dry_total
-        self.lactating_total = updated_lactating
+        self.manure = manure
+        self.calf_total = calf_total
+        self.heifer_total = heifer_total
+        self.dry_total = dry_total
+        self.lactating_total = lactating_total
 
     def _copy_manure_template(self):
         return copy.deepcopy(self._manure_dict_template)
