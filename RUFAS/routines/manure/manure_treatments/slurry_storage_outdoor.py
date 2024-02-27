@@ -35,9 +35,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     """
 
-    def __init__(
-            self, weather, time, manure_treatment_config: ManureTreatmentConfig
-    ) -> None:
+    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
@@ -82,11 +80,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         if self._current_manure_treatment_daily_input:
-            return (
-                    self.treatment_volume
-                    + self.freeboard_volume
-                    + self.precipitation_volume
-            )
+            return self.treatment_volume + self.freeboard_volume + self.precipitation_volume
         return 0.0
 
     @property
@@ -117,11 +111,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         a = 3 * self.pit_depth
-        b = -4 * self.pit_slope * self.pit_depth ** 2
-        c = (
-                4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3
-                - self.treatment_volume
-        )
+        b = -4 * self.pit_slope * self.pit_depth**2
+        c = 4 * (self.pit_slope**2) * (self.pit_depth**3) / 3 - self.treatment_volume
         return a, b, c
 
     @property
@@ -134,7 +125,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         if self._current_manure_treatment_daily_input:
             a, b, c = self._calc_abc()
-            return (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
+            return (-b + math.sqrt(b**2 - 4 * a * c)) / (2 * a)
         return 0.0
 
     @property
@@ -166,10 +157,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         return (
-                self.pit_length * self.pit_width * self.pit_depth
-                - (self.pit_slope * (self.pit_depth ** 2))
-                * (self.pit_length + self.pit_width)
-                + (4 * self.pit_slope * (self.pit_depth ** 3) / 3)
+            self.pit_length * self.pit_width * self.pit_depth
+            - (self.pit_slope * (self.pit_depth**2)) * (self.pit_length + self.pit_width)
+            + (4 * self.pit_slope * (self.pit_depth**3) / 3)
         )
 
     @property
@@ -192,9 +182,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return self.freeboard_input * self.pit_surface_area
 
-    def calc_methane_emission(
-            self, accumulated_liquid_manure_total_volatile_solids: float
-    ) -> float:
+    def calc_methane_emission(self, accumulated_liquid_manure_total_volatile_solids: float) -> float:
         """Calculates the CH4 emission from the outdoor slurry storage treatment system.
 
         Args:
@@ -213,10 +201,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return methane_loss
 
     def calc_ammonia_emission(
-            self,
-            num_animals: int,
-            accumulated_manure_volume: float,
-            accumulated_manure_total_ammoniacal_nitrogen: float,
+        self,
+        num_animals: int,
+        accumulated_manure_volume: float,
+        accumulated_manure_total_ammoniacal_nitrogen: float,
     ) -> Tuple[float, float]:
         """Calculates the ammonia emission from the outdoor slurry storage treatment system.
 
@@ -261,9 +249,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
 
-        methane_loss = self.calc_methane_emission(
-            self._accumulated_output.liquid_manure_total_volatile_solids
-        )
+        methane_loss = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_volatile_solids)
         ammonia_loss = self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
@@ -274,12 +260,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.storage_ammonia = ammonia_loss
         daily_output.storage_methane = methane_loss
 
-        new_daily_accumulated_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
+        new_daily_accumulated_liquid_manure_total_solids = max(
+            daily_output.liquid_manure_total_solids - methane_loss, 0.0
+        )
         daily_output.liquid_manure_total_solids = new_daily_accumulated_liquid_manure_total_solids
 
-        new_daily_output_liquid_manure_nitrogen = max(
-            daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0
-        )
+        new_daily_output_liquid_manure_nitrogen = max(daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0)
         daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
         new_daily_output_liquid_manure_total_ammoniacal_nitrogen = max(
@@ -293,9 +279,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
-        self._accumulated_output.liquid_manure_nitrogen = (
-            new_accumulated_liquid_manure_nitrogen
-        )
+        self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
         )
@@ -315,7 +299,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return daily_output
 
     def _adjust_accumulated_output(
-            self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
         """
         Adjust the accumulated output by either resetting it or adding the daily output to it.
@@ -336,7 +320,5 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         if self._sim_day % self.storage_time_period == 1:
             return manure_treatment_daily_output.clone()
         else:
-            new_accumulated_output = (
-                    self._accumulated_output + manure_treatment_daily_output
-            )
+            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
             return new_accumulated_output

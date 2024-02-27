@@ -31,9 +31,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
     """
 
-    def __init__(
-        self, weather, time, manure_treatment_config: ManureTreatmentConfig
-    ) -> None:
+    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initialize the underfloor slurry storage manure treatment.
 
         Args:
@@ -46,9 +44,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         super().__init__(weather, time, manure_treatment_config)
         self.storage_time_period = self.config.storage_time_period
 
-    def calc_methane_emission(
-        self, accumulated_liquid_manure_total_solids: float
-    ) -> float:
+    def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> float:
         """Calculates the methane emission from the underfloor slurry storage.
 
         Args:
@@ -123,13 +119,11 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         daily_output.storage_methane = methane_loss
         daily_output.storage_ammonia = ammonia_loss
-        
+
         new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
 
-        new_daily_output_liquid_manure_nitrogen = max(
-            daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0
-        )
+        new_daily_output_liquid_manure_nitrogen = max(daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0)
         daily_output.liquid_manure_nitrogen = new_daily_output_liquid_manure_nitrogen
 
         new_daily_output_liquid_manure_total_ammoniacal_nitrogen = max(
@@ -143,9 +137,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
-        self._accumulated_output.liquid_manure_nitrogen = (
-            new_accumulated_liquid_manure_nitrogen
-        )
+        self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
 
         new_accumulated_liquid_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
@@ -166,7 +158,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         return daily_output
 
     def _adjust_accumulated_output(
-            self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
         """
         Adjust the accumulated output by either resetting it or adding the daily output to it.
@@ -187,8 +179,5 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         if self._sim_day % self.storage_time_period == 1:
             return manure_treatment_daily_output.clone()
         else:
-            new_accumulated_output = (
-                    self._accumulated_output + manure_treatment_daily_output
-            )
+            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
             return new_accumulated_output
-
