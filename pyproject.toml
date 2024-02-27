@@ -12,3 +12,5 @@ check_untyped_defs = true # Check the bodies of untyped functions, applying type
 disallow_any_generics = true # Disallow the use of Any as a type unless explicitly declared
 disallow_incomplete_defs = true # Require all variables to be explicitly typed
 show_column_numbers = true # Show column numbers in error messages
+strict = true
+exclude = ['^(?!.*(?:RUFAS|tests|main\.py|setup\.py)).*$']
