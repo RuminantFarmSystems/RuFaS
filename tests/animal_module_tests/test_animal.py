@@ -2533,12 +2533,12 @@ def test_DMI_constraint_upper(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.fixture
-def mock_cow_cons() -> MagicMock():
+def mock_cow_cons() -> MagicMock:
     return MagicMock(name="cow_cons")
 
 
 @pytest.fixture
-def mock_heifer_cons() -> MagicMock():
+def mock_heifer_cons() -> MagicMock:
     return MagicMock(name="heifer_cons")
 
 
