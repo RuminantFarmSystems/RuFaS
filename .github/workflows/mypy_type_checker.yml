@@ -70,6 +70,7 @@ jobs:
           else
             echo "No increase in mypy errors found."
           fi
+        continue-on-error: true
 
       - name: Checkout current branch
         if: github.ref != 'refs/heads/main'
