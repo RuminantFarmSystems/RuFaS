@@ -624,10 +624,10 @@ class LayerData:
 
         Parameters
         ----------
-            phosphorus_to_add : float
-                Amount of phosphorus to add (kg).
-            field_size : float
-                Size of the field (ha).
+        phosphorus_to_add : float
+            Amount of phosphorus to add (kg).
+        field_size : float
+            Size of the field (ha).
 
         """
         self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
@@ -641,10 +641,10 @@ class LayerData:
 
         Parameters
         ----------
-            phosphorus_to_add : float
-                Amount of phosphorus to add (kg).
-            field_size : float
-                Size of the field (ha).
+        phosphorus_to_add : float
+            Amount of phosphorus to add (kg).
+        field_size : float
+            Size of the field (ha).
 
         """
         self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
