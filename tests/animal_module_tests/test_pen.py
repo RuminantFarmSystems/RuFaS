@@ -16,6 +16,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.routines.animal.animal_manager import AnimalManager
 
 
 @pytest.fixture
@@ -226,9 +227,41 @@ def test_calc_avg_stats():
     pass
 
 
-def test_calc_manure():
+@pytest.mark.parametrize(
+    "pen_to_test, new_animals",
+    [
+        (
+            lazy_fixture("pen"),
+            lazy_fixture("mock_animal_list")
+        ),
+        (
+            lazy_fixture("pen_with_animals"),
+            lazy_fixture("mock_animal_list_ii"),
+        ),
+    ],
+)
+def test_calc_manure(pen_to_test: Pen, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+                     mocker: MockerFixture):
     """Unit test for function calc_manure in file routines/animal/pen.py"""
-    pass
+
+    man_sums = mocker.patch.object(Pen, "manure_sums")
+    man_sums.return_value = (mocker.MagicMock(), mocker.MagicMock())
+    pen_to_test.add_new_animals(new_animals)
+    patches = []
+
+    for animal in new_animals:
+        print(type(animal))
+        patches.append(mocker.patch.object(animal, "calc_manure_excretion"))
+    methane_model = mocker.MagicMock()
+    feed = mocker.MagicMock(spec="Feed")
+
+    # act
+    Pen.calc_manure(pen_to_test, feed, methane_model)
+
+    # assert
+    for obj in patches:
+        obj.assert_called_once_with(feed, methane_model)
+    # man_sums.assert_called()
 
 
 def test_reset_manure(pen: Pen) -> None:
