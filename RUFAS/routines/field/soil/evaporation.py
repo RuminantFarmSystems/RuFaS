@@ -242,7 +242,7 @@ class Evaporation:
         Returns
         -------
         float
-            amount of water removed from soil layer by evaporation (mm).
+            Amount of water removed from soil layer by evaporation (mm).
 
         References
         ----------
