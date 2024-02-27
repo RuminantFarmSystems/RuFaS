@@ -16,48 +16,57 @@ from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import Nitrogen
 
 
 class Soil:
+    """
+    A class to manage and simulate various soil processes based on a given SoilData object.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        A SoilData object containing initial attribute values as well as attributes tracked and updated throughout the simulation.
+    field_size : float, optional
+        The size of the field in hectares (ha), used to initialize a SoilData object if a pre-configured SoilData object is not provided.
+
+    Attributes
+    ----------
+    data : SoilData
+        An object that tracks all soil variables throughout the simulation.
+    soil_temp : SoilTemp
+        Process component that tracks and updates the temperatures within the soil profile.
+    phosphorus_cycling : PhosphorusCycling
+        Process component managing phosphorus on top of and in the soil profile.
+    carbon_cycling : CarbonCycling
+        Process component that handles carbon cycling through decomposition in the soil.
+    nitrogen_cycling : NitrogenCycling
+        Process component for managing nitrogen within the soil profile.
+    evaporation : Evaporation
+        Process component that controls evaporation from the soil.
+    infiltration : Infiltration
+        Process component that controls water infiltration from the soil surface into the profile.
+    percolation : Percolation
+        Process component that controls percolation of water from upper layers to lower layers.
+    soil_erosion : SoilErosion
+        Process component that tracks erosion from the soil profile.
+    snow : Snow
+        Process component that tracks snow.
+
+    """
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """Creates a Soil object based on a SoilData object.
-
-        Parameters
-        ----------
-        soil_data: a SoilData object containing initial attribute values as well as attributes tracked and updated
-            throughout the simulation
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        Notes
-        -----
-        If no SoilData object is passed, default configuration is used.
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
-        """object that tracks all soil variable throughout the simulation"""
 
         # Process components
         self.soil_temp = SoilTemp(self.data)
-        """Process component that tracks and updates the temperatures within the soil profile"""
         self.phosphorus_cycling = PhosphorusCycling(self.data)
-        """Process component managing phosphorus on top of and in the soil profile"""
         self.carbon_cycling = CarbonCycling(self.data)
-        """Process component that handles carbon cycling (through decomposition) in the soil."""
         # TODO: need to add phosphorus, manure, and carbon cycling main methods methods to the soil methods.
         #   It is unclear to me how best to do that.
         self.nitrogen_cycling = NitrogenCycling(self.data)
-        """Process component for managing nitrogen within the soil profile."""
 
         # Water components
         self.evaporation = Evaporation(self.data)
-        """Process component that controls evaporation from the soil"""
         self.infiltration = Infiltration(self.data)
-        """Process component that controls water infiltration from the soil surface into the profile"""
         self.percolation = Percolation(self.data)
-        """Process component that controls percolation of water from upper layers to lower layers"""
         self.soil_erosion = SoilErosion(self.data)
-        """Process component that tracks erosion from the soil profile"""
         self.snow = Snow(self.data)
-        """Process component that tracks snow"""
 
     def daily_soil_routine(
         self,
@@ -88,6 +97,7 @@ class Soil:
             Water content of the snow cover on the current day (mm).
         avg_annual_air_temp : float
             Average annual air temperature (degrees C).
+
         """
         # TODO: if no other daily update methods are added here, this method should be removed and Field should call
         #       this method directly
@@ -143,6 +153,7 @@ class Soil:
         -----
         The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
         profile depend on how much water enters and moves through the soil profile.
+
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
         self.percolation.percolate(has_seasonal_high_water_table)
