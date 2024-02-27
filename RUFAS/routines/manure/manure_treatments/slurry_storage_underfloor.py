@@ -15,6 +15,9 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class SlurryStorageUnderfloor(BaseManureTreatment):
@@ -62,7 +65,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             total_volatile_solids=accumulated_liquid_manure_total_solids,
             temp=temperature_celsius,
         )
-        return max(methane_loss, 0.0)
+        return methane_loss
 
     def calc_ammonia_emission(
         self,
@@ -120,7 +123,9 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         daily_output.storage_methane = methane_loss
         daily_output.storage_ammonia = ammonia_loss
-        self._accumulated_output.liquid_manure_total_volatile_solids -= methane_loss
+        
+        new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
+        daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
 
         new_daily_output_liquid_manure_nitrogen = max(
             daily_output.liquid_manure_nitrogen - ammonia_loss, 0.0
@@ -148,6 +153,15 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_total_ammoniacal_nitrogen
         )
+
+        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
+            manure_cover=self.config.manure_cover,
+            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        )
+        daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
+        self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
+        self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
 
         return daily_output
 
