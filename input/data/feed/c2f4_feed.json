@@ -249,6 +249,6 @@
       }
     ],
     "tolerance": 0.1,
-    "milk_reduction_maximum": 20 
+    "milk_reduction_maximum": 0 
   }
 }
