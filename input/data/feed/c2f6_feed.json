@@ -1,6 +1,6 @@
 {
   "calf_feeds": [
-    203,
+    202,
     216
   ],
   "growing_feeds": [
@@ -31,7 +31,7 @@
   ],
   "purchased_feeds": [
     {
-      "purchased_feed": 203,
+      "purchased_feed": 202,
       "purchased_feed_cost": 0.1 
     },
     {
@@ -79,11 +79,12 @@
       "purchased_feed_cost": 0.5
     },
     {
-      "purcahsed_feed": 301,
+      "purchased_feed": 301,
       "purchased_feed_cost": 1.0
     }
   ],
   "farm_grown_feeds": [
+    1
   ],
   "storage_options": [
     {
@@ -112,7 +113,7 @@
   "user_defined_ration_percentages": {
     "calf": [
       {
-        "feed_type": 203,
+        "feed_type": 202,
         "ration_percentage": 50 
       },
       {
@@ -198,7 +199,7 @@
         "ration_percentage": 8.8 
       },
       {
-        "feed_type": 167,
+        "feed_type":  67,
         "ration_percentage": 4.8 
       },
       {
