@@ -173,9 +173,7 @@ class AnimalModuleReporter:
                 pen.avg_nutrient_rqmts,
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
-            ration_per_animal_units = {
-                key: "kg" for key in ration_per_animal.keys()
-            }
+            ration_per_animal_units = {key: "kg" for key in ration_per_animal.keys()}
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_per_animal,
@@ -239,9 +237,7 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_daily_feed_emissions(
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
-            ration_total_units = {
-                key: "kg" for key in ration_total.keys()
-            }
+            ration_total_units = {key: "kg" for key in ration_total.keys()}
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
