@@ -16,6 +16,7 @@ class SoilConfigFactory:
     based on the CropSpeciesDataFactory model, and should contain all equivalent functionalities.
 
     """
+
     @staticmethod
     def create_soil_data(
         field_size: float,
