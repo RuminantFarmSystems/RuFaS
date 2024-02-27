@@ -174,7 +174,7 @@ class AnimalModuleReporter:
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
             ration_per_animal_units = {
-                #  TODO is this different for every ration formulation? If so, what to put here?
+                key: "kg" for key in ration_per_animal.keys()
             }
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -240,9 +240,7 @@ class AnimalModuleReporter:
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
             ration_total_units = {
-                "dry_matter_intake_total": "kg",
-                "byproducts_total": "kg",
-                # TODO same issue as todo for ration_per_animal_units
+                key: "kg" for key in ration_total.keys()
             }
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
