@@ -230,18 +230,16 @@ def test_calc_avg_stats():
 @pytest.mark.parametrize(
     "pen_to_test, new_animals",
     [
-        (
-            lazy_fixture("pen"),
-            lazy_fixture("mock_animal_list")
-        ),
+        (lazy_fixture("pen"), lazy_fixture("mock_animal_list")),
         (
             lazy_fixture("pen_with_animals"),
             lazy_fixture("mock_animal_list_ii"),
         ),
     ],
 )
-def test_calc_manure(pen_to_test: Pen, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-                     mocker: MockerFixture):
+def test_calc_manure(
+    pen_to_test: Pen, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
+):
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
     man_sums = mocker.patch.object(Pen, "manure_sums")
