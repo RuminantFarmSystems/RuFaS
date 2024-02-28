@@ -92,3 +92,6 @@ class AnimalModuleConstants:
 
     MILK_REDUCTION_KG = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
+
+    MINIMUM_HEIFER_BW_CHANGE = 0.5
+    """Minimum daily growth for heifers, kg."""
