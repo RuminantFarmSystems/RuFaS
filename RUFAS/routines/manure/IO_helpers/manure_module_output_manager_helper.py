@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import fields, dataclass
+from enum import Enum
+
 from RUFAS.output_manager import OutputManager
 
 
@@ -40,4 +42,8 @@ class ManureModuleOutputManagerHelper:
 
         for field in fields(dataclass_object):
             if exclude_fields is None or field.name not in exclude_fields:
+                if type(getattr(dataclass_object, field.name)) is Enum:
+                    unit = "unitless"
+                else:
+                    pass
                 cls._om.add_variable(field.name, getattr(dataclass_object, field.name), info_maps)
