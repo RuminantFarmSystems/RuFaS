@@ -22,9 +22,11 @@ class Soil:
     Parameters
     ----------
     soil_data : SoilData, optional
-        A SoilData object containing initial attribute values as well as attributes tracked and updated throughout the simulation.
+        A SoilData object containing initial attribute values as well as attributes tracked and updated throughout the
+        simulation.
     field_size : float, optional
-        The size of the field in hectares (ha), used to initialize a SoilData object if a pre-configured SoilData object is not provided.
+        The size of the field in hectares (ha), used to initialize a SoilData object if a pre-configured SoilData object
+        is not provided.
 
     Attributes
     ----------
