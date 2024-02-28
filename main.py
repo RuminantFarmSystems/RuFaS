@@ -69,39 +69,6 @@ def main():
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
 
 
-def get_error_warning_counts() -> tuple[int, int]:
-    """
-    Get the total number of errors and warnings in the output manager's error and warning pools.
-
-    Returns
-    -------
-    tuple[int, int]
-        The total number of errors and warnings in the output manager's error and warning pools.
-    """
-
-    output_manager = OutputManager()
-    errors_count = sum([len(value_dict["values"]) for value_dict in output_manager.errors_pool.values()])
-    warnings_count = sum([len(value_dict["values"]) for value_dict in output_manager.warnings_pool.values()])
-    return errors_count, warnings_count
-
-
-def show_error_warning_counts() -> None:
-    """
-    Print the total number of errors and warnings in the output manager's error and warning pools.
-    """
-
-    error_count, warning_count = get_error_warning_counts()
-    if error_count == 0 and warning_count == 0:
-        sys.stdout.write("No errors or warnings found.\n\n")
-        return
-
-    errors_label = "error" if error_count == 1 else "errors"
-    warnings_label = "warning" if warning_count == 1 else "warnings"
-
-    sys.stdout.write(f"{error_count} {errors_label} and {warning_count} {warnings_label} found.\n")
-    sys.stdout.write("Please see the log files for more details.\n\n")
-
-
 def run_rufas(
     load_pool: bool,
     produce_graphics: bool,
@@ -472,8 +439,6 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
-
-        show_error_warning_counts()
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
