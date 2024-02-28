@@ -16,7 +16,6 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
-from RUFAS.routines.animal.animal_manager import AnimalManager
 
 
 @pytest.fixture
