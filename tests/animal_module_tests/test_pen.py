@@ -295,6 +295,9 @@ def test_set_milk_avgs(pen: Pen):
     ],
 )
 def test_calc_manure(pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture):
+def test_calc_manure(
+    pen_to_test: Pen, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
+):
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
     man_sums = mocker.patch.object(Pen, "manure_sums")
