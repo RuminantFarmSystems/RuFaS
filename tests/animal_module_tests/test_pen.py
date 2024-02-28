@@ -300,11 +300,11 @@ def test_calc_manure(
     Pen.calc_manure(pen_to_test, feed, methane_model)
 
     # assert
-    for patched in patches:
-        if patched == Cow:
-            patches[patched].assert_called_with(feed, methane_model, pen_to_test.MEdiet)
+    for animal in patches:
+        if animal == Cow:
+            patches[animal].assert_called_with(feed, methane_model, pen_to_test.MEdiet)
         else:
-            patches[patched].assert_called_once_with(feed, methane_model)
+            patches[animal].assert_called_once_with(feed, methane_model)
     man_sums.assert_called()
 
 
