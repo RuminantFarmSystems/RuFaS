@@ -31,22 +31,22 @@ class AnimalModuleConstants:
     HORIZONTAL_DIST_TO_MILKING_PARLOR = 1.6
     """The default horizontal distance from the animal pens to the milking parlor."""
 
-    DEFAULT_HOUSING_TYPE = 'open air barn'
+    DEFAULT_HOUSING_TYPE = "open air barn"
     """The default housing type for animals in the simulation."""
 
-    DEFAULT_BEDDING_TYPE = 'sawdust'
+    DEFAULT_BEDDING_TYPE = "sawdust"
     """The default bedding material used in the pens."""
 
-    DEFAULT_PEN_TYPE = 'freestall'
+    DEFAULT_PEN_TYPE = "freestall"
     """The default type of pen to be created in the simulation."""
 
-    DEFAULT_MANURE_HANDLER = 'manual scraping'
+    DEFAULT_MANURE_HANDLER = "manual scraping"
     """The default method of manure handling used in those pens created dynamically during the simulation."""
 
-    DEFAULT_MANURE_SEPARATOR = 'screw press'
+    DEFAULT_MANURE_SEPARATOR = "screw press"
     """The default manure separator system used in those pens created dynamically during the simulation."""
 
-    DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
+    DEFAULT_MANURE_STORAGE = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
     MONENSIN_CP_LOWER_BOUND = 15
@@ -92,3 +92,6 @@ class AnimalModuleConstants:
 
     MILK_REDUCTION_KG = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
+
+    MINIMUM_HEIFER_BW_CHANGE = 0.5
+    """Minimum daily growth for heifers, kg."""

@@ -1,12 +1,15 @@
 import argparse
 from pathlib import Path
-from mock import patch
 
 import pytest
+from mock import patch
 from pytest_mock import MockerFixture
 
 from RUFAS.config import Config
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
+from RUFAS.simulation_engine import SimulationEngine
 from main import (
     CaseInsensitiveArgumentAction,
     execute_simulations,
@@ -17,11 +20,9 @@ from main import (
     run_validation,
     METADATA_PATHS,
     initialize_herd,
+    get_error_warning_counts,
+    show_error_warning_counts,
 )
-
-from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogVerbosity
 
 
 @pytest.mark.parametrize(
@@ -29,15 +30,81 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
     "graphics_dir, vars_file_path, init_herd, save_animals, save_animals_path,"
     "terminate_simulation_post_herd_generation",
     [
-        (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "", False, False, "output/",
-         False),
-        (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "", True, False, "output/",
-         False),
-        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", True, True, "output/", False),
-        (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json", True, True,
-         "output/", True),
-        (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json", False, False, "output/",
-         True),
+        (
+            False,
+            False,
+            "verbose",
+            LogVerbosity.ERRORS,
+            True,
+            True,
+            True,
+            "graphics",
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            False,
+            True,
+            "basic",
+            LogVerbosity.LOGS,
+            False,
+            False,
+            False,
+            "custom_graphics",
+            "",
+            True,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            False,
+            True,
+            "block",
+            LogVerbosity.NONE,
+            True,
+            False,
+            False,
+            "graphics",
+            "",
+            True,
+            True,
+            "output/",
+            False,
+        ),
+        (
+            True,
+            False,
+            "inline",
+            LogVerbosity.WARNINGS,
+            False,
+            False,
+            False,
+            "custom_graphics",
+            "path.json",
+            True,
+            True,
+            "output/",
+            True,
+        ),
+        (
+            True,
+            True,
+            "verbose",
+            LogVerbosity.LOGS,
+            False,
+            True,
+            False,
+            "graphics",
+            "path.json",
+            False,
+            False,
+            "output/",
+            True,
+        ),
     ],
 )
 def test_main(
@@ -53,7 +120,7 @@ def test_main(
     init_herd: bool,
     save_animals: bool,
     save_animals_path: str,
-    terminate_simulation_post_herd_generation: bool
+    terminate_simulation_post_herd_generation: bool,
 ) -> None:
     output_dir = "output/"
     filters_dir = "output/output_filters/"
@@ -74,7 +141,7 @@ def test_main(
             init_herd=init_herd,
             save_animals=save_animals,
             save_animals_dir=save_animals_path,
-            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -96,7 +163,7 @@ def test_main(
                 init_herd=init_herd,
                 save_animals=save_animals,
                 save_animals_dir=Path(save_animals_path),
-                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
             )
 
 
@@ -128,25 +195,276 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
     "graphics_dir, load_pool, vars_file_path, init_herd, save_animals, save_animals_dir, "
     "terminate_simulation_post_herd_generation",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, "", False, False, "output/", False),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False),
-        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, "", False, False, "output/", False),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json", False, False, "output/",
-         False),
+        (
+            "verbose",
+            True,
+            LogVerbosity.NONE,
+            True,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "block",
+            False,
+            LogVerbosity.LOGS,
+            True,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "inline",
+            True,
+            LogVerbosity.ERRORS,
+            True,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            True,
+            LogVerbosity.WARNINGS,
+            False,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "verbose",
+            True,
+            LogVerbosity.NONE,
+            True,
+            False,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "block",
+            True,
+            LogVerbosity.LOGS,
+            True,
+            True,
+            False,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "inline",
+            False,
+            LogVerbosity.ERRORS,
+            True,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            False,
+            LogVerbosity.WARNINGS,
+            False,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "verbose",
+            False,
+            LogVerbosity.NONE,
+            True,
+            False,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "block",
+            False,
+            LogVerbosity.LOGS,
+            True,
+            True,
+            False,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "inline",
+            False,
+            LogVerbosity.ERRORS,
+            False,
+            True,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            False,
+            LogVerbosity.WARNINGS,
+            True,
+            False,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "verbose",
+            False,
+            LogVerbosity.NONE,
+            True,
+            True,
+            False,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "block",
+            False,
+            LogVerbosity.WARNINGS,
+            False,
+            False,
+            True,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "inline",
+            False,
+            LogVerbosity.LOGS,
+            False,
+            True,
+            False,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            False,
+            LogVerbosity.ERRORS,
+            False,
+            False,
+            False,
+            "",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            False,
+            LogVerbosity.LOGS,
+            False,
+            False,
+            False,
+            "graphics",
+            False,
+            "",
+            False,
+            False,
+            "output/",
+            False,
+        ),
+        (
+            "basic",
+            False,
+            LogVerbosity.LOGS,
+            False,
+            False,
+            False,
+            "graphics",
+            True,
+            "path.json",
+            False,
+            False,
+            "output/",
+            False,
+        ),
     ],
 )
 def test_run_rufas(
@@ -196,7 +514,7 @@ def test_run_rufas(
         init_herd,
         save_animals,
         save_animals_dir,
-        terminate_simulation_post_herd_generation
+        terminate_simulation_post_herd_generation,
     )
 
     # Assert
@@ -235,7 +553,7 @@ def test_run_rufas(
             init_herd,
             save_animals,
             save_animals_dir,
-            terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation,
         )
 
     if clear_output:
@@ -277,9 +595,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
-        metadata_file_list
-    )
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exclude_info_maps, format_option)
     ] * len(metadata_file_list)
@@ -299,11 +615,11 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     ],
 )
 def test_initialize_herd(
-        mocker: MockerFixture,
-        set_seed: bool,
-        seed: int,
-        terminate_simulation_post_herd_generation: bool,
-        add_log_count: int
+    mocker: MockerFixture,
+    set_seed: bool,
+    seed: int,
+    terminate_simulation_post_herd_generation: bool,
+    add_log_count: int,
 ) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_simulation_config = mocker.MagicMock(auto_spec=Config)
@@ -320,11 +636,13 @@ def test_initialize_herd(
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.HerdFactory", return_value=mock_herd_factory)
 
-    initialize_herd(simulation_config=mock_simulation_config,
-                    init_herd=False,
-                    save_animals=False,
-                    save_animals_dir=Path("output/"),
-                    terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
+    initialize_herd(
+        simulation_config=mock_simulation_config,
+        init_herd=False,
+        save_animals=False,
+        save_animals_dir=Path("output/"),
+        terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
+    )
 
     if set_seed:
         patch_random_seed.assert_called_once_with(seed)
@@ -338,7 +656,7 @@ def test_initialize_herd(
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
     "initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",
     [
         (False, False, True, False, 2, 2, 0, "verbose"),
@@ -349,7 +667,6 @@ def test_initialize_herd(
         (True, False, False, False, 0, 0, 4, "block"),
         (True, True, True, False, 2, 2, 0, "basic"),
         (True, True, False, False, 0, 0, 4, "inline"),
-
         (False, False, True, True, 2, 0, 0, "verbose"),
         (False, False, False, True, 0, 0, 4, "block"),
         (False, True, True, True, 2, 0, 0, "inline"),
@@ -361,15 +678,15 @@ def test_initialize_herd(
     ],
 )
 def test_execute_simulations(
-        mocker: MockerFixture,
-        produce_graphics: bool,
-        exlclude_info_maps: bool,
-        is_data_valid: bool,
-        terminate_simulation_post_herd_generation: bool,
-        initialize_herd_call_count: int,
-        simulate_call_count: int,
-        add_error_call_count: int,
-        format_option: str,
+    mocker: MockerFixture,
+    produce_graphics: bool,
+    exlclude_info_maps: bool,
+    is_data_valid: bool,
+    terminate_simulation_post_herd_generation: bool,
+    initialize_herd_call_count: int,
+    simulate_call_count: int,
+    add_error_call_count: int,
+    format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
@@ -418,7 +735,7 @@ def test_execute_simulations(
         init_herd=False,
         save_animals=False,
         save_animals_dir=Path("output/"),
-        terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+        terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
     )
 
     # Assert
@@ -427,9 +744,7 @@ def test_execute_simulations(
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
-        metadata_file_list
-    )
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
@@ -441,20 +756,19 @@ def test_execute_simulations(
             exlclude_info_maps,
             produce_graphics,
             graphics_dir,
-            csv_dir
+            csv_dir,
         ),
     ] * len(metadata_file_list)
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
     "initialize_herd_call_count, format_option",
     [
         (False, False, True, False, 2, "verbose"),
         (False, True, True, False, 2, "inline"),
         (True, False, True, False, 2, "verbose"),
         (True, True, True, False, 2, "basic"),
-
         (False, False, True, True, 2, "verbose"),
         (False, True, True, True, 2, "inline"),
         (True, False, True, True, 2, "verbose"),
@@ -462,13 +776,13 @@ def test_execute_simulations(
     ],
 )
 def test_execute_simulations_raises_exception(
-        mocker: MockerFixture,
-        produce_graphics: bool,
-        exlclude_info_maps: bool,
-        is_data_valid: bool,
-        terminate_simulation_post_herd_generation: bool,
-        initialize_herd_call_count: int,
-        format_option: str,
+    mocker: MockerFixture,
+    produce_graphics: bool,
+    exlclude_info_maps: bool,
+    is_data_valid: bool,
+    terminate_simulation_post_herd_generation: bool,
+    initialize_herd_call_count: int,
+    format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
@@ -518,7 +832,7 @@ def test_execute_simulations_raises_exception(
             init_herd=False,
             save_animals=False,
             save_animals_dir=Path("output/"),
-            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
         )
 
     # Assert
@@ -528,7 +842,11 @@ def test_execute_simulations_raises_exception(
     assert mock_input_manager.flush_pool.call_count == 1
     assert mock_output_manager.dump_all_nondata_pools.call_count == 1
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call(path=output_dir, exclude_info_maps=exlclude_info_maps, format_option=format_option)
+        mocker.call(
+            path=output_dir,
+            exclude_info_maps=exlclude_info_maps,
+            format_option=format_option,
+        )
     ]
     assert mock_output_manager.save_results.call_count == 0
 
@@ -545,9 +863,15 @@ def test_execute_simulations_raises_exception(
         ("path.json", False, "verbose", False, Path(""), True),
     ],
 )
-def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_info_maps: bool,
-                            format_option: str, produce_graphics: bool,
-                            graphics_dir: Path, clear_output: bool, ) -> None:
+def test_run_load_vars_pool(
+    mocker: MockerFixture,
+    vars_file_path: str,
+    exclude_info_maps: bool,
+    format_option: str,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    clear_output: bool,
+) -> None:
     """Checks the run_load_vars_pool function in main.py"""
     output_dir = Path("output/")
     filters_dir = Path("output/output_filters/")
@@ -561,8 +885,17 @@ def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
-    run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output,
-                       output_dir, filters_dir, csv_dir)
+    run_load_vars_pool(
+        vars_file_path,
+        exclude_info_maps,
+        format_option,
+        produce_graphics,
+        graphics_dir,
+        clear_output,
+        output_dir,
+        filters_dir,
+        csv_dir,
+    )
 
     if clear_output:
         assert mock_output_manager.clear_output_dir.call_count == 1
@@ -580,9 +913,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     # Arrange
     mock_parser = mocker.MagicMock(auto_spec=argparse.ArgumentParser)
     mock_add_argument = mocker.patch.object(mock_parser, "add_argument")
-    mock_parse_args = mocker.patch.object(
-        mock_parser, "parse_args", return_value="test_args"
-    )
+    mock_parse_args = mocker.patch.object(mock_parser, "parse_args", return_value="test_args")
     mocker.patch("main.argparse.ArgumentParser", return_value=mock_parser)
 
     # Act
@@ -656,27 +987,27 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-C",
             "--csv-dir",
             help="The directory for the csv output files to be saved",
-            default="output/CSVs/"
+            default="output/CSVs/",
         ),
         mocker.call(
             "-I",
             "--init_herd",
             help="Select this flag if you want to initialize the herd by generating a herd population through "
-                 "simulation.",
+            "simulation.",
             action="store_true",
         ),
         mocker.call(
             "-s",
             "--save_animals",
             help="If the '--init_herd' flag is selected, choose this flag if you want to save the generated herd data "
-                 "into a JSON file.",
+            "into a JSON file.",
             action="store_true",
         ),
         mocker.call(
             "-S",
             "--save_animals_dir",
             help="If '--save_animals' flag is selected, use this flag to specify the directory to save the output "
-                 "animal population JSON file.",
+            "animal population JSON file.",
             default="output/",
         ),
         mocker.call(
@@ -706,3 +1037,59 @@ def test_case_insensitive_argument_action():
     for argument in arguments:
         assert hasattr(namespace, argument)
         assert getattr(namespace, argument) == value
+
+
+@pytest.mark.parametrize(
+    "errors_pool, warnings_pool, expected",
+    [
+        ({}, {}, (0, 0)),
+        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
+        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
+        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
+    ],
+)
+def test_get_error_warning_counts(
+    mocker: MockerFixture,
+    errors_pool: dict[str, dict[str, list]],
+    warnings_pool: dict[str, dict[str, list]],
+    expected: tuple[int, int],
+) -> None:
+    """
+    Unit test for the get_error_warning_counts() function in main.py
+    """
+
+    # Arrange
+    mock_output_manager = mocker.MagicMock()
+    mock_output_manager.errors_pool = errors_pool
+    mock_output_manager.warnings_pool = warnings_pool
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+
+    # Act and Assert
+    assert get_error_warning_counts() == expected
+
+
+@pytest.mark.parametrize(
+    "error_count, warning_count, expected_output",
+    [
+        (0, 0, "No errors or warnings found.\n\n"),
+        (1, 0, "1 error and 0 warnings found.\nPlease see the log files for more details.\n\n"),
+        (0, 1, "0 errors and 1 warning found.\nPlease see the log files for more details.\n\n"),
+        (1, 1, "1 error and 1 warning found.\nPlease see the log files for more details.\n\n"),
+    ],
+)
+def test_show_error_warning_counts(
+    mocker: MockerFixture, capsys: pytest.CaptureFixture, error_count: int, warning_count: int, expected_output: str
+) -> None:
+    """
+    Unit test for the show_error_warning_counts() function in main.py
+    """
+
+    # Arrange
+    mocker.patch("main.get_error_warning_counts", return_value=(error_count, warning_count))
+
+    # Act
+    show_error_warning_counts()
+    captured = capsys.readouterr()
+
+    # Assert
+    assert captured.out == expected_output

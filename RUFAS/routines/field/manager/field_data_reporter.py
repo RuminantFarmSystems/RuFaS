@@ -7,12 +7,30 @@ om = OutputManager()
 
 
 class FieldDataReporter:
+    """
+    This class is responsible for reporting daily and annual variables for the whole field.
+
+    Parameters
+    ----------
+    fields : List[Field]
+        A list of Field instances.
+
+    Attributes
+    ----------
+    fields : List[Field]
+        A list of Field instances.
+
+    """
+
     def __init__(self, fields: List[Field]):
         self.fields = fields
 
     def send_daily_variables(self) -> None:
         """sends daily variables to the output manager"""
-        info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_daily_variables.__name__,
+        }
         for field in self.fields:
             info_map["suffix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
@@ -693,7 +711,10 @@ class FieldDataReporter:
 
     def send_annual_variables(self) -> None:
         """sends annual variables to the output manager"""
-        info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_annual_variables.__name__,
+        }
         # adding field variable
         for field in self.fields:
             # Adding field data
