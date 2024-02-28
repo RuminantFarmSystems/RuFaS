@@ -4064,3 +4064,62 @@ def test_array_type_validator_refactored(
 
     # Assert
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "first_level_key, properties_blob_key, input_data, eager_termination,"
+    "expected_result, metadata_properties, extract_mock_return, validate_mock_return",
+    [
+        # Test case: valid data without eager termination
+        (
+            "key1",
+            "blob1",
+            {"key1": "valid data"},
+            False,
+            True,
+            {"blob1": {"key1": {"type": "string"}}},
+            {"type": "string"},
+            True,
+        ),
+        # Test case: invalid data with eager termination
+        (
+            "key2",
+            "blob2",
+            {"key2": "invalid data"},
+            True,
+            False,
+            {"blob2": {"key2": {"type": "number"}}},
+            {"type": "number"},
+            False,
+        ),
+    ],
+)
+def test_validate_json_element(
+    mocker: MockerFixture,
+    first_level_key: str,
+    properties_blob_key: str,
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    expected_result: bool,
+    metadata_properties: Dict[str, Any],
+    extract_mock_return: Dict[str, Any],
+    validate_mock_return: bool,
+):
+    """
+    Unit test for the _validate_json_element() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", {"properties": metadata_properties})
+
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=extract_mock_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=validate_mock_return)
+
+    # Act
+    result = input_manager._validate_json_element(first_level_key, properties_blob_key, input_data, eager_termination)
+
+    # Assert
+    assert result == expected_result
+
+
