@@ -7,7 +7,6 @@
 		"cow_num":3500,
 		"replace_num":14000,
 		"herd_num":3500,
-		"herd_init": false,
 		"breed": "JE"
   },
   "herd_initialization": {
@@ -24,7 +23,9 @@
 			"heifer_repro_cull_time":450,
 			"do_not_breed_time" :200,
 			"cull_milk_production": 20,
-			"cow_times_milked_per_day":2.5
+			"cow_times_milked_per_day":3,
+			"milk_fat_percent": 4.78,
+			"milk_protein_percent": 3.74
 		},
 		"farm_level": {
 			"calf": {
@@ -39,41 +40,29 @@
                 "voluntary_waiting_period":65,
 				"conception_rate_decrease":0.026,
                 "avg_gestation_len":279,
+				"decrease_conception_rate_in_rebreeding": false,
+				"decrease_conception_rate_by_parity": false,
 				"std_gestation_len":6,
-				"prefresh_day":30,
+				"prefresh_day":21,
                 "calving_interval":404,
                 "heifers": {
                     "estrus_detection_rate":0.9,
                     "estrus_conception_rate":0.55,
-                    "repro_sub_protocol":"5dCG2P",
+                    "repro_sub_protocol":"N/A",
           "repro_sub_properties": {
-            "conception_rate":0.397,
-                    "estrus_detection_rate":0.68
+            "conception_rate":0.55,
+                    "estrus_detection_rate":0.9
           }
         },
                     "cows": {
-          "estrus_detection_rate":0.68,
-                    "estrus_conception_rate":0.397,
-                    "presynch_protocol": "Double OvSynch",
-          "resynch_protocol":"TAIafterPD",
-                    "repro_sub_protocol":"OvSynch 56",
-          "repro_sub_properties": {
-            "conception_rate":0.397,
-            "tai_program_start_day":50
-          }
-                },
-                "cow_repro_programs": {
-                    "estrus_detection_rate":0.68,
-                    "estrus_service_rate":0.9,
-                    "ed_conception_rate":0.397,
-                    "cow_presynch_protocol":"Double OvSynch",
-                    "cow_TAI_protocol":"OvSynch 56",
-                    "ovsynch56_conception_rate":0.397,
-                    "ovsynch48_conception_rate":0.397,
-					"cosynch72_conception_rate":0.397,
-                    "cosynch5d_conception_rate":0.397,
-                    "cow_resynch_protocol": "TAIafterPD",
-                    "tai_program_start_day": 50
+          "estrus_detection_rate":0.68 ,
+                    "ED_conception_rate": 0.397,
+                    "presynch_program": "None",
+          "presynch_program_start_day": 0,
+            	"ovsynch_program": "None",
+                    "ovsynch_program_start_day": 0,
+				"ovsynch_program_conception_rate": 0,
+                    "resynch_program": "None"
                 }
 			},
 			"bodyweight": {
