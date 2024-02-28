@@ -77,21 +77,20 @@
       "type": "csv",
       "properties": "weather_properties"
     },
-        "user_feeds": {
+    "user_feeds": {
       "title": "User Feed",
       "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
-},
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
-    }
-  },
+    },
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
@@ -109,7 +108,7 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/c1f3_corn_alfalfa_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
@@ -133,6 +132,7 @@
       "path": "input/data/field/c1f3_corn_alfalfa_field.json",
       "type": "json",
       "properties": "field_properties"
-    },
+    }
+  },
   "cross-validation": {}
 }
