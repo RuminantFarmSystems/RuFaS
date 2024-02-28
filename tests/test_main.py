@@ -20,8 +20,6 @@ from main import (
     run_validation,
     METADATA_PATHS,
     initialize_herd,
-    get_error_warning_counts,
-    show_error_warning_counts,
 )
 
 
@@ -1037,59 +1035,3 @@ def test_case_insensitive_argument_action():
     for argument in arguments:
         assert hasattr(namespace, argument)
         assert getattr(namespace, argument) == value
-
-
-@pytest.mark.parametrize(
-    "errors_pool, warnings_pool, expected",
-    [
-        ({}, {}, (0, 0)),
-        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
-        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
-        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
-    ],
-)
-def test_get_error_warning_counts(
-    mocker: MockerFixture,
-    errors_pool: dict[str, dict[str, list]],
-    warnings_pool: dict[str, dict[str, list]],
-    expected: tuple[int, int],
-) -> None:
-    """
-    Unit test for the get_error_warning_counts() function in main.py
-    """
-
-    # Arrange
-    mock_output_manager = mocker.MagicMock()
-    mock_output_manager.errors_pool = errors_pool
-    mock_output_manager.warnings_pool = warnings_pool
-    mocker.patch("main.OutputManager", return_value=mock_output_manager)
-
-    # Act and Assert
-    assert get_error_warning_counts() == expected
-
-
-@pytest.mark.parametrize(
-    "error_count, warning_count, expected_output",
-    [
-        (0, 0, "No errors or warnings found.\n\n"),
-        (1, 0, "1 error and 0 warnings found.\nPlease see the log files for more details.\n\n"),
-        (0, 1, "0 errors and 1 warning found.\nPlease see the log files for more details.\n\n"),
-        (1, 1, "1 error and 1 warning found.\nPlease see the log files for more details.\n\n"),
-    ],
-)
-def test_show_error_warning_counts(
-    mocker: MockerFixture, capsys: pytest.CaptureFixture, error_count: int, warning_count: int, expected_output: str
-) -> None:
-    """
-    Unit test for the show_error_warning_counts() function in main.py
-    """
-
-    # Arrange
-    mocker.patch("main.get_error_warning_counts", return_value=(error_count, warning_count))
-
-    # Act
-    show_error_warning_counts()
-    captured = capsys.readouterr()
-
-    # Assert
-    assert captured.out == expected_output
