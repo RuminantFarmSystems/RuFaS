@@ -3715,18 +3715,6 @@
           "minimum": 0,
           "maximum": 1
         },
-        "biogas_generation_ratio": {
-          "type": "number",
-          "description": "Biogas Generation Ratio -- The ratio of biogas generated to the amount of manure treated.",
-          "default": 0,
-          "minimum": 0
-        },
-        "methane_generation_ratio": {
-          "type": "number",
-          "description": "Methane Generation Ratio -- The ratio of methane generated from the treatment system (calculated from the amount of biogas generated).",
-          "default": 0,
-          "minimum": 0
-        },
         "evaporation_fraction": {
           "type": "number",
           "description": "Evaporation Fraction -- The fraction of the liquid portion evaporated from the treatment system.",
