@@ -144,7 +144,7 @@ def create_animals(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferI
         "calf_birth_weight": 200,
         "presynch_method": "Presynch",
         "resynch_method": "PGFatPD",
-        "tai_method_c": "OvSynch 56"
+        "tai_method_c": "OvSynch 56",
     }
     calf = Calf(args)
     calf.id = 1
@@ -277,14 +277,12 @@ def test_set_milk_avgs(pen: Pen):
 @pytest.mark.parametrize(
     "pen_to_test, animals",
     [
-        (
-            lazy_fixture("pen"),
-            lazy_fixture("create_animals")
-        ),
+        (lazy_fixture("pen"), lazy_fixture("create_animals")),
     ],
 )
 def test_calc_manure(
-        pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture):
+    pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
+):
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
     man_sums = mocker.patch.object(Pen, "manure_sums")
