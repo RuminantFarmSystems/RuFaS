@@ -2,49 +2,36 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields
 
+from RUFAS.routines.manure.constants_and_units.datatype_with_unit import FloatWithUnit
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-
-
-class FloatWithUnit(Float):
-    def __init__(self, unit: str = "unitless"):
-        super.__init__()
-        self.unit = unit
-
-    def __eq__(self, other) -> bool:
-        if self == other:
-            return True
-        if self == LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
-            return True
-        if self == LogVerbosity.LOGS:
-            return False
-        return False
 
 
 @dataclass(kw_only=True, frozen=True)
 class ManureNutrients:
     """A class to store the relevant manure nutrient information to be passed to the crop and soil module"""
 
+    manure_type: ManureType
+    """Type of manure."""
+
     nitrogen: FloatWithUnit = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
+    nitrogen.unit = "kg"
 
     phosphorus: FloatWithUnit = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
+    phosphorus.unit = "kg"
 
     potassium: FloatWithUnit = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
+    potassium.unit = "kg"
 
     dry_matter: FloatWithUnit = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
+    dry_matter.unit = "kg"
 
     total_manure_mass: FloatWithUnit = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
-
-    manure_type: ManureType
-    """Type of manure."""
+    total_manure_mass.unit = "kg"
 
     def __post_init__(self):
         """
@@ -77,6 +64,7 @@ class ManureNutrients:
             The dry matter fraction of the manure, unitless, between 0 and 1.
 
         """
+        print(self.manure_type, self.total_manure_mass, self.nitrogen, self.dry_matter, self.phosphorus, self.potassium)
         if self.total_manure_mass == 0.0:
             return 0.0
         return self.dry_matter / self.total_manure_mass

@@ -1,3 +1,4 @@
+from RUFAS.routines.manure.constants_and_units.datatype_with_unit import FloatWithUnit, IntWithUnit, FieldWithUnit
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
@@ -60,33 +61,56 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         Number of animals in the pen each day.
     """
 
-    pen_id: int = -1
-    simulation_day: int = -1
-    manure_urea: float = 0.0
-    liquid_manure_total_ammoniacal_nitrogen: float = 0.0
-    liquid_manure_nitrogen: float = 0.0
-    liquid_manure_total_solids: float = 0.0
-    manure_degradable_volatile_solids: float = 0.0
-    manure_non_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_volatile_solids: float = field(init=False)
-    liquid_manure_phosphorus: float = 0.0
-    liquid_manure_potassium: float = 0.0
+    pen_id: IntWithUnit = IntWithUnit(-1, unit="unitless")
 
-    housing_methane: float = 0.0
-    housing_carbon_dioxide: float = 0.0
-    housing_ammonia: float = 0.0
+    simulation_day: IntWithUnit = IntWithUnit(-1, unit="simulation days")
 
-    manure_volume: float = 0.0
-    cleaning_water_volume: float = 0.0
-    total_bedding_volume: float = 0.0
-    total_bedding_mass: float = 0.0
-    total_water_volume_in_milking_parlor: float = 0.0
-    total_daily_manure_volume: float = field(init=False)
+    manure_urea: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    liquid_manure_total_ammoniacal_nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    liquid_manure_nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    liquid_manure_total_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    manure_degradable_volatile_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    manure_non_degradable_volatile_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    liquid_manure_total_volatile_solids: FloatWithUnit = FieldWithUnit(init=False, unit="kg")
+
+    liquid_manure_phosphorus: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    liquid_manure_potassium: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    housing_methane: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    housing_carbon_dioxide: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    housing_ammonia: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    manure_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+
+    cleaning_water_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+
+    total_bedding_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+
+    total_bedding_mass: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+
+    total_water_volume_in_milking_parlor: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+
+    total_daily_manure_volume: FloatWithUnit = field(init=False)
+    total_daily_manure_volume.unit = "m^3"
+
     # To satisfy the LiquidManurePortionProtocol
-    liquid_manure_daily_volume: float = field(init=False)
+    liquid_manure_daily_volume: FloatWithUnit = field(init=False)
+    liquid_manure_daily_volume.unit = "m^3"
 
-    tempC: float = 0.0
-    num_animals: int = -1
+    tempC: FloatWithUnit = 0.0
+    tempC.unit = "°C"
+
+    num_animals: IntWithUnit = -1
+    num_animals.unit = "uniteless"
 
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""
