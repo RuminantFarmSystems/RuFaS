@@ -1,15 +1,15 @@
-from copy import deepcopy
-from functools import reduce
 import json
 import os
 import re
+from copy import deepcopy
+from enum import Enum
+from functools import reduce
 from pathlib import Path
+from typing import Any, Dict, List, Union, Callable, Tuple
 
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union, Callable, Tuple
-
 from RUFAS.util import Utility
 
 om = OutputManager()
@@ -36,6 +36,7 @@ class InputManager:
         self.__pool: Dict[str, Any] = {}
         self.__properties_used: Dict[str, Any] = {}
         self.__get_data_logs_pool: Dict[str, str] = {}
+        self.elements_counter = ElementsCounter()
 
     def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
         """
@@ -56,7 +57,7 @@ class InputManager:
         """
         self._load_metadata(metadata_path)
         self._load_properties()
-        is_input_data_valid = self._populate_pool(eager_termination)
+        is_input_data_valid = self._populate_pool_refactored(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -326,6 +327,97 @@ class InputManager:
         om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
         om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
+
+    def _populate_pool_refactored(self, eager_termination: bool) -> bool:
+        """
+        Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
+        then adds data to the pool.
+
+        Parameters
+        ----------
+        eager_termination : bool
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data,
+            If invalid data is found.
+
+        Returns
+        -------
+        bool
+            True if data is valid, otherwise False.
+
+        Raises
+        ------
+        KeyError
+            If faulty data type found in data blob key.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._populate_pool_refactored.__name__,
+        }
+
+        data_type_to_loader_map: Dict[str, Callable] = {
+            "json": self._load_data_from_json,
+            "csv": self._load_data_from_csv,
+        }
+
+        for file_blob_key, file_details in self.__metadata["files"].items():
+            file_path = file_details["path"]
+
+            try:
+                file_type = file_details["type"]
+                data_loader = data_type_to_loader_map[file_details["type"]]
+                input_data = data_loader(file_path)
+            except KeyError:
+                raise KeyError(
+                    f"Faulty data type in {file_blob_key}," f"supported types are: {data_type_to_loader_map.keys()}"
+                )
+
+            properties_blob_key = file_details["properties"]
+            metadata_properties = self.__metadata["properties"][properties_blob_key]
+            (
+                input_data,
+                missing_required_property_keys,
+                property_keys_with_default_values,
+            ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
+            self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
+            filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
+            validated_data = {}
+            for metadata_property in metadata_properties.keys():
+                if file_type == "json":
+                    is_element_acceptable = self._validate_json_element(
+                        metadata_property,
+                        properties_blob_key,
+                        filtered_input_data,
+                        eager_termination,
+                    )
+                elif file_type == "csv":
+                    is_element_acceptable = self._validate_tabular_element_refactored(
+                        metadata_property,
+                        properties_blob_key,
+                        filtered_input_data,
+                        eager_termination,
+                    )
+                else:
+                    raise ValueError(
+                        f"Unsupported file type {file_type}, supported types are: {data_type_to_loader_map.keys()}"
+                    )
+
+                if is_element_acceptable:
+                    validated_data[metadata_property] = filtered_input_data[metadata_property]
+                elif eager_termination:
+                    return False
+
+            if validated_data:
+                self.__pool[file_blob_key] = validated_data
+
+        om.add_log("Validation count: total items", f"{self.elements_counter.total_elements()}", info_map)
+        om.add_log("Validation count: total valid", f"{self.elements_counter.valid_elements}", info_map)
+        om.add_log("Validation count: total fixed", f"{self.elements_counter.fixed_elements}", info_map)
+        om.add_log("Validation count: total invalid", f"{self.elements_counter.invalid_elements}", info_map)
+
+        return self.elements_counter.invalid_elements == 0
 
     def _filter_input_data_by_metadata(
         self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
@@ -631,6 +723,82 @@ class InputManager:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
+    def _validate_input_by_type(
+        self,
+        variable_properties: Dict[str, Any],
+        variable_path: List[str | int],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Validates the input data based on its specified type.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            A dictionary containing properties relevant to the validation.
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        input_data : Dict[str, Any]
+            The input data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+        properties_blob_key : str
+            The metadata properties for the data input file being checked.
+
+        Returns
+        -------
+        bool
+            True if the input data is valid, False otherwise.
+        """
+
+        if "type" not in variable_properties:
+            raise KeyError(f"Missing 'type' key in {variable_properties}")
+        data_type = variable_properties["type"]
+
+        primitive_data_type_to_validator_map: Dict[str, Callable] = {
+            "string": self._string_type_validator,
+            "number": self._num_type_validator,
+            "bool": self._bool_type_validator,
+        }
+
+        complex_type_to_validator_map: Dict[str, Callable] = {
+            "array": self._array_type_validator_refactored,
+            "object": self._object_type_validator,
+        }
+
+        if data_type not in primitive_data_type_to_validator_map and data_type not in complex_type_to_validator_map:
+            raise ValueError(
+                f"The metadata type of the element '{self._convert_variable_path_to_str(variable_path)}' "
+                f"is not valid. Supported types are: {primitive_data_type_to_validator_map.keys()}, "
+                f"{complex_type_to_validator_map.keys()}"
+            )
+
+        elif data_type in primitive_data_type_to_validator_map:
+            variable_path_str = self._convert_variable_path_to_str(variable_path)
+            input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+            is_valid = primitive_data_type_to_validator_map[data_type](
+                variable_properties,
+                variable_path_str,
+                input_data_value,
+                properties_blob_key,
+            )
+            if is_valid:
+                self.elements_counter.increment(ElementState.VALID)
+                return True
+            is_fixed = self._fix_data(variable_properties, variable_path, input_data, properties_blob_key)
+            if is_fixed:
+                self.elements_counter.increment(ElementState.FIXED)
+                return True
+            self.elements_counter.increment(ElementState.INVALID)
+            return False
+
+        else:
+            return complex_type_to_validator_map[data_type](
+                variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+            )
+
     def _validate_tabular_element(
         self,
         var_name: str,
@@ -712,6 +880,56 @@ class InputManager:
                         return element_counter_and_validity
 
         return element_counter_and_validity
+
+    def _validate_tabular_element_refactored(
+        self,
+        first_level_key: str,
+        properties_blob_key: str,
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+    ) -> bool:
+        """
+        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
+        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
+
+        Parameters
+        ----------
+        first_level_key : str
+            The name of the csv data element being validated.
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+        input_data : Dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            True if data is valid, otherwise False.
+        """
+
+        column = input_data[first_level_key]
+        variable_properties = self._extract_value_by_key_list(
+            self.__metadata["properties"][properties_blob_key],
+            [first_level_key],
+        )
+
+        is_whole_column_acceptable = True
+        for idx in range(len(column)):
+            is_element_acceptable = self._validate_input_by_type(
+                variable_properties,
+                [first_level_key, idx],
+                input_data,
+                eager_termination,
+                properties_blob_key,
+            )
+            is_whole_column_acceptable = is_whole_column_acceptable and is_element_acceptable
+            if eager_termination and not is_element_acceptable:
+                return False
+
+        return is_whole_column_acceptable
 
     def _validate_dict_element(  # noqa
         self,
@@ -848,6 +1066,46 @@ class InputManager:
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
+    def _validate_json_element(  # noqa
+        self,
+        first_level_key: str,
+        properties_blob_key: str,
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+    ) -> bool:
+        """
+        Receives data loaded from json input file, recursively finds and then validates nested elements,
+        attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
+
+        Parameters
+        ----------
+        first_level_key : str
+            The name of the json data element just under the level of properties_blob_key.
+
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+
+        input_data : Dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
+
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            True if data is valid, otherwise False.
+        """
+
+        variable_properties = self._extract_value_by_key_list(
+            self.__metadata["properties"][properties_blob_key],
+            [first_level_key],
+        )
+        return self._validate_input_by_type(
+            variable_properties, [first_level_key], input_data, eager_termination, properties_blob_key
+        )
+
     def _array_type_validator(
         self,
         variable_properties: Dict[str, Any],
@@ -894,6 +1152,183 @@ class InputManager:
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
         return True
+
+    def _validate_array_container_properties(
+        self,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Any,
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Validates the container properties of an array input data element.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        input_data : Any
+            The input data to be validated.
+        properties_blob_key : str
+            The metadata properties for the data input file being checked.
+
+        Returns
+        -------
+        bool
+            True if the array container properties are valid, False otherwise.
+        """
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_array_container_properties.__name__,
+        }
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        if not isinstance(input_data, list):
+            om.add_warning(
+                "Validation: array container is not a list",
+                f"Variable: '{variable_path_str}' is not an array but has type: {type(input_data)}. "
+                f"{properties_violation_message}",
+                info_map,
+            )
+            return False
+
+        maximum_length = variable_properties.get("maximum_length")
+        minimum_length = variable_properties.get("minimum_length")
+        if minimum_length is not None:
+            is_in_range = variable_properties["minimum_length"] <= len(input_data)
+            if not is_in_range:
+                om.add_warning(
+                    "Validation: array container length less than minimum",
+                    f"Variable: '{variable_path_str}' has length: {len(input_data)}, less than minimum length: "
+                    f"{minimum_length}. {properties_violation_message}",
+                    info_map,
+                )
+                return False
+
+        if maximum_length is not None:
+            is_in_range = len(input_data) <= variable_properties["maximum_length"]
+            if not is_in_range:
+                om.add_warning(
+                    "Validation: array container length greater than maximum",
+                    f"Variable: '{variable_path_str}' has length: {len(input_data)}, greater than maximum length: "
+                    f"{maximum_length}. {properties_violation_message}",
+                    info_map,
+                )
+                return False
+        return True
+
+    def _array_type_validator_refactored(
+        self,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Validates an input data element of type array.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        input_data : Dict[str, Any]
+            The input data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated upon finding invalid data.
+        properties_blob_key : str
+            The metadata properties for the data input file being checked.
+
+        Returns
+        -------
+        bool
+            True if the input data element is valid or fixable, False otherwise.
+        """
+
+        array_value = self._extract_value_by_key_list(input_data, variable_path)
+        if not self._validate_array_container_properties(
+            variable_path, variable_properties, array_value, properties_blob_key
+        ):
+            return False
+
+        is_whole_array_acceptable = True
+        for index, element in enumerate(array_value):
+            is_element_acceptable = self._validate_input_by_type(
+                variable_properties["properties"],
+                variable_path + [index],
+                input_data,
+                eager_termination,
+                properties_blob_key,
+            )
+            is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
+            if not is_element_acceptable and eager_termination:
+                return False
+        return is_whole_array_acceptable
+
+    def _object_type_validator(
+        self,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Validates an input data element of type object.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        input_data : Dict[str, Any]
+            The input data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated upon finding invalid data.
+        properties_blob_key : str
+            The metadata properties for the data input file being checked.
+
+        Returns
+        -------
+        bool
+            True if the input data element is valid or fixable, False otherwise.
+        """
+
+        object_value = self._extract_value_by_key_list(input_data, variable_path)
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+        if not isinstance(object_value, dict):
+            om.add_warning(
+                "Validation: object is not a dictionary",
+                f"Variable: '{variable_path_str}' is not ab object but has type: {type(object_value)}. "
+                f"{properties_violation_message}",
+                {"class": self.__class__.__name__, "function": self._object_type_validator.__name__},
+            )
+            return False
+
+        is_whole_object_acceptable = True
+        for key in object_value.keys():
+            is_element_acceptable = self._validate_input_by_type(
+                variable_properties[key],
+                variable_path + [key],
+                input_data,
+                eager_termination,
+                properties_blob_key,
+            )
+            is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
+            if not is_element_acceptable and eager_termination:
+                return False
+        return is_whole_object_acceptable
 
     def _num_type_validator(
         self,
@@ -1029,6 +1464,106 @@ class InputManager:
             return False
 
         return input_data_value in (True, False)
+
+    def _extract_value_by_key_list(self, input_data: List[Any] | Dict[str, Any], variable_path: List[str | int]) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        ValueError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and isinstance(key, int) and 0 <= key < len(input_data):
+                input_data = input_data[key]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise ValueError(f"Cannot extract value from {input_data} by following this path {variable_path}")
+        return input_data
+
+    def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
+        """
+        Converts a list of keys (int or str) into a string representation of the path to a variable.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        str
+            A string representation of the path to a variable.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> input_manager._convert_variable_path_to_str(var_path)
+        'animal.herd_information.calf_num'
+
+        >>> input_manager = InputManager()
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> input_manager._convert_variable_path_to_str(var_path)
+        'manure_management_scenarios.[0].bedding_type'
+        """
+
+        formatted_path_elems = []
+        for raw_path_elem in variable_path:
+            if isinstance(raw_path_elem, int) or (isinstance(raw_path_elem, str) and raw_path_elem.isdigit()):
+                formatted_path_elems.append(f"[{raw_path_elem}]")
+            else:
+                formatted_path_elems.append(f"{raw_path_elem}")
+        return ".".join(formatted_path_elems)
 
     def _fix_data(
         self,
@@ -1651,3 +2186,130 @@ class InputManager:
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+
+class ElementState(Enum):
+    """
+    An enumeration of the states an input data element can be in during validation. An element cannot
+    be in more than one state at a time.
+
+    Attributes
+    ----------
+    VALID : int
+        The element is valid.
+    INVALID : int
+        The element is invalid and cannot be fixed.
+    FIXED : int
+        The element is invalid initially but has been fixed.
+    """
+
+    VALID = 1
+    INVALID = 2
+    FIXED = 3
+
+
+class ElementsCounter:
+    """
+    A class to keep track of the number of elements in each state during validation.
+
+    Attributes
+    ----------
+    valid_elements : int
+        The number of valid elements.
+    invalid_elements : int
+        The number of invalid elements.
+    fixed_elements : int
+        The number of fixed elements.
+    """
+
+    def __init__(self):
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
+    def _update(self, state: ElementState, value: int) -> None:
+        """
+        Updates the count of elements in a given state.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        value : int
+            The value by which the count should be updated.
+
+        Raises
+        ------
+        ValueError
+            If the state is not one of the valid states.
+        """
+        if state == ElementState.VALID:
+            self.valid_elements += value
+        elif state == ElementState.INVALID:
+            self.invalid_elements += value
+        elif state == ElementState.FIXED:
+            self.fixed_elements += value
+        else:
+            raise ValueError(f"Invalid state: {state}")
+        self._check_negative_counts()
+
+    def increment(self, state: ElementState) -> None:
+        """
+        Increments the count of elements in a given state by one.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        """
+
+        self._update(state, 1)
+
+    def decrement(self, state: ElementState) -> None:
+        """
+        Decrements the count of elements in a given state by one.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        """
+
+        self._update(state, -1)
+
+    def _check_negative_counts(self) -> None:
+        """
+        Checks if any of the element counts are negative and raises a ValueError if so.
+
+        Raises
+        ------
+        ValueError
+            If any of the element counts are negative.
+        """
+
+        if self.valid_elements < 0:
+            raise ValueError(f"Valid elements count is negative: {self.valid_elements}")
+        if self.invalid_elements < 0:
+            raise ValueError(f"Invalid elements count is negative: {self.invalid_elements}")
+        if self.fixed_elements < 0:
+            raise ValueError(f"Fixed elements count is negative: {self.fixed_elements}")
+
+    def total_elements(self):
+        """
+        Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
+        """
+        return self.valid_elements + self.invalid_elements + self.fixed_elements
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the ElementsCounter object.
+        """
+
+        return str(
+            {
+                "valid_elements": self.valid_elements,
+                "invalid_elements": self.invalid_elements,
+                "fixed_elements": self.fixed_elements,
+                "total_elements": self.total_elements(),
+            }
+        )

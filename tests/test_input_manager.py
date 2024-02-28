@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Type, Union, Optional
 from typing import Tuple
 
 import pandas as pd
@@ -223,25 +223,21 @@ def test_load_data_from_csv_invalid_data_raises_error(
 def test_start_data_processing(
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
-    mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._populate_pool = MagicMock(return_value=True)
-    mock_input_manager._load_properties = MagicMock()
+    patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
+    patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool_refactored", return_value=True)
+    patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
 
     mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
 
-    mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
-    mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
-    mock_input_manager._load_properties.assert_called_once()
-
-    # Restore original methods
-    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
+    patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
+    patch_for_populate_pool.assert_called_once_with(eager_termination)
+    patch_for_load_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -3729,3 +3725,398 @@ def test_dump_get_data_logs(
 
     mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, expected, expected_exception",
+    [
+        # Success cases
+        (
+            {
+                "animal": {
+                    "herd_information": {
+                        "calf_num": 8,
+                        "heiferI_num": 44,
+                        "heiferII_num": 38,
+                        "heiferIII_num_springers": 12,
+                    }
+                }
+            },
+            ["animal", "herd_information", "calf_num"],
+            8,
+            None,
+        ),
+        (
+            {
+                "manure_management_scenarios": [
+                    {"bedding_type": "straw", "manure_handler": "manual scraping"},
+                    {"bedding_type": "sawdust", "manure_handler": "flush system"},
+                ]
+            },
+            ["manure_management_scenarios", 0, "bedding_type"],
+            "straw",
+            None,
+        ),
+        # Error cases
+        (
+            {"animal": {"herd_information": {"calf_num": 8}}},
+            ["animal", "herd_information", "missing_key"],
+            None,
+            ValueError,
+        ),
+        ([{"key": "value"}], [0, "nonexistent_key"], None, ValueError),
+    ],
+)
+def test_extract_value_by_key_list(
+    input_data: Union[List[Any], Dict[str, Any]],
+    variable_path: List[Union[str, int]],
+    expected: Optional[Any],
+    expected_exception: Optional[Type[Exception]],
+) -> None:
+    """
+    Unit test for the _extract_value_by_key_list() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act and assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            input_manager._extract_value_by_key_list(input_data, variable_path)
+    else:
+        result = input_manager._extract_value_by_key_list(input_data, variable_path)
+        assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, expected",
+    [
+        (["animal", "herd_information", "calf_num"], "animal.herd_information.calf_num"),
+        (["manure_management_scenarios", 0, "bedding_type"], "manure_management_scenarios.[0].bedding_type"),
+        ([], ""),
+        (["level1", 2, "level3", "4", 5], "level1.[2].level3.[4].[5]"),
+        (["single_level"], "single_level"),
+        (["multi", "path", "with", "strings"], "multi.path.with.strings"),
+        ([0, 1, 2, 3], "[0].[1].[2].[3]"),
+    ],
+)
+def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expected: str) -> None:
+    """
+    Unit test for the _convert_variable_path_to_str() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act
+    result = input_manager._convert_variable_path_to_str(variable_path)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
+    "expected_result, patch_extract_return, patch_validate_return",
+    [
+        # Test case with valid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": {"key": "value"}}},
+            False,
+            "blob_key",
+            True,
+            {"key": "value"},
+            True,
+        ),
+        # Test case with invalid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": "not_a_dict"}},
+            False,
+            "blob_key",
+            False,
+            "not_a_dict",
+            False,
+        ),
+        (
+            ["data", "object", "nested"],
+            {"nested": {"type": "object", "properties": {"key": {"type": "string"}}}},
+            {"data": {"object": {"nested": {"key": 123}}}},
+            False,
+            "blob_key",
+            False,
+            {"nested": {"key": 123}},
+            False,
+        ),
+        (
+            ["data", "early_failure"],
+            {"key1": {"type": "string"}, "key2": {"type": "integer"}},
+            {"data": {"early_failure": {"key1": "valid", "key2": "not_an_integer"}}},  # key2 fails validation
+            True,
+            "blob_key",
+            False,
+            {"key1": "valid", "key2": "not_an_integer"},
+            False,
+        ),
+    ],
+)
+def test_object_type_validator(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_result: bool,
+    patch_extract_return: Any,
+    patch_validate_return: bool,
+) -> None:
+    """
+    Unit test for the _object_type_validator() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_validate_return)
+    mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+
+    # Act
+    result = input_manager._object_type_validator(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, properties_blob_key," "expected_result, expected_warning",
+    [
+        # Input data is not a list
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            "not_a_list",
+            "blob_key",
+            False,
+            "Validation: array container is not a list",
+        ),
+        # Input list's length is less than the specified minimum length
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 2},
+            [1],
+            "blob_key",
+            False,
+            "Validation: array container length less than minimum",
+        ),
+        # Input list's length exceeds the specified maximum length
+        (
+            ["data", "array"],
+            {"maximum_length": 3, "minimum_length": 1},
+            [1, 2, 3, 4],
+            "blob_key",
+            False,
+            "Validation: array container length greater than maximum",
+        ),
+        # Input list's length is within the specified constraints
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            [1, 2, 3],
+            "blob_key",
+            True,
+            None,
+        ),
+    ],
+)
+def test_validate_array_container_properties(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Any,
+    properties_blob_key: str,
+    expected_result: bool,
+    expected_warning: str,
+):
+    """
+    Unit test for the _validate_array_container_properties() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+
+    # Act
+    result = input_manager._validate_array_container_properties(
+        variable_path, variable_properties, input_data, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
+    if expected_warning:
+        patch_for_add_warning.assert_called_with(
+            expected_warning,
+            mocker.ANY,
+            mocker.ANY,
+        )
+    else:
+        patch_for_add_warning.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key, "
+    "patch_extract_return, patch_container_valid, patch_element_valid, expected_result",
+    [
+        # Array extraction returns a non-list
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {},
+            False,
+            "blob_key",
+            None,
+            False,
+            True,
+            False,
+        ),
+        # Array container properties are invalid
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            False,
+            True,
+            False,
+        ),
+        # Element validation within the array fails
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            False,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+        # Successful validation of all elements
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            True,
+            True,
+            True,
+        ),
+        # Eager termination on element validation failure
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            True,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+    ],
+)
+def test_array_type_validator_refactored(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    patch_extract_return: Any,
+    patch_container_valid: bool,
+    patch_element_valid: bool,
+    expected_result: bool,
+):
+    """
+    Unit test for the _array_type_validator_refactored() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_array_container_properties", return_value=patch_container_valid)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_element_valid)
+
+    # Act
+    result = input_manager._array_type_validator_refactored(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "first_level_key, properties_blob_key, input_data, eager_termination,"
+    "expected_result, metadata_properties, extract_mock_return, validate_mock_return",
+    [
+        # Test case: valid data without eager termination
+        (
+            "key1",
+            "blob1",
+            {"key1": "valid data"},
+            False,
+            True,
+            {"blob1": {"key1": {"type": "string"}}},
+            {"type": "string"},
+            True,
+        ),
+        # Test case: invalid data with eager termination
+        (
+            "key2",
+            "blob2",
+            {"key2": "invalid data"},
+            True,
+            False,
+            {"blob2": {"key2": {"type": "number"}}},
+            {"type": "number"},
+            False,
+        ),
+    ],
+)
+def test_validate_json_element(
+    mocker: MockerFixture,
+    first_level_key: str,
+    properties_blob_key: str,
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    expected_result: bool,
+    metadata_properties: Dict[str, Any],
+    extract_mock_return: Dict[str, Any],
+    validate_mock_return: bool,
+):
+    """
+    Unit test for the _validate_json_element() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", {"properties": metadata_properties})
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=extract_mock_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=validate_mock_return)
+
+    # Act
+    result = input_manager._validate_json_element(first_level_key, properties_blob_key, input_data, eager_termination)
+
+    # Assert
+    assert result == expected_result
