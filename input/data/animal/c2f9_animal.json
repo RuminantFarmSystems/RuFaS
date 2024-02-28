@@ -78,11 +78,11 @@
 		"from_literature": {
 			"repro": {
 				"preg_check_day_1": 38,
-				"preg_loss_rate_1": 3.9,
+				"preg_loss_rate_1": 0.039,
 				"preg_check_day_2": 60,
-				"preg_loss_rate_2": 1.95,
+				"preg_loss_rate_2": 0.0195,
 				"preg_check_day_3": 190,
-				"preg_loss_rate_3": 1.95,
+				"preg_loss_rate_3": 0.0195,
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
 				"avg_estrus_cycle_heifer": 21,
