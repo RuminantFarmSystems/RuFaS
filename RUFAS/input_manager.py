@@ -2220,6 +2220,7 @@ class ElementsCounter:
     fixed_elements : int
         The number of fixed elements.
     """
+
     def __init__(self):
         self.valid_elements = 0
         self.invalid_elements = 0
