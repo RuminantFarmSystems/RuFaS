@@ -147,16 +147,20 @@ def create_animals(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferI
         "tai_method_c": "OvSynch 56"
     }
     calf = Calf(args)
-
+    calf.id = 1
     heiferI = HeiferI(args)
     heiferII = HeiferII(args)
+    heiferII.id = 3
     heiferIII = HeiferIII(args)
+    heiferIII.id = 4
     cow1 = Cow(args)
+    cow1.id = 5
     cow2 = Cow(args)
+    cow2.id = 6
     cow1.is_milking = True
     cow2.is_milking = False
 
-    return [calf, heiferI, heiferII, heiferIII]
+    return [heiferI, heiferII, heiferIII, calf, cow1, cow2]
 
 
 @pytest.mark.parametrize(
@@ -270,21 +274,6 @@ def test_set_milk_avgs(pen: Pen):
     assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
 
 
-# @pytest.mark.parametrize(
-#     "pen_to_test, new_animals, expected_animals_in_pen",
-#     [
-#         (
-#             lazy_fixture("pen"),
-#             lazy_fixture("mock_animal_list"),
-#             lazy_fixture("mock_animal_list"),
-#         ),
-#         (
-#             lazy_fixture("pen_with_animals"),
-#             lazy_fixture("mock_animal_list_ii"),
-#             lazy_fixture("mock_animal_list_combined"),
-#         ),
-#     ],
-# )
 @pytest.mark.parametrize(
     "pen_to_test, animals",
     [
@@ -300,30 +289,25 @@ def test_calc_manure(
 
     man_sums = mocker.patch.object(Pen, "manure_sums")
     man_sums.return_value = (mocker.MagicMock(), mocker.MagicMock())
-
     pen_to_test.add_new_animals(animals)
-    patches = []
+    patches = {}
     methane_model = mocker.MagicMock()
     feed = mocker.MagicMock(spec="Feed")
     feed.available_feeds = mocker.MagicMock()
 
     for animal in animals:
-        patches.append(mocker.patch.object(type(animal), "calc_manure_excretion"))
-        Pen.calc_manure(pen_to_test, feed, methane_model)
-        if type(animal) == Cow:
-            patches[-1].assert_called_with(feed, methane_model, pen_to_test.MEdiet)
-        else:
-            patches[-1].assert_called_with(feed, methane_model)
+        animal_type = type(animal)
+        patches[animal_type] = mocker.patch.object(animal_type, "calc_manure_excretion")
 
     # act
     Pen.calc_manure(pen_to_test, feed, methane_model)
 
     # assert
     for patched in patches:
-        if patched.target != Cow:
-            patched.assert_called_with(feed, methane_model, pen_to_test.MEdiet)
+        if patched == Cow:
+            patches[patched].assert_called_with(feed, methane_model, pen_to_test.MEdiet)
         else:
-            patched.assert_called_with(feed, methane_model)
+            patches[patched].assert_called_once_with(feed, methane_model)
     man_sums.assert_called()
 
 
