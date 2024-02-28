@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Type, Union, Optional
 from typing import Tuple
 
 import pandas as pd
@@ -3725,3 +3725,170 @@ def test_dump_get_data_logs(
 
     mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, expected, expected_exception",
+    [
+        # Success cases
+        (
+            {
+                "animal": {
+                    "herd_information": {
+                        "calf_num": 8,
+                        "heiferI_num": 44,
+                        "heiferII_num": 38,
+                        "heiferIII_num_springers": 12,
+                    }
+                }
+            },
+            ["animal", "herd_information", "calf_num"],
+            8,
+            None,
+        ),
+        (
+            {
+                "manure_management_scenarios": [
+                    {"bedding_type": "straw", "manure_handler": "manual scraping"},
+                    {"bedding_type": "sawdust", "manure_handler": "flush system"},
+                ]
+            },
+            ["manure_management_scenarios", 0, "bedding_type"],
+            "straw",
+            None,
+        ),
+        # Error cases
+        (
+            {"animal": {"herd_information": {"calf_num": 8}}},
+            ["animal", "herd_information", "missing_key"],
+            None,
+            ValueError,
+        ),
+        ([{"key": "value"}], [0, "nonexistent_key"], None, ValueError),
+    ],
+)
+def test_extract_value_by_key_list(
+    input_data: Union[List[Any], Dict[str, Any]],
+    variable_path: List[Union[str, int]],
+    expected: Optional[Any],
+    expected_exception: Optional[Type[Exception]],
+) -> None:
+    """
+    Unit test for the _extract_value_by_key_list() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act and assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            input_manager._extract_value_by_key_list(input_data, variable_path)
+    else:
+        result = input_manager._extract_value_by_key_list(input_data, variable_path)
+        assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, expected",
+    [
+        (["animal", "herd_information", "calf_num"], "animal.herd_information.calf_num"),
+        (["manure_management_scenarios", 0, "bedding_type"], "manure_management_scenarios.[0].bedding_type"),
+        ([], ""),
+        (["level1", 2, "level3", "4", 5], "level1.[2].level3.[4].[5]"),
+        (["single_level"], "single_level"),
+        (["multi", "path", "with", "strings"], "multi.path.with.strings"),
+        ([0, 1, 2, 3], "[0].[1].[2].[3]"),
+    ],
+)
+def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expected: str) -> None:
+    """
+    Unit test for the _convert_variable_path_to_str() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act
+    result = input_manager._convert_variable_path_to_str(variable_path)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
+    "expected_result, patch_extract_return, patch_validate_return",
+    [
+        # Test case with valid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": {"key": "value"}}},
+            False,
+            "blob_key",
+            True,
+            {"key": "value"},
+            True,
+        ),
+        # Test case with invalid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": "not_a_dict"}},
+            False,
+            "blob_key",
+            False,
+            "not_a_dict",
+            False,
+        ),
+        (
+            ["data", "object", "nested"],
+            {"nested": {"type": "object", "properties": {"key": {"type": "string"}}}},
+            {"data": {"object": {"nested": {"key": 123}}}},
+            False,
+            "blob_key",
+            False,
+            {"nested": {"key": 123}},
+            False,
+        ),
+        (
+            ["data", "early_failure"],
+            {"key1": {"type": "string"}, "key2": {"type": "integer"}},
+            {"data": {"early_failure": {"key1": "valid", "key2": "not_an_integer"}}},  # key2 fails validation
+            True,
+            "blob_key",
+            False,
+            {"key1": "valid", "key2": "not_an_integer"},
+            False,
+        ),
+    ],
+)
+def test_object_type_validator(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_result: bool,
+    patch_extract_return: Any,
+    patch_validate_return: bool,
+) -> None:
+    """
+    Unit test for the _object_type_validator() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_validate_return)
+    mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+
+    # Act
+    result = input_manager._object_type_validator(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
