@@ -4112,7 +4112,6 @@ def test_validate_json_element(
     # Arrange
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", {"properties": metadata_properties})
-
     mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=extract_mock_return)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=validate_mock_return)
 
@@ -4121,5 +4120,3 @@ def test_validate_json_element(
 
     # Assert
     assert result == expected_result
-
-
