@@ -1124,3 +1124,17 @@ class OutputManager(object):
             self.add_error("Permission Error", f"{path=}; Exception: {str(e)}", info_map)
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
+
+    def get_error_and_warning_counts(self) -> tuple[int, int]:
+        """
+        Get the total number of errors and warnings in the output manager's error and warning pools.
+
+        Returns
+        -------
+        tuple[int, int]
+            The total number of errors and warnings in the output manager's error and warning pools.
+        """
+
+        errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
+        warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
+        return errors_count, warnings_count
