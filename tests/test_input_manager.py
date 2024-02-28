@@ -223,25 +223,21 @@ def test_load_data_from_csv_invalid_data_raises_error(
 def test_start_data_processing(
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
-    mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._populate_pool = MagicMock(return_value=True)
-    mock_input_manager._load_properties = MagicMock()
+    patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
+    patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool_refactored", return_value=True)
+    patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
 
     mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
 
-    mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
-    mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
-    mock_input_manager._load_properties.assert_called_once()
-
-    # Restore original methods
-    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
+    patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
+    patch_for_populate_pool.assert_called_once_with(eager_termination)
+    patch_for_load_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
