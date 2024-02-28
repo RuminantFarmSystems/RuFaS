@@ -916,6 +916,7 @@ class InputManager:
             [first_level_key],
         )
 
+        is_whole_column_acceptable = True
         for idx in range(len(column)):
             is_element_acceptable = self._validate_input_by_type(
                 variable_properties,
@@ -924,11 +925,11 @@ class InputManager:
                 eager_termination,
                 properties_blob_key,
             )
-
+            is_whole_column_acceptable = is_whole_column_acceptable and is_element_acceptable
             if eager_termination and not is_element_acceptable:
                 return False
 
-        return True
+        return is_whole_column_acceptable
 
     def _validate_dict_element(  # noqa
         self,
