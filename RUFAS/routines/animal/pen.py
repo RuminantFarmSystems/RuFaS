@@ -300,11 +300,11 @@ class Pen:
         )
 
         # manure attributes are initialized in the reset_manure method
-        self.manure = {}
-        self.calf_total = {}
-        self.heifer_total = {}
-        self.dry_total = {}
-        self.lactating_total = {}
+        self.manure = None
+        self.calf_total = None
+        self.heifer_total = None
+        self.dry_total = None
+        self.lactating_total = None
 
         self.reset_manure()
 
