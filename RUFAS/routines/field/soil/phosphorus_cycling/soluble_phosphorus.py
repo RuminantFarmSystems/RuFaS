@@ -9,14 +9,30 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     MILLIGRAMS_TO_KILOGRAMS,
 )
 
-"""
-This module tracks the movement of phosphorus in the soil profile based on equations from APLE.
-"""
-
 
 class SolublePhosphorus:
+    """
+    Tracks the movement of phosphorus in the soil profile using equations from the APLE (Agricultural Phosphorus Loss
+    Estimator) model.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        An instance of SoilData for tracking the movement of phosphorus through the soil profile. If not provided, a new
+        instance will be created with the specified field size.
+    field_size : float, optional
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object that stores and manages the phosphorus data within the soil profile.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+        """
+        This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
         ----------
@@ -25,21 +41,22 @@ class SolublePhosphorus:
             new one if one is not provided.
         field_size : float, optional
             Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+            not provided (ha).
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_update_routine(self, runoff: float, field_size: float) -> None:
-        """Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil
-            profile as water percolates through it.
+        """
+        Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil
+        profile as water percolates through it.
 
         Parameters
         ----------
         runoff : float
-            Amount of rainfall that runs off the field on the current day (mm)
+            Amount of rainfall that runs off the field on the current day (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -93,25 +110,26 @@ class SolublePhosphorus:
         bulk_density: float,
         layer_thickness: float,
     ) -> float:
-        """This method calculates how much phosphorus is lost from the top soil layer to runoff.
+        """
+        This method calculates how much phosphorus is lost from the top soil layer to runoff.
 
         Parameters
         ----------
         runoff : float
-            Amount of rainfall that runs off the field on the current day (mm)
+            Amount of rainfall that runs off the field on the current day (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         labile_phosphorus : float
-            Concentration of labile phosphorus in the soil layer (kg / ha)
+            Concentration of labile phosphorus in the soil layer (kg / ha).
         bulk_density : float
-            Density of the soil layer (megagrams / cubic meter)
+            Density of the soil layer (megagrams / cubic meter).
         layer_thickness : float
-            Thickness of the soil layer (mm)
+            Thickness of the soil layer (mm).
 
         Returns
         -------
         float
-            Amount of phosphorus removed from the soil layer by runoff water (kg / ha)
+            Amount of phosphorus removed from the soil layer by runoff water (kg / ha).
 
         References
         ----------
@@ -137,17 +155,18 @@ class SolublePhosphorus:
 
     @staticmethod
     def _determine_isotherm_slope(percent_clay_content: float) -> float:
-        """Calculates the slope of the linear phosphorus sorption isotherm.
+        """
+        Calculates the slope of the linear phosphorus sorption isotherm.
 
         Parameters
         ----------
         percent_clay_content : float
-            Percent clay content of a soil layer, expressed in the range [0, 100] (unitless)
+            Percent clay content of a soil layer, expressed in the range [0, 100] (unitless).
 
         Returns
         -------
         float
-            The slope of the phosphorus sorption isotherm (unitless)
+            The slope of the phosphorus sorption isotherm (unitless).
 
         References
         ----------
@@ -158,17 +177,18 @@ class SolublePhosphorus:
 
     @staticmethod
     def _determine_isotherm_intercept(isotherm_slope: float) -> float:
-        """Calculates the intercept of the linear phosphorus sorption isotherm.
+        """
+        Calculates the intercept of the linear phosphorus sorption isotherm.
 
         Parameters
         ----------
         isotherm_slope : float
-            The slope of the phosphorus sorption isotherm (unitless)
+            The slope of the phosphorus sorption isotherm (unitless).
 
         Returns
         -------
         float
-            The intercept of the phosphorus sorption isotherm (unitless)
+            The intercept of the phosphorus sorption isotherm (unitless).
 
         References
         ----------
@@ -181,21 +201,22 @@ class SolublePhosphorus:
     def _determine_dissolved_reactive_phosphorus_leachate(
         soil_phosphorus: float, isotherm_slope: float, isotherm_intercept: float
     ) -> float:
-        """Calculates how much phosphorus can be leached out of a soil layer by percolation from layer.
+        """
+        Calculates how much phosphorus can be leached out of a soil layer by percolation from layer.
 
         Parameters
         ----------
         soil_phosphorus : float
-            Concentration of phosphorus in the soil layer (mg phosphorous per kg soil)
+            Concentration of phosphorus in the soil layer (mg phosphorous per kg soil).
         isotherm_slope : float
-            Slope of the phosphorus sorption isotherm (unitless)
+            Slope of the phosphorus sorption isotherm (unitless).
         isotherm_intercept
-             Intercept of the phosphorus sorption isotherm (unitless)
+             Intercept of the phosphorus sorption isotherm (unitless).
 
         Returns
         -------
         float
-            Concentration of dissolved phosphorus in the soil water that can be leached into the next layer (mg / L)
+            Concentration of dissolved phosphorus in the soil water that can be leached into the next layer (mg / L).
 
         References
         ----------
@@ -217,19 +238,20 @@ class SolublePhosphorus:
 
     @staticmethod
     def _determine_percolated_water_volume(percolated_water: float, field_size: float) -> float:
-        """Calculates the volume of water that is percolated out of a soil layer.
+        """
+        Calculates the volume of water that is percolated out of a soil layer.
 
         Parameters
         ----------
         percolated_water : float
-            Amount of water that percolated out of the soil layer on a given day (mm)
+            Amount of water that percolated out of the soil layer on a given day (mm).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            Volume of water that percolated out of the soil on the current day (L)
+            Volume of water that percolated out of the soil on the current day (L).
 
         """
         percolated_water_in_cubic_millimeters = percolated_water * field_size * HECTARES_TO_SQUARE_MILLIMETERS
@@ -245,27 +267,28 @@ class SolublePhosphorus:
         percolated_water: float,
         field_size: float,
     ) -> float:
-        """Calculates the actual amount of phosphorus that leaves a soil layer and enters the one below it.
+        """
+        Calculates the actual amount of phosphorus that leaves a soil layer and enters the one below it.
 
         Parameters
         ----------
         labile_phosphorus : float
-            The labile phosphorus content of this layer of soil (kg / ha)
+            The labile phosphorus content of this layer of soil (kg / ha).
         bulk_density : float
-            The density of this soil layer (megagrams / cubic meter)
+            The density of this soil layer (megagrams / cubic meter).
         layer_thickness : float
-            The thickness of this layer of soil (mm)
+            The thickness of this layer of soil (mm).
         percent_clay_content : float
-            The clay content expressed of soil in this layer, expressed as a number in the range [0, 100] (unitless)
+            The clay content expressed of soil in this layer, expressed as a number in the range [0, 100] (unitless).
         percolated_water : float
-            The amount of water that percolated from this soil layer on the current day (mm)
+            The amount of water that percolated from this soil layer on the current day (mm).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
 
         Returns
         -------
         float
-            The amount of phosphorus that leaves this layer of soil on the current day (kg / ha)
+            The amount of phosphorus that leaves this layer of soil on the current day (kg / ha).
 
         """
         soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(
