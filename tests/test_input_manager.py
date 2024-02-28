@@ -3892,3 +3892,175 @@ def test_object_type_validator(
 
     # Assert
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, properties_blob_key," "expected_result, expected_warning",
+    [
+        # Input data is not a list
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            "not_a_list",
+            "blob_key",
+            False,
+            "Validation: array container is not a list",
+        ),
+        # Input list's length is less than the specified minimum length
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 2},
+            [1],
+            "blob_key",
+            False,
+            "Validation: array container length less than minimum",
+        ),
+        # Input list's length exceeds the specified maximum length
+        (
+            ["data", "array"],
+            {"maximum_length": 3, "minimum_length": 1},
+            [1, 2, 3, 4],
+            "blob_key",
+            False,
+            "Validation: array container length greater than maximum",
+        ),
+        # Input list's length is within the specified constraints
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            [1, 2, 3],
+            "blob_key",
+            True,
+            None,
+        ),
+    ],
+)
+def test_validate_array_container_properties(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Any,
+    properties_blob_key: str,
+    expected_result: bool,
+    expected_warning: str,
+):
+    """
+    Unit test for the _validate_array_container_properties() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+
+    # Act
+    result = input_manager._validate_array_container_properties(
+        variable_path, variable_properties, input_data, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
+    if expected_warning:
+        patch_for_add_warning.assert_called_with(
+            expected_warning,
+            mocker.ANY,
+            mocker.ANY,
+        )
+    else:
+        patch_for_add_warning.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key, "
+    "patch_extract_return, patch_container_valid, patch_element_valid, expected_result",
+    [
+        # Array extraction returns a non-list
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {},
+            False,
+            "blob_key",
+            None,
+            False,
+            True,
+            False,
+        ),
+        # Array container properties are invalid
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            False,
+            True,
+            False,
+        ),
+        # Element validation within the array fails
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            False,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+        # Successful validation of all elements
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            True,
+            True,
+            True,
+        ),
+        # Eager termination on element validation failure
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            True,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+    ],
+)
+def test_array_type_validator_refactored(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    patch_extract_return: Any,
+    patch_container_valid: bool,
+    patch_element_valid: bool,
+    expected_result: bool,
+):
+    """
+    Unit test for the _array_type_validator_refactored() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_array_container_properties", return_value=patch_container_valid)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_element_valid)
+
+    # Act
+    result = input_manager._array_type_validator_refactored(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
