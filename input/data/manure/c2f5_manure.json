@@ -3,16 +3,24 @@
     {
       "scenario_id": 0,
       "bedding_type": "none",
-      "manure_handler": "manual scraping",
+      "manure_handler": "harrowing",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "compost"
+      "manure_treatment": "open lot"
     },
     {
       "scenario_id": 1,
       "bedding_type": "none",
-      "manure_handler": "flush",
-      "manure_separator": "rotary screen",
+      "manure_handler": "harrowing",
+      "manure_separator": "none",
+      "manure_separator_after_digestion": "none",
+      "manure_treatment": "composting"
+    },
+    {
+      "scenario_id": 2,
+      "bedding_type": "manure solids",
+      "manure_handler": "flush system",
+      "manure_separator": "none",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     }
@@ -66,7 +74,7 @@
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.0,
       "bedding_phosphorus_content": 0.0,
-      "sand_removal_efficiency": 0.9
+      "sand_removal_efficiency": 1.0
 },
     {
       "bedding_type": "none",
@@ -130,8 +138,8 @@
     {
       "manure_separator_type": "rotary screen",
       "percent_dry_solids": 0.20,
-      "total_solids_removal_efficiency_for_separator": 0.55,
-      "volatile_solids_removal_efficiency_for_separator": 0.6,
+      "total_solids_removal_efficiency_for_separator": 0.35,
+      "volatile_solids_removal_efficiency_for_separator": 0.40,
       "nitrogen_removal_efficiency_for_separator": 0.30,
       "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.15,
       "phosphorus_removal_efficiency_for_separator": 0.40,
@@ -146,7 +154,19 @@
       "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
       "phosphorus_removal_efficiency_for_separator": 0.20,
       "potassium_removal_efficiency_for_separator": 0.23
+    },
+    {
+      "manure_separator_type": "screw press + settling pond",
+      "percent_dry_solids": 0.35,
+      "total_solids_removal_efficiency_for_separator": 0.38,
+      "volatile_solids_removal_efficiency_for_separator": 0.48,
+      "nitrogen_removal_efficiency_for_separator": 0.30,
+      "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
+      "phosphorus_removal_efficiency_for_separator": 0.20,
+      "potassium_removal_efficiency_for_separator": 0.23
     }
+
+
   ],
   "manure_treatment_configs": [
     {
@@ -183,7 +203,7 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00,
-      "storage_time_period": 365,
+      "storage_time_period": 90,
       "freeboard_input": 0.3048,
       "manure_cover": "cover"
     },
@@ -229,7 +249,7 @@
     },
     {
       "manure_treatment_type": "composting",
-      "composting_type": "intensive windrow"
+      "composting_type": "static pile"
     }
   ]
 }
