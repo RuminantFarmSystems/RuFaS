@@ -76,8 +76,7 @@ class PenManure:
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
-        self.manure_volume = FloatWithUnit(self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
-                                           unit="m^3")
+        self.manure_volume = FloatWithUnit(self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY, unit="m^3")
 
         # Zero out any negative field
         # TODO: This is a temporary fix. Need to find out why negative values are being generated
@@ -116,37 +115,47 @@ class PenManure:
             urine=FloatWithUnit(animal_manure["urine"], unit=PenManure.urine.unit),
             urine_nitrogen=FloatWithUnit(animal_manure["urine_nitrogen"], unit=PenManure.urine_nitrogen.unit),
             urine_total_ammoniacal_nitrogen=FloatWithUnit(
-                animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
-                unit="kg"
+                animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR, unit="kg"
             ),
             manure_total_ammoniacal_nitrogen=FloatWithUnit(
-                animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
-                unit="kg"
+                animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR, unit="kg"
             ),
             nitrogen=FloatWithUnit(animal_manure["manure_nitrogen"], unit=PenManure.nitrogen.unit),
             manure_mass=FloatWithUnit(animal_manure["manure_mass"], unit=PenManure.manure_mass.unit),
             total_solids=FloatWithUnit(animal_manure["total_solids"], unit=PenManure.total_solids.unit),
-            degradable_volatile_solids=FloatWithUnit(animal_manure["degradable_volatile_solids"],
-                                                     unit=PenManure.degradable_volatile_solids.unit),
-            non_degradable_volatile_solids=FloatWithUnit(animal_manure["non_degradable_volatile_solids"],
-                                                         unit=PenManure.non_degradable_volatile_solids.unit),
-            inorganic_phosphorus_fraction=FloatWithUnit(animal_manure["inorganic_phosphorus_fraction"] / num_animals,
-                                                        unit=PenManure.inorganic_phosphorus_fraction.unit),
-            organic_phosphorus_fraction=FloatWithUnit(animal_manure["organic_phosphorus_fraction"] / num_animals,
-                                                      unit=PenManure.organic_phosphorus_fraction.unit),
+            degradable_volatile_solids=FloatWithUnit(
+                animal_manure["degradable_volatile_solids"], unit=PenManure.degradable_volatile_solids.unit
+            ),
+            non_degradable_volatile_solids=FloatWithUnit(
+                animal_manure["non_degradable_volatile_solids"], unit=PenManure.non_degradable_volatile_solids.unit
+            ),
+            inorganic_phosphorus_fraction=FloatWithUnit(
+                animal_manure["inorganic_phosphorus_fraction"] / num_animals,
+                unit=PenManure.inorganic_phosphorus_fraction.unit,
+            ),
+            organic_phosphorus_fraction=FloatWithUnit(
+                animal_manure["organic_phosphorus_fraction"] / num_animals,
+                unit=PenManure.organic_phosphorus_fraction.unit,
+            ),
             non_water_inorganic_phosphorus_fraction=FloatWithUnit(
                 animal_manure["non_water_inorganic_phosphorus_fraction"] / num_animals,
-                unit=PenManure.non_water_inorganic_phosphorus_fraction.unit
+                unit=PenManure.non_water_inorganic_phosphorus_fraction.unit,
             ),
             non_water_organic_phosphorus_fraction=FloatWithUnit(
                 animal_manure["non_water_organic_phosphorus_fraction"] / num_animals,
-                unit=PenManure.non_water_organic_phosphorus_fraction.unit),
-            phosphorus=FloatWithUnit(animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
-                                     unit=PenManure.phosphorus.unit),
-            phosphorus_fraction=FloatWithUnit(animal_manure["phosphorus_fraction"] / num_animals,
-                                              unit=PenManure.phosphorus_fraction.unit),
-            potassium=FloatWithUnit(animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,
-                                    unit=PenManure.potassium.unit),
-            enteric_methane_kg=FloatWithUnit(animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
-                                             unit=PenManure.enteric_methane_kg.unit),
+                unit=PenManure.non_water_organic_phosphorus_fraction.unit,
+            ),
+            phosphorus=FloatWithUnit(
+                animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG, unit=PenManure.phosphorus.unit
+            ),
+            phosphorus_fraction=FloatWithUnit(
+                animal_manure["phosphorus_fraction"] / num_animals, unit=PenManure.phosphorus_fraction.unit
+            ),
+            potassium=FloatWithUnit(
+                animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG, unit=PenManure.potassium.unit
+            ),
+            enteric_methane_kg=FloatWithUnit(
+                animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
+                unit=PenManure.enteric_methane_kg.unit,
+            ),
         )
