@@ -45,8 +45,15 @@ class ManureModuleOutputManagerHelper:
             if exclude_fields is None or field.name not in exclude_fields:
                 if type(attribute := getattr(dataclass_object, field.name)) is Enum:
                     unit = "unitless"
-                elif type(attribute) is Dict:
-                    print(attribute)
+                # elif type(attribute) is Dict:
+                #     print(attribute)
                 else:
-                    pass
-                cls._om.add_variable(field.name, attribute, info_maps)
+                    try:
+                        unit = attribute.unit
+                    except AttributeError as ae:
+                        print(type(dataclass_object))
+                        print(dataclass_object)
+                        print(field.name)
+                        print(attribute)
+                        raise ae
+                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
