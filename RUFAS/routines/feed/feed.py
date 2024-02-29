@@ -157,6 +157,15 @@ class Feed:
                 "function": self.summarize_feed_storage.__name__,
                 "storage_type": storage,
             }
+            nutrient_dict_units = {
+                "carbon": "kg",
+                "nitrogen": "kg",
+                "phosphorus": "kg",
+                "dry_matter": "kg",
+                "crude_protein": "kg",
+                "carbon_loss": "kg",
+                "crude_protein_loss": "kg",
+            }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
             nutrients_dict["nitrogen"] = self.N
@@ -165,7 +174,7 @@ class Feed:
             nutrients_dict["crude_protein"] = self.CP
             nutrients_dict["carbon_loss"] = self.C_loss
             nutrients_dict["crude_protein_loss"] = self.CP_loss
-            om.add_variable("nutrients_summary", nutrients_dict, info_map)
+            om.add_variable("nutrients_summary", nutrients_dict, dict(info_map, **{"units": nutrient_dict_units}))
 
     class Storage:
         def __init__(self, data):

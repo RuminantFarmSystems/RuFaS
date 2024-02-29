@@ -10,39 +10,42 @@ from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
     SolublePhosphorus,
 )
 
-"""
-This module contains the composite class for phosphorus cycling, which contains and manages all the necessary all
-necessary aspects for managing phosphorus in and on top of a soil profile.
-"""
-
 
 class PhosphorusCycling:
+    """
+    This module contains the composite class for phosphorus cycling, which contains and manages all the necessary
+    aspects for managing phosphorus in and on top of a soil profile.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        An instance of SoilData to be used for tracking phosphorus cycling. If not provided, a new instance
+        will be created with the given field size.
+    field_size : float, optional
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object that contains data and functionality related to soil and phosphorus properties.
+    manure : Manure
+        Process component that manages manure on the field.
+    fertilizer : Fertilizer
+        Process component that manages fertilizer on the field.
+    mineralization : PhosphorusMineralization
+        Process component that controls the mineralization of phosphorus within the soil profile.
+    soluble_phosphorus : SolublePhosphorus
+        Process component that controls the movement of phosphorus between layers of soil.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track phosphorus cycling, creates new one if one is not provided.
-        field_size : float, optional
-            Size of the field (ha)
-
-        Notes
-        -----
-        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is not
-        provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
         self.manure = Manure(self.data)
-        """Process component that manages manure on the field."""
         self.fertilizer = Fertilizer(self.data)
-        """Process component that manages fertilizer on the field."""
         self.mineralization = PhosphorusMineralization(self.data)
-        """Process component that controls the mineralization of phosphorus within the soil profile."""
         self.soluble_phosphorus = SolublePhosphorus(self.data)
-        """Process component that controls the movement of phosphorus between layers of soil."""
 
     def cycle_phosphorus(
         self,
@@ -56,13 +59,13 @@ class PhosphorusCycling:
         Parameters
         ----------
         rainfall : float
-            The amount of rainfall on the current day (mm)
+            The amount of rainfall on the current day (mm).
         runoff : float
-            The amount of runoff from rainfall on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm).
         field_size : float
-            The size of the field (ha)
+            The size of the field (ha).
         mean_air_temperature : float
-            Mean air temperature on the current day (degrees C)
+            Mean air temperature on the current day (°C).
 
         """
         self.manure.daily_manure_update(rainfall, runoff, field_size, mean_air_temperature)
