@@ -135,7 +135,7 @@ class AnimalModuleReporter:
                 "simulation_day": simulation_day,
             }
             nutrient_amount_units = {
-                "dm": "kg",
+                "dm": "kg/animal",
                 "CP": "percent of DM",
                 "ADF": "percent of DM",
                 "NDF": "percent of DM",
@@ -166,7 +166,7 @@ class AnimalModuleReporter:
                 "P_req": "g",
                 "DMIest_requirement": "kg",
                 "avg_BW": "kg",
-                "avg_milk_production_reduction_pen": "kg/day",
+                "avg_milk_production_reduction_pen": "kg/animal",
             }
             om.add_variable(
                 f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
@@ -697,7 +697,7 @@ class AnimalModuleReporter:
         om.add_variable(
             "milk_production_305days_herd_mean",
             milk_production_305days_herd_mean,
-            dict(info_map, **{"units": "kg/day"}),
+            dict(info_map, **{"units": "kg"}),
         )
 
     def report_daily_reports(animal_manager, available_feeds: Dict[str, Dict[str, Any]]):
