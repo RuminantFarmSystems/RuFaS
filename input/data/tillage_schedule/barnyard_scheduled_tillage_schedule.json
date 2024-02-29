@@ -4,6 +4,7 @@
     "incorporation_fractions": [0.95],
     "mixing_fractions": [0.95],
     "tillage_depths": [150],
+    "implements": ["disk-harrow"],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }            

@@ -72,6 +72,7 @@ class ExampleAnimalSA:
     animal_management_instance : AnimalManager
         an instance of the AnimalManagement class; the main object containing the method of interest.
     """
+
     def __init__(self):
         self.animal_management_json = None
         self.main_input_dict = None
@@ -155,7 +156,9 @@ class ExampleAnimalSA:
 
         # run the method of interest
         example_class.animal_management_instance.daily_updates(
-            example_class.feed_instance, example_class.weather_instance, example_class.time_instance
+            example_class.feed_instance,
+            example_class.weather_instance,
+            example_class.time_instance,
         )
 
         # collect and return the output values of interest
@@ -207,10 +210,17 @@ class ExampleAnimalSA:
         results = numpy.empty((rows, n_outputs))
         for i in range(rows):  # This loop is probably slowing things down - need faster way to vectorize
             dry_matter, carbon, phosphorus, nitrogen, fiber = X[i, :]
-            results[i, ] = ExampleAnimalSA.objective_function(dry_matter, carbon, phosphorus, nitrogen, fiber,
-                                                              animal_management_json=animal_management_json,
-                                                              animal_dir=animal_dir, manure_dir=manure_dir,
-                                                              feed_dir=feed_dir)
+            results[i,] = ExampleAnimalSA.objective_function(
+                dry_matter,
+                carbon,
+                phosphorus,
+                nitrogen,
+                fiber,
+                animal_management_json=animal_management_json,
+                animal_dir=animal_dir,
+                manure_dir=manure_dir,
+                feed_dir=feed_dir,
+            )
 
         return results
 
@@ -260,27 +270,47 @@ class ExampleAnimalSA:
 
         self.animal_management_dict = self.make_data_dict_from_json(self.animal_path)  # this will get altered
         self.animal_management_dict["manure_management_scenarios"] = self.make_data_dict_from_json(
-            self.manure_management_path)["manure_management_scenarios"]
+            self.manure_management_path
+        )["manure_management_scenarios"]
 
 
 # --- Example in Practice ----
-if __name__ == '__main__':
+if __name__ == "__main__":
     import time
-    from model_evaluation.sensitivity_analysis.generalized_sensitivity import SensitivityAnalysis
+    from model_evaluation.sensitivity_analysis.generalized_sensitivity import (
+        SensitivityAnalysis,
+    )
 
     # example of objective function evaluation
-    print(ExampleAnimalSA.objective_function(feed_dry_matter=100, feed_carbon=0.8, feed_phosphorus=0.012,
-                                             feed_nitrogen=0.11, feed_detergent_fiber=0.001))
+    print(
+        ExampleAnimalSA.objective_function(
+            feed_dry_matter=100,
+            feed_carbon=0.8,
+            feed_phosphorus=0.012,
+            feed_nitrogen=0.11,
+            feed_detergent_fiber=0.001,
+        )
+    )
     # example of vectorized objective function evaluation
-    input_matrix = numpy.array([[100, 0.8, 0.12, 0.11, 0.001],
-                                [110, 0.8, 0.12, 0.11, 0.001],  # increase dry matter
-                                [100, 0.7, 0.12, 0.11, 0.001],  # decrease carbon
-                                [100, 0.7, 0.10, 0.08, 0.002]])  # multiple changes
+    input_matrix = numpy.array(
+        [
+            [100, 0.8, 0.12, 0.11, 0.001],
+            [110, 0.8, 0.12, 0.11, 0.001],  # increase dry matter
+            [100, 0.7, 0.12, 0.11, 0.001],  # decrease carbon
+            [100, 0.7, 0.10, 0.08, 0.002],
+        ]
+    )  # multiple changes
     outs = ExampleAnimalSA.vectorized_objective_function(input_matrix)
     print(outs)
 
     # run SA
-    par_names = ["feed_dry_matter", "feed_carbon", "feed_phosphorus", "feed_nitrogen", "feed_detergent_fiber"]
+    par_names = [
+        "feed_dry_matter",
+        "feed_carbon",
+        "feed_phosphorus",
+        "feed_nitrogen",
+        "feed_detergent_fiber",
+    ]
     par_bounds = [(0, 10000), (0, 1), (0, 1), (0, 1), (0, 1)]
     output_names = ["phosphorus_requirements", "manure_production"]
     SA = SensitivityAnalysis(fun=ExampleAnimalSA.vectorized_objective_function,

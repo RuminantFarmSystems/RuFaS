@@ -79,11 +79,11 @@ class SimulationEngine:
                 {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
                 for feed in self.feed_manager.query_available_feeds()
             ],
-            info_map
+            info_map,
         )
         t_end_sim = timer.time()
 
-        sys.stdout.write("\nSimulation Successful\n\n")
+        sys.stdout.write("\nSimulation Completed.\n\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
@@ -95,6 +95,9 @@ class SimulationEngine:
                 "function": self.simulate.__name__,
             },
         )
+
+        error_count, warning_count = om.get_error_and_warning_counts()
+        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
 
     def _run_simulation_main_loop(self) -> None:
         """

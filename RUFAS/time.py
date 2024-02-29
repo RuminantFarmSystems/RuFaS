@@ -55,7 +55,7 @@ class Time:
             elif year == self.end_year_int:
                 days = [_ for _ in range(1, self.end_day + 1)]
             else:
-                days = [_ for _ in range(1, year_length)]
+                days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
 
