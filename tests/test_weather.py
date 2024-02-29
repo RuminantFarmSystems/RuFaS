@@ -3,7 +3,6 @@ from pytest_mock.plugin import MockerFixture
 from unittest.mock import MagicMock, patch
 from typing import Callable
 
-from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.weather import Weather
@@ -28,26 +27,21 @@ def mock_weather_input() -> dict:
 
 
 @pytest.fixture
-def mock_config() -> Config:
-    mock_config = MagicMock(Config)
-    setattr(mock_config, "years", [[1]])
-    setattr(mock_config, "w_start_year", 0)
-    setattr(mock_config, "w_start_day", 1)
-    setattr(mock_config, "start_year", 1)
-    setattr(mock_config, "start_day", 1)
-    setattr(mock_config, "end_year", 1)
-    setattr(mock_config, "end_day", 5)
-    setattr(mock_config, "year_length", 365)
-    setattr(mock_config, "leap_year_length", 366)
-    return mock_config
+def mock_time() -> Time:
+    """Fixture for Time object."""
+    mock_time = MagicMock(auto_spec=Time)
+    mock_time.year = 1
+    mock_time.day = 1
+    mock_time.start_year_int = 2022
+    mock_time.end_year_int = 2023
+    return mock_time
 
 
 @pytest.fixture
 def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
-    mock_config = MagicMock(Config)
-    mock_weather = Weather({}, mock_config)
+    mock_weather = Weather({}, mock_time)
     mock_weather._Weather__radiation = [[1.0, 2.0, 3.0]]
     mock_weather._Weather__min_daily_temperature = [[1.1, 2.1, 3.1]]
     mock_weather._Weather__mean_daily_temperature = [[1.2, 2.2, 3.2]]
@@ -86,23 +80,12 @@ def mock_current_day_conditions() -> CurrentDayConditions:
     return mock_current_weather
 
 
-@pytest.fixture
-def mock_time() -> Time:
-    """Fixture for Time object."""
-    mock_time = MagicMock(Time)
-    mock_time.year = 1
-    mock_time.day = 1
-    return mock_time
-
-
-def test_weather_init(mock_weather_input: dict, mock_config: Config) -> None:
+def test_weather_init(mock_weather_input: dict, mock_time: Time) -> None:
     """Tests that subroutines are called appropriately when Weather instance in initialized."""
-    with (
-        patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg,
-        patch("RUFAS.output_manager.OutputManager.add_variable") as add,
-        patch("RUFAS.weather.Weather._get_latitude") as latitude,
-    ):
-        Weather(mock_weather_input, mock_config)
+    with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
+            patch("RUFAS.output_manager.OutputManager.add_variable") as add, \
+            patch("RUFAS.weather.Weather._get_latitude") as latitude:
+        Weather(mock_weather_input, mock_time)
         avg.assert_called_once()
         add.assert_called_once()
         latitude.assert_called_once()
@@ -168,23 +151,14 @@ def test_get_current_day_conditions(
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
-    with (
-        patch(
-            "RUFAS.util.Utility.day_to_month_conversion",
-            new_callable=MagicMock,
-            return_value=3,
-        ) as conversion,
-        patch(
-            "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
-            new_callable=MagicMock,
-            return_value=10.0,
-        ) as daylength,
-    ):
-        actual = mock_weather.get_current_day_conditions(mocked_time)
+    with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock, return_value=3) as conversion:
+        with patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", new_callable=MagicMock,
+                   return_value=10.0) as daylength:
+            actual = mock_weather.get_current_day_conditions(mocked_time)
 
-        assert actual == expected
-        assert conversion.call_count == 1
-        daylength.assert_called_once_with(day, 43.0723, 3)
+    assert actual == expected
+    assert conversion.call_count == 1
+    daylength.assert_called_once_with(day, 43.0723, 3)
 
 
 @pytest.mark.parametrize(
