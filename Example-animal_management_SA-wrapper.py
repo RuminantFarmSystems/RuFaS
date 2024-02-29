@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from typing import Dict, Tuple, Any
 
-from RUFAS.config import Config
 from RUFAS.routines.feed import Feed
 from RUFAS.weather import Weather
 from RUFAS.time import Time
@@ -56,16 +55,12 @@ class ExampleAnimalSA:
         a dictionary object containing data parsed from `animal_management.json`
     animal_path : str
         path to a default animal input json file
-    config_dict : dict
-        a dictionary object created from the "config" subset of `main_input_dict`
     feed_path : str
         path to the feed input json file
     manure_management_path : str
         path to the manure management input json file
     weather_path : str
         path to the weather csv file
-    config_instance : Config
-        an instance of the Config class
     feed_instance : Feed
         an instance of the Feed class
     weather_instance : Weather
@@ -82,11 +77,9 @@ class ExampleAnimalSA:
         self.animal_management_json = None
         self.main_input_dict = None
         self.animal_path = None
-        self.config_dict = None
         self.feed_path = None
         self.manure_management_path = None
         self.weather_path = None
-        self.config_instance = None
         self.feed_instance = None
         self.weather_instance = None
         self.time_instance = None
@@ -94,17 +87,12 @@ class ExampleAnimalSA:
         self.animal_management_instance = None
 
     @staticmethod
-    def objective_function(
-        feed_dry_matter: float,
-        feed_carbon: float,
-        feed_phosphorus: float,
-        feed_nitrogen: float,
-        feed_detergent_fiber: float,
-        animal_management_json: str = "input/animal_management.json",
-        animal_dir: str = "input/animal",
-        feed_dir: str = "input/feed",
-        manure_dir: str = "input/manure",
-    ) -> Tuple[float | Any, float | Any]:
+    def objective_function(feed_dry_matter: float, feed_carbon: float, feed_phosphorus: float,
+                           feed_nitrogen: float, feed_detergent_fiber: float,
+                           animal_management_json: str = "input/data/animal/default_animal.json",
+                           animal_dir: str = "input/data/animal", feed_dir: str = "input/data/feed",
+                           manure_dir: str = "input/data/manure",
+                           ) -> Tuple[float | Any, float | Any]:
         """The non-vectorized objective function for this example.
 
         This function calculates the average phosphorus requirements and manure production for a pen of animals, based
@@ -162,11 +150,8 @@ class ExampleAnimalSA:
 
         # initialize the class of interest, with altered configurations
         example_class.animal_management_instance = AnimalManager(
-            example_class.animal_management_dict,
-            example_class.config_instance,
-            example_class.feed_instance,
-            example_class.weather_instance,
-            example_class.time_instance,
+            example_class.animal_management_dict, example_class.feed_instance,
+            example_class.weather_instance, example_class.time_instance
         )
 
         # run the method of interest
@@ -190,13 +175,10 @@ class ExampleAnimalSA:
         return mean_pen_phosphorus_requirements, mean_pen_manure_mass
 
     @staticmethod
-    def vectorized_objective_function(
-        X: numpy.array,
-        animal_management_json: str = "input/animal_management.json",
-        animal_dir: str = "input/animal",
-        feed_dir: str = "input/feed",
-        manure_dir: str = "input/manure",
-    ) -> numpy.array:
+    def vectorized_objective_function(X: numpy.array,
+                                      animal_management_json: str = "input/animal/default_animal.json",
+                                      animal_dir: str = "input/animal", feed_dir: str = "input/feed",
+                                      manure_dir: str = "input/manure") -> numpy.array:
         """Vectorized wrapper for `objective_function()`
 
         Parameters
@@ -256,13 +238,9 @@ class ExampleAnimalSA:
             data_dict = json.load(f)
             return data_dict
 
-    def _perform_initial_setup(
-        self,
-        animal_management_json: str = "input/animal_management.json",
-        animal_dir: str = "input/animal",
-        feed_dir: str = "input/feed",
-        manure_dir: str = "input/manure",
-    ):
+    def _perform_initial_setup(self, animal_management_json: str = "input/animal/default_animal.json",
+                               animal_dir: str = "input/data/animal", feed_dir: str = "input/data/feed",
+                               manure_dir: str = "input/data/manure"):
         """Executes the first setup steps; converts input files into dictionaries
 
         Parameters
@@ -279,7 +257,6 @@ class ExampleAnimalSA:
         self.animal_management_json = animal_management_json
         self.main_input_dict = self.make_data_dict_from_json(self.animal_management_json)
         self.animal_path = animal_dir + "/" + self.main_input_dict["farm"]["animal"]
-        self.config_dict = self.main_input_dict["config"]
         self.feed_path = feed_dir + "/" + self.main_input_dict["farm"]["feed"]
         self.manure_management_path = manure_dir + "/" + self.main_input_dict["farm"]["manure"]
         self.weather_path = self.main_input_dict["weather"]
@@ -287,10 +264,9 @@ class ExampleAnimalSA:
     def _setup_main_object(self):
         """Creates an instance the main AnimalManager class, after creating instances of the objects needed to
         initialize this class"""
-        self.config_instance = Config(self.config_dict)
         self.feed_instance = Feed(self.make_data_dict_from_json(self.feed_path))
-        self.weather_instance = Weather(self.weather_path, self.config_instance)
-        self.time_instance = Time(self.config_instance)
+        self.time_instance = Time()
+        self.weather_instance = Weather(self.weather_path, self.time_instance)
 
         self.animal_management_dict = self.make_data_dict_from_json(self.animal_path)  # this will get altered
         self.animal_management_dict["manure_management_scenarios"] = self.make_data_dict_from_json(
@@ -337,19 +313,11 @@ if __name__ == "__main__":
     ]
     par_bounds = [(0, 10000), (0, 1), (0, 1), (0, 1), (0, 1)]
     output_names = ["phosphorus_requirements", "manure_production"]
-    SA = SensitivityAnalysis(
-        fun=ExampleAnimalSA.vectorized_objective_function,
-        pars=par_names,
-        bounds=par_bounds,
-        outputs=output_names,
-        sample_n=2**7,
-        n_cores=2,
-        method="fast",
-        animal_management_json="input/animal_management.json",
-        animal_dir="input/animal",
-        feed_dir="input/feed",
-        manure_dir="input/manure",
-    )
+    SA = SensitivityAnalysis(fun=ExampleAnimalSA.vectorized_objective_function,
+                             pars=par_names, bounds=par_bounds, outputs=output_names, sample_n=2**7,
+                             n_cores=2, method="fast",
+                             animal_management_json="input/data/animal/default_animal.json",
+                             animal_dir="input/data/animal", feed_dir="input/data/feed", manure_dir="input/data/manure")
 
     # results
     start_time = time.time()
