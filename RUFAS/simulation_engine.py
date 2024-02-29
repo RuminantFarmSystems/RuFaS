@@ -71,13 +71,19 @@ class SimulationEngine:
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
         AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.day_counter)
+        available_feeds_on_final_day = [
+            {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
+            for feed in self.feed_manager.query_available_feeds()
+        ]
+        available_feeds_units = {
+            "category": "unitless",
+            "type": "unitless",
+            "amount": "kg"
+        }
         om.add_variable(
             "available_feeds_on_final_day",
-            [
-                {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
-                for feed in self.feed_manager.query_available_feeds()
-            ],
-            info_map,
+            available_feeds_on_final_day,
+            dict(info_map, **{"units": available_feeds_units}),
         )
         t_end_sim = timer.time()
 
@@ -88,10 +94,7 @@ class SimulationEngine:
         om.add_variable(
             "day_counter_final_value",
             self.day_counter,
-            {
-                "class": self.__class__.__name__,
-                "function": self.simulate.__name__,
-            },
+            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
         )
 
         error_count, warning_count = om.get_error_and_warning_counts()
