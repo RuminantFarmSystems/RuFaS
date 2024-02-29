@@ -3127,7 +3127,6 @@ def test_add_variable_to_pool_eager_termination(
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
-    }
     """
     Unit test for add_variable_to_pool() method in file input_manager.py with eager_termination=True.
     """
