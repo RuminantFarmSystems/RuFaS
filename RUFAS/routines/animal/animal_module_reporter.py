@@ -481,12 +481,8 @@ class AnimalModuleReporter:
         om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num, dict(info_map, **{"units": "animals"}))
         om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num, dict(info_map, **{"units": "animals"}))
         om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num, dict(info_map, **{"units": "animals"}))
-        om.add_variable(
-            "avg_days_in_milk", life_cycle_manager.avg_days_in_milk, dict(info_map, **{"units": "days"})
-        )
-        om.add_variable(
-            "avg_days_in_preg", life_cycle_manager.avg_days_in_preg, dict(info_map, **{"units": "days"})
-        )
+        om.add_variable("avg_days_in_milk", life_cycle_manager.avg_days_in_milk, dict(info_map, **{"units": "days"}))
+        om.add_variable("avg_days_in_preg", life_cycle_manager.avg_days_in_preg, dict(info_map, **{"units": "days"}))
         om.add_variable(
             "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight, dict(info_map, **{"units": "kg"})
         )

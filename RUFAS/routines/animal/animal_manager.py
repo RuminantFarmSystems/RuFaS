@@ -1841,8 +1841,9 @@ class AnimalManager:
             if HeiferII.stats["num_ai_performed_in_ED"] > 0
             else 0
         )
-        om.add_variable("heiferII_ED_conception_rate", ed_conception_rate,
-                        dict(info_map, **{"units": "conceptions/service"}))
+        om.add_variable(
+            "heiferII_ED_conception_rate", ed_conception_rate, dict(info_map, **{"units": "conceptions/service"})
+        )
 
         om.add_variable(
             "heiferII_num_ai_performed_in_TAI",
@@ -1859,8 +1860,9 @@ class AnimalManager:
             if HeiferII.stats["num_ai_performed_in_TAI"] > 0
             else 0
         )
-        om.add_variable("heiferII_TAI_conception_rate", tai_conception_rate,
-                        dict(info_map, **{"units": "conceptions/service"}))
+        om.add_variable(
+            "heiferII_TAI_conception_rate", tai_conception_rate, dict(info_map, **{"units": "conceptions/service"})
+        )
 
         om.add_variable(
             "heiferII_num_ai_performed_in_SynchED",
@@ -1878,8 +1880,9 @@ class AnimalManager:
             else 0
         )
         om.add_variable(
-            "heiferII_SynchED_conception_rate", synch_ed_conception_rate,
-            dict(info_map, **{"units": "conceptions/service"})
+            "heiferII_SynchED_conception_rate",
+            synch_ed_conception_rate,
+            dict(info_map, **{"units": "conceptions/service"}),
         )
 
     def _record_cows_conception_rate(self) -> None:
@@ -1891,9 +1894,7 @@ class AnimalManager:
             "class": self.__class__.__name__,
             "function": self._record_cows_conception_rate.__name__,
         }
-        om.add_variable(
-            "cow_total_num_ai_performed", Cow.stats["num_ai_performed"], dict(info_map, **{"units": "AIs"})
-        )
+        om.add_variable("cow_total_num_ai_performed", Cow.stats["num_ai_performed"], dict(info_map, **{"units": "AIs"}))
         om.add_variable(
             "cow_total_num_successful_conceptions",
             Cow.stats["num_successful_conceptions"],
@@ -1905,8 +1906,9 @@ class AnimalManager:
             else 0
         )
         om.add_variable(
-            "cow_overall_conception_rate", cow_overall_conception_rate,
-            dict(info_map, **{"units": "conceptions/service"})
+            "cow_overall_conception_rate",
+            cow_overall_conception_rate,
+            dict(info_map, **{"units": "conceptions/service"}),
         )
 
     def _record_culling_stats(self) -> None:
