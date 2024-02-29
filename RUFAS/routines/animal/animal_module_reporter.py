@@ -166,7 +166,7 @@ class AnimalModuleReporter:
                 "P_req": "g",
                 "DMIest_requirement": "kg",
                 "avg_BW": "kg",
-                "avg_milk_production_reduction_pen": "kg",
+                "avg_milk_production_reduction_pen": "kg/day",
             }
             om.add_variable(
                 f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
