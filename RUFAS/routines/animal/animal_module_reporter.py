@@ -35,23 +35,23 @@ class AnimalModuleReporter:
             + len(animal_manager.heiferIIs)
             + len(animal_manager.heiferIIIs)
             + len(animal_manager.cows),
-            dict(info_map, **{"units": "unitless"}),
+            dict(info_map, **{"units": "animals"}),
         )
-        om.add_variable("num_calves", len(animal_manager.calves), dict(info_map, **{"units": "unitless"}))
-        om.add_variable("num_heiferIs", len(animal_manager.heiferIs), dict(info_map, **{"units": "unitless"}))
-        om.add_variable("num_heiferIIs", len(animal_manager.heiferIIs), dict(info_map, **{"units": "unitless"}))
-        om.add_variable("num_heiferIIIs", len(animal_manager.heiferIIIs), dict(info_map, **{"units": "unitless"}))
+        om.add_variable("num_calves", len(animal_manager.calves), dict(info_map, **{"units": "animals"}))
+        om.add_variable("num_heiferIs", len(animal_manager.heiferIs), dict(info_map, **{"units": "animals"}))
+        om.add_variable("num_heiferIIs", len(animal_manager.heiferIIs), dict(info_map, **{"units": "animals"}))
+        om.add_variable("num_heiferIIIs", len(animal_manager.heiferIIIs), dict(info_map, **{"units": "animals"}))
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in animal_manager.cows if cow.is_lactating]),
-            dict(info_map, **{"units": "unitless"}),
+            dict(info_map, **{"units": "animals"}),
         )
         om.add_variable(
             "num_dry_cows",
             len([cow for cow in animal_manager.cows if not cow.is_lactating]),
-            dict(info_map, **{"units": "unitless"}),
+            dict(info_map, **{"units": "animals"}),
         )
-        om.add_variable("num_cows_total", len(animal_manager.cows), dict(info_map, **{"units": "unitless"}))
+        om.add_variable("num_cows_total", len(animal_manager.cows), dict(info_map, **{"units": "animals"}))
 
     def report_milk(pen, simulation_day: int) -> None:
         """
@@ -418,36 +418,36 @@ class AnimalModuleReporter:
         om.add_variable(
             "sold_heiferIII_oversupply_num",
             life_cycle_manager.sold_heiferIII_oversupply_num,
-            dict(info_map, **{"units": "unitless"}),
+            dict(info_map, **{"units": "animals"}),
         )
         om.add_variable(
-            "bought_heifer_num", life_cycle_manager.bought_heifer_num, dict(info_map, **{"units": "unitless"})
+            "bought_heifer_num", life_cycle_manager.bought_heifer_num, dict(info_map, **{"units": "animals"})
         )
         om.add_variable(
-            "sold_heiferII_num", life_cycle_manager.sold_heiferII_num, dict(info_map, **{"units": "unitless"})
+            "sold_heiferII_num", life_cycle_manager.sold_heiferII_num, dict(info_map, **{"units": "animals"})
         )
         om.add_variable(
-            "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, dict(info_map, **{"units": "unitless"})
+            "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, dict(info_map, **{"units": "animals"})
         )
-        om.add_variable("sold_cow_num", life_cycle_manager.sold_cow_num, dict(info_map, **{"units": "unitless"}))
+        om.add_variable("sold_cow_num", life_cycle_manager.sold_cow_num, dict(info_map, **{"units": "animals"}))
         om.add_variable(
-            "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, dict(info_map, **{"units": "unitless"})
-        )
-        om.add_variable(
-            "GnRH_injection_num", life_cycle_manager.GnRH_injection_num, dict(info_map, **{"units": "unitless"})
+            "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, dict(info_map, **{"units": "injections"})
         )
         om.add_variable(
-            "PGF_injection_num", life_cycle_manager.PGF_injection_num, dict(info_map, **{"units": "unitless"})
+            "GnRH_injection_num", life_cycle_manager.GnRH_injection_num, dict(info_map, **{"units": "injections"})
         )
         om.add_variable(
-            "PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h, dict(info_map, **{"units": "unitless"})
+            "PGF_injection_num", life_cycle_manager.PGF_injection_num, dict(info_map, **{"units": "injections"})
         )
-        om.add_variable("ai_num", life_cycle_manager.ai_num, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("preg_check_num", life_cycle_manager.preg_check_num, dict(info_map, **{"units": "unitless"}))
         om.add_variable(
-            "preg_check_num_h", life_cycle_manager.preg_check_num_h, dict(info_map, **{"units": "unitless"})
+            "PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h, dict(info_map, **{"units": "injections"})
         )
-        om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num, dict(info_map, **{"units": "unitless"}))
+        om.add_variable("ai_num", life_cycle_manager.ai_num, dict(info_map, **{"units": "AIs"}))
+        om.add_variable("preg_check_num", life_cycle_manager.preg_check_num, dict(info_map, **{"units": "preg checks"}))
+        om.add_variable(
+            "preg_check_num_h", life_cycle_manager.preg_check_num_h, dict(info_map, **{"units": "preg checks"})
+        )
+        om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num, dict(info_map, **{"units": "animals"}))
         om.add_variable(
             "daily_milk_production", life_cycle_manager.daily_milk_production, dict(info_map, **{"units": "kg/day"})
         )
@@ -476,19 +476,19 @@ class AnimalModuleReporter:
             life_cycle_manager.dry_cows_milk_protein_kg,
             dict(info_map, **{"units": "kg/day"}),
         )
-        om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num, dict(info_map, **{"units": "unitless"}))
+        om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, dict(info_map, **{"units": "animals"}))
+        om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, dict(info_map, **{"units": "animals"}))
+        om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num, dict(info_map, **{"units": "animals"}))
+        om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num, dict(info_map, **{"units": "animals"}))
+        om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num, dict(info_map, **{"units": "animals"}))
         om.add_variable(
-            "avg_days_in_milk", life_cycle_manager.avg_days_in_milk, dict(info_map, **{"units": "unitless"})
+            "avg_days_in_milk", life_cycle_manager.avg_days_in_milk, dict(info_map, **{"units": "days"})
         )
         om.add_variable(
-            "avg_days_in_preg", life_cycle_manager.avg_days_in_preg, dict(info_map, **{"units": "unitless"})
+            "avg_days_in_preg", life_cycle_manager.avg_days_in_preg, dict(info_map, **{"units": "days"})
         )
         om.add_variable(
-            "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight, dict(info_map, **{"units": "unitless"})
+            "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight, dict(info_map, **{"units": "kg"})
         )
         om.add_variable("avg_parity_num", life_cycle_manager.avg_parity_num, dict(info_map, **{"units": "unitless"}))
         om.add_variable(
@@ -517,11 +517,11 @@ class AnimalModuleReporter:
         parity_2 = life_cycle_manager.num_cow_for_parity["2"]
         parity_3 = life_cycle_manager.num_cow_for_parity["3"]
         parity_greater_than_3 = life_cycle_manager.num_cow_for_parity["greater_than_3"]
-        om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": "unitless"}))
-        om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": "unitless"}))
+        om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": "animals"}))
+        om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": "animals"}))
+        om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": "animals"}))
         om.add_variable(
-            "num_cow_for_parity_greater_than_3", parity_greater_than_3, dict(info_map, **{"units": "unitless"})
+            "num_cow_for_parity_greater_than_3", parity_greater_than_3, dict(info_map, **{"units": "animals"})
         )
         calving_to_preg_time_1 = life_cycle_manager.avg_calving_to_preg_time["1"]
         calving_to_preg_time_2 = life_cycle_manager.avg_calving_to_preg_time["2"]
@@ -671,10 +671,10 @@ class AnimalModuleReporter:
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal.body_weight for sold_animal in daily_sell[day])
-                om.add_variable(f"{report_name}_sold_count", sold_count, dict(info_map, **{"units": "unitless"}))
+                om.add_variable(f"{report_name}_sold_count", sold_count, dict(info_map, **{"units": "animals"}))
                 om.add_variable(f"{report_name}_sold_weight", sold_weight, dict(info_map, **{"units": "kg"}))
             else:
-                om.add_variable(f"{report_name}_sold_count", 0, dict(info_map, **{"units": "unitless"}))
+                om.add_variable(f"{report_name}_sold_count", 0, dict(info_map, **{"units": "animals"}))
                 om.add_variable(f"{report_name}_sold_weight", 0, dict(info_map, **{"units": "kg"}))
 
     def report_305d_milk(animal_manager):
