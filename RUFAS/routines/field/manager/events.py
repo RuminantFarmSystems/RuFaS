@@ -9,8 +9,7 @@ presently growing in a field will be harvested.
 """
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-
-
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
@@ -37,6 +36,7 @@ class Event:
     An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
 
     """
+
     def __init__(self, year: int = 1, day: int = 120):
         self.year = year
         self.day = day
@@ -82,6 +82,7 @@ class PlantingEvent(Event):
         Flag indicating if the crop will be harvested when it has a certain amount of heat units.
 
     """
+
     def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
@@ -90,8 +91,11 @@ class PlantingEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for PlantingEvent objects."""
         if isinstance(other, PlantingEvent):
-            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+            return (
+                super().__eq__(other)
+                and other.crop_reference == self.crop_reference
                 and other.use_heat_scheduled_harvest == self.use_heat_scheduled_harvest
+            )
         return False
 
     def __hash__(self):
@@ -111,12 +115,13 @@ class HarvestEvent(Event):
         A harvest operation from the Harvest Operations enum.
 
     """
+
     def __init__(
         self,
         crop_reference: str,
         year: int = 1,
         day: int = 240,
-        operation: HarvestOperation = HarvestOperation.HARVEST_KILL
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL,
     ):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
@@ -125,8 +130,11 @@ class HarvestEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
-            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+            return (
+                super().__eq__(other)
+                and other.crop_reference == self.crop_reference
                 and other.operation == self.operation
+            )
         return False
 
     def __hash__(self):
@@ -146,26 +154,43 @@ class TillageEvent(Event):
         Fraction of soil surface pool incorporated into the soil profile (unitless).
     mixing_fraction : float
         Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).
+    implement : TillageImplement
+        Tillage implement that is being used to execute this tillage application.
 
     """
-    def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
-                 day: int = 160):
+
+    def __init__(
+        self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        implement: TillageImplement,
+        year: int = 1,
+        day: int = 160,
+    ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
         self.mixing_fraction = mixing_fraction
+        self.implement = implement
 
     def __eq__(self, other):
         """Overrides the equality operator for TillageEvent objects."""
         if isinstance(other, TillageEvent):
-            return super().__eq__(other) and other.tillage_depth == self.tillage_depth \
-                and other.incorporation_fraction == self.incorporation_fraction \
+            return (
+                super().__eq__(other)
+                and other.tillage_depth == self.tillage_depth
+                and other.incorporation_fraction == self.incorporation_fraction
                 and other.mixing_fraction == self.mixing_fraction
+                and other.implement == self.implement
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for TillageEvent objects."""
-        return hash((self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction))
+        return hash(
+            (self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction, self.implement)
+        )
 
 
 class ManureEvent(Event):
@@ -192,8 +217,18 @@ class ManureEvent(Event):
         Fraction of manure applied that remains on the soil surface (unitless).
 
     """
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
-                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
+
+    def __init__(
+        self,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        manure_type: ManureType,
+        field_coverage: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+    ):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
@@ -205,18 +240,31 @@ class ManureEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for ManureEvent objects."""
         if isinstance(other, ManureEvent):
-            return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
-                and other.phosphorus_mass == self.phosphorus_mass \
-                and other.manure_type == self.manure_type \
-                and other.field_coverage == self.field_coverage \
-                and other.application_depth == self.application_depth \
+            return (
+                super().__eq__(other)
+                and other.nitrogen_mass == self.nitrogen_mass
+                and other.phosphorus_mass == self.phosphorus_mass
+                and other.manure_type == self.manure_type
+                and other.field_coverage == self.field_coverage
+                and other.application_depth == self.application_depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.manure_type,
-                     self.field_coverage, self.application_depth, self.surface_remainder_fraction))
+        return hash(
+            (
+                self.year,
+                self.day,
+                self.nitrogen_mass,
+                self.phosphorus_mass,
+                self.manure_type,
+                self.field_coverage,
+                self.application_depth,
+                self.surface_remainder_fraction,
+            )
+        )
 
 
 class FertilizerEvent(Event):
@@ -240,8 +288,17 @@ class FertilizerEvent(Event):
     surface_remainder_fraction : float
         Fraction of fertilizer that remains on the soil surface after application.
     """
-    def __init__(self, mix_name: str, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, depth: float,
-                 surface_remainder_fraction: float):
+
+    def __init__(
+        self,
+        mix_name: str,
+        year: int,
+        day: int,
+        nitrogen_mass: float,
+        phosphorus_mass: float,
+        depth: float,
+        surface_remainder_fraction: float,
+    ):
         super().__init__(year=year, day=day)
         self.mix_name = mix_name
         self.nitrogen_mass = nitrogen_mass
@@ -252,14 +309,26 @@ class FertilizerEvent(Event):
     def __eq__(self, other):
         """Overrides the equality operator for FertilizerEvent objects."""
         if isinstance(other, FertilizerEvent):
-            return super().__eq__(other) and other.mix_name == self.mix_name \
-                and other.nitrogen_mass == self.nitrogen_mass \
-                and other.phosphorus_mass == self.phosphorus_mass \
-                and other.depth == self.depth \
+            return (
+                super().__eq__(other)
+                and other.mix_name == self.mix_name
+                and other.nitrogen_mass == self.nitrogen_mass
+                and other.phosphorus_mass == self.phosphorus_mass
+                and other.depth == self.depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
+            )
         return False
 
     def __hash__(self):
         """Overrides the hash method for FertilizerEvent objects."""
-        return hash((self.year, self.day, self.mix_name, self.nitrogen_mass, self.phosphorus_mass, self.depth,
-                     self.surface_remainder_fraction))
+        return hash(
+            (
+                self.year,
+                self.day,
+                self.mix_name,
+                self.nitrogen_mass,
+                self.phosphorus_mass,
+                self.depth,
+                self.surface_remainder_fraction,
+            )
+        )

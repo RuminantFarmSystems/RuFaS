@@ -41,9 +41,7 @@ class ManureManagerConfigHandler:
             The manure manager config dictionary that contains all the manure manager config information.
 
         """
-        self.custom_bedding_configs = self._process_bedding_configs(
-            manure_manager_config["bedding_configs"]
-        )
+        self.custom_bedding_configs = self._process_bedding_configs(manure_manager_config["bedding_configs"])
         self.manure_handler_configs = self._process_manure_handler_configs(
             manure_manager_config["manure_handler_configs"]
         )
@@ -54,9 +52,7 @@ class ManureManagerConfigHandler:
             manure_manager_config["manure_treatment_configs"]
         )
 
-    def get_custom_bedding_config(
-        self, bedding_type_name: str
-    ) -> Optional[BeddingConfig]:
+    def get_custom_bedding_config(self, bedding_type_name: str) -> Optional[BeddingConfig]:
         """Returns the custom bedding config for the given bedding type name, or None if no custom config exists.
 
         Parameters
@@ -70,9 +66,7 @@ class ManureManagerConfigHandler:
             The custom bedding config for the given bedding type name, or None if no custom config exists.
 
         """
-        return self.custom_bedding_configs.get(
-            BeddingType.get_type(bedding_type_name), None
-        )
+        return self.custom_bedding_configs.get(BeddingType.get_type(bedding_type_name), None)
 
     def get_manure_handler_config(self, manure_handler_type_name: str) -> ManureHandlerConfig:
         """Returns the manure handler config for the given manure handler type name.
@@ -96,16 +90,20 @@ class ManureManagerConfigHandler:
         try:
             return self.manure_handler_configs[manure_handler_type_name]
         except KeyError:
-            info_map = {"class": self.__class__.__name__, "function": self.get_manure_handler_config.__name__}
-            error_title = \
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.get_manure_handler_config.__name__,
+            }
+            # fmt: off
+            error_title = (
                 f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'."
+            )
+            # fmt: on
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
 
-    def get_custom_manure_separator_config(
-        self, manure_separator_type_name: str
-    ) -> Optional[ManureSeparatorConfig]:
+    def get_custom_manure_separator_config(self, manure_separator_type_name: str) -> Optional[ManureSeparatorConfig]:
         """Returns the custom manure separator config for the given manure separator type name, or None if no custom
         config exists.
 
@@ -121,13 +119,9 @@ class ManureManagerConfigHandler:
             exists.
 
         """
-        return self.custom_manure_separator_configs.get(
-            ManureSeparatorType.get_type(manure_separator_type_name), None
-        )
+        return self.custom_manure_separator_configs.get(ManureSeparatorType.get_type(manure_separator_type_name), None)
 
-    def get_custom_manure_treatment_config(
-        self, manure_treatment_type_name: str
-    ) -> Optional[ManureTreatmentConfig]:
+    def get_custom_manure_treatment_config(self, manure_treatment_type_name: str) -> Optional[ManureTreatmentConfig]:
         """Returns the custom manure treatment config for the given manure treatment type name, or None if no custom
         config exists.
 
@@ -143,14 +137,10 @@ class ManureManagerConfigHandler:
             exists.
 
         """
-        return self.custom_manure_treatment_configs.get(
-            ManureTreatmentType.get_type(manure_treatment_type_name), None
-        )
+        return self.custom_manure_treatment_configs.get(ManureTreatmentType.get_type(manure_treatment_type_name), None)
 
     @classmethod
-    def _process_bedding_configs(
-        cls, bedding_json_configs: List[Dict]
-    ) -> Dict[BeddingType, BeddingConfig]:
+    def _process_bedding_configs(cls, bedding_json_configs: List[Dict]) -> Dict[BeddingType, BeddingConfig]:
         """Returns a dictionary of bedding config objects, with the key being the bedding type.
 
         Parameters
@@ -196,7 +186,10 @@ class ManureManagerConfigHandler:
 
         """
 
-        info_map = {"class": cls.__name__, "function": cls._process_manure_handler_configs.__name__}
+        info_map = {
+            "class": cls.__name__,
+            "function": cls._process_manure_handler_configs.__name__,
+        }
 
         available_manure_handler_configs: Dict[str, ManureHandlerConfig] = {}
 
@@ -229,27 +222,19 @@ class ManureManagerConfigHandler:
             A dictionary of manure separator config objects, with the key being the manure separator type.
 
         """
-        manure_separator_config_by_manure_separator_type: Dict[
-            ManureSeparatorType, ManureSeparatorConfig
-        ] = {}
+        manure_separator_config_by_manure_separator_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {}
         for json_manure_separator_config in manure_separator_json_configs:
-            manure_separator_type = ManureSeparatorType.get_type(
-                json_manure_separator_config["manure_separator_type"]
-            )
+            manure_separator_type = ManureSeparatorType.get_type(json_manure_separator_config["manure_separator_type"])
             del json_manure_separator_config["manure_separator_type"]
-            manure_separator_config_by_manure_separator_type[
-                manure_separator_type
-            ] = ManureSeparatorConfig(**json_manure_separator_config)
+            manure_separator_config_by_manure_separator_type[manure_separator_type] = ManureSeparatorConfig(
+                **json_manure_separator_config
+            )
         return manure_separator_config_by_manure_separator_type
 
     @classmethod
-    def _process_manure_treatment_configs(
-        cls, manure_treatment_json_configs: List[Dict]
-    ) -> Dict[
+    def _process_manure_treatment_configs(cls, manure_treatment_json_configs: List[Dict]) -> Dict[
         ManureTreatmentType,
-        Union[
-            ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
-        ],
+        Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
@@ -276,30 +261,23 @@ class ManureManagerConfigHandler:
         ] = {}
 
         for json_manure_treatment_config in manure_treatment_json_configs:
-            manure_treatment_type = ManureTreatmentType.get_type(
-                json_manure_treatment_config["manure_treatment_type"]
-            )
+            manure_treatment_type = ManureTreatmentType.get_type(json_manure_treatment_config["manure_treatment_type"])
             del json_manure_treatment_config["manure_treatment_type"]
-            manure_treatment_config_by_type[
-                manure_treatment_type
-            ] = ManureTreatmentConfig(**json_manure_treatment_config)
+            manure_treatment_config_by_type[manure_treatment_type] = ManureTreatmentConfig(
+                **json_manure_treatment_config
+            )
 
         # Only do this because we only have one special case
         if (
             ManureTreatmentType.ANAEROBIC_LAGOON in manure_treatment_config_by_type
-            and ManureTreatmentType.ANAEROBIC_DIGESTION
-            in manure_treatment_config_by_type
+            and ManureTreatmentType.ANAEROBIC_DIGESTION in manure_treatment_config_by_type
         ):
             combo_config = (
-                manure_treatment_config_by_type[
-                    ManureTreatmentType.ANAEROBIC_DIGESTION
-                ],
+                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION],
                 manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_LAGOON],
             )
-            manure_treatment_config_by_type[
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
-            ] = manure_treatment_config_by_type[
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
-            ] = combo_config
+            manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] = (
+                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR]
+            ) = combo_config
 
         return manure_treatment_config_by_type

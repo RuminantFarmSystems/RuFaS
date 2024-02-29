@@ -1,9 +1,12 @@
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
+    manure_calculations,
+)
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 om = OutputManager()
 
@@ -34,8 +37,14 @@ class HeiferI(Calf):
         """
         return self.get_calf_values()
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {},
-                           metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
+    def set_nutrient_rqmts(
+        self,
+        temp,
+        animal_grouping_scenario,
+        nutrient_conc: dict = {},
+        metabolizable_energy: float = 15.625,
+        previous_DMI: float = 10.0,
+    ):
         """
         Calculates this heiferI's nutrient requirements.
         """
@@ -43,26 +52,28 @@ class HeiferI(Calf):
             metabolizable_energy = 15.625
         if previous_DMI == 0.0:
             previous_DMI = 10.0
-        if nutrient_conc and nutrient_conc['dm'] != 0.0:
-            NDF_conc = nutrient_conc['NDF'] / 100
-            TDN_conc = nutrient_conc['TDN'] / 100
-            net_energy_diet_concentration = (metabolizable_energy * 0.64)/previous_DMI
+        if nutrient_conc and nutrient_conc["dm"] != 0.0:
+            NDF_conc = nutrient_conc["NDF"] / 100
+            TDN_conc = nutrient_conc["TDN"] / 100
+            net_energy_diet_concentration = (metabolizable_energy * 0.64) / previous_DMI
         else:
             NDF_conc = 0.3
             TDN_conc = 0.7
             net_energy_diet_concentration = 1.0
         req = AnimalRequirements()
-        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
-                                             mature_body_weight=self.mature_body_weight,
-                                             day_of_pregnancy=None,
-                                             animal_type=animal_grouping_scenario.get_animal_type(self),
-                                             body_condition_score_5=3,
-                                             previous_temperature=temp,
-                                             average_daily_gain_heifer=self.daily_growth,
-                                             NDF_conc=NDF_conc,
-                                             TDN_conc=TDN_conc,
-                                             net_energy_diet_concentration=net_energy_diet_concentration,
-                                             days_born=self.days_born)
+        animal_requirements = req.calc_rqmts(
+            body_weight=self.body_weight,
+            mature_body_weight=self.mature_body_weight,
+            day_of_pregnancy=None,
+            animal_type=animal_grouping_scenario.get_animal_type(self),
+            body_condition_score_5=3,
+            previous_temperature=temp,
+            average_daily_gain_heifer=self.daily_growth,
+            NDF_conc=NDF_conc,
+            TDN_conc=TDN_conc,
+            net_energy_diet_concentration=net_energy_diet_concentration,
+            days_born=self.days_born,
+        )
 
         self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
         self.NEg_requirement = animal_requirements["NEg_requirement"]
@@ -83,7 +94,12 @@ class HeiferI(Calf):
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+            self.ration_formulation,
+            feed,
+            self.body_weight,
+            p_feces_excrt,
+            p_urine,
+            methane_model,
         )
 
     def phosphorus_rqmts(self, DMI):
@@ -119,12 +135,24 @@ class HeiferI(Calf):
         If the days_born of the animal is equal to 400,
         the difference is set to 1 (otherwise results in a division by 0 error).
 
-        Returns: the daily body weight change for a heifer that is not pregnant
+        Notes
+        -----
+        Calculation is [A.1A.C.6] in pseudocode, itself from  Fox et al. 1999 and NRC 2001.
+        However, for animals over 55% of their mature body weight, the equation results in a negative return.
+        Therefore when the result is negative, the minimum BW change constant is returned instead.
+
+        Returns
+        -------
+        int
+            The daily body weight change for a heifer that is not pregnant.
         """
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
         if divisor == 0:
             divisor = 1
-        return (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor
+        return max(
+            (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
+            AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
+        )
 
     def update(self, sim_day):
         """

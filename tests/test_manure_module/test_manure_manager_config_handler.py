@@ -7,7 +7,10 @@ from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType, ManureHandlerConfig
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    ManureHandlerType,
+    ManureHandlerConfig,
+)
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     ManureSeparatorType,
 )
@@ -57,9 +60,7 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
     )
 
     # Act
-    actual_bedding_configs = ManureManagerConfigHandler._process_bedding_configs(
-        json_bedding_configs
-    )
+    actual_bedding_configs = ManureManagerConfigHandler._process_bedding_configs(json_bedding_configs)
 
     # Assert
     assert len(actual_bedding_configs) == 3
@@ -214,10 +215,8 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
     )
 
     # Act
-    actual_manure_separator_configs = (
-        ManureManagerConfigHandler._process_manure_separator_configs(
-            manure_separator_json_configs
-        )
+    actual_manure_separator_configs = ManureManagerConfigHandler._process_manure_separator_configs(
+        manure_separator_json_configs
     )
 
     # Assert
@@ -302,8 +301,6 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             "sludge_accumulation_period": 1.0,
             "sludge_accumulation_volume_fraction": 0.03,
             "top_cover_volume_fraction": 0.2,
-            "biogas_generation_ratio": 0.38,
-            "methane_generation_ratio": 0.65,
             "evaporation_fraction": 0.02,
             "anaerobic_digestion_temperature_set_point": 37.5,
             "anaerobic_digestion_temperature": 37.5,
@@ -326,10 +323,8 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
     )
 
     # Act
-    actual_manure_treatment_configs = (
-        ManureManagerConfigHandler._process_manure_treatment_configs(
-            manure_treatment_json_configs
-        )
+    actual_manure_treatment_configs = ManureManagerConfigHandler._process_manure_treatment_configs(
+        manure_treatment_json_configs
     )
 
     # Assert
@@ -386,28 +381,20 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             sludge_accumulation_period=1.0,
             sludge_accumulation_volume_fraction=0.03,
             top_cover_volume_fraction=0.2,
-            biogas_generation_ratio=0.38,
-            methane_generation_ratio=0.65,
             evaporation_fraction=0.02,
             anaerobic_digestion_temperature_set_point=37.5,
             anaerobic_digestion_temperature=37.5,
         ),
     ]
-    assert (
-        ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR in actual_manure_treatment_configs
-    )
+    assert ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR in actual_manure_treatment_configs
     assert ManureTreatmentType.SLURRY_STORAGE_OUTDOOR in actual_manure_treatment_configs
     assert ManureTreatmentType.ANAEROBIC_LAGOON in actual_manure_treatment_configs
     assert ManureTreatmentType.ANAEROBIC_DIGESTION in actual_manure_treatment_configs
-    assert actual_manure_treatment_configs[
-        ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
-    ] == (
+    assert actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] == (
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION],
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
     )
-    assert actual_manure_treatment_configs[
-        ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
-    ] == (
+    assert actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR] == (
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION],
         actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
     )
@@ -426,14 +413,11 @@ def test_get_custom_bedding_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     mock_bedding_config = mocker.MagicMock()
     mock_custom_bedding_configs = {mock_bedding_type: mock_bedding_config}
@@ -463,14 +447,11 @@ def test_get_custom_bedding_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     manure_manager_config_handler.custom_bedding_configs = {}
 
@@ -487,24 +468,33 @@ def test_get_custom_bedding_config(mocker: MockerFixture) -> None:
     assert actual_bedding_config is None
 
 
-@pytest.mark.parametrize("handler_name,expected_config", [
-    ("alley scraper", ManureHandlerConfig(
-        manure_handler_type=ManureHandlerType.ALLEY_SCRAPER,
-        cleaning_water_use_rate=100.0,
-        minutes_per_cleaning=10,
-        cleanings_per_day=10,
-        daily_tillage_frequency=0,
-        cleaning_water_recycle_fraction=0.9,
-    )),
-    ("unorthodox handler", ManureHandlerConfig(
-        manure_handler_type=ManureHandlerType.FLUSH_SYSTEM,
-        cleaning_water_use_rate=20.0,
-        minutes_per_cleaning=30,
-        cleanings_per_day=2,
-        daily_tillage_frequency=0,
-        cleaning_water_recycle_fraction=0.5,
-    ))
-])
+@pytest.mark.parametrize(
+    "handler_name,expected_config",
+    [
+        (
+            "alley scraper",
+            ManureHandlerConfig(
+                manure_handler_type=ManureHandlerType.ALLEY_SCRAPER,
+                cleaning_water_use_rate=100.0,
+                minutes_per_cleaning=10,
+                cleanings_per_day=10,
+                daily_tillage_frequency=0,
+                cleaning_water_recycle_fraction=0.9,
+            ),
+        ),
+        (
+            "unorthodox handler",
+            ManureHandlerConfig(
+                manure_handler_type=ManureHandlerType.FLUSH_SYSTEM,
+                cleaning_water_use_rate=20.0,
+                minutes_per_cleaning=30,
+                cleanings_per_day=2,
+                daily_tillage_frequency=0,
+                cleaning_water_recycle_fraction=0.5,
+            ),
+        ),
+    ],
+)
 def test_get_manure_handler_config(
     handler_name: str,
     expected_config: ManureHandlerConfig,
@@ -527,11 +517,11 @@ def test_get_manure_handler_config(
             cleanings_per_day=2,
             daily_tillage_frequency=0,
             cleaning_water_recycle_fraction=0.5,
-        )
+        ),
     }
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
-        return_value=None
+        return_value=None,
     )
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = manure_handler_configs
@@ -545,11 +535,14 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
     expected_title = "Attempted to use a non-existent manure handler configuration called 'not there'."
     expected_message = "Raising ValueError."
-    expected_info_map = {"class": "ManureManagerConfigHandler", "function": "get_manure_handler_config"}
+    expected_info_map = {
+        "class": "ManureManagerConfigHandler",
+        "function": "get_manure_handler_config",
+    }
 
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
-        return_value=None
+        return_value=None,
     )
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = {}
@@ -573,37 +566,26 @@ def test_get_custom_manure_separator_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     mock_manure_separator_config = mocker.MagicMock()
-    mock_custom_separator_configs = {
-        mock_manure_separator_type: mock_manure_separator_config
-    }
-    manure_manager_config_handler.custom_manure_separator_configs = (
-        mock_custom_separator_configs
-    )
+    mock_custom_separator_configs = {mock_manure_separator_type: mock_manure_separator_config}
+    manure_manager_config_handler.custom_manure_separator_configs = mock_custom_separator_configs
 
     # Act
-    actual_manure_separator_config = (
-        manure_manager_config_handler.get_custom_manure_separator_config(
-            manure_separator_type_name=mock_manure_separator_type_name
-        )
+    actual_manure_separator_config = manure_manager_config_handler.get_custom_manure_separator_config(
+        manure_separator_type_name=mock_manure_separator_type_name
     )
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
         manure_manager_config=mock_manure_manager_config
     )
-    patch_for_manure_separator_type_get_type.assert_called_once_with(
-        mock_manure_separator_type_name
-    )
+    patch_for_manure_separator_type_get_type.assert_called_once_with(mock_manure_separator_type_name)
     assert actual_manure_separator_config == mock_manure_separator_config
 
     # --------------------
@@ -618,31 +600,24 @@ def test_get_custom_manure_separator_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     manure_manager_config_handler.custom_manure_separator_configs = {}
 
     # Act
-    actual_manure_separator_config = (
-        manure_manager_config_handler.get_custom_manure_separator_config(
-            manure_separator_type_name=mock_manure_separator_type_name
-        )
+    actual_manure_separator_config = manure_manager_config_handler.get_custom_manure_separator_config(
+        manure_separator_type_name=mock_manure_separator_type_name
     )
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
         manure_manager_config=mock_manure_manager_config
     )
-    patch_for_manure_separator_type_get_type.assert_called_once_with(
-        mock_manure_separator_type_name
-    )
+    patch_for_manure_separator_type_get_type.assert_called_once_with(mock_manure_separator_type_name)
     assert actual_manure_separator_config is None
 
 
@@ -659,37 +634,26 @@ def test_get_custom_manure_treatment_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     mock_manure_treatment_config = mocker.MagicMock()
-    mock_custom_treatment_configs = {
-        mock_manure_treatment_type: mock_manure_treatment_config
-    }
-    manure_manager_config_handler.custom_manure_treatment_configs = (
-        mock_custom_treatment_configs
-    )
+    mock_custom_treatment_configs = {mock_manure_treatment_type: mock_manure_treatment_config}
+    manure_manager_config_handler.custom_manure_treatment_configs = mock_custom_treatment_configs
 
     # Act
-    actual_manure_treatment_config = (
-        manure_manager_config_handler.get_custom_manure_treatment_config(
-            manure_treatment_type_name=mock_manure_treatment_type_name
-        )
+    actual_manure_treatment_config = manure_manager_config_handler.get_custom_manure_treatment_config(
+        manure_treatment_type_name=mock_manure_treatment_type_name
     )
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
         manure_manager_config=mock_manure_manager_config
     )
-    patch_for_manure_treatment_type_get_type.assert_called_once_with(
-        mock_manure_treatment_type_name
-    )
+    patch_for_manure_treatment_type_get_type.assert_called_once_with(mock_manure_treatment_type_name)
     assert actual_manure_treatment_config == mock_manure_treatment_config
 
     # --------------------
@@ -704,31 +668,24 @@ def test_get_custom_manure_treatment_config(mocker: MockerFixture) -> None:
     )
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
-        ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     manure_manager_config_handler.custom_manure_treatment_configs = {}
 
     # Act
-    actual_manure_treatment_config = (
-        manure_manager_config_handler.get_custom_manure_treatment_config(
-            manure_treatment_type_name=mock_manure_treatment_type_name
-        )
+    actual_manure_treatment_config = manure_manager_config_handler.get_custom_manure_treatment_config(
+        manure_treatment_type_name=mock_manure_treatment_type_name
     )
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
         manure_manager_config=mock_manure_manager_config
     )
-    patch_for_manure_treatment_type_get_type.assert_called_once_with(
-        mock_manure_treatment_type_name
-    )
+    patch_for_manure_treatment_type_get_type.assert_called_once_with(mock_manure_treatment_type_name)
     assert actual_manure_treatment_config is None
 
 
@@ -772,31 +729,14 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     )
 
     # Act
-    manure_manager_config_handler = ManureManagerConfigHandler(
-        manure_manager_config=mock_manure_manager_config
-    )
+    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     # Assert
     patch_for_process_bedding_configs.assert_called_once_with(mock_bedding_json_configs)
-    patch_for_process_manure_handler_configs.assert_called_once_with(
-        mock_manure_handler_json_configs
-    )
-    patch_for_process_manure_separator_configs.assert_called_once_with(
-        mock_manure_separator_json_configs
-    )
-    patch_for_process_manure_treatment_configs.assert_called_once_with(
-        mock_manure_treatment_json_configs
-    )
-    assert (
-        manure_manager_config_handler.custom_bedding_configs
-        == mock_custom_bedding_configs
-    )
+    patch_for_process_manure_handler_configs.assert_called_once_with(mock_manure_handler_json_configs)
+    patch_for_process_manure_separator_configs.assert_called_once_with(mock_manure_separator_json_configs)
+    patch_for_process_manure_treatment_configs.assert_called_once_with(mock_manure_treatment_json_configs)
+    assert manure_manager_config_handler.custom_bedding_configs == mock_custom_bedding_configs
     assert manure_manager_config_handler.manure_handler_configs == mock_manure_handler_configs
-    assert (
-        manure_manager_config_handler.custom_manure_separator_configs
-        == mock_custom_manure_separator_configs
-    )
-    assert (
-        manure_manager_config_handler.custom_manure_treatment_configs
-        == mock_custom_manure_treatment_configs
-    )
+    assert manure_manager_config_handler.custom_manure_separator_configs == mock_custom_manure_separator_configs
+    assert manure_manager_config_handler.custom_manure_treatment_configs == mock_custom_manure_treatment_configs
