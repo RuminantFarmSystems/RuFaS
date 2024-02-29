@@ -295,7 +295,6 @@ def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str
     allocate_animals_to_pens_patch.start()
 
     data = MagicMock()
-    config = MagicMock()
     feed = MagicMock()
     weather = MagicMock()
     time = MagicMock()
@@ -303,11 +302,10 @@ def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str
     feed_emissions_manager = MagicMock()
 
     input_manager._InputManager__pool = mock_im_pool
-    animal_manager = AnimalManager(data, config, feed, weather, time, manure_manager_config, feed_emissions_manager)
+    animal_manager = AnimalManager(data, feed, weather, time, manure_manager_config, feed_emissions_manager)
     init_pens_patch.stop()
     init_animals_patch.stop()
     init_nutrient_rqmts_patch.stop()
-    # init_allocate_all_pens_patch.stop()
     allocate_animals_to_pens_patch.stop()
 
     return animal_manager
