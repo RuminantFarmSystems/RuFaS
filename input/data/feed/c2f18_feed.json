@@ -69,6 +69,7 @@
       }
     ],
     "farm_grown_feeds": [
+      1
     ],
     "storage_options": [
       {
@@ -97,12 +98,12 @@
     "user_defined_ration_percentages": {
       "calf": [
         {
-          "feed_type": 216,
-          "ration_percentage": 0
+          "feed_type": 202,
+          "ration_percentage": 50
         },
         {
           "feed_type": 216,
-          "ration_percentage": 150
+          "ration_percentage": 50
         }
       ],
       "growing": [
