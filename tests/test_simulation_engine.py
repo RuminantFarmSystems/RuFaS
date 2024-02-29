@@ -85,8 +85,8 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.weather = mocker.MagicMock()
     simulation_engine.time = mocker.MagicMock()
-    simulation_engine.state.animal_manager.all_pens = mocker.MagicMock()
-    simulation_engine.state.animal_manager.simulation_day = mocker.MagicMock()
+    simulation_engine.animal_manager.all_pens = mocker.MagicMock()
+    simulation_engine.animal_manager.simulation_day = mocker.MagicMock()
 
     patch_for_simulate_daily_manure_manager = mocker.patch("RUFAS.simulation_engine.simulate_daily_manure_manager")
     patch_for_daily_feed_routine = mocker.patch("RUFAS.simulation_engine.routines.daily_feed_routine")
@@ -98,7 +98,7 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     # Assert
     simulation_engine.animal_manager.daily_updates.assert_called_once_with(
         simulation_engine.feed, simulation_engine.weather, simulation_engine.time,
-        simulation_engine.manure_manager
+        manure_manager=simulation_engine.manure_manager
     )
     patch_for_simulate_daily_manure_manager.assert_called_once_with(
         simulation_engine.manure_manager, simulation_engine.animal_manager.all_pens,
