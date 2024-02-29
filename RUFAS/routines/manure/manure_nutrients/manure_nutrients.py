@@ -13,25 +13,20 @@ class ManureNutrients:
     manure_type: ManureType
     """Type of manure."""
 
-    nitrogen: FloatWithUnit = 0.0
+    nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
-    nitrogen.unit = "kg"
 
-    phosphorus: FloatWithUnit = 0.0
+    phosphorus: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
-    phosphorus.unit = "kg"
 
-    potassium: FloatWithUnit = 0.0
+    potassium: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
     """Amount of accumulated manure potassium derived from the manure module, kg."""
-    potassium.unit = "kg"
 
-    dry_matter: FloatWithUnit = 0.0
+    dry_matter: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
     """Amount of accumulated dry matter derived from the manure module, kg."""
-    dry_matter.unit = "kg"
 
-    total_manure_mass: FloatWithUnit = 0.0
+    total_manure_mass: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
     """Amount of accumulated manure mass derived from the manure module, kg."""
-    total_manure_mass.unit = "kg"
 
     def __post_init__(self):
         """
@@ -64,7 +59,6 @@ class ManureNutrients:
             The dry matter fraction of the manure, unitless, between 0 and 1.
 
         """
-        print(self.manure_type, self.total_manure_mass, self.nitrogen, self.dry_matter, self.phosphorus, self.potassium)
         if self.total_manure_mass == 0.0:
             return 0.0
         return self.dry_matter / self.total_manure_mass
