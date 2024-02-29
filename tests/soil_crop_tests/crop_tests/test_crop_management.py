@@ -1,6 +1,5 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
-from RUFAS.config import Config
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
@@ -22,15 +21,7 @@ om = OutputManager()
 
 @pytest.fixture
 def mock_time() -> Time:
-    config = Config(
-        {
-            "start_date": "1:1",
-            "end_date": "1:10",
-            "set_seed": False,
-            "random_seed": 42,
-        }
-    )
-    return Time(config)
+    return MagicMock(auto_spec=Time)
 
 
 @pytest.fixture
@@ -257,7 +248,7 @@ def test_manage_harvest(
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, mock_time.year, mock_time.day)
+        record_yield.assert_called_once_with(field_name, field_size, mock_time.calendar_year, mock_time.day)
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 

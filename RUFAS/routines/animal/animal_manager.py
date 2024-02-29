@@ -6,6 +6,7 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set, Union, Optional
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
@@ -35,6 +36,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -88,7 +90,6 @@ class AnimalManager:
     def __init__(
         self,
         data,
-        config,
         feed: Feed,
         weather: Weather,
         time: Time,
@@ -103,8 +104,6 @@ class AnimalManager:
         ----------
         data : Dict
             dictionary with animal information from the input JSON file
-        config : Config
-            instance of the Config class
         feed : Feed
             instance of the Feed class
         weather : Weather
@@ -115,9 +114,10 @@ class AnimalManager:
             Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
+        config_data: Dict[str, Any] = im.get_data("config")
 
         # simulation length, days
-        self.sim_length = config.sim_length
+        self.sim_length = time.simulation_length
 
         # day in the simulation
         self.simulation_day = 1
@@ -131,7 +131,7 @@ class AnimalManager:
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
 
         # if False, there are no animals being simulated on the farm
-        self.simulate_animals = config.simulate_animals
+        self.simulate_animals = config_data.get("simulate_animals", True)
 
         # list of all the animals in the simulation
         self.calves = []
