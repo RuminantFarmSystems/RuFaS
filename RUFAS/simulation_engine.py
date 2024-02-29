@@ -90,11 +90,7 @@ class SimulationEngine:
         om.add_variable(
             "day_counter_final_value",
             self.day_counter,
-            {
-                "class": self.__class__.__name__,
-                "function": self.simulate.__name__,
-                "units": "days"
-            },
+            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
         )
 
         error_count, warning_count = om.get_error_and_warning_counts()
