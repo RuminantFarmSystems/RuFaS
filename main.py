@@ -10,12 +10,12 @@ import argparse
 import random
 import sys
 import traceback
+from typing import Dict, Any
 from pathlib import Path
 from typing import List
 
 import numpy
 
-from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -275,7 +275,7 @@ def run_validation(
 
 
 def initialize_herd(
-    simulation_config: Config,
+    simulation_config: Dict[str, Any],
     init_herd: bool = False,
     save_animals: bool = False,
     save_animals_dir: Path = Path("output/"),
@@ -286,8 +286,8 @@ def initialize_herd(
 
     Parameters
     ----------
-    simulation_config : Config
-        Config object containing parameters and settings for the simulation.
+    simulation_config : Dict[str, Any]
+        Dictionary object containing parameters and settings for the simulation.
     init_herd: bool
         User input indicating whether to initialize herd with simulation.
     save_animals: bool
@@ -317,9 +317,9 @@ def initialize_herd(
     }
     output_manager = OutputManager()
 
-    if simulation_config.set_seed:
-        random.seed(simulation_config.seed)
-        numpy.random.seed(simulation_config.seed)
+    if "set_seed" in simulation_config.keys() and simulation_config["set_seed"]:
+        random.seed(simulation_config["random_seed"])
+        numpy.random.seed(simulation_config["random_seed"])
 
     output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
@@ -405,7 +405,7 @@ def execute_simulations(
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
-            simulation_config = Config(input_manager.get_data("config"))
+            simulation_config = input_manager.get_data("config")
             try:
                 initialize_herd(
                     simulation_config=simulation_config,
