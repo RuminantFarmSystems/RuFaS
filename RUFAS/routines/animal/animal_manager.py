@@ -87,8 +87,14 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-    def __init__(self, data, feed: Feed, weather: Weather, time: Time,
-                 feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None):
+    def __init__(
+        self,
+        data,
+        feed: Feed,
+        weather: Weather,
+        time: Time,
+        feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
+    ):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance

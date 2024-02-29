@@ -87,12 +87,17 @@ class ExampleAnimalSA:
         self.animal_management_instance = None
 
     @staticmethod
-    def objective_function(feed_dry_matter: float, feed_carbon: float, feed_phosphorus: float,
-                           feed_nitrogen: float, feed_detergent_fiber: float,
-                           animal_management_json: str = "input/data/animal/default_animal.json",
-                           animal_dir: str = "input/data/animal", feed_dir: str = "input/data/feed",
-                           manure_dir: str = "input/data/manure",
-                           ) -> Tuple[float | Any, float | Any]:
+    def objective_function(
+        feed_dry_matter: float,
+        feed_carbon: float,
+        feed_phosphorus: float,
+        feed_nitrogen: float,
+        feed_detergent_fiber: float,
+        animal_management_json: str = "input/data/animal/default_animal.json",
+        animal_dir: str = "input/data/animal",
+        feed_dir: str = "input/data/feed",
+        manure_dir: str = "input/data/manure",
+    ) -> Tuple[float | Any, float | Any]:
         """The non-vectorized objective function for this example.
 
         This function calculates the average phosphorus requirements and manure production for a pen of animals, based
@@ -150,8 +155,10 @@ class ExampleAnimalSA:
 
         # initialize the class of interest, with altered configurations
         example_class.animal_management_instance = AnimalManager(
-            example_class.animal_management_dict, example_class.feed_instance,
-            example_class.weather_instance, example_class.time_instance
+            example_class.animal_management_dict,
+            example_class.feed_instance,
+            example_class.weather_instance,
+            example_class.time_instance,
         )
 
         # run the method of interest
@@ -175,10 +182,13 @@ class ExampleAnimalSA:
         return mean_pen_phosphorus_requirements, mean_pen_manure_mass
 
     @staticmethod
-    def vectorized_objective_function(X: numpy.array,
-                                      animal_management_json: str = "input/animal/default_animal.json",
-                                      animal_dir: str = "input/animal", feed_dir: str = "input/feed",
-                                      manure_dir: str = "input/manure") -> numpy.array:
+    def vectorized_objective_function(
+        X: numpy.array,
+        animal_management_json: str = "input/animal/default_animal.json",
+        animal_dir: str = "input/animal",
+        feed_dir: str = "input/feed",
+        manure_dir: str = "input/manure",
+    ) -> numpy.array:
         """Vectorized wrapper for `objective_function()`
 
         Parameters
@@ -238,9 +248,13 @@ class ExampleAnimalSA:
             data_dict = json.load(f)
             return data_dict
 
-    def _perform_initial_setup(self, animal_management_json: str = "input/animal/default_animal.json",
-                               animal_dir: str = "input/data/animal", feed_dir: str = "input/data/feed",
-                               manure_dir: str = "input/data/manure"):
+    def _perform_initial_setup(
+        self,
+        animal_management_json: str = "input/animal/default_animal.json",
+        animal_dir: str = "input/data/animal",
+        feed_dir: str = "input/data/feed",
+        manure_dir: str = "input/data/manure",
+    ):
         """Executes the first setup steps; converts input files into dictionaries
 
         Parameters
@@ -313,11 +327,19 @@ if __name__ == "__main__":
     ]
     par_bounds = [(0, 10000), (0, 1), (0, 1), (0, 1), (0, 1)]
     output_names = ["phosphorus_requirements", "manure_production"]
-    SA = SensitivityAnalysis(fun=ExampleAnimalSA.vectorized_objective_function,
-                             pars=par_names, bounds=par_bounds, outputs=output_names, sample_n=2**7,
-                             n_cores=2, method="fast",
-                             animal_management_json="input/data/animal/default_animal.json",
-                             animal_dir="input/data/animal", feed_dir="input/data/feed", manure_dir="input/data/manure")
+    SA = SensitivityAnalysis(
+        fun=ExampleAnimalSA.vectorized_objective_function,
+        pars=par_names,
+        bounds=par_bounds,
+        outputs=output_names,
+        sample_n=2**7,
+        n_cores=2,
+        method="fast",
+        animal_management_json="input/data/animal/default_animal.json",
+        animal_dir="input/data/animal",
+        feed_dir="input/data/feed",
+        manure_dir="input/data/manure",
+    )
 
     # results
     start_time = time.time()

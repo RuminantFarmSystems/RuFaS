@@ -82,9 +82,11 @@ def mock_current_day_conditions() -> CurrentDayConditions:
 
 def test_weather_init(mock_weather_input: dict, mock_time: Time) -> None:
     """Tests that subroutines are called appropriately when Weather instance in initialized."""
-    with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
-            patch("RUFAS.output_manager.OutputManager.add_variable") as add, \
-            patch("RUFAS.weather.Weather._get_latitude") as latitude:
+    with (
+        patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg,
+        patch("RUFAS.output_manager.OutputManager.add_variable") as add,
+        patch("RUFAS.weather.Weather._get_latitude") as latitude,
+    ):
         Weather(mock_weather_input, mock_time)
         avg.assert_called_once()
         add.assert_called_once()
@@ -152,8 +154,11 @@ def test_get_current_day_conditions(
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
     with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock, return_value=3) as conversion:
-        with patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", new_callable=MagicMock,
-                   return_value=10.0) as daylength:
+        with patch(
+            "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
+            new_callable=MagicMock,
+            return_value=10.0,
+        ) as daylength:
             actual = mock_weather.get_current_day_conditions(mocked_time)
 
     assert actual == expected

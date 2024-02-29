@@ -275,11 +275,11 @@ def run_validation(
 
 
 def initialize_herd(
-        simulation_config: Dict[str, Any],
-        init_herd: bool = False,
-        save_animals: bool = False,
-        save_animals_dir: Path = Path("output/"),
-        terminate_simulation_post_herd_generation: bool = False
+    simulation_config: Dict[str, Any],
+    init_herd: bool = False,
+    save_animals: bool = False,
+    save_animals_dir: Path = Path("output/"),
+    terminate_simulation_post_herd_generation: bool = False,
 ) -> None:
     """
     Initializes a herd based on the provided simulation configuration.
@@ -404,9 +404,7 @@ def execute_simulations(
         output_manager.set_metadata_prefix(metadata_file["prefix"])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log(
-                "Validation complete", "Data is valid. \nSimulating...\n", info_map
-            )
+            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
             simulation_config = input_manager.get_data("config")
             try:
                 initialize_herd(

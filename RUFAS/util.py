@@ -363,8 +363,11 @@ class Utility:
             366,
         ]
 
-        cumulative_days_in_months = leap_cumulative_days_in_months if Utility.is_leap_year(calendar_year) else \
-            non_leap_cumulative_days_in_months
+        cumulative_days_in_months = (
+            leap_cumulative_days_in_months
+            if Utility.is_leap_year(calendar_year)
+            else non_leap_cumulative_days_in_months
+        )
 
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:

@@ -62,12 +62,8 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_run_simulation_main_loop.assert_called_once()
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
-    patch_for_output_manager.add_log.assert_called_with(
-        "total_simulation_time", expected_log_message, info_map
-    )
-    patch_for_animal_module_reporter.assert_called_once_with(
-        simulation_engine.animal_manager, 100
-    )
+    patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
+    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
     patch_for_sys_stdout_write.assert_has_calls(
         [mocker.call("\nSimulation Completed.\n\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
@@ -128,8 +124,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
     config_data = {"set_seed": True, "random_seed": 42}
     patch_for_get_data = mocker.patch(
-        "RUFAS.simulation_engine.im.get_data", side_effect=[config_data, {}, {}, {'manure_management_scenarios': {}},
-                                                            {}]
+        "RUFAS.simulation_engine.im.get_data",
+        side_effect=[config_data, {}, {}, {"manure_management_scenarios": {}}, {}],
     )
 
     mock_weather = mocker.MagicMock()
@@ -139,24 +135,16 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_time = mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
 
     mock_feed = mocker.MagicMock()
-    patch_for_feed = mocker.patch(
-        "RUFAS.simulation_engine.Feed", return_value=mock_feed
-    )
+    patch_for_feed = mocker.patch("RUFAS.simulation_engine.Feed", return_value=mock_feed)
 
     mock_animal_manager = mocker.MagicMock()
-    patch_for_animal_manager = mocker.patch(
-        "RUFAS.simulation_engine.AnimalManager", return_value=mock_animal_manager
-    )
+    patch_for_animal_manager = mocker.patch("RUFAS.simulation_engine.AnimalManager", return_value=mock_animal_manager)
 
     mock_manure_manager = mocker.MagicMock()
-    patch_for_manure_manager = mocker.patch(
-        "RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager
-    )
+    patch_for_manure_manager = mocker.patch("RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager)
 
     mock_field_manager = mocker.MagicMock()
-    patch_for_field_manager = mocker.patch(
-        "RUFAS.simulation_engine.FieldManager", return_value=mock_field_manager
-    )
+    patch_for_field_manager = mocker.patch("RUFAS.simulation_engine.FieldManager", return_value=mock_field_manager)
 
     mock_feed_manager = mocker.MagicMock()
     patch_for_feed_manager = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
@@ -168,18 +156,27 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     simulation_engine._initialize_simulation()
 
     # Assert
-    patch_for_get_data.assert_has_calls([mocker.call("config"), mocker.call("weather"), mocker.call("feed"),
-                                         mocker.call("manure_management"), mocker.call("animal")])
+    patch_for_get_data.assert_has_calls(
+        [
+            mocker.call("config"),
+            mocker.call("weather"),
+            mocker.call("feed"),
+            mocker.call("manure_management"),
+            mocker.call("animal"),
+        ]
+    )
     patch_for_random_seed.assert_called_once_with(42)
     patch_for_numpy_seed.assert_called_once_with(42)
 
     patch_for_weather.assert_called_once_with({}, mock_time)
     patch_for_time.assert_called_once_with()
     patch_for_feed.assert_called_once_with({})
-    patch_for_animal_manager.assert_called_once_with({'manure_management_scenarios': {}}, mock_feed, mock_weather,
-                                                     mock_time)
-    patch_for_manure_manager.assert_called_once_with(mock_animal_manager, mock_weather, mock_time,
-                                                     {'manure_management_scenarios': {}})
+    patch_for_animal_manager.assert_called_once_with(
+        {"manure_management_scenarios": {}}, mock_feed, mock_weather, mock_time
+    )
+    patch_for_manure_manager.assert_called_once_with(
+        mock_animal_manager, mock_weather, mock_time, {"manure_management_scenarios": {}}
+    )
     patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager, feed_manager=mock_feed_manager)
     patch_for_feed_manager.assert_called_once()
 
@@ -280,9 +277,7 @@ def test_run_post_annual_routines(mocker: MockerFixture) -> None:
     simulation_engine._run_post_annual_routines()
 
     # Assert
-    simulation_engine.annual_mass_balance.assert_called_once_with(
-        simulation_engine.time
-    )
+    simulation_engine.annual_mass_balance.assert_called_once_with(simulation_engine.time)
     simulation_engine.annual_reset.assert_called_once()
     simulation_engine.time.advance.assert_called_once()
 
@@ -343,9 +338,7 @@ def test_advance_time(
 
     # Assert
     simulation_engine.time.advance.assert_called_once()
-    assert (
-        simulation_engine.animal_manager.simulation_day == expected_simulation_day
-    )
+    assert simulation_engine.animal_manager.simulation_day == expected_simulation_day
 
     if print_day:
         expected_log_message = f"simulating day: {to_str_return_value}"

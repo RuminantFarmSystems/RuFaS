@@ -120,12 +120,12 @@ class Weather:
             elif current_year == time.end_year_int and current_day > time.end_day:
                 break
 
-            self.__precipitation[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.__max_daily_temperature[current_year_index][current_day_index] = weather_file['high'][i]
-            self.__min_daily_temperature[current_year_index][current_day_index] = weather_file['low'][i]
-            self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.__radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.__irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
+            self.__precipitation[current_year_index][current_day_index] = weather_file["precip"][i]
+            self.__max_daily_temperature[current_year_index][current_day_index] = weather_file["high"][i]
+            self.__min_daily_temperature[current_year_index][current_day_index] = weather_file["low"][i]
+            self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file["avg"][i]
+            self.__radiation[current_year_index][current_day_index] = weather_file["Hday"][i]
+            self.__irrigation[current_year_index][current_day_index] = weather_file["irrigation"][i]
 
         self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
 

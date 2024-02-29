@@ -70,9 +70,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(
-            self.animal_manager, self.day_counter
-        )
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.day_counter)
         om.add_variable(
             "available_feeds_on_final_day",
             [
@@ -110,16 +108,10 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         self.day_counter += 1
-        self.animal_manager.daily_updates(
-            self.feed, self.weather, self.time
-        )
-        simulate_daily_manure_manager(
-            self.manure_manager, self.animal_manager
-        )
+        self.animal_manager.daily_updates(self.feed, self.weather, self.time)
+        simulate_daily_manure_manager(self.manure_manager, self.animal_manager)
         self.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(
-            self.feed, self.field_manager, self.animal_manager
-        )
+        routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -217,7 +209,7 @@ class SimulationEngine:
 
         manure_class_config = im.get_data("manure_management")
         animal_class_config = im.get_data("animal")
-        animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
+        animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
         self.manure_manager = ManureManager(self.animal_manager, self.weather, self.time, manure_class_config)
