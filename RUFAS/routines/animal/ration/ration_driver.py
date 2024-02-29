@@ -90,10 +90,29 @@ class RationManager:
                     "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
+                fail_summary_units = {
+                    "simulation_day": "simulation day",
+                    "reattempt number": "unitless",
+                    "constraints_failed_dict": "unitless",
+                    "ration_attempted": "unitless",
+                    "pen requirements": {
+                        "NEmaint_requirement": "Mcal",
+                        "NEa_requirement": "Mcal",
+                        "NEg_requirement": "Mcal",
+                        "NEpreg_requirement": "Mcal",
+                        "NEl_requirement": "Mcal",
+                        "MP_requirement": "g",
+                        "Ca_requirement": "g",
+                        "P_req": "g",
+                        "DMIest_requirement": "kg",
+                        "avg_BW": "kg",
+                        "avg_milk_production_reduction_pen": "kg",
+                    },
+                }
                 om.add_variable(
                     f"failed_constraint_summary_for_pen_{pen.id}",
                     fail_summary,
-                    info_map,
+                    dict(info_map, **{"units": fail_summary_units}),
                 )
 
         if solution is not None:
@@ -254,7 +273,25 @@ class RationManager:
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.heifer_cons, ration_config
             )
-
+        fail_summary_units = {
+            "simulation_day": "simulation day",
+            "reattempt number": "unitless",
+            "constraints_failed_dict": "unitless",
+            "ration_attempted": "unitless",
+            "pen requirements": {
+                "NEmaint_requirement": "Mcal",
+                "NEa_requirement": "Mcal",
+                "NEg_requirement": "Mcal",
+                "NEpreg_requirement": "Mcal",
+                "NEl_requirement": "Mcal",
+                "MP_requirement": "g",
+                "Ca_requirement": "g",
+                "P_req": "g",
+                "DMIest_requirement": "kg",
+                "avg_BW": "kg",
+                "avg_milk_production_reduction_pen": "kg",
+            },
+        }
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
@@ -266,7 +303,11 @@ class RationManager:
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                 "pen requirements": pen.avg_nutrient_rqmts,
             }
-            om.add_variable(f"failed_constraint_summary_for_pen_{pen.id}", fail_summary, info_map)
+            om.add_variable(
+                f"failed_constraint_summary_for_pen_{pen.id}",
+                fail_summary,
+                dict(info_map, **{"units": fail_summary_units}),
+            )
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
@@ -319,7 +360,7 @@ class RationManager:
                     om.add_variable(
                         f"failed_constraint_summary_for_pen_{pen.id}",
                         fail_summary,
-                        info_map,
+                        dict(info_map, **{"units": fail_summary_units}),
                     )
 
         if fixed_ration:
