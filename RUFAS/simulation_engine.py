@@ -75,11 +75,7 @@ class SimulationEngine:
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
         ]
-        available_feeds_units = {
-            "category": "unitless",
-            "type": "unitless",
-            "amount": "kg"
-        }
+        available_feeds_units = {"category": "unitless", "type": "unitless", "amount": "kg"}
         om.add_variable(
             "available_feeds_on_final_day",
             available_feeds_on_final_day,
