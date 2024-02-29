@@ -110,7 +110,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
     assert om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"]["info_maps"] == [
         {
             "data_origin": [("AnimalManager", "daily_updates")],
-            "units": "unitless",
+            "units": "animals",
         }
     ]
 
