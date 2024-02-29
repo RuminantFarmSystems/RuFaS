@@ -1811,6 +1811,15 @@ class ElementsCounter:
 
         self._update(state, -1)
 
+    def reset(self) -> None:
+        """
+        Resets the counts of all element states to zero.
+        """
+
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
     def _check_negative_counts(self) -> None:
         """
         Checks if any of the element counts are negative and raises a ValueError if so.
