@@ -1054,7 +1054,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1185,7 +1186,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1316,7 +1318,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1477,7 +1480,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",

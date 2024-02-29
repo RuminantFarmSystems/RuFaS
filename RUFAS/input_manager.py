@@ -57,7 +57,7 @@ class InputManager:
         """
         self._load_metadata(metadata_path)
         self._load_properties()
-        is_input_data_valid = self._populate_pool_refactored(eager_termination)
+        is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -234,110 +234,6 @@ class InputManager:
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data,
-            if invalid data is found.
-
-        Returns
-        -------
-        bool
-            True if data is valid, otherwise False.
-
-        Raises
-        ------
-        KeyError
-            If faulty data type found in data blob key.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._populate_pool.__name__,
-        }
-        valid_elements_counter = 0
-        invalid_elements_counter = 0
-        total_elements_counter = 0
-        fixed_elements_counter = 0
-
-        data_type_to_loader_map: Dict[str, Callable] = {
-            "json": self._load_data_from_json,
-            "csv": self._load_data_from_csv,
-        }
-
-        for file_blob_key, file_details in self.__metadata["files"].items():
-            file_path = file_details["path"]
-
-            try:
-                file_type = file_details["type"]
-                data_loader = data_type_to_loader_map[file_details["type"]]
-                input_data = data_loader(file_path)
-            except KeyError:
-                raise KeyError(
-                    f"Faulty data type in {file_blob_key}," f"supported types are: {data_type_to_loader_map.keys()}"
-                )
-
-            properties_blob_key = file_details["properties"]
-            metadata_properties = self.__metadata["properties"][properties_blob_key]
-            (
-                input_data,
-                missing_required_property_keys,
-                property_keys_with_default_values,
-            ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
-            self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
-            filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
-
-            validated_data = {}
-            for metadata_property in metadata_properties.keys():
-                element_counter_and_validity = {
-                    "fixed_elements": 0,
-                    "total_elements": 0,
-                    "valid_elements": 0,
-                    "invalid_elements": 0,
-                    "is_valid": True,
-                }
-                if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element(
-                        [metadata_property],
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-
-                fixed_elements_counter += element_counter_and_validity["fixed_elements"]
-                valid_elements_counter += element_counter_and_validity["valid_elements"]
-                total_elements_counter += element_counter_and_validity["total_elements"]
-                if element_counter_and_validity["is_valid"]:
-                    validated_data[metadata_property] = filtered_input_data[metadata_property]
-                else:
-                    if not eager_termination:
-                        invalid_elements_counter += element_counter_and_validity["invalid_elements"]
-                    else:
-                        return False
-            if validated_data:
-                self.__pool[file_blob_key] = validated_data
-
-        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
-        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
-        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
-        return invalid_elements_counter == 0
-
-    def _populate_pool_refactored(self, eager_termination: bool) -> bool:
-        """
-        Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
-        then adds data to the pool.
-
-        Parameters
-        ----------
-        eager_termination : bool
-            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data,
             If invalid data is found.
 
         Returns
@@ -351,10 +247,6 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._populate_pool_refactored.__name__,
-        }
 
         data_type_to_loader_map: Dict[str, Callable] = {
             "json": self._load_data_from_json,
@@ -386,18 +278,20 @@ class InputManager:
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 if file_type == "json":
-                    is_element_acceptable = self._validate_json_element(
+                    is_element_acceptable = self._validate_dict_element(
                         metadata_property,
                         properties_blob_key,
                         filtered_input_data,
                         eager_termination,
+                        self.elements_counter,
                     )
                 elif file_type == "csv":
-                    is_element_acceptable = self._validate_tabular_element_refactored(
+                    is_element_acceptable = self._validate_tabular_element(
                         metadata_property,
                         properties_blob_key,
                         filtered_input_data,
                         eager_termination,
+                        self.elements_counter,
                     )
                 else:
                     raise ValueError(
@@ -411,11 +305,6 @@ class InputManager:
 
             if validated_data:
                 self.__pool[file_blob_key] = validated_data
-
-        om.add_log("Validation count: total items", f"{self.elements_counter.total_elements()}", info_map)
-        om.add_log("Validation count: total valid", f"{self.elements_counter.valid_elements}", info_map)
-        om.add_log("Validation count: total fixed", f"{self.elements_counter.fixed_elements}", info_map)
-        om.add_log("Validation count: total invalid", f"{self.elements_counter.invalid_elements}", info_map)
 
         return self.elements_counter.invalid_elements == 0
 
@@ -655,74 +544,6 @@ class InputManager:
 
         return updated_array, missing_required_property_keys, property_keys_with_default_values
 
-    def _validate_input_type_dynamic(
-        self,
-        variable_properties: Dict[str, Any],
-        var_name: str,
-        input_data_value: Any,
-        properties_blob_key: str,
-    ) -> bool:
-        """
-        Validates the input data value based on its specified dynamic type.
-
-        Parameters
-        ----------
-        variable_properties : Dict[str, Any]
-            A dictionary containing properties relevant to the validation.
-
-        var_name : str
-            The name of the variable being validated.
-
-        input_data_value : Any
-            The input data value to be validated.
-
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-
-        Returns
-        -------
-        bool
-            True if the input data value is valid for the specified type, False otherwise.
-
-        Raises
-        ------
-        KeyError
-            If an invalid type is provided in the variable_properties.
-            If "type" key is missing.
-
-        Notes
-        ------
-        This function determines the type of validation needed based on the 'type' property in variable_properties.
-        It dynamically selects the appropriate validator based on the determined type and delegates the validation
-        process to that validator function. If the determined type is not recognized or if "type" key is missing,
-        a KeyError is raised.
-
-        Example
-        --------
-        variable_properties = {"type": "string", "min_length": 3, "max_length": 10}
-        var_name = "name"
-        input_data_value = "John Doe"
-        is_valid = validate_input_type_dynamic(variable_properties, var_name, input_data_value)
-        if is_valid:
-            print(f"{var_name} is a valid {variable_properties['type']}.")
-        else:
-            print(f"{var_name} is not a valid {variable_properties['type']}.")
-        """
-        if "type" not in variable_properties:
-            raise KeyError("Missing 'type' key in variable_properties")
-        var_type = variable_properties["type"]
-        data_type_to_validator_map = {
-            "string": self._string_type_validator,
-            "number": self._num_type_validator,
-            "array": self._array_type_validator,
-            "bool": self._bool_type_validator,
-        }
-        try:
-            validator = data_type_to_validator_map[var_type]
-        except KeyError:
-            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-        return validator(variable_properties, var_name, input_data_value, properties_blob_key)
-
     def _validate_input_by_type(
         self,
         variable_properties: Dict[str, Any],
@@ -730,6 +551,7 @@ class InputManager:
         input_data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -746,6 +568,8 @@ class InputManager:
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
         properties_blob_key : str
             The metadata properties for the data input file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
 
         Returns
         -------
@@ -764,7 +588,7 @@ class InputManager:
         }
 
         complex_type_to_validator_map: Dict[str, Callable] = {
-            "array": self._array_type_validator_refactored,
+            "array": self._array_type_validator,
             "object": self._object_type_validator,
         }
 
@@ -785,108 +609,27 @@ class InputManager:
                 properties_blob_key,
             )
             if is_valid:
-                self.elements_counter.increment(ElementState.VALID)
+                elements_counter.increment(ElementState.VALID)
                 return True
             is_fixed = self._fix_data(variable_properties, variable_path, input_data, properties_blob_key)
             if is_fixed:
-                self.elements_counter.increment(ElementState.FIXED)
+                elements_counter.increment(ElementState.FIXED)
                 return True
-            self.elements_counter.increment(ElementState.INVALID)
+            elements_counter.increment(ElementState.INVALID)
             return False
 
         else:
             return complex_type_to_validator_map[data_type](
-                variable_path, variable_properties, input_data, eager_termination, properties_blob_key
+                variable_path, variable_properties, input_data, eager_termination, properties_blob_key, elements_counter
             )
 
     def _validate_tabular_element(
-        self,
-        var_name: str,
-        properties_blob_key: str,
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        element_counter_and_validity: Dict[str, int | bool],
-    ) -> Dict[str, int | bool]:
-        """
-        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
-        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
-        and total elements from the input file are checked.
-
-        Parameters
-        ----------
-        var_name : str
-            The name of the csv data element being validated.
-
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-
-        input_data : Dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
-
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-
-        element_counter_and_validity : Dict[str, int | bool]
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
-        Returns
-        -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_tabular_element.__name__,
-        }
-        variable = input_data[var_name]
-        variable_properties = reduce(
-            lambda d, key: d[key],
-            [var_name],
-            self.__metadata["properties"][properties_blob_key],
-        )
-
-        for element_num in range(len(variable)):
-            element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(
-                variable_properties,
-                var_name,
-                variable[element_num],
-                properties_blob_key,
-            )
-            if is_valid:
-                element_counter_and_validity["valid_elements"] += 1
-            else:
-                is_fixed = self._fix_data(
-                    variable_properties,
-                    [var_name, element_num],
-                    input_data,
-                    properties_blob_key,
-                )
-                if is_fixed:
-                    element_counter_and_validity["fixed_elements"] += 1
-                else:
-                    element_counter_and_validity["invalid_elements"] += 1
-                    element_counter_and_validity["is_valid"] = False
-                    om.add_warning(
-                        "Validation: invalid unfixable element found",
-                        f"{var_name} element {element_num} was invalid and could not be fixed",
-                        info_map,
-                    )
-                    if eager_termination:
-                        return element_counter_and_validity
-
-        return element_counter_and_validity
-
-    def _validate_tabular_element_refactored(
         self,
         first_level_key: str,
         properties_blob_key: str,
         input_data: Dict[str, Any],
         eager_termination: bool,
+        elements_counter: "ElementsCounter",
     ) -> bool:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
@@ -903,6 +646,8 @@ class InputManager:
             A buffer dictionary that holds the input data for validation and fixing.
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
 
         Returns
         -------
@@ -924,6 +669,7 @@ class InputManager:
                 input_data,
                 eager_termination,
                 properties_blob_key,
+                elements_counter,
             )
             is_whole_column_acceptable = is_whole_column_acceptable and is_element_acceptable
             if eager_termination and not is_element_acceptable:
@@ -931,147 +677,13 @@ class InputManager:
 
         return is_whole_column_acceptable
 
-    def _validate_dict_element(  # noqa
-        self,
-        element_hierarchy: List[str],
-        properties_blob_key: str,
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        element_counter_and_validity: Dict[str, int | bool],
-    ) -> dict:
-        """
-        Receives data loaded from json input file, recursively finds and then validates nested elements,
-        attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
-        and total elements from the input file are checked.
-
-        Parameters
-        ----------
-        element_hierarchy : List[str]
-            A list of strings representing the path to the data being validated.
-
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-
-        input_data : Dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
-
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-
-        element_counter_and_validity : Dict[str, int | bool]
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
-        Returns
-        -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
-        Raises
-        ------
-        KeyError
-            If properties_blob_key not found in input data.
-            If metadata properties for variable is missing the "type" field.
-            If variable metadata is checking for is not found in input data.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_dict_element.__name__,
-        }
-        try:
-            variable_properties = reduce(
-                lambda d, key: d[key],
-                element_hierarchy,
-                self.__metadata["properties"][properties_blob_key],
-            )
-        except KeyError as e:
-            raise KeyError(f"{str(e)} not found in input data")
-
-        if "type" not in variable_properties:
-            raise KeyError("Missing 'type' key in variable_properties")
-        is_nested = variable_properties["type"] == "object"
-        if is_nested:
-            children_status: Dict[str, bool] = {}
-            false_counter = 0
-            variable_properties_to_ignore = ["type", "description"]
-            for nested_key in variable_properties.keys():
-                if nested_key not in variable_properties_to_ignore:
-                    element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_dict_element(
-                        element_hierarchy,
-                        properties_blob_key,
-                        input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-                    is_child_valid = element_counter_and_validity["is_valid"]
-                    if eager_termination and not is_child_valid:
-                        return element_counter_and_validity
-                    element_path = ".".join(element_hierarchy)
-                    children_status[element_path] = is_child_valid
-                    if not is_child_valid:
-                        om.add_warning(
-                            "Validation: invalid nested element found",
-                            f"{element_path}",
-                            info_map,
-                        )
-                        false_counter += 1
-                    element_hierarchy.remove(nested_key)
-
-            is_valid = false_counter == 0
-            element_counter_and_validity["is_valid"] = is_valid
-
-            return element_counter_and_validity
-        else:
-            var_name = element_hierarchy[-1]
-
-            try:
-                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
-            except KeyError:
-                om.add_error(
-                    "Validation: key not found in input data",
-                    f"Key {var_name} not found in input data.",
-                    info_map,
-                )
-                input_data_value = None
-
-            is_valid = self._validate_input_type_dynamic(
-                variable_properties, var_name, input_data_value, properties_blob_key
-            )
-
-            element_counter_and_validity["total_elements"] += 1
-            if is_valid:
-                element_counter_and_validity["valid_elements"] += 1
-                return element_counter_and_validity
-            else:
-                is_fixed = self._fix_data(
-                    variable_properties,
-                    element_hierarchy,
-                    input_data,
-                    properties_blob_key,
-                )
-                if is_fixed:
-                    element_counter_and_validity["fixed_elements"] += 1
-                else:
-                    om.add_warning(
-                        "Validation: invalid unfixable element found",
-                        f"Variable: '{var_name}' was invalid and could not be fixed",
-                        info_map,
-                    )
-                    element_counter_and_validity["invalid_elements"] += 1
-                    element_counter_and_validity["is_valid"] = False
-                return element_counter_and_validity
-
-    def _validate_json_element(  # noqa
+    def _validate_dict_element(
         self,
         first_level_key: str,
         properties_blob_key: str,
         input_data: Dict[str, Any],
         eager_termination: bool,
+        elements_counter: "ElementsCounter",
     ) -> bool:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
@@ -1082,15 +694,14 @@ class InputManager:
         ----------
         first_level_key : str
             The name of the json data element just under the level of properties_blob_key.
-
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
-
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
-
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
 
         Returns
         -------
@@ -1103,55 +714,8 @@ class InputManager:
             [first_level_key],
         )
         return self._validate_input_by_type(
-            variable_properties, [first_level_key], input_data, eager_termination, properties_blob_key
+            variable_properties, [first_level_key], input_data, eager_termination, properties_blob_key, elements_counter
         )
-
-    def _array_type_validator(
-        self,
-        variable_properties: Dict[str, Any],
-        var_name: str,
-        input_data_value: list,
-        properties_blob_key: str,
-    ) -> bool:
-        """Validates an input data element of type array."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._array_type_validator.__name__,
-        }
-        properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
-        )
-        if type(input_data_value) is not list:
-            warning_string = "Validation: array is not a list"
-            warning_message = (
-                f"Variable: '{var_name}' is type: {type(input_data_value)}. " f"{properties_violation_message}"
-            )
-            om.add_warning(warning_string, warning_message, info_map)
-            return False
-
-        maximum_length = variable_properties.get("maximum_length")
-        minimum_length = variable_properties.get("minimum_length")
-        if minimum_length is not None:
-            is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
-            if not is_in_range:
-                warning_name = "Validation: array length less than minimum"
-                warning_message = (
-                    f"Variable: '{var_name}' has length: {len(input_data_value)}, less than minimum "
-                    f"length: {minimum_length}. {properties_violation_message}"
-                )
-                om.add_warning(warning_name, warning_message, info_map)
-                return False
-        if maximum_length is not None:
-            is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
-            if not is_in_range:
-                warning_name = "Validation: array length greater than maximum"
-                warning_message = (
-                    f"Variable: '{var_name}' has length: {len(input_data_value)}, greater than "
-                    f"maximum length: {maximum_length}. {properties_violation_message}"
-                )
-                om.add_warning(warning_name, warning_message, info_map)
-                return False
-        return True
 
     def _validate_array_container_properties(
         self,
@@ -1222,13 +786,14 @@ class InputManager:
                 return False
         return True
 
-    def _array_type_validator_refactored(
+    def _array_type_validator(
         self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         input_data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -1245,6 +810,8 @@ class InputManager:
             If True, the process will be terminated upon finding invalid data.
         properties_blob_key : str
             The metadata properties for the data input file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
 
         Returns
         -------
@@ -1266,6 +833,7 @@ class InputManager:
                 input_data,
                 eager_termination,
                 properties_blob_key,
+                elements_counter,
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1279,6 +847,7 @@ class InputManager:
         input_data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -1295,6 +864,8 @@ class InputManager:
             If True, the process will be terminated upon finding invalid data.
         properties_blob_key : str
             The metadata properties for the data input file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
 
         Returns
         -------
@@ -1324,6 +895,7 @@ class InputManager:
                 input_data,
                 eager_termination,
                 properties_blob_key,
+                elements_counter,
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1953,66 +1525,24 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._add_variable_to_pool.__name__,
         }
-        element_counter = {
-            "valid_elements": 0,
-            "invalid_elements": 0,
-            "total_elements": 0,
-            "fixed_elements": 0,
-        }
         validated_data = {}
+        elements_counter = ElementsCounter()
 
         metadata_properties = self.__metadata["properties"][properties_blob_key]
+        validate_method: Callable[[str, str, Dict[str, Any], bool, "ElementsCounter"], bool] = (
+            self._validate_dict_element if is_variable_dict else self._validate_tabular_element
+        )
         for metadata_property in metadata_properties.keys():
-            element_counter_and_validity = {
-                "fixed_elements": 0,
-                "total_elements": 0,
-                "valid_elements": 0,
-                "invalid_elements": 0,
-                "is_valid": True,
-            }
-            if is_variable_dict:
-                element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=[metadata_property],
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
-            else:
-                element_counter_and_validity = self._validate_tabular_element(
-                    var_name=metadata_property,
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
+            is_element_acceptable = validate_method(
+                metadata_property,
+                properties_blob_key,
+                data,
+                eager_termination,
+                elements_counter,
+            )
 
-            for key in element_counter.keys():
-                element_counter[key] += element_counter_and_validity[key]
-
-            if element_counter_and_validity["is_valid"]:
+            if is_element_acceptable:
                 validated_data[metadata_property] = data[metadata_property]
-
-        om.add_log(
-            f"Validation count for variable {variable_name}: total items",
-            f"{element_counter['total_elements']=}",
-            info_map,
-        )
-        om.add_log(
-            f"Validation count for variable {variable_name}: total valid",
-            f"{element_counter['valid_elements']=}",
-            info_map,
-        )
-        om.add_log(
-            f"Validation count for variable {variable_name}: total fixed",
-            f"{element_counter['fixed_elements']=}",
-            info_map,
-        )
-        om.add_log(
-            f"Validation count for variable {variable_name}: total invalid",
-            f"{element_counter['invalid_elements']=}",
-            info_map,
-        )
 
         if validated_data:
             if variable_name in self.__pool.keys():
@@ -2023,8 +1553,9 @@ class InputManager:
                 )
 
             self.__pool[variable_name] = validated_data
+            self.elements_counter += elements_counter
 
-        if element_counter["invalid_elements"] > 0:
+        if elements_counter.invalid_elements > 0:
             om.add_error(
                 "Invalid variable",
                 f"Variable {variable_name} has invalid components. Only successfully validated components are "
@@ -2036,10 +1567,9 @@ class InputManager:
                     f"Variable {variable_name} has invalid components. Only successfully validated components are added"
                     f" to InputManager pool during runtime."
                 )
-            else:
-                return False
-        else:
-            return True
+            return False
+
+        return True
 
     def add_dict_variable_to_pool(
         self,
@@ -2105,6 +1635,8 @@ class InputManager:
                 is_variable_dict=True,
             )
             return add_variable_success
+
+        return False
 
     def add_tabular_variable_to_pool(
         self,
@@ -2172,6 +1704,8 @@ class InputManager:
                 is_variable_dict=False,
             )
             return add_variable_success
+
+        return False
 
     def dump_get_data_logs(self, path: Path) -> None:
         """
@@ -2313,3 +1847,25 @@ class ElementsCounter:
                 "total_elements": self.total_elements(),
             }
         )
+
+    def __add__(self, other):
+        """
+        Adds the counts of two ElementsCounter objects together.
+
+        Parameters
+        ----------
+        other : ElementsCounter
+            The other ElementsCounter object to be added.
+
+        Returns
+        -------
+        ElementsCounter
+            A new ElementsCounter object with the counts of the two objects added together.
+        """
+
+        new_counter = ElementsCounter()
+        new_counter.valid_elements = self.valid_elements + other.valid_elements
+        new_counter.invalid_elements = self.invalid_elements + other.invalid_elements
+        new_counter.fixed_elements = self.fixed_elements + other.fixed_elements
+        new_counter._check_negative_counts()
+        return new_counter

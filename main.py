@@ -67,6 +67,7 @@ def main():
             cmd_arguments.format_option,
         )
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
+        raise e
 
 
 def run_rufas(
@@ -420,8 +421,7 @@ def execute_simulations(
                     exclude_info_maps=exclude_info_maps,
                     format_option=format_option,
                 )
-                raise e
-
+            output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
             if not terminate_simulation_post_herd_generation:
                 simulator = SimulationEngine()
                 simulator.simulate()
