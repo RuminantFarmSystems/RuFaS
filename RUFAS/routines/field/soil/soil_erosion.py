@@ -50,6 +50,7 @@ class SoilErosion:
         This method calculates the mass of soil that gets eroded from the soil profile based on the content of the soil,
         how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into the soil,
         and the geometry of the field.
+
         """
         erodibility_factor = self._determine_soil_erodibility_factor(
             self.data.soil_layers[0].percent_sand_content,
@@ -118,6 +119,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.6
+
         """
         return 0.2 + 0.3 * exp((-0.256) * percent_sand_content * (1 - (percent_silt_content / 100)))
 
@@ -146,6 +148,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.7
+
         """
         if percent_silt_content == 0 and percent_clay_content == 0:
             raise ValueError("Cannot have percent silt content and percent clay content both be 0")
@@ -175,6 +178,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.8
+
         """
         return 1 - (
             (0.25 * percent_organic_carbon) / (percent_organic_carbon + exp(3.72 - (2.95 * percent_organic_carbon)))
@@ -202,6 +206,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.9
+
         """
         not_sand_fraction = 1 - (percent_sand_content / 100)
         return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 * not_sand_fraction)))
@@ -241,6 +246,7 @@ class SoilErosion:
         Reference
         ---------
         SWAT Theoretical documentation eqn. 4:1.1.5
+
         """
 
         coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(percent_sand_content, percent_silt_content)
@@ -275,6 +281,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.10
+
         """
         if minimum_cover_management_factor <= 0:
             raise ValueError("Minimum cover and management cannot be less than or equal to 0")
@@ -307,6 +314,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.13
+
         """
         return 0.6 * (1 - exp(-35.835 * average_subbasin_slope))
 
@@ -373,6 +381,7 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.15
+
         """
         return exp(-0.053 * percent_rock_content)
 
@@ -662,5 +671,6 @@ class SoilErosion:
         Reference
         ---------
         SWAT Theoretical documentation eqn. 4:1.3.1
+
         """
         return sediment_yield / exp((3 * snow_water_content) / 25.4)
