@@ -58,7 +58,7 @@
 					"estrus_detection_rate": 0.7,
 					"ED_conception_rate": 0.43,
 					"presynch_program": "PreSynch",
-					"presynch_program_start_day": "45",
+					"presynch_program_start_day": 45,
             		"ovsynch_program": "OvSynch 56",
 					"ovsynch_program_start_day": 74,
 					"ovsynch_program_conception_rate": 0.43,
