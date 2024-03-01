@@ -24,9 +24,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Format code with Black
-      run: |
-        black --check ${{ env.FILES }}
     - name: Get all added or modified files
       run: |
         echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
@@ -37,6 +34,9 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
+    - name: Format code with Black
+      run: |
+        black --check ${{ env.FILES }}
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
