@@ -93,7 +93,6 @@ class AnimalManager:
         feed: Feed,
         weather: Weather,
         time: Time,
-        manure_manager_config,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ):
         """
@@ -197,7 +196,7 @@ class AnimalManager:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens(weather, time, manure_manager_config)
+            self.allocate_animals_to_pens(weather, time, data["manure_management_scenarios"])
 
         self._print_animal_num_warnings(data["herd_information"])
 

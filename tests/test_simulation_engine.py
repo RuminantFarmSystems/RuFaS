@@ -142,6 +142,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_feed = mocker.patch("RUFAS.simulation_engine.Feed", return_value=mock_feed)
 
     mock_animal_manager = mocker.MagicMock()
+    mock_animal_manager.all_pens = mocker.MagicMock()
     patch_for_animal_manager = mocker.patch("RUFAS.simulation_engine.AnimalManager", return_value=mock_animal_manager)
 
     mock_manure_manager = mocker.MagicMock()
@@ -179,7 +180,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         {"manure_management_scenarios": {}}, mock_feed, mock_weather, mock_time
     )
     patch_for_manure_manager.assert_called_once_with(
-        mock_animal_manager, mock_weather, mock_time, {"manure_management_scenarios": {}}
+        mock_animal_manager.all_pens, mock_weather, mock_time, {"manure_management_scenarios": {}}
     )
     patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager, feed_manager=mock_feed_manager)
     patch_for_feed_manager.assert_called_once()
