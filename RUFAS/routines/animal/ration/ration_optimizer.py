@@ -887,7 +887,7 @@ class RationOptimizer:
     def optimize(
         self, animal_combination: AnimalCombination,
         ration_config: RationConfig,
-        previous_ration: Dict[str, float | str] = None
+        previous_ration: Dict[str, float | str] | None = None
     ) -> OptimizeResult:
         """
         Calls the objective function and constraint functions and formulates
@@ -898,11 +898,9 @@ class RationOptimizer:
         ----------
         animal_combination : AnimalCombination
             enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
-        available_feeds : Dict
-            a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         ration_config : RationConfig object
             Attributes are animal requirement and feed supply information required for optimization
-        previous_ration : Dict[str, float | str]
+        previous_ration : Dict[str, float | str] | None
             Ration from previous month, if applicable.
 
         Returns
@@ -918,19 +916,16 @@ class RationOptimizer:
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
         if previous_ration:
-            prev_ration = previous_ration.copy()
-            del prev_ration['status']
-            del prev_ration['objective']
             x0 = []
-            for key in prev_ration:
-                x0.append(prev_ration[key] / 3)
-                x0.append(prev_ration[key] / 3)
-                x0.append(prev_ration[key] / 3)
+            prev_ration = previous_ration.copy()
+            for key, value in prev_ration.items():
+                if key not in ["status", "objective"]:
+                    x0.append(value / 3)
+                    x0.append(value / 3)
+                    x0.append(value / 3)
         else:
             n = len(ration_config.price_list)
-            x0 = [1]
-            for _ in range(n - 1):
-                x0.append(random.random() * 10)
+            x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.is_udr:
             bnds = self.make_user_bounds(
@@ -972,7 +967,7 @@ class RationOptimizer:
         requirements: AnimalRequirements,
         available_feeds: Dict,
         animal_combination: AnimalCombination,
-        previous_ration: Dict[str, float | str] = None
+        previous_ration: Dict[str, float | str] | None = None
     ):
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -986,7 +981,7 @@ class RationOptimizer:
             A DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         animal_combination : AnimalCombination
             Enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
-        previous_ration : Dict[str, float | str]
+        previous_ration : Dict[str, float | str] | None
             Ration from previous month, if applicable.
 
         """
