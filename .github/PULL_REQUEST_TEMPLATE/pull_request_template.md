@@ -1,4 +1,4 @@
-<!-- Provide a short summary the changes this pull request contains. -->
+<!-- Provide a short summary of the changes this pull request contains. -->
 
 ### What
 <!-- Add more detail about the changes that are being made in the pull request. -->
@@ -9,7 +9,7 @@
 
 
 ### How
-<!-- Give an explanation how this pull request addresses needed changes. -->
+<!-- Give an explanation of how this pull request addresses needed changes. -->
 
 
 ### Housekeeping
