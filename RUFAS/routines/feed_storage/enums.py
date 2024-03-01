@@ -17,7 +17,6 @@ class CropCategory(Enum):
         Represents grass crops.
     ALFALFA : str
         Represents alfalfa crops.
-
     """
 
     SMALL_GRAIN = "Small grain"
@@ -63,7 +62,6 @@ class CropType(Enum):
         Represents a type of Grass.
     MEADOW_FESCUE : str
         Represents a type of Grass.
-
     """
 
     WHEAT = "Wheat"
