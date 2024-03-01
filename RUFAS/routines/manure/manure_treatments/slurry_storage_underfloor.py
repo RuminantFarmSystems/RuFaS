@@ -185,4 +185,3 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         else:
             new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
             return new_accumulated_output
-
