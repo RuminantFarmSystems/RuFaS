@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
+    GasEmissionConstants,
+)
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
 )
@@ -81,9 +84,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         # MS.3.B.3
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
-        new_daily_output.biogas = (
-            self.config.biogas_generation_ratio * self._manure_handler_daily_output.liquid_manure_total_volatile_solids
-        )
+        new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.METHANE_DENSITY
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
         new_daily_output.biogas_energy_content = biogas_energy_content
