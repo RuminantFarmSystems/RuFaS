@@ -274,8 +274,8 @@ def input_manager(mocker: MockerFixture) -> InputManager:
 
 
 @pytest.fixture
-def mock_im_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
-    return {"config": {"nutrient_standard": "NASEM"}}
+def mock_im_pool() -> Dict[str, Dict[str, Any]]:
+    return {"config": {"nutrient_standard": "NASEM"}, "animal": {"herd_information": {"breed": "HO"}}}
 
 
 @pytest.fixture
@@ -2572,9 +2572,9 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.cows = mock_cows = mocker.MagicMock()
     mock_animal_manager.methane_model = mock_methane_model = mocker.MagicMock()
     mock_animal_manager.methane_mitigation_method = mock_methane_mitigation_method = mocker.MagicMock()
-    mock_animal_manager.methane_mitigation_additive_amount = mock_methane_mitigation_additive_amount = (
-        mocker.MagicMock()
-    )
+    mock_animal_manager.methane_mitigation_additive_amount = (
+        mock_methane_mitigation_additive_amount
+    ) = mocker.MagicMock()
     patch_for_end_ration_interval = mocker.patch.object(
         AnimalManager, "end_ration_interval", return_value=is_end_ration_interval
     )
