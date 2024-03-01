@@ -110,6 +110,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
     assert om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"]["info_maps"] == [
         {
             "data_origin": [("AnimalManager", "daily_updates")],
+            "units": "animals",
         }
     ]
 
@@ -155,9 +156,51 @@ def test_report_milk(mocker: MockerFixture):
         test_milk_data_update,
     ]
     assert om.variables_pool["AnimalModuleReporter.report_milk.milk_data_at_milk_update"]["info_maps"] == [
-        {"data_origin": [("Cow", "milking_update")]},
-        {"data_origin": [("Cow", "milking_update")]},
-        {"data_origin": [("Cow", "milking_update")]},
+        {
+            "data_origin": [("Cow", "milking_update")],
+            "units": {
+                "days_in_milk": "days",
+                "estimated_daily_milk_produced": "kg/day",
+                "milk_protein": "kg/day",
+                "milk_fat": "kg/day",
+                "milk_lactose": "kg/day",
+                "lactating": "unitless",
+                "parity": "unitless",
+                "cow_id": "unitless",
+                "pen_id": "unitless",
+                "simulation_day": "simulation day",
+            },
+        },
+        {
+            "data_origin": [("Cow", "milking_update")],
+            "units": {
+                "days_in_milk": "days",
+                "estimated_daily_milk_produced": "kg/day",
+                "milk_protein": "kg/day",
+                "milk_fat": "kg/day",
+                "milk_lactose": "kg/day",
+                "lactating": "unitless",
+                "parity": "unitless",
+                "cow_id": "unitless",
+                "pen_id": "unitless",
+                "simulation_day": "simulation day",
+            },
+        },
+        {
+            "data_origin": [("Cow", "milking_update")],
+            "units": {
+                "days_in_milk": "days",
+                "estimated_daily_milk_produced": "kg/day",
+                "milk_protein": "kg/day",
+                "milk_fat": "kg/day",
+                "milk_lactose": "kg/day",
+                "lactating": "unitless",
+                "parity": "unitless",
+                "cow_id": "unitless",
+                "pen_id": "unitless",
+                "simulation_day": "simulation day",
+            },
+        },
     ]
 
 
@@ -262,6 +305,28 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
         assert om.variables_pool[
             f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"
         ]["values"] == [test_data[f"formatted_ration_{i}"]]
+
+
+def test_report_daily_pen_total(mocker: MockerFixture):
+    """Unit test for function report_daily_pen_total in file
+    routines/animal/ration/animal_module_reporter.py"""
+    penlist = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    for i in range(len(penlist)):
+        penlist[i].id = i
+        penlist[i].animal_combination.name = "some_name"
+        penlist[i].animals_in_pen = [i] * i
+    AnimalModuleReporter.report_daily_pen_total(penlist)
+    for i in range(len(penlist)):
+        assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
+            "values"
+        ] == [i]
+    for i in range(len(penlist)):
+        penlist[i].animals_in_pen = [i] * (i + 1)
+    AnimalModuleReporter.report_daily_pen_total(penlist)
+    for i in range(1, 2):
+        assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
+            "values"
+        ] == [i, i + 1]
 
 
 def test_report_animal_module_manure():

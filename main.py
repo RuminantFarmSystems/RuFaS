@@ -10,12 +10,12 @@ import argparse
 import random
 import sys
 import traceback
+from typing import Dict, Any
 from pathlib import Path
 from typing import List
 
 import numpy
 
-from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -67,39 +67,6 @@ def main():
             cmd_arguments.format_option,
         )
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
-
-
-def get_error_warning_counts() -> tuple[int, int]:
-    """
-    Get the total number of errors and warnings in the output manager's error and warning pools.
-
-    Returns
-    -------
-    tuple[int, int]
-        The total number of errors and warnings in the output manager's error and warning pools.
-    """
-
-    output_manager = OutputManager()
-    errors_count = sum([len(value_dict["values"]) for value_dict in output_manager.errors_pool.values()])
-    warnings_count = sum([len(value_dict["values"]) for value_dict in output_manager.warnings_pool.values()])
-    return errors_count, warnings_count
-
-
-def show_error_warning_counts() -> None:
-    """
-    Print the total number of errors and warnings in the output manager's error and warning pools.
-    """
-
-    error_count, warning_count = get_error_warning_counts()
-    if error_count == 0 and warning_count == 0:
-        sys.stdout.write("No errors or warnings found.\n\n")
-        return
-
-    errors_label = "error" if error_count == 1 else "errors"
-    warnings_label = "warning" if warning_count == 1 else "warnings"
-
-    sys.stdout.write(f"{error_count} {errors_label} and {warning_count} {warnings_label} found.\n")
-    sys.stdout.write("Please see the log files for more details.\n\n")
 
 
 def run_rufas(
@@ -308,7 +275,7 @@ def run_validation(
 
 
 def initialize_herd(
-    simulation_config: Config,
+    simulation_config: Dict[str, Any],
     init_herd: bool = False,
     save_animals: bool = False,
     save_animals_dir: Path = Path("output/"),
@@ -319,8 +286,8 @@ def initialize_herd(
 
     Parameters
     ----------
-    simulation_config : Config
-        Config object containing parameters and settings for the simulation.
+    simulation_config : Dict[str, Any]
+        Dictionary object containing parameters and settings for the simulation.
     init_herd: bool
         User input indicating whether to initialize herd with simulation.
     save_animals: bool
@@ -350,9 +317,9 @@ def initialize_herd(
     }
     output_manager = OutputManager()
 
-    if simulation_config.set_seed:
-        random.seed(simulation_config.seed)
-        numpy.random.seed(simulation_config.seed)
+    if "set_seed" in simulation_config.keys() and simulation_config["set_seed"]:
+        random.seed(simulation_config["random_seed"])
+        numpy.random.seed(simulation_config["random_seed"])
 
     output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
@@ -438,7 +405,7 @@ def execute_simulations(
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
-            simulation_config = Config(input_manager.get_data("config"))
+            simulation_config = input_manager.get_data("config")
             try:
                 initialize_herd(
                     simulation_config=simulation_config,
@@ -472,8 +439,6 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
-
-        show_error_warning_counts()
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
