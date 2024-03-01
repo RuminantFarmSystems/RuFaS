@@ -56,11 +56,7 @@ def main():
         output_manager = OutputManager()
         error_message = "This terminal error occurred during runtime. "
         error_message += traceback.format_exc()
-        output_manager.add_error(
-            f"Dumping all logs from main.py because of error '{e}'",
-            error_message,
-            info_map,
-        )
+        output_manager.add_error(f"Dumping all logs from main.py because of error '{e}'", error_message, info_map,)
         output_manager.dump_all_nondata_pools(
             Path(cmd_arguments.output_dir),
             cmd_arguments.exclude_info_maps,
@@ -72,8 +68,7 @@ def main():
 def run_rufas(
     load_pool: bool,
     produce_graphics: bool,
-    format_option: str,
-    verbose: LogVerbosity,
+    format_option: str, verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
