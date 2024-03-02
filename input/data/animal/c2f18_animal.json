@@ -21,7 +21,7 @@
       "semen_type": "conventional",
       "days_in_preg_when_dry": 210,
       "heifer_repro_cull_time": 720,
-      "do_not_breed_time": 250,
+      "do_not_breed_time": 300,
       "cull_milk_production": 13.6,
       "cow_times_milked_per_day": 2,
       "milk_fat_percent": 4,
@@ -102,7 +102,7 @@
       },
       "culling": {
         "parity_death_prob": [0.039,0.056,0.085,0.117],
-        "parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
+        "parity_cull_prob": [0.085, 0.1165, 0.1505, 0.204],
         "injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
         "death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
         "cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
