@@ -88,22 +88,8 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
 
 
 @pytest.fixture
-def test_add_new_animals(
-    pen_to_test: Pen,
-    mock_animal_list,
-    new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-    expected_animals_in_pen: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-):
-    """Unit test for function add_new_animals in file routines/animal/pen.py"""
-
-    pen_to_test.add_new_animals(new_animals)
-    pen_values = list(pen_to_test.animals_in_pen.values())
-    assert pen_values == expected_animals_in_pen
-
-
-@pytest.fixture
-def create_animals(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII | HeiferIII]:
-    """Create a list of Calf, HeiferI, HeiferII, Cow and HeiferIII objects for testing purposes"""
+def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII | HeiferIII]:
+    """Returns a list of Calf, HeiferI, HeiferII, Cow and HeiferIII objects for testing purposes"""
 
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.nutrients",
@@ -162,6 +148,19 @@ def create_animals(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferI
     return [heiferI, heiferII, heiferIII, calf, cow1, cow2]
 
 
+def test_add_new_animals(
+    pen_to_test: Pen,
+    mock_animal_list,
+    new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+    expected_animals_in_pen: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+) -> None:
+    """Unit test for function add_new_animals in file routines/animal/pen.py"""
+
+    pen_to_test.add_new_animals(new_animals)
+    pen_values = list(pen_to_test.animals_in_pen.values())
+    assert pen_values == expected_animals_in_pen
+
+
 @pytest.mark.parametrize(
     "pen_to_test, expected_pen_populated",
     [
@@ -169,7 +168,7 @@ def create_animals(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferI
         (lazy_fixture("pen_with_animals"), True),
     ],
 )
-def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
+def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool) -> None:
     """Unit test for function update_pen_populated in file routines/animal/pen.py"""
     pen_to_test.update_pen_populated()
 
@@ -183,7 +182,7 @@ def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
         (lazy_fixture("pen_with_animals"), 0.03),
     ],
 )
-def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float):
+def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float) -> None:
     """Unit test for function update_stocking_density in file routines/animal/pen.py"""
     pen_to_test.update_stocking_density()
 
@@ -200,14 +199,14 @@ def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: fl
         AnimalCombination.GROWING_AND_CLOSE_UP,
     ],
 )
-def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination):
+def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination) -> None:
     """Unit test for function update_animal_combination in file routines/animal/pen.py"""
     pen.update_animal_combination(animal_combination)
 
     assert pen.animal_combination == animal_combination
 
 
-def test_update_animals(pen: Pen, mocker: MockerFixture):
+def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
@@ -242,7 +241,7 @@ def test_calc_avg_stats():
     pass
 
 
-def test_set_avg_nutrient_rqmts(pen: Pen):
+def test_set_avg_nutrient_rqmts(pen: Pen) -> None:
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
     avg_nutrient_rqmts = {
         "NEmaint_requirement": 22.739694446587276,
@@ -262,7 +261,7 @@ def test_set_avg_nutrient_rqmts(pen: Pen):
     assert pen.avg_nutrient_rqmts == avg_nutrient_rqmts
 
 
-def test_set_milk_avgs(pen: Pen):
+def test_set_milk_avgs(pen: Pen) -> None:
     """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
     avg_milk = 40.362
     avg_CP_milk = 3.196
@@ -276,12 +275,12 @@ def test_set_milk_avgs(pen: Pen):
 @pytest.mark.parametrize(
     "pen_to_test, animals",
     [
-        (lazy_fixture("pen"), lazy_fixture("create_animals")),
+        (lazy_fixture("pen"), lazy_fixture("animal_list")),
     ],
 )
 def test_calc_manure(
     pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
-):
+) -> None:
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
     man_sums = mocker.patch.object(Pen, "manure_sums")
@@ -486,7 +485,7 @@ def test_get_prefix_and_default_manure_excretion(
     animal_type: Calf | HeiferI | HeiferII | HeiferIII | Cow | MagicMock,
     is_lactating_cow: bool,
     expected_prefix: str | ValueError,
-):
+) -> None:
     """
     Unit test for the static method _get_prefix_and_default_manure_excretion in pen.py.
 

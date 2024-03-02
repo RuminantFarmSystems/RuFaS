@@ -438,7 +438,8 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def manure_sums(self, manure, curr_manure, animal_dict):
+    def manure_sums(self, manure: Dict[float, int] , curr_manure: AnimalManureExcretions,
+                    animal_dict : Dict[float, int]) -> Tuple[Dict[float, int], Dict[float, int]]:
         """
         Accumulator helper function for calc_manure.
         The function finds sums of manure components for each
@@ -453,6 +454,10 @@ class Pen:
             animal_dict: Dict[float, int]
                 A dictionary that contains the manure excretion values for specific animals in the pen
 
+        Returns
+        -------
+        Tuple[Dict[float, int], Dict[float, int]]
+            A tuple containing the updated manure dictionary and the updated animal dictionary.
         """
 
         for key in manure.keys():
