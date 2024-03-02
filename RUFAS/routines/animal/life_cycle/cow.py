@@ -345,12 +345,12 @@ class Cow(HeiferIII):
         Updates milking status for lactating cows, using breed and
         parity to estimate daily milk production from specific lactation
         curves (following Wood's curve model.)
-        
+
         Parameters
         -------
         sim_day : Any
         calving_interval : Any
-        
+
         Returns
         -------
             estimated_daily_milk_produced : float
