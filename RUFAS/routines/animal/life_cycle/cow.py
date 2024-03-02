@@ -343,8 +343,9 @@ class Cow(HeiferIII):
 
     def milking_update(self, sim_day, calving_interval):
         """
-        Updates milking status for lactating cows, using breed and parity to estimate
-        daily milk production from specific lactation curves (following Wood's curve model.)
+        Updates milking status for lactating cows, using breed and parity
+        to estimate daily milk production from specific lactation curves
+        (following Wood's curve model.)
 
         Parameters
         -------
