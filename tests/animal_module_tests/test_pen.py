@@ -87,35 +87,65 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
     return pen
 
 
-def test_set_avg_nutrient_rqmts(pen: Pen):
-    """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    avg_nutrient_rqmts = {
-        "NEmaint_requirement": 22.739694446587276,
-        "NEa_requirement": 0,
-        "NEg_requirement": 0.0,
-        "NEpreg_requirement": 0.8809032714863911,
-        "NEl_requirement": 0,
-        "MP_requirement": 169.60219829211576,
-        "Ca_requirement": 8.551061771355254,
-        "P_requirement": 0.8978663353409345,
-        "DMIest_requirement": 0,
-        "avg_BW": 445.74074026264447,
+@pytest.fixture
+def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII | HeiferIII]:
+    """Returns a list of Calf, HeiferI, HeiferII, Cow and HeiferIII objects for testing purposes"""
+
+    mocker.patch(
+        "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.nutrients",
+        new_callable=mocker.PropertyMock,
+        return_value=[],
+    )
+
+    animal_config = {
+        "wean_day": 10,
+        "semen_type": "conventional",
+        "male_calf_rate_conventional_semen": 2.0,
+        "male_calf_rate_sexed_semen": 3.0,
+        "still_birth_rate": 1.0,
+        "birth_weight": 0,
+        "keep_female_calf_rate": 2.0,
+        "mature_body_weight_avg": 1.0,
+        "mature_body_weight_std": 1.0,
     }
+    mocker.patch(
+        "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config",
+        new_callable=mocker.PropertyMock,
+        return_value=animal_config,
+    )
+    args = {
+        "id": 2,
+        "breed": 1,
+        "birth_date": 1,
+        "events": "3: simulation_day=0, event",
+        "mature_body_weight": 2000.0,
+        "wean_weight": 10.0,
+        "days_born": 20,
+        "birth_weight": 200,
+        "p_init": 1,
+        "repro_program": "ED",
+        "tai_method_h": "5dCG2P",
+        "synch_ed_method_h": "2P",
+        "calf_birth_weight": 200,
+        "presynch_method": "Presynch",
+        "resynch_method": "PGFatPD",
+        "tai_method_c": "OvSynch 56",
+    }
+    calf = Calf(args)
+    calf.id = 1
+    heiferI = HeiferI(args)
+    heiferII = HeiferII(args)
+    heiferII.id = 3
+    heiferIII = HeiferIII(args)
+    heiferIII.id = 4
+    cow1 = Cow(args)
+    cow1.id = 5
+    cow2 = Cow(args)
+    cow2.id = 6
+    cow1.is_milking = True
+    cow2.is_milking = False
 
-    pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
-
-    assert pen.avg_nutrient_rqmts == avg_nutrient_rqmts
-
-
-def test_set_milk_avgs(pen: Pen):
-    """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
-    avg_milk = 40.362
-    avg_CP_milk = 3.196
-    avg_milk_production_reduction = 1.5
-
-    pen.set_milk_avgs(avg_milk, avg_CP_milk, avg_milk_production_reduction)
-
-    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
+    return [heiferI, heiferII, heiferIII, calf, cow1, cow2]
 
 
 @pytest.mark.parametrize(
@@ -138,7 +168,7 @@ def test_add_new_animals(
     mock_animal_list,
     new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
     expected_animals_in_pen: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-):
+) -> None:
     """Unit test for function add_new_animals in file routines/animal/pen.py"""
 
     pen_to_test.add_new_animals(new_animals)
@@ -153,7 +183,7 @@ def test_add_new_animals(
         (lazy_fixture("pen_with_animals"), True),
     ],
 )
-def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
+def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool) -> None:
     """Unit test for function update_pen_populated in file routines/animal/pen.py"""
     pen_to_test.update_pen_populated()
 
@@ -167,7 +197,7 @@ def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
         (lazy_fixture("pen_with_animals"), 0.03),
     ],
 )
-def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float):
+def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float) -> None:
     """Unit test for function update_stocking_density in file routines/animal/pen.py"""
     pen_to_test.update_stocking_density()
 
@@ -184,14 +214,14 @@ def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: fl
         AnimalCombination.GROWING_AND_CLOSE_UP,
     ],
 )
-def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination):
+def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination) -> None:
     """Unit test for function update_animal_combination in file routines/animal/pen.py"""
     pen.update_animal_combination(animal_combination)
 
     assert pen.animal_combination == animal_combination
 
 
-def test_update_animals(pen: Pen, mocker: MockerFixture):
+def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
@@ -226,9 +256,70 @@ def test_calc_avg_stats():
     pass
 
 
-def test_calc_manure():
+def test_set_avg_nutrient_rqmts(pen: Pen) -> None:
+    """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
+    avg_nutrient_rqmts = {
+        "NEmaint_requirement": 22.739694446587276,
+        "NEa_requirement": 0,
+        "NEg_requirement": 0.0,
+        "NEpreg_requirement": 0.8809032714863911,
+        "NEl_requirement": 0,
+        "MP_requirement": 169.60219829211576,
+        "Ca_requirement": 8.551061771355254,
+        "P_requirement": 0.8978663353409345,
+        "DMIest_requirement": 0,
+        "avg_BW": 445.74074026264447,
+    }
+
+    pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
+
+    assert pen.avg_nutrient_rqmts == avg_nutrient_rqmts
+
+
+def test_set_milk_avgs(pen: Pen) -> None:
+    """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
+    avg_milk = 40.362
+    avg_CP_milk = 3.196
+    avg_milk_production_reduction = 1.5
+
+    pen.set_milk_avgs(avg_milk, avg_CP_milk, avg_milk_production_reduction)
+
+    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
+
+
+@pytest.mark.parametrize(
+    "pen_to_test, animals",
+    [
+        (lazy_fixture("pen"), lazy_fixture("animal_list")),
+    ],
+)
+def test_calc_manure(
+    pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
+) -> None:
     """Unit test for function calc_manure in file routines/animal/pen.py"""
-    pass
+
+    man_sums = mocker.patch.object(Pen, "manure_sums")
+    man_sums.return_value = (mocker.MagicMock(), mocker.MagicMock())
+    pen_to_test.add_new_animals(animals)
+    patches = {}
+    methane_model = mocker.MagicMock()
+    feed = mocker.MagicMock(spec="Feed")
+    feed.available_feeds = mocker.MagicMock()
+
+    for animal in animals:
+        animal_type = type(animal)
+        patches[animal_type] = mocker.patch.object(animal_type, "calc_manure_excretion")
+
+    # act
+    Pen.calc_manure(pen_to_test, feed, methane_model)
+
+    # assert
+    for animal in patches:
+        if animal == Cow:
+            patches[animal].assert_called_with(feed, methane_model, pen_to_test.MEdiet)
+        else:
+            patches[animal].assert_called_once_with(feed, methane_model)
+    man_sums.assert_called()
 
 
 def test_reset_manure(pen: Pen) -> None:
@@ -409,7 +500,7 @@ def test_get_prefix_and_default_manure_excretion(
     animal_type: Calf | HeiferI | HeiferII | HeiferIII | Cow | MagicMock,
     is_lactating_cow: bool,
     expected_prefix: str | ValueError,
-):
+) -> None:
     """
     Unit test for the static method _get_prefix_and_default_manure_excretion in pen.py.
 
