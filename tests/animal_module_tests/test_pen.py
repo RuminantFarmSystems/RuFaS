@@ -148,6 +148,21 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
     return [heiferI, heiferII, heiferIII, calf, cow1, cow2]
 
 
+@pytest.mark.parametrize(
+    "pen_to_test, new_animals, expected_animals_in_pen",
+    [
+        (
+            lazy_fixture("pen"),
+            lazy_fixture("mock_animal_list"),
+            lazy_fixture("mock_animal_list"),
+        ),
+        (
+            lazy_fixture("pen_with_animals"),
+            lazy_fixture("mock_animal_list_ii"),
+            lazy_fixture("mock_animal_list_combined"),
+        ),
+    ],
+)
 def test_add_new_animals(
     pen_to_test: Pen,
     mock_animal_list,
