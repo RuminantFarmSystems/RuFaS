@@ -360,8 +360,10 @@ class Cow(HeiferIII):
 
         Notes
         ------
-        - The targeted lactation curve is set at the beginning of each lactation, and the variance can be added after adjusted by the nutrition submodel.
-        - TEMP: Currently, the variables for fat percent, FCM, body weight during lactation, and dry matter
+        - The targeted lactation curve is set at the beginning of each lactation,
+        and the variance can be added after adjusted by the nutrition submodel.
+        - TEMP: Currently, the variables for fat percent, FCM,
+        body weight during lactation, and dry matter
         intake are coded here with equations containing hard-coded parameters just
         to validate the simulation model. They indicate places for future
         adjustment in regards to ration formulation and economics calculation.
@@ -369,7 +371,13 @@ class Cow(HeiferIII):
         References
         ------
        [1] [A.1A.C.33]-[A.1A.C.34]
-        """
+       [2] M. Li, G.J.M. Rosa, K.F. Reed, V.E. Cabrera,
+       Investigating the effect of temporal, geographic, and management
+       factors on US Holstein lactation curve parameters,
+       Journal of Dairy Science, Volume 105, Issue 9, 2022,
+       Pages 7525-7538, ISSN 0022-0302.
+       """
+        
         if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
             self.milking = False
             self.events.add_event(self.days_born, sim_day, const.DRY)
