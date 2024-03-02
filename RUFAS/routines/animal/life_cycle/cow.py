@@ -343,7 +343,6 @@ class Cow(HeiferIII):
 
     def milking_update(self, sim_day, calving_interval):
         """
-        HEAD
         Updates milking status for lactating cows, using breed and
         parity to estimate daily milk production from specific lactation
         curves (following Wood's curve model.)
@@ -373,6 +372,10 @@ class Cow(HeiferIII):
         with equations containing hard-coded parameters just to validate
         the simulation model. They indicate places for future adjustment
         in regards to ration formulation and economics calculation.
+
+        References
+        ------
+        [A.1A.C.33]-[A.1A.C.34]
         """
 
         if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
