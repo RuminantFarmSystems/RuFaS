@@ -356,6 +356,10 @@ class Cow(HeiferIII):
             fat_percent: calculated with days in milk, for temporary use
             daily_fat_correct_milk_production: calculated form estimated
                 milk production and fat percent, for temporary use
+
+        References
+        ------
+        [A.1A.C.33]-[A.1A.C.34]
         """
         if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
             self.milking = False
