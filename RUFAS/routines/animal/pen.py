@@ -438,8 +438,9 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def manure_sums(self, manure: Dict[float, int] , curr_manure: AnimalManureExcretions,
-                    animal_dict : Dict[float, int]) -> Tuple[Dict[float, int], Dict[float, int]]:
+    def manure_sums(
+        self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
+    ) -> Tuple[Dict[float, int], Dict[float, int]]:
         """
         Accumulator helper function for calc_manure.
         The function finds sums of manure components for each
