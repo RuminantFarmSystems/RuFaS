@@ -47,10 +47,6 @@ class Pen:
         The number of stalls.
         Obtained from the input file.
 
-    stocking_density : float
-        The stocking density of the pen.
-        Calculated when animals in pen are updated in update_animals()
-
     housing_type : string
         The housing type of the pen.
         Obtained from the input file.
@@ -235,8 +231,6 @@ class Pen:
         self.populated = False
 
         self.classes_in_pen = set()
-        # TODO: To be removed. Use the property 'current_stocking_density' instead. GitHub Issue #1206
-        self.stocking_density = 0.0
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -392,11 +386,11 @@ class Pen:
         """
         self.populated = len(self.animals_in_pen) != 0
 
-    def update_stocking_density(self) -> None:
-        """
-        Updates the stocking density of the pen
-        """
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls
+    # def update_stocking_density(self) -> None:
+    #     """
+    #     Updates the stocking density of the pen
+    #     """
+    #     self.stocking_density = len(self.animals_in_pen) / self.num_stalls
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -433,7 +427,7 @@ class Pen:
 
         self.add_new_animals(new_animals)
         self.update_pen_populated()
-        self.update_stocking_density()
+        # self.update_stocking_density()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
