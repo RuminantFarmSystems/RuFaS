@@ -386,12 +386,6 @@ class Pen:
         """
         self.populated = len(self.animals_in_pen) != 0
 
-    # def update_stocking_density(self) -> None:
-    #     """
-    #     Updates the stocking density of the pen
-    #     """
-    #     self.stocking_density = len(self.animals_in_pen) / self.num_stalls
-
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
@@ -427,7 +421,6 @@ class Pen:
 
         self.add_new_animals(new_animals)
         self.update_pen_populated()
-        # self.update_stocking_density()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
