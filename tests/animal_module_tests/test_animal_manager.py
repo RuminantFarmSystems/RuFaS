@@ -60,7 +60,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 0,
             "vertical_dist_to_parlor": 1.0,
             "horizontal_dist_to_parlor": 2.0,
-            # "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {0: 100000, 1: 100001},
         },
@@ -68,7 +67,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 1,
             "vertical_dist_to_parlor": 5.0,
             "horizontal_dist_to_parlor": 10.0,
-            # "stocking_density": 1.075,
             "num_stalls": 50,
             "animals_in_pen": {1: 200000, 2: 200001},
         },
@@ -76,7 +74,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 2,
             "vertical_dist_to_parlor": 4.0,
             "horizontal_dist_to_parlor": 8.0,
-            # "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {1: 300000, 2: 300001},
         },
@@ -84,7 +81,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 3,
             "vertical_dist_to_parlor": 2.0,
             "horizontal_dist_to_parlor": 4.0,
-            # "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {3: 400000, 4: 400001},
         },
@@ -1479,7 +1475,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
             "new_cow_dict": {
                 100394: "HeiferI",
                 103171: "HeiferI",
-                110810: "HeiferII",
+                # 110810: "HeiferII",
                 113905: "HeiferIII",
                 116462: "Dry_Cow",
                 122790: "Lac_Cow",
@@ -1548,7 +1544,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                 175830: 1,
                 182621: 1,
                 190070: 1,
-                110810: 2,
+                # 110810: 2,
                 114067: 2,
                 119819: 2,
                 166593: 2,
@@ -1690,7 +1686,6 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
 
     for animal in animal_list:
         dummy_pen.animals_in_pen[animal.id] = animal
-    # dummy_pen.stocking_density = len(animal_list) / num_stalls
 
     return dummy_pen
 
@@ -1828,7 +1823,7 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
         )
         assert set_up_new_animal.call_count == len(info_dict["new_calf_dict"]) + len(info_dict["new_cow_dict"])
 
-    # assert dummy_animal_manager.animal_to_pen_id_map == info_dict["animal_to_pen_id_map_after_daily_update"]
+    assert dummy_animal_manager.animal_to_pen_id_map == info_dict["animal_to_pen_id_map_after_daily_update"]
 
 
 def test_get_dry_cows() -> None:

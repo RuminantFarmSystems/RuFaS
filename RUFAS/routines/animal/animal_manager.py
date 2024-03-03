@@ -586,10 +586,8 @@ class AnimalManager:
             group = animal_type_mapping_dict.get(animal_class)["animal_group"]
 
             candidate_pens = self.pens_by_animal_combination[group]
+            print(candidate_pens)
             pen_for_insert = min(candidate_pens, key=lambda p: p.current_stocking_density)
-
-            # new_pen_population = (pen_for_insert.stocking_density * pen_for_insert.num_stalls) + 1
-            # pen_for_insert.stocking_density = new_pen_population / pen_for_insert.num_stalls
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(

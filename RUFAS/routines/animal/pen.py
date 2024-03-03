@@ -308,8 +308,6 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
-    # TODO: (Not used yet) Use this property instead of self.stocking_density because it is dynamically calculated
-    # GitHub Issue #1206
     @property
     def current_stocking_density(self) -> float:
         """
