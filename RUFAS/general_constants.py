@@ -33,7 +33,8 @@ class GeneralConstants:
     KG_TO_CUBIC_METERS = 0.001
 
     # Time-related
-    DAYS_PER_YEAR = 365
+    YEAR_LENGTH = 365
+    LEAP_YEAR_LENGTH = 366
     SECONDS_PER_DAY = 86400
 
     # Density-related
