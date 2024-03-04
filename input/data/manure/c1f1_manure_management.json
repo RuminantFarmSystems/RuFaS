@@ -34,24 +34,16 @@
     },
     {
       "scenario_id": 4,
-      "bedding_type": "straw",
+      "bedding_type": "CBPB sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "slurry storage outdoor"
+      "manure_treatment": "composting"
     },
     {
       "scenario_id": 5,
       "bedding_type": "manure solids",
       "manure_handler": "manual scraping",
-      "manure_separator": "rotary screen",
-      "manure_separator_after_digestion": "none",
-      "manure_treatment": "anaerobic lagoon"
-    },
-    {
-      "scenario_id": 6,
-      "bedding_type": "manure solids",
-      "manure_handler": "alley scraper",
       "manure_separator": "rotary screen",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
@@ -269,7 +261,7 @@
     },
     {
       "manure_treatment_type": "composting",
-      "composting_type": "intensive windrow"
+      "composting_type": "passive windrow"
     }
   ]
 }
