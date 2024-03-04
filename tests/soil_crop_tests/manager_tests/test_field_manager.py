@@ -15,7 +15,6 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.config import Config
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_manager import ManureManager
@@ -81,9 +80,9 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
 
-    mock_config = MagicMock(Config)
+    mock_time = MagicMock(Time)
 
-    mock_weather = Weather({}, mock_config)
+    mock_weather = Weather({}, mock_time)
     return mock_weather
 
 
