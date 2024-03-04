@@ -1739,7 +1739,7 @@ def test_heiferIII_calc_manure_excretion():
     pass
 
 
-def test_heiferIII_update():
+def test_heiferIII_update() -> None:
     """Unit test for function update in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
@@ -2799,7 +2799,7 @@ def test_reduce_milk_production() -> None:
         assert reduced_predicted[i] == animal.estimated_daily_milk_produced
 
 
-def test_make_ration_from_solution():
+def test_make_ration_from_solution() -> None:
     """Unit test for function make_ration_from_solution in file routines/animal/ration/ration_driver.py"""
 
     # make a mocked solution object - the critical component being the x
@@ -2856,7 +2856,7 @@ def test_get_user_defined_ration():
     pass
 
 
-def test_report_ration():
+def test_report_ration() -> None:
     """Unit test for function report_ration in file routines/animal/ration/ration_driver.py"""
     ration = {"1": 1, "2": 2, "3": 3, "121": 1, "122": 2, "155": 3, "157": 4}
     available_feeds = {
@@ -3082,7 +3082,7 @@ def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_r
     assert failed_constraints_indices == expected_result
 
 
-def test_calc_pen_requirements():
+def test_calc_pen_requirements() -> None:
     """Unit test for function set_pen_requirements in file routines/animal/ration/ration_driver.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     req.calc_pen_requirements(
@@ -3138,7 +3138,7 @@ def test_calc_pen_requirements():
         assert getattr(req, attribute) == 2.8
 
 
-def test_feed_nutrients():
+def test_feed_nutrients() -> None:
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     feed_obj = MagicMock()
     feed_obj.available_feeds = {
