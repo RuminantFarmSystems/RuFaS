@@ -34,9 +34,11 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
+    - name: Display Black version
+      run: black --version
     - name: Format code with Black
       run: |
-        black --check --config pyproject.toml --diff ${{ env.FILES }}
+        black --check --config pyproject.toml ${{ env.FILES }}
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
