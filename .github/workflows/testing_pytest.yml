@@ -4,11 +4,10 @@
 name: Testing
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Formatting"]
+    types:
+        - completed
 
 jobs:
   build:
