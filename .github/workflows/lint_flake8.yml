@@ -41,7 +41,7 @@ jobs:
     - name: Format code with Black
       if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
       run: |
-        black --check --config pyproject.toml ${{ env.FILES }}
+        black --check --diff --config pyproject.toml ${{ env.FILES }}
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
