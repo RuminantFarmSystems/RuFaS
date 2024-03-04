@@ -322,7 +322,7 @@ class TillageApplication:
             "year": "year",
             "day": "day",
             "field_size": "ha",
-            "average_clay_percent": "percent",
+            "average_clay_percent": "percentage",
         }
         info_map = {
             "class": self.__class__.__name__,
