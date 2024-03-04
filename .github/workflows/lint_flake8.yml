@@ -1,28 +1,26 @@
-# This workflow will install Python dependencies and run lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Formatting and Linting
+name: Linting
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Formatting"]
+    branches: [main]
+    types:
+        - completed
 
 jobs:
-  build:
-
+  linting:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
         python-version: "3.10"
     - id: files
-      name: Set up dependency for gettting changed files
+      name: Set up dependency for getting changed files
       uses: jitterbit/get-changed-files@v1
     - name: Install dependencies
       run: |
@@ -38,23 +36,6 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
-    - name: Format code with Black
-      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
-      run: |
-        black --line-length=120 ${{ env.FILES }}
-    - name: Commit and push formatting changes
-      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
-      env:
-        BRANCH_NAME: ${{ github.head_ref || github.ref }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add -A
-        git commit -m "Apply Black Formatting" --allow-empty
-        git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-        CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
-        git push -f origin HEAD:$CLEAN_BRANCH_NAME
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
