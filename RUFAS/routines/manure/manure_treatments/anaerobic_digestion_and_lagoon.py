@@ -83,9 +83,9 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             sim_day=self._sim_day,
         )
 
-        self._adjust_accumulated_output(self.anaerobic_digestion_daily_output)
-        self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
-        return anaerobic_lagoon_daily_output
+        self._accumulated_output = self._adjust_accumulated_output(self.anaerobic_digestion_daily_output)
+        self._accumulated_output = self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+        return self._accumulated_output
 
     def _adjust_accumulated_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
