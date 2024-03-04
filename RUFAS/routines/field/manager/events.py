@@ -1,8 +1,8 @@
-"""This module defines the various Event classes and helper functions
+"""This module defines the various BaseFieldManagementEvent classes and helper functions
 
 Events are simple classes that will facilitate scheduling of different management operations. At their core, they
 are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
-the main `Event` class can extend the functionality by adding additional attributes specific to the type of management
+the main `BaseFieldManagementEvent` class can extend the functionality by adding additional attributes specific to the type of management
 operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which specific harvest
 method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is
 presently growing in a field will be harvested.
@@ -13,7 +13,7 @@ from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
-class Event:
+class BaseFieldManagementEvent:
     """
     Class that will facilitate scheduling of different management operations.
 
@@ -42,13 +42,13 @@ class Event:
         self.day = day
 
     def __eq__(self, other):
-        """Overrides the equality operator for Event objects."""
-        if isinstance(other, Event):
+        """Overrides the equality operator for BaseFieldManagementEvent objects."""
+        if isinstance(other, BaseFieldManagementEvent):
             return other.year == self.year and other.day == self.day
         return False
 
     def __hash__(self):
-        """Overrides the hash method for Event objects."""
+        """Overrides the hash method for BaseFieldManagementEvent objects."""
         return hash((self.year, self.day))
 
     def occurs_today(self, time) -> bool:
@@ -69,9 +69,9 @@ class Event:
         return self.year == time.calendar_year and self.day == time.day
 
 
-class PlantingEvent(Event):
+class PlantingEvent(BaseFieldManagementEvent):
     """
-    A child of Event class that dictates when a crop will be planted and how it will eventually be
+    A child of BaseFieldManagementEvent class that dictates when a crop will be planted and how it will eventually be
     harvested.
 
     Parameters
@@ -103,9 +103,9 @@ class PlantingEvent(Event):
         return hash((self.crop_reference, self.year, self.day, self.use_heat_scheduled_harvest))
 
 
-class HarvestEvent(Event):
+class HarvestEvent(BaseFieldManagementEvent):
     """
-    A child of Event class that determines when (and how) a harvest operation should occur for a crop.
+    A child of BaseFieldManagementEvent class that determines when (and how) a harvest operation should occur for a crop.
 
     Parameters
     ----------
@@ -142,9 +142,9 @@ class HarvestEvent(Event):
         return hash((self.year, self.day, self.crop_reference, self.operation))
 
 
-class TillageEvent(Event):
+class TillageEvent(BaseFieldManagementEvent):
     """
-    A child of Event class that defines a tillage application to be applied on a specific day of a year.
+    A child of BaseFieldManagementEvent class that defines a tillage application to be applied on a specific day of a year.
 
     Parameters
     ----------
@@ -193,9 +193,9 @@ class TillageEvent(Event):
         )
 
 
-class ManureEvent(Event):
+class ManureEvent(BaseFieldManagementEvent):
     """
-    A child of Event class that defines how manure much manure such be requested and applied to a field.
+    A child of BaseFieldManagementEvent class that defines how manure much manure such be requested and applied to a field.
 
     Parameters
     ----------
@@ -267,9 +267,9 @@ class ManureEvent(Event):
         )
 
 
-class FertilizerEvent(Event):
+class FertilizerEvent(BaseFieldManagementEvent):
     """
-    A child of Event class that defines the parameters of a single fertilizer application.
+    A child of BaseFieldManagementEvent class that defines the parameters of a single fertilizer application.
 
     Parameters
     ----------

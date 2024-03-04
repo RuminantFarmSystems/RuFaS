@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.species_data_factory import (
     CropSpeciesDataFactory,
 )
 from RUFAS.routines.field.manager.events import (
-    Event,
+    BaseFieldManagementEvent,
     PlantingEvent,
     HarvestEvent,
     FertilizerEvent,
@@ -923,14 +923,14 @@ class Field:
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
-    def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
+    def _filter_events(all_events: List[BaseFieldManagementEvent], time) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
 
         Parameters
         ----------
-        all_events : List[Event]
+        all_events : List[BaseFieldManagementEvent]
             List of all Events that will occur over the run of the simulation in this field.
         time : Time
             Object containing the current day and year of the simulation.
