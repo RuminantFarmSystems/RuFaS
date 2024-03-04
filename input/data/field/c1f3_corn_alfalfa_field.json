@@ -1,16 +1,9 @@
 {
   "soil_specification": "soil",
-<<<<<<< HEAD
   "crop_specification": "c1f3_corn_alfalfa_rotation",
   "fertilizer_management_specification": "c1f3_corn_alfalfa_fertilizer_schedule",
   "manure_management_specification": "c1f3_corn_alfalfa_manure_schedule",
   "tillage_management_specification": "c1f3_corn_alfalfa_tillage_schedule",
-=======
-  "crop_specification": "crop",
-  "fertilizer_management_specification": "fertilizer_schedule",
-  "manure_management_specification": "manure_schedule",
-  "tillage_management_specification": "tillage_schedule",
->>>>>>> origin/pilot_testing_Dec2023
   "field_size": 935,
   "absolute_latitude": 42.8602778,
   "longitude": -76.6080556,
