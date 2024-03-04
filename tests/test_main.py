@@ -5,7 +5,6 @@ import pytest
 from mock import patch
 from pytest_mock import MockerFixture
 
-from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -20,8 +19,6 @@ from main import (
     run_validation,
     METADATA_PATHS,
     initialize_herd,
-    get_error_warning_counts,
-    show_error_warning_counts,
 )
 
 
@@ -622,12 +619,12 @@ def test_initialize_herd(
     add_log_count: int,
 ) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
-    mock_simulation_config = mocker.MagicMock(auto_spec=Config)
+    mock_simulation_config = {}
     mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
 
     mock_output_manager.add_log.return_value = None
-    mock_simulation_config.set_seed = set_seed
-    mock_simulation_config.seed = seed
+    mock_simulation_config["set_seed"] = set_seed
+    mock_simulation_config["random_seed"] = seed
     mock_herd_factory.initialize_herd.return_value = None
 
     patch_random_seed = mocker.patch("random.seed", return_value=None)
@@ -692,14 +689,12 @@ def test_execute_simulations(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_config = mocker.MagicMock(auto_spec=Config)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    mocker.patch("main.Config", return_value=mock_config)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"
@@ -788,14 +783,12 @@ def test_execute_simulations_raises_exception(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_config = mocker.MagicMock(auto_spec=Config)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    mocker.patch("main.Config", return_value=mock_config)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"
@@ -1037,59 +1030,3 @@ def test_case_insensitive_argument_action():
     for argument in arguments:
         assert hasattr(namespace, argument)
         assert getattr(namespace, argument) == value
-
-
-@pytest.mark.parametrize(
-    "errors_pool, warnings_pool, expected",
-    [
-        ({}, {}, (0, 0)),
-        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
-        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
-        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
-    ],
-)
-def test_get_error_warning_counts(
-    mocker: MockerFixture,
-    errors_pool: dict[str, dict[str, list]],
-    warnings_pool: dict[str, dict[str, list]],
-    expected: tuple[int, int],
-) -> None:
-    """
-    Unit test for the get_error_warning_counts() function in main.py
-    """
-
-    # Arrange
-    mock_output_manager = mocker.MagicMock()
-    mock_output_manager.errors_pool = errors_pool
-    mock_output_manager.warnings_pool = warnings_pool
-    mocker.patch("main.OutputManager", return_value=mock_output_manager)
-
-    # Act and Assert
-    assert get_error_warning_counts() == expected
-
-
-@pytest.mark.parametrize(
-    "error_count, warning_count, expected_output",
-    [
-        (0, 0, "No errors or warnings found.\n\n"),
-        (1, 0, "1 error and 0 warnings found.\nPlease see the log files for more details.\n\n"),
-        (0, 1, "0 errors and 1 warning found.\nPlease see the log files for more details.\n\n"),
-        (1, 1, "1 error and 1 warning found.\nPlease see the log files for more details.\n\n"),
-    ],
-)
-def test_show_error_warning_counts(
-    mocker: MockerFixture, capsys: pytest.CaptureFixture, error_count: int, warning_count: int, expected_output: str
-) -> None:
-    """
-    Unit test for the show_error_warning_counts() function in main.py
-    """
-
-    # Arrange
-    mocker.patch("main.get_error_warning_counts", return_value=(error_count, warning_count))
-
-    # Act
-    show_error_warning_counts()
-    captured = capsys.readouterr()
-
-    # Assert
-    assert captured.out == expected_output
