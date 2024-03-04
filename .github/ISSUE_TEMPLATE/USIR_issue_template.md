@@ -1,3 +1,13 @@
+---
+name: Report issue in USIR format
+about: Report issue with Urgency-Status-Intention-Request format
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+
 <!-- This is a Git Issue Template following the Urgency-Status-Intention-Request (USIR) pattern.
      Please fill in as many details as you can.
 -->
