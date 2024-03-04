@@ -614,9 +614,9 @@ def test_plant_crop(
                 "units": {
                     "crop": "unitless",
                     "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "unitless", "day": "unitless"},
+                    "date": {"year": "year", "day": "day"},
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {
@@ -639,9 +639,9 @@ def test_plant_crop(
                 "units": {
                     "crop": "unitless",
                     "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "unitless", "day": "unitless"},
+                    "date": {"year": "year", "day": "day"},
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {
@@ -664,9 +664,9 @@ def test_plant_crop(
                 "units": {
                     "crop": "unitless",
                     "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "unitless", "day": "unitless"},
+                    "date": {"year": "year", "day": "day"},
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {
@@ -1387,10 +1387,10 @@ def test_record_fertilizer_application(
         "potassium": "kg",
         "application_depth": "mm",
         "surface_remainder_fraction": "unitless",
-        "year": "unitless",
-        "day": "unitless",
+        "year": "year",
+        "day": "day",
         "field_size": "ha",
-        "average_clay_percent": "unitless",
+        "average_clay_percent": "percentage",
     }
 
     expected_info_map = {"suffix": f"field='{field_name}'", "mix_name": mix_name, "units": expected_units}
@@ -1817,18 +1817,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_1'",
                 "units": {
-                    "dry_matter_mass": "kg",
-                    "dry_matter_fraction": "unitless",
+                    "dry_matter_mass": "dry kg",
+                    "dry_matter_fraction": "fraction",
                     "field_coverage": "unitless",
                     "application_depth": "mm",
                     "surface_remainder_fraction": "unitless",
                     "nitrogen": "kg",
                     "phosphorus": "kg",
                     "potassium": "kg",
-                    "day": "unitless",
-                    "year": "unitless",
+                    "day": "day",
+                    "year": "year",
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {
@@ -1862,18 +1862,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_2'",
                 "units": {
-                    "dry_matter_mass": "kg",
-                    "dry_matter_fraction": "unitless",
+                    "dry_matter_mass": "dry kg",
+                    "dry_matter_fraction": "fraction",
                     "field_coverage": "unitless",
                     "application_depth": "mm",
                     "surface_remainder_fraction": "unitless",
                     "nitrogen": "kg",
                     "phosphorus": "kg",
                     "potassium": "kg",
-                    "day": "unitless",
-                    "year": "unitless",
+                    "day": "day",
+                    "year": "year",
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {
@@ -1907,18 +1907,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_3'",
                 "units": {
-                    "dry_matter_mass": "kg",
-                    "dry_matter_fraction": "unitless",
+                    "dry_matter_mass": "dry kg",
+                    "dry_matter_fraction": "fraction",
                     "field_coverage": "unitless",
                     "application_depth": "mm",
                     "surface_remainder_fraction": "unitless",
                     "nitrogen": "kg",
                     "phosphorus": "kg",
                     "potassium": "kg",
-                    "day": "unitless",
-                    "year": "unitless",
+                    "day": "day",
+                    "year": "year",
                     "field_size": "ha",
-                    "average_clay_percent": "unitless",
+                    "average_clay_percent": "percentage",
                 },
             },
             {

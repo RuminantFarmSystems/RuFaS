@@ -438,17 +438,17 @@ def test_record_yield(
 
     expected_units = {
         "crop": "unitless",
-        "wet_yield": "kg/ha",
-        "dry_yield": "kg/ha",
+        "wet_yield": "wet kg/ha",
+        "dry_yield": "dry kg/ha",
         "nitrogen": "kg/ha",
         "phosphorus": "kg/ha",
-        "yield_residue": "kg/ha",
+        "yield_residue": "dry kg/ha",
         "harvest_index": "unitless",
         "planting_date": {
-            "year": "unitless",
-            "day": "unitless",
+            "year": "year",
+            "day": "day",
         },
-        "harvest_date": {"year": "unitless", "day": "unitless"},
+        "harvest_date": {"year": "year", "day": "day"},
         "field_size": "ha",
     }
 
