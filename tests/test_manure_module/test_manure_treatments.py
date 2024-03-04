@@ -361,8 +361,6 @@ def test_manure_treatment_config() -> None:
         sludge_accumulation_period=20,
         sludge_accumulation_volume_fraction=0.15,
         top_cover_volume_fraction=0.25,
-        biogas_generation_ratio=0.35,
-        methane_generation_ratio=0.45,
         evaporation_fraction=0.55,
         anaerobic_digestion_temperature_set_point=60.0,
         anaerobic_digestion_temperature_celsius=70.0,
@@ -382,8 +380,6 @@ def test_manure_treatment_config() -> None:
     assert manure_treatment_config.sludge_accumulation_period == 20
     assert manure_treatment_config.sludge_accumulation_volume_fraction == approx(0.15)
     assert manure_treatment_config.top_cover_volume_fraction == approx(0.25)
-    assert manure_treatment_config.biogas_generation_ratio == approx(0.35)
-    assert manure_treatment_config.methane_generation_ratio == approx(0.45)
 
     assert manure_treatment_config.evaporation_fraction == approx(0.55)
     assert manure_treatment_config.anaerobic_digestion_temperature_set_point == approx(60.0)
@@ -445,8 +441,6 @@ def test_anaerobic_digestion_default_config() -> None:
     assert anaerobic_digestion_config.sludge_accumulation_period == 1.0
     assert anaerobic_digestion_config.sludge_accumulation_volume_fraction == approx(0.0)
     assert anaerobic_digestion_config.top_cover_volume_fraction == approx(0.2)
-    assert anaerobic_digestion_config.biogas_generation_ratio == approx(0.38)
-    assert anaerobic_digestion_config.methane_generation_ratio == approx(0.65)
 
     assert anaerobic_digestion_config.evaporation_fraction == approx(0.02)
     assert anaerobic_digestion_config.anaerobic_digestion_temperature_set_point == approx(37.5)
@@ -1007,7 +1001,9 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     mock_accumulated_output.daily_final_manure_volume = final_manure_volume = 30.0
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 110.0
     slurry_storage._accumulated_output = mock_accumulated_output
-    patch_for_accumulate_daily_output = mocker.patch.object(slurry_storage, "_accumulate_daily_output")
+    patch_for_accumulate_daily_output = mocker.patch.object(
+        slurry_storage, "_adjust_accumulated_output", return_value=mock_accumulated_output
+    )
 
     mock_pen = mocker.MagicMock()
     mock_pen.num_animals = num_animals = 100
@@ -2506,7 +2502,6 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     mock_manure_treatment_config = mocker.MagicMock()
     mock_manure_treatment_config.hydraulic_retention_time = hydraulic_retention_time = 12
     mock_manure_treatment_config.top_cover_volume_fraction = top_cover_volume_fraction = 0.4
-    mock_manure_treatment_config.biogas_generation_ratio = biogas_generation_ratio = 0.6
     mock_manure_treatment_config.evaporation_fraction = evaporation_fraction = 0.1
     anaerobic_digestion = AnaerobicDigestion(
         weather=mocker.MagicMock(),
@@ -2554,7 +2549,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         return_value=biogas_energy_content,
     )
 
-    expected_biogas = biogas_generation_ratio * liquid_manure_total_volatile_solids
+    expected_biogas = methane_generation_volume * GasEmissionConstants.METHANE_DENSITY
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
