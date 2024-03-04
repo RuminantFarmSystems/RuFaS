@@ -20,18 +20,23 @@ def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
     mock_manure_manager = mocker.MagicMock()
     mock_manure_manager.daily_update.return_value = None
     mock_animal_manager = mocker.MagicMock()
+    mock_animal_manager.all_pens = mocker.MagicMock()
+    mock_animal_manager.simulation_day = mocker.MagicMock()
 
     # Act
-    simulate_daily_manure_manager(mock_manure_manager, mock_animal_manager)
+    simulate_daily_manure_manager(mock_manure_manager, mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
 
     # Assert
-    mock_manure_manager.daily_update.assert_called_once_with(mock_animal_manager)
+    mock_manure_manager.daily_update.assert_called_once_with(
+        mock_animal_manager.all_pens, mock_animal_manager.simulation_day
+    )
 
 
 def test_manure_manager_init(mocker: MockFixture) -> None:
     """Unit test for __init__() of ManureManager in manure_manager.py"""
     # Arrange
     mock_animal_manager = mocker.MagicMock()
+    mock_animal_manager.all_pens = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_manure_manager_config = mocker.MagicMock()
@@ -45,14 +50,14 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         "RUFAS.routines.manure.manure_manager.ManureNutrientManager",
         return_value=mock_manure_nutrient_manager,
     )
-    patch_for_configure_manure_manager_components = mocker.patch(
-        "RUFAS.routines.manure.manure_manager.ManureManager." "_configure_manure_manager_components",
+    patch_forconfigure_manure_manager_components = mocker.patch(
+        "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
     )
 
     # Act
     manure_manager = ManureManager(
-        animal_manager=mock_animal_manager,
+        pen_list=mock_animal_manager.all_pens,
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
@@ -70,7 +75,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
     patch_for_manure_manager_config_handler.assert_called_once_with(mock_manure_manager_config)
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
     patch_for_manure_nutrient_manager.assert_called_once()
-    patch_for_configure_manure_manager_components.assert_called_once_with(mock_animal_manager)
+    patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
 
 
 def test_data_property(mocker: MockFixture) -> None:
@@ -116,8 +121,9 @@ def test_data_property(mocker: MockFixture) -> None:
         "test_manure_separator",
     ],
 )
-def test_configure_manure_manager_components(manure_separator: str, mocker: MockFixture) -> None:
-    """Unit test for _configure_manure_manager_components() in manure_manager.py"""
+def testconfigure_manure_manager_components(manure_separator: str, mocker: MockFixture) -> None:
+    """Unit test for configure_manure_manager_components() in manure_manager.py"""
+
     # Arrange
     mock_animal_manager = mocker.MagicMock()
     mock_pen = mocker.MagicMock()
@@ -146,7 +152,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     )
 
     manure_manager = ManureManager(
-        animal_manager=mock_animal_manager,
+        pen_list=mock_animal_manager.all_pens,
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
@@ -207,7 +213,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     manure_manager.time = mock_time
 
     # Act
-    manure_manager._configure_manure_manager_components(mock_animal_manager)
+    manure_manager.configure_manure_manager_components(mock_animal_manager.all_pens)
 
     # Assert
     patch_for_manure_manager_pen_init.assert_called_once_with(mock_pen)
@@ -709,7 +715,7 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
     # Arrange
     mock_animal_manager = mocker.MagicMock()
     mock_animal_manager.simulation_day = simulation_day = 1
-    num_pens = 10
+    num_pens = 3
     mock_all_pens = [mocker.MagicMock() for _ in range(num_pens)]
     mock_animal_manager.all_pens = mock_all_pens
 
@@ -727,21 +733,33 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
     )
+    patch_for_configure_manure_manager_components = mocker.patch(
+        "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
+        return_value=None,
+    )
     patch_for_pen_daily_update = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureManager." "_pen_daily_update",
         return_value=None,
     )
     manure_manager.time = mock_time
     manure_manager._manure_nutrient_manager = mocker.MagicMock()
+    manure_manager.manure_treatments = [mocker.MagicMock(), mocker.MagicMock()]
+
     mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureModuleOutputManagerHelper.add_dataclass_object",
         return_value=None,
     )
+    mocker.patch(
+        "RUFAS.routines.manure.manure_manager.ManureManager.configure_manure_manager_components",
+        return_value=None,
+    )
+    manure_manager.manure_treatments = mocker.MagicMock()
 
     # Act
-    manure_manager.daily_update(mock_animal_manager)
+    manure_manager.daily_update(mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
 
     # Assert
+    patch_for_configure_manure_manager_components.assert_called_once
     assert patch_for_pen_daily_update.call_count == num_pens
     assert patch_for_pen_daily_update.call_args_list == [mocker.call(simulation_day, pen) for pen in mock_all_pens]
 
