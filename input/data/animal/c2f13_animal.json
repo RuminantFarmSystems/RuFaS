@@ -58,7 +58,7 @@
           "estrus_detection_rate": 0.63,
           "ED_conception_rate": 0.38,
           "presynch_program": "None",
-          "presynch_program_start_day": "0",
+          "presynch_program_start_day": 0,
             	"ovsynch_program": "OvSynch 56",
           "ovsynch_program_start_day": 60,
           "ovsynch_program_conception_rate": 0.38,
@@ -102,7 +102,7 @@
       },
       "culling": {
         "parity_death_prob": [0.05,0.06,0.08,0.08],
-        "parity_cull_prob": [0.319, 0.41, 0.54, 0.54],
+        "parity_cull_prob": [0.05, 0.06, 0.07, 0.07],
         "injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
         "death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
         "cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
@@ -142,7 +142,7 @@
       "number_of_stalls": 300,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 0
     },
     {
@@ -154,7 +154,7 @@
       "number_of_stalls": 3000,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 0
     },
     {
@@ -166,7 +166,7 @@
       "number_of_stalls": 110,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 1
     },
     {
@@ -178,7 +178,7 @@
       "number_of_stalls": 350,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 2
     },
     {
@@ -190,7 +190,7 @@
       "number_of_stalls": 2850,
       "housing_type": "open air barn",
       "pen_type": "freestall",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 3
     },
     {
@@ -202,7 +202,7 @@
       "number_of_stalls": 115,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 1
     },
     {
@@ -214,7 +214,7 @@
       "number_of_stalls": 350,
       "housing_type": "open air barn",
       "pen_type": "open lot",
-      "max_stocking_density": 1.5,
+      "max_stocking_density": 2.5,
       "manure_management_scenario_id": 2
     }
   ]
