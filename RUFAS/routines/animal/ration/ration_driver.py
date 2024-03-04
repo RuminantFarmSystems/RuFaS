@@ -264,6 +264,7 @@ class RationManager:
         fixed_ration = False
         num_reattempts = 0
         constraints_failed_list = []
+
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
         else:

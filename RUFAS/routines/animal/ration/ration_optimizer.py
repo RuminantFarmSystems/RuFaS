@@ -1047,8 +1047,7 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(
-                    animal_combination, ration_config,
-                    previous_ration
+                    animal_combination, ration_config, previous_ration
                 )
             except Exception as e:  # noqa
                 i -= 1
