@@ -2,10 +2,10 @@
 
 Events are simple classes that will facilitate scheduling of different management operations. At their core, they
 are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
-the main `BaseFieldManagementEvent` class can extend the functionality by adding additional attributes specific to the type of management
-operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which specific harvest
-method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is
-presently growing in a field will be harvested.
+the main `BaseFieldManagementEvent` class can extend the functionality by adding additional attributes specific to the
+type of management operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which
+specific harvest method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which
+crop that is presently growing in a field will be harvested.
 """
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -105,7 +105,8 @@ class PlantingEvent(BaseFieldManagementEvent):
 
 class HarvestEvent(BaseFieldManagementEvent):
     """
-    A child of BaseFieldManagementEvent class that determines when (and how) a harvest operation should occur for a crop.
+    A child of BaseFieldManagementEvent class that determines when (and how) a harvest operation should occur for a
+    crop.
 
     Parameters
     ----------
@@ -144,7 +145,8 @@ class HarvestEvent(BaseFieldManagementEvent):
 
 class TillageEvent(BaseFieldManagementEvent):
     """
-    A child of BaseFieldManagementEvent class that defines a tillage application to be applied on a specific day of a year.
+    A child of BaseFieldManagementEvent class that defines a tillage application to be applied on a specific day of a
+    year.
 
     Parameters
     ----------
@@ -195,7 +197,8 @@ class TillageEvent(BaseFieldManagementEvent):
 
 class ManureEvent(BaseFieldManagementEvent):
     """
-    A child of BaseFieldManagementEvent class that defines how manure much manure such be requested and applied to a field.
+    A child of BaseFieldManagementEvent class that defines how manure much manure such be requested and applied to a
+    field.
 
     Parameters
     ----------
