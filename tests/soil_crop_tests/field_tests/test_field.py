@@ -9,7 +9,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import (
-    Event,
+    BaseFieldManagementEvent,
     PlantingEvent,
     HarvestEvent,
     FertilizerEvent,
@@ -470,11 +470,11 @@ def test_harvest_heat_scheduled_crops(
     "events,year,day,expected_remaining,expected_current",
     [
         (
-            [Event(1990, 120), Event(1990, 200), Event(1993, 100)],
+            [BaseFieldManagementEvent(1990, 120), BaseFieldManagementEvent(1990, 200), BaseFieldManagementEvent(1993, 100)],
             1990,
             120,
-            [Event(1990, 200), Event(1993, 100)],
-            [Event(1990, 120)],
+            [BaseFieldManagementEvent(1990, 200), BaseFieldManagementEvent(1993, 100)],
+            [BaseFieldManagementEvent(1990, 120)],
         ),
         (
             [
@@ -509,11 +509,11 @@ def test_harvest_heat_scheduled_crops(
     ],
 )
 def test_filter_events(
-    events: List[Event],
+    events: List[BaseFieldManagementEvent],
     year: int,
     day: int,
-    expected_remaining: List[Event],
-    expected_current: List[Event],
+    expected_remaining: List[BaseFieldManagementEvent],
+    expected_current: List[BaseFieldManagementEvent],
 ) -> None:
     """Tests that list of events are properly checked and have current events correctly removed from them."""
     mocked_time = MagicMock(Time)
