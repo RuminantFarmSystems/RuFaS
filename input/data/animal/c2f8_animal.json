@@ -7,7 +7,6 @@
     "cow_num": 2796,
     "replace_num": 13980,
     "herd_num": 2796,
-    "herd_init": false,
     "breed": "HO"
   },
   "herd_initialization": {
@@ -17,19 +16,21 @@
   "animal_config": {
     "management_decisions": {
       "breeding_start_day_h": 402,
-      "heifer_repro_method": "ED",
-      "cow_repro_method": "ED",
+      "heifer_repro_method": "SynchED",
+      "cow_repro_method": "ED-TAI",
       "semen_type": "conventional",
       "days_in_preg_when_dry": 220,
       "heifer_repro_cull_time": 600,
       "do_not_breed_time": 225,
       "cull_milk_production": 31.8,
-      "cow_times_milked_per_day": 3
+      "cow_times_milked_per_day": 3,
+      "milk_fat_percent": 4.4,
+	    "milk_protein_percent": 3.3 
     },
     "farm_level": {
       "calf": {
         "male_calf_rate_sexed_semen": 0.52,
-        "male_calf_rate_conventional_semen": 0.52,
+        "male_calf_rate_conventional_semen": 0.66,
         "keep_female_calf_rate": 1,
         "wean_day": 42,
         "wean_length": 7,
@@ -53,27 +54,13 @@
         },
         "cows": {
           "estrus_detection_rate": 0.53,
-          "estrus_conception_rate": 0.53,
-          "presynch_protocol": "Presynch",
-          "resynch_protocol": "TAIafterPD",
-          "repro_sub_protocol": "OvSynch 56",
-          "repro_sub_properties": {
-            "conception_rate": 0.53,
-            "tai_program_start_day": 71
-          }
-        },
-        "cow_repro_programs": {
-          "estrus_detection_rate": 0.53,
-          "estrus_service_rate": 0.9,
-          "ed_conception_rate": 0.53,
-          "cow_presynch_protocol": "Presynch",
-          "cow_TAI_protocol": "OvSynch 56",
-          "ovsynch56_conception_rate": 0.53,
-          "ovsynch48_conception_rate": 0.53,
-          "cosynch72_conception_rate": 0.53,
-          "cosynch5d_conception_rate": 0.53,
-          "cow_resynch_protocol": "TAIafterPD",
-          "tai_program_start_day": 71
+          "ED_conception_rate": 0.53,
+          "presynch_program": "PreSynch",
+          "presynch_program_start_day": 45,
+            	"ovsynch_program": "OvSynch 56",
+          "ovsynch_program_start_day": 71,
+          "ovsynch_program_conception_rate": 0.53,
+          "resynch_program": "TAIafterPD"
         }
       },
       "bodyweight": {
@@ -138,7 +125,7 @@
   },
   "housing": "barn",
   "pasture_concentrate": 0,
-  "methane_model": "IPCC",
+  "methane_model": "Mutian",
   "ration": {
     "user_input": true,
     "formulation_interval": 30
@@ -152,7 +139,7 @@
       "horizontal_dist_to_milking_parlor": 0.0,
       "number_of_stalls": 350,
       "housing_type": "open air barn",
-      "pen_type": "tiestall",
+      "pen_type": "compost bedded pack barn",
       "max_stocking_density": 1.5,
       "manure_management_scenario_id": 0
     },

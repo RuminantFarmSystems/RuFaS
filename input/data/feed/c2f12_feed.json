@@ -7,26 +7,34 @@
 	  44,
 	  156,
 	  167,
-	  187, 301
+	  187, 
+	  301
 	],
 	"close_up_feeds": [
-	  51, 200,
+	  51, 
+	  200,
 	  161,
-	  163, 301
+	  163, 
+	  301
 		],
 	"lac_cow_feeds": [
 	  44,
-	  51,
+	  5 ,
 	  58,
 	  110,
 	  163,
-	  167, 301
+	  167, 
+	  301
 
 	],
 	"purchased_feeds": [
 	  {
 		"purchased_feed": 44,
 		"purchased_feed_cost": 0.5
+	  },
+	  {
+		"purchased_feed": 5,
+		"purchased_feed_cost": 0.1
 	  },
 	  {
 		"purchased_feed": 51,
@@ -78,6 +86,7 @@
 	  }
 	],
 	"farm_grown_feeds": [
+		1
 	],
 	"storage_options": [
 	  {
@@ -188,7 +197,7 @@
 		  "ration_percentage": 15
 		}
 	  ],
-	  "tolerance": 0.2,
-	  "milk_reduction_maximum": 0.50
+	  "tolerance": 0.1,
+	  "milk_reduction_maximum": 0.0
 	}
   }
