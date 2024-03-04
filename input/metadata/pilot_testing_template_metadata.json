@@ -38,7 +38,7 @@
 "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Purchased feeds emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_emissions.csv",
+      "path": "input/data/EEE/full_feeds_emissions_new.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
