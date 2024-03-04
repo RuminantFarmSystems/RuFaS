@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import astuple
+from dataclasses import astuple, fields
 from dataclasses import dataclass
+from typing import Dict
 
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
@@ -100,58 +101,141 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     """
 
     pen_id: int = -1
+    pen_id_unit: str = "unitless"
+
     simulation_day: int = -1
+    simulation_day_unit: str = "simulation days"
+
     liquid_manure_total_ammoniacal_nitrogen: float = 0.0
+    liquid_manure_total_ammoniacal_nitrogen_unit: str = "kg"
+
     liquid_manure_nitrogen: float = 0.0
+    liquid_manure_nitrogen_unit: str = "kg"
+
     liquid_manure_total_solids: float = 0.0
+    liquid_manure_total_solids_unit: str = "kg"
+
     liquid_manure_total_volatile_solids: float = 0.0
+    liquid_manure_total_volatile_solids_unit: str = "kg"
+
     liquid_manure_phosphorus: float = 0.0
+    liquid_manure_phosphorus_unit: str = "kg"
+
     liquid_manure_potassium: float = 0.0
+    liquid_manure_potassium_unit: str = "kg"
+
     daily_final_manure_volume: float = 0.0
-    liquid_manure_daily_volume: float = 0.0  # To satisfy the LiquidManurePortionProtocol
+    daily_final_manure_volume_unit: str = "m^3"
+
+    # To satisfy the LiquidManurePortionProtocol
+    liquid_manure_daily_volume: float = 0.0
+    liquid_manure_daily_volume_unit: str = "m^3"
 
     storage_methane: float = 0.0
+    storage_methane_unit: str = "kg"
+
     storage_ammonia: float = 0.0
+    storage_ammonia_unit: str = "kg"
+
     storage_nitrous_oxide: float = 0.0
+    storage_nitrous_oxide_unit: str = "kg"
+
     storage_nitrogen_leached: float = 0.0
+    storage_nitrogen_leached_unit: str = "kg"
 
     sludge_manure_total_solids: float = 0.0
+    sludge_manure_total_solids_unit: str = "kg"
+
     sludge_manure_total_volatile_solids: float = 0.0
+    sludge_manure_total_volatile_solids_unit: str = "kg"
+
     sludge_manure_nitrogen: float = 0.0
+    sludge_manure_nitrogen_unit: str = "kg"
+
     sludge_manure_phosphorus: float = 0.0
+    sludge_manure_phosphorus_unit: str = "kg"
+
     sludge_manure_potassium: float = 0.0
+    sludge_manure_potassium_unit: str = "kg"
+
     sludge_manure_daily_volume: float = 0.0
+    sludge_manure_daily_volume_unit: str = "m^3"
 
     solid_manure_total_solids: float = 0.0
+    solid_manure_total_solids_unit: str = "kg"
+
     solid_manure_total_volatile_solids: float = 0.0
+    solid_manure_total_volatile_solids_unit: str = "kg"
 
     solid_manure_nitrogen: float = 0.0
+    solid_manure_nitrogen_unit: str = "kg"
+
     solid_manure_inorganic_nitrogen: float = 0.0
+    solid_manure_inorganic_nitrogen_unit: str = "kg"
+
     solid_manure_organic_nitrogen: float = 0.0
+    solid_manure_organic_nitrogen_unit: str = "kg"
+
     solid_manure_total_ammoniacal_nitrogen: float = 0.0
+    solid_manure_total_ammoniacal_nitrogen_unit: str = "kg"
 
     solid_manure_phosphorus: float = 0.0
+    solid_manure_phosphorus_unit: str = "kg"
+
     solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_water_extractable_inorganic_phosphorus_unit: str = "kg"
+
     solid_manure_water_extractable_organic_phosphorus: float = 0.0
+    solid_manure_water_extractable_organic_phosphorus_unit: str = "kg"
+
     solid_manure_non_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_inorganic_phosphorus_unit: str = "kg"
+
     solid_manure_non_water_extractable_organic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_organic_phosphorus_unit: str = "kg"
 
     solid_manure_potassium: float = 0.0
-    solid_manure_daily_mass: float = 0.0
+    solid_manure_potassium_unit: str = "kg"
 
+    solid_manure_daily_mass: float = 0.0
+    solid_manure_daily_mass_unit: str = "kg"
+
+    # different unit from docstring m^3 vs m^3/day?
     biogas: float = 0.0  # biogas production per day (m3/day)
+    biogas_unit: str = "m^3/day"
+
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
+    biogas_energy_content_unit: str = "MJ/m^3"
+
     methane_generation_volume: float = 0.0
+    methane_generation_volume_unit: str = "m^3"
+
     heating_input_energy: float = 0.0
+    heating_input_energy_unit: str = "MJ"
+
     evaporated_water: float = 0.0
+    evaporated_water_unit: str = "m^3"
+
     minimum_digester_volume: float = 0.0
+    minimum_digester_volume_unit: str = "m^3"
+
     top_cover_volume: float = 0.0
+    top_cover_volume_unit: str = "m^3"
 
     solid_manure_carbon_decomposition: float = 0.0
+    solid_manure_carbon_decomposition_unit: str = "kg"
 
     def __post_init__(self):
         """Ensures that the daily volume is set to the final manure volume."""
         self.liquid_manure_daily_volume = self.daily_final_manure_volume
+
+    @property
+    def units_dict(self) -> Dict[str, str]:
+        return {
+            k: v for unit in
+            ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            for (k, v) in unit.items()
+        }
 
     def set_daily_final_manure_volume(self, daily_final_manure_volume: float) -> None:
         """Sets the daily final manure volume and ensures that the daily volume is set to the final manure volume.
@@ -176,7 +260,14 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         if not isinstance(other, ManureTreatmentDailyOutput):
             raise TypeError("Other must be of type ManureTreatmentDailyOutput.")
 
-        return ManureTreatmentDailyOutput(*[attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))])
+        summed_attributes = {
+            field.name: getattr(self, field.name) + getattr(other, field.name)
+            for field in fields(self)
+            if not field.name.endswith("_unit")
+        }
+        summed_attributes.update(self.units_dict)
+
+        return ManureTreatmentDailyOutput(**summed_attributes)
 
     def clone(self) -> ManureTreatmentDailyOutput:
         """Returns a clone of this object.
