@@ -470,7 +470,11 @@ def test_harvest_heat_scheduled_crops(
     "events,year,day,expected_remaining,expected_current",
     [
         (
-            [BaseFieldManagementEvent(1990, 120), BaseFieldManagementEvent(1990, 200), BaseFieldManagementEvent(1993, 100)],
+            [
+                BaseFieldManagementEvent(1990, 120),
+                BaseFieldManagementEvent(1990, 200),
+                BaseFieldManagementEvent(1993, 100),
+            ],
             1990,
             120,
             [BaseFieldManagementEvent(1990, 200), BaseFieldManagementEvent(1993, 100)],

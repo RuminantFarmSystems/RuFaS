@@ -923,7 +923,9 @@ class Field:
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
-    def _filter_events(all_events: List[BaseFieldManagementEvent], time) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
+    def _filter_events(
+        all_events: List[BaseFieldManagementEvent], time
+    ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
