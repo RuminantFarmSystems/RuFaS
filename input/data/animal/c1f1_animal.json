@@ -143,7 +143,7 @@
 			"number_of_stalls": 100,
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
-			"max_stocking_density": 1.5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0 
 		},
 		{
@@ -155,7 +155,7 @@
 			"number_of_stalls": 1200,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 1 
 		},
 		{
@@ -167,7 +167,7 @@
 			"number_of_stalls": 300,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 0.8,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 2 
 		},
 		{
@@ -179,7 +179,7 @@
 			"number_of_stalls": 507,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 3 
 		},
 		{
@@ -191,7 +191,7 @@
 			"number_of_stalls": 25,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id":4 
 		},
 		{
@@ -203,7 +203,7 @@
 			"number_of_stalls": 254,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 5 
 		},
 		{
@@ -215,8 +215,8 @@
 			"number_of_stalls": 254,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.5,
-			"manure_management_scenario_id": 6 
-		} 
+			"max_stocking_density": 2,
+			"manure_management_scenario_id": 5 
+		}
 	]
 }
