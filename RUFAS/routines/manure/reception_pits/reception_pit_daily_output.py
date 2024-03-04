@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Optional, Dict
 
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
