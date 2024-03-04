@@ -1,11 +1,9 @@
 from typing import Optional
 
-from RUFAS.routines.manure.constants_and_units.datatype_with_unit import FloatWithUnit, IntWithUnit
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
 from dataclasses import dataclass
-from dataclasses import field
 
 from RUFAS.general_constants import GeneralConstants
 
@@ -63,71 +61,67 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         Number of animals in the pen each day.
     """
 
-    pen_id: IntWithUnit = IntWithUnit(-1, unit="unitless")
+    pen_id: int = -1
 
-    simulation_day: IntWithUnit = IntWithUnit(-1, unit="simulation days")
+    simulation_day: int = -1
 
-    manure_urea: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    manure_urea: float = 0.0
 
-    liquid_manure_total_ammoniacal_nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    liquid_manure_total_ammoniacal_nitrogen: float = 0.0
 
-    liquid_manure_nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    liquid_manure_nitrogen: float = 0.0
 
-    liquid_manure_total_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    liquid_manure_total_solids: float = 0.0
 
-    manure_degradable_volatile_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    manure_degradable_volatile_solids: float = 0.0
 
-    manure_non_degradable_volatile_solids: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    manure_non_degradable_volatile_solids: float = 0.0
 
-    liquid_manure_total_volatile_solids: Optional[FloatWithUnit] = FloatWithUnit(None, unit="kg")
+    liquid_manure_total_volatile_solids: Optional[float] = None
 
-    liquid_manure_phosphorus: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    liquid_manure_phosphorus: float = 0.0
 
-    liquid_manure_potassium: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    liquid_manure_potassium: float = 0.0
 
-    housing_methane: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    housing_methane: float = 0.0
 
-    housing_carbon_dioxide: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    housing_carbon_dioxide: float = 0.0
 
-    housing_ammonia: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    housing_ammonia: float = 0.0
 
-    manure_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+    manure_volume: float = 0.0
 
-    cleaning_water_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+    cleaning_water_volume: float = 0.0
 
-    total_bedding_volume: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+    total_bedding_volume: float = 0.0
 
-    total_bedding_mass: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    total_bedding_mass: float = 0.0
 
-    total_water_volume_in_milking_parlor: FloatWithUnit = FloatWithUnit(0.0, unit="m^3")
+    total_water_volume_in_milking_parlor: float = 0.0
 
-    total_daily_manure_volume: Optional[FloatWithUnit] = FloatWithUnit(None, unit="m^3")
+    total_daily_manure_volume: Optional[float] = None
 
     # To satisfy the LiquidManurePortionProtocol
-    liquid_manure_daily_volume: Optional[FloatWithUnit] = FloatWithUnit(None, unit="m^3")
+    liquid_manure_daily_volume: Optional[float] = None
 
-    tempC: FloatWithUnit = FloatWithUnit(0.0, unit="°C")
+    tempC: float = 0.0
 
-    num_animals: IntWithUnit = IntWithUnit(-1, unit="unitless")
+    num_animals: int = -1
 
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""
 
-        self.liquid_manure_total_volatile_solids = FloatWithUnit(
-            self.manure_degradable_volatile_solids + self.manure_non_degradable_volatile_solids, unit="kg"
-        )
+        self.liquid_manure_total_volatile_solids = \
+            self.manure_degradable_volatile_solids + self.manure_non_degradable_volatile_solids
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
         self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
 
-        self.total_daily_manure_volume = FloatWithUnit(
-            sum(
-                [
-                    self.manure_volume,
-                    self.cleaning_water_volume,
-                    self.total_bedding_volume,
-                    self.total_water_volume_in_milking_parlor,
-                ]
-            ),
-            unit="m^3",
+        self.total_daily_manure_volume = sum(
+            [
+                self.manure_volume,
+                self.cleaning_water_volume,
+                self.total_bedding_volume,
+                self.total_water_volume_in_milking_parlor,
+            ]
         )
         self.liquid_manure_daily_volume = self.total_daily_manure_volume

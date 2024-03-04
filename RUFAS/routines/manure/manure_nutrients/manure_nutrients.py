@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields
 
-from RUFAS.routines.manure.constants_and_units.datatype_with_unit import FloatWithUnit
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
@@ -13,19 +12,19 @@ class ManureNutrients:
     manure_type: ManureType
     """Type of manure."""
 
-    nitrogen: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    nitrogen: float = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
 
-    phosphorus: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    phosphorus: float = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
 
-    potassium: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    potassium: float = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
 
-    dry_matter: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    dry_matter: float = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
 
-    total_manure_mass: FloatWithUnit = FloatWithUnit(0.0, unit="kg")
+    total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
 
     def __post_init__(self):
