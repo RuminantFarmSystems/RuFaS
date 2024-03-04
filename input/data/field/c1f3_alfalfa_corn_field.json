@@ -1,7 +1,7 @@
 {
   "soil_specification": "soil",
   "crop_specification": "c1f3_alfalfa_corn_rotation",
-  "fertilizer_management_specification": "fertilizer_schedule_alfalfa",
+  "fertilizer_management_specification": "c1f3_alfalfa_corn_fertilizer_schedule",
   "manure_management_specification": "c1f3_alfalfa_corn_manure_schedule",
   "tillage_management_specification": "c1f3_alfalfa_corn_tillage_schedule",
   "field_size": 935,
