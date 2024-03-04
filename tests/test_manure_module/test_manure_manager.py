@@ -121,7 +121,7 @@ def test_data_property(mocker: MockFixture) -> None:
         "test_manure_separator",
     ],
 )
-def testconfigure_manure_manager_components(manure_separator: str, mocker: MockFixture) -> None:
+def test_configure_manure_manager_components(manure_separator: str, mocker: MockFixture) -> None:
     """Unit test for configure_manure_manager_components() in manure_manager.py"""
 
     # Arrange

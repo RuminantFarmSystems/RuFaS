@@ -244,18 +244,6 @@ class AnimalModuleReporter:
                 dict(info_map, **{"units": ration_total_units}),
             )
 
-    def report_daily_pen_totals(penlist):
-        info_map = {
-            "class": "AnimalModuleReporter",
-            "function": "report_daily_pen_totals",
-        }
-        for pen in penlist:
-            om.add_variable(
-                f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
-                len(pen.animals_in_pen),
-                info_map,
-            )
-
     def report_daily_feed_emissions(
         ration_total: dict[str, float],
         pen_id: int,
