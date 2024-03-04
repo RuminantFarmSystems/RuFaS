@@ -17,4 +17,4 @@ freezegun
 salib
 tqdm
 mypy
-black
+black==24.2.0
