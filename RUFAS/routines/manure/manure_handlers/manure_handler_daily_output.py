@@ -134,8 +134,9 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""
 
-        self.liquid_manure_total_volatile_solids = \
+        self.liquid_manure_total_volatile_solids = (
             self.manure_degradable_volatile_solids + self.manure_non_degradable_volatile_solids
+        )
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
         self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
 
@@ -152,7 +153,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     @property
     def units_dict(self) -> Dict[str, str]:
         return {
-            k: v for unit in
-            ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            k: v
+            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
             for (k, v) in unit.items()
         }
