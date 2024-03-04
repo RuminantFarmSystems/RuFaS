@@ -3,7 +3,6 @@ name: Linting
 on:
   workflow_run:
     workflows: ["Formatting"]
-    branches: [main]
     types:
         - completed
 
