@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import fields, dataclass
+from enum import Enum
+from typing import Dict
+
 from RUFAS.output_manager import OutputManager
 
 
@@ -37,7 +40,11 @@ class ManureModuleOutputManagerHelper:
             List of field names to be excluded, by default None.
 
         """
+        units_vars_list = list(dataclass_object.units_dict.keys())
 
         for field in fields(dataclass_object):
-            if exclude_fields is None or field.name not in exclude_fields:
-                cls._om.add_variable(field.name, getattr(dataclass_object, field.name), info_maps)
+            if field.name not in units_vars_list and (exclude_fields is None or field.name not in exclude_fields):
+                attribute = getattr(dataclass_object, field.name)
+                unit = getattr(dataclass_object, field.name+"_unit")
+
+                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
