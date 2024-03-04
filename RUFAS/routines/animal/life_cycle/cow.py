@@ -342,21 +342,37 @@ class Cow(HeiferIII):
 
     def milking_update(self, sim_day, calving_interval):
         """
-        Update milking status for lactating cows.
-        start at calving, daily milk production estimated by breed and parity
-        specific lactation curves.
-        TEMP: fat percent, FCM, body weight during lactation, and dry matter
-        intake are coded here with equations with hard-coded parameters just
-        for valid the simulation model indication of the place for future
-        adjustment with ration formulation and economics calculation.
+        Updates milking status for lactating cows, using breed and
+        parity to estimate daily milk production from specific lactation
+        curves (following Wood's curve model.)
 
-        Returns:
-            estimated_daily_milk_produced: estimated daily milk production
-                from the lactation curve
-            fat_percent: calculated with days in milk, for temporary use
-            daily_fat_correct_milk_production: calculated form estimated
-                milk production and fat percent, for temporary use
+        Parameters
+        -------
+        sim_day : Any
+        calving_interval : Any
+
+        Returns
+        -------
+            estimated_daily_milk_produced : float
+                Estimated daily milk production from the lactation curve
+            fat_percent : float
+                Calculated with days in milk, for temporary use
+            daily_fat_correct_milk_production : Any | float
+                Calculated from estimated milk production and fat percent,
+                for temporary use
+
+        Notes
+        ------
+        - The targeted lactation curve is set at the beginning of each
+        lactation, and the variance can be added after adjusted by the
+        nutrition submodel.
+        - TEMP: Currently, the variables for fat percent, FCM, body
+        weight during lactation, and dry matter intake are coded here
+        with equations containing hard-coded parameters just to validate
+        the simulation model. They indicate places for future adjustment
+        in regards to ration formulation and economics calculation.
         """
+
         if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
             self.milking = False
             self.events.add_event(self.days_born, sim_day, const.DRY)
