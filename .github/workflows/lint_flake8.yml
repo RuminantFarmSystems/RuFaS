@@ -36,7 +36,7 @@ jobs:
                         tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Format code with Black
       run: |
-        black --check ${{ env.FILES }}
+        black --check --config pyproject.toml -- diff ${{ env.FILES }}
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
