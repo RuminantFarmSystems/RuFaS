@@ -4,19 +4,19 @@
 name: Testing
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Formatting"]
+    types:
+        - completed
 
 jobs:
-  build:
-
+  linting:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:

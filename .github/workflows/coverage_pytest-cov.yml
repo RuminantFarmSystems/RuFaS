@@ -4,26 +4,23 @@
 name: Test and Coverage
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Formatting"]
+    types:
+        - completed
 
 jobs:
-  build:
-
+  testing:
     runs-on: ubuntu-latest
 
     steps:
-
-    # Environment setup
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
+        ref: ${{ github.event.workflow_run.head_branch }}      
         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
         fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "3.10"
 
