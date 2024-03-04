@@ -59,8 +59,8 @@ class ManureNutrients:
     @property
     def units_dict(self) -> Dict[str, str]:
         return {
-            k: v for unit in
-            ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            k: v
+            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
             for (k, v) in unit.items()
         }
 
@@ -175,7 +175,8 @@ class ManureNutrients:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
         multiplied_attributes = {
-            field.name: getattr(self, field.name) * scalar for field in fields(self)
+            field.name: getattr(self, field.name) * scalar
+            for field in fields(self)
             if (field.name != "manure_type" and not field.name.endswith("_unit"))
         }
         multiplied_attributes["manure_type"] = self.manure_type
