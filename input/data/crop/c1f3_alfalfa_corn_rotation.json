@@ -22,7 +22,7 @@
             "planting_skip": 0,
             "harvesting_skip": 0,
             "planting_days": [110],
-            "harvest_years": [2000, 2001, 2002, 2003, 2008, 2009, 2010, 2011, 2016, 2017, 2018, 2019],
+            "harvest_years": [2000, 2000, 2000, 2001, 2001, 2001, 2001, 2002, 2002, 2002, 2002, 2003, 2003, 2003, 2003, 2008, 2008, 2008, 2009, 2009, 2009, 2009, 2010, 2010, 2010, 2010, 2011, 2011, 2011, 2011, 2016, 2016, 2016, 2017, 2017, 2017, 2017, 2017, 2018, 2018, 2018, 2018, 2018, 2019, 2019, 2019, 2019],
             "harvest_days": [160, 190, 220, 140, 170, 210, 240, 140, 170, 210, 240, 140, 170, 210, 240, 140, 170, 210, 240],
             "harvest_operations": ["harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only","harvest_kill"],
             "harvest_type": "scheduled",
