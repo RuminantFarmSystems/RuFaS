@@ -232,8 +232,8 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     @property
     def units_dict(self) -> Dict[str, str]:
         return {
-            k: v for unit in
-            ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            k: v
+            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
             for (k, v) in unit.items()
         }
 
