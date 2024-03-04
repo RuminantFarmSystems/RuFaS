@@ -33,18 +33,29 @@ class MockDataclass:
 
     @property
     def units_dict(self) -> Dict[str, str]:
-        return {"field1_unit": "kg",
-                "field2_unit": "unitless"}
+        return {"field1_unit": "kg", "field2_unit": "unitless"}
 
 
 @pytest.mark.parametrize(
     "mock_data, exclude_fields, expected_calls",
     [
-        ((10, "value"), None, [("field1", 10, {"info_map1": "value1", "units": "kg"}),
-                               ("field2", "value", {"info_map1": "value1", "units": "unitless"})]),
+        (
+            (10, "value"),
+            None,
+            [
+                ("field1", 10, {"info_map1": "value1", "units": "kg"}),
+                ("field2", "value", {"info_map1": "value1", "units": "unitless"}),
+            ],
+        ),
         ((10, "value"), ["field2"], [("field1", 10, {"info_map1": "value1", "units": "kg"})]),
-        ((5, "other_value"), None, [("field1", 5, {"info_map1": "value1", "units": "kg"}),
-                                    ("field2", "other_value", {"info_map1": "value1", "units": "unitless"})]),
+        (
+            (5, "other_value"),
+            None,
+            [
+                ("field1", 5, {"info_map1": "value1", "units": "kg"}),
+                ("field2", "other_value", {"info_map1": "value1", "units": "unitless"}),
+            ],
+        ),
         ((5, "other_value"), ["field2"], [("field1", 5, {"info_map1": "value1", "units": "kg"})]),
     ],
 )

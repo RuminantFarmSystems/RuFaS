@@ -45,6 +45,6 @@ class ManureModuleOutputManagerHelper:
         for field in fields(dataclass_object):
             if field.name not in units_vars_list and (exclude_fields is None or field.name not in exclude_fields):
                 attribute = getattr(dataclass_object, field.name)
-                unit = getattr(dataclass_object, field.name+"_unit")
+                unit = getattr(dataclass_object, field.name + "_unit")
 
                 cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
