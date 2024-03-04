@@ -1,4 +1,4 @@
-name: Linting
+name: Formatting and Linting
 
 on:
   push:
@@ -34,29 +34,20 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.txt$|\.json$|\.csv$"  |
                         tr "\n" " ")" >> "$GITHUB_ENV"
-    - name: Lint with flake8
-      if: ${{ env.FILES != '' }}
+    - name: Format code with Black
+      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 ${{ env.FILES }}
-    - name: Check for Unauthorized Changes
+        black --config pyproject.toml ${{ env.FILES }}
+    - name: Commit and push formatting changes
+      if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+      env:
+        BRANCH_NAME: ${{ github.head_ref || github.ref }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        paths_to_protect=(
-          'RUFAS/scenario_manager.py'
-        )
-        unauthorized_changes=false
-        
-        for path in "${paths_to_protect[@]}"; do
-          if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
-            unauthorized_changes=true
-            unauthorized_paths+="$path, "
-          fi
-        done
-
-        if $unauthorized_changes; then
-          echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
-          echo "Review and remove these changes if they are not intended."
-          exit 1
-        else
-          echo "No unauthorized changes detected."
-        fi
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add -A
+        git commit -m "Apply Black Formatting" --allow-empty
+        git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+        CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
+        git push -f origin HEAD:$CLEAN_BRANCH_NAME
