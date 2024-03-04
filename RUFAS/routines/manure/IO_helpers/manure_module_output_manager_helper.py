@@ -40,20 +40,11 @@ class ManureModuleOutputManagerHelper:
             List of field names to be excluded, by default None.
 
         """
+        units_vars_list = list(dataclass_object.units_dict.keys())
 
         for field in fields(dataclass_object):
-            if exclude_fields is None or field.name not in exclude_fields:
-                if type(attribute := getattr(dataclass_object, field.name)) is Enum:
-                    unit = "unitless"
-                # elif type(attribute) is Dict:
-                #     print(attribute)
-                else:
-                    try:
-                        unit = attribute.unit
-                    except AttributeError as ae:
-                        print(type(dataclass_object))
-                        print(dataclass_object)
-                        print(field.name)
-                        print(attribute)
-                        raise ae
+            if field.name not in units_vars_list and (exclude_fields is None or field.name not in exclude_fields):
+                attribute = getattr(dataclass_object, field.name)
+                unit = getattr(dataclass_object, field.name+"_unit")
+
                 cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
