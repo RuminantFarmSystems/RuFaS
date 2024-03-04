@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import fields, dataclass
-from enum import Enum
-from typing import Dict
 
 from RUFAS.output_manager import OutputManager
 
