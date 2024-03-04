@@ -1,6 +1,5 @@
 import numpy as np
 
-from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
@@ -9,25 +8,6 @@ from RUFAS.util import Utility
 
 im = InputManager()
 om = OutputManager()
-
-
-def is_leap_year(year):
-    """
-    Description:
-        Helper method determines if the given year is a leap year
-    Args:
-        year: an int of the year
-    Returns:
-        bool: True if the year is a leap year
-    """
-    if year % 400 == 0:
-        return True
-    elif year % 100 == 0:
-        return False
-    elif year % 4 == 0:
-        return True
-    else:
-        return False
 
 
 class Weather:
@@ -58,7 +38,7 @@ class Weather:
 
     """
 
-    def __init__(self, weather_file: dict, config: Config):
+    def __init__(self, weather_file: dict, time: Time):
         """
         Initializes the a `Weather` instance using user-supplied whether data and overall simulation parameters.
 
@@ -66,8 +46,8 @@ class Weather:
         ----------
         weather_file : dict
             All the weather data available to be used by the simulation.
-        config : Config
-            Config instance containing information about the configuration of the simulation.
+        time : Time
+            The Time instance containing time configuration information of the simulation.
 
         Notes
         -----
@@ -77,11 +57,11 @@ class Weather:
 
         """
 
-        years = config.years
-        w_start_year = config.w_start_year
-        w_start_day = config.w_start_day
-        start_year = config.start_year
-        start_day = config.start_day
+        years = time.years
+        w_start_year = time.start_year_int
+        w_start_day = time.start_day
+        start_year = time.start_year_int
+        start_day = time.start_day
 
         # initialize data sets
         self.__precipitation = []
@@ -93,12 +73,12 @@ class Weather:
         self.__mean_annual_temperature: float = None
         self.__latitude: float = self._get_latitude()
 
-        year_length = config.year_length
-        leap_year_length = config.leap_year_length
+        year_length = time.year_length
+        leap_year_length = time.leap_year_length
 
         # calculate the number of days between the beginning of
         # the weather file and the next year
-        if is_leap_year(w_start_year):
+        if Utility.is_leap_year(w_start_year):
             w_day_offset = leap_year_length - w_start_day
         else:
             w_day_offset = year_length - w_start_day
@@ -113,7 +93,7 @@ class Weather:
             days_to_start = w_day_offset + start_day
             temp_year = w_start_year + 1
             while temp_year != start_year:
-                if is_leap_year(temp_year):
+                if Utility.is_leap_year(temp_year):
                     days_to_start += leap_year_length
                 else:
                     days_to_start += year_length
@@ -135,9 +115,9 @@ class Weather:
             current_year_index = current_year - start_year
             current_day_index = current_day - 1
 
-            if not start_year <= current_year <= config.end_year:
+            if not start_year <= current_year <= time.end_year_int:
                 continue
-            elif current_year == config.end_year and current_day > config.end_day:
+            elif current_year == time.end_year_int and current_day > time.end_day:
                 break
 
             self.__precipitation[current_year_index][current_day_index] = weather_file["precip"][i]
@@ -154,7 +134,7 @@ class Weather:
             "function": self.__init__.__name__,
             "prefix": "Weather",
         }
-        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, dict(info_map, **{"units": "°C"}))
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -212,15 +192,15 @@ class Weather:
             "prefix": "Weather",
         }
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable("precipitation", current_weather.precipitation, info_map)
-        om.add_variable("rainfall", current_weather.rainfall, info_map)
-        om.add_variable("snowfall", current_weather.snowfall, info_map)
-        om.add_variable("daylength", current_weather.daylength, info_map)
-        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
-        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
-        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
-        om.add_variable("radiation", current_weather.incoming_light, info_map)
-        om.add_variable("irrigation", current_weather.irrigation, info_map)
+        om.add_variable("precipitation", current_weather.precipitation, dict(info_map, **{"units": "mm"}))
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": "mm"}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": "mm"}))
+        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": "hours"}))
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, dict(info_map, **{"units": "°C"}))
+        om.add_variable("radiation", current_weather.incoming_light, dict(info_map, **{"units": "MJ/m^2"}))
+        om.add_variable("irrigation", current_weather.irrigation, dict(info_map, **{"units": "mm"}))
 
     @staticmethod
     def _calculate_average_annual_temperature(
