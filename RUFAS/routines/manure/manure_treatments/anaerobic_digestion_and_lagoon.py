@@ -37,7 +37,7 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
         manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config[0].storage_time_period
+        self.storage_time_period = self.config[1].storage_time_period
         self._anaerobic_digestion = AnaerobicDigestion(weather, time, manure_treatment_config[0])
         self.anaerobic_digestion_daily_output = None
         self._anaerobic_lagoon = AnaerobicLagoon(weather, time, manure_treatment_config[1])
