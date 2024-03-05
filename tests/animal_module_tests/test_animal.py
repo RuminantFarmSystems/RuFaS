@@ -2642,10 +2642,7 @@ def test_ration_optimizer_optimize(
 
 
 def test_ration_optimizer_optimize_with_prev_ration(
-    mocker: MockerFixture,
-    mock_ration_config: MagicMock,
-    ration_optimizer: RationOptimizer,
-    mock_heifer_cons: MagicMock
+    mocker: MockerFixture, mock_ration_config: MagicMock, ration_optimizer: RationOptimizer, mock_heifer_cons: MagicMock
 ) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
     is_udr = False
@@ -2659,7 +2656,7 @@ def test_ration_optimizer_optimize_with_prev_ration(
         (0, 2.0001),
     ]
     expected_constraints = mock_heifer_cons
-    prev_ration = {'a': 3, 'b': 6}
+    prev_ration = {"a": 3, "b": 6}
     expected_x0 = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0]
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=is_udr))
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
