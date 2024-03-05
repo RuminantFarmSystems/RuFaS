@@ -118,7 +118,7 @@
       "path": "input/data/field/c1f3_corn_alfalfa_field.json",
       "type": "json",
       "properties": "field_properties"
-    },,
+    },
     "c1f3_alfalfa_corn_rotation": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
