@@ -2641,6 +2641,44 @@ def test_ration_optimizer_optimize(
     )
 
 
+def test_ration_optimizer_optimize_with_prev_ration(
+    mocker: MockerFixture,
+    mock_ration_config: MagicMock,
+    ration_optimizer: RationOptimizer,
+    mock_heifer_cons: MagicMock
+) -> None:
+    """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
+    is_udr = False
+    animal_combination = "AnimalCombination.GROWING"
+    expected_bounds = [
+        (0, 0.3334333333333333),
+        (0, 0.6667666666666666),
+        (0, 1.0001),
+        (0, 1.3334333333333332),
+        (0, 1.6667666666666667),
+        (0, 2.0001),
+    ]
+    expected_constraints = mock_heifer_cons
+    prev_ration = {'a': 3, 'b': 6}
+    expected_x0 = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0]
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=is_udr))
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
+    mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
+
+    assert ration_optimizer.optimize(animal_combination, mock_ration_config, prev_ration) == mock_minimize.return_value
+
+    ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
+    mock_minimize.assert_called_once_with(
+        ration_optimizer.objective,
+        expected_x0,
+        method="SLSQP",
+        bounds=expected_bounds,
+        constraints=expected_constraints,
+        args=(mock_ration_config,),
+    )
+
+
 def test_ration_optimizer_optimize_value_error(
     mocker: MockerFixture,
     mock_ration_config: MagicMock,
