@@ -84,6 +84,13 @@
       "type": "json",
       "properties": "soil_profile_properties"
     },
+    "c1f3_corn_alfalfa_rotation": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c1f3_corn_alfalfa_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
     "c1f3_corn_alfalfa_fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
@@ -111,6 +118,13 @@
       "path": "input/data/field/c1f3_corn_alfalfa_field.json",
       "type": "json",
       "properties": "field_properties"
+    },,
+    "c1f3_alfalfa_corn_rotation": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c1f3_alfalfa_corn_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
     },
     "c1f3_alfalfa_corn_fertilizer_schedule": {
       "title": "Fertilizer schedule.",
