@@ -2860,8 +2860,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     )
     mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
     mock_pen = mocker.MagicMock()
-    prev_ration = mocker.MagicMock()
-    mock_pen.ration_per_animal = prev_ration
+    delattr(mock_pen, "ration_per_animal")
     mock_pen.animal_combination = mocker.MagicMock()
     mock_pen.animal_combination.name = "LAC_COW"
     mock_pen.ration = None
@@ -2898,7 +2897,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
                                             animal_grouping_scenario=mocker.MagicMock())
     # Assert
     assert actual == expected
-    mock_attempt_optimization.assert_called_with(req, available_feeds, mock_pen.animal_combination, prev_ration)
+    mock_attempt_optimization.assert_called_with(req, available_feeds, mock_pen.animal_combination, None)
     mock_make_ration_from_solution.assert_called_with(
         available_feeds, mock_solution_exists
     )
