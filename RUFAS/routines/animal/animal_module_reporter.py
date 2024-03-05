@@ -12,6 +12,36 @@ om = OutputManager()
 
 
 class AnimalModuleReporter:
+
+    def data_padder_daily(reference_variable, full_variable_to_add, short_variable_to_add, simulation_day, info_map):
+        if simulation_day > 0 and reference_variable in om.variables_pool:
+            if full_variable_to_add in om.variables_pool:
+                current_output_length = len(list(om.variables_pool[full_variable_to_add].values())[0])
+            else:
+                current_output_length = 0
+            length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
+            if length_difference > 1:
+                print(f"padding: {short_variable_to_add}")
+                print(length_difference)
+                for _ in range(0, length_difference - 1):
+                    om.add_variable(
+                        short_variable_to_add,
+                        0,
+                        info_map=info_map,
+                    )
+
+    def data_padder_ration_interval(formulation_interval: int, variable_to_add, simulation_day, info_map):
+        pass
+        # if variable_to_add not in om.variables_pool and simulation_day > 1:
+        #     print(f"formulation_interval {simulation_day // formulation_interval - 1}")
+        #     print(variable_to_add)
+        #     for day in range(0, simulation_day // formulation_interval - 1):
+        #         om.add_variable(
+        #             variable_to_add,
+        #             '',
+        #             info_map=info_map,
+        #         )
+
     def report_daily_animal_population(animal_manager) -> None:
         """
         Adds daily totals for animal types to output manager.
@@ -145,10 +175,22 @@ class AnimalModuleReporter:
                 "potassium": "percent of DM",
                 "N": "percent of DM",
             }
+            AnimalModuleReporter.data_padder_ration_interval(
+                animal_manager.formulation_interval,
+                f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
+                simulation_day,
+                info_map,
+            )
             om.add_variable(
                 f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
                 nutrient_amount,
                 dict(info_map, **{"units": nutrient_amount_units}),
+            )
+            AnimalModuleReporter.data_padder_ration_interval(
+                animal_manager.formulation_interval,
+                f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
+                simulation_day,
+                info_map,
             )
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
@@ -168,12 +210,23 @@ class AnimalModuleReporter:
                 "avg_BW": "kg",
                 "avg_milk_production_reduction_pen": "kg/animal",
             }
+            AnimalModuleReporter.data_padder_ration_interval(
+                animal_manager.formulation_interval,
+                f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
+                simulation_day,
+                info_map,
+            )
             om.add_variable(
                 f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
                 pen.avg_nutrient_rqmts,
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
             ration_per_animal_units = {key: "kg" for key in ration_per_animal.keys()}
+            AnimalModuleReporter.data_padder_ration_interval(
+                animal_manager.formulation_interval,
+                f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
+                simulation_day, info_map
+            )
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_per_animal,
@@ -197,6 +250,12 @@ class AnimalModuleReporter:
                     feed.available_feeds,
                     ration_report,
                     pen.avg_nutrient_rqmts["avg_BW"],
+                )
+                AnimalModuleReporter.data_padder_ration_interval(
+                    animal_manager.formulation_interval,
+                    f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
+                    simulation_day,
+                    info_map,
                 )
                 om.add_variable(
                     f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -238,6 +297,15 @@ class AnimalModuleReporter:
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
             ration_total_units = {key: "kg" for key in ration_total.keys()}
+            classname = AnimalModuleReporter.__name__
+            funcname = AnimalModuleReporter.report_daily_ration.__name__
+            AnimalModuleReporter.data_padder_daily(
+                f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_0_CALF",
+                f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
+                f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
+                animal_manager.simulation_day,
+                info_map,
+            )
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
@@ -272,6 +340,15 @@ class AnimalModuleReporter:
         }
         daily_feed_emissions = animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(
             ration_total
+        )
+        classname = AnimalModuleReporter.__name__
+        funcname = AnimalModuleReporter.report_daily_feed_emissions.__name__
+        AnimalModuleReporter.data_padder_daily(
+            f"{classname}.{funcname}.pen_0_animal_CALF_feed_emissions",
+            f"{classname}.{funcname}.pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
+            f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
+            animal_manager.simulation_day,
+            info_map,
         )
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
@@ -394,20 +471,11 @@ class AnimalModuleReporter:
             "enteric_methane_g": "g/day",
         }
         for manure_property, manure_value in pen.manure.items():
-            if f"pen.calc_total_manure.pen_{pen.id}_daily_{str(manure_property)}" in om.variables_pool:
-                current_length = len(
-                    om.variables_pool[
-                        f"pen.calc_total_manure.pen_" f"{pen.id}_daily_" f"{str(manure_property)}"
-                    ].values()
-                )
-                if current_length < simulation_day:
-                    missing_days = simulation_day - current_length
-                    for day in range(0, missing_days):
-                        om.add_variable(
-                            f"pen_{pen.id}_daily_{str(manure_property)}",
-                            0,
-                            info_map=info_map,
-                        )
+            # classname = AnimalModuleReporter.__name__
+            # funcname = AnimalModuleReporter.report_pen_manure_properties.__name__
+            # reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
+            # variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
+            # AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add, simulation_day, info_map)
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
@@ -573,12 +641,19 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": cull_reason_stats_units}),
         )
 
-    def report_daily_pen_total(penlist):
+    def report_daily_pen_total(simulation_day, penlist):
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_pen_total.__name__,
         }
+        classname = AnimalModuleReporter.__name__
+        funcname = AnimalModuleReporter.report_daily_pen_total.__name__
         for pen in penlist:
+            variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
+            reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
+            short_variable_to_add = f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
+            AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add,
+                                                   short_variable_to_add, simulation_day, info_map)
             om.add_variable(
                 f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
                 len(pen.animals_in_pen),
@@ -730,7 +805,7 @@ class AnimalModuleReporter:
             animal_manager.life_cycle_manager, animal_manager.simulation_day
         )
         AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
-        AnimalModuleReporter.report_daily_pen_total(animal_manager.all_pens)
+        AnimalModuleReporter.report_daily_pen_total(animal_manager.simulation_day, animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen, animal_manager.simulation_day)
