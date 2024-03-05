@@ -112,8 +112,8 @@
         "manure_handler_type": "tillage",
         "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
-      "cleanings_per_day": 0,
-      "daily_tillage_frequency": 1,
+      "cleanings_per_day": 0.011,
+      "daily_tillage_frequency": 0.011,
       "cleaning_water_recycle_fraction": 0.0
     },
     {
