@@ -1169,6 +1169,108 @@ class InputManager:
                 f'"{parent_address}" does not have attribute "{invalid_key}".'
             )
 
+    def property_exists_in_pool(self, data_address: str) -> bool:
+        """
+        Check if the requested property exists in the pool.
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested property.
+
+        Returns
+        -------
+        bool
+            True if the property exists in the pool, False otherwise.
+
+        Examples
+        --------
+        The user can check if a property exists in the pool.
+
+        Input Manager must first be instantiated:
+        >>> input_manager = InputManager()
+
+        This will return True if the property `calf_num` exists in the `herd_information` section of the `animal` blob:
+        >>> input_manager.property_exists_in_pool('animal.herd_information.calf_num')
+        True
+
+        If the property does not exist, the method will return False:
+        >>> input_manager.property_exists_in_pool('animal.herd_information.nonexistent_property')
+        False
+        """
+
+        variable_path = data_address.split(".")
+        try:
+            self._extract_value_by_key_list(self.__pool, variable_path)
+            return True
+        except ValueError:
+            return False
+
+    def _extract_value_by_key_list(self, input_data: List[Any] | Dict[str, Any], variable_path: List[str | int]) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        ValueError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise ValueError(f"Cannot extract value from {input_data} by following this path {variable_path}")
+        return input_data
+
     def get_metadata(self, metadata_address: str) -> Any:
         """
         Get the requested metadata from the IM metadata dictionary.
