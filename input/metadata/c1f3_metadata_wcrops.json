@@ -73,67 +73,81 @@
     "soil_1": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/default_soil.json",
+      "path": "input/data/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "soil_2": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/default_soil_2.json",
+      "path": "input/data/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule": {
+    "c1f3_corn_alfalfa_rotation": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c1f3_corn_alfalfa_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "c1f3_corn_alfalfa_fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
       "path": "input/data/fertilizer_schedule/c1f3_corn_alfalfa_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule": {
+    "c1f3_corn_alfalfa_manure_schedule": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
       "path": "input/data/manure_schedule/c1f3_corn_alfalfa_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule": {
+    "c1f3_corn_alfalfa_tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Schedule of tillage applications for a field.",
       "path": "input/data/tillage_schedule/c1f3_corn_alfalfa_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field": {
+    "c1f3_corn_alfalfa_field": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f3_corn_alfalfa_field.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "fertilizer_schedule_alfalfa": {
+    "c1f3_alfalfa_corn_rotation": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c1f3_alfalfa_corn_rotation.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "c1f3_alfalfa_corn_fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer types available, and their application schedule.",
       "path": "input/data/fertilizer_schedule/c1f3_alfalfa_corn_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule_alfalfa": {
+    "c1f3_alfalfa_corn_manure_schedule": {
       "title": "Manure schedule.",
       "description": "Specifies manure applications to a field.",
       "path": "input/data/manure_schedule/c1f3_alfalfa_corn_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule_alfalfa": {
+    "c1f3_alfalfa_corn_tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Schedule of tillage applications for a field.",
       "path": "input/data/tillage_schedule/c1f3_alfalfa_corn_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field_alfalfa": {
+    "c1f3_alfalfa_corn_field": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f3_alfalfa_corn_field.json",
