@@ -264,7 +264,6 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
-                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 input_data = data_loader(file_path)
             except KeyError:
@@ -291,22 +290,13 @@ class InputManager:
                     "invalid_elements": 0,
                     "is_valid": True,
                 }
-                if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element(
-                        [metadata_property],
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
+                element_counter_and_validity = self._validate_dict_element(
+                    [metadata_property],
+                    properties_blob_key,
+                    filtered_input_data,
+                    eager_termination,
+                    element_counter_and_validity,
+                )
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -1380,7 +1370,6 @@ class InputManager:
         data: Dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        is_variable_dict: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1401,8 +1390,6 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
-        is_variable_dict : bool
-            Weather the variable is a dictionary variable (rather than tabular).
 
         Returns
         -------
@@ -1435,22 +1422,13 @@ class InputManager:
                 "invalid_elements": 0,
                 "is_valid": True,
             }
-            if is_variable_dict:
-                element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=[metadata_property],
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
-            else:
-                element_counter_and_validity = self._validate_tabular_element(
-                    var_name=metadata_property,
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
+            element_counter_and_validity = self._validate_dict_element(
+                element_hierarchy=[metadata_property],
+                properties_blob_key=properties_blob_key,
+                input_data=data,
+                eager_termination=eager_termination,
+                element_counter_and_validity=element_counter_and_validity,
+            )
 
             for key in element_counter.keys():
                 element_counter[key] += element_counter_and_validity[key]
@@ -1506,7 +1484,7 @@ class InputManager:
         else:
             return True
 
-    def add_dict_variable_to_pool(
+    def add_variable_to_pool(
         self,
         variable_name: str,
         data: Dict[str, Any],
@@ -1540,13 +1518,13 @@ class InputManager:
             False if the variable is invalid and not added to the pool.
 
         Raises
-        -------
+        ------
         TypeError
             If `data` is not the expected type of Dict[str, Any].
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.add_dict_variable_to_pool.__name__,
+            "function": self.add_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict)):
             om.add_error(
@@ -1567,74 +1545,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=True,
-            )
-            return add_variable_success
-
-    def add_tabular_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, List[Any]] | List[Any],
-        properties_blob_key: str,
-        eager_termination: bool,
-    ) -> bool:
-        """
-        Adds a tabular variable to the InputManager's pool after validating it against metadata.
-
-        Notes
-        -----
-        This function takes in a variable along with its name and a key to access its validation metadata.
-        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
-
-        Parameters
-        ----------
-        variable_name: str
-            The name of the variable to be added.
-        data : Dict[str, List[Any]] | List[Any]
-            The data of the tabular variable, structured as a dictionary of lists or a list.
-        properties_blob_key : str
-            A key used to locate the metadata for validation of the variable.
-        eager_termination : bool
-            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
-            If False, the function returns False.
-
-        Returns
-        -------
-        bool
-            True if the variable is successfully validated and added to the pool.
-            False if the variable is invalid and not added to the pool.
-
-        Raises
-        -------
-        TypeError
-            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.add_tabular_variable_to_pool.__name__,
-        }
-        if not (isinstance(data, Dict) or isinstance(data, List)):
-            om.add_error(
-                "Incorrect variable type",
-                f"Variable {variable_name} has type {type(data)}, does not match "
-                f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
-                info_map,
-            )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`.")
-
-        data = {variable_name: data} if isinstance(data, List) else data
-
-        metadata_properties_exist = self._metadata_properties_exist(
-            variable_name=variable_name, properties_blob_key=properties_blob_key
-        )
-
-        if metadata_properties_exist:
-            add_variable_success = self._add_variable_to_pool(
-                variable_name=variable_name,
-                data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=eager_termination,
-                is_variable_dict=False,
             )
             return add_variable_success
 
