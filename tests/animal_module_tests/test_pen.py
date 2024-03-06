@@ -292,9 +292,7 @@ def test_set_milk_avgs(pen: Pen) -> None:
         (lazy_fixture("pen")),
     ],
 )
-def test_calc_manure(
-    pen_to_test: Pen, mocker: MockerFixture
-) -> None:
+def test_calc_manure(pen_to_test: Pen, mocker: MockerFixture) -> None:
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
     animals = animal_list(mocker)
