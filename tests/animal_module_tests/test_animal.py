@@ -2790,9 +2790,6 @@ def test_calculate_rqmts():
 
 def test_formulate_ration_is_udr_true(mocker: MockerFixture) -> None:
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
-    pass
-    # mock_animal_requirements
-    # req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     mocker.patch(
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
         return_value=None,
@@ -2878,7 +2875,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
         ],
     )
     available_feeds = mocker.MagicMock()
-    # mocking for inside while loop
+
     mock_find_failed_constraints = mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints",
         return_value=mocker.MagicMock(),
