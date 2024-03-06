@@ -1,4 +1,5 @@
 class UserInput(Exception):
+
     """Raised when the user enters an invalid input at the prompt"""
 
     def __init__(self, msg):
