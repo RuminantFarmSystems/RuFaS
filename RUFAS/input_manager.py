@@ -1151,7 +1151,7 @@ class InputManager:
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
-            om.add_error("Validation: data not found", fr"{key_error}", info_map)
+            om.add_error("Validation: data not found", str(key_error), info_map)
 
         return None
 
@@ -1256,7 +1256,6 @@ class InputManager:
             elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
                 input_data = input_data[key]
             else:
-                variable_path = str(variable_path)
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
 
