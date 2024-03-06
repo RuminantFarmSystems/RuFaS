@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union, Optional, Type
 from typing import Tuple
 
 import pandas as pd
@@ -3729,10 +3729,7 @@ def test_dump_get_data_logs(
     ],
 )
 def test_property_exists_in_pool(
-        mocker: MockerFixture,
-        data_address: str,
-        expected_result: bool,
-        raise_key_error: bool
+    mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
 ) -> None:
     """
     Unit test for the property_exists_in_pool() method of the InputManager class.
@@ -3750,3 +3747,65 @@ def test_property_exists_in_pool(
     # Assert
     assert result == expected_result
     patch_for_extract_value.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, expected, expected_exception",
+    [
+        # Success cases
+        (
+            {
+                "animal": {
+                    "herd_information": {
+                        "calf_num": 8,
+                        "heiferI_num": 44,
+                        "heiferII_num": 38,
+                        "heiferIII_num_springers": 12,
+                    }
+                }
+            },
+            ["animal", "herd_information", "calf_num"],
+            8,
+            None,
+        ),
+        (
+            {
+                "manure_management_scenarios": [
+                    {"bedding_type": "straw", "manure_handler": "manual scraping"},
+                    {"bedding_type": "sawdust", "manure_handler": "flush system"},
+                ]
+            },
+            ["manure_management_scenarios", 0, "bedding_type"],
+            "straw",
+            None,
+        ),
+        # Error cases
+        (
+            {"animal": {"herd_information": {"calf_num": 8}}},
+            ["animal", "herd_information", "missing_key"],
+            None,
+            KeyError,
+        ),
+        ([{"key": "value"}], [0, "nonexistent_key"], None, KeyError),
+    ],
+)
+def test_extract_value_by_key_list(
+    input_data: Union[List[Any], Dict[str, Any]],
+    variable_path: List[Union[str, int]],
+    expected: Optional[Any],
+    expected_exception: Optional[Type[Exception]],
+) -> None:
+    """
+    Unit test for the _extract_value_by_key_list() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act and assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            input_manager._extract_value_by_key_list(input_data, variable_path)
+    else:
+        result = input_manager._extract_value_by_key_list(input_data, variable_path)
+        assert result == expected
