@@ -51,7 +51,7 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 ### SWE Goals
 * Finish Feed Storage Module (P1)
   - Fix the issues in the Feed library _Issues_ [1245](https://github.com/RuminantFarmSystems/MASM/issues/1245)
-  - Feed Degradation
+  - Feed Degradation _Issues_ [1375](https://github.com/RuminantFarmSystems/MASM/issues/1375) [1376](https://github.com/RuminantFarmSystems/MASM/issues/1376) [1377](https://github.com/RuminantFarmSystems/MASM/issues/1377) [1378](https://github.com/RuminantFarmSystems/MASM/issues/1378) 
   - Purchase Feed logic
 * Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
 * Implement Scenario Manager (P0)
