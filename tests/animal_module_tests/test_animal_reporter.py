@@ -225,6 +225,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
     pen2.id = "2"
     pen2.animal_combination.name = "combo2"
     animal_manager_fixture.all_pens = [pen1, pen2]
+    animal_manager_fixture.formulation_interval = mocker.MagicMock()
     for pen in animal_manager_fixture.all_pens:
         pen.ration_nutrient_amount = test_data["ration_nutrient_amount"]
         pen.ration_nutrient_conc = test_data["ration_nutrient_conc"]
@@ -315,14 +316,15 @@ def test_report_daily_pen_total(mocker: MockerFixture):
         penlist[i].id = i
         penlist[i].animal_combination.name = "some_name"
         penlist[i].animals_in_pen = [i] * i
-    AnimalModuleReporter.report_daily_pen_total(penlist)
+    simulation_day = 0
+    AnimalModuleReporter.report_daily_pen_total(simulation_day, penlist)
     for i in range(len(penlist)):
         assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
             "values"
         ] == [i]
     for i in range(len(penlist)):
         penlist[i].animals_in_pen = [i] * (i + 1)
-    AnimalModuleReporter.report_daily_pen_total(penlist)
+    AnimalModuleReporter.report_daily_pen_total(simulation_day, penlist)
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
             "values"
@@ -573,7 +575,8 @@ def test_report_daily_reports(mocker: MockerFixture):
     )
     patch_for_report_milk = mocker.patch.object(AnimalModuleReporter, "report_milk", return_value="")
     mock_available_feeds = mocker.MagicMock()
-
+    patch_for_data_padder_daily = mocker.patch.object(AnimalModuleReporter, "data_padder_daily",
+                                                      return_value="")
     # act
     AnimalModuleReporter.report_daily_reports(animal_manager, mock_available_feeds)
 
@@ -586,6 +589,7 @@ def test_report_daily_reports(mocker: MockerFixture):
     patch_for_report_305d_milk.assert_called_once_with(animal_manager)
     assert patch_for_report_pen_manure_properties.call_count == len(animal_manager.all_pens)
     patch_for_report_milk.assert_called_once_with(animal_manager.all_pens[0], animal_manager.simulation_day)
+    patch_for_data_padder_daily.assert_called()
 
 
 def test_report_end_of_simulation(mocker: MockerFixture):
