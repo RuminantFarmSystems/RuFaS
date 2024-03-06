@@ -10,6 +10,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 import numpy.typing as npt
 from RUFAS.output_manager import OutputManager
@@ -884,7 +885,9 @@ class RationOptimizer:
         return tribounds
 
     def optimize(
-        self, animal_combination, available_feeds: Dict, ration_config: RationConfig
+        self, animal_combination: AnimalCombination,
+        ration_config: RationConfig,
+        previous_ration: Dict[str, float | str] | None = None
     ) -> OptimizeResult:
         """
         Calls the objective function and constraint functions and formulates
@@ -895,10 +898,10 @@ class RationOptimizer:
         ----------
         animal_combination : AnimalCombination
             enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
-        available_feeds : Dict
-            a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         ration_config : RationConfig object
             Attributes are animal requirement and feed supply information required for optimization
+        previous_ration : Dict[str, float | str] | None
+            Ration from previous month, if applicable.
 
         Returns
         -------
@@ -912,10 +915,17 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        n = len(ration_config.price_list)
-        x0 = [1]
-        for i in range(n - 1):
-            x0.append(random.random() * 10)
+        if previous_ration:
+            x0 = []
+            prev_ration = previous_ration.copy()
+            for key, value in prev_ration.items():
+                if key not in ["status", "objective"]:
+                    x0.append(value / 3)
+                    x0.append(value / 3)
+                    x0.append(value / 3)
+        else:
+            n = len(ration_config.price_list)
+            x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.is_udr:
             bnds = self.make_user_bounds(
@@ -956,7 +966,8 @@ class RationOptimizer:
         self,
         requirements: AnimalRequirements,
         available_feeds: Dict,
-        animal_combination,
+        animal_combination: AnimalCombination,
+        previous_ration: Dict[str, float | str] | None = None
     ):
         """
         Function that sets up the nutrients and requirements lists into structured
@@ -965,11 +976,13 @@ class RationOptimizer:
         Parameters
         ----------
         requirements: AnimalRequirements
-
+            Summary of requirements for a group of animals.
         available_feeds : Dict
-            a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+            A DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         animal_combination : AnimalCombination
-            enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
+            Enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
+        previous_ration : Dict[str, float | str] | None
+            Ration from previous month, if applicable.
 
         """
         price_list = self.triple_values_in_list(available_feeds["price"])
@@ -1034,7 +1047,7 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(
-                    animal_combination, available_feeds, ration_config
+                    animal_combination, ration_config, previous_ration
                 )
             except Exception as e:  # noqa
                 i -= 1
