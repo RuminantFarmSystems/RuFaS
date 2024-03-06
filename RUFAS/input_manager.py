@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union, Callable, Tuple
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 from RUFAS.util import Utility
 
@@ -1147,27 +1147,17 @@ class InputManager:
         element_hierarchy = data_address.split(".")
 
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool)
-
+            data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
-
             return deepcopy(data_value)
-
         except KeyError as key_error:
-            invalid_key = str(key_error).strip("'")
-            parent_address = str(data_address.split("." + invalid_key)[0])
-
-            om.add_error(
-                "Validation: data not found:",
-                f'Cannot find "{data_address}", ' f'"{parent_address}" does not have attribute ' f'"{invalid_key}".',
-                info_map,
-            )
-
-            raise KeyError(
-                f'Data not found: Cannot find "{data_address}", '
-                f'"{parent_address}" does not have attribute "{invalid_key}".'
-            )
+            om.add_error("Validation: data not found",
+                         str(key_error),
+                         info_map
+                         )
+            raise KeyError(f"Data not found at address: {data_address}."
+                           f" {str(key_error)}")
 
     def property_exists_in_pool(self, data_address: str) -> bool:
         """
@@ -1203,10 +1193,10 @@ class InputManager:
         try:
             self._extract_value_by_key_list(self.__pool, variable_path)
             return True
-        except ValueError:
+        except KeyError:
             return False
 
-    def _extract_value_by_key_list(self, input_data: List[Any] | Dict[str, Any], variable_path: List[str | int]) -> Any:
+    def _extract_value_by_key_list(self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
@@ -1224,7 +1214,7 @@ class InputManager:
 
         Raises
         ------
-        ValueError
+        KeyError
             If the value cannot be extracted from the input data using the provided variable path.
 
         Examples
@@ -1268,7 +1258,7 @@ class InputManager:
             elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
                 input_data = input_data[key]
             else:
-                raise ValueError(f"Cannot extract value from {input_data} by following this path {variable_path}")
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
 
     def get_metadata(self, metadata_address: str) -> Any:
