@@ -2215,20 +2215,20 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.mark.parametrize(
-    "dummy_data_path, expected_result, expected_warning_call_count",
+    "dummy_data_path, expected_result",
     [
-        ("module1.integer_var", 5, 0),
-        ("module1.float_var", 0.5, 0),
-        ("module1.string_var", "dummyvalue1", 0),
-        ("module1.boolean_var", True, 0),
-        ("module1.integer_array_var", [1, 2, 3], 0),
-        ("module1.float_array_var", [0.1, 0.2, 3.14159], 0),
-        ("module1.string_array_var", ["1", "2", "3", "4", "5"], 0),
-        ("module1.string_var", "dummyvalue1", 0),
-        ("module1.boolean_array_var", [True, False], 0),
-        ("module1.submodule1.nested_var", "dummyvalue2", 0),
-        ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3", 0),
-        ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4", 0),
+        ("module1.integer_var", 5),
+        ("module1.float_var", 0.5),
+        ("module1.string_var", "dummyvalue1"),
+        ("module1.boolean_var", True),
+        ("module1.integer_array_var", [1, 2, 3]),
+        ("module1.float_array_var", [0.1, 0.2, 3.14159]),
+        ("module1.string_array_var", ["1", "2", "3", "4", "5"]),
+        ("module1.string_var", "dummyvalue1"),
+        ("module1.boolean_array_var", [True, False]),
+        ("module1.submodule1.nested_var", "dummyvalue2"),
+        ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3"),
+        ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4"),
         (
             "module1",
             {
@@ -2242,7 +2242,6 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
                 "boolean_array_var": [True, False],
                 "submodule1": {"nested_var": "dummyvalue2"},
             },
-            0,
         ),
     ],
 )
@@ -2250,63 +2249,54 @@ def test_get_data_with_valid_key(
     dummy_data_path: str,
     mock_pool_for_get_data: Dict[str, Dict[str, Any]],
     expected_result: Any,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for get_data function in file input_manager.py with a valid data_path key"""
 
-    mock_input_manager._InputManager__pool = mock_pool_for_get_data
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_get_data)
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager.get_data(dummy_data_path)
+    # Act
+    result = input_manager.get_data(dummy_data_path)
 
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
-    "dummy_data_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count",
+    "dummy_data_path, error_key",
     [
-        ("module1.dummy_key", "module1", "dummy_key", 1),
-        ("module1.submodule1.dummy_key", "module1.submodule1", "dummy_key", 1),
-        (
-            "module2.submodule1.nested_module1.dummy_key",
-            "module2.submodule1.nested_module1",
-            "dummy_key",
-            1,
-        ),
-        (
-            "module2.submodule1.dummy_key.nested_var1",
-            "module2.submodule1",
-            "dummy_key",
-            1,
-        ),
-        ("module2.dummy_key.nested_module1.nested_var1", "module2", "dummy_key", 1),
+        ("module1.dummy_key", "dummy_key"),
+        ("module1.submodule1.dummy_key", "dummy_key"),
+        ("module2.submodule1.nested_module1.dummy_key", "dummy_key"),
+        ("module2.submodule1.dummy_key.nested_var1", "dummy_key"),
+        ("module2.dummy_key.nested_module1.nested_var1", "dummy_key"),
     ],
 )
-def test_get_data_raises_exception(
+def test_get_data_returns_none(
     dummy_data_path: str,
-    expected_error_parent_address: str,
-    expected_error_invalid_key: str,
+    error_key: str,
     mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function get_data raising an exception in file input_manager.py"""
 
-    mock_input_manager._InputManager__pool = mock_pool_for_get_data
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_get_data)
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        with pytest.raises(KeyError) as key_error:
-            mock_input_manager.get_data(dummy_data_path)
+    # Act
+    result = input_manager.get_data(dummy_data_path)
 
-        error_message = key_error.value.__str__().strip("'")
-        assert (
-            error_message == f'Data not found: Cannot find "{dummy_data_path}", '
-            f'"{expected_error_parent_address}" does not have attribute '
-            f'"{expected_error_invalid_key}".'
-        )
-        assert add_error.call_count == expected_warning_call_count
+    # Assert
+    assert result is None
+    patch_for_add_error.assert_called_once_with(
+        "Validation: data not found",
+        mocker.ANY,
+        mocker.ANY,
+    )
+    assert error_key in patch_for_add_error.call_args[0][1]
 
 
 @pytest.fixture
@@ -3729,3 +3719,34 @@ def test_dump_get_data_logs(
 
     mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")
+
+
+@pytest.mark.parametrize(
+    "data_address,expected_result,raise_key_error",
+    [
+        ("animal.herd_information.calf_num", True, False),
+        ("animal.herd_information.nonexistent_property", False, True),
+    ],
+)
+def test_property_exists_in_pool(
+        mocker: MockerFixture,
+        data_address: str,
+        expected_result: bool,
+        raise_key_error: bool
+) -> None:
+    """
+    Unit test for the property_exists_in_pool() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    patch_for_extract_value = mocker.patch.object(input_manager, "_extract_value_by_key_list")
+    if raise_key_error:
+        patch_for_extract_value.side_effect = KeyError("Key Error")
+
+    # Act
+    result = input_manager.property_exists_in_pool(data_address)
+
+    # Assert
+    assert result == expected_result
+    patch_for_extract_value.assert_called_once()
