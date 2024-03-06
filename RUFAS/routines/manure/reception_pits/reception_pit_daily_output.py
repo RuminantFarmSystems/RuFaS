@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional, Dict
+from dataclasses import dataclass, field
+from typing import Dict
 
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
@@ -67,7 +67,7 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     total_daily_manure_volume_unit: str = "m^3"
 
     # To satisfy the LiquidManurePortionProtocol
-    liquid_manure_daily_volume: Optional[float] = None
+    liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: str = "m^3"
 
     def __post_init__(self):

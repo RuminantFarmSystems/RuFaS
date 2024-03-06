@@ -1,9 +1,9 @@
-from typing import Optional, Dict
+from typing import Dict
 
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.general_constants import GeneralConstants
 
@@ -85,7 +85,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     manure_non_degradable_volatile_solids: float = 0.0
     manure_non_degradable_volatile_solids_unit: str = "kg"
 
-    liquid_manure_total_volatile_solids: Optional[float] = None
+    liquid_manure_total_volatile_solids: float = field(init=False)
     liquid_manure_total_volatile_solids_unit: str = "kg"
 
     liquid_manure_phosphorus: float = 0.0
@@ -118,11 +118,11 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     total_water_volume_in_milking_parlor: float = 0.0
     total_water_volume_in_milking_parlor_unit: str = "m^3"
 
-    total_daily_manure_volume: Optional[float] = None
+    total_daily_manure_volume: float = field(init=False)
     total_daily_manure_volume_unit: str = "m^3"
 
     # To satisfy the LiquidManurePortionProtocol
-    liquid_manure_daily_volume: Optional[float] = None
+    liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: str = "m^3"
 
     tempC: float = 0.0

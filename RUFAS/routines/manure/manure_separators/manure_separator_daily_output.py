@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional, Dict
+from dataclasses import dataclass, field
+from typing import Dict
 
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
@@ -51,7 +51,7 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     final_solids_wet_mass: float = 0.0
     final_solids_wet_mass_unit: str = "kg"
 
-    final_solids_wet_mass_volume: Optional[float] = None
+    final_solids_wet_mass_volume: float = field(init=False)
     final_solids_wet_mass_volume_unit: str = "m^3"
 
     solid_manure_total_solids: float = 0.0
@@ -87,11 +87,11 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_potassium: float = 0.0
     liquid_manure_potassium_unit: str = "kg"
 
-    final_daily_volume: Optional[float] = None
+    final_daily_volume: float = field(init=False)
     final_daily_volume_unit: str = "m^3"
 
     # To satisfy the LiquidManurePortionProtocol
-    liquid_manure_daily_volume: Optional[float] = None
+    liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: str = "m^3"
 
     def __post_init__(self):
