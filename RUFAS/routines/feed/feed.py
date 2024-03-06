@@ -112,24 +112,52 @@ class Feed:
         # Loading in user-defined ration values
         self.user_defined_ration_percentages = data["user_defined_ration_percentages"]
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__,
+        }
         udrm.calf_ration = {
             str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
         }
+        if sum(udrm.calf_ration.values()) != 100.0:
+            om.add_warning(
+                "User defined calf_ration percentages do not sum to 100",
+                f"User defined calf_ration sums to {sum(udrm.calf_ration.values())}",
+                info_map
+            )
 
         udrm.growing_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["growing"]
         }
+        if sum(udrm.growing_ration.values()) != 100.0:
+            om.add_warning(
+                "User defined growing_ration percentages do not sum to 100",
+                f"User defined growing_ration sums to {sum(udrm.growing_ration.values())}",
+                info_map,
+            )
 
         udrm.close_up_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["close_up"]
         }
+        if sum(udrm.close_up_ration.values()) != 100.0:
+            om.add_warning(
+                "User defined close_up_ration percentages do not sum to 100",
+                f"User defined close_up_ration sums to {sum(udrm.close_up_ration.values())}",
+                info_map,
+            )
 
         udrm.lactating_cow_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["lac_cow"]
         }
+        if sum(udrm.lactating_cow_ration.values()) != 100.0:
+            om.add_warning(
+                "User defined lactating_cow_ration percentages do not sum to 100",
+                f"User defined lactating_cow_ration sums to {sum(udrm.lactating_cow_ration.values())}",
+                info_map,
+            )
 
         udrm.tolerance = self.user_defined_ration_percentages["tolerance"]
 
