@@ -87,7 +87,6 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
     return pen
 
 
-@pytest.fixture
 def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII | HeiferIII]:
     """Returns a list of Calf, HeiferI, HeiferII, Cow and HeiferIII objects for testing purposes"""
 
@@ -288,16 +287,17 @@ def test_set_milk_avgs(pen: Pen) -> None:
 
 
 @pytest.mark.parametrize(
-    "pen_to_test, animals",
+    "pen_to_test",
     [
-        (lazy_fixture("pen"), lazy_fixture("animal_list")),
+        (lazy_fixture("pen")),
     ],
 )
 def test_calc_manure(
-    pen_to_test: Pen, animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII], mocker: MockerFixture
+    pen_to_test: Pen, mocker: MockerFixture
 ) -> None:
     """Unit test for function calc_manure in file routines/animal/pen.py"""
 
+    animals = animal_list(mocker)
     man_sums = mocker.patch.object(Pen, "manure_sums")
     man_sums.return_value = (mocker.MagicMock(), mocker.MagicMock())
     pen_to_test.add_new_animals(animals)
