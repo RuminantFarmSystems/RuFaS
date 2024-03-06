@@ -4973,28 +4973,43 @@
       }
     },
     "Tractor E (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter E as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "Tractor F (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter F as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "Tractor G (unitless)": {
       "type": "number",
       "description": "Parameter G as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "is depth relevant": {
-      "type": "bool",
-      "description": "true if depth is relevant for attachment operation, otherwise false"
+      "type": "array",
+      "description": "true if depth is relevant for attachment operation, otherwise false",
+      "property": {
+        "type": "bool"
+      }
     },
     "Max Throughput (tons dm/hour)": {
-      "type": "number",
+      "type": "array",
       "description": "The maximum throughput of the implement (tons dm/hour)",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     }
   },
   "EEE_constants_properties": {
