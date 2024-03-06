@@ -88,8 +88,8 @@
     ],
     "storage_options": [
         {
-            "storage_type": "bunker",
-            "moisture": "direct_cut",
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
             "additive": "preservative",
             "packing_density": 14,
             "inoculation": "heterofermentative",
@@ -99,8 +99,8 @@
             "initial_dry_matter": 0
         },
         {
-            "storage_type": "bunker",
-            "moisture": "direct_cut",
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
             "additive": "preservative",
             "packing_density": 14,
             "inoculation": "heterofermentative",
