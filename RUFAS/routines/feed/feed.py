@@ -123,7 +123,7 @@ class Feed:
             om.add_warning(
                 "User defined calf_ration percentages do not sum to 100",
                 f"User defined calf_ration sums to {sum(udrm.calf_ration.values())}",
-                info_map
+                info_map,
             )
 
         udrm.growing_ration = {
