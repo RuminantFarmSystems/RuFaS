@@ -4924,36 +4924,53 @@
       }
     },
     "Tractor Implement": {
-      "type": "string",
-      "description": "The implement that is attached to the tractor"
-      "proper"
+      "type": "array",
+      "description": "The implement that is attached to the tractor",
+      "properties": {
+        "type": "string"
+      }
     },
     "Tractor A (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter A as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "Tractor B (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter B as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "Tractor C (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter C as described in the scientific references",
-      "default": 0
+      "properties": {
+        "type": "number",
+        "default": 0
+      }
     },
     "Tractor Implement Width (m)": {
-      "type": "number",
+      "type": "array",
       "description": "The width of the implement in meters",
-      "default": 0,
-      "minimum": 0
+      "properties": {
+        "type": "number",
+        "default": 0,
+        "minimum": 0
+      }
     },
     "Tractor Implement Mass (kg)": {
-      "type": "number",
+      "type": "array",
       "description": "The mass of the implement in kg",
-      "default": 0,
-      "minimum": 0
+      "properties": {
+        "type": "number",
+        "default": 0,
+        "minimum": 0
+      }
     },
     "Tractor E (unitless)": {
       "type": "number",
