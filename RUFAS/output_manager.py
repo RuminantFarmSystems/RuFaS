@@ -674,7 +674,7 @@ class OutputManager(object):
                 f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
                 f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             )
-        filter_pattern_matches = Utility.filter_pool(self.variables_pool, filter_patterns, filter_by_exclusion)
+        filter_pattern_matches = Utility.filter_dictionary(self.variables_pool, filter_patterns, filter_by_exclusion)
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
