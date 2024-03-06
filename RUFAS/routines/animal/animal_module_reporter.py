@@ -35,7 +35,8 @@ class AnimalModuleReporter:
         reference_variable,
         full_variable_to_add,
         short_variable_to_add,
-        simulation_day, info_map
+        simulation_day,
+        info_map,
     ):
         if simulation_day > 0 and reference_variable in om.variables_pool:
             if full_variable_to_add in om.variables_pool:
@@ -688,8 +689,9 @@ class AnimalModuleReporter:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
             short_variable_to_add = f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
-            AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add,
-                                                   short_variable_to_add, simulation_day, info_map)
+            AnimalModuleReporter.data_padder_daily(
+                reference_variable, variable_to_add, short_variable_to_add, simulation_day, info_map
+            )
             om.add_variable(
                 f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
                 len(pen.animals_in_pen),

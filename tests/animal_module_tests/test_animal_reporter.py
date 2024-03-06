@@ -575,8 +575,7 @@ def test_report_daily_reports(mocker: MockerFixture):
     )
     patch_for_report_milk = mocker.patch.object(AnimalModuleReporter, "report_milk", return_value="")
     mock_available_feeds = mocker.MagicMock()
-    patch_for_data_padder_daily = mocker.patch.object(AnimalModuleReporter, "data_padder_daily",
-                                                      return_value="")
+    patch_for_data_padder_daily = mocker.patch.object(AnimalModuleReporter, "data_padder_daily", return_value="")
     # act
     AnimalModuleReporter.report_daily_reports(animal_manager, mock_available_feeds)
 
