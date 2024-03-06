@@ -1939,6 +1939,7 @@
       "type": "array",
       "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
       "properties": {
+        "type": "number",
         "minimum": 0,
         "default": 500
       }
@@ -3336,6 +3337,7 @@
       "type": "array",
       "description": "Dry matter content of the feed (% DM).",
       "properties": {
+        "type": "number",
         "minimum": 0,
         "maximum": 100
       }
@@ -3344,6 +3346,7 @@
       "type": "array",
       "description": "Crude protein content of the feed (% DM).",
       "properties": {
+        "type": "number",
         "minimum": 0,
         "maximum": 288 
       }
@@ -3661,6 +3664,7 @@
       "type": "array",
       "description": "Dry matter content of the feed (% DM).",
       "properties": {
+        "type": "number",
         "minimum": 0,
         "maximum": 100
       }
@@ -3679,6 +3683,7 @@
       "type": "array",
       "description": "Crude protein content of the feed (% DM).",
       "properties": {
+        "type": "number",
         "minimum": 0,
         "maximum": 288 
       }
@@ -4989,7 +4994,7 @@
       }
     },
     "Tractor G (unitless)": {
-      "type": "number",
+      "type": "array",
       "description": "Parameter G as described in the scientific references",
       "properties": {
         "type": "number",
@@ -4999,7 +5004,7 @@
     "is depth relevant": {
       "type": "array",
       "description": "true if depth is relevant for attachment operation, otherwise false",
-      "property": {
+      "properties": {
         "type": "bool"
       }
     },
