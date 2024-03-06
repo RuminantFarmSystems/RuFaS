@@ -1096,7 +1096,7 @@ class InputManager:
 
     def get_data(self, data_address: str) -> Any:
         """
-        Get the requested data from the pool.
+        Get the requested data from the pool if it exists. If not, None is returned.
 
         Parameters
         ----------
@@ -1106,12 +1106,7 @@ class InputManager:
         Returns
         -------
         Any
-            The requested data if found.
-
-        Raises
-        -------
-        KeyError
-            If the requested data is not found.
+            The requested data if found. None otherwise.
 
         Examples
         -------
@@ -1138,26 +1133,27 @@ class InputManager:
         herd_init: False,
         breed: HO
         }
+
+        If the requested data does not exist, the method will return None:
+        >>> input_manager.get_data('animal.herd_information.nonexistent_property')
+        None
         """
+
         info_map = {
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
 
         element_hierarchy = data_address.split(".")
-
         try:
             data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
-            om.add_error("Validation: data not found",
-                         str(key_error),
-                         info_map
-                         )
-            raise KeyError(f"Data not found at address: {data_address}."
-                           f" {str(key_error)}")
+            om.add_error("Validation: data not found", fr"{key_error}", info_map)
+
+        return None
 
     def property_exists_in_pool(self, data_address: str) -> bool:
         """
@@ -1196,7 +1192,9 @@ class InputManager:
         except KeyError:
             return False
 
-    def _extract_value_by_key_list(self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    def _extract_value_by_key_list(
+        self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
+    ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
@@ -1258,6 +1256,7 @@ class InputManager:
             elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
                 input_data = input_data[key]
             else:
+                variable_path = str(variable_path)
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
 
