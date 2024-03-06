@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.species_data_factory import (
     CropSpeciesDataFactory,
 )
 from RUFAS.routines.field.manager.events import (
-    Event,
+    BaseFieldManagementEvent,
     PlantingEvent,
     HarvestEvent,
     FertilizerEvent,
@@ -473,11 +473,24 @@ class Field:
             Julian day on which this fertilizer application is occurring.
 
         """
+        units = {
+            "mass": "kg",
+            "nitrogen": "kg",
+            "phosphorus": "kg",
+            "potassium": "kg",
+            "application_depth": "mm",
+            "surface_remainder_fraction": "unitless",
+            "year": "year",
+            "day": "day",
+            "field_size": "ha",
+            "average_clay_percent": "percentage",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_fertilizer_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "mix_name": mix_name,
+            "units": units,
         }
         value = {
             "mass": total_mass,
@@ -688,10 +701,25 @@ class Field:
             Mass of potassium in the manure applied (kg)
 
         """
+        units = {
+            "dry_matter_mass": "dry kg",
+            "dry_matter_fraction": "fraction",
+            "field_coverage": "unitless",
+            "application_depth": "mm",
+            "surface_remainder_fraction": "unitless",
+            "nitrogen": "kg",
+            "phosphorus": "kg",
+            "potassium": "kg",
+            "day": "day",
+            "year": "year",
+            "field_size": "ha",
+            "average_clay_percent": "percentage",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
+            "units": units,
         }
         value = {
             "dry_matter_mass": dry_matter_mass,
@@ -895,14 +923,16 @@ class Field:
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
-    def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
+    def _filter_events(
+        all_events: List[BaseFieldManagementEvent], time
+    ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
 
         Parameters
         ----------
-        all_events : List[Event]
+        all_events : List[BaseFieldManagementEvent]
             List of all Events that will occur over the run of the simulation in this field.
         time : Time
             Object containing the current day and year of the simulation.
@@ -1012,10 +1042,18 @@ class Field:
             Julian day on which this crop planting occurs.
 
         """
+        units = {
+            "crop": "unitless",
+            "heat_scheduled_harvest": "unitless",
+            "date": {"year": "year", "day": "day"},
+            "field_size": "ha",
+            "average_clay_percent": "percentage",
+        }
         info_map = {
             "class": self.__class__.__name__,
             "function": self._record_planting.__name__,
             "suffix": f"field='{self.field_data.name}'",
+            "units": units,
         }
         value = {
             "crop": species,
