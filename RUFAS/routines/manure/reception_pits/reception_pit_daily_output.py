@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
+from typing import Dict
 
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
@@ -31,20 +31,53 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     """
 
     pen_id: int = -1
+    pen_id_unit: str = "unitless"
+
     simulation_day: int = -1
+    simulation_day_unit: str = "simulation days"
+
     manure_urea: float = 0.0
+    manure_urea_unit: str = "g/L"
+
     liquid_manure_total_ammoniacal_nitrogen: float = 0.0
+    liquid_manure_total_ammoniacal_nitrogen_unit: str = "kg"
+
     liquid_manure_nitrogen: float = 0.0
+    liquid_manure_nitrogen_unit: str = "kg"
+
     liquid_manure_total_solids: float = 0.0
+    liquid_manure_total_solids_unit: str = "kg"
+
     manure_degradable_volatile_solids: float = 0.0
+    manure_degradable_volatile_solids_unit: str = "kg"
+
     manure_non_degradable_volatile_solids: float = 0.0
+    manure_non_degradable_volatile_solids_unit: str = "kg"
+
     liquid_manure_total_volatile_solids: float = 0.0
+    liquid_manure_total_volatile_solids_unit: str = "kg"
+
     liquid_manure_phosphorus: float = 0.0
+    liquid_manure_phosphorus_unit: str = "kg"
+
     liquid_manure_potassium: float = 0.0
+    liquid_manure_potassium_unit: str = "kg"
+
     total_daily_manure_volume: float = 0.0
+    total_daily_manure_volume_unit: str = "m^3"
+
     # To satisfy the LiquidManurePortionProtocol
     liquid_manure_daily_volume: float = field(init=False)
+    liquid_manure_daily_volume_unit: str = "m^3"
 
     def __post_init__(self):
         """Ensures that the daily volume is set to the total daily manure volume."""
         self.liquid_manure_daily_volume = self.total_daily_manure_volume
+
+    @property
+    def units_dict(self) -> Dict[str, str]:
+        return {
+            k: v
+            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            for (k, v) in unit.items()
+        }

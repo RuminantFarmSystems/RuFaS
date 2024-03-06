@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
+from typing import Dict
 
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
@@ -9,23 +10,29 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 class ManureNutrients:
     """A class to store the relevant manure nutrient information to be passed to the crop and soil module"""
 
+    manure_type: ManureType
+    """Type of manure."""
+    manure_type_unit: str = "unitless"
+
     nitrogen: float = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
+    nitrogen_unit: str = "kg"
 
     phosphorus: float = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
+    phosphorus_unit: str = "kg"
 
     potassium: float = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
+    potassium_unit: str = "kg"
 
     dry_matter: float = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
+    dry_matter_unit: str = "kg"
 
     total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
-
-    manure_type: ManureType
-    """Type of manure."""
+    total_manure_mass_unit: str = "kg"
 
     def __post_init__(self):
         """
@@ -40,12 +47,22 @@ class ManureNutrients:
         """
         for field in fields(self):
             value = getattr(self, field.name)
-            if field.name != "manure_type":
-                if value < 0:
-                    raise ValueError(f"Field {field.name} must be non-negative.")
-            else:
+            if field.name.endswith("_unit"):
+                pass
+            elif field.name == "manure_type":
                 if not isinstance(value, ManureType):
                     raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+            else:
+                if value < 0:
+                    raise ValueError(f"Field {field.name} must be non-negative.")
+
+    @property
+    def units_dict(self) -> Dict[str, str]:
+        return {
+            k: v
+            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
+            for (k, v) in unit.items()
+        }
 
     @property
     def dry_matter_fraction(self) -> float:
@@ -122,9 +139,10 @@ class ManureNutrients:
         summed_attributes = {
             field.name: getattr(self, field.name) + getattr(other, field.name)
             for field in fields(self)
-            if field.name != "manure_type"
+            if field.name != "manure_type" and not field.name.endswith("_unit")
         }
         summed_attributes["manure_type"] = self.manure_type
+        summed_attributes.update(self.units_dict)
 
         return ManureNutrients(**summed_attributes)
 
@@ -157,9 +175,12 @@ class ManureNutrients:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
         multiplied_attributes = {
-            field.name: getattr(self, field.name) * scalar for field in fields(self) if field.name != "manure_type"
+            field.name: getattr(self, field.name) * scalar
+            for field in fields(self)
+            if (field.name != "manure_type" and not field.name.endswith("_unit"))
         }
         multiplied_attributes["manure_type"] = self.manure_type
+        multiplied_attributes.update(self.units_dict)
 
         return ManureNutrients(**multiplied_attributes)
 
@@ -194,13 +215,14 @@ class ManureNutrients:
 
         subtracted_attributes = {}
         for field in fields(self):
-            if field.name != "manure_type":
+            if field.name != "manure_type" and not field.name.endswith("_unit"):
                 self_value = getattr(self, field.name)
                 other_value = getattr(other, field.name)
                 if other_value > self_value:
                     raise ValueError(f"The amount of {field.name} in other object is greater than what is available.")
                 subtracted_attributes[field.name] = self_value - other_value
         subtracted_attributes["manure_type"] = self.manure_type
+        subtracted_attributes.update(self.units_dict)
 
         return ManureNutrients(**subtracted_attributes)
 
