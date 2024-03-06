@@ -1055,7 +1055,7 @@ class InputManager:
 
         Raises
         ------
-        ValueError
+        KeyError
             If the value cannot be extracted from the input data using the provided variable path.
 
         Examples
@@ -1094,12 +1094,12 @@ class InputManager:
         """
 
         for key in variable_path:
-            if isinstance(input_data, list) and isinstance(key, int) and 0 <= key < len(input_data):
-                input_data = input_data[key]
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
             elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
                 input_data = input_data[key]
             else:
-                raise ValueError(f"Cannot extract value from {input_data} by following this path {variable_path}")
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
 
     def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
