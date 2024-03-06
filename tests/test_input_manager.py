@@ -3626,9 +3626,9 @@ def test_dump_get_data_logs(
             {"animal": {"herd_information": {"calf_num": 8}}},
             ["animal", "herd_information", "missing_key"],
             None,
-            ValueError,
+            KeyError,
         ),
-        ([{"key": "value"}], [0, "nonexistent_key"], None, ValueError),
+        ([{"key": "value"}], [0, "nonexistent_key"], None, KeyError),
     ],
 )
 def test_extract_value_by_key_list(
