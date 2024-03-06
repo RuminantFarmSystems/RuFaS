@@ -1112,9 +1112,7 @@ def test_handle_new_born(
     mock_calf.sold_at_day = 0
     patch_for_mock_calf = mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=mock_calf)
     calves_born = []
-
-    mock_input_manager = InputManager()
-    patch_im_getdata = mocker.patch.object(mock_input_manager, "get_data", return_value="HO")
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", {"breed": "HO"})
 
     # Act
     life_cycle_manager._handle_new_born(sim_day, mock_cow, calves_born)
@@ -1123,7 +1121,6 @@ def test_handle_new_born(
     assert mock_cow.p_animal == expected_cow_p_animal
     assert mock_cow.p_gest_for_calf == approx(0.0)
     assert mock_cow.calf_birth_weight == approx(0.0)
-    patch_im_getdata.assert_called_once_with("animal.herd_information.breed")
     patch_for_mock_calf.assert_called_once_with(
         {
             "id": calf_id,
