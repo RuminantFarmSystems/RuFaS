@@ -1,5 +1,5 @@
 {
-  "soil_specification": "soil",
+  "soil_specification": "soil_1",
   "crop_specification": "c1f3_corn_alfalfa_rotation",
   "fertilizer_management_specification": "c1f3_corn_alfalfa_fertilizer_schedule",
   "manure_management_specification": "c1f3_corn_alfalfa_manure_schedule",
@@ -13,3 +13,4 @@
   "watering_interval": 0,
   "supplement_manure_nutrient_deficiencies": false
 }
+

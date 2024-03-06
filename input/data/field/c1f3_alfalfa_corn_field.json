@@ -1,5 +1,5 @@
 {
-  "soil_specification": "soil_alfalfa",
+  "soil_specification": "soil_2",
   "crop_specification": "c1f3_alfalfa_corn_rotation",
   "fertilizer_management_specification": "c1f3_alfalfa_corn_fertilizer_schedule",
   "manure_management_specification": "c1f3_alfalfa_corn_manure_schedule",
