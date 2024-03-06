@@ -4885,30 +4885,48 @@
   },
   "tractor_dataset_properties": {
     "ID": {
-      "type": "number",
-      "description": "Unique integer identifier for the data entry"
+      "type": "array",
+      "description": "Unique integer identifier for the data entry",
+      "properties": {
+        "type": "number"
+      }
     },
     "Crop Type or Tillage Implement": {
-      "type": "string",
-      "default": "untitled"
+      "type": "array",
+      "properties": {
+        "type": "string",
+        "default": "untitled"
+      }
     },
     "Tractor Size": {
-      "type": "string",
+      "type": "array",
       "description": "The categorical size of the tractor",
-      "pattern": "(small|medium|large)",
-      "default": "medium"
+      "properties": {
+        "type": "string",
+        "pattern": "(small|medium|large)",
+        "default": "medium"
+      }
     },
-    "Operation": { "type": "string" },
+    "Operation": { 
+      "type": "array",
+      "properties": {
+        "type": "string"
+      }
+    },
     "Depth": {
-      "type": "number",
+      "type": "array",
       "description": "How deep in the soil the implement goes",
-      "minimum": 0,
-      "maximum": 10,
-      "default": 0
+      "properties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 10,
+        "default": 0
+      }
     },
     "Tractor Implement": {
       "type": "string",
       "description": "The implement that is attached to the tractor"
+      "proper"
     },
     "Tractor A (unitless)": {
       "type": "number",
