@@ -115,7 +115,7 @@ run of the simulation.
 - Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
   - [x] Create `Soil` instances. - 3 points
   - [x] Create `FieldData` instances. - 2 point
-  - Load lists of `Event` objects into `Field` instances.
+  - Load lists of `BaseFieldManagementEvent` objects into `Field` instances.
     - [x] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points
     - [x] `TillageEvent`s. - 2 points
     - [x] `FertilizerEvent`s. - 2 points
