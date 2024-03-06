@@ -1,4 +1,5 @@
 import re
+from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
 
@@ -221,7 +222,7 @@ def test_get_timestamp() -> None:
 
 
 @pytest.mark.parametrize(
-    "data_pool, filter_patterns, filter_by_exclusion, expected_result",
+    "dict_to_be_filtered, filter_patterns, filter_by_exclusion, expected_result",
     [
         (
             {"var1": 1, "var2": 2, "var3": 3},
@@ -241,5 +242,10 @@ def test_get_timestamp() -> None:
         ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
     ],
 )
-def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
-    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
+def test_filter_dictionary(
+    dict_to_be_filtered: Dict[str, Any],
+    filter_patterns: List[str],
+    filter_by_exclusion: bool,
+    expected_result: Dict[str, Any],
+) -> None:
+    assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
