@@ -2,9 +2,9 @@
 
 ### Context
 <!-- Use this section to link this pull request to other issues, other pull requests, or mention people. -->
-Issue(s) closed by this pull request: #
+Issue(s) closed by this pull request: closes #
 
-The [changelog](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit#gid=0) has been updated: [ ]
+- [ ] The [changelog](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit#gid=0) has been updated.
 
 ### What
 <!-- Add more detail about the changes that are being made in the pull request. -->
