@@ -638,13 +638,13 @@ def test_combine_aggregate_report_data(
         # Reports dictionary is empty
         (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
         # Regex match one reference
-        (["ref\d"], {"ref1": {}}, None, None),
+        (["ref\\d"], {"ref1": {}}, None, None),
         # Regex match multiple references
-        (["ref\d"], {"ref2": {}, "ref3": {}}, None, None),
+        (["ref\\d"], {"ref2": {}, "ref3": {}}, None, None),
         # Regex match none
-        (["ref\d+"], {"report1": {}, "report2": {}}, KeyError, r"Missing referenced reports: ref\\d+"),
+        (["ref\\d+"], {"report1": {}, "report2": {}}, KeyError, r"Missing referenced reports: ref\\d+"),
         # Complex regex pattern
-        (["ref[1-3]", "report\d{2}"], {"ref1": {}, "ref2": {}, "report01": {}}, None, None),
+        (["ref[1-3]", "report\\d{2}"], {"ref1": {}, "ref2": {}, "report01": {}}, None, None),
     ],
 )
 def test_check_for_missing_references(
@@ -679,7 +679,7 @@ def test_check_for_missing_references(
         # Match single report
         (["report1"], {"report1": {"data": []}}),
         # Match multiple reports with simple pattern
-        (["report\d"], {"report1": {"data": []}, "report2": {"data": []}}),
+        (["report\\d"], {"report1": {"data": []}, "report2": {"data": []}}),
         # Match multiple reports with complex pattern
         (["report[12]"], {"report1": {"data": []}, "report2": {"data": []}}),
         # No match
@@ -687,7 +687,7 @@ def test_check_for_missing_references(
         # Partial match not included
         (["report"], {}),
         # Match with special characters in report names
-        (["special_report-\d"], {"special_report-1": {"data": []}}),
+        (["special_report-\\d"], {"special_report-1": {"data": []}}),
     ],
 )
 def test_get_reports_by_regex(
