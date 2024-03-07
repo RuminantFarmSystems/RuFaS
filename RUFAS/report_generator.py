@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List, Any, Callable
 
 from RUFAS.util import Utility
@@ -138,7 +139,7 @@ class ReportGenerator:
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the ReportGenerator.
         """
@@ -197,7 +198,7 @@ class ReportGenerator:
         try:
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
-                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+                cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
@@ -266,9 +267,38 @@ class ReportGenerator:
         KeyError
             If any of the report references are missing.
         """
-        missing_references = [ref for ref in references if ref not in self.reports]
+
+        missing_references = []
+
+        for ref in references:
+            if not any(re.fullmatch(ref, report_name) for report_name in self.reports):
+                missing_references.append(ref)
+
         if missing_references:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+
+    def _get_reports_by_regex(self, regex_patterns: List[str]) -> Dict[str, Dict[str, List[Any]]]:
+        """
+        Retrieve reports based on matching the existing report names with the given regex patterns.
+
+        Notes
+        -----
+        Each pattern is checked for a full match against the report names. A "full match"
+        means that the regex must match the entire string of the report name from start to finish,
+        without partial matches. This reduces the potential for false positives.
+
+        Parameters
+        ----------
+        regex_patterns : List[str]
+            A list of regex patterns to match with the existing report names.
+        """
+
+        matched_reports = {}
+        for pattern in regex_patterns:
+            for report_name in self.reports:
+                if re.fullmatch(pattern, report_name):
+                    matched_reports[report_name] = self.reports[report_name]
+        return matched_reports
 
     def _perform_aggregations(
         self,
