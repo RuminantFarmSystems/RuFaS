@@ -108,14 +108,6 @@ class PenManure:
             else:
                 pass
 
-    @property
-    def units_dict(self) -> Dict[str, str]:
-        return {
-            k: v
-            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
-            for (k, v) in unit.items()
-        }
-
     @classmethod
     def get_instance(cls, animal_manure: AnimalManureExcretions, num_animals: int) -> PenManure:
         """

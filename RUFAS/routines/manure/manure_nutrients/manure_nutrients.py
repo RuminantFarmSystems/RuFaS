@@ -58,10 +58,23 @@ class ManureNutrients:
 
     @property
     def units_dict(self) -> Dict[str, str]:
+        """
+        Creates a dictionary of unit labels for each property in the ManureNutrients class.
+
+        This method iterates over all attributes of the instance, filtering for those ending with "_unit", and
+        constructs a dictionary where each key corresponds to the name of a nutrient or property (e.g., 'nitrogen_unit',
+        'phosphorus_unit', etc.), and each value is the unit of measurement (e.g., 'kg', 'unitless').
+
+        Returns
+        -------
+        Dict[str, str]
+            A dictionary where keys are the names of attributes representing the units of nutrients and properties,
+            and values are the respective units of measurement.
+        """
+        units_vars_list = list(key for (key, value) in self.__dict__.items() if key.endswith("_unit"))
         return {
-            k: v
-            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
-            for (k, v) in unit.items()
+            unit_key: getattr(self, unit_key)
+            for unit_key in units_vars_list
         }
 
     @property

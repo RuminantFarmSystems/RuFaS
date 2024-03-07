@@ -229,14 +229,6 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         """Ensures that the daily volume is set to the final manure volume."""
         self.liquid_manure_daily_volume = self.daily_final_manure_volume
 
-    @property
-    def units_dict(self) -> Dict[str, str]:
-        return {
-            k: v
-            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
-            for (k, v) in unit.items()
-        }
-
     def set_daily_final_manure_volume(self, daily_final_manure_volume: float) -> None:
         """Sets the daily final manure volume and ensures that the daily volume is set to the final manure volume.
 
@@ -265,7 +257,14 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
             for field in fields(self)
             if not field.name.endswith("_unit")
         }
-        summed_attributes.update(self.units_dict)
+
+        units_vars_list = list(key for (key, value) in self.__dict__.items() if key.endswith("_unit"))
+
+        units_attributes = {
+            unit_key: getattr(self, unit_key)
+            for unit_key in units_vars_list
+        }
+        summed_attributes.update(units_attributes)
 
         return ManureTreatmentDailyOutput(**summed_attributes)
 
