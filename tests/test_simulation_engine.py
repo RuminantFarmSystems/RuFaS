@@ -65,9 +65,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
-    patch_for_sys_stdout_write.assert_has_calls(
-        [mocker.call("\nSimulation Completed.\n\n")]
-    )
+    patch_for_sys_stdout_write.assert_has_calls([mocker.call("\nSimulation Completed.\n\n")])
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:

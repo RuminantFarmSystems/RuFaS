@@ -757,10 +757,7 @@ def test_execute_simulations(
         ),
     ] * len(metadata_file_list)
     patch_for_stdout_write.assert_has_calls(
-        [
-            mocker.call("Simulating...\n"),
-            mocker.call("1 error(s) and 2 warning(s) found.\n")
-        ]
+        [mocker.call("Simulating...\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
     )
 
 
