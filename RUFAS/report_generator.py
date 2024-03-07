@@ -572,7 +572,7 @@ class ReportGenerator:
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
                 )
-                filtered_data = Utility.filter_pool(temp_data, selected_variables, filter_by_exclusion)
+                filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
                     if filtered_key in report_data:
                         report_data[filtered_key].extend(filtered_value)
