@@ -621,7 +621,6 @@ class InputManager:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-
     def _validate_dict_element(  # noqa
         self,
         element_hierarchy: List[str],
@@ -1466,7 +1465,7 @@ class InputManager:
                 eager_termination=eager_termination,
             )
             return add_variable_success
-    
+
     def add_tabular_variable_to_pool(
         self,
         variable_name: str,
@@ -1481,7 +1480,7 @@ class InputManager:
         -----
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
-        
+
         Parameters
         ----------
         variable_name: str
@@ -1493,18 +1492,18 @@ class InputManager:
         eager_termination : bool
             If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
             If False, the function returns False.
-        
+
         Returns
         -------
         bool
             True if the variable is successfully validated and added to the pool.
             False if the variable is invalid and not added to the pool.
-        
+
         Raises
         -------
         TypeError
             If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
-        
+
         """
         info_map = {
             "class": self.__class__.__name__,
