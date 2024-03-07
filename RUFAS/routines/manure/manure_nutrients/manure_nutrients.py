@@ -34,7 +34,7 @@ class ManureNutrients:
     """Amount of accumulated manure mass derived from the manure module, kg."""
     total_manure_mass_unit: str = "kg"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
 

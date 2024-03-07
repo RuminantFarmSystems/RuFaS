@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import fields, dataclass
+from typing import Dict, Any
 
 from RUFAS.output_manager import OutputManager
 
@@ -22,9 +23,9 @@ class ManureModuleOutputManagerHelper:
     def add_dataclass_object(
         cls,
         dataclass_object: dataclass,
-        info_maps: dict,
+        info_maps: Dict[str, Any],
         exclude_fields: list[str] | None = None,
-    ):
+    ) -> None:
         """
         Add the fields of a dataclass object to the output manager.
 

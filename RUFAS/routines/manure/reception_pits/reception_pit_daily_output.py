@@ -70,6 +70,6 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: str = "m^3"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the total daily manure volume."""
         self.liquid_manure_daily_volume = self.total_daily_manure_volume

@@ -94,7 +94,7 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: str = "m^3"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Calculates the final daily volume and the final solids wet mass volume."""
         self.final_solids_wet_mass_volume = self.final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
         self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume

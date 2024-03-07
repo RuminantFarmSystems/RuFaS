@@ -91,7 +91,7 @@ class PenManure:
     """Amount of methane emission (kg/day)."""
     enteric_methane_kg_unit: str = "kg/day"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
 
