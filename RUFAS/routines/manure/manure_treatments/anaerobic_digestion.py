@@ -155,3 +155,9 @@ class AnaerobicDigestion(BaseManureTreatment):
         """
         # TODO: Name the constants if you can - Issue #1120
         return 0.68298 + 0.025662 * average_temperature_celsius + 0.01306 * moisture_content * 100
+
+    def _adjust_accumulated_output(
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+    ) -> ManureTreatmentDailyOutput:
+        new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
+        return new_accumulated_output

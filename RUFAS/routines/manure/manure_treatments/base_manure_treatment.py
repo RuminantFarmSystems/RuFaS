@@ -337,12 +337,13 @@ class BaseManureTreatment(ABC):
     def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """Accumulates the daily output of the manure treatment.
 
-        Args:
-            manure_treatment_daily_output: A ManureTreatmentDailyOutput object containing
-                the daily output of the manure treatment.
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
         """
-        self._accumulated_output += self._adjust_accumulated_output(manure_treatment_daily_output)
+        self._accumulated_output = self._adjust_accumulated_output(manure_treatment_daily_output)
 
     def _adjust_accumulated_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
