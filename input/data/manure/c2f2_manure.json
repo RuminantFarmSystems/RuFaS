@@ -3,7 +3,7 @@
     {
       "scenario_id": 0,
       "bedding_type": "straw",
-      "manure_handler": "manual scraping",
+      "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "compost bedded pack barn"
@@ -113,7 +113,7 @@
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
       "cleanings_per_day": 0,
-      "daily_tillage_frequency": 1,
+      "daily_tillage_frequency": 0.01,
       "cleaning_water_recycle_fraction": 0.0
     },
     {
