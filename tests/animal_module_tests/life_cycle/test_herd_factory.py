@@ -49,7 +49,7 @@ def input_manager_original_method_states(
     """Fixture to store original methods of InputManager"""
     return {
         "get_data": mock_input_manager.get_data,
-        "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
+        "add_variable_to_pool": mock_input_manager.add_variable_to_pool,
     }
 
 
@@ -1645,7 +1645,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=True"""
     mock_input_manager.get_data = mock.MagicMock()
-    mock_input_manager.add_dict_variable_to_pool = mock.MagicMock()
+    mock_input_manager.add_variable_to_pool = mock.MagicMock()
 
     mock_output_manager.dict_to_file_json = mock.MagicMock()
 
@@ -1691,7 +1691,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
         expected_save_path,
         minify_output_file=True,
     )
-    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(
+    mock_input_manager.add_variable_to_pool.assert_called_once_with(
         variable_name="runtime_animal_population",
         data=mock_herd_factory.post_animal_population.__repr__(),
         properties_blob_key="animal_population_properties",
@@ -1699,7 +1699,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     )
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-    mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
+    mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
@@ -1713,7 +1713,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
     mock_input_manager.get_data = mock.MagicMock()
-    mock_input_manager.add_dict_variable_to_pool = mock.MagicMock()
+    mock_input_manager.add_variable_to_pool = mock.MagicMock()
 
     mock_output_manager.dict_to_file_json = mock.MagicMock()
 
@@ -1750,7 +1750,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_herd_factory._random_sample_with_replacement.assert_called_once()
 
     mock_output_manager.dict_to_file_json.assert_not_called()
-    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(
+    mock_input_manager.add_variable_to_pool.assert_called_once_with(
         variable_name="runtime_animal_population",
         data=mock_herd_factory.post_animal_population.__repr__(),
         properties_blob_key="animal_population_properties",
@@ -1758,7 +1758,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     )
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-    mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
+    mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
@@ -1772,7 +1772,7 @@ def test_initialize_herd_init_herd_false(
 ) -> None:
     """Unit test for initialize_herd() with init_herd=False"""
     mock_input_manager.get_data = mock.MagicMock()
-    mock_input_manager.add_dict_variable_to_pool = mock.MagicMock()
+    mock_input_manager.add_variable_to_pool = mock.MagicMock()
 
     mock_output_manager.dict_to_file_json = mock.MagicMock()
 
@@ -1809,7 +1809,7 @@ def test_initialize_herd_init_herd_false(
     mock_herd_factory._random_sample_with_replacement.assert_called_once()
 
     mock_output_manager.dict_to_file_json.assert_not_called()
-    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(
+    mock_input_manager.add_variable_to_pool.assert_called_once_with(
         variable_name="runtime_animal_population",
         data=mock_herd_factory.post_animal_population.__repr__(),
         properties_blob_key="animal_population_properties",
@@ -1817,5 +1817,5 @@ def test_initialize_herd_init_herd_false(
     )
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-    mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
+    mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
