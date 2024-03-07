@@ -38,7 +38,7 @@ class ManureModuleOutputManagerHelper:
             List of field names to be excluded, by default None.
 
         """
-        units_vars_list = list(dataclass_object.units_dict.keys())
+        units_vars_list = list(key for (key, value) in dataclass_object.__dict__.items() if key.endswith("_unit"))
 
         for field in fields(dataclass_object):
             if field.name not in units_vars_list and (exclude_fields is None or field.name not in exclude_fields):

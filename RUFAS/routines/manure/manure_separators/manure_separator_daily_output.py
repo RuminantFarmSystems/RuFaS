@@ -99,11 +99,3 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
         self.final_solids_wet_mass_volume = self.final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
         self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume
         self.liquid_manure_daily_volume = self.final_daily_volume
-
-    @property
-    def units_dict(self) -> Dict[str, str]:
-        return {
-            k: v
-            for unit in ({k: v} for (k, v) in self.__dict__.items() if k.endswith("_unit"))
-            for (k, v) in unit.items()
-        }
