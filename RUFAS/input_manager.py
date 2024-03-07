@@ -264,7 +264,6 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
-                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 input_data = data_loader(file_path)
             except KeyError:
@@ -291,22 +290,13 @@ class InputManager:
                     "invalid_elements": 0,
                     "is_valid": True,
                 }
-                if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element(
-                        [metadata_property],
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
+                element_counter_and_validity = self._validate_dict_element(
+                    [metadata_property],
+                    properties_blob_key,
+                    filtered_input_data,
+                    eager_termination,
+                    element_counter_and_validity,
+                )
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -630,88 +620,6 @@ class InputManager:
         except KeyError:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
-
-    def _validate_tabular_element(
-        self,
-        var_name: str,
-        properties_blob_key: str,
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        element_counter_and_validity: Dict[str, int | bool],
-    ) -> Dict[str, int | bool]:
-        """
-        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
-        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
-        and total elements from the input file are checked.
-
-        Parameters
-        ----------
-        var_name : str
-            The name of the csv data element being validated.
-
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-
-        input_data : Dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
-
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-
-        element_counter_and_validity : Dict[str, int | bool]
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
-        Returns
-        -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_tabular_element.__name__,
-        }
-        variable = input_data[var_name]
-        variable_properties = reduce(
-            lambda d, key: d[key],
-            [var_name],
-            self.__metadata["properties"][properties_blob_key],
-        )
-
-        for element_num in range(len(variable)):
-            element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(
-                variable_properties,
-                var_name,
-                variable[element_num],
-                properties_blob_key,
-            )
-            if is_valid:
-                element_counter_and_validity["valid_elements"] += 1
-            else:
-                is_fixed = self._fix_data(
-                    variable_properties,
-                    [var_name, element_num],
-                    input_data,
-                    properties_blob_key,
-                )
-                if is_fixed:
-                    element_counter_and_validity["fixed_elements"] += 1
-                else:
-                    element_counter_and_validity["invalid_elements"] += 1
-                    element_counter_and_validity["is_valid"] = False
-                    om.add_warning(
-                        "Validation: invalid unfixable element found",
-                        f"{var_name} element {element_num} was invalid and could not be fixed",
-                        info_map,
-                    )
-                    if eager_termination:
-                        return element_counter_and_validity
-
-        return element_counter_and_validity
 
     def _validate_dict_element(  # noqa
         self,
@@ -1380,7 +1288,6 @@ class InputManager:
         data: Dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        is_variable_dict: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1401,8 +1308,6 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
-        is_variable_dict : bool
-            Weather the variable is a dictionary variable (rather than tabular).
 
         Returns
         -------
@@ -1435,22 +1340,13 @@ class InputManager:
                 "invalid_elements": 0,
                 "is_valid": True,
             }
-            if is_variable_dict:
-                element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=[metadata_property],
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
-            else:
-                element_counter_and_validity = self._validate_tabular_element(
-                    var_name=metadata_property,
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
+            element_counter_and_validity = self._validate_dict_element(
+                element_hierarchy=[metadata_property],
+                properties_blob_key=properties_blob_key,
+                input_data=data,
+                eager_termination=eager_termination,
+                element_counter_and_validity=element_counter_and_validity,
+            )
 
             for key in element_counter.keys():
                 element_counter[key] += element_counter_and_validity[key]
@@ -1540,7 +1436,7 @@ class InputManager:
             False if the variable is invalid and not added to the pool.
 
         Raises
-        -------
+        ------
         TypeError
             If `data` is not the expected type of Dict[str, Any].
         """
@@ -1567,7 +1463,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=True,
             )
             return add_variable_success
 
@@ -1608,6 +1503,7 @@ class InputManager:
         -------
         TypeError
             If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1634,7 +1530,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=False,
             )
             return add_variable_success
 
