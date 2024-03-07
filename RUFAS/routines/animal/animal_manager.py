@@ -586,7 +586,6 @@ class AnimalManager:
             group = animal_type_mapping_dict.get(animal_class)["animal_group"]
 
             candidate_pens = self.pens_by_animal_combination[group]
-            print(candidate_pens)
             pen_for_insert = min(candidate_pens, key=lambda p: p.current_stocking_density)
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
@@ -1597,7 +1596,7 @@ class AnimalManager:
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         pen_with_min_stocking_density = min(
             self.pens_by_animal_combination[animal_combination],
-            key=lambda p: p.current_stocking_density(),
+            key=lambda p: p.current_stocking_density,
         )
         pen_with_min_stocking_density.add_animal(
             animal,
