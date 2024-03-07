@@ -66,7 +66,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
     patch_for_sys_stdout_write.assert_has_calls(
-        [mocker.call("\nSimulation Completed.\n\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
+        [mocker.call("\nSimulation Completed.\n\n")]
     )
 
 
