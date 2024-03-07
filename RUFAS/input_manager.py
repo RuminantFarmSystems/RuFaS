@@ -621,7 +621,6 @@ class InputManager:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-
     def _validate_dict_element(  # noqa
         self,
         element_hierarchy: List[str],
