@@ -2811,7 +2811,7 @@ def test_formulate_ration_is_udr_true(mocker: MockerFixture) -> None:
 def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
-    mocker.patch(  
+    mocker.patch(
         "RUFAS.routines.animal.ration.ration_driver.animal_requirements.AnimalRequirements.__new__", return_value=req
     )
     mocker.patch(
