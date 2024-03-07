@@ -915,7 +915,7 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        if previous_ration:
+        if previous_ration and not udrm.is_udr:
             x0 = []
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
