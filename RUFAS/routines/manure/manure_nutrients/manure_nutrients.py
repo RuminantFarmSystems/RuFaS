@@ -13,26 +13,32 @@ class ManureNutrients:
     manure_type: ManureType
     """Type of manure."""
     manure_type_unit: str = "unitless"
+    """Unit for manure_type"""
 
     nitrogen: float = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
     nitrogen_unit: str = "kg"
+    """Unit for nitrogen"""
 
     phosphorus: float = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
     phosphorus_unit: str = "kg"
+    """Unit for phosphorus"""
 
     potassium: float = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
     potassium_unit: str = "kg"
+    """Unit for potassium"""
 
     dry_matter: float = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
     dry_matter_unit: str = "kg"
+    """Unit for dry_matter"""
 
     total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
     total_manure_mass_unit: str = "kg"
+    """Unit for total_manure_mass"""
 
     def __post_init__(self) -> None:
         """

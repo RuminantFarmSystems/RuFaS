@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
-from typing import Optional, Dict
+from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -18,78 +18,97 @@ class PenManure:
     urea: float = 0.0
     """Concentration of urea in manure (g/L)."""
     urea_unit: str = "g/L"
+    """Unit for urea"""
 
     urine: float = 0.0
     """Amount of urine in manure (kg)."""
     urine_unit: str = "kg"
+    """Unit for urine"""
 
     urine_total_ammoniacal_nitrogen: float = 0.0
     """Amount of ammoniacal nitrogen concentration in urine (kg)."""
     urine_total_ammoniacal_nitrogen_unit: str = "kg"
+    """Unit for urine_total_ammoniacal_nitrogen"""
 
     manure_total_ammoniacal_nitrogen: float = 0.0
     """Amount of total ammoniacal nitrogen in manure slurry (kg)."""
     manure_total_ammoniacal_nitrogen_unit: str = "kg"
+    """Unit for manure_total_ammoniacal_nitrogen"""
 
     urine_nitrogen: float = 0.0
     """Amount of nitrogen in urine (kg)."""
     urine_nitrogen_unit: str = "kg"
+    """Unit for urine_nitrogen"""
 
     nitrogen: float = 0.0
     """Amount of nitrogen in manure (kg)."""
     nitrogen_unit: str = "kg"
+    """Unit for nitrogen"""
 
     manure_mass: float = 0.0
     """Amount of manure (kg)."""
     manure_mass_unit: str = "kg"
+    """Unit for manure_mass"""
 
     manure_volume: Optional[float] = None
     """Volume of manure (m^3)."""
     manure_volume_unit: str = "m^3"
+    """Unit for manure_volume"""
 
     total_solids: float = 0.0
     """Amount of total solids (kg)."""
     total_solids_unit: str = "kg"
+    """Unit for total_solids"""
 
     degradable_volatile_solids: float = 0.0
     """Amount of degradable volatile solids (kg)."""
     degradable_volatile_solids_unit: str = "kg"
+    """Unit for degradable_volatile_solids"""
 
     non_degradable_volatile_solids: float = 0.0
     """Amount of non-degradable volatile solids (kg)."""
     non_degradable_volatile_solids_unit: str = "kg"
+    """Unit for non_degradable_volatile_solids"""
 
     inorganic_phosphorus_fraction: float = 0.0
     """Fraction of water extractable inorganic phosphorus (unitless)."""
     inorganic_phosphorus_fraction_unit: str = "unitless"
+    """Unit for inorganic_phosphorus_fraction"""
 
     organic_phosphorus_fraction: float = 0.0
     """Fraction of water extractable organic phosphorus (unitless)."""
     organic_phosphorus_fraction_unit: str = "unitless"
+    """Unit for organic_phosphorus_fraction"""
 
     non_water_inorganic_phosphorus_fraction: float = 0.0
     """Fraction of non-water extractable inorganic phosphorus (unitless)."""
     non_water_inorganic_phosphorus_fraction_unit: str = "unitless"
+    """Unit for non_water_inorganic_phosphorus_fraction"""
 
     non_water_organic_phosphorus_fraction: float = 0.0
     """Fraction of non-water extractable organic phosphorus (unitless)."""
     non_water_organic_phosphorus_fraction_unit: str = "unitless"
+    """Unit for non_water_organic_phosphorus_fraction"""
 
     phosphorus: float = 0.0
     """Amount of phosphorus excreted in manure (kg)."""
     phosphorus_unit: str = "kg"
+    """Unit for phosphorus"""
 
     phosphorus_fraction: float = 0.0
     """Fraction of phosphorus in manure (unitless)."""
     phosphorus_fraction_unit: str = "unitless"
+    """Unit for phosphorus_fraction"""
 
     potassium: float = 0.0
     """Amount of potassium in manure (kg)."""
     potassium_unit: str = "kg"
+    """Unit for potassium"""
 
     enteric_methane_kg: float = 0.0
     """Amount of methane emission (kg/day)."""
     enteric_methane_kg_unit: str = "kg/day"
+    """Unit for enteric_methane_kg"""
 
     def __post_init__(self) -> None:
         """Performs any necessary unit conversion after initialization."""
