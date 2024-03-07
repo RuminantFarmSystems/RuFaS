@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict
 
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
@@ -13,29 +12,84 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     """Daily output of a manure separator.
 
-    Attributes:
-        pen_id: ID of the pen that this output is associated with.
-        simulation_day: Number of days into the simulation.
-        total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
-        final_solids_wet_mass: Total mass of the solids on wet-weight basis, kg.
-        final_solids_wet_mass_volume: Total volume of the solids on wet-weight basis, m^3.
+    Attribute
+    ---------
+    pen_id: int
+        ID of the pen that this output is associated with.
+    pen_id_unit: str
+        Unit for
 
-        solid_manure_total_solids: Total amount of solids in the separated solids, kg.
-        solid_manure_total_volatile_solids: Total amount of volatile solids in the separated solids, kg.
-        solid_manure_nitrogen: Amount of nitrogen in the separated solids, kg.
-        solid_manure_phosphorus: Total amount of phosphorus in the separated solids, kg.
-        solid_manure_potassium: Total amount of potassium in the separated solids, kg.
+    simulation_day: int
+        Number of days into the simulation.
+    simulation_day_unit: str
+        Unit for simulation_day
+    total_daily_manure_volume: float
+        Total amount of manure, bedding, and water combined, m^3.
+    total_daily_manure_volume_unit: str
+        Unit for total_daily_manure_volume
+    final_solids_wet_mass: float
+        Total mass of the solids on wet-weight basis, kg.
+    final_solids_wet_mass_unit: str
+        Unit for final_solids_wet_mass
+    final_solids_wet_mass_volume: float
+        Total volume of the solids on wet-weight basis, m^3.
+    final_solids_wet_mass_volume_unit: str
+        Unit for final_solids_wet_mass_volume
 
-        liquid_manure_total_solids: Total amount of solids in the manure volume, kg.
-        liquid_manure_total_volatile_solids: Total amount of volatile solids in the manure volume, kg.
-        liquid_manure_nitrogen: Amount of nitrogen in the manure volume, kg.
-        liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen in the manure volume, kg.
-        liquid_manure_phosphorus: Total amount of phosphorus in the manure volume, kg.
-        liquid_manure_potassium: Total amount of potassium in the manure volume, kg.
+    solid_manure_total_solids: float
+        Total amount of solids in the separated solids, kg.
+    solid_manure_total_solids_unit: str
+        Unit for solid_manure_total_solids
+    solid_manure_total_volatile_solids: float
+        Total amount of volatile solids in the separated solids, kg.
+    solid_manure_total_volatile_solids_unit: str
+        Unit for solid_manure_total_volatile_solids
+    solid_manure_nitrogen: float
+        Amount of nitrogen in the separated solids, kg.
+    solid_manure_nitrogen_unit: str
+        Unit for solid_manure_nitrogen
+    solid_manure_phosphorus: float
+        Total amount of phosphorus in the separated solids, kg.
+    solid_manure_phosphorus_unit: str
+        Unit for solid_manure_phosphorus
+    solid_manure_potassium: float
+        Total amount of potassium in the separated solids, kg.
+    solid_manure_potassium_unit: str
+        Unit for solid_manure_potassium
 
-        final_daily_volume: Total manure volume after separation, m^3.
-        liquid_manure_daily_volume: Same as final_daily_volume.
-        Used for satisfying the LiquidManurePortionProtocol.
+    liquid_manure_total_solids: float
+        Total amount of solids in the manure volume, kg.
+    liquid_manure_total_solids_unit: str
+        Unit for liquid_manure_total_solids
+    liquid_manure_total_volatile_solids: float
+        Total amount of volatile solids in the manure volume, kg.
+    liquid_manure_total_volatile_solids_unit: str
+        Unit for liquid_manure_total_volatile_solids
+    liquid_manure_nitrogen: float
+        Amount of nitrogen in the manure volume, kg.
+    liquid_manure_nitrogen_unit: str
+        Unit for liquid_manure_nitrogen
+    liquid_manure_total_ammoniacal_nitrogen: float
+        Total ammoniacal nitrogen in the manure volume, kg.
+    liquid_manure_total_ammoniacal_nitrogen_unit: str
+        Unit for liquid_manure_total_ammoniacal_nitrogen
+    liquid_manure_phosphorus: float
+        Total amount of phosphorus in the manure volume, kg.
+    liquid_manure_phosphorus_unit: str
+        Unit for liquid_manure_phosphorus
+    liquid_manure_potassium: float
+        Total amount of potassium in the manure volume, kg.
+    liquid_manure_potassium_unit: str
+        Unit for liquid_manure_potassium
+
+    final_daily_volume: float
+        Total manure volume after separation, m^3.
+    final_daily_volume_unit: str
+        Unit for final_daily_volume
+    liquid_manure_daily_volume: float
+        Same as final_daily_volume. Used for satisfying the LiquidManurePortionProtocol.
+    liquid_manure_daily_volume_unit: str
+        Unit for liquid_manure_daily_volume
 
     """
 
