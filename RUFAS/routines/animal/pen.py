@@ -448,7 +448,7 @@ class Pen:
         Parameters
         ----------
             manure: Dict[float, int]
-                A dictionary that contains the the accumulated maniure excretion values for all animals
+                A dictionary that contains the the accumulated manure excretion values for all animals
             curr_manure: AnimalManureExcretions
                 A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
                 in the AnimalManureExcretions class definition.
