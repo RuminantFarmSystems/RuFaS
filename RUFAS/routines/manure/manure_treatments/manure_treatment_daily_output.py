@@ -341,10 +341,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
         units_vars_list = list(key for (key, value) in self.__dict__.items() if key.endswith("_unit"))
 
-        units_attributes = {
-            unit_key: getattr(self, unit_key)
-            for unit_key in units_vars_list
-        }
+        units_attributes = {unit_key: getattr(self, unit_key) for unit_key in units_vars_list}
         summed_attributes.update(units_attributes)
 
         return ManureTreatmentDailyOutput(**summed_attributes)

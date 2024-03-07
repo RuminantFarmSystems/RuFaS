@@ -78,10 +78,7 @@ class ManureNutrients:
             and values are the respective units of measurement.
         """
         units_vars_list = list(key for (key, value) in self.__dict__.items() if key.endswith("_unit"))
-        return {
-            unit_key: getattr(self, unit_key)
-            for unit_key in units_vars_list
-        }
+        return {unit_key: getattr(self, unit_key) for unit_key in units_vars_list}
 
     @property
     def dry_matter_fraction(self) -> float:
