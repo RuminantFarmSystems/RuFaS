@@ -61,6 +61,14 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
         Total amount of solids in the manure volume, kg.
     liquid_manure_total_solids_unit: str
         Unit for liquid_manure_total_solids
+    liquid_manure_total_degradable_volatile_solids: float
+        Total amount of degradable volatile solids in the manure volume, kg.
+    liquid_manure_total_degradable_volatile_solids_unit: str
+        Unit for liquid_manure_total_degradable_volatile_solids
+    liquid_manure_total_non_degradable_volatile_solids: float
+        Total amount of non-degradable volatile solids in the manure volume, kg.
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
+        Unit for liquid_manure_total_non_degradable_volatile_solids
     liquid_manure_total_volatile_solids: float
         Total amount of volatile solids in the manure volume, kg.
     liquid_manure_total_volatile_solids_unit: str

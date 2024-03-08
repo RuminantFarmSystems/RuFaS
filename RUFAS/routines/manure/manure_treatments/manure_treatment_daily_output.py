@@ -39,6 +39,14 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         Total amount of volatile solids, kg.
     liquid_manure_total_volatile_solids_unit: str
         Unit for liquid_manure_total_volatile_solids.
+    liquid_manure_total_degradable_volatile_solids: float
+        Amount of degradable volatile solids, kg.
+    liquid_manure_total_degradable_volatile_solids_unit: str
+        Unit for liquid_manure_total_degradable_volatile_solids
+    liquid_manure_total_non_degradable_volatile_solids: float
+        Amount of non-degradable volatile solids, kg.
+    liquid_manure_total_non_degradable_volatile_solids_unit: str
+        Unit for liquid_manure_total_non_degradable_volatile_solids
     liquid_manure_phosphorus: float
         Amount of phosphorus excreted in manure, kg.
     liquid_manure_phosphorus_unit: str
