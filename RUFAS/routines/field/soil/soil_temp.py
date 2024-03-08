@@ -3,23 +3,29 @@ from math import exp, log
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
-"""
-
 
 class SoilTemp:
+    """
+    Manages and simulates soil temperature based on the "Soil Temperature" section (1:1.3.3) of the Soil and Water
+    Assessment Tool (SWAT) documentation.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track the temperatures within the soil profile, creates new one
+        if one is not provided.
+    field_size : float, optional
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+        not provided (ha).
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
         ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track the temperatures within the soil profile, creates new one
-            if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
@@ -118,6 +124,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.6
+
         """
         top_term = 2500 * bulk_density
         bottom_term = bulk_density + (686 * exp(-5.63 * bulk_density))
@@ -145,6 +152,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.7
+
         """
         return soil_water_content / ((0.356 - (0.144 * bulk_density)) * bottom_depth)
 
@@ -168,6 +176,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.8
+
         """
         first_term = log(500 / max_damping_depth)
         second_term = ((1 - scaling_factor) / (1 + scaling_factor)) ** 2
@@ -193,6 +202,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.4, 5
+
         """
         # calculate ratio of center depth to damping depth (SWAT 1:1.3.5)
         ratio = center_depth / damping_depth
@@ -219,6 +229,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.10
+
         """
         return ((solar_radiation * (1 - albedo)) - 14) / 20
 
@@ -248,6 +259,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.9
+
         """
         return avg_temp + (radiation_factor * ((max_temp - min_temp) / 2))
 
@@ -271,6 +283,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.11
+
         """
         plant_factor = plant_cover / (plant_cover + exp(7.563 - ((1.297 * 10 ** (-4)) * plant_cover)))
         snow_factor = snow_cover / (snow_cover + exp(6.055 - (0.3002 * snow_cover)))
@@ -332,6 +345,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.12
+
         """
         return (
             cover_weighting_factor * previous_top_soil_layer_temp
@@ -371,6 +385,7 @@ class SoilTemp:
         References
         ----------
         SWAT Theoretical documentation eqn. 1:1.3.3
+
         """
         first_term = prev_temperature_effect * previous_day_soil_temp
         second_term = (1 - prev_temperature_effect) * (
