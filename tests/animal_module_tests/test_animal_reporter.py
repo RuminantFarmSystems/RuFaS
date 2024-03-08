@@ -11,14 +11,14 @@ om = OutputManager()
 
 
 @pytest.fixture
-def animal_manager_fixture(mocker: MockerFixture):
+def animal_manager_fixture(mocker: MockerFixture) -> AnimalManager:
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock(),
     )
     animal_manager.simulation_day = 42
     animal_manager.calves = [mocker.MagicMock()]
@@ -49,20 +49,20 @@ def animal_manager_fixture(mocker: MockerFixture):
     return animal_manager
 
 
-def test___init__():
+def test___init__() -> None:
     pass
 
 
-def test_report_daily_animal_population(mocker: MockerFixture):
+def test_report_daily_animal_population(mocker: MockerFixture) -> None:
     """Unit test for function report_daily_animal_population in file
     routines/animal/ration/animal_module_reporter.py"""
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock(),
     )
     animal_manager.simulation_day = 42
     animal_manager.calves = [mocker.MagicMock()]
@@ -115,7 +115,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
     ]
 
 
-def test_report_milk(mocker: MockerFixture):
+def test_report_milk(mocker: MockerFixture) -> None:
     """Unit test for function report_milk in file
     routines/animal/ration/animal_module_reporter.py"""
     test_milk_data_update = {
@@ -204,7 +204,7 @@ def test_report_milk(mocker: MockerFixture):
     ]
 
 
-def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture) -> None:
+def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mocker: MockerFixture) -> None:
     """Unit test for function report_ration_interval_data in file
     routines/animal/ration/animal_module_reporter.py"""
     test_data = {
@@ -262,7 +262,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         ]["values"] == ["ration_supply_report"]
 
 
-def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
+def test_report_daily_ration(animal_manager_fixture: AnimalManager, mocker: MockerFixture) -> None:
     """Unit test for function report_daily_ration in file
     routines/animal/ration/animal_module_reporter.py"""
     test_data = {
@@ -308,7 +308,7 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
         ]["values"] == [test_data[f"formatted_ration_{i}"]]
 
 
-def test_report_daily_pen_total(mocker: MockerFixture):
+def test_report_daily_pen_total(mocker: MockerFixture) -> None:
     """Unit test for function report_daily_pen_total in file
     routines/animal/ration/animal_module_reporter.py"""
     penlist = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
@@ -331,7 +331,7 @@ def test_report_daily_pen_total(mocker: MockerFixture):
         ] == [i, i + 1]
 
 
-def test_report_animal_module_manure():
+def test_report_animal_module_manure() -> None:
     test_output_dict = {
         "prefix": "dummy",
         "manure": {"property1": 100, "property2": 200},
@@ -346,7 +346,7 @@ def test_report_animal_module_manure():
         ]
 
 
-def test_report_pen_manure(mocker: MockerFixture):
+def test_report_pen_manure(mocker: MockerFixture) -> None:
     dummy_pen = mocker.MagicMock()
     dummy_pen.id = 1
     dummy_pen.animal_combination._name_ = "dummy_name"
