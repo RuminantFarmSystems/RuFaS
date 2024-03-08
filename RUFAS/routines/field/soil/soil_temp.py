@@ -21,13 +21,6 @@ class SoilTemp:
     """
 
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_soil_temperature_update(
