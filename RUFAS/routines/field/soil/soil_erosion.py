@@ -10,6 +10,22 @@ This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1
 
 
 class SoilErosion:
+    """
+    Manages and simulates soil erosion based on the Modified Universal Soil Loss Equation (MUSLE).
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track and simulate erosion.
+    field_size : float, optional, default=None
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData instance used for tracking and simulating soil erosion throughout the simulation process.
+
+    """
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
