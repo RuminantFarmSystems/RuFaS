@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class AnimalCombination(Enum):
-
     """
     Enumeration that represents the valid combinations of animals in a pen.
 
