@@ -84,7 +84,7 @@ class GasEmissionsCalculator:
         Returns
         -------
         float
-            Methane emission from manure storage (kg :math:`CH_4`/day).
+            Methane emission from manure volatile solids (kg :math:`CH_4`/day).
         float
             Methane emission from degradable volatile solids (kg :math:`CH_4`/day).
 
