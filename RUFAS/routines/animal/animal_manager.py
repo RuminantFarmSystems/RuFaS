@@ -196,7 +196,7 @@ class AnimalManager:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens(weather, time, data["manure_management_scenarios"])
+            self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data["herd_information"])
 
@@ -835,7 +835,7 @@ class AnimalManager:
         num_animals: int,
         pens: List[Pen],
         animal_combination: AnimalCombination,
-        start_pen_id=0,
+        start_pen_id: int = 0,
     ) -> List[Pen]:
         """
         Create a list of default pens to accommodate potential animal space shortage.
@@ -1092,7 +1092,7 @@ class AnimalManager:
 
         return num_animals_in_pens
 
-    def allocate_animals_to_pens(self, weather, time, manure_manager) -> None:
+    def allocate_animals_to_pens(self) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -1127,9 +1127,6 @@ class AnimalManager:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-            # mm = ManureManager(new_default_pens, weather, time, manure_manager_config)
-            # manure_manager.configure_manure_manager_components(new_default_pens)
-            # ManureManager.configure_manure_manager_components(manure_manager_config,new_default_pens)
 
         self.fully_update_animal_to_pen_id_map()
 
@@ -1674,7 +1671,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time, manure_manager):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1752,9 +1749,9 @@ class AnimalManager:
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
-                self.allocate_animals_to_pens(weather, time, manure_manager)
+                self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)
-                AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
+                AnimalModuleReporter.report_ration_interval_data(self.all_pens, feed, self.simulation_day)
                 self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":

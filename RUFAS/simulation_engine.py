@@ -107,7 +107,7 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         self.day_counter += 1
-        self.animal_manager.daily_updates(self.feed, self.weather, self.time, manure_manager=self.manure_manager)
+        self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         simulate_daily_manure_manager(
             self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
         )

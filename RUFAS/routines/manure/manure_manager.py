@@ -221,7 +221,6 @@ class ManureManager:
         simulation_day : int
             Day of simulation.
         """
-        # configure newly created pens (if they exist)
         number_of_new_pens = len(pen_list) - len(self.manure_treatments)
         if number_of_new_pens > 0:
             self.configure_manure_manager_components(pen_list[len(self.manure_treatments) :])
@@ -741,7 +740,7 @@ class ManureManager:
         )
 
 
-def simulate_daily_manure_manager(manure_manager: ManureManager, penlist, simulation_day) -> None:
+def simulate_daily_manure_manager(manure_manager: ManureManager, penlist: list[Pen], simulation_day: int) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 
     There is no strict reason why this function is needed. It is simply to make the code
@@ -752,9 +751,8 @@ def simulate_daily_manure_manager(manure_manager: ManureManager, penlist, simula
     ----------
     manure_manager : ManureManager
         A reference to the ManureManager object stored in the SimulationEngine.
-    animal_manager : AnimalManager
-        A reference to the AnimalManager object stored in the SimulationEngine
-        so the latest data can be passed to the ManureManager object.
+    penlist : List[Pen]
+        A list of Penss.
 
     """
     manure_manager.daily_update(penlist, simulation_day)
