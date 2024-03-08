@@ -12,8 +12,8 @@ class SoilConfiguration(Enum):
 
 class SoilConfigFactory:
     """
-    This module serves as a way to easily create and modify SoilData objects based on a set of given configurations. It is
-    based on the CropSpeciesDataFactory model, and should contain all equivalent functionalities.
+    This module serves as a way to easily create and modify SoilData objects based on a set of given configurations. It
+    is based on the CropSpeciesDataFactory model, and should contain all equivalent functionalities.
 
     """
 
