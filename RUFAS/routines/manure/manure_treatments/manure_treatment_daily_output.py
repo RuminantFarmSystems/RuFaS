@@ -105,6 +105,8 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_nitrogen: float = 0.0
     liquid_manure_total_solids: float = 0.0
     liquid_manure_total_volatile_solids: float = 0.0
+    liquid_manure_total_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_non_degradable_volatile_solids: float = 0.0
     liquid_manure_phosphorus: float = 0.0
     liquid_manure_potassium: float = 0.0
     daily_final_manure_volume: float = 0.0

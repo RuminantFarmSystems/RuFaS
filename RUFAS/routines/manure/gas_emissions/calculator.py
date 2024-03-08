@@ -1,4 +1,5 @@
 import math
+from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
@@ -11,9 +12,11 @@ class GasEmissionsCalculator:
     @classmethod
     def methane_emission_from_slurry_storage(
         cls,
-        total_volatile_solids: float,
+        accumulated_liquid_manure_total_volatile_solids: float,
+        accumulated_liquid_manure_total_degradable_volatile_solids: float,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
         temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-    ) -> float:
+    ) -> Tuple[float, float]:
         """
         Calculate the methane emission from manure storage using total volatile solids.
 
@@ -68,8 +71,12 @@ class GasEmissionsCalculator:
 
         Parameters
         ----------
-        total_volatile_solids : float
+        accumulated_liquid_manure_total_volatile_solids : float
             Total volatile solids in manure (kg).
+        accumulated_liquid_manure_total_degradable_volatile_solids: float
+            Total degradable volatile solids in manure (kg).
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
+            Total non-degradable volatile solids in manure (kg).
         temp : float
             Temperature in Celsius (:math:`^\\circ C`). Default is set to 20 degrees Celsius. This value is
             listed as :attr:`DEFAULT_SLURRY_STORAGE_TEMPERATURE` in :class:`GasEmissionConstants`.
@@ -78,24 +85,27 @@ class GasEmissionsCalculator:
         -------
         float
             Methane emission from manure storage (kg :math:`CH_4`/day).
+        float
+            Methane emission from degradable volatile solids (kg :math:`CH_4`/day).
 
         Raises
         ------
         ValueError
             If the total volatile solids is not positive.
         """
+        degradable_volatile_solids_fraction = \
+            accumulated_liquid_manure_total_degradable_volatile_solids / accumulated_liquid_manure_total_volatile_solids
+        non_degradable_volatile_solids_fraction = \
+            accumulated_liquid_manure_total_non_degradable_volatile_solids / \
+            accumulated_liquid_manure_total_volatile_solids
 
-        if total_volatile_solids <= 0:
+        if accumulated_liquid_manure_total_volatile_solids <= 0:
             raise ValueError(
-                f"Total volatile solids must be positive. Total volatile solids provided: {total_volatile_solids}"
+                "Total volatile solids must be positive. Total volatile solids provided: "
+                f"{accumulated_liquid_manure_total_volatile_solids}"
             )
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
-
-        (
-            degradable_volatile_solids_fraction,
-            non_degradable_volatile_solids_fraction,
-        ) = cls._volatile_solid_component_fractions(total_volatile_solids)
 
         methane_emission_from_degradable_volatile_solids = (
             (
@@ -103,7 +113,7 @@ class GasEmissionsCalculator:
                 * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
             )
-            * total_volatile_solids
+            * accumulated_liquid_manure_total_volatile_solids
             * GeneralConstants.GRAMS_TO_KG
         )
         methane_emission_from_non_degradable_volatile_solids = (
@@ -112,7 +122,7 @@ class GasEmissionsCalculator:
                 * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
                 * arrhenius_exponent
             )
-            * total_volatile_solids
+            * accumulated_liquid_manure_total_volatile_solids
             * GeneralConstants.GRAMS_TO_KG
         )
 
@@ -120,7 +130,7 @@ class GasEmissionsCalculator:
             methane_emission_from_degradable_volatile_solids + methane_emission_from_non_degradable_volatile_solids
         )
 
-        return methane_emission
+        return methane_emission, methane_emission_from_degradable_volatile_solids
 
     @classmethod
     def _arrhenius_exponent(cls, temp: float) -> float:
@@ -173,74 +183,6 @@ class GasEmissionsCalculator:
             GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
             - (GasEmissionConstants.ACTIVATION_ENERGY / (GasEmissionConstants.GAS_CONSTANT * temp_kelvin))
         )
-
-    @classmethod
-    def _volatile_solid_component_fractions(cls, total_volatile_solids: float) -> tuple[float, float]:
-        """
-        Calculate the degradable and non-degradable volatile solids fractions.
-
-        Notes
-        -----
-        The degradable and non-degradable volatile solids fractions are calculated as follows:
-
-        .. math::
-
-            VS_d = \\frac{VS \\cdot B_o}{E_{CH_4,pot}}
-
-            VS_d fraction = VS_d / VS
-
-            VS_{nd} = VS - VS_d
-
-            VS_{nd} fraction = VS_{nd} / VS
-
-        where:
-
-            :math:`VS_d` is the degradable volatile solids (kg),
-
-            :math:`VS_d fraction` is the degradable volatile solids fraction (unitless),
-
-            :math:`VS_{nd}` is the non-degradable volatile solids (kg),
-
-            :math:`VS_{nd} fraction` is the non-degradable volatile solids fraction (unitless),
-
-            :math:`VS` is the total volatile solids (kg),
-
-            :math:`B_o` is the achievable methane emission (kg :math:`CH_4`/kg VS),
-
-            :math:`E_{CH_4,pot}` is the potential methane yield of manure (kg :math:`CH_4`/kg VS).
-
-        Parameters
-        ----------
-        total_volatile_solids : float
-            Total volatile solids in manure (kg).
-
-        Returns
-        -------
-        tuple[float, float]
-            Degradable volatile solids and non-degradable volatile solids fractions.
-
-        Raises
-        ------
-        ValueError
-            If the total volatile solids is negative.
-
-        """
-        if total_volatile_solids <= 0:
-            raise ValueError(
-                f"Total volatile solids must be positive. Total volatile solids provided: {total_volatile_solids}"
-            )
-
-        degradable_volatile_solids = (
-            total_volatile_solids
-            * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-            / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
-        )
-        non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
-
-        degradable_volatile_solids_fraction = degradable_volatile_solids / total_volatile_solids
-        non_degradable_volatile_solids_fraction = non_degradable_volatile_solids / total_volatile_solids
-
-        return degradable_volatile_solids_fraction, non_degradable_volatile_solids_fraction
 
     @classmethod
     def _modified_hours(cls, hours: float) -> float:
