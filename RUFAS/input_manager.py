@@ -52,11 +52,11 @@ class Modifiability(Enum):
         return list(map(lambda c: c.value, cls))
 
     @classmethod
-    def get_required_during_initialization(cls) -> list[str]:
+    def get_required_during_initialization(cls) -> List['Modifiability']:
         return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
 
     @classmethod
-    def get_modifiable_at_runtime(cls) -> list[str]:
+    def get_modifiable_at_runtime(cls) -> List['Modifiability']:
         return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
@@ -67,7 +67,7 @@ class InputManager:
 
     __instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> 'InputManager':
         if not hasattr(cls, "instance"):
             cls.instance = super(InputManager, cls).__new__(cls)
         return cls.instance
@@ -215,7 +215,7 @@ class InputManager:
         om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path) as json_file:
-                data = json.load(json_file)
+                data: Dict[str, Any] = json.load(json_file)
                 om.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {file_path}.",
@@ -298,7 +298,7 @@ class InputManager:
         total_elements_counter = 0
         fixed_elements_counter = 0
 
-        data_type_to_loader_map: Dict[str, Callable] = {
+        data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
@@ -449,6 +449,7 @@ class InputManager:
                 f"one of {Modifiability.values()}. Using the default value: {default}",
                 info_map,
             )
+            return Modifiability.__getitem__("_".join(default.strip().upper().split()))
 
     def _is_input_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
@@ -940,7 +941,7 @@ class InputManager:
         eager_termination: bool,
         element_counter_and_validity: Dict[str, int | bool],
         called_during_initialization: bool = False,
-    ) -> dict:
+    ) -> Dict[str, int | bool]:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -1078,7 +1079,7 @@ class InputManager:
         self,
         variable_properties: Dict[str, Any],
         var_name: str,
-        input_data_value: list,
+        input_data_value: List[Any],
         properties_blob_key: str,
     ) -> bool:
         """Validates an input data element of type array."""
@@ -1514,7 +1515,7 @@ class InputManager:
         If no keys have the specified property, the method returns an empty list.
 
         """
-        data_keys = []
+        data_keys: List[str] = []
 
         info_map = {
             "class": self.__class__.__name__,
@@ -1894,6 +1895,8 @@ class InputManager:
                 is_variable_dict=True,
             )
             return add_variable_success
+        else:
+            return False
 
     def add_tabular_variable_to_pool(
         self,
@@ -1961,6 +1964,8 @@ class InputManager:
                 is_variable_dict=False,
             )
             return add_variable_success
+        else:
+            return False
 
     def dump_get_data_logs(self, path: Path) -> None:
         """
