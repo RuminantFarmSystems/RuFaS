@@ -2,7 +2,7 @@
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 
-[![Mypy](https://img.shields.io/badge/mypy-4696%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/mypy_type_checker.yml)
+[![Mypy](https://img.shields.io/badge/mypy-4689%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/mypy_type_checker.yml)
 
 
 # Vision
