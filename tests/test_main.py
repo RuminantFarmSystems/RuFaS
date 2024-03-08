@@ -715,6 +715,8 @@ def test_execute_simulations(
     csv_dir = Path("output/CSVs/")
     graphics_dir = Path("")
     verbose = LogVerbosity("none")
+    mock_output_manager.get_error_and_warning_counts.return_value = (1, 2)
+    patch_for_stdout_write = mocker.patch("main.sys.stdout.write")
 
     # Act
     execute_simulations(
@@ -754,10 +756,13 @@ def test_execute_simulations(
             csv_dir,
         ),
     ] * len(metadata_file_list)
+    patch_for_stdout_write.assert_has_calls(
+        [mocker.call("Simulating...\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
+    )
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
+    "produce_graphics, exclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
     "initialize_herd_call_count, format_option",
     [
         (False, False, True, False, 2, "verbose"),
@@ -773,7 +778,7 @@ def test_execute_simulations(
 def test_execute_simulations_raises_exception(
     mocker: MockerFixture,
     produce_graphics: bool,
-    exlclude_info_maps: bool,
+    exclude_info_maps: bool,
     is_data_valid: bool,
     terminate_simulation_post_herd_generation: bool,
     initialize_herd_call_count: int,
@@ -814,7 +819,7 @@ def test_execute_simulations_raises_exception(
     with pytest.raises(Exception):
         execute_simulations(
             metadata_files=metadata_file_list,
-            exclude_info_maps=exlclude_info_maps,
+            exclude_info_maps=exclude_info_maps,
             produce_graphics=produce_graphics,
             graphics_dir=graphics_dir,
             format_option=format_option,
@@ -837,7 +842,7 @@ def test_execute_simulations_raises_exception(
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(
             path=output_dir,
-            exclude_info_maps=exlclude_info_maps,
+            exclude_info_maps=exclude_info_maps,
             format_option=format_option,
         )
     ]
