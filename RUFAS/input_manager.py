@@ -290,7 +290,7 @@ class InputManager:
                     "invalid_elements": 0,
                     "is_valid": True,
                 }
-                element_counter_and_validity = self._validate_dict_element(
+                element_counter_and_validity = self._dict_type_validator(
                     [metadata_property],
                     properties_blob_key,
                     filtered_input_data,
@@ -621,7 +621,7 @@ class InputManager:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-    def _validate_dict_element(  # noqa
+    def _dict_type_validator(  # noqa
         self,
         element_hierarchy: List[str],
         properties_blob_key: str,
@@ -638,16 +638,12 @@ class InputManager:
         ----------
         element_hierarchy : List[str]
             A list of strings representing the path to the data being validated.
-
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
-
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
-
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
-
         element_counter_and_validity : Dict[str, int | bool]
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
@@ -670,7 +666,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._validate_dict_element.__name__,
+            "function": self._dict_type_validator.__name__,
         }
         try:
             variable_properties = reduce(
@@ -691,7 +687,7 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_dict_element(
+                    element_counter_and_validity = self._dict_type_validator(
                         element_hierarchy,
                         properties_blob_key,
                         input_data,
@@ -1340,7 +1336,7 @@ class InputManager:
                 "invalid_elements": 0,
                 "is_valid": True,
             }
-            element_counter_and_validity = self._validate_dict_element(
+            element_counter_and_validity = self._dict_type_validator(
                 element_hierarchy=[metadata_property],
                 properties_blob_key=properties_blob_key,
                 input_data=data,
