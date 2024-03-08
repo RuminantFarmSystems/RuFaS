@@ -204,7 +204,7 @@ def test_report_milk(mocker: MockerFixture):
     ]
 
 
-def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture):
+def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture) -> None:
     """Unit test for function report_ration_interval_data in file
     routines/animal/ration/animal_module_reporter.py"""
     test_data = {
@@ -238,7 +238,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         return_value="ration_supply_report",
     )
 
-    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture, feed, 1)
+    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture.all_pens, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[

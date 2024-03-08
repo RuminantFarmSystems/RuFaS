@@ -504,7 +504,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     manure_manager = mocker.MagicMock()
 
     # Act
-    animal_manager.allocate_animals_to_pens(animal_manager.weather, animal_manager.time, manure_manager)
+    animal_manager.allocate_animals_to_pens()
 
     # Assert
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
