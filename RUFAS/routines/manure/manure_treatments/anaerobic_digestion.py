@@ -36,7 +36,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
             manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
@@ -159,5 +159,6 @@ class AnaerobicDigestion(BaseManureTreatment):
     def _adjust_accumulated_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
-        new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
-        return new_accumulated_output
+        """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
+        wanting to never empty the manure pit for AnaerobicDigestion"""
+        self._accumulated_output += manure_treatment_daily_output

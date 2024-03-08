@@ -95,7 +95,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
-        self._accumulated_output = self._adjust_accumulated_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
         self._accumulated_precipitation_volume += self.precipitation_volume
 
         self._update_ammonia_emission(daily_output)
@@ -173,31 +173,6 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         return self._manure_handler_daily_output.cleaning_water_volume
-
-    # def _adjust_accumulated_output(
-    #     self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    # ) -> ManureTreatmentDailyOutput:
-    #     """
-    #     Adjust the accumulated output by either resetting it or adding the daily output to it.
-
-    #     The accumulated output will be reset on the first day of every storage time period.
-
-    #     Parameters
-    #     ----------
-    #     manure_treatment_daily_output : ManureTreatmentDailyOutput
-    #         The daily output from the manure treatment system.
-
-    #     Returns
-    #     -------
-    #     ManureTreatmentDailyOutput
-    #         The adjusted accumulated output.
-
-    #     """
-    #     if self._sim_day % self.storage_time_period == 1:
-    #         return manure_treatment_daily_output.clone()
-    #     else:
-    #         new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
-    #         return new_accumulated_output
 
     @property
     def volume_needed(self):
