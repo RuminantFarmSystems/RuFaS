@@ -355,6 +355,7 @@ class SoilData:
         -------
         layered_attribute : list[any]
             values of the specified attribute for each layer
+
         """
         return [getattr(layer, attribute) for layer in self.soil_layers]
 
@@ -367,6 +368,7 @@ class SoilData:
             the LayerData attribute to set
         values : list[any]
             values of the attribute to set for each layer
+
         """
         [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
 
@@ -420,6 +422,7 @@ class SoilData:
         of water is 0. The calculation is done per layer, meaning that if one layer has water content greater than its
         wilting water point and another layer has water content less than its wilting point, the first layer will not
         have to compensate for the deficit in the second layer.
+
         """
         water_sum = 0
         for layer in self.soil_layers:
@@ -435,6 +438,7 @@ class SoilData:
         -------
         float
             The saturated soil water content in millimeters (mm).
+
         """
         saturation_sum = 0
         for layer in self.soil_layers:
@@ -451,6 +455,7 @@ class SoilData:
         -------
         float
             The soil water content at field capacity in millimeters (mm).
+
         """
         field_capacity_sum = 0
         for layer in self.soil_layers:
@@ -470,6 +475,7 @@ class SoilData:
         References
         ----------
         SWAT Theoretical documentation eqn. 5:2.3.18
+
         """
         unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
         clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
@@ -491,7 +497,8 @@ class SoilData:
         Returns
         -------
         float
-            The average bulk density of the soil profile (Mg per cubic meter)
+            The average bulk density of the soil profile (Mg per cubic meter).
+
         """
         weighted_densities_sum = 0
         weights_sum = 0
@@ -585,6 +592,7 @@ class SoilData:
         ----------
         pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants may differ between documents; defer to
         pseudocode_soil and old code).
+
         """
         if self.cover_type == "BARE":
             return 0.5333
@@ -615,6 +623,7 @@ class SoilData:
         References
         ----------
         SurPhos paragraph just below [16].
+
         """
         if self.rain_events_after_fertilizer_application <= 1:
             return 1
