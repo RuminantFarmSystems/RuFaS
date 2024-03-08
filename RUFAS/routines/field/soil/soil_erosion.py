@@ -26,6 +26,7 @@ class SoilErosion:
         The SoilData instance used for tracking and simulating soil erosion throughout the simulation process.
 
     """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
