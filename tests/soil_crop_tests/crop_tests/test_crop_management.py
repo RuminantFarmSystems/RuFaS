@@ -427,10 +427,27 @@ def test_record_yield(
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
+    expected_units = {
+        "crop": "unitless",
+        "wet_yield": "wet kg/ha",
+        "dry_yield": "dry kg/ha",
+        "nitrogen": "kg/ha",
+        "phosphorus": "kg/ha",
+        "yield_residue": "dry kg/ha",
+        "harvest_index": "unitless",
+        "planting_date": {
+            "year": "year",
+            "day": "day",
+        },
+        "harvest_date": {"year": "year", "day": "day"},
+        "field_size": "ha",
+    }
+
     expected_info_map = {
         "class": crop_manager.__class__.__name__,
         "function": crop_manager._record_yield.__name__,
         "suffix": f"field='{field_name}'",
+        "units": expected_units,
     }
     expected_value = {
         "crop": species,

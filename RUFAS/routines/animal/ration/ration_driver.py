@@ -50,8 +50,12 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
+        if hasattr(pen, "ration_per_animal"):
+            previous_ration = pen.ration_per_animal
+        else:
+            previous_ration = None
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination
+            req, available_feeds, pen.animal_combination, previous_ration
         )
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
@@ -70,13 +74,12 @@ class RationManager:
                         constraints_failed_list.append(constr["fun"].__name__)
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
-
                 req.set_requirements(pen, animal_grouping_scenario, True)
                 (
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 info_map = {
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
@@ -90,10 +93,29 @@ class RationManager:
                     "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
+                fail_summary_units = {
+                    "simulation_day": "simulation day",
+                    "reattempt number": "unitless",
+                    "constraints_failed_dict": "unitless",
+                    "ration_attempted": "unitless",
+                    "pen requirements": {
+                        "NEmaint_requirement": "Mcal",
+                        "NEa_requirement": "Mcal",
+                        "NEg_requirement": "Mcal",
+                        "NEpreg_requirement": "Mcal",
+                        "NEl_requirement": "Mcal",
+                        "MP_requirement": "g",
+                        "Ca_requirement": "g",
+                        "P_req": "g",
+                        "DMIest_requirement": "kg",
+                        "avg_BW": "kg",
+                        "avg_milk_production_reduction_pen": "kg",
+                    },
+                }
                 om.add_variable(
                     f"failed_constraint_summary_for_pen_{pen.id}",
                     fail_summary,
-                    info_map,
+                    dict(info_map, **{"units": fail_summary_units}),
                 )
 
         if solution is not None:
@@ -243,8 +265,12 @@ class RationManager:
         num_reattempts = 0
         constraints_failed_list = []
 
+        if hasattr(pen, "ration_per_animal"):
+            previous_ration = pen.ration_per_animal
+        else:
+            previous_ration = None
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination
+            req, available_feeds, pen.animal_combination, previous_ration
         )
         if pen.animal_combination.name in ["LAC_COW"]:
             failed_constraints = ration_optimizer.find_failed_constraints(
@@ -254,7 +280,25 @@ class RationManager:
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.heifer_cons, ration_config
             )
-
+        fail_summary_units = {
+            "simulation_day": "simulation day",
+            "reattempt number": "unitless",
+            "constraints_failed_dict": "unitless",
+            "ration_attempted": "unitless",
+            "pen requirements": {
+                "NEmaint_requirement": "Mcal",
+                "NEa_requirement": "Mcal",
+                "NEg_requirement": "Mcal",
+                "NEpreg_requirement": "Mcal",
+                "NEl_requirement": "Mcal",
+                "MP_requirement": "g",
+                "Ca_requirement": "g",
+                "P_req": "g",
+                "DMIest_requirement": "kg",
+                "avg_BW": "kg",
+                "avg_milk_production_reduction_pen": "kg",
+            },
+        }
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
@@ -266,7 +310,11 @@ class RationManager:
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
                 "pen requirements": pen.avg_nutrient_rqmts,
             }
-            om.add_variable(f"failed_constraint_summary_for_pen_{pen.id}", fail_summary, info_map)
+            om.add_variable(
+                f"failed_constraint_summary_for_pen_{pen.id}",
+                fail_summary,
+                dict(info_map, **{"units": fail_summary_units}),
+            )
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
@@ -300,7 +348,7 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
@@ -319,7 +367,7 @@ class RationManager:
                     om.add_variable(
                         f"failed_constraint_summary_for_pen_{pen.id}",
                         fail_summary,
-                        info_map,
+                        dict(info_map, **{"units": fail_summary_units}),
                     )
 
         if fixed_ration:
