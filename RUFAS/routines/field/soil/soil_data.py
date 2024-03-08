@@ -328,13 +328,14 @@ class SoilData:
         return self.plant_surface_residue + self.plant_root_residue
 
     def __post_init__(self, field_size: float):
-        """This method initializes attributes that either cannot be set to a default above or depend on other
-            attributes in the object to be set before they can be set
+        """
+        This method initializes attributes that either cannot be set to a default above or depend on other
+        attributes in the object to be set before they can be set.
 
         Parameters
         ----------
         field_size: float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Raises
         ------
@@ -394,12 +395,13 @@ class SoilData:
         self.initial_nitrates_total = self.profile_nitrates_total
 
     def _subdivide_top_layer(self, field_size: float) -> None:
-        """This method ensures that the soil profile has a top layer that is 20 mm deep.
+        """
+        This method ensures that the soil profile has a top layer that is 20 mm deep.
 
         Parameters
         ----------
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -418,30 +420,32 @@ class SoilData:
         self.soil_layers.insert(0, new_top_layer)
 
     def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
-        """returns a list containing the specified attribute for each soil layer
+        """
+        Returns a list containing the specified attribute for each soil layer.
 
         Parameters
         ----------
         attribute : str
-            the LayerData attribute or property to be vectorized
+            the LayerData attribute or property to be vectorized.
 
         Returns
         -------
         layered_attribute : list[any]
-            values of the specified attribute for each layer
+            values of the specified attribute for each layer.
 
         """
         return [getattr(layer, attribute) for layer in self.soil_layers]
 
     def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
-        """sets a given attribute for all layers in soil_data
+        """
+        Sets a given attribute for all layers in soil_data.
 
         Parameters
         ----------
         attribute : str
-            the LayerData attribute to set
+            the LayerData attribute to set.
         values : list[any]
-            values of the attribute to set for each layer
+            values of the attribute to set for each layer.
 
         """
         [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
