@@ -93,11 +93,13 @@ class GasEmissionsCalculator:
         ValueError
             If the total volatile solids is not positive.
         """
-        degradable_volatile_solids_fraction = \
+        degradable_volatile_solids_fraction = (
             accumulated_liquid_manure_total_degradable_volatile_solids / accumulated_liquid_manure_total_volatile_solids
-        non_degradable_volatile_solids_fraction = \
-            accumulated_liquid_manure_total_non_degradable_volatile_solids / \
-            accumulated_liquid_manure_total_volatile_solids
+        )
+        non_degradable_volatile_solids_fraction = (
+            accumulated_liquid_manure_total_non_degradable_volatile_solids
+            / accumulated_liquid_manure_total_volatile_solids
+        )
 
         if accumulated_liquid_manure_total_volatile_solids <= 0:
             raise ValueError(

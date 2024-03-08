@@ -10,14 +10,14 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
-    #B1
+    # B1
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
     Rate correcting factor for degradable volatile solids, used in calculation of slurry storage
     methane emission (unitless).
     """
 
-    #B2
+    # B2
     NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 0.01
     """
     Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
