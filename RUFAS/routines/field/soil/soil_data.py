@@ -200,6 +200,7 @@ class SoilData:
         Nitrogen contained in the harvested yield (kg/ha).
 
     """
+
     # ID variables
     name: Optional[str] = "generic soil configuration"
 
