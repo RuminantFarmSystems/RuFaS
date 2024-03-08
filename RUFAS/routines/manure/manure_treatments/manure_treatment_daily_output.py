@@ -198,6 +198,12 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     liquid_manure_total_volatile_solids: float = 0.0
     liquid_manure_total_volatile_solids_unit: str = "kg"
+    
+    liquid_manure_total_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_degradable_volatile_solids_unit: str = "kg"
+    
+    liquid_manure_total_non_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
 
     liquid_manure_phosphorus: float = 0.0
     liquid_manure_phosphorus_unit: str = "kg"
