@@ -1727,7 +1727,7 @@ def mock_metadata_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any
     }
 
 
-def mock_input_array_data_for_fix_data() -> dict[str, dict[str, Any]]:
+def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[str, Any]]:
     return {
         "element1": [1, 2, 3],
         "element2": [1, 2, 3, 4, 5],
@@ -1798,9 +1798,9 @@ def mock_input_array_data_for_fix_data() -> dict[str, dict[str, Any]]:
     ],
 )
 def test_fix_array_type_fixable_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_value: list,
+    dummy_variable_properties: Dict[str, Any],
+    dummy_element_hierarchy: List[str],
+    expected_value: List[Any],
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
@@ -1870,8 +1870,8 @@ def test_fix_array_type_fixable_data(
     ],
 )
 def test_fix_array_type_critical_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_variable_properties: Dict[str, Any],
+    dummy_element_hierarchy: List[str],
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
@@ -2089,7 +2089,7 @@ def test_fix_string_type_critical_data(
     assert add_warning.call_count == expected_warning_call_count
 
 
-def mock_input_number_data_for_fix_data() -> dict[str, dict[str, Any]]:
+def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
     return {
         "element1": -1,
         "element2": -1,
@@ -3985,7 +3985,7 @@ def mock_metadata_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any]]
 
 
 @pytest.fixture
-def mock_pool_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any]]:
+def mock_pool_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any] | List[Any]]:
     return {
         "dict_data_runtime_modifiable": {
             "int": 1,
