@@ -1001,7 +1001,9 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     mock_accumulated_output.daily_final_manure_volume = final_manure_volume = 30.0
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 110.0
     slurry_storage._accumulated_output = mock_accumulated_output
-    patch_for_accumulate_daily_output = mocker.patch.object(slurry_storage, "_accumulate_daily_output")
+    patch_for_accumulate_daily_output = mocker.patch.object(
+        slurry_storage, "_adjust_accumulated_output", return_value=mock_accumulated_output
+    )
 
     mock_pen = mocker.MagicMock()
     mock_pen.num_animals = num_animals = 100
@@ -2795,9 +2797,9 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         "_create_anaerobic_digestion_daily_output",
         return_value=mock_anaerobic_digestion_daily_output,
     )
-    patch_for_accumulate_daily_output = mocker.patch.object(
+    patch_for_adjust_accumulated_output = mocker.patch.object(
         anaerobic_digestion_and_lagoon,
-        "_accumulate_daily_output",
+        "_adjust_accumulated_output",
         return_value=None,
     )
 
@@ -2851,8 +2853,8 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         )
 
     assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
-    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_digestion_daily_output)
-    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
+    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_digestion_daily_output)
+    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
 
 
 # Test CompostBeddedPackBarn specific methods
