@@ -93,6 +93,12 @@ class GasEmissionsCalculator:
         ValueError
             If the total volatile solids is not positive.
         """
+        if accumulated_liquid_manure_total_volatile_solids <= 0:
+            raise ValueError(
+                "Total volatile solids must be positive. Total volatile solids provided: "
+                f"{accumulated_liquid_manure_total_volatile_solids}"
+            )
+
         degradable_volatile_solids_fraction = (
             accumulated_liquid_manure_total_degradable_volatile_solids / accumulated_liquid_manure_total_volatile_solids
         )
@@ -100,12 +106,6 @@ class GasEmissionsCalculator:
             accumulated_liquid_manure_total_non_degradable_volatile_solids
             / accumulated_liquid_manure_total_volatile_solids
         )
-
-        if accumulated_liquid_manure_total_volatile_solids <= 0:
-            raise ValueError(
-                "Total volatile solids must be positive. Total volatile solids provided: "
-                f"{accumulated_liquid_manure_total_volatile_solids}"
-            )
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
 

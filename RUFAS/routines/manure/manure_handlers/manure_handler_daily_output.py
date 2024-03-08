@@ -121,11 +121,11 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_total_solids: float = 0.0
     liquid_manure_total_solids_unit: str = "kg"
 
-    manure_degradable_volatile_solids: float = 0.0
-    manure_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_degradable_volatile_solids_unit: str = "kg"
 
-    manure_non_degradable_volatile_solids: float = 0.0
-    manure_non_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_non_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
 
     liquid_manure_total_volatile_solids: float = field(init=False)
     liquid_manure_total_volatile_solids_unit: str = "kg"
@@ -177,7 +177,8 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         """Calculates total volatile solids and total daily manure volume after initialization."""
 
         self.liquid_manure_total_volatile_solids = (
-            self.manure_degradable_volatile_solids + self.manure_non_degradable_volatile_solids
+            self.liquid_manure_total_degradable_volatile_solids +
+            self.liquid_manure_total_non_degradable_volatile_solids
         )
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
         self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
