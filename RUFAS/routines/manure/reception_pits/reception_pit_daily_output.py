@@ -86,11 +86,11 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_total_solids: float = 0.0
     liquid_manure_total_solids_unit: str = "kg"
 
-    manure_degradable_volatile_solids: float = 0.0
-    manure_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_degradable_volatile_solids_unit: str = "kg"
 
-    manure_non_degradable_volatile_solids: float = 0.0
-    manure_non_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_non_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
 
     liquid_manure_total_volatile_solids: float = 0.0
     liquid_manure_total_volatile_solids_unit: str = "kg"
