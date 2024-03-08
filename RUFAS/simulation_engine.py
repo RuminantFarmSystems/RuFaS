@@ -192,12 +192,7 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        config_data: Dict[str, Any] = im.get_data("config")
         weather_data = im.get_data("weather")
-
-        if config_data.get("set_seed"):
-            random.seed(config_data["random_seed"])
-            numpy.random.seed(config_data["random_seed"])
 
         self.time = Time()
         self.weather = Weather(weather_data, self.time)
