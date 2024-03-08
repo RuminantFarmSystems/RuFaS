@@ -3622,6 +3622,16 @@ def test_log_missing_keys(
             },
             ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp[0].nestedProp", 42)]),
         ),
+        (
+            {"arrayProp": [{}]},
+            {
+                "arrayProp": {
+                    "type": "array",
+                    "properties": {"type": "object", "nestedProp": {"type": "number"}},
+                }
+            },
+            ({"arrayProp": [{}]}, ["arrayProp[0].nestedProp"], []),
+        ),
     ],
 )
 def test_add_default_values_to_missing_inputs(
@@ -3728,11 +3738,11 @@ def test_dump_get_data_logs(
         ("animal.herd_information.nonexistent_property", False, True),
     ],
 )
-def test_property_exists_in_pool(
+def test_check_property_exists_in_pool(
     mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
 ) -> None:
     """
-    Unit test for the property_exists_in_pool() method of the InputManager class.
+    Unit test for the check_property_exists_in_pool() method of the InputManager class.
     """
 
     # Arrange
@@ -3742,7 +3752,7 @@ def test_property_exists_in_pool(
         patch_for_extract_value.side_effect = KeyError("Key Error")
 
     # Act
-    result = input_manager.property_exists_in_pool(data_address)
+    result = input_manager.check_property_exists_in_pool(data_address)
 
     # Assert
     assert result == expected_result

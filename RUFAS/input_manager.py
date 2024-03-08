@@ -1155,7 +1155,7 @@ class InputManager:
 
         return None
 
-    def property_exists_in_pool(self, data_address: str) -> bool:
+    def check_property_exists_in_pool(self, data_address: str) -> bool:
         """
         Check if the requested property exists in the pool.
 
@@ -1177,11 +1177,11 @@ class InputManager:
         >>> input_manager = InputManager()
 
         This will return True if the property `calf_num` exists in the `herd_information` section of the `animal` blob:
-        >>> input_manager.property_exists_in_pool('animal.herd_information.calf_num')
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.calf_num')
         True
 
         If the property does not exist, the method will return False:
-        >>> input_manager.property_exists_in_pool('animal.herd_information.nonexistent_property')
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
         False
         """
 
