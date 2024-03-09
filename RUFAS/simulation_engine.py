@@ -1,13 +1,9 @@
 # !/usr/bin/env python3
 
-import random
 import sys
 import time as timer
 from enum import Enum
-from typing import Optional, Dict, Any
-
-import numpy
-
+from typing import Optional
 from RUFAS import routines
 from RUFAS.weather import Weather
 from RUFAS.time import Time
