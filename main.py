@@ -10,11 +10,10 @@ import argparse
 import random
 import sys
 import traceback
-from typing import Dict, Any
 from pathlib import Path
 from typing import List
 
-import numpy as np
+import numpy
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -274,26 +273,31 @@ def run_validation(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
-def set_randomization_seed(im: InputManager) -> None:
+def set_random_seed(input_manager: InputManager) -> None:
     """
     Sets the random seed for this simulation, if one is provided.
+
+    Parameters
+    ----------
+    input_manager : InputManager
+        The Input Manager instance that contains all input data.
 
     Notes
     -----
     The packages seeded are Python's builtin `random` library and the NumPy `random` library.
 
     """
-    set_seed = im.get_data("config.set_seed")
+    set_seed = input_manager.get_data("config.set_seed")
 
     if not set_seed:
         return
 
-    seed = im.get_data("config.random_seed")
+    seed = input_manager.get_data("config.random_seed")
     random.seed(seed)
-    np.random.seed(seed)
+    numpy.random.seed(seed)
 
     om = OutputManager()
-    info_map = {"class": "No caller class", "function": set_randomization_seed.__name__}
+    info_map = {"class": "No caller class", "function": set_random_seed.__name__}
     log_name = "Randomization seed set."
     log_message = f"Randomization libraries have been seeded with {seed}."
     om.add_log(log_name, log_message, info_map)
@@ -423,7 +427,7 @@ def execute_simulations(
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
-            set_randomization_seed(input_manager)
+            set_random_seed(input_manager)
             try:
                 initialize_herd(
                     init_herd=init_herd,
