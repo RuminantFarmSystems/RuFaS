@@ -2797,9 +2797,9 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         "_create_anaerobic_digestion_daily_output",
         return_value=mock_anaerobic_digestion_daily_output,
     )
-    patch_for_accumulate_daily_output = mocker.patch.object(
+    patch_for_adjust_accumulated_output = mocker.patch.object(
         anaerobic_digestion_and_lagoon,
-        "_accumulate_daily_output",
+        "_adjust_accumulated_output",
         return_value=None,
     )
 
@@ -2853,8 +2853,8 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         )
 
     assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
-    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_digestion_daily_output)
-    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
+    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_digestion_daily_output)
+    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
 
 
 # Test CompostBeddedPackBarn specific methods

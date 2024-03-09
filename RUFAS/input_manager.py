@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union, Callable, Tuple
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 from RUFAS.util import Utility
 
@@ -1323,7 +1323,7 @@ class InputManager:
 
     def get_data(self, data_address: str) -> Any:
         """
-        Get the requested data from the pool.
+        Get the requested data from the pool if it exists. If not, None is returned.
 
         Parameters
         ----------
@@ -1333,12 +1333,7 @@ class InputManager:
         Returns
         -------
         Any
-            The requested data if found.
-
-        Raises
-        -------
-        KeyError
-            If the requested data is not found.
+            The requested data if found. None otherwise.
 
         Examples
         -------
@@ -1365,36 +1360,131 @@ class InputManager:
         herd_init: False,
         breed: HO
         }
+
+        If the requested data does not exist, the method will return None:
+        >>> input_manager.get_data('animal.herd_information.nonexistent_property')
+        None
         """
+
         info_map = {
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
 
         element_hierarchy = data_address.split(".")
-
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool)
-
+            data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
-
             return deepcopy(data_value)
-
         except KeyError as key_error:
-            invalid_key = str(key_error).strip("'")
-            parent_address = str(data_address.split("." + invalid_key)[0])
+            om.add_error("Validation: data not found", str(key_error), info_map)
 
-            om.add_error(
-                "Validation: data not found:",
-                f'Cannot find "{data_address}", ' f'"{parent_address}" does not have attribute ' f'"{invalid_key}".',
-                info_map,
-            )
+        return None
 
-            raise KeyError(
-                f'Data not found: Cannot find "{data_address}", '
-                f'"{parent_address}" does not have attribute "{invalid_key}".'
-            )
+    def check_property_exists_in_pool(self, data_address: str) -> bool:
+        """
+        Check if the requested property exists in the pool.
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested property.
+
+        Returns
+        -------
+        bool
+            True if the property exists in the pool, False otherwise.
+
+        Examples
+        --------
+        The user can check if a property exists in the pool.
+
+        Input Manager must first be instantiated:
+        >>> input_manager = InputManager()
+
+        This will return True if the property `calf_num` exists in the `herd_information` section of the `animal` blob:
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.calf_num')
+        True
+
+        If the property does not exist, the method will return False:
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
+        False
+        """
+
+        variable_path = data_address.split(".")
+        try:
+            self._extract_value_by_key_list(self.__pool, variable_path)
+            return True
+        except KeyError:
+            return False
+
+    def _extract_value_by_key_list(
+        self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
+    ) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+        return input_data
 
     def get_metadata(self, metadata_address: str) -> Any:
         """
