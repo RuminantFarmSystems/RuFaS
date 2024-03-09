@@ -6,7 +6,7 @@ Date last edited: 5/31/2023
 This document is meant to outline how the `FieldManager` will handle the scheduling of crop plantings and harvestings. 
 
 The input data is parsed and used to create a `CropSchedule`, which determines how a crop should be scheduled
-in a field. From that `CropSchedule` two lists of `Event`s will be created, a list of `PlantingEvent`s and a list of 
+in a field. From that `CropSchedule` two lists of `BaseFieldManagementEvent`s will be created, a list of `PlantingEvent`s and a list of 
 `HarvestEvent`s. 
 
 ## Scheduling an individual crop practice
