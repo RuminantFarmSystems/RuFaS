@@ -52,11 +52,11 @@ class Modifiability(Enum):
         return list(map(lambda c: c.value, cls))
 
     @classmethod
-    def get_required_during_initialization(cls) -> List['Modifiability']:
+    def get_required_during_initialization(cls) -> List["Modifiability"]:
         return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
 
     @classmethod
-    def get_modifiable_at_runtime(cls) -> List['Modifiability']:
+    def get_modifiable_at_runtime(cls) -> List["Modifiability"]:
         return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
@@ -67,7 +67,7 @@ class InputManager:
 
     __instance = None
 
-    def __new__(cls) -> 'InputManager':
+    def __new__(cls) -> "InputManager":
         if not hasattr(cls, "instance"):
             cls.instance = super(InputManager, cls).__new__(cls)
         return cls.instance
@@ -2069,5 +2069,5 @@ class InputManager:
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
-        
+
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
