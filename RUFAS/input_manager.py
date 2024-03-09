@@ -1979,5 +1979,4 @@ class InputManager:
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
-        
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
