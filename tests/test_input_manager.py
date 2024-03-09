@@ -1727,7 +1727,7 @@ def mock_metadata_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any
     }
 
 
-def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[str, Any]]:
+def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
     return {
         "element1": [1, 2, 3],
         "element2": [1, 2, 3, 4, 5],
