@@ -89,12 +89,12 @@ class AnimalManager:
 
     def __init__(
         self,
-        data,
+        data: Dict[str, Any],
         feed: Feed,
         weather: Weather,
         time: Time,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
-    ):
+    ) -> None:
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -102,7 +102,7 @@ class AnimalManager:
 
         Parameters
         ----------
-        data : Dict
+        data : Dict[str, Any]
             dictionary with animal information from the input JSON file
         feed : Feed
             instance of the Feed class

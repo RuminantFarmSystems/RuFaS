@@ -5,6 +5,11 @@ import sys
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
@@ -743,7 +748,7 @@ class AnimalModuleReporter:
                 om.add_variable("parity", "NA", dict(info_map, **{"units": "unitless"}))
 
     @classmethod
-    def report_sold_animal_information_sort_by_sell_day(cls, sold_animals, report_name: str, total_days: int) -> None:
+    def report_sold_animal_information_sort_by_sell_day(cls, sold_animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
 

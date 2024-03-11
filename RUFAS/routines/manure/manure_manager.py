@@ -85,7 +85,6 @@ class ManureManager:
         A dictionary that maps an animal pen's id to a ManureSeparator object.
     manure_treatments : Dict
         A dictionary that maps an animal pen's id to a Treatment object.
-    
     """
 
     def __init__(self, pen_list: List[Pen], weather: Weather, time: Time, manure_manager_config: Dict) -> None:
