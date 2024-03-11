@@ -74,20 +74,18 @@ class ManureManager:
     a daily simulation, it invokes the update method on an instance of this class, thereby generating
     and storing daily output data.
 
-    Notes
-    -----
-    This class will replace the `ManureStorage` class.
 
     Attributes
     ----------
     manure_handlers : Dict
-        a dictionary that maps an animal pen's id to a ManureHandler object.
+        A dictionary that maps an animal pen's id to a ManureHandler object.
     reception_pits : Dict
-        a dictionary that maps an animal pen's id to a ReceptionPit object.
+        A dictionary that maps an animal pen's id to a ReceptionPit object.
     manure_separators : Dict
-        a dictionary that maps an animal pen's id to a ManureSeparator object.
+        A dictionary that maps an animal pen's id to a ManureSeparator object.
     manure_treatments : Dict
-        a dictionary that maps an animal pen's id to a Treatment object.
+        A dictionary that maps an animal pen's id to a Treatment object.
+    
     """
 
     def __init__(self, pen_list: List[Pen], weather: Weather, time: Time, manure_manager_config: Dict) -> None:
@@ -211,6 +209,8 @@ class ManureManager:
     def daily_update(self, pen_list: List[Pen], simulation_day: int) -> None:
         """Calculates daily output data for each manure manager component for each animal pen.
 
+        Notes
+        -----
         On the last day of the simulation, all the data generated daily by the manure manager
         components will be exported to a CSV file.
 
@@ -740,7 +740,7 @@ class ManureManager:
         )
 
 
-def simulate_daily_manure_manager(manure_manager: ManureManager, penlist: list[Pen], simulation_day: int) -> None:
+def simulate_daily_manure_manager(manure_manager: ManureManager, pen_list: list[Pen], simulation_day: int) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 
     There is no strict reason why this function is needed. It is simply to make the code

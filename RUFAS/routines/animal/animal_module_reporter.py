@@ -30,8 +30,6 @@ class AnimalModuleReporter:
             length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
             if length_difference > 1:
                 short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
-                print(f"padding: {short_variable_to_add}")
-                print(length_difference)
                 for _ in range(0, length_difference - 1):
                     om.add_variable(
                         short_variable_to_add,
@@ -55,8 +53,6 @@ class AnimalModuleReporter:
             length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
             if length_difference > 1:
                 short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
-                print(f"padding: {short_variable_to_add}")
-                print(length_difference)
                 for _ in range(0, length_difference - 1):
                     om.add_variable(
                         short_variable_to_add,
@@ -155,7 +151,7 @@ class AnimalModuleReporter:
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
 
     @staticmethod
-    def report_ration_interval_data(penlist: List[Pen], feed: Feed, simulation_day: int) -> None:
+    def report_ration_interval_data(pen_list: List[Pen], feed: Feed, simulation_day: int) -> None:
         """
         For each pen, adds ration per animal and other supply reports, to output manager.
 
@@ -506,9 +502,9 @@ class AnimalModuleReporter:
             "potassium": "g",
             "enteric_methane_g": "g/day",
         }
+        classname = AnimalModuleReporter.__name__
+        funcname = AnimalModuleReporter.report_pen_manure_properties.__name__
         for manure_property, manure_value in pen.manure.items():
-            classname = AnimalModuleReporter.__name__
-            funcname = AnimalModuleReporter.report_pen_manure_properties.__name__
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
             AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add, 0, simulation_day, info_map)
@@ -678,13 +674,13 @@ class AnimalModuleReporter:
         )
 
     @staticmethod
-    def report_daily_pen_total(simulation_day: int, penlist: List[Pen]) -> None:
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
-        }
+    def report_daily_pen_total(simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_pen_total.__name__
+        info_map = {
+            "class": classname,
+            "function": funcname,
+        }
         for pen in penlist:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"

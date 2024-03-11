@@ -787,7 +787,7 @@ class AnimalManager:
         reference_pen: Pen,
     ) -> Pen:
         """
-        Create a default Pen object with the given parameters.
+        Duplicate a Pen object using a handful of parameters and a reference Pen.
 
         Parameters
         ----------
@@ -826,7 +826,7 @@ class AnimalManager:
             max_stocking_density=max_stocking_density,
         )
 
-    def _create_default_pens_for_potential_space_shortage(
+    def _create_additional_pens_for_potential_space_shortage(
         self,
         num_animals: int,
         pens: List[Pen],
