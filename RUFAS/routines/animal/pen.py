@@ -423,9 +423,38 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
+    def manure_sums(
+        self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
+    ) -> Tuple[Dict[float, int], Dict[float, int]]:
+        """
+        Accumulator helper function for calc_manure.
+        The function finds sums of manure components for each
+        animal in the pen and the total manure for each animal type.
+
+        Parameters
+        ----------
+        manure: Dict[float, int]
+            A dictionary that contains the the accumulated manure excretion values for all animals
+        curr_manure: AnimalManureExcretions
+            A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
+            in the AnimalManureExcretions class definition.
+        animal_dict: Dict[float, int]
+            A dictionary that contains the manure excretion values for specific animals in the pen
+
+        Returns
+        -------
+        Tuple[Dict[float, int], Dict[float, int]]
+            A tuple containing the updated manure dictionary and the updated animal dictionary.
+        """
+
+        for key in manure.keys():
+            manure[key] += curr_manure[key]
+            animal_dict[key] += curr_manure[key]
+        return manure, animal_dict
+
     def calc_manure(self, feed, methane_model: str):  # noqa
         """
-        Calculate the manure excretion of the animals in the pen.
+        Calculates the manure excretion of the animals in the pen.
 
         Parameters
         ----------
@@ -459,25 +488,16 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
-        # TODO: Write an accumulator function GitHub Issue # 1211
         for animal in animals:
             curr_manure = animal.manure_excretion
             if type(animal) == Calf:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    calf_total[key] += curr_manure[key]
+                manure, calf_total = self.manure_sums(manure, curr_manure, calf_total)
             elif type(animal) in [HeiferI, HeiferII, HeiferIII]:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    heifer_total[key] += curr_manure[key]
+                manure, heifer_total = self.manure_sums(manure, curr_manure, heifer_total)
             elif type(animal) == Cow and not animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    dry_total[key] += curr_manure[key]
+                manure, dry_total = self.manure_sums(manure, curr_manure, dry_total)
             elif type(animal) == Cow and animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    lactating_total[key] += curr_manure[key]
+                manure, lactating_total = self.manure_sums(manure, curr_manure, lactating_total)
 
         self.manure = manure
         self.calf_total = calf_total
