@@ -108,7 +108,9 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
         self.day_counter += 1
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
-        simulate_daily_manure_manager(self.manure_manager, self.animal_manager)
+        simulate_daily_manure_manager(
+            self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
+        )
         self.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
@@ -211,6 +213,6 @@ class SimulationEngine:
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
-        self.manure_manager = ManureManager(self.animal_manager, self.weather, self.time, manure_class_config)
+        self.manure_manager = ManureManager(self.animal_manager.all_pens, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)

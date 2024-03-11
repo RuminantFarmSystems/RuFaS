@@ -2566,6 +2566,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.methane_mitigation_additive_amount = mock_methane_mitigation_additive_amount = (
         mocker.MagicMock()
     )
+    mock_animal_manager.formulation_interval = mocker.MagicMock()
     patch_for_end_ration_interval = mocker.patch.object(
         AnimalManager, "end_ration_interval", return_value=is_end_ration_interval
     )
