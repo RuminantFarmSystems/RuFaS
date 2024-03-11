@@ -401,34 +401,36 @@ class Utility:
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     @staticmethod
-    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+    def filter_dictionary(
+        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
+    ) -> Dict[Any, Any]:
         """
-        Returns a filtered data pool based on either inclusion or exclusion.
+        Returns a filtered dictionary based on either inclusion or exclusion.
 
         Parameters
         ----------
-        data_pool : Dict[str, Any]
-            The pool to be filtered.
+        dict_to_filter : Dict[str, Any]
+            The dictionary to be filtered.
         filter_patterns : List[str]
-            A list of patterns by which to filter the pool.
+            A list of patterns by which to filter the dictionary.
         filter_by_exclusion : bool
-            A flag indicating whether the data pool should be filtered by exclusion
+            A flag indicating whether the dictionary should be filtered by exclusion
             or inclusion.
 
         Returns
         -------
         Dict[str, Any]
-            The filtered data pool.
+            The filtered dictionary.
         """
         if filter_by_exclusion:
             return {
-                key: data_pool[key]
-                for key in data_pool.keys()
+                key: dict_to_filter[key]
+                for key in dict_to_filter.keys()
                 if not any(re.search(pattern, key) for pattern in filter_patterns)
             }
         return {
-            key: data_pool[key]
-            for key in data_pool.keys()
+            key: dict_to_filter[key]
+            for key in dict_to_filter.keys()
             if any(re.search(pattern, key) for pattern in filter_patterns)
         }
 
