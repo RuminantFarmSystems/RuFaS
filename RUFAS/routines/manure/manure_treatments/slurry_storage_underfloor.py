@@ -44,25 +44,44 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         super().__init__(weather, time, manure_treatment_config)
         self.storage_time_period = self.config.storage_time_period
 
-    def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> Tuple[float, float]:
-        """Calculates the methane emission from the underfloor slurry storage.
+    def calc_methane_emission(
+        self,
+        accumulated_liquid_manure_total_volatile_solids: float,
+        accumulated_liquid_manure_total_degradable_volatile_solids: float,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
+    ) -> Tuple[float, float]:
+        """Calculates the CH4 emission from the outdoor slurry storage treatment system.
 
-        Args:
-            accumulated_liquid_manure_total_solids: Accumulated manure total solids in the treatment system, kg.
+        Parameters
+        ----------
+        accumulated_liquid_manure_total_volatile_solids: float
+            The accumulated total VS in the treatment system, kg VS.
+        accumulated_liquid_manure_total_degradable_volatile_solids: float
+            The accumulated total degradable VS in the treatment system, kg VSd.
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float
+            The accumulated total non-degradable VS in the treatment system, kg VSnd.
 
-        Returns:
-            methane_loss: methane emission from the underfloor slurry storage, kg.
-            new_accumulated_liquid_manure_total_solids: Accumulated total solids in the treatment system
-            after the methane emission is calculated, kg.
+        Returns
+        -------
+        float
+            methane_loss: methane emission from the outdoor slurry storage treatment system, (kg :math:`CH_4`/day).
+        float
+            methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
+            (kg :math:`CH_4`/day).
 
         """
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_loss = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-            total_volatile_solids=accumulated_liquid_manure_total_solids,
-            temp=temperature_celsius,
+        methane_loss, methane_emission_from_degradable_volatile_solids = (
+            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+                accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=
+                accumulated_liquid_manure_total_degradable_volatile_solids,
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=
+                accumulated_liquid_manure_total_non_degradable_volatile_solids,
+                temp=temperature_celsius,
+            )
         )
-
-        return methane_loss
+        return methane_loss, methane_emission_from_degradable_volatile_solids
 
     def calc_ammonia_emission(
         self,
@@ -107,7 +126,17 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
 
-        methane_loss = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_solids)
+        methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
+            accumulated_liquid_manure_total_volatile_solids=
+            self._accumulated_output.liquid_manure_total_volatile_solids,
+            accumulated_liquid_manure_total_degradable_volatile_solids=
+            self._accumulated_output.liquid_manure_total_degradable_volatile_solids,
+            accumulated_liquid_manure_total_non_degradable_volatile_solids=
+            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
+        )
+        methane_emission_from_non_degradable_volatile_solids = (
+            methane_loss - methane_emission_from_degradable_volatile_solids
+        )
 
         ammonia_loss = self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
@@ -137,10 +166,36 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
         self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
+
         new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - methane_loss, 0.0
+            self._accumulated_output.liquid_manure_total_solids - (methane_loss * 9.25), 0.0
         )
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
+
+        new_accumulated_liquid_manure_total_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_volatile_solids - (methane_loss * 9.25), 0.0
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            new_accumulated_liquid_manure_total_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_degradable_volatile_solids
+            - (methane_emission_from_degradable_volatile_solids * 9.25),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_degradable_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_non_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+            - (methane_emission_from_non_degradable_volatile_solids * 9.25),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_non_degradable_volatile_solids
+        )
 
         new_accumulated_liquid_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - ammonia_loss,
