@@ -743,8 +743,6 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
     )
     manure_manager.time = mock_time
     manure_manager._manure_nutrient_manager = mocker.MagicMock()
-    manure_manager.manure_treatments = [mocker.MagicMock(), mocker.MagicMock()]
-
     mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureModuleOutputManagerHelper.add_dataclass_object",
         return_value=None,
