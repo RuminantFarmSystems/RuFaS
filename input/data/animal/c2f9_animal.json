@@ -29,8 +29,8 @@
 		},
 		"farm_level": {
 			"calf": {
-				"male_calf_rate_sexed_semen": 0.75,
-				"male_calf_rate_conventional_semen": 0.75,
+				"male_calf_rate_sexed_semen": 0.7,
+				"male_calf_rate_conventional_semen": 0.7,
 				"keep_female_calf_rate": 0.82,
 				"wean_day": 72,
 				"wean_length": 7,
@@ -93,7 +93,7 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
-				"wood_l": [[16.13, 23.61, 23.81], [22.55, 30.72, 29.43]],
+				"wood_l": [[22.55, 30.72, 29.43], [22.55, 30.72, 29.43]],
 				"wood_m": [[0.235, 0.227, 0.244], [0.271, 0.263, 0.291]],
 				"wood_n": [[0.0019, 0.0032, 0.0036], [0.0025, 0.0037, 0.0041]],
 				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
