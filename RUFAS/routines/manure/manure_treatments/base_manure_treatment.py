@@ -173,14 +173,14 @@ class BaseManureTreatment(ABC):
             1 - self.config.volatile_solids_removal_efficiency_for_treatment
         )
 
-        liquid_manure_total_degradable_volatile_solids = \
-            manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids * (
-                1 - self.config.volatile_solids_removal_efficiency_for_treatment
+        liquid_manure_total_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
         )
 
-        liquid_manure_total_non_degradable_volatile_solids = \
-            manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids * (
-                1 - self.config.volatile_solids_removal_efficiency_for_treatment
+        liquid_manure_total_non_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
         )
 
         liquid_manure_phosphorus = manure_treatment_daily_input.liquid_manure_phosphorus * (
