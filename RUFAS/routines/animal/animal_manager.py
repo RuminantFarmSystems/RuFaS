@@ -1114,7 +1114,7 @@ class AnimalManager:
             animals_by_combination[animal_combination].append(animal)
 
         for animal_combination, animals in animals_by_combination.items():
-            new_default_pens = self._create_default_pens_for_potential_space_shortage(
+            new_default_pens = self._create_additional_pens_for_potential_space_shortage(
                 num_animals=len(animals),
                 pens=self.pens_by_animal_combination[animal_combination],
                 animal_combination=animal_combination,
