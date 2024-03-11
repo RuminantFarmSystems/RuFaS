@@ -15,10 +15,13 @@ om = OutputManager()
 
 class AnimalModuleReporter:
     @staticmethod
-    def data_padder_daily(reference_variable: str,
-                          full_variable_to_add: str,
-                          thing_to_add: Any,
-                          simulation_day: int, info_map: Dict[str, Any]) -> None:
+    def data_padder_daily(
+        reference_variable: str,
+        full_variable_to_add: str,
+        thing_to_add: Any,
+        simulation_day: int,
+        info_map: Dict[str, Any],
+    ) -> None:
         if simulation_day > 0 and reference_variable in om.variables_pool:
             if full_variable_to_add in om.variables_pool:
                 current_output_length = len(list(om.variables_pool[full_variable_to_add].values())[0])
@@ -26,7 +29,7 @@ class AnimalModuleReporter:
                 current_output_length = 0
             length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
             if length_difference > 1:
-                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind('.') + 1:]
+                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
                 print(f"padding: {short_variable_to_add}")
                 print(length_difference)
                 for _ in range(0, length_difference - 1):
@@ -51,7 +54,7 @@ class AnimalModuleReporter:
                 current_output_length = 0
             length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
             if length_difference > 1:
-                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind('.') + 1:]
+                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
                 print(f"padding: {short_variable_to_add}")
                 print(length_difference)
                 for _ in range(0, length_difference - 1):
@@ -508,9 +511,7 @@ class AnimalModuleReporter:
             funcname = AnimalModuleReporter.report_pen_manure_properties.__name__
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
-            AnimalModuleReporter.data_padder_daily(
-                reference_variable, variable_to_add, 0, simulation_day, info_map
-            )
+            AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add, 0, simulation_day, info_map)
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
@@ -687,9 +688,7 @@ class AnimalModuleReporter:
         for pen in penlist:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
-            AnimalModuleReporter.data_padder_daily(
-                reference_variable, variable_to_add, 0, simulation_day, info_map
-            )
+            AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add, 0, simulation_day, info_map)
             om.add_variable(
                 f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
                 len(pen.animals_in_pen),
