@@ -353,8 +353,8 @@ class BaseManureTreatment(ABC):
                 info_maps={
                     "class": self.__class__.__name__,
                     "function": self._adjust_accumulated_output.__name__,
-                    "prefix": f"{self.__class__.__name__}_pit_emptying_amount_on_sim_day_{self._sim_day}"
-                }
+                    "prefix": f"{self.__class__.__name__}_pit_emptying_amount_on_sim_day_{self._sim_day}",
+                },
             )
             self._accumulated_output = manure_treatment_daily_output.clone()
         else:
