@@ -339,6 +339,10 @@ class BaseManureTreatment(ABC):
 
     def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """Adjust the accumulated output by either resetting it or adding the daily output to it.
+
+        Notes
+        -----
+
         The accumulated output will be reset on the first day of every storage time period.
 
         Parameters
