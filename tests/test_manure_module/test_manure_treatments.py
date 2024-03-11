@@ -800,6 +800,10 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str, 
     manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 20
     manure_treatment_daily_input.liquid_manure_nitrogen = liquid_manure_nitrogen = 30
     manure_treatment_daily_input.liquid_manure_total_volatile_solids = liquid_manure_total_volatile_solids = 40
+    manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids = \
+        liquid_manure_total_degradable_volatile_solids = 39.6
+    manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids = \
+        liquid_manure_total_non_degradable_volatile_solids = 39.6
     manure_treatment_daily_input.liquid_manure_phosphorus = liquid_manure_phosphorus = 50
     manure_treatment_daily_input.liquid_manure_potassium = liquid_manure_potassium = 60
 
@@ -814,6 +818,12 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str, 
         liquid_manure_potassium=(liquid_manure_potassium * (1 - potassium_removal_efficiency_for_treatment)),
         liquid_manure_total_volatile_solids=(
             liquid_manure_total_volatile_solids * (1 - volatile_solids_removal_efficiency_for_treatment)
+        ),
+        liquid_manure_total_degradable_volatile_solids=(
+                liquid_manure_total_degradable_volatile_solids * (1 - volatile_solids_removal_efficiency_for_treatment)
+        ),
+        liquid_manure_total_non_degradable_volatile_solids=(
+            liquid_manure_total_non_degradable_volatile_solids * (1 - volatile_solids_removal_efficiency_for_treatment)
         ),
         liquid_manure_total_solids=(liquid_manure_total_solids * (1 - total_solids_removal_efficiency_for_treatment)),
         daily_final_manure_volume=(liquid_manure_daily_volume),
