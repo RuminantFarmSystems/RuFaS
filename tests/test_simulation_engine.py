@@ -122,10 +122,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
 
-    config_data = {"set_seed": True, "random_seed": 42}
     patch_for_get_data = mocker.patch(
         "RUFAS.simulation_engine.im.get_data",
-        side_effect=[config_data, {}, {}, {"manure_management_scenarios": {}}, {}],
+        side_effect=[{}, {}, {"manure_management_scenarios": {}}, {}],
     )
 
     mock_weather = mocker.MagicMock()
@@ -149,24 +148,18 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_feed_manager = mocker.MagicMock()
     patch_for_feed_manager = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
 
-    patch_for_random_seed = mocker.patch("RUFAS.simulation_engine.random.seed")
-    patch_for_numpy_seed = mocker.patch("RUFAS.simulation_engine.numpy.random.seed")
-
     # Act
     simulation_engine._initialize_simulation()
 
     # Assert
     patch_for_get_data.assert_has_calls(
         [
-            mocker.call("config"),
             mocker.call("weather"),
             mocker.call("feed"),
             mocker.call("manure_management"),
             mocker.call("animal"),
         ]
     )
-    patch_for_random_seed.assert_called_once_with(42)
-    patch_for_numpy_seed.assert_called_once_with(42)
 
     patch_for_weather.assert_called_once_with({}, mock_time)
     patch_for_time.assert_called_once_with()
