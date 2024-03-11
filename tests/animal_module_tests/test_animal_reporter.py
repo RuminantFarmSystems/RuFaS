@@ -311,20 +311,20 @@ def test_report_daily_ration(animal_manager_fixture: AnimalManager, mocker: Mock
 def test_report_daily_pen_total(mocker: MockerFixture) -> None:
     """Unit test for function report_daily_pen_total in file
     routines/animal/ration/animal_module_reporter.py"""
-    penlist = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
-    for i in range(len(penlist)):
-        penlist[i].id = i
-        penlist[i].animal_combination.name = "some_name"
-        penlist[i].animals_in_pen = [i] * i
+    pen_list = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    for i in range(len(pen_list)):
+        pen_list[i].id = i
+        pen_list[i].animal_combination.name = "some_name"
+        pen_list[i].animals_in_pen = [i] * i
     simulation_day = 0
-    AnimalModuleReporter.report_daily_pen_total(simulation_day, penlist)
-    for i in range(len(penlist)):
+    AnimalModuleReporter.report_daily_pen_total(simulation_day, pen_list)
+    for i in range(len(pen_list)):
         assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
             "values"
         ] == [i]
-    for i in range(len(penlist)):
-        penlist[i].animals_in_pen = [i] * (i + 1)
-    AnimalModuleReporter.report_daily_pen_total(simulation_day, penlist)
+    for i in range(len(pen_list)):
+        pen_list[i].animals_in_pen = [i] * (i + 1)
+    AnimalModuleReporter.report_daily_pen_total(simulation_day, pen_list)
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_{i}_some_name"][
             "values"

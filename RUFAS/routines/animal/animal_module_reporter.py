@@ -165,7 +165,7 @@ class AnimalModuleReporter:
             Day of simulation.
         """
 
-        for pen in penlist:
+        for pen in pen_list:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
             ration_per_animal = pen.ration_per_animal.copy()
@@ -681,7 +681,7 @@ class AnimalModuleReporter:
             "class": classname,
             "function": funcname,
         }
-        for pen in penlist:
+        for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
             AnimalModuleReporter.data_padder_daily(reference_variable, variable_to_add, 0, simulation_day, info_map)

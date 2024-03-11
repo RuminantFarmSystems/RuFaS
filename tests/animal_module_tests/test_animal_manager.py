@@ -2011,30 +2011,30 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             animal.milk_production_reduction = 100.1
 
     # mock an animal_manager object, but specifically so it returns a list of pens
-    penlist = MagicMock()
-    penlist.all_pens = pens_with_mock_animals
-    for pen in penlist.all_pens:
+    pen_list = MagicMock()
+    pen_list.all_pens = pens_with_mock_animals
+    for pen in pen_list.all_pens:
         pen.animal_combination.name = "NOT_LAC_COW"
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # call the function once on the list of pens
-    AnimalManager.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(pen_list)
 
     # then assert that all animals in all pens are still 100.1
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # now set that they are LAC_COW
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         pen.animal_combination.name = "LAC_COW"
 
     # call the function again on the list of pens
-    AnimalManager.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(pen_list)
 
     # then assert that all animals in all pens are now 0.0
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 0.0
 

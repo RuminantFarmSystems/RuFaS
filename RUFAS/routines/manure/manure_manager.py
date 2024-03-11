@@ -751,8 +751,8 @@ def simulate_daily_manure_manager(manure_manager: ManureManager, pen_list: list[
     ----------
     manure_manager : ManureManager
         A reference to the ManureManager object stored in the SimulationEngine.
-    penlist : List[Pen]
-        A list of Penss.
+    pen_list : List[Pen]
+        A list of Pens.
 
     """
-    manure_manager.daily_update(penlist, simulation_day)
+    manure_manager.daily_update(pen_list, simulation_day)
