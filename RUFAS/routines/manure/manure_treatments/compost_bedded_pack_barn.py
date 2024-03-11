@@ -50,6 +50,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         """
 
         super().__init__(weather, time, manure_treatment_config)
+        self.storage_time_period = self.config.storage_time_period
 
     def _calc_dry_matter_changes(
         self,
@@ -213,6 +214,6 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             solid_manure_daily_mass=solid_manure_mass,
         )
 
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         return daily_output

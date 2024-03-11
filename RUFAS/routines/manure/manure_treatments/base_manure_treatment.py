@@ -14,6 +14,9 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
@@ -334,12 +337,25 @@ class BaseManureTreatment(ABC):
         precipitation = current_conditions.precipitation
         return precipitation * GeneralConstants.MM_TO_M
 
-    def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
-        """Accumulates the daily output of the manure treatment.
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+        """Adjust the accumulated output by either resetting it or adding the daily output to it.
+        The accumulated output will be reset on the first day of every storage time period.
 
-        Args:
-            manure_treatment_daily_output: A ManureTreatmentDailyOutput object containing
-                the daily output of the manure treatment.
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
         """
-        self._accumulated_output += manure_treatment_daily_output
+        if self._sim_day % self.storage_time_period == 1:
+            ManureModuleOutputManagerHelper.add_dataclass_object(
+                self._accumulated_output,
+                info_maps={
+                    "class": self.__class__.__name__,
+                    "function": self._adjust_accumulated_output.__name__,
+                    "prefix": f"{self.__class__.__name__}_pit_emptying_amount_on_sim_day_{self._sim_day}"
+                }
+            )
+            self._accumulated_output = manure_treatment_daily_output.clone()
+        else:
+            self._accumulated_output += manure_treatment_daily_output
