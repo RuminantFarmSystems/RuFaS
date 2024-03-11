@@ -3787,14 +3787,7 @@ def test_add_variable_to_pool_nested(
     mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool_nested
     mock_input_manager._InputManager__pool = mock_pool_for_add_variable_to_pool_nested
 
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {
+    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
         "fixed_elements": 1,
         "valid_elements": 1,
         "total_elements": 1,
@@ -3811,7 +3804,6 @@ def test_add_variable_to_pool_nested(
                             input_data=data,
                             properties_blob_key=properties_blob_key,
                             eager_termination=eager_termination,
-                            is_variable_dict=True,
                         )
         assert mock_om_add_log.call_count == 0
         assert mock_om_add_warning.call_count == 0
@@ -3825,7 +3817,6 @@ def test_add_variable_to_pool_nested(
                         input_data=data,
                         properties_blob_key=properties_blob_key,
                         eager_termination=False,
-                        is_variable_dict=True,
                     )
 
         assert result is True
@@ -3836,8 +3827,7 @@ def test_add_variable_to_pool_nested(
         assert mock_input_manager.get_data(variable_name) == data
 
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
 
 
 @pytest.mark.parametrize(
