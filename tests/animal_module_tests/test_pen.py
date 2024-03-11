@@ -196,11 +196,10 @@ def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool) ->
         (lazy_fixture("pen_with_animals"), 0.03),
     ],
 )
-def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float) -> None:
+def test_current_stocking_density(pen_to_test: Pen, expected_stocking_density: float) -> None:
     """Unit test for function update_stocking_density in file routines/animal/pen.py"""
-    pen_to_test.update_stocking_density()
 
-    assert pen_to_test.stocking_density == expected_stocking_density
+    assert pen_to_test.current_stocking_density == expected_stocking_density
 
 
 @pytest.mark.parametrize(
@@ -225,7 +224,6 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
 
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_pen_populated")
-    mocker.patch("RUFAS.routines.animal.pen.Pen.update_stocking_density")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_animal_combination")
     mocker.patch("RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_classes_in_pen")
@@ -234,7 +232,6 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
 
     pen.add_new_animals.assert_called_once()
     pen.update_pen_populated.assert_called_once()
-    pen.update_stocking_density.assert_called_once()
     pen.update_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
     pen.update_classes_in_pen.assert_called_once()
