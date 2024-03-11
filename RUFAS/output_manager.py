@@ -1003,10 +1003,10 @@ class OutputManager(object):
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.variables_pool = {}
+        self.warnings_pool = {}
+        self.errors_pool = {}
+        self.logs_pool = {}
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
