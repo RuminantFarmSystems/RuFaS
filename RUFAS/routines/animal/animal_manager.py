@@ -834,7 +834,7 @@ class AnimalManager:
         start_pen_id: int = 0,
     ) -> List[Pen]:
         """
-        Create a list of default pens to accommodate potential animal space shortage.
+        Create a list of additional pens to accommodate potential animal space shortage.
 
         Parameters
         ----------

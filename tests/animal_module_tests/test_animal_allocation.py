@@ -197,10 +197,10 @@ def test_create_default_pen(animal_combination: AnimalCombination, mocker: Mocke
         AnimalCombination.LAC_COW,
     ],
 )
-def test_create_default_pens_for_potential_space_shortage(
+def test_create_additional_pens_for_potential_space_shortage(
     animal_combination: AnimalCombination, mocker: MockerFixture
 ) -> None:
-    """Unit test for function _create_default_pens_for_potential_space_shortage() in file animal_manager.py"""
+    """Unit test for function _create_additional_pens_for_potential_space_shortage() in file animal_manager.py"""
     # Arrange
     num_animals = 100
     mock_pens = mocker.MagicMock(spec=List[Pen])
@@ -229,14 +229,14 @@ def test_create_default_pens_for_potential_space_shortage(
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock()
     )
 
     # Act
-    new_default_pens = animal_manager._create_default_pens_for_potential_space_shortage(
+    new_default_pens = animal_manager._create_additional_pens_for_potential_space_shortage(
         num_animals=num_animals,
         pens=mock_pens,
         animal_combination=animal_combination,
@@ -456,7 +456,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     num_new_default_pens = 10
     dummy_new_default_pens = [mocker.MagicMock() for _ in range(num_new_default_pens)]
     mocker.patch(
-        "RUFAS.routines.animal.animal_manager.AnimalManager" "._create_default_pens_for_potential_space_shortage",
+        "RUFAS.routines.animal.animal_manager.AnimalManager" "._create_additional_pens_for_potential_space_shortage",
         return_value=dummy_new_default_pens,
     )
     patch_for_allocate_animals_to_pens_helper = mocker.patch.object(
@@ -469,10 +469,10 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock(),
     )
     animal_manager.calves = calves
     animal_manager.heiferIs = heiferIs
@@ -501,7 +501,6 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
 
     animal_manager.weather = mocker.MagicMock()
     animal_manager.time = mocker.MagicMock()
-    manure_manager = mocker.MagicMock()
 
     # Act
     animal_manager.allocate_animals_to_pens()
@@ -520,16 +519,16 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     patch_for_sort_animals_before_allocation.assert_called_once()
 
 
-def test_set_animal_grouping_scenario(mocker: MockerFixture):
+def test_set_animal_grouping_scenario(mocker: MockerFixture) -> None:
     """Unit test for function set_animal_grouping_scenario() in file animal_manager.py."""
     scenario = mocker.MagicMock()
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock(),
     )
     # act
     animal_manager.set_animal_grouping_scenario(scenario)

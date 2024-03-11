@@ -30,6 +30,13 @@ class AnimalModuleReporter:
         info_map: Dict[str, Any],
     ) -> None:
         """
+        Check the length of a reference variable in OutputManager and the variable of interest, and if there is a
+        mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the variable to add is one less than the reference variable.
+
+        This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there may be a mismatch in variable lengths.
+        A common case would be when a variable is stored in OutputManager by pen, and additional pens are created during the simulation.
+        What it would do in that case is add the number 
+
         Parameters
         ----------
         reference_variable : str

@@ -53,6 +53,11 @@ def test___init__() -> None:
     pass
 
 
+def test_data_padder() -> None:
+    """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
+    pass
+
+
 def test_report_daily_animal_population(mocker: MockerFixture) -> None:
     """Unit test for function report_daily_animal_population in file
     routines/animal/ration/animal_module_reporter.py"""
@@ -357,7 +362,7 @@ def test_report_pen_manure(mocker: MockerFixture) -> None:
     assert om.variables_pool["AnimalModuleReporter.report_pen_manure.pen_manure_data"]["values"] == [dummy_pen.manure]
 
 
-def test_report_life_cycle_manager_data(mocker: MockerFixture):
+def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
     life_cycle_manager = mocker.MagicMock()
     keydict = {
         "sold_heiferIII_oversupply_num": 1,
@@ -528,7 +533,7 @@ def test_report_sold_animal_information(
         patch_for_add_variable.assert_any_call("parity", none_str, mocker.ANY)
 
 
-def test_report_305d_milk(mocker: MockerFixture):
+def test_report_305d_milk(mocker: MockerFixture) -> None:
     animal_manager = mocker.MagicMock()
     animal_manager.cows = [mocker.MagicMock(), mocker.MagicMock()]
     for cow in animal_manager.cows:
@@ -555,7 +560,7 @@ def test_report_305d_milk(mocker: MockerFixture):
     ]
 
 
-def test_report_daily_reports(mocker: MockerFixture):
+def test_report_daily_reports(mocker: MockerFixture) -> None:
     animal_manager = mocker.MagicMock()
     animal_manager.all_pens = [mocker.MagicMock(), mocker.MagicMock()]
     animal_manager.all_pens[0].animal_combination.name = "LAC_COW"
@@ -575,7 +580,7 @@ def test_report_daily_reports(mocker: MockerFixture):
     )
     patch_for_report_milk = mocker.patch.object(AnimalModuleReporter, "report_milk", return_value="")
     mock_available_feeds = mocker.MagicMock()
-    patch_for_data_padder_daily = mocker.patch.object(AnimalModuleReporter, "data_padder_daily", return_value="")
+    patch_for_data_padder = mocker.patch.object(AnimalModuleReporter, "data_padder", return_value="")
     # act
     AnimalModuleReporter.report_daily_reports(animal_manager, mock_available_feeds)
 
@@ -588,10 +593,10 @@ def test_report_daily_reports(mocker: MockerFixture):
     patch_for_report_305d_milk.assert_called_once_with(animal_manager)
     assert patch_for_report_pen_manure_properties.call_count == len(animal_manager.all_pens)
     patch_for_report_milk.assert_called_once_with(animal_manager.all_pens[0], animal_manager.simulation_day)
-    patch_for_data_padder_daily.assert_called()
+    patch_for_data_padder.assert_called()
 
 
-def test_report_end_of_simulation(mocker: MockerFixture):
+def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     animal_manager = mocker.MagicMock()
     patch_for_plan_animal_allocation = mocker.patch.object(
         AnimalModuleReporter, "report_sold_animal_information", return_value=""
