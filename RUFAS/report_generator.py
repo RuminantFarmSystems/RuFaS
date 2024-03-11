@@ -275,7 +275,9 @@ class ReportGenerator:
                 missing_references.append(ref)
 
         if missing_references:
-            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+            raise KeyError(
+                f"Missing referenced reports matching the following pattern(s): {', '.join(missing_references)}"
+            )
 
     def _get_reports_by_regex(self, regex_patterns: List[str]) -> Dict[str, Dict[str, List[Any]]]:
         """
