@@ -270,8 +270,8 @@ def input_manager(mocker: MockerFixture) -> InputManager:
 
 
 @pytest.fixture
-def mock_im_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
-    return {"config": {"nutrient_standard": "NASEM"}}
+def mock_im_pool() -> Dict[str, Dict[str, Any]]:
+    return {"config": {"nutrient_standard": "NASEM"}, "animal": {"herd_information": {"breed": "HO"}}}
 
 
 @pytest.fixture
