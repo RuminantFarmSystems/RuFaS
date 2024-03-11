@@ -627,22 +627,22 @@ def test_combine_aggregate_report_data(
         # All references are present
         (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
         # One reference is missing
-        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2"),
+        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports matching the following pattern(s): ref2"),
         # Multiple references are missing
         (
             ["ref1", "ref2", "ref3"],
             {"ref1": {}},
             KeyError,
-            "Missing referenced reports: ref2, ref3",
+            "Missing referenced reports matching the following pattern(s): ref2, ref3",
         ),
         # Reports dictionary is empty
-        (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
+        (["ref1"], {}, KeyError, "Missing referenced reports matching the following pattern(s): ref1"),
         # Regex match one reference
         (["ref\\d"], {"ref1": {}}, None, None),
         # Regex match multiple references
         (["ref\\d"], {"ref2": {}, "ref3": {}}, None, None),
         # Regex match none
-        (["ref\\d+"], {"report1": {}, "report2": {}}, KeyError, r"Missing referenced reports: ref\\d+"),
+        (["ref\\d+"], {"report1": {}, "report2": {}}, KeyError, r"Missing referenced reports matching the following pattern(s): ref\\d+"),
         # Complex regex pattern
         (["ref[1-3]", "report\\d{2}"], {"ref1": {}, "ref2": {}, "report01": {}}, None, None),
     ],
