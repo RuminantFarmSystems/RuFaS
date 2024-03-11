@@ -250,7 +250,7 @@ class InputManager:
 
         """
 
-        data_type_to_loader_map: Dict[str, Callable] = {
+        data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
@@ -259,7 +259,6 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
-                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 input_data = data_loader(file_path)
             except KeyError:
@@ -279,26 +278,13 @@ class InputManager:
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
-                if file_type == "json":
-                    is_element_acceptable = self._validate_dict_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        self.elements_counter,
-                    )
-                elif file_type == "csv":
-                    is_element_acceptable = self._validate_tabular_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        self.elements_counter,
-                    )
-                else:
-                    raise ValueError(
-                        f"Unsupported file type {file_type}, supported types are: {data_type_to_loader_map.keys()}"
-                    )
+                is_element_acceptable = self._dict_type_validator(
+                    metadata_property,
+                    properties_blob_key,
+                    filtered_input_data,
+                    eager_termination,
+                    self.elements_counter,
+                )
 
                 if is_element_acceptable:
                     validated_data[metadata_property] = filtered_input_data[metadata_property]
@@ -583,13 +569,15 @@ class InputManager:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
         data_type = variable_properties["type"]
 
-        primitive_data_type_to_validator_map: Dict[str, Callable] = {
+        primitive_data_type_to_validator_map: Dict[str, Callable[[Dict[str, Any], str, Any, str], bool]] = {
             "string": self._string_type_validator,
             "number": self._num_type_validator,
             "bool": self._bool_type_validator,
         }
 
-        complex_type_to_validator_map: Dict[str, Callable] = {
+        complex_type_to_validator_map: Dict[
+            str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter"], bool]
+        ] = {
             "array": self._array_type_validator,
             "object": self._object_type_validator,
         }
@@ -679,7 +667,7 @@ class InputManager:
 
         return is_whole_column_acceptable
 
-    def _validate_dict_element(
+    def _dict_type_validator(
         self,
         first_level_key: str,
         properties_blob_key: str,
@@ -1579,7 +1567,6 @@ class InputManager:
         data: Dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        is_variable_dict: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1600,8 +1587,6 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
-        is_variable_dict : bool
-            Weather the variable is a dictionary variable (rather than tabular).
 
         Returns
         -------
@@ -1621,11 +1606,8 @@ class InputManager:
         elements_counter = ElementsCounter()
 
         metadata_properties = self.__metadata["properties"][properties_blob_key]
-        validate_method: Callable[[str, str, Dict[str, Any], bool, "ElementsCounter"], bool] = (
-            self._validate_dict_element if is_variable_dict else self._validate_tabular_element
-        )
         for metadata_property in metadata_properties.keys():
-            is_element_acceptable = validate_method(
+            is_element_acceptable = self._dict_type_validator(
                 metadata_property,
                 properties_blob_key,
                 data,
@@ -1724,7 +1706,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=True,
             )
             return add_variable_success
 
@@ -1793,7 +1774,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=False,
             )
             return add_variable_success
 
@@ -1848,7 +1828,7 @@ class ElementsCounter:
         The number of fixed elements.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.valid_elements = 0
         self.invalid_elements = 0
         self.fixed_elements = 0
@@ -1929,7 +1909,7 @@ class ElementsCounter:
         if self.fixed_elements < 0:
             raise ValueError(f"Fixed elements count is negative: {self.fixed_elements}")
 
-    def total_elements(self):
+    def total_elements(self) -> int:
         """
         Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
         """
