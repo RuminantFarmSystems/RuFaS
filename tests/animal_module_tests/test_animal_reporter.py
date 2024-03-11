@@ -55,7 +55,46 @@ def test___init__() -> None:
 
 def test_data_padder() -> None:
     """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
-    pass
+    reference_variable = 'reference'
+    om.variables_pool = {}
+    om.variables_pool[reference_variable] = {}
+    om.variables_pool[reference_variable]["values"] = [0, 1, 2, 3, 4]
+
+    # Act
+    AnimalModuleReporter.data_padder(
+        reference_variable,
+        full_variable_to_add='full_variable',
+        thing_to_add=0,
+        simulation_day=100,
+        info_map={'class': 'dummyclass',
+                  'function': 'dummyfunction'}
+    )
+
+    # Assert
+    full_variable_added = om.variables_pool["dummyclass.dummyfunction.full_variable"][
+        "values"
+    ]
+    assert full_variable_added[-1] == 0
+    assert len(full_variable_added) == 4
+
+
+def test_data_padder_no_data_to_pad() -> None:
+    """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
+    reference_variable = "reference"
+    om.variables_pool = {}
+    om.variables_pool[reference_variable] = {}
+
+    # Act
+    AnimalModuleReporter.data_padder(
+        reference_variable,
+        full_variable_to_add="full_variable",
+        thing_to_add=0,
+        simulation_day=0,
+        info_map={"class": "dummyclass", "function": "dummyfunction"},
+    )
+
+    # Assert
+    assert "dummyclass.dummyfunction.full_variable" not in om.variables_pool
 
 
 def test_report_daily_animal_population(mocker: MockerFixture) -> None:

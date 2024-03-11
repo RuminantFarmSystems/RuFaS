@@ -30,17 +30,23 @@ class AnimalModuleReporter:
         info_map: Dict[str, Any],
     ) -> None:
         """
-        Check the length of a reference variable in OutputManager and the variable of interest, and if there is a
-        mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the variable to add is one less than the reference variable.
+        Pads a variable in OutputManager for entries that it "missed" relative to another variable.
 
-        This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there may be a mismatch in variable lengths.
-        A common case would be when a variable is stored in OutputManager by pen, and additional pens are created during the simulation.
-        What it would do in that case is add the number 
+        This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there
+        may be a mismatch in variable lengths.
+        A common case would be when a variable is stored in OutputManager by pen, and additional pens are created
+        during the simulation.
+
+        This method checks the length of a reference variable (in the previous example, Pen 0) in OutputManager and the
+        variable of interest (in the previous example, a newly created Pen 15), and if there is a
+        mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the
+        variable to add is one less than the reference variable using "blank" data.
 
         Parameters
         ----------
         reference_variable : str
-            The "reference" variable name as found in om.variables_pool. In the case of a pen, this should be pen 0 (as it will always be instantiated at the start of the simulation).
+            The "reference" variable name as found in om.variables_pool. In the case of a pen, this should be pen 0 (as
+            it will always be instantiated at the start of the simulation).
         full_variable_to_add: str
             The variable name as found in om.variables_pool.
         thing_to_add : Any
