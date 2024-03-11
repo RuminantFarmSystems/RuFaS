@@ -445,15 +445,16 @@ class Pen:
         Accumulator helper function for calc_manure.
         The function finds sums of manure components for each
         animal in the pen and the total manure for each animal type.
+
         Parameters
         ----------
-            manure: Dict[float, int]
-                A dictionary that contains the the accumulated manure excretion values for all animals
-            curr_manure: AnimalManureExcretions
-                A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
-                in the AnimalManureExcretions class definition.
-            animal_dict: Dict[float, int]
-                A dictionary that contains the manure excretion values for specific animals in the pen
+        manure: Dict[float, int]
+            A dictionary that contains the the accumulated manure excretion values for all animals
+        curr_manure: AnimalManureExcretions
+            A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
+            in the AnimalManureExcretions class definition.
+        animal_dict: Dict[float, int]
+            A dictionary that contains the manure excretion values for specific animals in the pen
 
         Returns
         -------
