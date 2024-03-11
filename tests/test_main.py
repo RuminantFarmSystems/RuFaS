@@ -19,6 +19,7 @@ from main import (
     run_validation,
     METADATA_PATHS,
     initialize_herd,
+    set_random_seed,
 )
 
 
@@ -599,79 +600,94 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "set_seed, seed, terminate_simulation_post_herd_generation, add_log_count",
+    "set_seed,seed,expected_seed,get_data_call_count,add_log_call_count",
     [
-        (False, 42, True, 3),
-        (False, 42, False, 2),
-        (False, 31415, True, 3),
-        (False, 31415, False, 2),
-        (True, 42, True, 3),
-        (True, 42, False, 2),
-        (True, 31415, True, 3),
-        (True, 31415, False, 2),
+        (True, 1, 1, 2, 1),
+        (False, 1, None, 1, 0),
+    ],
+)
+def test_set_random_seed(
+    mocker: MockerFixture,
+    set_seed: bool,
+    seed: int,
+    expected_seed: int,
+    get_data_call_count: int,
+    add_log_call_count: int,
+) -> None:
+    """Tests that the randomization libraries used in simulations are correctly seeded."""
+    mock_input_manager = mocker.MagicMock(autospec=InputManager)
+    mock_input_manager.get_data.side_effect = [set_seed, seed]
+    mock_output_manager = mocker.MagicMock(autospec=OutputManager)
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mock_random_seed = mocker.patch("random.seed")
+    mock_numpy_random_seed = mocker.patch("numpy.random.seed")
+
+    set_random_seed(mock_input_manager)
+
+    mock_input_manager.get_data.call_count == get_data_call_count
+    mock_random_seed.assert_called_once_with(expected_seed)
+    mock_numpy_random_seed.assert_called_once_with(expected_seed)
+    assert mock_output_manager.add_log.call_count == add_log_call_count
+
+
+@pytest.mark.parametrize(
+    "terminate_simulation_post_herd_generation, add_log_count",
+    [
+        (True, 3),
+        (False, 2),
+        (True, 3),
+        (False, 2),
+        (True, 3),
+        (False, 2),
+        (True, 3),
+        (False, 2),
     ],
 )
 def test_initialize_herd(
     mocker: MockerFixture,
-    set_seed: bool,
-    seed: int,
     terminate_simulation_post_herd_generation: bool,
     add_log_count: int,
 ) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
-    mock_simulation_config = {}
     mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
 
     mock_output_manager.add_log.return_value = None
-    mock_simulation_config["set_seed"] = set_seed
-    mock_simulation_config["random_seed"] = seed
     mock_herd_factory.initialize_herd.return_value = None
-
-    patch_random_seed = mocker.patch("random.seed", return_value=None)
-    patch_numpy_random_seed = mocker.patch("numpy.random.seed", return_value=None)
 
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.HerdFactory", return_value=mock_herd_factory)
 
     initialize_herd(
-        simulation_config=mock_simulation_config,
         init_herd=False,
         save_animals=False,
         save_animals_dir=Path("output/"),
         terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
     )
 
-    if set_seed:
-        patch_random_seed.assert_called_once_with(seed)
-        patch_numpy_random_seed.assert_called_once_with(seed)
-    else:
-        patch_random_seed.assert_not_called()
-        patch_numpy_random_seed.assert_not_called()
-
     assert mock_herd_factory.initialize_herd.call_count == 1
     assert mock_output_manager.add_log.call_count == add_log_count
 
 
 @pytest.mark.parametrize(
-    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
-    "initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
+    "set_random_seed_call_count, initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",
     [
-        (False, False, True, False, 2, 2, 0, "verbose"),
-        (False, False, False, False, 0, 0, 4, "block"),
-        (False, True, True, False, 2, 2, 0, "inline"),
-        (False, True, False, False, 0, 0, 4, "basic"),
-        (True, False, True, False, 2, 2, 0, "verbose"),
-        (True, False, False, False, 0, 0, 4, "block"),
-        (True, True, True, False, 2, 2, 0, "basic"),
-        (True, True, False, False, 0, 0, 4, "inline"),
-        (False, False, True, True, 2, 0, 0, "verbose"),
-        (False, False, False, True, 0, 0, 4, "block"),
-        (False, True, True, True, 2, 0, 0, "inline"),
-        (False, True, False, True, 0, 0, 4, "basic"),
-        (True, False, True, True, 2, 0, 0, "verbose"),
-        (True, False, False, True, 0, 0, 4, "block"),
-        (True, True, True, True, 2, 0, 0, "basic"),
-        (True, True, False, True, 0, 0, 4, "inline"),
+        (False, False, True, False, 2, 2, 2, 0, "verbose"),
+        (False, False, False, False, 0, 0, 0, 4, "block"),
+        (False, True, True, False, 2, 2, 2, 0, "inline"),
+        (False, True, False, False, 0, 0, 0, 4, "basic"),
+        (True, False, True, False, 2, 2, 2, 0, "verbose"),
+        (True, False, False, False, 0, 0, 0, 4, "block"),
+        (True, True, True, False, 2, 2, 2, 0, "basic"),
+        (True, True, False, False, 0, 0, 0, 4, "inline"),
+        (False, False, True, True, 2, 2, 0, 0, "verbose"),
+        (False, False, False, True, 0, 0, 0, 4, "block"),
+        (False, True, True, True, 2, 2, 0, 0, "inline"),
+        (False, True, False, True, 0, 0, 0, 4, "basic"),
+        (True, False, True, True, 2, 2, 0, 0, "verbose"),
+        (True, False, False, True, 0, 0, 0, 4, "block"),
+        (True, True, True, True, 2, 2, 0, 0, "basic"),
+        (True, True, False, True, 0, 0, 0, 4, "inline"),
     ],
 )
 def test_execute_simulations(
@@ -680,6 +696,7 @@ def test_execute_simulations(
     exlclude_info_maps: bool,
     is_data_valid: bool,
     terminate_simulation_post_herd_generation: bool,
+    set_random_seed_call_count: int,
     initialize_herd_call_count: int,
     simulate_call_count: int,
     add_error_call_count: int,
@@ -706,6 +723,7 @@ def test_execute_simulations(
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
     patch_initialize_herd = mocker.patch("main.initialize_herd")
+    patch_set_random_seed = mocker.patch("main.set_random_seed")
 
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
@@ -737,6 +755,7 @@ def test_execute_simulations(
 
     # Assert
     assert patch_initialize_herd.call_count == initialize_herd_call_count
+    assert patch_set_random_seed.call_count == set_random_seed_call_count
     assert mock_simulator.simulate.call_count == simulate_call_count
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
@@ -763,16 +782,16 @@ def test_execute_simulations(
 
 @pytest.mark.parametrize(
     "produce_graphics, exclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation,"
-    "initialize_herd_call_count, format_option",
+    "set_random_seed_call_count, format_option",
     [
-        (False, False, True, False, 2, "verbose"),
-        (False, True, True, False, 2, "inline"),
-        (True, False, True, False, 2, "verbose"),
-        (True, True, True, False, 2, "basic"),
-        (False, False, True, True, 2, "verbose"),
-        (False, True, True, True, 2, "inline"),
-        (True, False, True, True, 2, "verbose"),
-        (True, True, True, True, 2, "basic"),
+        (False, False, True, False, 1, "verbose"),
+        (False, True, True, False, 1, "inline"),
+        (True, False, True, False, 1, "verbose"),
+        (True, True, True, False, 1, "basic"),
+        (False, False, True, True, 1, "verbose"),
+        (False, True, True, True, 1, "inline"),
+        (True, False, True, True, 1, "verbose"),
+        (True, True, True, True, 1, "basic"),
     ],
 )
 def test_execute_simulations_raises_exception(
@@ -781,7 +800,7 @@ def test_execute_simulations_raises_exception(
     exclude_info_maps: bool,
     is_data_valid: bool,
     terminate_simulation_post_herd_generation: bool,
-    initialize_herd_call_count: int,
+    set_random_seed_call_count: int,
     format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
@@ -804,6 +823,7 @@ def test_execute_simulations_raises_exception(
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
+    patch_set_random_seed = mocker.patch("main.set_random_seed")
     patch("main.initialize_herd", side_effct=Exception)
 
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
@@ -834,6 +854,7 @@ def test_execute_simulations_raises_exception(
         )
 
     # Assert
+    assert patch_set_random_seed.call_count == set_random_seed_call_count
     assert mock_simulator.simulate.call_count == 0
     assert mock_output_manager.add_error.call_count == 0
     assert mock_output_manager.flush_pools.call_count == 1
