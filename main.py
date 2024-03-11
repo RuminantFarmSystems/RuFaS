@@ -463,6 +463,9 @@ def execute_simulations(
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
+        error_count, warning_count = output_manager.get_error_and_warning_counts()
+        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
+
 
 class CaseInsensitiveArgumentAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None) -> None:
