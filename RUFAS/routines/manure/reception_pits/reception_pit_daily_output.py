@@ -37,6 +37,14 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
         Total amount of solids from the manure and the bedding, kg.
     liquid_manure_total_solids_unit: str
         Unit for liquid_manure_total_solids.
+    liquid_manure_total_degradable_volatile_solids: float
+        Total amount of degradable solids from the manure and the bedding, kg.
+    liquid_manure_total_degradable_volatile_solids_unit: str
+        Unit for liquid_manure_total_degradable_volatile_solids
+    liquid_manure_total_non_degradable_volatile_solids: float
+        Total amount of non-degradable solids from the manure and the bedding, kg.
+    liquid_manure_total_non_degradable_volatile_solids_unit: str
+        Unit for liquid_manure_total_non_degradable_volatile_solids
     manure_degradable_volatile_solids: float
         Amount of degradable volatile solids, kg.
     manure_degradable_volatile_solids_unit: str
@@ -86,11 +94,11 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_total_solids: float = 0.0
     liquid_manure_total_solids_unit: str = "kg"
 
-    manure_degradable_volatile_solids: float = 0.0
-    manure_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_degradable_volatile_solids_unit: str = "kg"
 
-    manure_non_degradable_volatile_solids: float = 0.0
-    manure_non_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_non_degradable_volatile_solids: float = 0.0
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
 
     liquid_manure_total_volatile_solids: float = 0.0
     liquid_manure_total_volatile_solids_unit: str = "kg"
