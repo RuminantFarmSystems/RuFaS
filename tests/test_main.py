@@ -733,6 +733,8 @@ def test_execute_simulations(
     csv_dir = Path("output/CSVs/")
     graphics_dir = Path("")
     verbose = LogVerbosity("none")
+    mock_output_manager.get_error_and_warning_counts.return_value = (1, 2)
+    patch_for_stdout_write = mocker.patch("main.sys.stdout.write")
 
     # Act
     execute_simulations(
@@ -773,6 +775,9 @@ def test_execute_simulations(
             csv_dir,
         ),
     ] * len(metadata_file_list)
+    patch_for_stdout_write.assert_has_calls(
+        [mocker.call("Simulating...\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
+    )
 
 
 @pytest.mark.parametrize(
