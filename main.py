@@ -284,23 +284,25 @@ def set_random_seed(input_manager: InputManager) -> None:
 
     Notes
     -----
-    The packages seeded are Python's builtin `random` library and the NumPy `random` library.
+    The packages seeded are Python's builtin `random` library and the NumPy `random` library. If the input indicates
+    that there should be no random seeding, the random libraries are "seeded" with `None`, which seeds the random
+    libraries with the system time.
 
     """
     set_seed = input_manager.get_data("config.set_seed")
 
-    if not set_seed:
-        return
+    if set_seed:
+        seed = input_manager.get_data("config.random_seed")
+        om = OutputManager()
+        info_map = {"class": "No caller class", "function": set_random_seed.__name__}
+        log_name = "Randomization seed set."
+        log_message = f"Randomization libraries being seeded with {seed}."
+        om.add_log(log_name, log_message, info_map)
+    else:
+        seed = None
 
-    seed = input_manager.get_data("config.random_seed")
     random.seed(seed)
     numpy.random.seed(seed)
-
-    om = OutputManager()
-    info_map = {"class": "No caller class", "function": set_random_seed.__name__}
-    log_name = "Randomization seed set."
-    log_message = f"Randomization libraries have been seeded with {seed}."
-    om.add_log(log_name, log_message, info_map)
 
 
 def initialize_herd(

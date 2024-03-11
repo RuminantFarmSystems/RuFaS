@@ -600,14 +600,19 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "set_seed,seed,get_data_call_count,add_log_call_count",
+    "set_seed,seed,expected_seed,get_data_call_count,add_log_call_count",
     [
-        (True, 1, 2, 1),
-        (False, 1, 1, 0),
+        (True, 1, 1, 2, 1),
+        (False, 1, None, 1, 0),
     ],
 )
 def test_set_random_seed(
-    mocker: MockerFixture, set_seed: bool, seed: int, get_data_call_count: int, add_log_call_count: int
+    mocker: MockerFixture,
+    set_seed: bool,
+    seed: int,
+    expected_seed: int,
+    get_data_call_count: int,
+    add_log_call_count: int,
 ) -> None:
     """Tests that the randomization libraries used in simulations are correctly seeded."""
     mock_input_manager = mocker.MagicMock(autospec=InputManager)
@@ -620,12 +625,8 @@ def test_set_random_seed(
     set_random_seed(mock_input_manager)
 
     mock_input_manager.get_data.call_count == get_data_call_count
-    if set_seed:
-        mock_random_seed.assert_called_once_with(seed)
-        mock_numpy_random_seed.assert_called_once_with(seed)
-    else:
-        mock_random_seed.assert_not_called()
-        mock_numpy_random_seed.assert_not_called()
+    mock_random_seed.assert_called_once_with(expected_seed)
+    mock_numpy_random_seed.assert_called_once_with(expected_seed)
     assert mock_output_manager.add_log.call_count == add_log_call_count
 
 
