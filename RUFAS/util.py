@@ -7,14 +7,11 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
-from RUFAS.config import is_leap_year
 
 
 class Utility:
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(
-        list_of_dicts: List[Dict[str, Any]]
-    ) -> Dict[str, List[Any]]:
+    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
         """
         Convert a list of dictionaries into a dictionary of lists.
 
@@ -74,9 +71,7 @@ class Utility:
             return Path(__file__).resolve().parents[1]
 
     @staticmethod
-    def read_json_file(
-        file_path: Path
-    ) -> Dict[Any, Any]:
+    def read_json_file(file_path: Path) -> Dict[Any, Any]:
         """
         Description:
             Reads and interprets the JSON file at the given path. Compiles the
@@ -114,9 +109,7 @@ class Utility:
             print(e.msg)
 
     @staticmethod
-    def calc_average(
-        num_values: int, cur_avg: float, new_value: float
-    ) -> Tuple[int, float]:
+    def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
         """
         Calculate the new average given the number of values,
         the current average, and the new value.
@@ -237,9 +230,7 @@ class Utility:
 
         # If the object is a tuple, serialize each element recursively
         if isinstance(obj, tuple):
-            return tuple(
-                [cls._make_serializable(elem, depth + 1, max_depth) for elem in obj]
-            )
+            return tuple([cls._make_serializable(elem, depth + 1, max_depth) for elem in obj])
 
         # If the object is a set, serialize each element recursively
         # Note: sets are not serializable by default, so we convert them to lists
@@ -250,9 +241,7 @@ class Utility:
         # Note: dictionary keys must be strings
         if isinstance(obj, dict):
             return {
-                str(
-                    cls._make_serializable(key, depth, max_depth)
-                ): cls._make_serializable(value, depth, max_depth)
+                str(cls._make_serializable(key, depth, max_depth)): cls._make_serializable(value, depth, max_depth)
                 for key, value in obj.items()
             }
 
@@ -345,11 +334,40 @@ class Utility:
         The calendar year is specified so it can be determined if it is a leap year.
 
         """
-        non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
-        leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+        non_leap_cumulative_days_in_months = [
+            31,
+            59,
+            90,
+            120,
+            151,
+            181,
+            212,
+            243,
+            273,
+            304,
+            334,
+            365,
+        ]
+        leap_cumulative_days_in_months = [
+            31,
+            60,
+            91,
+            121,
+            152,
+            182,
+            213,
+            244,
+            274,
+            305,
+            335,
+            366,
+        ]
 
-        cumulative_days_in_months = \
-            leap_cumulative_days_in_months if is_leap_year(calendar_year) else non_leap_cumulative_days_in_months
+        cumulative_days_in_months = (
+            leap_cumulative_days_in_months
+            if Utility.is_leap_year(calendar_year)
+            else non_leap_cumulative_days_in_months
+        )
 
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
@@ -379,39 +397,63 @@ class Utility:
         """
 
         base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
-        timestamp_format_string: str = (
-            f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
-        )
+        timestamp_format_string: str = f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     @staticmethod
-    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+    def filter_dictionary(
+        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
+    ) -> Dict[Any, Any]:
         """
-        Returns a filtered data pool based on either inclusion or exclusion.
+        Returns a filtered dictionary based on either inclusion or exclusion.
 
         Parameters
         ----------
-        data_pool : Dict[str, Any]
-            The pool to be filtered.
+        dict_to_filter : Dict[str, Any]
+            The dictionary to be filtered.
         filter_patterns : List[str]
-            A list of patterns by which to filter the pool.
+            A list of patterns by which to filter the dictionary.
         filter_by_exclusion : bool
-            A flag indicating whether the data pool should be filtered by exclusion
+            A flag indicating whether the dictionary should be filtered by exclusion
             or inclusion.
 
         Returns
         -------
         Dict[str, Any]
-            The filtered data pool.
+            The filtered dictionary.
         """
         if filter_by_exclusion:
             return {
-                key: data_pool[key]
-                for key in data_pool.keys()
+                key: dict_to_filter[key]
+                for key in dict_to_filter.keys()
                 if not any(re.search(pattern, key) for pattern in filter_patterns)
             }
         return {
-                key: data_pool[key]
-                for key in data_pool.keys()
-                if any(re.search(pattern, key) for pattern in filter_patterns)
-            }
+            key: dict_to_filter[key]
+            for key in dict_to_filter.keys()
+            if any(re.search(pattern, key) for pattern in filter_patterns)
+        }
+
+    @staticmethod
+    def is_leap_year(year: int) -> bool:
+        """
+        Helper method determines if the given year is a leap year
+
+        Parameters
+        ----------
+        year: int
+            The year.
+
+        Returns
+        -------
+        bool
+            True if the year is a leap year, otherwise False.
+        """
+        if year % 400 == 0:
+            return True
+        elif year % 100 == 0:
+            return False
+        elif year % 4 == 0:
+            return True
+        else:
+            return False
