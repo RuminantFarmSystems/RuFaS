@@ -168,7 +168,7 @@
         "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
         "phosphorus_removal_efficiency_for_treatment": 0.00,
         "potassium_removal_efficiency_for_treatment": 0.00,
-        "storage_time_period": 1,
+        "storage_time_period": 2,
         "freeboard_input": 0.3048,
       "manure_cover": "cover"
       },

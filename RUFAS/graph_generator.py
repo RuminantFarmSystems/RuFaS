@@ -255,7 +255,7 @@ class GraphGenerator:
                     )
                     continue
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
+                filtered_data = Utility.filter_dictionary(data_dict, selected_variables, filter_by_exclusion)
                 if not filtered_data:
                     log_pool.append(
                         {

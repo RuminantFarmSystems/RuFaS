@@ -94,7 +94,7 @@
       "manure_handler_type": "manual scraping",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
-      "cleanings_per_day": 2,
+      "cleanings_per_day": 0.14,
       "daily_tillage_frequency": 0,
       "cleaning_water_recycle_fraction": 0.10
     },
@@ -229,7 +229,7 @@
     },
     {
       "manure_treatment_type": "composting",
-      "composting_type": "intensive windrow"
+      "composting_type": "passive windrow"
     }
   ]
 }

@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union, Callable, Tuple
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 from RUFAS.util import Utility
 
@@ -264,7 +264,6 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
-                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 input_data = data_loader(file_path)
             except KeyError:
@@ -291,22 +290,13 @@ class InputManager:
                     "invalid_elements": 0,
                     "is_valid": True,
                 }
-                if file_type == "json":
-                    element_counter_and_validity = self._validate_dict_element(
-                        [metadata_property],
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(
-                        metadata_property,
-                        properties_blob_key,
-                        filtered_input_data,
-                        eager_termination,
-                        element_counter_and_validity,
-                    )
+                element_counter_and_validity = self._dict_type_validator(
+                    [metadata_property],
+                    properties_blob_key,
+                    filtered_input_data,
+                    eager_termination,
+                    element_counter_and_validity,
+                )
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -631,89 +621,7 @@ class InputManager:
             raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-    def _validate_tabular_element(
-        self,
-        var_name: str,
-        properties_blob_key: str,
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        element_counter_and_validity: Dict[str, int | bool],
-    ) -> Dict[str, int | bool]:
-        """
-        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
-        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
-        and total elements from the input file are checked.
-
-        Parameters
-        ----------
-        var_name : str
-            The name of the csv data element being validated.
-
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-
-        input_data : Dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
-
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-
-        element_counter_and_validity : Dict[str, int | bool]
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-
-        Returns
-        -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_tabular_element.__name__,
-        }
-        variable = input_data[var_name]
-        variable_properties = reduce(
-            lambda d, key: d[key],
-            [var_name],
-            self.__metadata["properties"][properties_blob_key],
-        )
-
-        for element_num in range(len(variable)):
-            element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(
-                variable_properties,
-                var_name,
-                variable[element_num],
-                properties_blob_key,
-            )
-            if is_valid:
-                element_counter_and_validity["valid_elements"] += 1
-            else:
-                is_fixed = self._fix_data(
-                    variable_properties,
-                    [var_name, element_num],
-                    input_data,
-                    properties_blob_key,
-                )
-                if is_fixed:
-                    element_counter_and_validity["fixed_elements"] += 1
-                else:
-                    element_counter_and_validity["invalid_elements"] += 1
-                    element_counter_and_validity["is_valid"] = False
-                    om.add_warning(
-                        "Validation: invalid unfixable element found",
-                        f"{var_name} element {element_num} was invalid and could not be fixed",
-                        info_map,
-                    )
-                    if eager_termination:
-                        return element_counter_and_validity
-
-        return element_counter_and_validity
-
-    def _validate_dict_element(  # noqa
+    def _dict_type_validator(  # noqa
         self,
         element_hierarchy: List[str],
         properties_blob_key: str,
@@ -730,16 +638,12 @@ class InputManager:
         ----------
         element_hierarchy : List[str]
             A list of strings representing the path to the data being validated.
-
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
-
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
-
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
-
         element_counter_and_validity : Dict[str, int | bool]
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
@@ -762,7 +666,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._validate_dict_element.__name__,
+            "function": self._dict_type_validator.__name__,
         }
         try:
             variable_properties = reduce(
@@ -783,7 +687,7 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_dict_element(
+                    element_counter_and_validity = self._dict_type_validator(
                         element_hierarchy,
                         properties_blob_key,
                         input_data,
@@ -1096,7 +1000,7 @@ class InputManager:
 
     def get_data(self, data_address: str) -> Any:
         """
-        Get the requested data from the pool.
+        Get the requested data from the pool if it exists. If not, None is returned.
 
         Parameters
         ----------
@@ -1106,12 +1010,7 @@ class InputManager:
         Returns
         -------
         Any
-            The requested data if found.
-
-        Raises
-        -------
-        KeyError
-            If the requested data is not found.
+            The requested data if found. None otherwise.
 
         Examples
         -------
@@ -1138,36 +1037,131 @@ class InputManager:
         herd_init: False,
         breed: HO
         }
+
+        If the requested data does not exist, the method will return None:
+        >>> input_manager.get_data('animal.herd_information.nonexistent_property')
+        None
         """
+
         info_map = {
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
 
         element_hierarchy = data_address.split(".")
-
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool)
-
+            data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
-
             return deepcopy(data_value)
-
         except KeyError as key_error:
-            invalid_key = str(key_error).strip("'")
-            parent_address = str(data_address.split("." + invalid_key)[0])
+            om.add_error("Validation: data not found", str(key_error), info_map)
 
-            om.add_error(
-                "Validation: data not found:",
-                f'Cannot find "{data_address}", ' f'"{parent_address}" does not have attribute ' f'"{invalid_key}".',
-                info_map,
-            )
+        return None
 
-            raise KeyError(
-                f'Data not found: Cannot find "{data_address}", '
-                f'"{parent_address}" does not have attribute "{invalid_key}".'
-            )
+    def check_property_exists_in_pool(self, data_address: str) -> bool:
+        """
+        Check if the requested property exists in the pool.
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested property.
+
+        Returns
+        -------
+        bool
+            True if the property exists in the pool, False otherwise.
+
+        Examples
+        --------
+        The user can check if a property exists in the pool.
+
+        Input Manager must first be instantiated:
+        >>> input_manager = InputManager()
+
+        This will return True if the property `calf_num` exists in the `herd_information` section of the `animal` blob:
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.calf_num')
+        True
+
+        If the property does not exist, the method will return False:
+        >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
+        False
+        """
+
+        variable_path = data_address.split(".")
+        try:
+            self._extract_value_by_key_list(self.__pool, variable_path)
+            return True
+        except KeyError:
+            return False
+
+    def _extract_value_by_key_list(
+        self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
+    ) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> input_manager._extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+        return input_data
 
     def get_metadata(self, metadata_address: str) -> Any:
         """
@@ -1380,7 +1374,6 @@ class InputManager:
         data: Dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        is_variable_dict: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1401,8 +1394,6 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
-        is_variable_dict : bool
-            Weather the variable is a dictionary variable (rather than tabular).
 
         Returns
         -------
@@ -1435,22 +1426,13 @@ class InputManager:
                 "invalid_elements": 0,
                 "is_valid": True,
             }
-            if is_variable_dict:
-                element_counter_and_validity = self._validate_dict_element(
-                    element_hierarchy=[metadata_property],
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
-            else:
-                element_counter_and_validity = self._validate_tabular_element(
-                    var_name=metadata_property,
-                    properties_blob_key=properties_blob_key,
-                    input_data=data,
-                    eager_termination=eager_termination,
-                    element_counter_and_validity=element_counter_and_validity,
-                )
+            element_counter_and_validity = self._dict_type_validator(
+                element_hierarchy=[metadata_property],
+                properties_blob_key=properties_blob_key,
+                input_data=data,
+                eager_termination=eager_termination,
+                element_counter_and_validity=element_counter_and_validity,
+            )
 
             for key in element_counter.keys():
                 element_counter[key] += element_counter_and_validity[key]
@@ -1540,7 +1522,7 @@ class InputManager:
             False if the variable is invalid and not added to the pool.
 
         Raises
-        -------
+        ------
         TypeError
             If `data` is not the expected type of Dict[str, Any].
         """
@@ -1567,7 +1549,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=True,
             )
             return add_variable_success
 
@@ -1608,6 +1589,7 @@ class InputManager:
         -------
         TypeError
             If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1634,7 +1616,6 @@ class InputManager:
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                is_variable_dict=False,
             )
             return add_variable_success
 

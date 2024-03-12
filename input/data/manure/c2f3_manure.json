@@ -3,10 +3,10 @@
     {
       "scenario_id": 0,
       "bedding_type": "CBPB sawdust",
-      "manure_handler": "manual scraping",
+      "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "composting"
+      "manure_treatment": "compost bedded pack barn"
     },
     {
       "scenario_id": 1,
@@ -113,7 +113,7 @@
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
       "cleanings_per_day": 0,
-      "daily_tillage_frequency": 1,
+      "daily_tillage_frequency": 0.07,
       "cleaning_water_recycle_fraction": 0.0
     },
     {
@@ -170,7 +170,7 @@
       "potassium_removal_efficiency_for_treatment": 0.00,
       "storage_time_period": 180,
       "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "no cover"
     },
     {
       "manure_treatment_type": "anaerobic lagoon",

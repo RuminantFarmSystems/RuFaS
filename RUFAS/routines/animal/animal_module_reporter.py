@@ -571,18 +571,6 @@ class AnimalModuleReporter:
                 info_map,
             )
 
-    def report_daily_pen_total(penlist):
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_pen_total.__name__,
-        }
-        for pen in penlist:
-            om.add_variable(
-                f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
-                len(pen.animals_in_pen),
-                info_map,
-            )
-
     @staticmethod
     def report_sold_animal_information(animal_manager) -> None:
         """
