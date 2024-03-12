@@ -837,7 +837,7 @@ def test_ensure_unique_report_name_with_timestamp(
             {},
             None,
             None,
-            {"graph_report_graph_filter": {"values": [7, 8, 9]}},
+            {},
             ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
         ),
         # Report with both graph_details and enable_graph_and_report set - tests enabling both graph and report data
@@ -946,8 +946,10 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     filter_content = {
         "name": "example_report",
         "filters": ["filter1", "filter2"],
-        "graph_details": {"metadata_prefix": "prefix", "graphics_dir": "dir", "other_details": "details"},
+        "graph_details": {"metadata_prefix": "prefix", "graphics_dir": "dir", "other_details": "details",
+                          "produce_graphics": True},
     }
+    produce_graphics = True
 
     mock_generate_graph = mocker.patch.object(
         GraphGenerator, "generate_graph", return_value={"status": "success", "message": "Graph generated"}
@@ -960,12 +962,13 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         graph_data,
         {
             "metadata_prefix": "prefix",
+            "other_details": "details",
             "title": "example_report",
             "filters": ["filter1", "filter2"],
-            "other_details": "details",
         },
         individual_report_name,
         "dir",
+        produce_graphics
     )
 
     assert graph_event_log == {
