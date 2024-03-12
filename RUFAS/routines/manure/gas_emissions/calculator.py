@@ -98,7 +98,7 @@ class GasEmissionsCalculator:
         ) = cls._volatile_solid_component_fractions(total_volatile_solids)
 
         methane_emission_from_degradable_volatile_solids = GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR * (
-            arrhenius_exponent 
+            arrhenius_exponent
             * degradable_volatile_solids_fraction
             * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
             * total_volatile_solids
