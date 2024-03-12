@@ -573,6 +573,8 @@ class Field:
         manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
+            self._add_manure_water(manure_supplied, requested_manure_type)
+
             supplied_nitrogen = manure_supplied.nitrogen
             supplied_phosphorus = manure_supplied.phosphorus
 

@@ -1585,6 +1585,7 @@ def test_record_fertilizer_application(
     ],
 )
 def test_execute_manure_application(
+    mocker: MockerFixture,
     nitrogen: float,
     phosphorus: float,
     manure_type: ManureType,
@@ -1612,6 +1613,7 @@ def test_execute_manure_application(
         ),
         manure_manager=mocked_manure_manager,
     )
+    field._add_manure_water = mocker.MagicMock()
     field.manure_applicator.apply_machine_manure = MagicMock()
     field._record_manure_application = MagicMock()
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
@@ -1636,6 +1638,7 @@ def test_execute_manure_application(
 
             if supplied_manure is not None:
                 mocked_manure_manager.request_nutrients.assert_called_once_with(expected_request)
+                field._add_manure_water.assert_called_once_with(supplied_manure, manure_type)
                 field.manure_applicator.apply_machine_manure.assert_called_once_with(
                     dry_matter_mass=supplied_manure.dry_matter,
                     dry_matter_fraction=supplied_manure.dry_matter_fraction,
@@ -1709,6 +1712,7 @@ def test_execute_manure_application(
     ],
 )
 def test_execute_manure_application_with_invalid_args(
+    mocker: MockerFixture,
     depth: float,
     remainder: float,
     expected_depth: float,
@@ -1732,6 +1736,7 @@ def test_execute_manure_application_with_invalid_args(
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
     expected_total_organic_fraction = 0.35  # equal to (50.0 / 100.0) * 0.7
+    field._add_manure_water = mocker.MagicMock()
 
     with (
         patch(
@@ -1758,6 +1763,7 @@ def test_execute_manure_application_with_invalid_args(
     ):
         field._execute_manure_application(50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133)
 
+        field._add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
         if invalid_combination:
             patched_error.assert_called_once_with(depth, remainder, "manure_application_error", 2000, 133)
         else:
