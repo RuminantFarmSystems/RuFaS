@@ -2358,11 +2358,14 @@ def test_determine_watering_amount(
             assert incorp.field_data.annual_irrigation_water_use_total == 0
 
 
-@pytest.mark.parametrize("water_amount,field_name", [
-    (0.0, "test_1"),
-    (10.0, "test_2"),
-    (45.3, "test_3"),
-])
+@pytest.mark.parametrize(
+    "water_amount,field_name",
+    [
+        (0.0, "test_1"),
+        (10.0, "test_2"),
+        (45.3, "test_3"),
+    ],
+)
 def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
     """Tests that manure water is correctly retrieved and logged."""
     field_data = FieldData(name=field_name, manure_water=water_amount)
