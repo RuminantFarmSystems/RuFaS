@@ -752,6 +752,8 @@ class Field:
         Notes
         -----
         This method only records manure water to be applied to a field if it comes from an application of liquid manure.
+        When extracting the amount of water applied in the manure application, the conversion from kilograms of water to
+        liters of water is implicit.
 
         """
 
@@ -1326,7 +1328,7 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time):
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1487,7 +1489,7 @@ class Field:
 
             if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
                 self.field_data.days_into_watering_interval = 0
-                water_applied_this_interval = self.field_data.current_water_deficit
+                water_applied_this_interval: float = self.field_data.current_water_deficit
                 self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
                 self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
                 self._record_field_watering(year=year, day=day, watering_amount=water_applied_this_interval)
@@ -1511,7 +1513,7 @@ class Field:
             Amount of water applied to the field via manure on the current day.
 
         """
-        manure_water = self.field_data.manure_water
+        manure_water: float = self.field_data.manure_water
 
         info_map = {
             "class": self.__class__.__name__,
