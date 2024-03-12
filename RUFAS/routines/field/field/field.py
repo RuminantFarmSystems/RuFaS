@@ -1,6 +1,8 @@
 import math
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import (
@@ -737,6 +739,30 @@ class Field:
         }
         om.add_variable("manure_application", value, info_map)
 
+    def _add_irrigation_from_manure(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
+        """
+        Records the water from a manure application so it can be added to the soil.
+
+        Parameters
+        ----------
+        manure_application : NutrientRequestResults
+            An object containing the infomation that defines a manure application.
+        manure_type : ManureType
+            Enum option indicating if the manure applied was solid or liquid.
+
+        """
+
+        if manure_type is ManureType.SOLID:
+            return
+
+        dry_matter = manure_application.dry_matter
+        water_amount_in_l = (dry_matter / manure_application.dry_matter_fraction) - dry_matter
+
+        water_amount_in_mm = self.field_data.convert_liters_to_millimeters(
+            water_amount_in_l, self.field_data.field_size
+        )
+        self.field_data.manure_water = water_amount_in_mm
+
     def _record_nutrient_application_error(
         self,
         application_depth: float,
@@ -1328,13 +1354,15 @@ class Field:
         of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
+        manure_water = self._get_manure_water()
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
+            manure_water=manure_water,
             year=time.year,
             day=time.day,
             irrigation=current_conditions.irrigation,
         )
-        total_precipitation = current_conditions.rainfall + watering_amount
+        total_precipitation = current_conditions.rainfall + watering_amount + manure_water
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
         water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
@@ -1413,24 +1441,29 @@ class Field:
                 crop.data.cumulative_potential_evapotranspiration = 0.0
                 crop.data.cumulative_water_uptake = 0.0
 
-    def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
-        """Manages watering of the field.
+    def _determine_watering_amount(
+        self, rainfall: float, manure_water: float, year: int, day: int, irrigation: float
+    ) -> float:
+        """
+        Manages watering of the field.
 
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall that occurs on this day (mm)
+            Amount of rainfall that occurs on this day (mm).
+        manure_water : float
+            Amount of water added to the field via manure application (mm).
         year : int
             Year in which this watering occurs.
         day : int
             Julian day on which this watering occurs.
         irrigation : float
-            The amount of hard-coded irrigation in the weather data (mm)
+            The amount of hard-coded irrigation in the weather data (mm).
 
         Returns
         -------
         float
-            Amount of water used to irrigate the field on this day (mm)
+            Amount of water used to irrigate the field on this day (mm).
 
         Notes
         -----
@@ -1447,6 +1480,7 @@ class Field:
         """
         if self.field_data.watering_occurs:
             self.field_data.current_water_deficit -= rainfall
+            self.field_data.current_water_deficit -= manure_water
             self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
 
             if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
@@ -1464,6 +1498,29 @@ class Field:
             return irrigation
         else:
             return 0.0
+
+    def _get_manure_water(self) -> float:
+        """
+        Grabs water from a manure application and records it, if any.
+
+        Returns
+        -------
+        float
+            Amount of water applied to the field via manure on the current day.
+
+        """
+        manure_water = self.field_data.manure_water
+
+        info_map = {
+            "classname": self.__class__.__name__,
+            "function": self._get_manure_water.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+        }
+        om.add_variable("manure_water", manure_water, info_map)
+
+        self.field_data.manure_water = 0.0
+
+        return manure_water
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
