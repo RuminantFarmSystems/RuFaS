@@ -113,7 +113,7 @@ class GasEmissionsCalculator:
         methane_emission = (
             methane_emission_from_degradable_volatile_solids + methane_emission_from_non_degradable_volatile_solids
         )
-        
+
         return methane_emission
 
     @classmethod
