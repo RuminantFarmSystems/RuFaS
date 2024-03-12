@@ -32,7 +32,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
 
-    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:
+    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:  # noqa
         """
         Calculate the methane emission from the anaerobic lagoon.
 
@@ -54,10 +54,10 @@ class AnaerobicLagoon(BaseManureTreatment):
         methane_emission, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
                 accumulated_liquid_manure_total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
-                accumulated_liquid_manure_total_degradable_volatile_solids=
-                daily_output.liquid_manure_total_degradable_volatile_solids,
-                accumulated_liquid_manure_total_non_degradable_volatile_solids=
-                daily_output.liquid_manure_total_non_degradable_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=(
+                    daily_output.liquid_manure_total_degradable_volatile_solids),
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                    daily_output.liquid_manure_total_non_degradable_volatile_solids),
                 temp=self._get_current_day_average_temperature_celsius(),
             )
         )
@@ -291,8 +291,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         a = 3 * self.lagoon_depth
         if math.isclose(a, 0.0, abs_tol=1e-9):
             raise ValueError("Coefficient for the squared term (a) cannot be 0.")
-        b = -4 * self.lagoon_slope * self.lagoon_depth**2
-        c = 4 * (self.lagoon_slope**2) * (self.lagoon_depth**3) / 3 - self.volume_needed
+        b = -4 * self.lagoon_slope * self.lagoon_depth ** 2
+        c = 4 * (self.lagoon_slope ** 2) * (self.lagoon_depth ** 3) / 3 - self.volume_needed
         return a, b, c
 
     @property
@@ -315,13 +315,13 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         a, b, c = self._calc_lagoon_width_coefficients()
-        discriminant = b**2 - 4 * a * c
+        discriminant = b ** 2 - 4 * a * c
 
         if discriminant < 0:
             return 0.0
 
-        root1 = (-b + discriminant**0.5) / (2 * a)
-        root2 = (-b - discriminant**0.5) / (2 * a)
+        root1 = (-b + discriminant ** 0.5) / (2 * a)
+        root2 = (-b - discriminant ** 0.5) / (2 * a)
 
         if root1 < 0 and root2 < 0:
             return 0.0
@@ -412,10 +412,10 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self.freeboard_input * self.lagoon_surface_area
 
     def _bound_sludge_accumulation_volume(
-        self,
-        calculated_sludge_accumulation_volume: float,
-        lower_bound: float,
-        upper_bound: float,
+            self,
+            calculated_sludge_accumulation_volume: float,
+            lower_bound: float,
+            upper_bound: float,
     ) -> float:
         """
         Calculate a value for sludge accumulation volume bounded by the specified lower and upper bounds.
