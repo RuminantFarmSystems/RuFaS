@@ -212,10 +212,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         methane_loss, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
                 accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
-                accumulated_liquid_manure_total_degradable_volatile_solids=
-                accumulated_liquid_manure_total_degradable_volatile_solids,
-                accumulated_liquid_manure_total_non_degradable_volatile_solids=
-                accumulated_liquid_manure_total_non_degradable_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=(
+                    accumulated_liquid_manure_total_degradable_volatile_solids),
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                    accumulated_liquid_manure_total_non_degradable_volatile_solids),
                 temp=temperature_celsius,
             )
         )
@@ -273,12 +273,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
-            accumulated_liquid_manure_total_volatile_solids=
-            self._accumulated_output.liquid_manure_total_volatile_solids,
-            accumulated_liquid_manure_total_degradable_volatile_solids=
-            self._accumulated_output.liquid_manure_total_degradable_volatile_solids,
-            accumulated_liquid_manure_total_non_degradable_volatile_solids=
-            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
+            accumulated_liquid_manure_total_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_volatile_solids),
+            accumulated_liquid_manure_total_degradable_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_degradable_volatile_solids),
+            accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
         )
         # fmt: on
         methane_emission_from_non_degradable_volatile_solids = (
