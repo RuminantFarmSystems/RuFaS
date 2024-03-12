@@ -2377,7 +2377,7 @@ def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name
         add_var.assert_called_once_with(
             "manure_water",
             water_amount,
-            {"class": "Field", "function": "_get_manure_water", "suffix": f"field='{field_name}'"},
+            {"class": "Field", "function": "_get_manure_water", "suffix": f"field='{field_name}'", "units": "mm"},
         )
 
     assert actual == water_amount
