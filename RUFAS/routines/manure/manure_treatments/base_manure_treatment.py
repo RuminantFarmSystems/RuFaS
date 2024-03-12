@@ -362,7 +362,7 @@ class BaseManureTreatment(ABC):
                     info_maps={
                         "class": self.__class__.__name__,
                         "function": self._adjust_accumulated_output.__name__,
-                        "prefix": f"{self.__class__.__name__}_pit_emptying_amount_pen_"
+                        "prefix": f"{self.__class__.__name__}_emptying_amount_pen_"
                         f"{self._accumulated_output.pen_id}",
                         "simulation_day": self._sim_day
                     },
