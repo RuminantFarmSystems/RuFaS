@@ -3152,7 +3152,7 @@
         "packing_density": {
           "type": "number",
           "description": "Packing Density -- The density of ensiled feed material, kg DM /m3",
-          "minimum": 200,
+          "minimum": 14,
           "maximum": 800,
           "default": 14
         },
