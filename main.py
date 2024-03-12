@@ -10,7 +10,6 @@ import argparse
 import random
 import sys
 import traceback
-from typing import Dict, Any
 from pathlib import Path
 from typing import List
 
@@ -274,8 +273,39 @@ def run_validation(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
+def set_random_seed(input_manager: InputManager) -> None:
+    """
+    Sets the random seed for this simulation, if one is provided.
+
+    Parameters
+    ----------
+    input_manager : InputManager
+        The Input Manager instance that contains all input data.
+
+    Notes
+    -----
+    The packages seeded are Python's builtin `random` library and the NumPy `random` library. If the input indicates
+    that there should be no random seeding, the random libraries are "seeded" with `None`, which seeds the random
+    libraries with the system time.
+
+    """
+    set_seed = input_manager.get_data("config.set_seed")
+
+    if set_seed:
+        seed = input_manager.get_data("config.random_seed")
+        om = OutputManager()
+        info_map = {"class": "No caller class", "function": set_random_seed.__name__}
+        log_name = "Randomization seed set."
+        log_message = f"Randomization libraries being seeded with {seed}."
+        om.add_log(log_name, log_message, info_map)
+    else:
+        seed = None
+
+    random.seed(seed)
+    numpy.random.seed(seed)
+
+
 def initialize_herd(
-    simulation_config: Dict[str, Any],
     init_herd: bool = False,
     save_animals: bool = False,
     save_animals_dir: Path = Path("output/"),
@@ -286,8 +316,6 @@ def initialize_herd(
 
     Parameters
     ----------
-    simulation_config : Dict[str, Any]
-        Dictionary object containing parameters and settings for the simulation.
     init_herd: bool
         User input indicating whether to initialize herd with simulation.
     save_animals: bool
@@ -316,10 +344,6 @@ def initialize_herd(
         "function": initialize_herd.__name__,
     }
     output_manager = OutputManager()
-
-    if "set_seed" in simulation_config.keys() and simulation_config["set_seed"]:
-        random.seed(simulation_config["random_seed"])
-        numpy.random.seed(simulation_config["random_seed"])
 
     output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
@@ -405,10 +429,9 @@ def execute_simulations(
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
-            simulation_config = input_manager.get_data("config")
+            set_random_seed(input_manager)
             try:
                 initialize_herd(
-                    simulation_config=simulation_config,
                     init_herd=init_herd,
                     save_animals=save_animals,
                     save_animals_dir=save_animals_dir,
@@ -439,6 +462,9 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+
+        error_count, warning_count = output_manager.get_error_and_warning_counts()
+        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
