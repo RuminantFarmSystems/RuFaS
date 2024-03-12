@@ -1473,6 +1473,7 @@ class Field:
         """
         if self.field_data.watering_occurs:
             self.field_data.current_water_deficit -= rainfall
+            self.field_data.current_water_deficit -= self._get_manure_water()
             self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
 
             if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
@@ -1490,6 +1491,29 @@ class Field:
             return irrigation
         else:
             return 0.0
+
+    def _get_manure_water(self) -> float:
+        """
+        Grabs water from a manure application and records it, if any.
+
+        Returns
+        -------
+        float
+            Amount of water applied to the field via manure on the current day.
+
+        """
+        manure_water = self.field_data.manure_water
+
+        info_map = {
+            "classname": self.__class__.__name__,
+            "function": self._get_manure_water.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+        }
+        om.add_variable("manure_water", manure_water, info_map)
+
+        self.field_data.manure_water = 0.0
+
+        return manure_water
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
