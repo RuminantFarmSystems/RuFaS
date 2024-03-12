@@ -1249,7 +1249,6 @@ def test_filter_variables_pool_regex_patterns(
     """Test case for pattern pool using regex patterns with
     function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool
-    dummy_input_file = ""
 
     # get all Class1 vars
     filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False}
@@ -1302,7 +1301,6 @@ def test_filter_variables_pool_exclude_regex_patterns(
     """Test case for pattern pool with regex patterns and exclude keyword with
     function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool
-    dummy_input_file = ""
 
     # get everything except Class1 vars
     filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": True}
