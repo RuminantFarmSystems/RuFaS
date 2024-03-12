@@ -148,7 +148,6 @@ class GraphGenerator:
             "function": self.generate_graph.__name__,
         }
         if not produce_graphics:
-            print("no prod graphs?")
             all_logs = [
                 {
                     "error": f"Can't plot {graph_details.get('title')} data set",
