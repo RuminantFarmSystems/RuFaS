@@ -1199,40 +1199,6 @@ def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name
         == expected_new_accumulated_manure_total_ammoniacal_nitrogen
     )
 
-
-# Test SlurryStorageUnderfloor specific methods
-# ==========================================
-
-
-def test_slurry_storage_underfloor_init(mocker: MockFixture) -> None:
-    """Unit test for __init__() in slurry_storage_underfloor.py."""
-    # Arrange
-    mock_weather = mocker.MagicMock()
-    mock_time = mocker.MagicMock()
-    mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_treatment_config.storage_time_period = storage_time_period = 120
-
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
-        self.weather = weather
-        self.time = time
-        self.config = manure_treatment_config
-
-    mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__",
-        new=mock_base_manure_treatment,
-    )
-
-    # Act
-    slurry_storage_underfloor = SlurryStorageUnderfloor(
-        weather=mock_weather,
-        time=mock_time,
-        manure_treatment_config=mock_manure_treatment_config,
-    )
-
-    # Assert
-    assert slurry_storage_underfloor.storage_time_period == storage_time_period
-
-
 # Test SlurryStorageOutdoor specific methods
 # ==========================================
 
@@ -1243,7 +1209,6 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_treatment_config.storage_time_period = storage_time_period = 120
     mock_manure_treatment_config.freeboard_input = freeboard_input = 130.0
 
     def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
@@ -1264,7 +1229,6 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     )
 
     # Assert
-    assert slurry_storage_outdoor.storage_time_period == storage_time_period
     assert slurry_storage_outdoor.freeboard_input == freeboard_input
 
 

@@ -42,7 +42,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         """
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config.storage_time_period
 
     def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> Tuple[float, float]:
         """Calculates the methane emission from the underfloor slurry storage.

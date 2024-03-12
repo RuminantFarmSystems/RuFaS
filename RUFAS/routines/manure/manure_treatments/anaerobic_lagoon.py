@@ -28,7 +28,6 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig):
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config.storage_time_period
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
 

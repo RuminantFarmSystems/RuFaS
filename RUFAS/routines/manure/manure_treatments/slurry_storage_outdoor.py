@@ -46,7 +46,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
 
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config.storage_time_period
         self.freeboard_input = self.config.freeboard_input
 
     @property
