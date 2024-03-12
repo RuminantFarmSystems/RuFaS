@@ -7,6 +7,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+import math
 
 im = InputManager()
 om = OutputManager()
@@ -111,25 +112,63 @@ class Feed:
 
         # Loading in user-defined ration values
         self.user_defined_ration_percentages = data["user_defined_ration_percentages"]
-
+        target_user_defined_ration_percentage_sum = 100.0
+        user_defined_ration_percentage_sum_tolerance = 0.01
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__,
+        }
         udrm.calf_ration = {
             str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
         }
+
+        if not math.isclose(sum(udrm.calf_ration.values()),
+                            target_user_defined_ration_percentage_sum,
+                            abs_tol=user_defined_ration_percentage_sum_tolerance):
+            om.add_warning(
+                "User defined calf_ration percentages do not sum to 100",
+                f"User defined calf_ration sums to {sum(udrm.calf_ration.values())}",
+                info_map,
+            )
 
         udrm.growing_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["growing"]
         }
+        if not math.isclose(sum(udrm.calf_ration.values()),
+                            target_user_defined_ration_percentage_sum,
+                            abs_tol=user_defined_ration_percentage_sum_tolerance):
+            om.add_warning(
+                "User defined growing_ration percentages do not sum to 100",
+                f"User defined growing_ration sums to {sum(udrm.growing_ration.values())}",
+                info_map,
+            )
 
         udrm.close_up_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["close_up"]
         }
+        if not math.isclose(sum(udrm.calf_ration.values()),
+                            target_user_defined_ration_percentage_sum,
+                            abs_tol=user_defined_ration_percentage_sum_tolerance):
+            om.add_warning(
+                "User defined close_up_ration percentages do not sum to 100",
+                f"User defined close_up_ration sums to {sum(udrm.close_up_ration.values())}",
+                info_map,
+            )
 
         udrm.lactating_cow_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["lac_cow"]
         }
+        if not math.isclose(sum(udrm.calf_ration.values()),
+                            target_user_defined_ration_percentage_sum,
+                            abs_tol=user_defined_ration_percentage_sum_tolerance):
+            om.add_warning(
+                "User defined lactating_cow_ration percentages do not sum to 100",
+                f"User defined lactating_cow_ration sums to {sum(udrm.lactating_cow_ration.values())}",
+                info_map,
+            )
 
         udrm.tolerance = self.user_defined_ration_percentages["tolerance"]
 
