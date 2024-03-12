@@ -364,7 +364,7 @@ class BaseManureTreatment(ABC):
                         "function": self._adjust_accumulated_output.__name__,
                         "prefix": f"{self.__class__.__name__}_emptying_amount_pen_"
                         f"{self._accumulated_output.pen_id}",
-                        "simulation_day": self._sim_day
+                        "simulation_day": self._sim_day,
                     },
                 )
             self._accumulated_output = manure_treatment_daily_output.clone()

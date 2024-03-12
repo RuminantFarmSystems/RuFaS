@@ -1199,6 +1199,7 @@ def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name
         == expected_new_accumulated_manure_total_ammoniacal_nitrogen
     )
 
+
 # Test SlurryStorageOutdoor specific methods
 # ==========================================
 
