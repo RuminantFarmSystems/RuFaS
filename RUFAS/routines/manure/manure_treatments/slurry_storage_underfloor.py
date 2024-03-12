@@ -163,12 +163,16 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
 
         new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO), 0.0
+            self._accumulated_output.liquid_manure_total_solids
+            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
 
         new_accumulated_liquid_manure_total_volatile_solids = max(
-            self._accumulated_output.liquid_manure_total_volatile_solids - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO), 0.0
+            self._accumulated_output.liquid_manure_total_volatile_solids
+            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_volatile_solids = (
             new_accumulated_liquid_manure_total_volatile_solids
@@ -176,7 +180,10 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         new_accumulated_liquid_manure_total_degradable_volatile_solids = max(
             self._accumulated_output.liquid_manure_total_degradable_volatile_solids
-            - (methane_emission_from_degradable_volatile_solids * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (
+                methane_emission_from_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
             0.0,
         )
         self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
@@ -185,7 +192,10 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         new_accumulated_liquid_manure_total_non_degradable_volatile_solids = max(
             self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
-            - (methane_emission_from_non_degradable_volatile_solids * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (
+                methane_emission_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
             0.0,
         )
         self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
