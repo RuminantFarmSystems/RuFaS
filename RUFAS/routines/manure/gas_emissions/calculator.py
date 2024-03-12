@@ -109,19 +109,27 @@ class GasEmissionsCalculator:
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
 
-        methane_emission_from_degradable_volatile_solids = GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR * (
-            arrhenius_exponent
-            * degradable_volatile_solids_fraction
-            * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-            * accumulated_liquid_manure_total_volatile_solids
-        ) * GeneralConstants.GRAMS_TO_KG
-        methane_emission_from_non_degradable_volatile_solids = GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR * (
-            arrhenius_exponent
-            * non_degradable_volatile_solids_fraction
-            * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-            * accumulated_liquid_manure_total_volatile_solids
-        ) * GeneralConstants.GRAMS_TO_KG
-        
+        methane_emission_from_degradable_volatile_solids = (
+            GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR
+            * (
+                arrhenius_exponent
+                * degradable_volatile_solids_fraction
+                * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+                * accumulated_liquid_manure_total_volatile_solids
+            )
+            * GeneralConstants.GRAMS_TO_KG
+        )
+        methane_emission_from_non_degradable_volatile_solids = (
+            GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR
+            * (
+                arrhenius_exponent
+                * non_degradable_volatile_solids_fraction
+                * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+                * accumulated_liquid_manure_total_volatile_solids
+            )
+            * GeneralConstants.GRAMS_TO_KG
+        )
+
         methane_emission = (
             methane_emission_from_degradable_volatile_solids + methane_emission_from_non_degradable_volatile_solids
         )
