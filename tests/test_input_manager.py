@@ -4396,91 +4396,23 @@ def test_increment_in_elements_counter() -> None:
     assert counter.total_elements() == 3
 
 
-def test_decrement_below_zero_raises_value_error() -> None:
-    """
-    Unit test for the decrement() method of the ElementsCounter class when attempting to decrement below 0.
-    """
-    # Arrange
-    counter = ElementsCounter()
-
-    # Act and Assert
-    with pytest.raises(ValueError):
-        counter.decrement(ElementState.VALID)
-
-
-def test_decrement_in_elements_counter() -> None:
-    """
-    Unit test for the decrement() method of the ElementsCounter class.
-    """
-
-    # Arrange
-    counter = ElementsCounter()
-    counter.increment(ElementState.VALID)
-    counter.increment(ElementState.INVALID)
-    counter.increment(ElementState.FIXED)
-    counter.increment(ElementState.VALID)
-
-    # Act
-    counter.decrement(ElementState.VALID)
-    counter.decrement(ElementState.INVALID)
-
-    # Assert
-    assert counter.valid_elements == 1
-    assert counter.invalid_elements == 0
-    assert counter.fixed_elements == 1
-
-
 def test_update_increments_correctly() -> None:
     """
-    Unit test for the _update() method of the ElementsCounter class.
+    Unit test for the update() method of the ElementsCounter class.
     """
 
     # Arrange
     counter = ElementsCounter()
 
     # Act
-    counter._update(ElementState.INVALID, 2)
-    counter._update(ElementState.VALID, 1)
-    counter._update(ElementState.FIXED, 3)
+    counter.update(ElementState.INVALID, 2)
+    counter.update(ElementState.VALID, 1)
+    counter.update(ElementState.FIXED, 3)
 
     # Assert
     assert counter.valid_elements == 1
     assert counter.invalid_elements == 2
     assert counter.fixed_elements == 3
-
-
-def test_update_decrements_correctly() -> None:
-    """
-    Unit test for the _update() method of the ElementsCounter class.
-    """
-
-    # Arrange
-    counter = ElementsCounter()
-    counter.valid_elements = 3
-    counter.invalid_elements = 2
-    counter.fixed_elements = 1
-
-    # Act
-    counter._update(ElementState.VALID, -1)
-    counter._update(ElementState.INVALID, -1)
-    counter._update(ElementState.FIXED, -1)
-
-    assert counter.valid_elements == 2
-    assert counter.invalid_elements == 1
-    assert counter.fixed_elements == 0
-
-
-def test_update_with_negative_value_raises_error() -> None:
-    """
-    Unit test for the _update() method of the ElementsCounter class when attempting to update with a negative value.
-    """
-
-    # Arrange
-    counter = ElementsCounter()
-
-    # Act and Assert
-    with pytest.raises(ValueError):
-        counter._update(ElementState.VALID, -1)
 
 
 def test_reset_method_in_elements_counter() -> None:
@@ -4506,31 +4438,6 @@ def test_reset_method_in_elements_counter() -> None:
     assert counter.valid_elements == 0
     assert counter.invalid_elements == 0
     assert counter.fixed_elements == 0
-
-
-def test_check_negative_counts_raises_error() -> None:
-    """
-    Unit test for the _check_negative_counts() method of the ElementsCounter class.
-    """
-
-    # Arrange
-    counter = ElementsCounter()
-
-    # Act and Assert
-    with pytest.raises(ValueError, match="Valid elements count is negative"):
-        counter.valid_elements = -1
-        counter._check_negative_counts()
-
-    with pytest.raises(ValueError, match="Invalid elements count is negative"):
-        counter.valid_elements = 0
-        counter.invalid_elements = -1
-        counter._check_negative_counts()
-
-    with pytest.raises(ValueError, match="Fixed elements count is negative"):
-        counter.invalid_elements = 0
-        counter.invalid_elements = 0
-        counter.fixed_elements = -1
-        counter._check_negative_counts()
 
 
 def test_total_elements_in_elements_counter() -> None:
