@@ -1354,13 +1354,15 @@ class Field:
         of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
+        manure_water = self._get_manure_water()
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
+            manure_water=manure_water,
             year=time.year,
             day=time.day,
             irrigation=current_conditions.irrigation,
         )
-        total_precipitation = current_conditions.rainfall + watering_amount
+        total_precipitation = current_conditions.rainfall + watering_amount + manure_water
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
         water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
@@ -1439,24 +1441,29 @@ class Field:
                 crop.data.cumulative_potential_evapotranspiration = 0.0
                 crop.data.cumulative_water_uptake = 0.0
 
-    def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
-        """Manages watering of the field.
+    def _determine_watering_amount(
+        self, rainfall: float, manure_water: float, year: int, day: int, irrigation: float
+    ) -> float:
+        """
+        Manages watering of the field.
 
         Parameters
         ----------
         rainfall : float
-            Amount of rainfall that occurs on this day (mm)
+            Amount of rainfall that occurs on this day (mm).
+        manure_water : float
+            Amount of water added to the field via manure application (mm).
         year : int
             Year in which this watering occurs.
         day : int
             Julian day on which this watering occurs.
         irrigation : float
-            The amount of hard-coded irrigation in the weather data (mm)
+            The amount of hard-coded irrigation in the weather data (mm).
 
         Returns
         -------
         float
-            Amount of water used to irrigate the field on this day (mm)
+            Amount of water used to irrigate the field on this day (mm).
 
         Notes
         -----
@@ -1473,7 +1480,7 @@ class Field:
         """
         if self.field_data.watering_occurs:
             self.field_data.current_water_deficit -= rainfall
-            self.field_data.current_water_deficit -= self._get_manure_water()
+            self.field_data.current_water_deficit -= manure_water
             self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
 
             if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
