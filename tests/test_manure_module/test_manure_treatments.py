@@ -1062,8 +1062,7 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     patch_for_calc_methane_emission.assert_called_once_with(
         accumulated_liquid_manure_total_volatile_solids=liquid_manure_total_solids,
         accumulated_liquid_manure_total_degradable_volatile_solids=liquid_manure_total_degradable_volatile_solids,
-        accumulated_liquid_manure_total_non_degradable_volatile_solids=
-        liquid_manure_total_non_degradable_volatile_solids,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids=liquid_manure_total_non_degradable_volatile_solids,
     )
     assert (
         slurry_storage._accumulated_output.liquid_manure_total_solids
@@ -1127,10 +1126,8 @@ def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name
     # Act
     actual_methane_loss, _ = slurry_storage.calc_methane_emission(
         accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
-        accumulated_liquid_manure_total_degradable_volatile_solids=
-        accumulated_liquid_manure_total_degradable_volatile_solids,
-        accumulated_liquid_manure_total_non_degradable_volatile_solids=
-        accumulated_liquid_manure_total_non_degradable_volatile_solids,
+        accumulated_liquid_manure_total_degradable_volatile_solids=accumulated_liquid_manure_total_degradable_volatile_solids,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids=accumulated_liquid_manure_total_non_degradable_volatile_solids,
     )
 
     actual_new_accumulated_liquid_manure_total_volatile_solids = max(
@@ -1141,10 +1138,8 @@ def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
         accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
-        accumulated_liquid_manure_total_degradable_volatile_solids=
-        accumulated_liquid_manure_total_degradable_volatile_solids,
-        accumulated_liquid_manure_total_non_degradable_volatile_solids=
-        accumulated_liquid_manure_total_non_degradable_volatile_solids,
+        accumulated_liquid_manure_total_degradable_volatile_solids=accumulated_liquid_manure_total_degradable_volatile_solids,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids=accumulated_liquid_manure_total_non_degradable_volatile_solids,
         temp=temperature_celsius,
     )
     assert actual_methane_loss == expected_methane_loss[0]
@@ -1733,12 +1728,9 @@ def test_anaerobic_lagoon_update_methane_emission(
 
     # Assert
     patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
-        accumulated_liquid_manure_total_volatile_solids=
-        anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids,
-        accumulated_liquid_manure_total_degradable_volatile_solids=
-        anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids,
-        accumulated_liquid_manure_total_non_degradable_volatile_solids=
-        anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
+        accumulated_liquid_manure_total_volatile_solids=anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids,
+        accumulated_liquid_manure_total_degradable_volatile_solids=anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids=anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
         temp=mock_temp_value,
     )
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
