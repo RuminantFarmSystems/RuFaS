@@ -1549,7 +1549,7 @@ def test_save_results_report_generation(
 #         graph_data = {"filters": ".*", "other keys": "other values"}
 #         mock_output_manager._route_save_functions(
 #             "graph_file", "save_path", {"key": [1, 2, 3, 4]}, False, graph_data, Path("graphics_dir"),
-    # Path("csvs_dir")
+# Path("csvs_dir")
 #         )
 #         mock_generate_graph.assert_not_called()
 #         mock_create_directory.assert_called_with(Path("graphics_dir"))

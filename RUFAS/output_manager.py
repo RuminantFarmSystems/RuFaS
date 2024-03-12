@@ -632,9 +632,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(
-        self, filter_content: Dict[str, Any]
-    ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -672,8 +670,9 @@ class OutputManager(object):
             filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
         self.add_log("filtering_log", filter_excl_msg, info_map)
 
-        filtered_pool = Utility.filter_dictionary(self.variables_pool, filter_content.get("filters", []),
-                                                  filter_by_exclusion)
+        filtered_pool = Utility.filter_dictionary(
+            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
+        )
         self.add_log(
             "num_filter_pattern_matches",
             f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
@@ -781,19 +780,17 @@ class OutputManager(object):
                     try:
                         graph_generator = GraphGenerator(self.__metadata_prefix)
                         log_pool = graph_generator.generate_graph(
-                            filtered_pool,
-                            filter_content,
-                            filter_file,
-                            graphics_dir,
-                            produce_graphics
+                            filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                         )
                         self._route_logs(log_pool)
                     except Exception as e:
                         self.add_error("graph generation exception", str(e), info_map)
                 else:
-                    self.add_error(f"Invalid prefix for filter file {filter_file}",
-                                   f"File name must start with {self.__supported_filter_types_prefixes.keys()}",
-                                   info_map)
+                    self.add_error(
+                        f"Invalid prefix for filter file {filter_file}",
+                        f"File name must start with {self.__supported_filter_types_prefixes.keys()}",
+                        info_map,
+                    )
             report_file_path = os.path.join(
                 save_path,
                 self.generate_file_name(f"report_{filter_file}", "csv"),

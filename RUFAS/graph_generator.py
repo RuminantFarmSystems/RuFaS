@@ -146,11 +146,13 @@ class GraphGenerator:
             "function": self.generate_graph.__name__,
         }
         if not produce_graphics:
-            all_logs = [{
-                "error": f"Can't plot {graph_details.get('title')} data set",
-                "message": "'produce_graphics' set to False, no graphs will be produced.",
-                "info_map": info_map,
-            }]
+            all_logs = [
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": info_map,
+                }
+            ]
             return all_logs
 
         try:
