@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Tuple
 
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -31,7 +32,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
 
-    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:
         """
         Calculate the methane emission from the anaerobic lagoon.
 
@@ -42,16 +43,28 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         Returns
         -------
-        None
-            Update the `storage_methane` attribute of the daily output object.
+        float
+            methane_loss: methane emission from the outdoor slurry storage treatment system, (kg :math:`CH_4`/day).
+        float
+            methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
+            (kg :math:`CH_4`/day).
 
         """
-        methane_emission = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-            total_volatile_solids=self.accumulated_output.liquid_manure_total_volatile_solids,
-            temp=self._get_current_day_average_temperature_celsius(),
+        methane_emission, methane_emission_from_degradable_volatile_solids = (
+            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+                accumulated_liquid_manure_total_volatile_solids=
+                daily_output.liquid_manure_total_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=
+                daily_output.liquid_manure_total_degradable_volatile_solids,
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=
+                daily_output.liquid_manure_total_non_degradable_volatile_solids,
+                temp=self._get_current_day_average_temperature_celsius(),
+            )
         )
         methane_emission = max(methane_emission, 0.0)
         daily_output.storage_methane = methane_emission
+
+        return methane_emission, methane_emission_from_degradable_volatile_solids
 
     def _update_ammonia_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
         """
@@ -98,7 +111,10 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_precipitation_volume += self.precipitation_volume
 
         self._update_ammonia_emission(daily_output)
-        self._update_methane_emission(daily_output)
+        methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(daily_output)
+        methane_emission_from_non_degradable_volatile_solids = (
+            methane_loss - methane_emission_from_degradable_volatile_solids
+        )
 
         new_daily_output_liquid_manure_nitrogen = max(
             daily_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
@@ -109,10 +125,45 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output.storage_methane += daily_output.storage_methane
 
         new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - daily_output.storage_methane,
+            self._accumulated_output.liquid_manure_total_solids
+            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
             0.0,
         )
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
+
+        new_accumulated_liquid_manure_total_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_volatile_solids
+            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            new_accumulated_liquid_manure_total_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_degradable_volatile_solids
+            - (
+                methane_emission_from_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_degradable_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_non_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+            - (
+                methane_emission_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_non_degradable_volatile_solids
+        )
+
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - daily_output.storage_ammonia,
             0.0,
