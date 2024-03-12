@@ -2,6 +2,7 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
@@ -1984,6 +1985,36 @@ def test_record_manure_application(
 
 
 @pytest.mark.parametrize(
+    "manure_application,manure_type,expected_liters,converted",
+    [
+        (NutrientRequestResults(total_manure_mass=100, dry_matter_fraction=0.05), ManureType.LIQUID, 95.0, True),
+        (NutrientRequestResults(total_manure_mass=100, dry_matter_fraction=0.05), ManureType.SOLID, 95.0, False),
+    ],
+)
+def test_add_manure_water(
+    mocker: MockerFixture,
+    manure_application: NutrientRequestResults,
+    manure_type: ManureType,
+    expected_liters: float,
+    converted: bool,
+) -> None:
+    """Tests that manure water is correctly calculated and stored."""
+    field_data = FieldData(field_size=2.3)
+    mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
+    field = Field(field_data=field_data, manure_manager=mock_manure_manager)
+    mocked_converter = mocker.patch.object(field.field_data, "convert_liters_to_millimeters", return_value=10.0)
+
+    field._add_manure_water(manure_application, manure_type)
+
+    if converted:
+        mocked_converter.assert_called_once_with(expected_liters, 2.3)
+        assert field.field_data.manure_water == 10.0
+    else:
+        mocked_converter.assert_not_called()
+        assert field.field_data.manure_water == 0.0
+
+
+@pytest.mark.parametrize(
     "depth,remainder,name,year,day,expected_info_map,expected_error_message",
     [
         (
@@ -2123,17 +2154,18 @@ def test_execute_daily_processes(
 
 
 @pytest.mark.parametrize(
-    "field_size,rainfall,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
+    "field_size,rainfall,manure_water,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
     "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing",
     [
-        (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
-        (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
-        (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
+        (1.9, 4.66, 3.2, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
+        (2.3, 5.6, 1.1, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
+        (2.3, 5.6, 0.0, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
     ],
 )
 def test_cycle_water(
     field_size: float,
     rainfall: float,
+    manure_water: float,
     runoff: float,
     high_water_table: bool,
     residue: float,
@@ -2208,6 +2240,7 @@ def test_cycle_water(
         incorp._evaporate_from_crop_canopies = MagicMock(return_value=30.5)
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=40.0)
         incorp._determine_soil_evaporation_and_sublimation_adjusted = MagicMock(return_value=10.5)
+        incorp._get_manure_water = MagicMock(return_value=manure_water)
 
         crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
         crop_1.water_dynamics.cycle_water = MagicMock()
@@ -2221,18 +2254,20 @@ def test_cycle_water(
 
         incorp._cycle_water(current_conditions, mocked_time)
 
+        expected_total_precipitation = rainfall + manure_water
         incorp._determine_watering_amount.assert_called_once_with(
             rainfall=rainfall,
+            manure_water=manure_water,
             year=mocked_time.year,
             day=mocked_time.day,
             irrigation=0.0,
         )
-        incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
+        incorp._handle_water_in_crop_canopies.assert_called_once_with(expected_total_precipitation)
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp, mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
-        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
+        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, expected_total_precipitation)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
         incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)
@@ -2266,21 +2301,22 @@ def test_cycle_water(
 
 
 @pytest.mark.parametrize(
-    "rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,old_method",
+    "rainfall,manure_water,days_into_interval,water_deficit,watering_occurs,irrigation,old_method",
     [
-        (3.4, 3, 1.5, False, 0, False),  # No watering because water_occurs is False
-        (3.1, 5, 2.3, True, 0, False),
+        (3.4, 2.4, 3, 1.5, False, 0, False),  # No watering because water_occurs is False
+        (3.1, 1.1, 5, 2.3, True, 0, False),
         # No watering because rainfall takes care of watering
-        (0.2, 5, 3.6, True, 0, False),
+        (0.2, 0.3, 5, 3.6, True, 0, False),
         # Watering occurs because water deficit has not been met
-        (0.19, 4, 2.8, True, 0, False),
+        (0.19, 0.0, 4, 2.8, True, 0, False),
         # No watering occurs because interval has not been met
-        (0.2, 5, 3.6, True, 9.24, False),
-        (0.2, 5, 3.6, False, 77.7, True),
+        (0.2, 1.0, 5, 3.6, True, 9.24, False),
+        (0.2, 0.0, 5, 3.6, False, 77.7, True),
     ],
 )
 def test_determine_watering_amount(
     rainfall: float,
+    manure_water: float,
     days_into_interval: int,
     water_deficit: float,
     watering_occurs: float,
@@ -2302,7 +2338,7 @@ def test_determine_watering_amount(
     data.current_water_deficit = water_deficit
     incorp = Field(field_data=data, manure_manager=MagicMock(ManureManager))
 
-    actual = incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
+    actual = incorp._determine_watering_amount(rainfall, manure_water, mocked_time.year, mocked_time.day, irrigation)
     if old_method:
         assert actual == irrigation
     else:
@@ -2311,15 +2347,41 @@ def test_determine_watering_amount(
             assert incorp.field_data.days_into_watering_interval == days_into_interval
             assert incorp.field_data.annual_irrigation_water_use_total == 0
         elif days_into_interval == incorp.field_data.watering_interval:
-            assert actual == max(0.0, water_deficit - rainfall)
+            assert actual == max(0.0, water_deficit - rainfall - manure_water)
             assert incorp.field_data.days_into_watering_interval == 0
             assert incorp.field_data.current_water_deficit == 5.0
             assert incorp.field_data.annual_irrigation_water_use_total == actual
         else:
             assert actual == 0.0
             assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
-            assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
+            assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall - manure_water)
             assert incorp.field_data.annual_irrigation_water_use_total == 0
+
+
+@pytest.mark.parametrize(
+    "water_amount,field_name",
+    [
+        (0.0, "test_1"),
+        (10.0, "test_2"),
+        (45.3, "test_3"),
+    ],
+)
+def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
+    """Tests that manure water is correctly retrieved and logged."""
+    field_data = FieldData(name=field_name, manure_water=water_amount)
+    field = Field(field_data=field_data, manure_manager=MagicMock(autospec=ManureManager))
+
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
+        actual = field._get_manure_water()
+
+        add_var.assert_called_once_with(
+            "manure_water",
+            water_amount,
+            {"class": "Field", "function": "_get_manure_water", "suffix": f"field='{field_name}'"},
+        )
+
+    assert actual == water_amount
+    assert field.field_data.manure_water == 0.0
 
 
 @pytest.mark.parametrize(
