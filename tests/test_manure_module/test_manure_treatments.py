@@ -901,8 +901,8 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
         "open lots",
     ],
 )
-def test_accumulate_daily_output(manure_treatment_type_name: str, mocker: MockFixture) -> None:
-    """Unit test for _accumulate_daily_output()."""
+def test_adjust_accumulated_output_not_emptying(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+    """Unit test for _adjust_accumulated_output() when not emptying manure pit."""
 
     # Arrange
     manure_treatment = ManureTreatmentFactory.get_instance(
@@ -910,6 +910,8 @@ def test_accumulate_daily_output(manure_treatment_type_name: str, mocker: MockFi
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
     )
+    manure_treatment._sim_day = 50
+    manure_treatment.storage_time_period = 150
     manure_treatment_daily_output = ManureTreatmentDailyOutput()
     dummy_value = 10
     for field_name in dataclasses.fields(manure_treatment_daily_output):
@@ -920,7 +922,7 @@ def test_accumulate_daily_output(manure_treatment_type_name: str, mocker: MockFi
     assert manure_treatment._accumulated_output == ManureTreatmentDailyOutput()
 
     # Act
-    manure_treatment._accumulate_daily_output(manure_treatment_daily_output=manure_treatment_daily_output)
+    manure_treatment._adjust_accumulated_output(manure_treatment_daily_output=manure_treatment_daily_output)
 
     # Assert after
     assert manure_treatment._accumulated_output == expected_accumulated_output
@@ -1021,9 +1023,7 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     mock_accumulated_output.daily_final_manure_volume = final_manure_volume = 30.0
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 110.0
     slurry_storage._accumulated_output = mock_accumulated_output
-    patch_for_accumulate_daily_output = mocker.patch.object(
-        slurry_storage, "_adjust_accumulated_output", return_value=mock_accumulated_output
-    )
+    patch_for_adjust_accumulated_output = mocker.patch.object(slurry_storage, "_adjust_accumulated_output")
 
     mock_pen = mocker.MagicMock()
     mock_pen.num_animals = num_animals = 100
@@ -1057,7 +1057,7 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
 
     # Assert
     patch_for_initialize_daily_output_during_update.assert_called_once_with(current_manure_treatment_daily_input)
-    patch_for_accumulate_daily_output.assert_called_once_with(initial_manure_treatment_daily_output)
+    patch_for_adjust_accumulated_output.assert_called_once_with(initial_manure_treatment_daily_output)
 
     patch_for_calc_methane_emission.assert_called_once_with(
         accumulated_liquid_manure_total_volatile_solids=liquid_manure_total_solids,
@@ -1238,39 +1238,6 @@ def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name
     )
 
 
-# Test SlurryStorageUnderfloor specific methods
-# ==========================================
-
-
-def test_slurry_storage_underfloor_init(mocker: MockFixture) -> None:
-    """Unit test for __init__() in slurry_storage_underfloor.py."""
-    # Arrange
-    mock_weather = mocker.MagicMock()
-    mock_time = mocker.MagicMock()
-    mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_treatment_config.storage_time_period = storage_time_period = 120
-
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
-        self.weather = weather
-        self.time = time
-        self.config = manure_treatment_config
-
-    mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__",
-        new=mock_base_manure_treatment,
-    )
-
-    # Act
-    slurry_storage_underfloor = SlurryStorageUnderfloor(
-        weather=mock_weather,
-        time=mock_time,
-        manure_treatment_config=mock_manure_treatment_config,
-    )
-
-    # Assert
-    assert slurry_storage_underfloor.storage_time_period == storage_time_period
-
-
 # Test SlurryStorageOutdoor specific methods
 # ==========================================
 
@@ -1281,7 +1248,6 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_treatment_config.storage_time_period = storage_time_period = 120
     mock_manure_treatment_config.freeboard_input = freeboard_input = 130.0
 
     def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
@@ -1302,7 +1268,6 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     )
 
     # Assert
-    assert slurry_storage_outdoor.storage_time_period == storage_time_period
     assert slurry_storage_outdoor.freeboard_input == freeboard_input
 
 
@@ -1992,46 +1957,47 @@ def test_flushing_volume_property(mocker: MockFixture) -> None:
     assert actual_flushing_volume == expected_flushing_volume
 
 
-def test_adjust_accumulated_output(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+    "manure_treatment_type_name",
+    [
+        "slurry storage underfloor",
+        "slurry storage outdoor",
+        "anaerobic lagoon",
+        "anaerobic digestion and lagoon",
+        "anaerobic digestion and lagoon with separator",
+        "compost bedded pack barn",
+        "open lots",
+    ],
+)
+def test_adjust_accumulated_output_empty_manure_pit(manure_treatment_type_name: str, mocker: MockFixture) -> None:
     """
-    Unit test for _adjust_accumulated_output() in anaerobic_lagoon.py.
+    Unit test for _adjust_accumulated_output() to empty the manure pit when sim_day % storage time period = 1.
 
     This test checks that the _adjust_accumulated_output() method correctly resets the
-    accumulated output on the first day of every storage time period or adds the daily
-    output to the accumulated output on other days.
+    accumulated output on the first day of every storage time period.
 
     """
-    # Arrange
-    mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.__init__",
-        return_value=None,
+    manure_treatment = ManureTreatmentFactory.get_instance(
+        manure_treatment_type_name=manure_treatment_type_name,
+        weather=mocker.MagicMock(),
+        time=mocker.MagicMock(),
     )
-    anaerobic_lagoon = AnaerobicLagoon(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
+    manure_treatment._sim_day = 51
+    manure_treatment.storage_time_period = 50
+    manure_treatment_daily_output = ManureTreatmentDailyOutput()
+    dummy_value = 10
+    for field_name in dataclasses.fields(manure_treatment_daily_output):
+        setattr(manure_treatment_daily_output, field_name.name, dummy_value)
 
-    mock_manure_treatment_daily_output = mocker.MagicMock()
-    mock_manure_treatment_daily_output_cloned = mocker.MagicMock()
-    mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output_cloned
+    expected_accumulated_output = manure_treatment_daily_output.clone()
 
-    daily_final_manure_volume = 10.0
-    mock_accumulated_output = mocker.MagicMock()
-    mock_new_accumulated_output = mocker.MagicMock()
-    mock_new_accumulated_output.daily_final_manure_volume = daily_final_manure_volume
-    mock_accumulated_output.__add__ = mocker.MagicMock(return_value=mock_new_accumulated_output)
-    anaerobic_lagoon._accumulated_output = mock_accumulated_output
-
-    # Case 1: Reset on the first day of storage time period
-    anaerobic_lagoon._sim_day = 1
-    anaerobic_lagoon.storage_time_period = 10
+    assert manure_treatment._accumulated_output == ManureTreatmentDailyOutput()
 
     # Act
-    result1 = anaerobic_lagoon._adjust_accumulated_output(mock_manure_treatment_daily_output)
+    manure_treatment._adjust_accumulated_output(manure_treatment_daily_output=manure_treatment_daily_output)
 
-    # Assert
-    mock_manure_treatment_daily_output.clone.assert_called_once()
-    assert result1 == mock_manure_treatment_daily_output_cloned
-
-    # Reset mock calls
-    mock_manure_treatment_daily_output.clone.reset_mock()
+    # Assert after
+    assert manure_treatment._accumulated_output == expected_accumulated_output
 
 
 def test_volume_needed_property(mocker: MockFixture) -> None:
@@ -2530,7 +2496,7 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
         "_calc_anaerobic_digestion_daily_output",
         return_value=complete_daily_output,
     )
-    patch_for_accumulate_daily_output = mocker.patch.object(anaerobic_digestion, "_accumulate_daily_output")
+    patch_for_accumulate_daily_output = mocker.patch.object(anaerobic_digestion, "_adjust_accumulated_output")
     patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch.object(
         anaerobic_digestion,
         "_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission",
@@ -3102,7 +3068,7 @@ def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> No
         "_get_current_day_average_temperature_celsius",
         return_value=20,
     )
-    mocker.patch.object(compost_bedded_pack_barn, "_accumulate_daily_output")
+    mocker.patch.object(compost_bedded_pack_barn, "_adjust_accumulated_output")
 
     expected_manure_nitrogen = daily_input_mock.liquid_manure_nitrogen - total_nitrogen_loss_from_cbpb
     expected_manure_organic_nitrogen = (
@@ -3353,7 +3319,7 @@ def test_open_lots_daily_update_helper(mocker: MockFixture) -> None:
     pen_mock.manure.non_water_organic_phosphorus_fraction = 0.7
     open_lots._current_pen = pen_mock
     mocker.patch.object(open_lots, "_get_current_day_average_temperature_celsius", return_value=20)
-    mocker.patch.object(open_lots, "_accumulate_daily_output")
+    mocker.patch.object(open_lots, "_adjust_accumulated_output")
 
     expected_manure_nitrogen = daily_input_mock.liquid_manure_nitrogen - total_nitrogen_loss_from_open_lots
     expected_manure_organic_nitrogen = (
@@ -3476,7 +3442,7 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     composting._current_manure_treatment_daily_input = daily_input_mock
     composting.time = time_mock
 
-    mock_accumulate_daily_output = mocker.patch.object(composting, "_accumulate_daily_output")
+    mock_accumulate_daily_output = mocker.patch.object(composting, "_adjust_accumulated_output")
 
     result = composting._daily_update_helper()
 
