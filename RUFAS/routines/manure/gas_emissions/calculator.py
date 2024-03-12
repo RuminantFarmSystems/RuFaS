@@ -108,7 +108,7 @@ class GasEmissionsCalculator:
         )
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
-        
+
         methane_emission_from_degradable_volatile_solids = GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR * (
             arrhenius_exponent
             * degradable_volatile_solids_fraction
