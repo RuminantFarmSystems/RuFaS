@@ -213,6 +213,6 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             solid_manure_daily_mass=solid_manure_mass,
         )
 
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         return daily_output
