@@ -1,6 +1,6 @@
 import re
 from typing import Dict, List, Any, Callable
-
+from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
 
@@ -196,19 +196,39 @@ class ReportGenerator:
         event_logs.append(init_event_log)
 
         try:
+            report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
-                cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
+                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
                 cross_reference_data.update(filtered_pool)
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data = self._perform_aggregations(filtered_pool, filter_content)
-
+            should_graph_report_data = filter_content.get("graph_details")
+            enable_graph_and_report = filter_content.get("graph_and_report", False)
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
                     f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
                 )
-                self.reports[column_name] = {"values": values}
+                report_filter_data[column_name] = {"values": values}
+            if should_graph_report_data:
+                if enable_graph_and_report:
+                    self.reports.update(report_filter_data)
+                graph_event_log = self._prepare_report_data_to_be_graphed(
+                    report_filter_data, filter_content, individual_report_name
+                )
+                event_logs.append(graph_event_log)
+            elif not should_graph_report_data:
+                self.reports.update(report_filter_data)
+                report_filter_data = {}
+                if enable_graph_and_report:
+                    warning_event_log = {
+                        "warning": "report_generation_warning",
+                        "message": "Request to graph and report data not fulfilled "
+                        "- no graph_details present in report filter file.",
+                        "info_map": info_map,
+                    }
+                    event_logs.append(warning_event_log)
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
@@ -220,6 +240,35 @@ class ReportGenerator:
             event_logs.append(error_event_log)
 
         return event_logs
+
+    def _prepare_report_data_to_be_graphed(
+        self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
+    ) -> Dict[str, str]:
+        """Prepare and send aggregated report data to Graph Generator to be graphed.
+        Parameters
+        ----------
+        graph_data : Dict[str, Any]
+            The report data to be graphed.
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details
+            such as 'name', 'filters', 'cross_references', and aggregation instructions.
+        individual_report_name : str
+            The name of the report to be graphed.
+        """
+
+        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
+        graph_details = {
+            **filter_content["graph_details"],
+            "title": filter_content["name"],
+            "filters": filter_content["filters"],
+        }
+        print(f"graphing {graph_details['title']}")
+        graphics_dir = graph_details.pop("graphics_dir", None)
+        produce_graphics = graph_details.get("produce_graphics")
+        graph_event_log = graph_generator.generate_graph(
+            graph_data, graph_details, individual_report_name, graphics_dir, produce_graphics
+        )
+        return graph_event_log
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """
