@@ -705,10 +705,10 @@ def test_arrhenius_exponent(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, (1.55838924852, 1.542959652), None),
-        (10.0, 20.0, (15.583892485199996, 15.429596519999997), None),
+        (1.0, 20.0, (0.00155838924852, 0.001542959652), None),
+        (10.0, 20.0, (0.015583892485199996, 0.015429596519999997), None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, (1.55838924852, 1.542959652), None),
+        (1.0, None, (0.00155838924852, 0.001542959652), None),
         # Exception case: Zero total volatile solids
         (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
