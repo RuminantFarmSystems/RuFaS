@@ -1584,11 +1584,7 @@ def test_route_save_functions_graph(
         )
 
         mock_generate_graph.assert_called_once_with(
-            {"key": [1, 2, 3, 4]},
-            graph_data,
-            "graph_file",
-            Path("graphics_dir"),
-            True
+            {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
         )
 
         mock_generate_graph.side_effect = Exception("test exception")
