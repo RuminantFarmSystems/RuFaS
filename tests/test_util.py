@@ -1,4 +1,5 @@
 import re
+from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
 
@@ -161,12 +162,15 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-@pytest.mark.parametrize("year, day, expected_month", [
-    (2000, 366, 12),  # leap year
-    (2001, 365, 12),  # normal year
-    (2000, 60, 2),
-    (2001, 60, 3)
-])
+@pytest.mark.parametrize(
+    "year, day, expected_month",
+    [
+        (2000, 366, 12),  # leap year
+        (2001, 365, 12),  # normal year
+        (2000, 60, 2),
+        (2001, 60, 3),
+    ],
+)
 def test_day_to_month_conversion(year: int, day: int, expected_month: int):
     """Tests that number of days were converted into months correctly"""
     assert Utility.day_to_month_conversion(day, year) == expected_month
@@ -209,29 +213,39 @@ def test_get_timestamp() -> None:
     """Unit test for the function get_timestamp in file util.py"""
 
     # Arrange
-    timestamp_with_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
-    )
-    timestamp_without_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
-    )
+    timestamp_with_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
+    timestamp_without_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
 
     # Act & Assert
-    assert re.match(
-        timestamp_with_millis_pattern, Utility.get_timestamp(include_millis=True)
-    )
-    assert re.match(
-        timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False)
-    )
+    assert re.match(timestamp_with_millis_pattern, Utility.get_timestamp(include_millis=True))
+    assert re.match(timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False))
 
 
-@pytest.mark.parametrize("data_pool, filter_patterns, filter_by_exclusion, expected_result", [
-    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], False, {"var1": 1, "var2": 2}),
-    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], True, {"var3": 3}),
-    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], False, {}),
-    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], True, {"var1": 1, "var2": 2, "var3": 3}),
-    ({}, ["var1"], False, {}),
-    ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
-])
-def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
-    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
+@pytest.mark.parametrize(
+    "dict_to_be_filtered, filter_patterns, filter_by_exclusion, expected_result",
+    [
+        (
+            {"var1": 1, "var2": 2, "var3": 3},
+            ["var1", "var2"],
+            False,
+            {"var1": 1, "var2": 2},
+        ),
+        ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], True, {"var3": 3}),
+        ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], False, {}),
+        (
+            {"var1": 1, "var2": 2, "var3": 3},
+            ["var4"],
+            True,
+            {"var1": 1, "var2": 2, "var3": 3},
+        ),
+        ({}, ["var1"], False, {}),
+        ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
+    ],
+)
+def test_filter_dictionary(
+    dict_to_be_filtered: Dict[str, Any],
+    filter_patterns: List[str],
+    filter_by_exclusion: bool,
+    expected_result: Dict[str, Any],
+) -> None:
+    assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result

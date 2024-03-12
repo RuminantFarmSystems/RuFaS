@@ -2,14 +2,13 @@ from typing import Dict
 
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
-
-    METHANE_EMISSION_COEFFICIENT: float = 24
-    """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
@@ -22,10 +21,10 @@ class GasEmissionConstants:
     Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
     methane emission (unitless)."""
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 43.33
-    """Natural log of the Arrhenius constant (unitless)."""
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    """Natural log of the Arrhenius constant (g :math:`CH_4`/kg manure VS/h)."""
 
-    ACTIVATION_ENERGY: float = 112700.0
+    ACTIVATION_ENERGY: float = 81_000.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
@@ -248,38 +247,35 @@ class GasEmissionConstants:
     FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.5,
         CompostingType.PASSIVE_WINDROW: 0.45,
-        CompostingType.INTENSIVE_WINDROW: 0.5
+        CompostingType.INTENSIVE_WINDROW: 0.5,
     }
 
     FRACTION_NITROGEN_LOST_TO_LEACHING: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
 
     FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
 
-    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (
-        Dict)[ManureTreatmentType, Dict[str, float]] = {
+    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (Dict)[ManureTreatmentType, Dict[str, float]] = {
         ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.ANAEROBIC_LAGOON: {
             ManureCoverEnum.COVER.value: 0.005,
-            ManureCoverEnum.NO_COVER.value: 0.0
+            ManureCoverEnum.NO_COVER.value: 0.0,
         },
-        ManureTreatmentType.ANAEROBIC_DIGESTION: {
-            ManureCoverEnum.NOT_APPLICABLE.value: 0.0006
-        }
+        ManureTreatmentType.ANAEROBIC_DIGESTION: {ManureCoverEnum.NOT_APPLICABLE.value: 0.0006},
     }
     """
     Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage
