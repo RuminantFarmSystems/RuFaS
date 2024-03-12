@@ -26,8 +26,8 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CH_4} = 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{d} \\cdot b_{1}
-            + 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{nd} \\cdot b_{2}
+            E_{CH_4} = 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{d} \\cdot b_{1} \\cdot \frac{1}{1000}
+            + 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{nd} \\cdot b_{2} \\cdot \frac{1}{1000}
 
         where:
 
@@ -48,26 +48,6 @@ class GasEmissionsCalculator:
             :math:`R` is the ideal gas constant (8.314 J/mol :math:`\\cdot` K),
 
             :math:`T` is the temperature in Kelvin (:math:`K`).
-
-        The degradable and non-degradable volatile solids are calculated using the following equations:
-
-        .. math::
-
-            VS_d = \\frac{VS \\cdot B_o}{E_{CH_4,pot}}
-
-            VS_{nd} = VS - VS_d
-
-        where:
-
-            :math:`VS` is the total volatile solids in manure (kg),
-
-            :math:`VS_d` is the degradable volatile solids in manure (kg),
-
-            :math:`VS_{nd}` is the non-degradable volatile solids in manure (kg),
-
-            :math:`B_o` is the achievable methane emission (0.24 kg :math:`CH_4`/kg VS),
-
-            :math:`E_{CH_4,pot}` is the potential methane production (0.48 kg :math:`CH_4`/kg VS).
 
         Parameters
         ----------
