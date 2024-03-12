@@ -2,7 +2,6 @@ import math
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import (
@@ -749,6 +748,10 @@ class Field:
             An object containing the infomation that defines a manure application.
         manure_type : ManureType
             Enum option indicating if the manure applied was solid or liquid.
+
+        Notes
+        -----
+        This method only records manure water to be applied to a field if it comes from an application of liquid manure.
 
         """
 
