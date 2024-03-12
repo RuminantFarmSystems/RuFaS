@@ -4,6 +4,7 @@ from typing import Dict, List, Any, Optional, Type
 
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.graph_generator import GraphGenerator
 
 from RUFAS.report_generator import (
     average_aggregator,
@@ -786,11 +787,7 @@ def test_ensure_unique_report_name_with_timestamp(
         ),
         # Report with cross-references
         (
-            {
-                "name": "report_with_references",
-                "filters": ["some_filter"],
-                "cross_references": ["ref1"],
-            },
+            {"name": "report_with_references", "filters": ["some_filter"], "cross_references": ["ref1"]},
             {"some_filter": [1, 2, 3]},
             {"ref1": {"values": [4, 5, 6]}},
             None,
@@ -828,6 +825,57 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Error generating the individual report (error_report) => ValueError: ",
             ],
         ),
+        # Report with graph_details, without enable_graph_and_report - tests graph_data
+        # creation and filtering reports by exclusion
+        (
+            {
+                "name": "graph_report",
+                "filters": ["graph_filter"],
+                "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
+            },
+            {"graph_filter": [7, 8, 9]},
+            {},
+            None,
+            None,
+            {},
+            ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
+        ),
+        # Report with both graph_details and enable_graph_and_report set - tests enabling both graph and report data
+        (
+            {
+                "name": "full_feature_report",
+                "filters": ["full_feature_filter"],
+                "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
+                "graph_and_report": True,
+            },
+            {"full_feature_filter": [10, 11, 12]},
+            {},
+            None,
+            None,
+            {"full_feature_report_full_feature_filter": {"values": [10, 11, 12]}},
+            [
+                "Start generating individual report: full_feature_report",
+                "Prepared graph data for report: full_feature_report",
+            ],
+        ),
+        # Report with enable_graph_and_report set but without graph_details
+        # tests warning log for missing graph_details
+        (
+            {
+                "name": "graph_report_missing_details",
+                "filters": ["missing_graph_filter"],
+                "graph_and_report": True,
+            },
+            {"missing_graph_filter": [13, 14, 15]},
+            {},
+            None,
+            None,
+            {"graph_report_missing_details_missing_graph_filter": {"values": [13, 14, 15]}},
+            [
+                "Start generating individual report: graph_report_missing_details",
+                "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
+            ],
+        ),
     ],
 )
 def test_generate_report(
@@ -848,16 +896,21 @@ def test_generate_report(
     mocker.patch("RUFAS.report_generator.ReportGenerator.__init__", return_value=None)
     report_generator = ReportGenerator()
     report_generator.reports = reports
-    mocker.patch.object(
-        report_generator,
-        "_ensure_unique_report_name_with_timestamp",
-        side_effect=lambda name: name,
-    )
+    mocker.patch.object(report_generator, "_ensure_unique_report_name_with_timestamp", side_effect=lambda name: name)
     mocker.patch.object(
         report_generator,
         "_check_for_missing_references",
         side_effect=reference_exception if reference_exception else None,
     )
+    mocker.patch.object(
+        report_generator,
+        "_prepare_report_data_to_be_graphed",
+        side_effect=lambda graph_data, filter_content, report_name: {
+            "message": f"Prepared graph data for report: {report_name}",
+            "info_map": {},
+        },
+    )
+    mocker.patch("RUFAS.report_generator.Utility.filter_dictionary", return_value=expected_report_columns)
     if perform_aggregations_exception:
         mocker.patch.object(
             report_generator,
@@ -878,10 +931,51 @@ def test_generate_report(
     # Assert
     if not reference_exception and not perform_aggregations_exception:
         assert report_generator.reports == expected_report_columns
-
     log_messages = [log["message"] for log in event_logs]
     for expected_message in expected_log_messages:
         assert expected_message in log_messages
+
+
+def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
+    """
+    Unit test for the _prepare_report_data_to_be_graphed method in the ReportGenerator class.
+    """
+    report_generator = ReportGenerator()
+    individual_report_name = "test_report"
+    graph_data = {"some_data_key": [1, 2, 3]}
+    filter_content = {
+        "name": "example_report",
+        "filters": ["filter1", "filter2"],
+        "graph_details": {"metadata_prefix": "prefix", "graphics_dir": "dir", "other_details": "details",
+                          "produce_graphics": True},
+    }
+    produce_graphics = True
+
+    mock_generate_graph = mocker.patch.object(
+        GraphGenerator, "generate_graph", return_value={"status": "success", "message": "Graph generated"}
+    )
+    graph_event_log = report_generator._prepare_report_data_to_be_graphed(
+        graph_data, filter_content, individual_report_name
+    )
+
+    mock_generate_graph.assert_called_once_with(
+        graph_data,
+        {
+            "metadata_prefix": "prefix",
+            "other_details": "details",
+            "produce_graphics": True,
+            "title": "example_report",
+            "filters": ["filter1", "filter2"],
+        },
+        individual_report_name,
+        "dir",
+        produce_graphics
+    )
+
+    assert graph_event_log == {
+        "status": "success",
+        "message": "Graph generated",
+    }, "Graph event log did not match expected output"
 
 
 def test_report_generator_init() -> None:
