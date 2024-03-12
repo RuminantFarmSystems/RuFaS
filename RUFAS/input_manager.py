@@ -821,7 +821,7 @@ class InputManager:
                 called_during_initialization,
             )
 
-    def _dict_type_validator(  # noqa
+    def _dict_type_validator(
         self,
         first_level_key: str,
         properties_blob_key: str,
@@ -1725,7 +1725,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(  # noqa
+    def _add_variable_to_pool(
         self,
         variable_name: str,
         input_data: Dict[str, Any],
@@ -2030,7 +2030,7 @@ class ElementsCounter:
         self.invalid_elements = 0
         self.fixed_elements = 0
 
-    def _update(self, state: ElementState, value: int) -> None:
+    def update(self, state: ElementState, value: int) -> None:
         """
         Updates the count of elements in a given state.
 
@@ -2054,7 +2054,6 @@ class ElementsCounter:
             self.fixed_elements += value
         else:
             raise ValueError(f"Invalid state: {state}")
-        self._check_negative_counts()
 
     def increment(self, state: ElementState) -> None:
         """
@@ -2066,19 +2065,7 @@ class ElementsCounter:
             The state of the element.
         """
 
-        self._update(state, 1)
-
-    def decrement(self, state: ElementState) -> None:
-        """
-        Decrements the count of elements in a given state by one.
-
-        Parameters
-        ----------
-        state : ElementState
-            The state of the element.
-        """
-
-        self._update(state, -1)
+        self.update(state, 1)
 
     def reset(self) -> None:
         """
@@ -2088,23 +2075,6 @@ class ElementsCounter:
         self.valid_elements = 0
         self.invalid_elements = 0
         self.fixed_elements = 0
-
-    def _check_negative_counts(self) -> None:
-        """
-        Checks if any of the element counts are negative and raises a ValueError if so.
-
-        Raises
-        ------
-        ValueError
-            If any of the element counts are negative.
-        """
-
-        if self.valid_elements < 0:
-            raise ValueError(f"Valid elements count is negative: {self.valid_elements}")
-        if self.invalid_elements < 0:
-            raise ValueError(f"Invalid elements count is negative: {self.invalid_elements}")
-        if self.fixed_elements < 0:
-            raise ValueError(f"Fixed elements count is negative: {self.fixed_elements}")
 
     def total_elements(self) -> int:
         """
@@ -2145,5 +2115,4 @@ class ElementsCounter:
         new_counter.valid_elements = self.valid_elements + other.valid_elements
         new_counter.invalid_elements = self.invalid_elements + other.invalid_elements
         new_counter.fixed_elements = self.fixed_elements + other.fixed_elements
-        new_counter._check_negative_counts()
         return new_counter
