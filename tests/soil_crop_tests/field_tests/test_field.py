@@ -2,6 +2,7 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
@@ -1981,6 +1982,36 @@ def test_record_manure_application(
     ]
     assert actual["info_maps"].__contains__(expected_info)
     assert actual["values"].__contains__(expected_values)
+
+
+@pytest.mark.parametrize(
+    "manure_application,manure_type,expected_liters,converted",
+    [
+        (NutrientRequestResults(total_manure_mass=100, dry_matter_fraction=0.05), ManureType.LIQUID, 95.0, True),
+        (NutrientRequestResults(total_manure_mass=100, dry_matter_fraction=0.05), ManureType.SOLID, 95.0, False),
+    ],
+)
+def test_add_manure_water(
+    mocker: MockerFixture,
+    manure_application: NutrientRequestResults,
+    manure_type: ManureType,
+    expected_liters: float,
+    converted: bool,
+) -> None:
+    """Tests that manure water is correctly calculated and stored."""
+    field_data = FieldData(field_size=2.3)
+    mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
+    field = Field(field_data=field_data, manure_manager=mock_manure_manager)
+    mocked_converter = mocker.patch.object(field.field_data, "convert_liters_to_millimeters", return_value=10.0)
+
+    field._add_manure_water(manure_application, manure_type)
+
+    if converted:
+        mocked_converter.assert_called_once_with(expected_liters, 2.3)
+        assert field.field_data.manure_water == 10.0
+    else:
+        mocked_converter.assert_not_called()
+        assert field.field_data.manure_water == 0.0
 
 
 @pytest.mark.parametrize(

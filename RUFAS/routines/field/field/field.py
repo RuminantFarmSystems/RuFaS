@@ -739,7 +739,7 @@ class Field:
         }
         om.add_variable("manure_application", value, info_map)
 
-    def _add_irrigation_from_manure(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
+    def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
         Records the water from a manure application so it can be added to the soil.
 
@@ -755,13 +755,12 @@ class Field:
         if manure_type is ManureType.SOLID:
             return
 
-        dry_matter = manure_application.dry_matter
-        water_amount_in_l = (dry_matter / manure_application.dry_matter_fraction) - dry_matter
+        water_amount_in_l = manure_application.total_manure_mass * (1 - manure_application.dry_matter_fraction)
 
         water_amount_in_mm = self.field_data.convert_liters_to_millimeters(
             water_amount_in_l, self.field_data.field_size
         )
-        self.field_data.manure_water = water_amount_in_mm
+        self.field_data.manure_water += water_amount_in_mm
 
     def _record_nutrient_application_error(
         self,
@@ -1512,7 +1511,7 @@ class Field:
         manure_water = self.field_data.manure_water
 
         info_map = {
-            "classname": self.__class__.__name__,
+            "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
         }
