@@ -306,9 +306,8 @@ class AnimalRequirements:
             animal.DMIest_requirement = req["DMIest_requirement"]
             # these animal class variables are only used for grouping purposes
             if animal_type in [AnimalType.LAC_COW]:
-                animal.DNED_requirement = (
-                                                  req["NEmaint_requirement"] + req["NEl_requirement"]
-                                          ) / animal.DMIest_requirement
+                animal.DNED_requirement = (req["NEmaint_requirement"]
+                                           + req["NEl_requirement"]) / animal.DMIest_requirement
                 animal.DMDP_requirement = (req["MP_requirement"]) / animal.DMIest_requirement
 
                 # calculating the activity requirement for energy
@@ -691,7 +690,7 @@ class AnimalRequirements:
         ]:
             body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
             net_energy_maintenance = (body_weight - conceptus_weight) ** (0.75) * (
-                    0.086 * (0.8 + (body_condition_score_9 - 1) * 0.05)
+                0.086 * (0.8 + (body_condition_score_9 - 1) * 0.05)
             ) + 0.0007 * (20 - previous_temperature)
         return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
@@ -1210,13 +1209,13 @@ class AnimalRequirements:
         MP_bactria_estimate = dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
 
         MPm = (
-                0.3 * (body_weight - conceptus_weight) ** 0.6
-                + 4.1 * (body_weight - conceptus_weight) ** 0.5
-                + (
-                        dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * 0.03
-                        - 0.5 * (MP_bactria_estimate / 0.68 - MP_bactria_estimate)
-                )
-                + 0.4 * 11.8 * dry_matter_intake_estimate / 0.67
+            0.3 * (body_weight - conceptus_weight) ** 0.6
+            + 4.1 * (body_weight - conceptus_weight) ** 0.5
+            + (
+                dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * 0.03
+                - 0.5 * (MP_bactria_estimate / 0.68 - MP_bactria_estimate)
+            )
+            + 0.4 * 11.8 * dry_matter_intake_estimate / 0.67
         )
         # Growth Requirement
         # ---------------------
@@ -1340,11 +1339,11 @@ class AnimalRequirements:
         TargetEffMP = 0.69
         if lactating:
             metabolizable_protein_requirement = (
-                    ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
+                ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
             )
         else:
             metabolizable_protein_requirement = (
-                    (NPscurf + NPMFP) / TargetEffMP + (NPGest / 0.33) + (NPGrowth / 0.40) + NPEndUrin
+                (NPscurf + NPMFP) / TargetEffMP + (NPGest / 0.33) + (NPGrowth / 0.40) + NPEndUrin
             )
         return metabolizable_protein_requirement
 
@@ -1499,8 +1498,8 @@ class AnimalRequirements:
             Ca_Preg = 0.02456 * math.exp(
                 (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
             ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)) * (
-                              body_weight / 715
-                      )
+                body_weight / 715
+            )
         Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
         calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
@@ -1712,7 +1711,7 @@ class AnimalRequirements:
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
             dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) * (
-                    1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
+                1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
             )
         elif animal_type in [AnimalType.DRY_COW]:
             dry_matter_intake_estimate = ((1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
@@ -1722,7 +1721,7 @@ class AnimalRequirements:
             else:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
-                    body_weight ** 0.75 * (0.2435 * DivFact - 0.0466 * DivFact ** 2 - value_to_use) / DivFact
+                body_weight ** 0.75 * (0.2435 * DivFact - 0.0466 * DivFact ** 2 - value_to_use) / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
@@ -1790,27 +1789,19 @@ class AnimalRequirements:
             if parity > 1:
                 parity_adjustment_factor = 1
             dry_matter_intake_estimate = (
-                                                 (3.7 + parity_adjustment_factor * 5.7)
-                                                 + 0.305 * net_energy_lactation
-                                                 + 0.022 * body_weight
-                                                 + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
-                                         ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * math.exp(
-                -0.053 * days_in_milk))
+                (3.7 + parity_adjustment_factor * 5.7)
+                + 0.305 * net_energy_lactation
+                + 0.022 * body_weight
+                + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
+            ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * math.exp(-0.053 * days_in_milk))
         else:
             dry_matter_intake_estimate = (
-                                                 0.0226 * mature_body_weight * (
-                                                 1 - math.exp(-1.47 * (body_weight / mature_body_weight)))
-                                         ) - (
-                                                 0.082
-                                                 * (
-                                                         NDF_conc
-                                                         - (
-                                                                 23.1
-                                                                 + 56 * (body_weight / mature_body_weight)
-                                                                 - 30.6 * (body_weight / mature_body_weight) ** 2.0
-                                                         )
-                                                 )
-                                         )
+                0.0226 * mature_body_weight * (1 - math.exp(-1.47 * (body_weight / mature_body_weight)))
+            )
+            - (
+                0.082 * (NDF_conc - (23.1 + 56 * (body_weight / mature_body_weight) - 30.6
+                                     * (body_weight / mature_body_weight) ** 2.0))
+            )
         return max(
             dry_matter_intake_estimate,
             AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
