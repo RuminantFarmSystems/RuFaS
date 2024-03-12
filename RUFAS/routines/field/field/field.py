@@ -1,6 +1,8 @@
 import math
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import (
@@ -736,6 +738,30 @@ class Field:
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("manure_application", value, info_map)
+
+    def _add_irrigation_from_manure(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
+        """
+        Records the water from a manure application so it can be added to the soil.
+
+        Parameters
+        ----------
+        manure_application : NutrientRequestResults
+            An object containing the infomation that defines a manure application.
+        manure_type : ManureType
+            Enum option indicating if the manure applied was solid or liquid.
+
+        """
+
+        if manure_type is ManureType.SOLID:
+            return
+
+        dry_matter = manure_application.dry_matter
+        water_amount_in_l = (dry_matter / manure_application.dry_matter_fraction) - dry_matter
+
+        water_amount_in_mm = self.field_data.convert_liters_to_millimeters(
+            water_amount_in_l, self.field_data.field_size
+        )
+        self.field_data.manure_water = water_amount_in_mm
 
     def _record_nutrient_application_error(
         self,

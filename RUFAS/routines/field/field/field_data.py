@@ -52,6 +52,8 @@ class FieldData:
         Status indicating if this field is watered at all.
     annual_irrigation_water_use_total : float, default=0.0
         Cumulative total of water used for irrigation in a year (mm).
+    manure_water : float, default=0.0
+        Amount of water to be added to the field from a manure application (mm).
 
     Methods
     -------
@@ -82,6 +84,7 @@ class FieldData:
     days_into_watering_interval: int = 0
     current_water_deficit: float = 0.0
     watering_occurs: bool = True
+    manure_water: float = 0.0
 
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
