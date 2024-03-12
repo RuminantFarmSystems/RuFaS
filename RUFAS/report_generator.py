@@ -255,7 +255,7 @@ class ReportGenerator:
         individual_report_name : str
             The name of the report to be graphed.
         """
-        
+
         graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
         graph_details = {
             **filter_content["graph_details"],
