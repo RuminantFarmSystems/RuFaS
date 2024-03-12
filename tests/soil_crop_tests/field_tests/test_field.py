@@ -2353,6 +2353,29 @@ def test_determine_watering_amount(
             assert incorp.field_data.annual_irrigation_water_use_total == 0
 
 
+@pytest.mark.parametrize("water_amount,field_name", [
+    (0.0, "test_1"),
+    (10.0, "test_2"),
+    (45.3, "test_3"),
+])
+def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
+    """Tests that manure water is correctly retrieved and logged."""
+    field_data = FieldData(name=field_name, manure_water=water_amount)
+    field = Field(field_data=field_data, manure_manager=MagicMock(autospec=ManureManager))
+
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
+        actual = field._get_manure_water()
+
+        add_var.assert_called_once_with(
+            "manure_water",
+            water_amount,
+            {"class": "Field", "function": "_get_manure_water", "suffix": f"field='{field_name}'"},
+        )
+
+    assert actual == water_amount
+    assert field.field_data.manure_water == 0.0
+
+
 @pytest.mark.parametrize(
     "precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
     "expected_first,expected_second",
