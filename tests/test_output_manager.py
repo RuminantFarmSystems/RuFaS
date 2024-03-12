@@ -1478,7 +1478,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
-    mocker.patch.object(mock_output_manager, '_route_logs', return_value=None)
+    mocker.patch.object(mock_output_manager, "_route_logs", return_value=None)
     mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
     mock_output_manager.create_directory = MagicMock()
 
@@ -1516,9 +1516,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
     mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-    mock_output_manager.create_directory = output_manager_original_method_states[
-        "create_directory"
-    ]
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
 
 
 def test_route_save_functions_csv(

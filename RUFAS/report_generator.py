@@ -214,8 +214,9 @@ class ReportGenerator:
                     graph_data[column_name] = {"values": values}
             enable_graph_and_report = filter_content.get("graph_and_report")
             if should_graph_report_data:
-                graph_event_log = self._prepare_report_data_to_be_graphed(graph_data, filter_content,
-                                                                          individual_report_name)
+                graph_event_log = self._prepare_report_data_to_be_graphed(
+                    graph_data, filter_content, individual_report_name
+                )
                 event_logs.append(graph_event_log)
                 if not enable_graph_and_report:
                     self.reports = Utility.filter_pool(self.reports, graph_data.keys(), filter_by_exclusion=True)
@@ -240,7 +241,7 @@ class ReportGenerator:
         return event_logs
 
     def _prepare_report_data_to_be_graphed(
-            self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
+        self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
     ) -> Dict[str, str]:
         """Prepare and send aggregated report data to Graph Generator to be graphed.
 
@@ -260,9 +261,9 @@ class ReportGenerator:
         graphics_dir = graph_details["graphics_dir"]
         graph_details["filters"] = filter_content["filters"]
         del graph_details["graphics_dir"]
-        graph_event_log = graph_generator.generate_graph(graph_data, graph_details,
-                                                         individual_report_name,
-                                                         graphics_dir)
+        graph_event_log = graph_generator.generate_graph(
+            graph_data, graph_details, individual_report_name, graphics_dir
+        )
         return graph_event_log
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
