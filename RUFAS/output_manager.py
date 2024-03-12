@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -611,7 +611,10 @@ class OutputManager(object):
                         result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = [element for element in filter_file.read().splitlines() if element]
-                    result = [{"filters": list_of_elements}]
+                    filter_by_exclusion = list_of_elements[0] == "exclude"
+                    if filter_by_exclusion:
+                        list_of_elements.pop(0)
+                    result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
                 else:
                     raise Exception("Unsupported file format; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
@@ -629,9 +632,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(
-        self, filter_patterns: List[str], input_file_name: Optional[str]
-    ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -661,27 +662,22 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._filter_variables_pool.__name__,
         }
-        exclude_keyword_location = 0
-        exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
+        filter_name = filter_content.get("filter_name", "NO_NAME")
         if filter_by_exclusion:
-            filter_vars_msg = (
-                f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
-                f" position {exclude_keyword_location}. Performing filtering by exclusion."
-            )
+            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_vars_msg = (
-                f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
-                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
-            )
-        filter_pattern_matches = Utility.filter_dictionary(self.variables_pool, filter_patterns, filter_by_exclusion)
-        self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = (
-            f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter pattern(s) in the {input_file_name} file."
+            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+        self.add_log("filtering_log", filter_excl_msg, info_map)
+        filtered_pool = Utility.filter_dictionary(
+            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
         )
-        self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
-        return filter_pattern_matches
+        self.add_log(
+            "num_filter_pattern_matches",
+            f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
+            info_map,
+        )
+        return filtered_pool
 
     def save_results(
         self,
@@ -757,11 +753,17 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
+                    filtered_pool = self._filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                    if filter_content.get("graph_details"):
+                        print(f"here for {filter_content.get('name')}")
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["produce_graphics"] = produce_graphics
+                        filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:
@@ -819,10 +821,7 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
+                        filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
                     self._route_logs(log_pool)
                 except Exception as e:
@@ -1003,10 +1002,10 @@ class OutputManager(object):
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool = {}
-        self.warnings_pool = {}
-        self.errors_pool = {}
-        self.logs_pool = {}
+        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
