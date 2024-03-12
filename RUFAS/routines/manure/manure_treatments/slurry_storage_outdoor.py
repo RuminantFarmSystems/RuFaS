@@ -211,10 +211,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         methane_loss, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
                 accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
-                accumulated_liquid_manure_total_degradable_volatile_solids=
-                accumulated_liquid_manure_total_degradable_volatile_solids,
-                accumulated_liquid_manure_total_non_degradable_volatile_solids=
-                accumulated_liquid_manure_total_non_degradable_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=accumulated_liquid_manure_total_degradable_volatile_solids,
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=accumulated_liquid_manure_total_non_degradable_volatile_solids,
                 temp=temperature_celsius,
             )
         )
@@ -270,12 +268,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._adjust_accumulated_output(daily_output)
 
         methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
-            accumulated_liquid_manure_total_volatile_solids=
-            self._accumulated_output.liquid_manure_total_volatile_solids,
-            accumulated_liquid_manure_total_degradable_volatile_solids=
-            self._accumulated_output.liquid_manure_total_degradable_volatile_solids,
-            accumulated_liquid_manure_total_non_degradable_volatile_solids=
-            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
+            accumulated_liquid_manure_total_volatile_solids=self._accumulated_output.liquid_manure_total_volatile_solids,
+            accumulated_liquid_manure_total_degradable_volatile_solids=self._accumulated_output.liquid_manure_total_degradable_volatile_solids,
+            accumulated_liquid_manure_total_non_degradable_volatile_solids=self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids,
         )
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
