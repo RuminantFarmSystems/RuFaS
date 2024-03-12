@@ -761,7 +761,13 @@ class OutputManager(object):
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
-                if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                if filter_file.startswith(
+                        self.__supported_filter_types_prefixes["report"]
+                ):
+                    if filter_content.get("graph_details"):
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:

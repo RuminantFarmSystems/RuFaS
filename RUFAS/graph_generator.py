@@ -149,9 +149,13 @@ class GraphGenerator:
             if found_errors:
                 return all_logs
 
-            fig, _ = plt.subplots()
-            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
-            self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
+            fig, _ = plt.subplots(figsize=(10, 6))
+            plt.subplots_adjust(right=0.65)
+            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"]
+                             if k in filtered_pool.keys()}
+            self._draw_graph(
+                graph_details["type"], prepared_data, prepared_data.keys()
+            )
             legend = graph_details.get("legend")
             if not legend:
                 graph_details["legend"] = list(prepared_data.keys())
@@ -349,6 +353,8 @@ class GraphGenerator:
         for attrib, value in customization_details.items():
             if attrib in FIGURE_SETTERS.keys():
                 FIGURE_SETTERS[attrib](fig, value)
+            elif attrib == "legend":
+                AXES_SETTERS[attrib](fig.axes[0], value, loc='upper left', bbox_to_anchor=(1, 1))
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
 

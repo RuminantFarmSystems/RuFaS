@@ -1453,6 +1453,7 @@ def test_save_results(
         (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False),
     ],
 )
 def test_save_results_report_generation(
@@ -1477,7 +1478,9 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
-    mocker.patch.object(mock_output_manager, "_route_logs", return_value=None)
+    mocker.patch.object(mock_output_manager, '_route_logs', return_value=None)
+    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
+    mock_output_manager.create_directory = MagicMock()
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
@@ -1498,6 +1501,13 @@ def test_save_results_report_generation(
                 mock_output_manager._list_filter_files_in_dir.return_value
             )
 
+        if not is_faulty and any("graph_details" in content for content in filter_content):
+            for content in filter_content:
+                if "graph_details" in content:
+                    assert "graphics_dir" in content["graph_details"]
+                    assert content["graph_details"]["graphics_dir"] == "graphics_dir"
+                    assert content["graph_details"]["metadata_prefix"] == "test_prefix"
+
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states["save_results"]
     mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
@@ -1506,6 +1516,9 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
     mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    mock_output_manager.create_directory = output_manager_original_method_states[
+        "create_directory"
+    ]
 
 
 def test_route_save_functions_csv(
