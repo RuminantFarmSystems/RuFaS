@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union, Optional, Type
+from typing import Any, Callable, Dict, List, Type, Union, Optional
 from typing import Tuple
 
 import pandas as pd
@@ -9,11 +9,11 @@ import pytest
 from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager, Modifiability
+from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
 
 
 @pytest.fixture
-def mock_input_manager(mocker: MockerFixture) -> InputManager:
+def mock_input_manager() -> InputManager:
     input_manager = InputManager()
     return input_manager
 
@@ -50,7 +50,6 @@ def input_manager_original_method_states(
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
         "get_data_keys_by_properties": mock_input_manager.get_data_keys_by_properties,
-        "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "flush_pool": mock_input_manager.flush_pool,
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
         "_set_nested_value": mock_input_manager._set_nested_value,
@@ -227,25 +226,21 @@ def test_load_data_from_csv_invalid_data_raises_error(
 def test_start_data_processing(
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
-    mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._populate_pool = MagicMock(return_value=True)
-    mock_input_manager._load_properties = MagicMock()
+    patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
+    patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
+    patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
 
     mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
 
-    mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
-    mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
-    mock_input_manager._load_properties.assert_called_once()
-
-    # Restore original methods
-    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._load_properties = input_manager_original_method_states["_load_properties"]
+    patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
+    patch_for_populate_pool.assert_called_once_with(eager_termination)
+    patch_for_load_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -302,163 +297,147 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 
 
 def test_populate_pool_valid(
-    mock_input_manager: InputManager,
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for valid data for function _populate_pool in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
-    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
-        mock_input_manager,
+        input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
+    )
+    mocker.patch.object(
+        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+    )
+    mocker.patch.object(input_manager, "_dict_type_validator", side_effect=lambda *args, **kwargs: True)
+    mocker.patch.object(
+        input_manager,
         "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys")
+    mocker.patch.object(input_manager, "_log_missing_keys")
+    mocker.patch("RUFAS.input_manager.om.add_warning")
+    mocker.patch("RUFAS.input_manager.om.add_log")
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._populate_pool(eager_termination=True)
+    # Act
+    result = input_manager._populate_pool(eager_termination=True)
 
-        assert result is True
-        assert add_log.call_count == 4
-        assert add_warning.call_count == 0
-        assert "file1" in mock_input_manager._InputManager__pool
-        assert "file2" in mock_input_manager._InputManager__pool
-
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result
+    assert "file1" in getattr(input_manager, "_InputManager__pool")
+    assert "file2" in getattr(input_manager, "_InputManager__pool")
 
 
 def test_populate_pool_invalid(
-    mock_input_manager: InputManager,
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
 
-    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
-    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
-        mock_input_manager,
+        input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
+    )
+    mocker.patch.object(
+        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+    )
+    mocker.patch.object(input_manager, "_dict_type_validator", side_effect=lambda *args, **kwargs: False)
+    mocker.patch.object(
+        input_manager,
         "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys")
+    mocker.patch.object(input_manager, "_log_missing_keys")
+    mocker.patch("RUFAS.input_manager.om.add_warning")
+    mocker.patch("RUFAS.input_manager.om.add_log")
+    elements_counter = ElementsCounter()
+    elements_counter.increment(ElementState.INVALID)
+    mocker.patch.object(input_manager, "elements_counter", elements_counter)
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._populate_pool(eager_termination=False)
+    # Act
+    result = input_manager._populate_pool(eager_termination=False)
 
-        assert result is False
-        assert add_log.call_count == 4
-        assert add_warning.call_count == 0
-        assert "file1" not in mock_input_manager._InputManager__pool
-        assert "file2" not in mock_input_manager._InputManager__pool
-
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert not result
+    assert "file1" not in getattr(input_manager, "_InputManager__pool")
+    assert "file2" not in getattr(input_manager, "_InputManager__pool")
 
 
 def test_populate_pool_partial_invalid(
-    mock_input_manager: InputManager,
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
-):
+) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
 
-    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
-    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._dict_type_validator = MagicMock(
-        side_effect=[
-            {"fixed_elements": 1, "valid_elements": 1, "total_elements": 1, "invalid_elements": 0, "is_valid": True},
-            {"fixed_elements": 0, "valid_elements": 0, "total_elements": 1, "invalid_elements": 1, "is_valid": False},
-            {"fixed_elements": 1, "valid_elements": 1, "total_elements": 1, "invalid_elements": 0, "is_valid": True},
-            {"fixed_elements": 0, "valid_elements": 0, "total_elements": 1, "invalid_elements": 1, "is_valid": False},
-        ]
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
+    mocker.patch.object(
+        input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
     )
     mocker.patch.object(
-        mock_input_manager,
+        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+    )
+    mocker.patch.object(input_manager, "_dict_type_validator", side_effect=[True, False, True, False])
+    mocker.patch.object(
+        input_manager,
         "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys")
+    mocker.patch.object(input_manager, "_log_missing_keys")
+    mocker.patch("RUFAS.input_manager.om.add_warning")
+    mocker.patch("RUFAS.input_manager.om.add_log")
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._populate_pool(eager_termination=False)
+    # Act
+    result = input_manager._populate_pool(eager_termination=False)
 
-        assert result is False
-        assert add_log.call_count == 4
-        assert add_warning.call_count == 0
-        assert "file1" in mock_input_manager._InputManager__pool
-        assert "file2" in mock_input_manager._InputManager__pool
-        assert "element1" in mock_input_manager._InputManager__pool["file1"]
-        assert "element2" not in mock_input_manager._InputManager__pool["file1"]
-        assert "element3" in mock_input_manager._InputManager__pool["file2"]
-        assert "element4" not in mock_input_manager._InputManager__pool["file2"]
-
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result
+    assert "file1" in getattr(input_manager, "_InputManager__pool")
+    assert "file2" in getattr(input_manager, "_InputManager__pool")
+    assert "element1" in getattr(input_manager, "_InputManager__pool")["file1"]
+    assert "element2" not in getattr(input_manager, "_InputManager__pool")["file1"]
+    assert "element3" in getattr(input_manager, "_InputManager__pool")["file2"]
+    assert "element4" not in getattr(input_manager, "_InputManager__pool")["file2"]
 
 
 def test_populate_pool_eager_termination(
-    mock_input_manager: InputManager,
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data with eager termination for function
     _populate_pool in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
 
-    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
-    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": False,
-    }
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
-        mock_input_manager,
+        input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
+    )
+    mocker.patch.object(
+        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+    )
+    mocker.patch.object(input_manager, "_dict_type_validator", side_effect=lambda *args, **kwargs: False)
+    mocker.patch.object(
+        input_manager,
         "_add_default_values_to_missing_inputs",
         side_effect=lambda input_data, _: (input_data, None, None),
     )
-    mocker.patch.object(mock_input_manager, "_log_missing_keys")
+    mocker.patch.object(input_manager, "_log_missing_keys")
+    mocker.patch("RUFAS.input_manager.om.add_warning")
+    mocker.patch("RUFAS.input_manager.om.add_log")
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._populate_pool(eager_termination=True)
-            assert result is False
-            assert add_log.call_count == 0
-            assert add_warning.call_count == 0
-            assert "file1" not in mock_input_manager._InputManager__pool
-            assert "file2" not in mock_input_manager._InputManager__pool
+    # Act
+    result = input_manager._populate_pool(eager_termination=True)
 
-    mock_input_manager._populate_pool = input_manager_original_method_states["_populate_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result is False
+    assert "file1" not in getattr(input_manager, "_InputManager__pool")
+    assert "file2" not in getattr(input_manager, "_InputManager__pool")
 
 
 def test_populate_pool_raises_keyerror(
@@ -488,77 +467,6 @@ def test_populate_pool_raises_keyerror(
     mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
 
 
-@pytest.mark.parametrize(
-    "variable_properties, input_data_value",
-    [
-        ({"type": "string", "dummy_property": "dummy_value"}, "dummy_value"),
-        ({"type": "number", "dummy_property": 10}, 10),
-        ({"type": "bool", "dummy_property": True}, True),
-        ({"type": "array", "dummy_property": []}, []),
-    ],
-)
-def test_validate_input_type_dynamic_valid_data(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    variable_properties: Dict[str, Any],
-    input_data_value: Any,
-) -> None:
-    """Unit test for valid data type for function _validate_input_type_dynamic in file input_manager.py"""
-    var_name = "dummy_var"
-    dummy_properties_key = "dummy_variable_properties"
-
-    result = mock_input_manager._validate_input_type_dynamic(
-        variable_properties, var_name, input_data_value, dummy_properties_key
-    )
-    assert result is True
-
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
-
-
-def test_validate_input_type_dynamic_invalid_type_raises_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for invalid data type raising a KeyError for function
-    _validate_input_type_dynamic in file input_manager.py"""
-    variable_properties = {"type": "invalid_type", "dummy_property": "dummy_value"}
-    var_name = "dummy_var"
-    input_data_value = "dummy_value"
-    dummy_properties_key = "dummy_variable_properties"
-
-    with pytest.raises(KeyError, match="Invalid type invalid_type"):
-        mock_input_manager._validate_input_type_dynamic(
-            variable_properties, var_name, input_data_value, dummy_properties_key
-        )
-
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
-
-
-def test_validate_input_type_dynamic_missing_type_raises_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for missing data type raising a KeyError for function
-    _validate_input_type_dynamic in file input_manager.py"""
-    variable_properties = {"dummy_property": "dummy_value"}
-    var_name = "dummy_var"
-    input_data_value = "dummy_value"
-    dummy_properties_key = "dummy_variable_properties"
-
-    with pytest.raises(KeyError, match="Missing 'type' key in variable_properties"):
-        mock_input_manager._validate_input_type_dynamic(
-            variable_properties, var_name, input_data_value, dummy_properties_key
-        )
-
-    mock_input_manager._validate_input_type_dynamic = input_manager_original_method_states[
-        "_validate_input_type_dynamic"
-    ]
-
-
 @pytest.fixture
 def mock_metadata_for_validate_element(
     mocker: MockerFixture,
@@ -575,7 +483,12 @@ def mock_metadata_for_validate_element(
             "property_map_key1": {
                 "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
-                "element3": {"type": "array", "minimum_length": 1, "maximum_length": 5},
+                "element3": {
+                    "type": "array",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                    "properties": {"type": "number"},
+                },
                 "element4": {
                     "type": "object",
                     "description": "dummy_description",
@@ -607,6 +520,7 @@ def mock_metadata_for_validate_element(
                             "type": "array",
                             "minimum_length": 1,
                             "maximum_length": 5,
+                            "properties": {"type": "number"},
                         },
                     },
                 },
@@ -621,341 +535,281 @@ def mock_metadata_for_validate_element(
     }
 
 
-def test_validate_element_fixable_data(
-    mock_input_manager: InputManager,
-    mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for a fixable number type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mock_input_manager._num_type_validator = MagicMock(return_value=False)
-    mock_input_manager._fix_data = MagicMock(return_value=True)
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-
-    input_data = {"element2": 123}
-    result = mock_input_manager._dict_type_validator(
-        ["element2"],
-        "property_map_key1",
-        input_data,
-        True,
-        mock_element_counter_and_validity,
-    )
-
-    assert result["is_valid"] is True
-    assert result["fixed_elements"] == 1
-    assert result["total_elements"] == 1
-    assert result["invalid_elements"] == 0
-    assert result["valid_elements"] == 0
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
-    mock_input_manager._num_type_validator = input_manager_original_method_states["_num_type_validator"]
-    mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
-
-
 def test_dict_type_validator_string_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for string type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    """
+    Unit test for string type input_data for _dict_type_validator in file input_manager.py
+    """
 
-    input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._dict_type_validator(
-        ["element1"],
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
+    input_data: Dict[str, Any] = {"element1": "123-45-6789"}
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element1",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is True
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["invalid_elements"] == 0
-    assert result["valid_elements"] == 1
+    # Assert
+    assert result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 1
+    assert elements_counter.invalid_elements == 0
 
+    # Arrange
     input_data = {"element1": "invalid_value"}
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    result = mock_input_manager._dict_type_validator(
-        ["element1"],
+    elements_counter.reset()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element1",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["invalid_elements"] == 1
-    assert result["valid_elements"] == 0
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 0
+    assert elements_counter.invalid_elements == 1
 
+    # Arrange
     input_data = {"element8": {"nested_element": 750}}
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._dict_type_validator(
-            ["element8"],
-            "property_map_key1",
-            input_data,
-            False,
-            mock_element_counter_and_validity,
-        )
+    elements_counter.reset()
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
-        assert add_warning.call_count == 3
-        assert result["is_valid"] is False
-        assert result["invalid_elements"] == 1
-        assert result["fixed_elements"] == 0
-        assert result["total_elements"] == 1
-        assert result["valid_elements"] == 0
+    # Act
+    result = input_manager._dict_type_validator(
+        "element8",
+        "property_map_key1",
+        input_data,
+        False,
+        elements_counter,
+    )
 
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert patch_for_add_warning.call_count == 1
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 0
+    assert elements_counter.invalid_elements == 1
 
 
 def test_dict_type_validator_number_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for number type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    """
+    Unit test for number type input_data for _dict_type_validator in file input_manager.py
+    """
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    input_data = {"element2": 123}
-    result = mock_input_manager._dict_type_validator(
-        ["element2"],
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
+    input_data: Dict[str, Any] = {"element2": 123}
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element2",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is True
-    assert result["invalid_elements"] == 0
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["valid_elements"] == 1
+    # Assert
+    assert result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 1
+    assert elements_counter.invalid_elements == 0
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
     input_data = {"element2": 500}
-    result = mock_input_manager._dict_type_validator(
-        ["element2"],
+    elements_counter.reset()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element2",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["valid_elements"] == 0
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 0
+    assert elements_counter.invalid_elements == 1
 
 
 def test_dict_type_validator_array_type(
-    mock_input_manager: InputManager,
+    mocker: MockerFixture,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Unit test for array type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    """
+    Unit test for array type input_data for _dict_type_validator in file input_manager.py
+    """
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._dict_type_validator(
-        ["element3"],
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
+    input_data: Dict[str, Any] = {"element3": [1, 2, 3]}
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element3",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is True
-    assert result["invalid_elements"] == 0
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["valid_elements"] == 1
+    # Assert
+    assert result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 3
+    assert elements_counter.valid_elements == 3
+    assert elements_counter.invalid_elements == 0
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
     input_data = {"element3": [1, 2, 3, 6, 7, 8, 10]}
-    result = mock_input_manager._dict_type_validator(
-        ["element3"],
+    elements_counter.reset()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element3",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["valid_elements"] == 0
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 0
+    assert elements_counter.valid_elements == 0
+    assert elements_counter.invalid_elements == 0
 
 
 def test_dict_type_validator_valid_object_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for valid nested object type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    """
+    Unit test for valid nested object type input_data for _dict_type_validator in file input_manager.py
+    """
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._dict_type_validator(
-        ["element4"],
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
+    input_data: Dict[str, Any] = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element4",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is True
-    assert result["invalid_elements"] == 0
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 2
-    assert result["valid_elements"] == 2
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 2
+    assert elements_counter.valid_elements == 2
+    assert elements_counter.invalid_elements == 0
 
 
 def test_dict_type_validator_invalid_object_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for nested invalid object type input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    """
+    Unit test for nested invalid object type input_data for _dict_type_validator in file input_manager.py
+    """
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
     input_data = {"element4": {"nested_element1": "value1", "nested_element2": 500}}
-    result = mock_input_manager._dict_type_validator(
-        ["element4"],
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element4",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 2
-    assert result["valid_elements"] == 1
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 2
+    assert elements_counter.valid_elements == 1
+    assert elements_counter.invalid_elements == 1
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
     input_data = {
         "element4": {
             "nested_element1": "value123456789value123456789",
             "nested_element2": 123,
         }
     }
-    result = mock_input_manager._dict_type_validator(
-        ["element4"],
+    elements_counter.reset()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element4",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 1
-    assert result["valid_elements"] == 0
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 1
+    assert elements_counter.valid_elements == 0
+    assert elements_counter.invalid_elements == 1
 
 
 def test_validate_element_valid_nested_object_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for valid object nested within another object type
-    input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    """
+    Unit test for valid object nested within another object type
+    input_data for _dict_type_validator in file input_manager.py
+    """
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
+    elements_counter = ElementsCounter()
     input_data = {
         "element5": {
             "nested_element1": "value1",
@@ -966,32 +820,34 @@ def test_validate_element_valid_nested_object_type(
             },
         }
     }
-    result = mock_input_manager._dict_type_validator(
-        ["element5"],
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element5",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is True
-    assert result["invalid_elements"] == 0
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 4
-    assert result["valid_elements"] == 4
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 6
+    assert elements_counter.valid_elements == 6
+    assert elements_counter.invalid_elements == 0
 
 
 def test_validate_element_invalid_nested_object_type(
-    mock_input_manager: InputManager,
     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid object nested within another object type
     input_data for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_validate_element)
     input_data = {
         "element5": {
             "nested_element1": "value1",
@@ -1002,34 +858,25 @@ def test_validate_element_invalid_nested_object_type(
             },
         }
     }
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    result = mock_input_manager._dict_type_validator(
-        ["element5"],
+    elements_counter = ElementsCounter()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element5",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 4
-    assert result["valid_elements"] == 3
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 3
+    assert elements_counter.valid_elements == 3
+    assert elements_counter.invalid_elements == 0
 
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
     input_data = {
         "element5": {
             "nested_element1": "value1",
@@ -1040,21 +887,23 @@ def test_validate_element_invalid_nested_object_type(
             },
         }
     }
-    result = mock_input_manager._dict_type_validator(
-        ["element5"],
+    elements_counter.reset()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        "element5",
         "property_map_key1",
         input_data,
         True,
-        mock_element_counter_and_validity,
+        elements_counter,
     )
 
-    assert result["is_valid"] is False
-    assert result["invalid_elements"] == 1
-    assert result["fixed_elements"] == 0
-    assert result["total_elements"] == 3
-    assert result["valid_elements"] == 2
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert not result
+    assert elements_counter.fixed_elements == 0
+    assert elements_counter.total_elements() == 3
+    assert elements_counter.valid_elements == 2
+    assert elements_counter.invalid_elements == 1
 
 
 @pytest.mark.parametrize(
@@ -1070,198 +919,115 @@ def test_validate_element_invalid_nested_object_type(
         (None, False),
     ],
 )
-def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock_input_manager: InputManager) -> None:
-    """Unit test for function _bool_type_validator in file input_manager.py"""
-    variable_properties = {}
+def test_bool_type_validator(
+    input_data_value: bool,
+    expected_result: bool,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _bool_type_validator in file input_manager.py
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    variable_properties: Dict[str, Any] = {}
     var_name = "dummy_var_name"
     dummy_properties_key = "dummy_variable_properties"
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._bool_type_validator(
-            variable_properties, var_name, input_data_value, dummy_properties_key
-        )
+    # Act
+    result = input_manager._bool_type_validator(variable_properties, var_name, input_data_value, dummy_properties_key)
 
+    # Assert
     if not expected_result:
-        add_warning.assert_called_once()
+        patch_for_add_warning.assert_called_once()
     else:
-        add_warning.assert_not_called()
+        patch_for_add_warning.assert_not_called()
     assert result == expected_result
 
 
-def test_dict_type_validator_invalid_var_name_raises_metadata_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for keyerror raised for invalid var name for _dict_type_validator in file input_manager.py"""
-    element_hierarchy = ["valid_key", "invalid_key"]
+def test_dict_type_validator_invalid_var_name_raises_metadata_keyerror() -> None:
+    """
+    Unit test for keyerror raised for invalid var name for _dict_type_validator in file input_manager.py
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    first_level_key = "valid_key"
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    elements_counter = ElementsCounter()
 
+    # Act and Assert
     with pytest.raises(KeyError):
-        mock_input_manager._dict_type_validator(
-            element_hierarchy,
+        input_manager._dict_type_validator(
+            first_level_key,
             properties_blob_key,
             input_data,
             eager_termination,
-            mock_element_counter_and_validity,
+            elements_counter,
         )
 
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
 
-
-def test_dict_type_validator_invalid_var_name_raises_input_data_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for keyerror raised for invalid var name for _dict_type_validator in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {
-        "properties": {
-            "dummy_properties_blob_key": {"valid_key": {"type": "object", "secondary_key": {"type": "string"}}}
-        }
-    }
-    element_hierarchy = ["valid_key", "secondary_key"]
-    properties_blob_key = "dummy_properties_blob_key"
-    input_data = {"valid_key": {"another_valid_key": "value"}}
-    eager_termination = False
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        with patch.object(
-            mock_input_manager, "_log_missing_data", new_callable=MagicMock, return_value=None
-        ) as _log_missing_data:
-            with patch.object(mock_input_manager, "_fix_data", new_callable=MagicMock, return_value=False) as fix_data:
-                mock_input_manager._dict_type_validator(
-                    element_hierarchy,
-                    properties_blob_key,
-                    input_data,
-                    eager_termination,
-                    mock_element_counter_and_validity,
-                )
-
-        assert add_error.call_count == 0
-        _log_missing_data.assert_called_once_with(
-            variable_properties={"type": "string"}, var_name="secondary_key", called_during_initialization=False
-        )
-        fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
-
-    mock_input_manager._log_missing_data = input_manager_original_method_states["_log_missing_data"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
-
-
-def test_dict_type_validator_invalid_var_type_raises_keyerror(
-    mock_input_manager: InputManager,
+def test_validate_json_element_invalid_var_type_raises_keyerror(
     mocker: MockerFixture,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Unit test for keyerror raised for invalid var type for _dict_type_validator in file input_manager.py"""
-    element_hierarchy = ["valid_key"]
+    """
+    Unit test for keyerror raised for invalid var type for _dict_type_validator in file input_manager.py
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    first_level_key = "valid_key"
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
-    mock_input_manager._InputManager__metadata = {
-        "properties": {properties_blob_key: {"valid_key": {"type": "invalid_type"}}}
-    }
+    mocker.patch.object(
+        input_manager,
+        "_InputManager__metadata",
+        {"properties": {properties_blob_key: {"valid_key": {"type": "invalid_type"}}}},
+    )
     eager_termination = False
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    elements_counter = ElementsCounter()
 
-    with pytest.raises(KeyError):
-        mock_input_manager._dict_type_validator(
-            element_hierarchy,
+    # Act and Assert
+    with pytest.raises(ValueError):
+        input_manager._dict_type_validator(
+            first_level_key,
             properties_blob_key,
             input_data,
             eager_termination,
-            mock_element_counter_and_validity,
+            elements_counter,
         )
 
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
 
-
-def test_dict_type_validator_missing_type_raises_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+def test_validate_json_element_missing_type_raises_keyerror(
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for missing data type raising a KeyError for function
+    """
+    Unit test for missing data type raising a KeyError for function
     _dict_type_validator in file input_manager.py"""
-    element_hierarchy = ["valid_key"]
+
+    # Arrange
+    input_manager = InputManager()
+    first_level_key = "valid_key"
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
-    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key: {"valid_key": {}}}}
+    mocker.patch.object(
+        input_manager, "_InputManager__metadata", {"properties": {properties_blob_key: {"valid_key": {}}}}
+    )
     eager_termination = False
-    mock_element_counter_and_validity = {
-        "fixed_elements": 0,
-        "total_elements": 0,
-        "valid_elements": 0,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    elements_counter = ElementsCounter()
 
-    with pytest.raises(KeyError, match="Missing 'type' key in variable_properties"):
-        mock_input_manager._dict_type_validator(
-            element_hierarchy,
+    # Act and Assert
+    with pytest.raises(KeyError, match="Missing 'type' key"):
+        input_manager._dict_type_validator(
+            first_level_key,
             properties_blob_key,
             input_data,
             eager_termination,
-            mock_element_counter_and_validity,
+            elements_counter,
         )
-
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
-
-
-@pytest.mark.parametrize(
-    "dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count",
-    [
-        ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10}, False, 1),
-        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
-        (
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-            {"minimum_length": 5, "maximum_length": 10},
-            False,
-            1,
-        ),
-        ([], {"minimum_length": 5}, False, 1),
-        (None, {"minimum_length": 3, "maximum_length": 6}, False, 1),
-        ("[1, 2, 3]", {"minimum_length": 1}, False, 1),
-    ],
-)
-def test_array_type_validator(
-    dummy_value: list,
-    dummy_variable_to_check: Dict[str, int],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
-) -> None:
-    """Unit test for function _array_type_validator in file input_manager.py"""
-    dummy_var_name = "dummy_array"
-    dummy_properties_key = "dummy_variable_properties"
-
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._array_type_validator(
-            dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
-        )
-
-    assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
@@ -1282,14 +1048,16 @@ def test_num_type_validator(
     dummy_variable_to_check: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
-    mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _num_type_validator in file input_manager.py"""
+
+    # Arrange
+    input_manager = InputManager()
     dummy_var_name = "dummy_num"
     dummy_properties_key = "dummy_variable_properties"
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._num_type_validator(
+    with patch("RUFAS.input_manager.om.add_warning") as add_warning:
+        result = input_manager._num_type_validator(
             dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
         )
 
@@ -2690,40 +2458,34 @@ def test_add_variable_to_pool_valid(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    """Unit test for add_variable_to_pool() method in file input_manager.py with valid data."""
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=True)
     expected_add_warning_count = 1 if starting_im_pool else 0
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result = mock_input_manager._add_variable_to_pool(
-                    variable_name=variable_name,
-                    input_data=data,
-                    properties_blob_key=properties_blob_key,
-                    eager_termination=False,
-                )
+    # Act
+    result = input_manager._add_variable_to_pool(
+        variable_name=variable_name,
+        input_data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
 
-    assert result is True
-    assert mock_om_add_log.call_count == 4
-    assert mock_om_add_warning.call_count == expected_add_warning_count
-    assert mock_om_add_error.call_count == 0
-    assert variable_name in mock_input_manager._InputManager__pool
-    assert mock_input_manager.get_data(variable_name) == data
-
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+    # Assert
+    assert result
+    assert patch_for_add_warning.call_count == expected_add_warning_count
+    assert patch_for_add_error.call_count == 0
+    assert variable_name in getattr(input_manager, "_InputManager__pool")
+    assert input_manager.get_data(variable_name) == data
 
 
 @pytest.mark.parametrize(
@@ -2822,42 +2584,41 @@ def test_add_variable_to_pool_invalid(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
+    """
+    Unit test for add_variable_to_pool() method in file input_manager.py with invalid data.
+    """
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result = mock_input_manager._add_variable_to_pool(
-                    variable_name=variable_name,
-                    input_data=data,
-                    properties_blob_key=properties_blob_key,
-                    eager_termination=False,
-                )
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=False)
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    mock_elements_counter = mocker.MagicMock()
+    mock_elements_counter.invalid_elements = 1
+    mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
 
+    # Act
+    result = input_manager._add_variable_to_pool(
+        variable_name=variable_name,
+        input_data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
+
+    # Assert
     assert result is False
-    assert mock_om_add_log.call_count == 4
-    assert mock_om_add_warning.call_count == 0
-    assert mock_om_add_error.call_count == 1
+    assert patch_for_add_warning.call_count == 0
+    assert patch_for_add_error.call_count == 1
 
     if starting_im_pool:
-        assert starting_im_pool[variable_name] == mock_input_manager.get_data(variable_name)
+        assert starting_im_pool[variable_name] == input_manager.get_data(variable_name)
     else:
-        assert variable_name not in mock_input_manager._InputManager__pool
-
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+        assert variable_name not in getattr(input_manager, "_InputManager__pool")
 
 
 @pytest.mark.parametrize(
@@ -2956,41 +2717,40 @@ def test_add_variable_to_pool_eager_termination(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
+    """
+    Unit test for add_variable_to_pool() method in file input_manager.py with eager_termination=True.
+    """
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                with pytest.raises(ValueError):
-                    mock_input_manager._add_variable_to_pool(
-                        variable_name=variable_name,
-                        input_data=data,
-                        properties_blob_key=properties_blob_key,
-                        eager_termination=True,
-                    )
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=False)
+    mock_elements_counter = mocker.MagicMock()
+    mock_elements_counter.invalid_elements = 1
+    mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
 
-    assert mock_om_add_log.call_count == 4
-    assert mock_om_add_warning.call_count == 0
-    assert mock_om_add_error.call_count == 1
+    # Act
+    with pytest.raises(ValueError):
+        input_manager._add_variable_to_pool(
+            variable_name=variable_name,
+            input_data=data,
+            properties_blob_key=properties_blob_key,
+            eager_termination=True,
+        )
 
+    # Assert
+    assert patch_for_add_warning.call_count == 0
+    assert patch_for_add_error.call_count == 1
     if starting_im_pool:
-        assert starting_im_pool[variable_name] == mock_input_manager.get_data(variable_name)
+        assert starting_im_pool[variable_name] == input_manager.get_data(variable_name)
     else:
-        assert variable_name not in mock_input_manager._InputManager__pool
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+        assert variable_name not in getattr(input_manager, "_InputManager__pool")
 
 
 @pytest.mark.parametrize(
@@ -3764,10 +3524,24 @@ def mock_pool_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any] | Li
     "variable_name, data, properties_blob_key, is_modifiable_during_runtime, eager_termination,"
     "expected_add_warning_call_count",
     [
-        ("dict_data_runtime_modifiable.nested_dict.a.b.c.d", 10, "dict_data_runtime_modifiable", True, False, 1),
-        ("dict_data_runtime_modifiable.nested_dict.A.B.C", "10", "dict_data_runtime_modifiable", True, False, 1),
-        ("dict_data_runtime_unmodifiable.nested_dict.a.b.c.d", 10, "dict_data_runtime_unmodifiable", False, False, 2),
-        ("dict_data_runtime_unmodifiable.nested_dict.A.B.C", "10", "dict_data_runtime_unmodifiable", False, False, 2),
+        ("dict_data_runtime_modifiable.nested_dict.a.b.c.d", {"d": 11}, "dict_data_runtime_modifiable", True, False, 0),
+        ("dict_data_runtime_modifiable.nested_dict.A.B.C", {"C": None}, "dict_data_runtime_modifiable", True, False, 0),
+        (
+            "dict_data_runtime_unmodifiable.nested_dict.a.b.c.d",
+            {"d": 11},
+            "dict_data_runtime_unmodifiable",
+            False,
+            False,
+            1,
+        ),
+        (
+            "dict_data_runtime_unmodifiable.nested_dict.A.B.C",
+            {"C": "CCCCC!"},
+            "dict_data_runtime_unmodifiable",
+            False,
+            False,
+            1,
+        ),
         ("dict_data_runtime_unmodifiable.nested_dict.a.b.c.d", 10, "dict_data_runtime_unmodifiable", False, True, 0),
         ("dict_data_runtime_unmodifiable.nested_dict.A.B.C", "10", "dict_data_runtime_unmodifiable", False, True, 0),
     ],
@@ -3779,55 +3553,42 @@ def test_add_variable_to_pool_nested(
     is_modifiable_during_runtime: bool,
     eager_termination: bool,
     expected_add_warning_call_count: int,
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool_nested: Dict[str, Any],
     mock_pool_for_add_variable_to_pool_nested: Dict[str, Any],
-    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool_nested
-    mock_input_manager._InputManager__pool = mock_pool_for_add_variable_to_pool_nested
+    """
+    Unit test for the _add_variable_to_pool method of the InputManager class for nested data.
+    """
 
-    mock_input_manager._dict_type_validator = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool_nested)
+    mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_variable_to_pool_nested)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=True)
+    mocker.patch("RUFAS.input_manager.om.add_log")
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    mocker.patch("RUFAS.input_manager.om.add_error")
+
     if (not is_modifiable_during_runtime) and eager_termination:
-        with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-            with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-                with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                    with pytest.raises(PermissionError):
-                        mock_input_manager._add_variable_to_pool(
-                            variable_name=variable_name,
-                            input_data=data,
-                            properties_blob_key=properties_blob_key,
-                            eager_termination=eager_termination,
-                        )
-        assert mock_om_add_log.call_count == 0
-        assert mock_om_add_warning.call_count == 0
-        assert mock_om_add_error.call_count == 1
+        with pytest.raises(PermissionError):
+            input_manager._add_variable_to_pool(
+                variable_name=variable_name,
+                input_data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+            )
     else:
-        with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-            with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-                with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                    result = mock_input_manager._add_variable_to_pool(
-                        variable_name=variable_name,
-                        input_data=data,
-                        properties_blob_key=properties_blob_key,
-                        eager_termination=False,
-                    )
+        result = input_manager._add_variable_to_pool(
+            variable_name=variable_name,
+            input_data=data,
+            properties_blob_key=properties_blob_key,
+            eager_termination=False,
+        )
 
-        assert result is True
-        assert mock_om_add_log.call_count == 4
-        assert mock_om_add_warning.call_count == expected_add_warning_call_count
-        assert mock_om_add_error.call_count == 0
-
-        assert mock_input_manager.get_data(variable_name) == data
-
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._dict_type_validator = input_manager_original_method_states["_dict_type_validator"]
+        assert result
+        assert patch_for_add_warning.call_count == expected_add_warning_call_count
+        assert input_manager.get_data(variable_name) == list(data.values())[0]
 
 
 @pytest.mark.parametrize(
@@ -4186,3 +3947,565 @@ def test_extract_value_by_key_list(
     else:
         result = input_manager._extract_value_by_key_list(input_data, variable_path)
         assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, expected",
+    [
+        (["animal", "herd_information", "calf_num"], "animal.herd_information.calf_num"),
+        (["manure_management_scenarios", 0, "bedding_type"], "manure_management_scenarios.[0].bedding_type"),
+        ([], ""),
+        (["level1", 2, "level3", "4", 5], "level1.[2].level3.[4].[5]"),
+        (["single_level"], "single_level"),
+        (["multi", "path", "with", "strings"], "multi.path.with.strings"),
+        ([0, 1, 2, 3], "[0].[1].[2].[3]"),
+    ],
+)
+def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expected: str) -> None:
+    """
+    Unit test for the _convert_variable_path_to_str() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act
+    result = input_manager._convert_variable_path_to_str(variable_path)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
+    "expected_result, patch_extract_return, patch_validate_return",
+    [
+        # Test case with valid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": {"key": "value"}}},
+            False,
+            "blob_key",
+            True,
+            {"key": "value"},
+            True,
+        ),
+        # Test case with invalid object data
+        (
+            ["data", "object"],
+            {"key": {"type": "string"}},
+            {"data": {"object": "not_a_dict"}},
+            False,
+            "blob_key",
+            False,
+            "not_a_dict",
+            False,
+        ),
+        (
+            ["data", "object", "nested"],
+            {"nested": {"type": "object", "properties": {"key": {"type": "string"}}}},
+            {"data": {"object": {"nested": {"key": 123}}}},
+            False,
+            "blob_key",
+            False,
+            {"nested": {"key": 123}},
+            False,
+        ),
+        (
+            ["data", "early_failure"],
+            {"key1": {"type": "string"}, "key2": {"type": "integer"}},
+            {"data": {"early_failure": {"key1": "valid", "key2": "not_an_integer"}}},  # key2 fails validation
+            True,
+            "blob_key",
+            False,
+            {"key1": "valid", "key2": "not_an_integer"},
+            False,
+        ),
+    ],
+)
+def test_object_type_validator(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_result: bool,
+    patch_extract_return: Any,
+    patch_validate_return: bool,
+) -> None:
+    """
+    Unit test for the _object_type_validator() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_validate_return)
+    mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    mock_elements_counter = mocker.MagicMock()
+
+    # Act
+    result = input_manager._object_type_validator(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key, mock_elements_counter
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, properties_blob_key," "expected_result, expected_warning",
+    [
+        # Input data is not a list
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            "not_a_list",
+            "blob_key",
+            False,
+            "Validation: array container is not a list",
+        ),
+        # Input list's length is less than the specified minimum length
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 2},
+            [1],
+            "blob_key",
+            False,
+            "Validation: array container length less than minimum",
+        ),
+        # Input list's length exceeds the specified maximum length
+        (
+            ["data", "array"],
+            {"maximum_length": 3, "minimum_length": 1},
+            [1, 2, 3, 4],
+            "blob_key",
+            False,
+            "Validation: array container length greater than maximum",
+        ),
+        # Input list's length is within the specified constraints
+        (
+            ["data", "array"],
+            {"maximum_length": 5, "minimum_length": 1},
+            [1, 2, 3],
+            "blob_key",
+            True,
+            None,
+        ),
+    ],
+)
+def test_validate_array_container_properties(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Any,
+    properties_blob_key: str,
+    expected_result: bool,
+    expected_warning: str,
+):
+    """
+    Unit test for the _validate_array_container_properties() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+
+    # Act
+    result = input_manager._validate_array_container_properties(
+        variable_path, variable_properties, input_data, properties_blob_key
+    )
+
+    # Assert
+    assert result == expected_result
+    if expected_warning:
+        patch_for_add_warning.assert_called_with(
+            expected_warning,
+            mocker.ANY,
+            mocker.ANY,
+        )
+    else:
+        patch_for_add_warning.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key, "
+    "patch_extract_return, patch_container_valid, patch_element_valid, expected_result",
+    [
+        # Array extraction returns a non-list
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {},
+            False,
+            "blob_key",
+            None,
+            False,
+            True,
+            False,
+        ),
+        # Array container properties are invalid
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            False,
+            True,
+            False,
+        ),
+        # Element validation within the array fails
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            False,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+        # Successful validation of all elements
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, 2, 3]}},
+            False,
+            "blob_key",
+            [1, 2, 3],
+            True,
+            True,
+            True,
+        ),
+        # Eager termination on element validation failure
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}},
+            {"data": {"array": [1, "two", 3]}},
+            True,
+            "blob_key",
+            [1, "two", 3],
+            True,
+            False,
+            False,
+        ),
+    ],
+)
+def test_array_type_validator(
+    mocker: MockerFixture,
+    variable_path: List[Union[str, int]],
+    variable_properties: Dict[str, Any],
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    patch_extract_return: Any,
+    patch_container_valid: bool,
+    patch_element_valid: bool,
+    expected_result: bool,
+):
+    """
+    Unit test for the _array_type_validator() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(input_manager, "_validate_array_container_properties", return_value=patch_container_valid)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_element_valid)
+    mock_elements_counter = mocker.MagicMock()
+
+    # Act
+    result = input_manager._array_type_validator(
+        variable_path, variable_properties, input_data, eager_termination, properties_blob_key, mock_elements_counter
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "first_level_key, properties_blob_key, input_data, eager_termination,"
+    "expected_result, metadata_properties, extract_mock_return, validate_mock_return",
+    [
+        # Test case: valid data without eager termination
+        (
+            "key1",
+            "blob1",
+            {"key1": "valid data"},
+            False,
+            True,
+            {"blob1": {"key1": {"type": "string"}}},
+            {"type": "string"},
+            True,
+        ),
+        # Test case: invalid data with eager termination
+        (
+            "key2",
+            "blob2",
+            {"key2": "invalid data"},
+            True,
+            False,
+            {"blob2": {"key2": {"type": "number"}}},
+            {"type": "number"},
+            False,
+        ),
+    ],
+)
+def test_dict_type_validator(
+    mocker: MockerFixture,
+    first_level_key: str,
+    properties_blob_key: str,
+    input_data: Dict[str, Any],
+    eager_termination: bool,
+    expected_result: bool,
+    metadata_properties: Dict[str, Any],
+    extract_mock_return: Dict[str, Any],
+    validate_mock_return: bool,
+) -> None:
+    """
+    Unit test for the _dict_type_validator() method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", {"properties": metadata_properties})
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=extract_mock_return)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=validate_mock_return)
+    mock_elements_counter = mocker.MagicMock()
+
+    # Act
+    result = input_manager._dict_type_validator(
+        first_level_key, properties_blob_key, input_data, eager_termination, mock_elements_counter
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "data_type, input_value, expected_result, validator_return, fixable",
+    [
+        # Primitive data type: valid string
+        ("string", "valid string", True, True, False),
+        # Primitive data type: invalid string, fixable
+        ("string", "invalid string", True, False, True),
+        # Primitive data type: invalid string, not fixable
+        ("string", "invalid string", False, False, False),
+        # Primitive data type: valid number
+        ("number", 123, True, True, False),
+        # Primitive data type: invalid number, fixable
+        ("number", "invalid number", True, False, True),
+        # Primitive data type: invalid number, not fixable
+        ("number", "invalid number", False, False, False),
+        # Primitive data type: valid bool
+        ("bool", True, True, True, False),
+        # Primitive data type: invalid bool, fixable
+        ("bool", "invalid bool", True, False, True),
+        # Primitive data type: invalid bool, not fixable
+        ("bool", "invalid bool", False, False, False),
+        # Complex data type: object, valid
+        ("object", {"key": "value"}, True, True, False),
+        # Complex data type: object, invalid, fixable
+        ("object", "not a dict", True, False, True),
+        # Complex data type: object, invalid, not fixable
+        ("object", "not a dict", False, False, False),
+        # Complex data type: array, valid
+        ("array", [1, 2, 3], True, True, False),
+        # Complex data type: array, invalid, fixable
+        ("array", "not a list", True, False, True),
+        # Complex data type: array, invalid, not fixable
+        ("array", "not a list", False, False, False),
+    ],
+)
+def test_validate_input_by_type(
+    mocker: MockerFixture,
+    data_type: str,
+    input_value: Any,
+    expected_result: bool,
+    validator_return: bool,
+    fixable: bool,
+) -> None:
+    """
+    Unit test for the _validate_input_by_type method of the InputManager class.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    variable_properties = {"type": data_type}
+    variable_path: List[Union[str, int]] = ["path", "to", "variable"]
+    input_data = {"path": {"to": {"variable": input_value}}}
+    eager_termination = False
+    properties_blob_key = "blobKey"
+    elements_counter = mocker.MagicMock()
+
+    mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=input_value)
+    mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="path.to.variable")
+    patch_for_fix_data = mocker.patch.object(input_manager, "_fix_data", return_value=fixable)
+
+    if data_type in ["string", "number", "bool"]:
+        data_type = "num" if data_type == "number" else data_type
+        validator_mock = mocker.patch.object(
+            input_manager, f"_{data_type}_type_validator", return_value=validator_return
+        )
+    else:
+        validator_mock = mocker.patch.object(
+            input_manager, f"_{data_type}_type_validator", return_value=expected_result
+        )
+
+    # Act
+    result = input_manager._validate_input_by_type(
+        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter
+    )
+
+    # Assert
+    assert result == expected_result
+    validator_mock.assert_called_once()
+
+    if data_type in ["string", "number", "bool"]:
+        if not validator_return and fixable:
+            patch_for_fix_data.assert_called_once()
+            elements_counter.increment.assert_called_with(ElementState.FIXED)
+        elif not validator_return and not fixable:
+            elements_counter.increment.assert_called_with(ElementState.INVALID)
+        elif validator_return:
+            elements_counter.increment.assert_called_with(ElementState.VALID)
+
+
+def test_increment_in_elements_counter() -> None:
+    """
+    Unit test for the increment() method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+
+    # Act
+    counter.increment(ElementState.VALID)
+    counter.increment(ElementState.INVALID)
+    counter.increment(ElementState.FIXED)
+
+    # Assert
+    assert counter.valid_elements == 1
+    assert counter.invalid_elements == 1
+    assert counter.fixed_elements == 1
+    assert counter.total_elements() == 3
+
+
+def test_update_increments_correctly() -> None:
+    """
+    Unit test for the update() method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+
+    # Act
+    counter.update(ElementState.INVALID, 2)
+    counter.update(ElementState.VALID, 1)
+    counter.update(ElementState.FIXED, 3)
+
+    # Assert
+    assert counter.valid_elements == 1
+    assert counter.invalid_elements == 2
+    assert counter.fixed_elements == 3
+
+
+def test_reset_method_in_elements_counter() -> None:
+    """
+    Unit test for the reset() method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    counter.increment(ElementState.VALID)
+    counter.increment(ElementState.INVALID)
+    counter.increment(ElementState.FIXED)
+
+    # Assert Before
+    assert counter.valid_elements == 1
+    assert counter.invalid_elements == 1
+    assert counter.fixed_elements == 1
+
+    # Act
+    counter.reset()
+
+    # Assert After
+    assert counter.valid_elements == 0
+    assert counter.invalid_elements == 0
+    assert counter.fixed_elements == 0
+
+
+def test_total_elements_in_elements_counter() -> None:
+    """
+    Unit test for the total_elements() method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    counter.increment(ElementState.VALID)
+    counter.increment(ElementState.INVALID)
+    counter.increment(ElementState.FIXED)
+    counter.increment(ElementState.VALID)
+    expected_total = 2 + 1 + 1  # 2 valid, 1 invalid, 1 fixed
+
+    # Act
+    actual_total = counter.total_elements()
+
+    # Assert
+    assert actual_total == expected_total
+
+
+def test_str_in_elements_counter() -> None:
+    """
+    Unit test for the __str__ method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    counter.valid_elements = 2
+    counter.invalid_elements = 1
+    counter.fixed_elements = 1
+    expected_str = "{'valid_elements': 2, 'invalid_elements': 1, 'fixed_elements': 1, 'total_elements': 4}"
+
+    # Act and Assert
+    assert str(counter) == expected_str
+
+
+def test_add_in_elements_counter() -> None:
+    """
+    Unit test for the __add__ method of the ElementsCounter class.
+    """
+
+    # Arrange
+    counter1 = ElementsCounter()
+    counter1.valid_elements = 2
+    counter1.invalid_elements = 1
+    counter1.fixed_elements = 0
+
+    counter2 = ElementsCounter()
+    counter2.valid_elements = 1
+    counter2.invalid_elements = 1
+    counter2.fixed_elements = 2
+
+    # Act
+    result_counter = counter1 + counter2
+
+    # Assert result counter values
+    assert result_counter.valid_elements == 3
+    assert result_counter.invalid_elements == 2
+    assert result_counter.fixed_elements == 2
+    assert result_counter.total_elements() == 7
+
+    # Assert original counter values
+    assert counter1.valid_elements == 2
+    assert counter1.invalid_elements == 1
+    assert counter1.fixed_elements == 0
+
+    assert counter2.valid_elements == 1
+    assert counter2.invalid_elements == 1
+    assert counter2.fixed_elements == 2
