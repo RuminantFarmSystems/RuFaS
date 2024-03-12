@@ -50,14 +50,18 @@ class AnaerobicLagoon(BaseManureTreatment):
             (kg :math:`CH_4`/day).
 
         """
+        # fmt: off
         methane_emission, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
                 accumulated_liquid_manure_total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
-                accumulated_liquid_manure_total_degradable_volatile_solids=daily_output.liquid_manure_total_degradable_volatile_solids,
-                accumulated_liquid_manure_total_non_degradable_volatile_solids=daily_output.liquid_manure_total_non_degradable_volatile_solids,
+                accumulated_liquid_manure_total_degradable_volatile_solids=
+                daily_output.liquid_manure_total_degradable_volatile_solids,
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=
+                daily_output.liquid_manure_total_non_degradable_volatile_solids,
                 temp=self._get_current_day_average_temperature_celsius(),
             )
         )
+        # fmt: on
         methane_emission = max(methane_emission, 0.0)
         daily_output.storage_methane = methane_emission
 
