@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -611,7 +611,10 @@ class OutputManager(object):
                         result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = [element for element in filter_file.read().splitlines() if element]
-                    result = [{"filters": list_of_elements}]
+                    filter_by_exclusion = list_of_elements[0] == "exclude"
+                    if filter_by_exclusion:
+                        list_of_elements.pop(0)
+                    result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
                 else:
                     raise Exception("Unsupported file format; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
@@ -630,7 +633,7 @@ class OutputManager(object):
             raise
 
     def _filter_variables_pool(
-        self, filter_patterns: List[str], input_file_name: Optional[str]
+        self, filter_content: Dict[str, Any]
     ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
@@ -661,29 +664,24 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._filter_variables_pool.__name__,
         }
-        exclude_keyword_location = 0
-        exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
+        filter_name = filter_content.get("filter_name", "NO_NAME")
         if filter_by_exclusion:
-            filter_vars_msg = (
-                f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
-                f" position {exclude_keyword_location}. Performing filtering by exclusion."
-            )
+            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_vars_msg = (
-                f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
-                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
-            )
-        filter_pattern_matches = Utility.filter_dictionary(self.variables_pool, filter_patterns, filter_by_exclusion)
-        self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = (
-            f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter pattern(s) in the {input_file_name} file."
-        )
-        self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
-        return filter_pattern_matches
+            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+        self.add_log("filtering_log", filter_excl_msg, info_map)
 
-    def save_results(
+        filtered_pool = Utility.filter_dictionary(self.variables_pool, filter_content.get("filters", []),
+                                                  filter_by_exclusion)
+        self.add_log(
+            "num_filter_pattern_matches",
+            f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
+            info_map,
+        )
+        return filtered_pool
+
+    def save_results(  # noqa: C901
         self,
         save_path: Path,
         filters_dir_path: Path,
@@ -693,7 +691,7 @@ class OutputManager(object):
         csv_dir: Path,
     ) -> None:
         """
-        Parses the filter files in the given directory and saves the results to the given path.
+        Parses the filter files in the given directory and routes the results to the proper filter handler function.
 
         Notes
         -----
@@ -734,12 +732,6 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
-                self.add_log(
-                    "init_report_generation",
-                    f"Generating report for file: {filter_file}",
-                    info_map,
-                )
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if not isinstance(filter_content, dict) or (
@@ -753,27 +745,55 @@ class OutputManager(object):
                         f"and the purpose is to generate a derived report.",
                         info_map,
                     )
-                    continue
-
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
+                    filtered_pool = self._filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
+                variable_csv_file_path = os.path.join(
+                    csv_dir,
+                    self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
+                )
 
-                if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                if filter_file.startswith("json"):
+                    file_path = os.path.join(
+                        save_path,
+                        self.generate_file_name(f"saved_variables_{filter_file}", "json"),
+                    )
+                    self.dict_to_file_json(filtered_pool, file_path)
+                elif filter_file.startswith("csv"):
+                    self.create_directory(csv_dir)
+                    variable_csv_file_path = os.path.join(
+                        csv_dir,
+                        self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
+                    )
+                    self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
+                elif filter_file.startswith("report"):
+                    if filter_content.get("graph_details"):
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+                        filter_content["graph_details"]["produce_graphics"] = produce_graphics
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
+                elif filter_file.startswith("graph"):
+                    self.create_directory(graphics_dir)
+                    try:
+                        graph_generator = GraphGenerator(self.__metadata_prefix)
+                        log_pool = graph_generator.generate_graph(
+                            filtered_pool,
+                            filter_content,
+                            filter_file,
+                            graphics_dir,
+                            produce_graphics
+                        )
+                        self._route_logs(log_pool)
+                    except Exception as e:
+                        self.add_error("graph generation exception", str(e), info_map)
                 else:
-                    self._route_save_functions(
-                        filter_file,
-                        save_path,
-                        filtered_pool,
-                        produce_graphics,
-                        filter_content,
-                        graphics_dir,
-                        csv_dir,
-                    )
+                    self.add_error(f"Invalid prefix for filter file {filter_file}",
+                                   f"File name must start with {self.__supported_filter_types_prefixes.keys()}",
+                                   info_map)
             report_file_path = os.path.join(
                 save_path,
                 self.generate_file_name(f"report_{filter_file}", "csv"),
@@ -781,58 +801,6 @@ class OutputManager(object):
             if report_generator.reports:
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
-
-    def _route_save_functions(
-        self,
-        filter_file: str,
-        save_path: Path,
-        filtered_pool: Dict[str, pool_element_type],
-        produce_graphics: bool,
-        filter_content: Dict[str, str | int],
-        graphics_dir: Path,
-        csv_dir: Path,
-    ) -> None:
-        """
-        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
-        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._route_save_functions.__name__,
-        }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-            file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"saved_variables_{filter_file}", "json"),
-            )
-            self.dict_to_file_json(filtered_pool, file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            self.create_directory(csv_dir)
-            variable_csv_file_path = os.path.join(
-                csv_dir,
-                self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
-            )
-            self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
-            self.create_directory(graphics_dir)
-            if produce_graphics:
-                try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
-                    log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
-                    )
-                    self._route_logs(log_pool)
-                except Exception as e:
-                    self.add_error("graph generation exception", str(e), info_map)
-            else:
-                self.add_warning(
-                    "No Graphics",
-                    f"Graphic generation is disabled, skipping {filter_file=}",
-                    info_map,
-                )
 
     def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
@@ -1003,10 +971,10 @@ class OutputManager(object):
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool = {}
-        self.warnings_pool = {}
-        self.errors_pool = {}
-        self.logs_pool = {}
+        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.

@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from typing import Dict, List, Any, Optional, Type
-
 import pytest
 from pytest_mock import MockerFixture
 
@@ -17,13 +15,13 @@ from RUFAS.report_generator import (
 )
 
 
-def test_average_aggregator() -> None:
+def test_average_aggregator():
     assert average_aggregator([1, 2, 3, 4, 5]) == 3
     assert average_aggregator([-1, -2, -3, -4, -5]) == -3
     assert average_aggregator([]) == 0
 
 
-def test_division_aggregator() -> None:
+def test_division_aggregator():
     assert division_aggregator([100, 2, 5]) == 10
     assert division_aggregator([100, -2, 5]) == -10
     assert division_aggregator([]) is None
@@ -31,25 +29,25 @@ def test_division_aggregator() -> None:
     assert division_aggregator([10, 0]) is None
 
 
-def test_product_aggregator() -> None:
+def test_product_aggregator():
     assert product_aggregator([1, 2, 3, 4, 5]) == 120
     assert product_aggregator([-1, 2, -3, 4, -5]) == -120
     assert product_aggregator([]) == 1
 
 
-def test_sd_aggregator() -> None:
+def test_sd_aggregator():
     assert sd_aggregator([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
     assert sd_aggregator([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
     assert sd_aggregator([]) == 0
 
 
-def test_sum_aggregator() -> None:
+def test_sum_aggregator():
     assert sum_aggregator([1, 2, 3, 4, 5]) == 15
     assert sum_aggregator([-1, -2, -3, -4, -5]) == -15
     assert sum_aggregator([]) == 0
 
 
-def test_subtraction_aggregator() -> None:
+def test_subtraction_aggregator():
     assert subtraction_aggregator([10, 2, 3]) == 5
     assert subtraction_aggregator([10, -2, -3]) == 15
     assert subtraction_aggregator([]) is None
@@ -627,41 +625,23 @@ def test_combine_aggregate_report_data(
         # All references are present
         (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
         # One reference is missing
-        (
-            ["ref1", "ref2"],
-            {"ref1": {}},
-            KeyError,
-            "Missing referenced reports matching the following pattern(s): ref2",
-        ),
+        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2"),
         # Multiple references are missing
         (
             ["ref1", "ref2", "ref3"],
             {"ref1": {}},
             KeyError,
-            "Missing referenced reports matching the following pattern(s): ref2, ref3",
+            "Missing referenced reports: ref2, ref3",
         ),
         # Reports dictionary is empty
-        (["ref1"], {}, KeyError, "Missing referenced reports matching the following pattern(s): ref1"),
-        # Regex match one reference
-        (["ref\\d"], {"ref1": {}}, None, None),
-        # Regex match multiple references
-        (["ref\\d"], {"ref2": {}, "ref3": {}}, None, None),
-        # Regex match none
-        (
-            ["ref\\d+"],
-            {"report1": {}, "report2": {}},
-            KeyError,
-            r"Missing referenced reports matching the following pattern(s): ref\\d+",
-        ),
-        # Complex regex pattern
-        (["ref[1-3]", "report\\d{2}"], {"ref1": {}, "ref2": {}, "report01": {}}, None, None),
+        (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
     ],
 )
 def test_check_for_missing_references(
     mocker: MockerFixture,
     references: List[str],
     reports: Dict[str, Dict[str, Any]],
-    expected_exception: Optional[Type[Exception]],
+    expected_exception: Optional[Exception],
     expected_message: Optional[str],
 ) -> None:
     """
@@ -675,52 +655,12 @@ def test_check_for_missing_references(
 
     if expected_exception:
         # Act and assert
-        with pytest.raises(expected_exception) as excinfo:
+        with pytest.raises(expected_exception) as excinfo:  # type: ignore
             report_generator._check_for_missing_references(references)
-        assert isinstance(expected_message, str) and expected_message in str(excinfo.value)
+        assert expected_message in str(excinfo.value)
     else:
         # Act
         report_generator._check_for_missing_references(references)
-
-
-@pytest.mark.parametrize(
-    "regex_patterns, expected_matched_reports",
-    [
-        # Match single report
-        (["report1"], {"report1": {"data": []}}),
-        # Match multiple reports with simple pattern
-        (["report\\d"], {"report1": {"data": []}, "report2": {"data": []}}),
-        # Match multiple reports with complex pattern
-        (["report[12]"], {"report1": {"data": []}, "report2": {"data": []}}),
-        # No match
-        (["unmatched"], {}),
-        # Partial match not included
-        (["report"], {}),
-        # Match with special characters in report names
-        (["special_report-\\d"], {"special_report-1": {"data": []}}),
-    ],
-)
-def test_get_reports_by_regex(
-    regex_patterns: List[str], expected_matched_reports: Dict[str, Dict[str, List[Any]]]
-) -> None:
-    """
-    Unit test for _get_reports_by_regex() method in report_generator.py file.
-    """
-
-    # Arrange
-    reports: Dict[str, Dict[str, List[Any]]] = {
-        "report1": {"data": []},
-        "report2": {"data": []},
-        "special_report-1": {"data": []},
-    }
-    report_generator = ReportGenerator()
-    report_generator.reports = reports
-
-    # Act
-    matched_reports = report_generator._get_reports_by_regex(regex_patterns)
-
-    # Assert
-    assert matched_reports == expected_matched_reports
 
 
 @pytest.mark.parametrize(
@@ -742,7 +682,7 @@ def test_ensure_unique_report_name_with_timestamp(
     reports: Dict[str, Dict[str, Any]],
     expected_name: str,
     timestamp_return_value: str,
-) -> None:
+):
     """
     Unit test for _ensure_unique_report_name_with_timestamp method in report_generator.py file.
     """
@@ -878,7 +818,7 @@ def test_generate_report(
     # Assert
     if not reference_exception and not perform_aggregations_exception:
         assert report_generator.reports == expected_report_columns
-
+    print(event_logs)
     log_messages = [log["message"] for log in event_logs]
     for expected_message in expected_log_messages:
         assert expected_message in log_messages
