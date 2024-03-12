@@ -87,6 +87,10 @@ class BaseManureTreatment(ABC):
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
         self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
+        try:
+            self.storage_time_period = self.config.storage_time_period
+        except AttributeError:
+            self.storage_time_period = None
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
@@ -352,14 +356,17 @@ class BaseManureTreatment(ABC):
 
         """
         if self._sim_day % self.storage_time_period == 1:
-            ManureModuleOutputManagerHelper.add_dataclass_object(
-                self._accumulated_output,
-                info_maps={
-                    "class": self.__class__.__name__,
-                    "function": self._adjust_accumulated_output.__name__,
-                    "prefix": f"{self.__class__.__name__}_pit_emptying_amount_on_sim_day_{self._sim_day}",
-                },
-            )
+            if self._accumulated_output.pen_id >= 0:
+                ManureModuleOutputManagerHelper.add_dataclass_object(
+                    self._accumulated_output,
+                    info_maps={
+                        "class": self.__class__.__name__,
+                        "function": self._adjust_accumulated_output.__name__,
+                        "prefix": f"{self.__class__.__name__}_pit_emptying_amount_pen_"
+                        f"{self._accumulated_output.pen_id}",
+                        "simulation_day": self._sim_day
+                    },
+                )
             self._accumulated_output = manure_treatment_daily_output.clone()
         else:
             self._accumulated_output += manure_treatment_daily_output
