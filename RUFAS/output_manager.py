@@ -681,7 +681,7 @@ class OutputManager(object):
         )
         return filtered_pool
 
-    def save_results(
+    def save_results(  # noqa: C901
         self,
         save_path: Path,
         filters_dir_path: Path,
