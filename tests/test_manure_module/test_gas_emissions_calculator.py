@@ -719,6 +719,40 @@ def test_arrhenius_exponent(
             ValueError,
             "Total volatile solids must be positive. Total volatile solids provided: 0.0",
         ),
+    ],
+)
+def test_volatile_solid_component_fractions(
+    total_volatile_solids: float,
+    expected: tuple[float, float] | Exception,
+    error_message: str | None,
+) -> None:
+    """
+    Unit test for _volatile_solid_component_fractions() method in calculator.py.
+
+    This test verifies that the method correctly calculates the degradable and non-degradable
+    volatile solids given the total volatile solids. It also checks that the method raises an
+    exception for total volatile solids that are negative.
+
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):
+            GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
+    else:
+        actual = GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
+        assert actual == approx(expected, rel=1e-6)
+
+
+@pytest.mark.parametrize(
+    "total_volatile_solids, temp, expected, error_message",
+    [
+        # Standard case
+        (1.0, 20.0, 1.55838924852, None),
+        (10.0, 20.0, 15.583892485199996, None),
+        # Case when temperature is not provided, default should be used
+        (1.0, None, 1.55838924852, None),
+        # Exception case: Zero total volatile solids
+        (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
         (
             -1.0,
@@ -750,8 +784,9 @@ def test_methane_emission_from_slurry_storage(
     # Arrange
     patch_for_arrhenius_exponent = mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._arrhenius_exponent",
-        return_value=0.2,  # Dummy return value
+        return_value=0.128579971,  # Dummy return value
     )
+    total_degradable_volatile_solids = total_non_degradable_volatile_solids = 0.5 * total_volatile_solids
 
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
