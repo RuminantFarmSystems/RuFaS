@@ -42,7 +42,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         """
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config.storage_time_period
 
     def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> Tuple[float, float]:
         """Calculates the methane emission from the underfloor slurry storage.
@@ -105,7 +104,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         """
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
-        self._accumulated_output = self._adjust_accumulated_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         methane_loss = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_solids)
 
@@ -160,28 +159,3 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
 
         return daily_output
-
-    def _adjust_accumulated_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> ManureTreatmentDailyOutput:
-        """
-        Adjust the accumulated output by either resetting it or adding the daily output to it.
-
-        The accumulated output will be reset on the first day of every storage time period.
-
-        Parameters
-        ----------
-        manure_treatment_daily_output : ManureTreatmentDailyOutput
-            The daily output from the manure treatment system.
-
-        Returns
-        -------
-        ManureTreatmentDailyOutput
-            The adjusted accumulated output.
-
-        """
-        if self._sim_day % self.storage_time_period == 1:
-            return manure_treatment_daily_output.clone()
-        else:
-            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
-            return new_accumulated_output
