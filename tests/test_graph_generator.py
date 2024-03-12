@@ -118,8 +118,9 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name,
-                                                           graphics_dir, True)
+    assert mock_log_pool == graph_generator.generate_graph(
+        filtered_pool, graph_details, filter_file_name, graphics_dir, True
+    )
     graph_generator._draw_graph.assert_not_called()
     graph_generator._customize_graph.assert_not_called()
     graph_generator._save_graph.assert_not_called()
@@ -137,8 +138,9 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name,
-                                                           graphics_dir, True)
+    assert mock_log_pool == graph_generator.generate_graph(
+        filtered_pool, graph_details, filter_file_name, graphics_dir, True
+    )
     graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys())
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)

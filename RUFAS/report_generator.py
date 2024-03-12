@@ -260,7 +260,7 @@ class ReportGenerator:
         graph_details = {
             **filter_content["graph_details"],
             "title": filter_content["name"],
-            "filters": filter_content["filters"]
+            "filters": filter_content["filters"],
         }
         print(f"graphing {graph_details['title']}")
         graphics_dir = graph_details.pop("graphics_dir", None)

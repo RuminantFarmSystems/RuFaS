@@ -632,9 +632,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(
-        self, filter_content: Dict[str, Any]
-    ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -823,11 +821,7 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
-                        produce_graphics
+                        filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
                     self._route_logs(log_pool)
                 except Exception as e:

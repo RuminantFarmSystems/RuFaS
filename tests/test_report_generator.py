@@ -946,8 +946,12 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     filter_content = {
         "name": "example_report",
         "filters": ["filter1", "filter2"],
-        "graph_details": {"metadata_prefix": "prefix", "graphics_dir": "dir", "other_details": "details",
-                          "produce_graphics": True},
+        "graph_details": {
+            "metadata_prefix": "prefix",
+            "graphics_dir": "dir",
+            "other_details": "details",
+            "produce_graphics": True,
+        },
     }
     produce_graphics = True
 
@@ -969,7 +973,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         },
         individual_report_name,
         "dir",
-        produce_graphics
+        produce_graphics,
     )
 
     assert graph_event_log == {
