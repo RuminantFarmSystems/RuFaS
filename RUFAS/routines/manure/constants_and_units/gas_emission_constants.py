@@ -9,6 +9,10 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
 
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
+    HOUR_TO_DAY_CONVERSION_FACTOR = 24 
+    """
+    The conversion factor from hours to days.
+    """
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
