@@ -219,7 +219,7 @@ class ReportGenerator:
                 )
                 event_logs.append(graph_event_log)
                 if not enable_graph_and_report:
-                    self.reports = Utility.filter_pool(self.reports, graph_data.keys(), filter_by_exclusion=True)
+                    self.reports = Utility.filter_dictionary(self.reports, graph_data.keys(), filter_by_exclusion=True)
             if enable_graph_and_report and not should_graph_report_data:
                 warning_event_log = {
                     "warning": "report_generation_warning",

@@ -910,7 +910,7 @@ def test_generate_report(
             "info_map": {},
         },
     )
-    mocker.patch("RUFAS.report_generator.Utility.filter_pool", return_value=expected_report_columns)
+    mocker.patch("RUFAS.report_generator.Utility.filter_dictionary", return_value=expected_report_columns)
     if perform_aggregations_exception:
         mocker.patch.object(
             report_generator,
