@@ -761,7 +761,9 @@ class OutputManager(object):
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if filter_content.get("graph_details"):
+                        print(f"here for {filter_content.get('name')}")
                         filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["produce_graphics"] = produce_graphics
                         filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
                         self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
@@ -825,6 +827,7 @@ class OutputManager(object):
                         filter_content,
                         filter_file,
                         graphics_dir,
+                        produce_graphics
                     )
                     self._route_logs(log_pool)
                 except Exception as e:

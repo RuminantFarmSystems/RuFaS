@@ -1590,6 +1590,7 @@ def test_route_save_functions_graph(
             graph_data,
             "graph_file",
             Path("graphics_dir"),
+            True
         )
 
         mock_generate_graph.side_effect = Exception("test exception")
