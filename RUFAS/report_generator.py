@@ -262,7 +262,6 @@ class ReportGenerator:
             "title": filter_content["name"],
             "filters": filter_content["filters"],
         }
-        print(f"graphing {graph_details['title']}")
         graphics_dir = graph_details.pop("graphics_dir", None)
         produce_graphics = graph_details.get("produce_graphics")
         graph_event_log = graph_generator.generate_graph(
