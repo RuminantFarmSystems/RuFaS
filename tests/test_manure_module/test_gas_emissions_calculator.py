@@ -702,62 +702,18 @@ def test_arrhenius_exponent(
 
 
 @pytest.mark.parametrize(
-    "total_volatile_solids, total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp, expected,"
-    "error_message",
-    [
-        # Standard case
-        (1.0, 0.99, 0.01, 20.0, (0.00019802, 0.000198), None),
-        (10.0, 9.9, 0.1, 20.0, (0.0019802, 0.00198), None),
-        # Case when temperature is not provided, default should be used
-        (1.0, 0.99, 0.01, None, (0.00019802, 0.000198), None),
-        # Exception case: Zero total volatile solids
-        (
-            0.0,
-            0.0,
-            0.0,
-            20.0,
-            ValueError,
-            "Total volatile solids must be positive. Total volatile solids provided: 0.0",
-        ),
-    ],
-)
-def test_volatile_solid_component_fractions(
-    total_volatile_solids: float,
-    expected: tuple[float, float] | Exception,
-    error_message: str | None,
-) -> None:
-    """
-    Unit test for _volatile_solid_component_fractions() method in calculator.py.
-
-    This test verifies that the method correctly calculates the degradable and non-degradable
-    volatile solids given the total volatile solids. It also checks that the method raises an
-    exception for total volatile solids that are negative.
-
-    """
-    # Act and assert
-    if isinstance(expected, type) and issubclass(expected, Exception):
-        with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
-    else:
-        actual = GasEmissionsCalculator._volatile_solid_component_fractions(total_volatile_solids)
-        assert actual == approx(expected, rel=1e-6)
-
-
-@pytest.mark.parametrize(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 1.55838924852, None),
-        (10.0, 20.0, 15.583892485199996, None),
+        (1.0, 20.0, (1.55838924852, 1.542959652), None),
+        (10.0, 20.0, (15.583892485199996, 15.429596519999997), None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 1.55838924852, None),
+        (1.0, None, (1.55838924852, 1.542959652), None),
         # Exception case: Zero total volatile solids
         (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
         (
             -1.0,
-            -0.99,
-            -0.01,
             20.0,
             ValueError,
             "Total volatile solids must be positive. Total volatile solids provided: -1.0",
@@ -767,8 +723,6 @@ def test_volatile_solid_component_fractions(
 def test_methane_emission_from_slurry_storage(
     mocker: MockerFixture,
     total_volatile_solids: float,
-    total_degradable_volatile_solids: float,
-    total_non_degradable_volatile_solids: float,
     temp: float | None,
     expected: Tuple[float, float] | Exception,
     error_message: str | None,
