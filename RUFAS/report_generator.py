@@ -255,14 +255,16 @@ class ReportGenerator:
         individual_report_name : str
             The name of the report to be graphed.
         """
+        
         graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
         graph_details = {
             **filter_content["graph_details"],
             "title": filter_content["name"],
             "filters": filter_content["filters"]
         }
+        print(f"graphing {graph_details['title']}")
         graphics_dir = graph_details.pop("graphics_dir", None)
-        produce_graphics = graph_details.pop("produce_graphics")
+        produce_graphics = graph_details.get("produce_graphics")
         graph_event_log = graph_generator.generate_graph(
             graph_data, graph_details, individual_report_name, graphics_dir, produce_graphics
         )

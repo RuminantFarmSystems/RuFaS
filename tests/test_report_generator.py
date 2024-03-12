@@ -963,6 +963,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         {
             "metadata_prefix": "prefix",
             "other_details": "details",
+            "produce_graphics": True,
             "title": "example_report",
             "filters": ["filter1", "filter2"],
         },
