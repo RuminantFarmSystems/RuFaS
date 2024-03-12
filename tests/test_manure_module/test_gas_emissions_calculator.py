@@ -743,10 +743,10 @@ def test_volatile_solid_component_fractions(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 0.000202, None),
-        (10.0, 20.0, 0.00202, None),
+        (1.0, 20.0, 1.55838924852, None),
+        (10.0, 20.0, 15.583892485199996, None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 0.000202, None),
+        (1.0, None, 1.55838924852, None),
         # Exception case: Zero total volatile solids
         (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
         # Exception case: Negative total volatile solids
@@ -776,11 +776,11 @@ def test_methane_emission_from_slurry_storage(
     # Arrange
     patch_for_arrhenius_exponent = mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._arrhenius_exponent",
-        return_value=0.2,  # Dummy return value
+        return_value=0.128579971,  # Dummy return value
     )
     patch_for_volatile_solid_components = mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._volatile_solid_component_fractions",
-        return_value=(1.0, 1.0) if total_volatile_solids != 0.0 else (0.0, 0.0),  # Dummy return value
+        return_value=(0.5, 0.5) if total_volatile_solids != 0.0 else (0.0, 0.0),  # Dummy return value
     )
 
     # Act and assert
