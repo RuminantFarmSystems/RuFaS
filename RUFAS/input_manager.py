@@ -5,13 +5,11 @@ from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Tuple
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
-
 from RUFAS.util import Utility
 
 om = OutputManager()
@@ -1909,8 +1907,6 @@ class InputManager:
         else:
             return False
 
-        return False
-
     def add_tabular_variable_to_pool(
         self,
         variable_name: str,
@@ -1979,8 +1975,6 @@ class InputManager:
             return add_variable_success
         else:
             return False
-
-        return False
 
     def dump_get_data_logs(self, path: Path) -> None:
         """
