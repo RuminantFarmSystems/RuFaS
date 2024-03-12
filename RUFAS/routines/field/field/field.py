@@ -1510,7 +1510,7 @@ class Field:
         Returns
         -------
         float
-            Amount of water applied to the field via manure on the current day.
+            Amount of water applied to the field via manure on the current day (mm).
 
         """
         manure_water: float = self.field_data.manure_water
@@ -1519,6 +1519,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
+            "units": "mm",
         }
         om.add_variable("manure_water", manure_water, info_map)
 
