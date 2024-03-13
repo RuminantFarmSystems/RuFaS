@@ -115,7 +115,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     graphics_dir = Path("/tmp")
     produce_graphics = True
 
-    with patch.object(graph_generator, '_validate_graph_filter', side_effect=Exception("Test Exception")):
+    with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
         expected_output = {
             "error": "Error plotting Example Graph data set",
             "message": "Unforeseen error Test Exception when trying to graph data.",
