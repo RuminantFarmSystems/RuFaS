@@ -20,13 +20,13 @@ class UserDefinedRationManager(object):
 
             self.is_udr = None
 
-            self.calf_ration = []
-            self.growing_ration = []
-            self.close_up_ration = []
-            self.lactating_cow_ration = []
+            self.calf_ration: Dict[str, float] = {}
+            self.growing_ration: Dict[str, float] = {}
+            self.close_up_ration: Dict[str, float] = {}
+            self.lactating_cow_ration: Dict[str, float] = {}
 
-            self.tolerance = []
-            self.milk_reduction_maximum = []
+            self.tolerance: float = 0.0
+            self.milk_reduction_maximum: float = 0.0
 
     @staticmethod
     def ration_to_use(animal_combination) -> Dict:
