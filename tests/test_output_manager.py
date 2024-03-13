@@ -1937,6 +1937,53 @@ def test_get_error_and_warning_counts(
                 }
             },
         ),
+        (
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+        ),
+        # Missing both keys
+        (
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+        ),
+        # Missing `info_maps` key
+        (
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+        ),
+        # Missing `values` key
+        (
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+        ),
     ],
 )
 def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expected: Dict[str, Dict[str, Any]]) -> None:
