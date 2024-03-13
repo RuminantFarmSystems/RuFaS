@@ -2,7 +2,7 @@
     "calf_feeds": [
         202,
         216
-    ],
+    ], 
     "growing_feeds": [
         31,
         107,
@@ -89,6 +89,7 @@
       }
     ],
     "farm_grown_feeds": [
+      1
     ],
     "storage_options": [
       {
