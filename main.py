@@ -444,7 +444,7 @@ def execute_simulations(
                     format_option=format_option,
                 )
                 raise e
-
+            output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
             if not terminate_simulation_post_herd_generation:
                 simulator = SimulationEngine()
                 simulator.simulate()
