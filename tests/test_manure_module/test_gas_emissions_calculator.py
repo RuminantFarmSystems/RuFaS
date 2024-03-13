@@ -710,13 +710,14 @@ def test_arrhenius_exponent(
         # Case when temperature is not provided, default should be used
         (1.0, None, (0.00155838924852, 0.001542959652), None),
         # Exception case: Zero total volatile solids
-        (0.0, 20.0, ValueError, "Total volatile solids must be positive. Total volatile solids provided: 0.0"),
+        (0.0, 20.0, ValueError, "Total degradable volatile solids must be positive. Total degradable volatile solids "
+                                "provided: 0.0"),
         # Exception case: Negative total volatile solids
         (
             -1.0,
             20.0,
             ValueError,
-            "Total volatile solids must be positive. Total volatile solids provided: -1.0",
+            "Total degradable volatile solids must be positive. Total degradable volatile solids provided: -0.5",
         ),
     ],
 )
@@ -746,16 +747,16 @@ def test_methane_emission_from_slurry_storage(
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids, total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
     else:
         if temp is None:
             actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids, total_degradable_volatile_solids, total_non_degradable_volatile_solids
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids
             )
         else:
             actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids, total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
         assert actual == approx(expected, rel=1e-6)
 
