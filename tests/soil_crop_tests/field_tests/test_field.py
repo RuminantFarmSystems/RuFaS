@@ -2260,7 +2260,7 @@ def test_cycle_water(
 
         incorp._cycle_water(current_conditions, mocked_time)
 
-        expected_total_precipitation = rainfall + manure_water
+        expected_total_water = rainfall + manure_water
         incorp._determine_watering_amount.assert_called_once_with(
             rainfall=rainfall,
             manure_water=manure_water,
@@ -2268,12 +2268,12 @@ def test_cycle_water(
             day=mocked_time.day,
             irrigation=0.0,
         )
-        incorp._handle_water_in_crop_canopies.assert_called_once_with(expected_total_precipitation)
+        incorp._handle_water_in_crop_canopies.assert_called_once_with(expected_total_water)
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp, mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
-        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, expected_total_precipitation)
+        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, expected_total_water)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
         incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)

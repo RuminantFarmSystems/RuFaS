@@ -1368,8 +1368,8 @@ class Field:
             day=time.day,
             irrigation=current_conditions.irrigation,
         )
-        total_precipitation = current_conditions.rainfall + watering_amount + manure_water
-        precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
+        total_water = current_conditions.rainfall + watering_amount + manure_water
+        precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_water)
         water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
@@ -1388,7 +1388,7 @@ class Field:
             self.field_data.field_size,
             0.02,
             self.field_data.current_residue,
-            total_precipitation,
+            total_water,
         )
         self.soil.phosphorus_cycling.cycle_phosphorus(
             water_reaching_soil,
