@@ -710,8 +710,12 @@ def test_arrhenius_exponent(
         # Case when temperature is not provided, default should be used
         (1.0, None, (0.00155838924852, 0.001542959652), None),
         # Exception case: Zero total volatile solids
-        (0.0, 20.0, ValueError, "Total degradable volatile solids must be positive. Total degradable volatile solids "
-                                "provided: 0.0"),
+        (
+            0.0,
+            20.0,
+            ValueError,
+            "Total degradable volatile solids must be positive. Total degradable volatile solids " "provided: 0.0",
+        ),
         # Exception case: Negative total volatile solids
         (
             -1.0,
