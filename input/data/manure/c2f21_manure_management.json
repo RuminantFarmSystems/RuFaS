@@ -99,7 +99,7 @@
       "cleaning_water_recycle_fraction": 0.10
     },
     {
-      "name": "manual scraping",
+      "name": "manual scraping 1",
             "manure_handler_type": "manual scraping",
             "cleaning_water_use_rate": 10.0,
             "minutes_per_cleaning": 8,
