@@ -836,6 +836,10 @@ class AnimalManager:
         """
         Create a list of additional pens to accommodate potential animal space shortage.
 
+        This method defines the first pen in the pens list as the 'reference' pen, which means that it uses those
+        attributes as a template for the creation of new pens. This assumes the incoming pen list is uniform, as they
+        are the same AnimalCombination.
+
         Parameters
         ----------
         num_animals : int
@@ -844,8 +848,8 @@ class AnimalManager:
             A list of Pen objects representing the currently available pens.
         animal_combination : AnimalCombination
             The animal combination for the new default pens.
-        start_pen_id : int, optional, default=0
-            The starting pen ID for the new default pens. The default value is 0.
+        start_pen_id : int, default=0
+            The starting pen ID for the new pens.
 
         Returns
         -------
@@ -855,28 +859,31 @@ class AnimalManager:
         """
 
         animal_space_shortage = self._calc_animal_space_shortage(num_animals=num_animals, pens=pens)
-        new_default_pens: List[Pen] = []
+        additional_pens: List[Pen] = []
 
         if animal_space_shortage > 0:
-            num_stalls_per_pen = self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
-            max_stocking_density = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
+            reference_pen = pens[0]
+            max_stocking_density = reference_pen.max_stocking_density
+            num_stalls_custom_pen = int(math.ceil(animal_space_shortage * max_stocking_density))
+            num_stalls_per_additional_pen = min(self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination],
+                                                num_stalls_custom_pen)
 
-            max_animal_spaces_per_default_pen = self._calc_max_animal_spaces_per_pen(
-                num_stalls=num_stalls_per_pen, max_stocking_density=max_stocking_density
+            max_animal_spaces_per_additional_pen = self._calc_max_animal_spaces_per_pen(
+                num_stalls=num_stalls_per_additional_pen, max_stocking_density=max_stocking_density
             )
-            num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
-            for i in range(num_new_default_pens):
-                new_default_pens.append(
+            num_new_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_additional_pen)
+            for i in range(num_new_pens):
+                additional_pens.append(
                     self._create_duplicate_pen(
                         pen_id=start_pen_id + i,
                         animal_combination=animal_combination,
-                        num_stalls=num_stalls_per_pen,
+                        num_stalls=num_stalls_per_additional_pen,
                         max_stocking_density=max_stocking_density,
-                        reference_pen=pens[0],
+                        reference_pen=reference_pen,
                     )
                 )
 
-        return new_default_pens
+        return additional_pens
 
     @classmethod
     def _calc_density(cls, num_animals: int, num_spaces: int) -> float:
