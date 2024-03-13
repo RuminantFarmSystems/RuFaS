@@ -112,7 +112,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         self._update_ammonia_emission(daily_output)
         methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(
-            self._accumulated_output)
+            self._accumulated_output
+        )
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
         )
