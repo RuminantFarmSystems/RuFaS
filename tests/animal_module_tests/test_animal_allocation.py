@@ -210,7 +210,7 @@ def test_create_additional_pens_for_potential_space_shortage(
     )
     num_stalls_per_pen = 5
     max_stocking_density_per_pen = 1.2
-
+    mock_pens[0].max_stocking_density = max_stocking_density_per_pen
     num_stalls_per_pen_before = AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
     AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination] = num_stalls_per_pen
     max_stocking_density_per_pen_before = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
