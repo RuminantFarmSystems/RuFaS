@@ -5,7 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import GraphGenerator
+from RUFAS.graph_generator import AXES_SETTERS, GraphGenerator
 
 
 @pytest.fixture
@@ -77,6 +77,63 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
     with freeze_time("2023-10-13 11:41:23"):
         result = graph_generator._generate_graph_path(graph_details, filter_file_name, graphics_dir)
         assert result == Path(r"graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png")
+
+
+def test_generate_graph_without_producing_graphics(graph_generator: GraphGenerator) -> None:
+    filtered_pool = {"dummy_key": {"dummy_data": [1, 2, 3]}}
+    graph_details = {"title": "Example Graph"}
+    filter_file_name = "dummy_filter"
+    graphics_dir = Path("/tmp")
+    produce_graphics = False
+
+    expected_output = [
+        {
+            "error": "Can't plot Example Graph data set",
+            "message": "'produce_graphics' set to False, no graphs will be produced.",
+            "info_map": {
+                "class": graph_generator.__class__.__name__,
+                "function": "generate_graph",
+            },
+        }
+    ]
+
+    result = graph_generator.generate_graph(
+        filtered_pool=filtered_pool,
+        graph_details=graph_details,
+        filter_file_name=filter_file_name,
+        graphics_dir=graphics_dir,
+        produce_graphics=produce_graphics,
+    )
+
+    assert result == expected_output, "Function did not return expected log message when produce_graphics is False."
+
+
+def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
+    filtered_pool = {"example": {"data": [1, 2, 3]}}
+    graph_details = {"title": "Example Graph", "type": "line", "filters": ["example"]}
+    filter_file_name = "example_filter"
+    graphics_dir = Path("/tmp")
+    produce_graphics = True
+
+    with patch.object(graph_generator, '_validate_graph_filter', side_effect=Exception("Test Exception")):
+        expected_output = {
+            "error": "Error plotting Example Graph data set",
+            "message": "Unforeseen error Test Exception when trying to graph data.",
+            "info_map": {
+                "class": graph_generator.__class__.__name__,
+                "function": "generate_graph",
+            },
+        }
+
+        result = graph_generator.generate_graph(
+            filtered_pool=filtered_pool,
+            graph_details=graph_details,
+            filter_file_name=filter_file_name,
+            graphics_dir=graphics_dir,
+            produce_graphics=produce_graphics,
+        )
+
+        assert result == expected_output, "Function did not return expected error log when an exception is raised."
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
