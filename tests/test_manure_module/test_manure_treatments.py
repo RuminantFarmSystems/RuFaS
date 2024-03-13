@@ -1143,7 +1143,6 @@ def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name
     # Assert
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
-        accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
         accumulated_liquid_manure_total_degradable_volatile_solids=(
             accumulated_liquid_manure_total_degradable_volatile_solids),
         accumulated_liquid_manure_total_non_degradable_volatile_solids=(
@@ -1738,8 +1737,6 @@ def test_anaerobic_lagoon_update_methane_emission(
     # Assert
     # fmt: off
     patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
-        accumulated_liquid_manure_total_volatile_solids=(
-            anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids),
         accumulated_liquid_manure_total_degradable_volatile_solids=(
             anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids),
         accumulated_liquid_manure_total_non_degradable_volatile_solids=(
@@ -1870,7 +1867,7 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
     assert daily_output.daily_final_manure_volume == expected_final_volume
     anaerobic_lagoon._update_ammonia_emission.assert_called_once_with(daily_output)
-    anaerobic_lagoon._update_methane_emission.assert_called_once_with(daily_output)
+    anaerobic_lagoon._update_methane_emission.assert_called_once_with(anaerobic_lagoon._accumulated_output)
     patch_for_adjust_final_manure_volume.assert_called_once_with(daily_final_manure_volume)
     patch_for_set_daily_final_manure_volume.assert_called_once_with(adjusted_final_manure_volume)
     patch_for_adjust_accumulated_output.assert_called_once_with(daily_output)
