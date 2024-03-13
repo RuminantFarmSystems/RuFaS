@@ -382,13 +382,13 @@ class OutputManager(object):
                 data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         indent=2,
                     )
