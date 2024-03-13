@@ -1873,3 +1873,82 @@ def test_get_error_and_warning_counts(
 
     # Act and Assert
     assert om.get_error_and_warning_counts() == expected
+
+
+@pytest.mark.parametrize(
+    "input_data,expected",
+    [
+        # Basic test case with a single data_origin per value
+        (
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                }
+            },
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                    "detailed_data_origins": [
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
+                    ],
+                }
+            },
+        ),
+        # Test case with multiple data_origin entries for a single value
+        (
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                }
+            },
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                    "detailed_data_origins": [
+                        [
+                            ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
+                            ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
+                        ],
+                        [("[SourceClassB.method_b]->[ModuleB.variable_y]", 40)],
+                    ],
+                }
+            },
+        ),
+    ],
+)
+def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expected: Dict[str, Dict[str, Any]]) -> None:
+    """
+    Unit test for the _add_detailed_data_origin() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Act
+    result = output_manager._add_detailed_data_origin(input_data)
+
+    # Assert
+    assert result == expected

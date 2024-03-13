@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -55,7 +55,7 @@ class LogVerbosity(Enum):
             return False
         return False
 
-    def __str__(self) -> bool:
+    def __str__(self) -> str:
         if self.value == "none":
             return "NONE"
         return self.value[:-1].upper()
@@ -379,21 +379,105 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
+                data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         indent=2,
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
             raise e
+
+    def _add_detailed_data_origin(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Adds a `detailed_data_origins` list to each sub-dictionary that has information about data origins.
+
+        Notes
+        -----
+        This method iterates over each key in the provided dictionary. For keys that correspond to
+        dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
+        named `detailed_data_origins`. This list contains details about the data origin, including the class name,
+        function name, and the key itself, paired with each corresponding value from the `values` list.
+        The format used for detailing the origin is "[class_name.function_name]->[key]",
+        where `class_name` and `function_name` are derived from the `data_origin`
+        entries within `info_maps`.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The input dictionary containing keys that may map to other dictionaries with `info_maps` and `values` keys.
+            `info_maps` should contain a list of dictionaries, each with a `data_origin` key indicating the source
+            of the data. `values` should contain a list of values corresponding to these origins.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The modified dictionary with a `detailed_data_origins` list added to each sub-dictionary that meets the
+            criteria. This list provides detailed information on the origin of each value.
+
+        Examples
+        --------
+        >>> example_data_dict = {
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals": {
+        ...         "info_maps": [
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"},
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"}
+        ...         ],
+        ...         "values": [193, 194]
+        ...     }
+        ... }
+        >>> output_manager = OutputManager()
+        >>> modified_data_dict = output_manager._add_detailed_data_origin(example_data_dict)
+        >>> assert modified_data_dict[
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_data_origins"
+        ... ] == [
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     193)],
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     194)]
+        ... ]
+        """
+
+        for key in data_dict:
+            if not isinstance(data_dict[key], dict):
+                continue
+
+            sub_data_dict = data_dict[key]
+            if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+                continue
+
+            if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+                continue
+
+            data_origins: List[List[Tuple[str, str]]] = []
+            for info_map in sub_data_dict["info_maps"]:
+                if "data_origin" not in info_map:
+                    break
+                data_origins.append(info_map["data_origin"])
+
+            if len(data_origins) != len(sub_data_dict["values"]):
+                continue
+
+            detailed_data_origins: List[List[Tuple[str, Any]]] = []
+            for index, value in enumerate(sub_data_dict["values"]):
+                detailed_origin_for_value = []
+                for origin in data_origins[index]:
+                    class_name, function_name = origin
+                    origin_key = f"[{class_name}.{function_name}]->[{key}]"
+                    detailed_origin_for_value.append((origin_key, value))
+                detailed_data_origins.append(detailed_origin_for_value)
+
+            sub_data_dict["detailed_data_origins"] = detailed_data_origins
+
+        return data_dict
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
