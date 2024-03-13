@@ -4810,20 +4810,6 @@
           "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
           "minimum": 0.0,
           "default": 0.05
-        },
-        "active_N_percent": {
-          "type": "number",
-          "description": "",
-          "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 0.0
-        },
-        "denitrification_rate": {
-          "type": "number",
-          "description": "",
-          "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.0
         }
       }
     }
