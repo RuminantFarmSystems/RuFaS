@@ -10,6 +10,8 @@ class LiquidManurePortionProtocol(Protocol):
     liquid_manure_nitrogen: float
     liquid_manure_total_solids: float
     liquid_manure_total_volatile_solids: float
+    liquid_manure_total_degradable_volatile_solids: float
+    liquid_manure_total_non_degradable_volatile_solids: float
     liquid_manure_phosphorus: float
     liquid_manure_potassium: float
     liquid_manure_daily_volume: float
