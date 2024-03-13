@@ -4074,7 +4074,7 @@ def test_object_type_validator(
             [1],
             "blob_key",
             False,
-            "Validation: array container length less than minimum",
+            "Validation: array length less than minimum",
         ),
         # Input list's length exceeds the specified maximum length
         (
@@ -4083,7 +4083,7 @@ def test_object_type_validator(
             [1, 2, 3, 4],
             "blob_key",
             False,
-            "Validation: array container length greater than maximum",
+            "Validation: array length greater than maximum",
         ),
         # Input list's length is within the specified constraints
         (

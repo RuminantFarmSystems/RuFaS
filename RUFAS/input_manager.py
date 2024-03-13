@@ -838,7 +838,7 @@ class InputManager:
         Parameters
         ----------
         first_level_key : str
-            The name of the json data element just under the level of properties_blob_key.
+            The name of the data element just under the level of properties_blob_key.
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
         input_data : Dict[str, Any]
@@ -920,7 +920,7 @@ class InputManager:
             is_in_range = variable_properties["minimum_length"] <= len(input_data)
             if not is_in_range:
                 om.add_warning(
-                    "Validation: array container length less than minimum",
+                    "Validation: array length less than minimum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, less than minimum length: "
                     f"{minimum_length}. {properties_violation_message}",
                     info_map,
@@ -931,7 +931,7 @@ class InputManager:
             is_in_range = len(input_data) <= variable_properties["maximum_length"]
             if not is_in_range:
                 om.add_warning(
-                    "Validation: array container length greater than maximum",
+                    "Validation: array length greater than maximum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, greater than maximum length: "
                     f"{maximum_length}. {properties_violation_message}",
                     info_map,
@@ -2006,9 +2006,9 @@ class ElementState(Enum):
         The element is invalid initially but has been fixed.
     """
 
-    VALID = 1
-    INVALID = 2
-    FIXED = 3
+    VALID = "valid"
+    INVALID = "invalid"
+    FIXED = "fixed"
 
 
 class ElementsCounter:
