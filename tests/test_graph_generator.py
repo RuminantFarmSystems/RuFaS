@@ -5,7 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import AXES_SETTERS, GraphGenerator
+from RUFAS.graph_generator import GraphGenerator
 
 
 @pytest.fixture
