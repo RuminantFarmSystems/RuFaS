@@ -826,7 +826,7 @@
         "pen_type": {
           "type": "string",
           "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
-          "pattern": "^freestall|tiestall|open lot|compost bedded pack barn$",
+          "pattern": "^(freestall|tiestall|open lot|compost bedded pack barn)$",
           "default": "freestall"
         },
         "max_stocking_density": {
@@ -3152,9 +3152,9 @@
         "packing_density": {
           "type": "number",
           "description": "Packing Density -- The density of ensiled feed material, kg DM /m3",
-          "minimum": 14,
+          "minimum": 200,
           "maximum": 800,
-          "default": 14
+          "default": 200
         },
         "inoculation": {
           "type": "string",
