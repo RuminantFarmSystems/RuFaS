@@ -12,7 +12,6 @@ class GasEmissionsCalculator:
     @classmethod
     def methane_emission_from_slurry_storage(
         cls,
-        accumulated_liquid_manure_total_volatile_solids: float,
         accumulated_liquid_manure_total_degradable_volatile_solids: float,
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
         temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
@@ -51,8 +50,6 @@ class GasEmissionsCalculator:
 
         Parameters
         ----------
-        accumulated_liquid_manure_total_volatile_solids : float
-            Total volatile solids in manure (kg).
         accumulated_liquid_manure_total_degradable_volatile_solids: float
             Total degradable volatile solids in manure (kg).
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
@@ -73,19 +70,11 @@ class GasEmissionsCalculator:
         ValueError
             If the total volatile solids is not positive.
         """
-        if accumulated_liquid_manure_total_volatile_solids <= 0:
+        if accumulated_liquid_manure_total_degradable_volatile_solids <= 0:
             raise ValueError(
-                "Total volatile solids must be positive. Total volatile solids provided: "
-                f"{accumulated_liquid_manure_total_volatile_solids}"
+                "Total degradable volatile solids must be positive. Total degradable volatile solids provided: "
+                f"{accumulated_liquid_manure_total_degradable_volatile_solids}"
             )
-
-        degradable_volatile_solids_fraction = (
-            accumulated_liquid_manure_total_degradable_volatile_solids / accumulated_liquid_manure_total_volatile_solids
-        )
-        non_degradable_volatile_solids_fraction = (
-            accumulated_liquid_manure_total_non_degradable_volatile_solids
-            / accumulated_liquid_manure_total_volatile_solids
-        )
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
 
@@ -93,9 +82,8 @@ class GasEmissionsCalculator:
             GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR
             * (
                 arrhenius_exponent
-                * degradable_volatile_solids_fraction
+                * accumulated_liquid_manure_total_degradable_volatile_solids
                 * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-                * accumulated_liquid_manure_total_volatile_solids
             )
             * GeneralConstants.GRAMS_TO_KG
         )
@@ -103,9 +91,8 @@ class GasEmissionsCalculator:
             GasEmissionConstants.HOUR_TO_DAY_CONVERSION_FACTOR
             * (
                 arrhenius_exponent
-                * non_degradable_volatile_solids_fraction
+                * accumulated_liquid_manure_total_non_degradable_volatile_solids
                 * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-                * accumulated_liquid_manure_total_volatile_solids
             )
             * GeneralConstants.GRAMS_TO_KG
         )

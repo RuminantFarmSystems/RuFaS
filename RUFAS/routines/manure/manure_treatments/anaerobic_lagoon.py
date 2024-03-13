@@ -32,14 +32,14 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
 
-    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:  # noqa
+    def _update_methane_emission(self, accumulated_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:  # noqa
         """
         Calculate the methane emission from the anaerobic lagoon.
 
         Parameters
         ----------
-        daily_output : ManureTreatmentDailyOutput
-            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
+        accumulated_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the accumulated daily output of the anaerobic lagoon.
 
         Returns
         -------
@@ -53,17 +53,16 @@ class AnaerobicLagoon(BaseManureTreatment):
         # fmt: off
         methane_emission, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                accumulated_liquid_manure_total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
                 accumulated_liquid_manure_total_degradable_volatile_solids=(
-                    daily_output.liquid_manure_total_degradable_volatile_solids),
+                    accumulated_output.liquid_manure_total_degradable_volatile_solids),
                 accumulated_liquid_manure_total_non_degradable_volatile_solids=(
-                    daily_output.liquid_manure_total_non_degradable_volatile_solids),
+                    accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
                 temp=self._get_current_day_average_temperature_celsius(),
             )
         )
         # fmt: on
         methane_emission = max(methane_emission, 0.0)
-        daily_output.storage_methane = methane_emission
+        accumulated_output.storage_methane += methane_emission
 
         return methane_emission, methane_emission_from_degradable_volatile_solids
 
@@ -112,10 +111,13 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_precipitation_volume += self.precipitation_volume
 
         self._update_ammonia_emission(daily_output)
-        methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(daily_output)
+        methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(
+            self._accumulated_output)
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
         )
+
+        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_nitrogen = max(
             daily_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
