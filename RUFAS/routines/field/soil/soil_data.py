@@ -446,7 +446,7 @@ class SoilData:
         attribute : str
             The LayerData attribute to set.
         values : list[any]
-            values of the attribute to set for each layer.
+            Values of the attribute to set for each layer.
 
         """
         [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
