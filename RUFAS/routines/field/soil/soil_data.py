@@ -427,7 +427,7 @@ class SoilData:
         Parameters
         ----------
         attribute : str
-            the LayerData attribute or property to be vectorized.
+            The LayerData attribute or property to be vectorized.
 
         Returns
         -------
