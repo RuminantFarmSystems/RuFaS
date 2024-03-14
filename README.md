@@ -59,7 +59,7 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 * Analyze Animal Module and Plan on action items (P0) _Issues_ [1229](https://github.com/RuminantFarmSystems/MASM/issues/1229) [1232](https://github.com/RuminantFarmSystems/MASM/issues/1232) [1235](https://github.com/RuminantFarmSystems/MASM/issues/1235) 
 * Analyze S&C Module and Plan action items (P0) _Issues_ [1230](https://github.com/RuminantFarmSystems/MASM/issues/1230) [1233](https://github.com/RuminantFarmSystems/MASM/issues/1233) [1236](https://github.com/RuminantFarmSystems/MASM/issues/1236)
 * Analyze Manure Module and Plan action items (P0) _Issues_ [1231](https://github.com/RuminantFarmSystems/MASM/issues/1231) [1234](https://github.com/RuminantFarmSystems/MASM/issues/1234) [1237](https://github.com/RuminantFarmSystems/MASM/issues/1237)
-* Un-entangle bio physical modules
+* Un-entangle bio physical modules [document here](https://docs.google.com/document/d/17BVgTnsqwVEZbdNoztIfBQILYJ94inlyXgwCvq9iQQw/edit?usp=sharing)
 * Implement IM cross validation (P1)
 * Draft Developer’s Rights and Responsibilities (P2)
 * Fix units across the codebase (P1) _Issues_ [1253](https://github.com/RuminantFarmSystems/MASM/issues/1253) [1254](https://github.com/RuminantFarmSystems/MASM/issues/1254) 
