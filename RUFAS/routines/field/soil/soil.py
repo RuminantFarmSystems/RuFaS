@@ -60,8 +60,6 @@ class Soil:
         self.soil_temp = SoilTemp(self.data)
         self.phosphorus_cycling = PhosphorusCycling(self.data)
         self.carbon_cycling = CarbonCycling(self.data)
-        # TODO: need to add phosphorus, manure, and carbon cycling main methods methods to the soil methods.
-        #   It is unclear to me how best to do that.
         self.nitrogen_cycling = NitrogenCycling(self.data)
 
         # Water components
