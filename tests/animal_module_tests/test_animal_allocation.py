@@ -232,7 +232,7 @@ def test_create_additional_pens_for_potential_space_shortage(
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        feed_emissions_estimator=mocker.MagicMock()
+        feed_emissions_estimator=mocker.MagicMock(),
     )
 
     # Act

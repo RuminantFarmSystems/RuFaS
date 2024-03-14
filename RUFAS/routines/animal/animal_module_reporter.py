@@ -72,7 +72,6 @@ class AnimalModuleReporter:
                         info_map=info_map,
                     )
 
-
     @classmethod
     def report_daily_animal_population(cls, animal_manager) -> None:
         """
@@ -761,7 +760,9 @@ class AnimalModuleReporter:
                 om.add_variable("parity", "NA", dict(info_map, **{"units": "unitless"}))
 
     @classmethod
-    def report_sold_animal_information_sort_by_sell_day(cls, sold_animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int) -> None:
+    def report_sold_animal_information_sort_by_sell_day(
+        cls, sold_animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int
+    ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
 

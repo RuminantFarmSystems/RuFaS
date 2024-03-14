@@ -865,8 +865,9 @@ class AnimalManager:
             reference_pen = pens[0]
             max_stocking_density = reference_pen.max_stocking_density
             num_stalls_custom_pen = int(math.ceil(animal_space_shortage * max_stocking_density))
-            num_stalls_per_additional_pen = min(self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination],
-                                                num_stalls_custom_pen)
+            num_stalls_per_additional_pen = min(
+                self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination], num_stalls_custom_pen
+            )
 
             max_animal_spaces_per_additional_pen = self._calc_max_animal_spaces_per_pen(
                 num_stalls=num_stalls_per_additional_pen, max_stocking_density=max_stocking_density
