@@ -1,13 +1,9 @@
 # !/usr/bin/env python3
 
-import random
 import sys
 import time as timer
 from enum import Enum
-from typing import Optional, Dict, Any
-
-import numpy
-
+from typing import Optional
 from RUFAS import routines
 from RUFAS.weather import Weather
 from RUFAS.time import Time
@@ -92,9 +88,6 @@ class SimulationEngine:
             self.day_counter,
             {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
         )
-
-        error_count, warning_count = om.get_error_and_warning_counts()
-        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -194,12 +187,7 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        config_data: Dict[str, Any] = im.get_data("config")
         weather_data = im.get_data("weather")
-
-        if config_data.get("set_seed"):
-            random.seed(config_data["random_seed"])
-            numpy.random.seed(config_data["random_seed"])
 
         self.time = Time()
         self.weather = Weather(weather_data, self.time)

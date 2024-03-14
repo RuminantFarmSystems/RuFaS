@@ -72,5 +72,11 @@ class ManureConstants:
 
     LIQUID_MANURE_SOLIDS_FRACTION = 0.05
     """
-    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed
+    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
+    """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO = 9.25
+    """
+    The mass converation factor from methane to methane and carbon dioxide based on a molar ratio of 1:3
+    (methane : carbon dioxide).
     """
