@@ -1,13 +1,9 @@
 # !/usr/bin/env python3
 
-import random
 import sys
 import time as timer
 from enum import Enum
-from typing import Optional, Dict, Any
-
-import numpy
-
+from typing import Optional
 from RUFAS import routines
 from RUFAS.weather import Weather
 from RUFAS.time import Time
@@ -93,9 +89,6 @@ class SimulationEngine:
             {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
         )
 
-        error_count, warning_count = om.get_error_and_warning_counts()
-        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
-
     def _run_simulation_main_loop(self) -> None:
         """
         The main loop for simulation.
@@ -108,7 +101,9 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
         self.day_counter += 1
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
-        simulate_daily_manure_manager(self.manure_manager, self.animal_manager)
+        simulate_daily_manure_manager(
+            self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
+        )
         self.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
@@ -192,12 +187,7 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        config_data: Dict[str, Any] = im.get_data("config")
         weather_data = im.get_data("weather")
-
-        if config_data.get("set_seed"):
-            random.seed(config_data["random_seed"])
-            numpy.random.seed(config_data["random_seed"])
 
         self.time = Time()
         self.weather = Weather(weather_data, self.time)
@@ -211,6 +201,6 @@ class SimulationEngine:
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
-        self.manure_manager = ManureManager(self.animal_manager, self.weather, self.time, manure_class_config)
+        self.manure_manager = ManureManager(self.animal_manager.all_pens, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)

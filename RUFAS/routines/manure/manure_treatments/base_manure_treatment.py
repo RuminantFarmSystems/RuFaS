@@ -14,6 +14,9 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
@@ -84,6 +87,10 @@ class BaseManureTreatment(ABC):
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
         self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
+        try:
+            self.storage_time_period = self.config.storage_time_period
+        except AttributeError:
+            self.storage_time_period = None
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
@@ -173,6 +180,16 @@ class BaseManureTreatment(ABC):
             1 - self.config.volatile_solids_removal_efficiency_for_treatment
         )
 
+        liquid_manure_total_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        )
+
+        liquid_manure_total_non_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        )
+
         liquid_manure_phosphorus = manure_treatment_daily_input.liquid_manure_phosphorus * (
             1 - self.config.phosphorus_removal_efficiency_for_treatment
         )
@@ -190,6 +207,8 @@ class BaseManureTreatment(ABC):
             liquid_manure_nitrogen=liquid_manure_nitrogen,
             liquid_manure_total_solids=liquid_manure_total_solids,
             liquid_manure_total_volatile_solids=liquid_manure_total_volatile_solids,
+            liquid_manure_total_degradable_volatile_solids=liquid_manure_total_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=liquid_manure_total_non_degradable_volatile_solids,
             liquid_manure_phosphorus=liquid_manure_phosphorus,
             liquid_manure_potassium=liquid_manure_potassium,
             daily_final_manure_volume=final_manure_volume,
@@ -334,12 +353,32 @@ class BaseManureTreatment(ABC):
         precipitation = current_conditions.precipitation
         return precipitation * GeneralConstants.MM_TO_M
 
-    def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
-        """Accumulates the daily output of the manure treatment.
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+        """Adjust the accumulated output by either resetting it or adding the daily output to it.
 
-        Args:
-            manure_treatment_daily_output: A ManureTreatmentDailyOutput object containing
-                the daily output of the manure treatment.
+        Notes
+        -----
+
+        The accumulated output will be reset on the first day of every storage time period.
+
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
         """
-        self._accumulated_output += manure_treatment_daily_output
+        if self._sim_day % self.storage_time_period == 1:
+            if self._accumulated_output.pen_id >= 0:
+                ManureModuleOutputManagerHelper.add_dataclass_object(
+                    self._accumulated_output,
+                    info_maps={
+                        "class": self.__class__.__name__,
+                        "function": self._adjust_accumulated_output.__name__,
+                        "prefix": f"{self.__class__.__name__}_emptying_amount_pen_"
+                        f"{self._accumulated_output.pen_id}",
+                        "simulation_day": self._sim_day,
+                    },
+                )
+            self._accumulated_output = manure_treatment_daily_output.clone()
+        else:
+            self._accumulated_output += manure_treatment_daily_output
