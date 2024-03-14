@@ -432,7 +432,7 @@ class SoilData:
         Returns
         -------
         layered_attribute : list[any]
-            values of the specified attribute for each layer.
+            Values of the specified attribute for each layer.
 
         """
         return [getattr(layer, attribute) for layer in self.soil_layers]
