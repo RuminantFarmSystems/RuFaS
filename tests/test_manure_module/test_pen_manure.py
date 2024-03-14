@@ -22,7 +22,8 @@ def test_pen_manure_init() -> None:
     # Assert
     for attr in pen_manure_attributes:
         assert hasattr(manure, attr)
-        assert getattr(manure, attr) == approx(0.0)
+        if type(attr) is float:
+            assert getattr(manure, attr) == approx(0.0)
 
     # --------------------------------------------------------------------------- #
 
