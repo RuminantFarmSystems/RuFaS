@@ -33,7 +33,7 @@ class SoilConfigFactory:
             Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
             SoilData object is not provided (ha).
         config : SoilConfiguration
-            configuration of the soil.
+            Configuration of the soil.
 
         Returns
         -------
