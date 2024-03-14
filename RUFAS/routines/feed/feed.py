@@ -787,7 +787,7 @@ class Feed:
                             "storage_type": "bag",
                             "moisture": "direct_cut",
                             "additive": "preservative",
-                            "packing_density": 14,
+                            "packing_density": 200,
                             "inoculation": "heterofermentative",
                             "bunk_type": "open_floor",
                             "ventilation": True,
