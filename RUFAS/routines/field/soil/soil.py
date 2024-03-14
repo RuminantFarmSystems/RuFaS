@@ -61,7 +61,6 @@ class Soil:
         self.carbon_cycling = CarbonCycling(self.data)
         self.nitrogen_cycling = NitrogenCycling(self.data)
 
-        # Water components
         self.evaporation = Evaporation(self.data)
         self.infiltration = Infiltration(self.data)
         self.percolation = Percolation(self.data)
