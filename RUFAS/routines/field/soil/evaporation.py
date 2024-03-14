@@ -202,7 +202,7 @@ class Evaporation:
         Returns
         -------
         float
-            reduced evaporative demand for current layer based on how much water is in layer (mm).
+            Reduced evaporative demand for current layer based on how much water is in layer (mm).
 
         References
         ----------
