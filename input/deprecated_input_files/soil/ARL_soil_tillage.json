@@ -58,11 +58,9 @@
             "bulk_density": 1.34,
             "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_percent": 0.02,
             "labile_P": 23.7,
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
-            "denitrification_rate": 0.1,
             "soil_water_percent": 0.3,
             "OM_percent": 0.019
         },
@@ -78,11 +76,9 @@
             "bulk_density": 1.42,
             "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_percent": 0.02,
             "labile_P": 23.7,
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
-            "denitrification_rate": 0.1,
             "soil_water_percent": 0.3,
             "OM_percent": 0.019
         },
@@ -98,11 +94,9 @@
             "bulk_density": 1.6,
             "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_percent": 0.02,
             "labile_P": 23.7,
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
-            "denitrification_rate": 0.1,
             "soil_water_percent": 0.3,
             "OM_percent": 0.019
         },
@@ -118,11 +112,9 @@
             "bulk_density": 1.5,
             "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_percent": 0.02,
             "labile_P": 23.7,
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
-            "denitrification_rate": 0.1,
             "soil_water_percent": 0.3,
             "OM_percent": 0.019
         }
