@@ -56,7 +56,6 @@ class Soil:
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
-        # Process components
         self.soil_temp = SoilTemp(self.data)
         self.phosphorus_cycling = PhosphorusCycling(self.data)
         self.carbon_cycling = CarbonCycling(self.data)
