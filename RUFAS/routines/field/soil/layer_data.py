@@ -32,7 +32,7 @@ class LayerData:
     soil_water_concentration : float, optional, default 0.25
         Soil water concentration of the layer (mm water / mm soil).
     water_content : float, optional
-        Water present in the layer (mm). This field is initialized based on other parameters.
+        Water present in the layer (mm).
     field_capacity_water_concentration : float, optional, default 0.3
         Water concentration of soil layer at field capacity (mm water / mm soil).
     wilting_point_water_concentration : float, optional, default 0.2
