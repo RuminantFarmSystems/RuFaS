@@ -133,6 +133,14 @@ class BaseManureSeparator:
                 manure_separator_daily_input.liquid_manure_total_volatile_solids
                 * (1 - self.config.volatile_solids_removal_efficiency_for_separator)
             ),
+            liquid_manure_total_degradable_volatile_solids=(
+                manure_separator_daily_input.liquid_manure_total_degradable_volatile_solids
+                * (1 - self.config.volatile_solids_removal_efficiency_for_separator)
+            ),
+            liquid_manure_total_non_degradable_volatile_solids=(
+                manure_separator_daily_input.liquid_manure_total_non_degradable_volatile_solids
+                * (1 - self.config.volatile_solids_removal_efficiency_for_separator)
+            ),
             liquid_manure_nitrogen=(
                 manure_separator_daily_input.liquid_manure_nitrogen
                 * (1 - self.config.nitrogen_removal_efficiency_for_separator)
