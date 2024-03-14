@@ -444,7 +444,7 @@ class SoilData:
         Parameters
         ----------
         attribute : str
-            the LayerData attribute to set.
+            The LayerData attribute to set.
         values : list[any]
             values of the attribute to set for each layer.
 
