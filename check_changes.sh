@@ -25,3 +25,4 @@ if [ -z "$changed_files" ]; then
 fi
 
 flake8 $changed_files
+mypy $changed_files
