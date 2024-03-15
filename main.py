@@ -8,7 +8,6 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 """
 import argparse
 import random
-import sys
 import traceback
 from pathlib import Path
 from typing import List
@@ -65,7 +64,11 @@ def main():
             cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
-        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
+        output_manager.add_error(
+            "Early termination",
+            "Unexpected early termination of the simulation. Please see logs for details.\n",
+            info_map,
+        )
 
 
 def run_rufas(
@@ -124,9 +127,10 @@ def run_rufas(
     terminate_simulation_post_herd_generation: bool
         User input indicating whether to terminate the simulation after herd generation.
     """
-    sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     output_manager = OutputManager()
+    output_manager.set_log_verbose(verbose)
+    output_manager.print_credits()
     output_manager.create_directory(output_dir)
 
     if load_pool:
@@ -148,7 +152,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_files, exclude_info_maps, format_option, verbose, output_dir)
+        run_validation(metadata_files, exclude_info_maps, format_option, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -156,7 +160,6 @@ def run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
-            verbose,
             output_dir,
             filters_dir,
             csv_dir,
@@ -223,7 +226,6 @@ def run_validation(
     metadata_files: List[Path],
     exclude_info_maps: bool,
     format_option: str,
-    verbose: LogVerbosity,
     output_dir: Path,
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
@@ -236,8 +238,6 @@ def run_validation(
         Flag for whether the user wants to include info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
-    verbose : LogVerbosity
-        The verbose option set by the user.
     output_dir : Path
         The directory for saving output.
     """
@@ -252,7 +252,6 @@ def run_validation(
         "***Only validating data, no simulation will follow.***",
         info_map,
     )
-    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -368,7 +367,6 @@ def execute_simulations(
     produce_graphics: bool,
     graphics_dir: Path,
     format_option: str,
-    verbose: LogVerbosity,
     output_dir: Path,
     filters_dir: Path,
     csv_dir: Path,
@@ -392,8 +390,6 @@ def execute_simulations(
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
-    verbose : LogVerbosity
-        The verbose option set by the user.
     output_dir : Path
         The directory for saving output.
     filters_dir : Path
@@ -413,10 +409,8 @@ def execute_simulations(
         "class": "No caller class",
         "function": execute_simulations.__name__,
     }
-    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
-    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -428,7 +422,9 @@ def execute_simulations(
         output_manager.set_metadata_prefix(metadata_file["prefix"])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
+            output_manager.add_log(
+                "Validation complete", f"Data is valid. \nSimulating...{metadata_file['prefix']}" " scenario", info_map
+            )
             set_random_seed(input_manager)
             try:
                 initialize_herd(
@@ -464,7 +460,9 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
         error_count, warning_count = output_manager.get_error_and_warning_counts()
-        sys.stdout.write(f"{error_count} error(s) and {warning_count} warning(s) found.\n")
+        output_manager.add_log(
+            "error and warning count", f"{error_count} error(s) and " f"{warning_count} warning(s) found.\n", info_map
+        )
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
@@ -498,8 +496,8 @@ def parse_gnu_args() -> argparse.Namespace:
     parser.add_argument(
         "-v",
         "--verbose",
-        choices=["errors", "warnings", "logs", "none"],
-        default="none",
+        choices=["errors", "warnings", "logs", "credits", "none"],
+        default="credits",
         help="Specify the log type to be printed",
     )
     parser.add_argument(

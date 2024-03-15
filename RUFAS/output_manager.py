@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import date
 
 import json
 import os
@@ -24,36 +25,42 @@ class LogVerbosity(Enum):
     ----------
     NONE : str
         Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    CREDITS : str
+        Selecting CREDITS will tell OutputManager to print out the credits.
     ERRORS : str
-        Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+        Selecting ERRORS will tell OutputManager to print out all credits and errors added during a simulation.
     WARNINGS : str
-        Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+        Selecting WARNINGS will tell OutputManager to print out the credits as well as warnings and errors added during
+        a simulation.
     LOGS : str
-        Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+        Selecting LOGS will tell OutputManager to print out the credits as well as logs, warnings, and errors added
+        during a simulation.
 
     Notes
     -----
-    NONE is the default setting.
+    CREDITS is the default setting.
 
     """
 
     NONE = "none"
+    CREDITS = "credits"
     ERRORS = "errors"
     WARNINGS = "warnings"
     LOGS = "logs"
 
     def __le__(self, other) -> bool:
-        if self == other:
-            return True
-        if self == LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
-            return True
-        if self == LogVerbosity.LOGS:
+        order = {
+            LogVerbosity.NONE: 0,
+            LogVerbosity.CREDITS: 1,
+            LogVerbosity.ERRORS: 2,
+            LogVerbosity.WARNINGS: 3,
+            LogVerbosity.LOGS: 4,
+        }
+
+        if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
             return False
-        return False
+
+        return order[self] <= order[other]
 
     def __str__(self) -> str:
         if self.value == "none":
@@ -105,7 +112,7 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
-            self.__log_verbose: LogVerbosity = LogVerbosity("none")
+            self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -294,7 +301,7 @@ class OutputManager(object):
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.CREDITS) -> None:
         """Sets the __log_verbose attribute"""
         self.__log_verbose = log_verbose
 
@@ -1220,3 +1227,11 @@ class OutputManager(object):
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
         return errors_count, warnings_count
+
+    def print_credits(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            current_year = date.today().year
+            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model {current_year}\n")
