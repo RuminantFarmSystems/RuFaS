@@ -1900,3 +1900,129 @@ def test_print_credits(
     if log_verbose >= LogVerbosity.CREDITS:
         captured = capfd.readouterr()
         assert captured.out == "RuFaS: Ruminant Farm Systems Model 2024\n"
+
+
+@pytest.mark.parametrize(
+    "input_data,expected",
+    [
+        # Basic test case with a single data_origin per value
+        (
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                }
+            },
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                    "detailed_data_origins": [
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
+                    ],
+                }
+            },
+        ),
+        # Test case with multiple data_origin entries for a single value
+        (
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                }
+            },
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                    "detailed_data_origins": [
+                        [
+                            ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
+                            ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
+                        ],
+                        [("[SourceClassB.method_b]->[ModuleB.variable_y]", 40)],
+                    ],
+                }
+            },
+        ),
+        (
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+        ),
+        # Missing both keys
+        (
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+        ),
+        # Missing `info_maps` key
+        (
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+        ),
+        # Missing `values` key
+        (
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+        ),
+    ],
+)
+def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expected: Dict[str, Dict[str, Any]]) -> None:
+    """
+    Unit test for the _add_detailed_data_origin() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Act
+    result = output_manager._add_detailed_data_origin(input_data)
+
+    # Assert
+    assert result == expected
