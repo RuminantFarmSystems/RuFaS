@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 from copy import deepcopy
@@ -1877,21 +1878,25 @@ def test_get_error_and_warning_counts(
     assert om.get_error_and_warning_counts() == expected
 
 
-@patch('your_module.sys.stdout.write')
-@patch('your_module.date.today')
+@pytest.mark.parametrize(
+    "log_verbose",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
+@patch('RUFAS.output_manager.date')
 def test_print_credits(
-    mock_output_manager: OutputManager,
     mock_date,
-    mock_write
+    mock_output_manager: OutputManager,
+    log_verbose: LogVerbosity,
+    capfd
 ) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
     """
-    mock_date.return_value.year = 2024
-    mock_output_manager._OutputManager__log_verbose = LogVerbosity.CREDITS
-
-    # Act
+    mock_date.today.return_value = datetime(2024, 1, 1)
+    mock_output_manager._OutputManager__log_verbose = log_verbose
     mock_output_manager.print_credits()
 
     # Assert
-    mock_write.assert_called_once_with("RuFaS: Ruminant Farm Systems Model 2023\n")
+    if log_verbose >= LogVerbosity.CREDITS:
+        captured = capfd.readouterr()
+        assert captured.out == "RuFaS: Ruminant Farm Systems Model 2024\n"
