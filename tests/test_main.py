@@ -182,10 +182,16 @@ def test_main_exception_handling(mocker: MockerFixture) -> None:
     main()
 
     expected_calls = [
-        call("Dumping all logs from main.py because of error 'Test Error'", ANY,
-             {'class': 'No caller class', 'function': 'main'}),
-        call('Early termination', 'Unexpected early termination of the simulation. Please see logs for details.\n',
-             {'class': 'No caller class', 'function': 'main'})
+        call(
+            "Dumping all logs from main.py because of error 'Test Error'",
+            ANY,
+            {"class": "No caller class", "function": "main"},
+        ),
+        call(
+            "Early termination",
+            "Unexpected early termination of the simulation. Please see logs for details.\n",
+            {"class": "No caller class", "function": "main"},
+        ),
     ]
 
     # Assert
