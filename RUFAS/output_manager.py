@@ -293,7 +293,7 @@ class OutputManager(object):
                 metadata_prefix=self.__metadata_prefix,
                 name=name,
                 message=msg,
-                log_level=log_level.name.upper(),
+                log_level=log_level,
             )
             sys.stdout.write(formatted_msg)
 

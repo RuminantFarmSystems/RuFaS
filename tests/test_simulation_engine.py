@@ -32,7 +32,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
     patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    patch_for_sys_stdout_write = mocker.patch("RUFAS.simulation_engine.sys.stdout.write")
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
     simulation_engine.day_counter = 100
@@ -65,7 +64,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
-    patch_for_sys_stdout_write.assert_has_calls([mocker.call("\nSimulation Completed.\n\n")])
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:
@@ -173,45 +171,6 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "day, update_interval, expected_output, should_write",
-    [
-        # Day is a multiple of update_interval, should write first char
-        (0, 50, "-", True),
-        # Day is a multiple of update_interval, should write second char
-        (50, 50, "\\", True),
-        # Day is a multiple of update_interval, should write third char
-        (100, 50, "|", True),
-        # Day is a multiple of update_interval, should write fourth char
-        (150, 50, "/", True),
-        # Day is not a multiple of update_interval, should not write
-        (51, 50, "", False),
-    ],
-)
-def test_visualize_sim_progress(
-    mocker: MockerFixture,
-    day: int,
-    update_interval: int,
-    expected_output: str,
-    should_write: bool,
-) -> None:
-    """
-    Unit test for function _visualize_sim_progress in file RUFAS/simulation_engine.py
-    """
-
-    # Arrange
-    mock_stdout = mocker.patch("RUFAS.simulation_engine.sys.stdout")
-
-    # Act
-    SimulationEngine._visualize_sim_progress(day, update_interval)
-
-    # Assert
-    if should_write:
-        mock_stdout.write.assert_called_with(expected_output)
-    else:
-        mock_stdout.write.assert_not_called()
-
-
-@pytest.mark.parametrize(
     "end_year_side_effect, expected_day_count",
     [
         # Simulate 1 year end
@@ -234,7 +193,6 @@ def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, ex
     patch_for_run_pre_annual_routines = mocker.patch.object(simulation_engine, "_run_pre_annual_routines")
     patch_for_run_post_annual_routines = mocker.patch.object(simulation_engine, "_run_post_annual_routines")
     patch_for_daily_simulation = mocker.patch.object(simulation_engine, "_daily_simulation")
-    patch_for_visualize_sim_progress = mocker.patch.object(simulation_engine, "_visualize_sim_progress")
 
     simulation_engine.time = mocker.MagicMock()
     simulation_engine.time.end_year.side_effect = end_year_side_effect
@@ -244,7 +202,6 @@ def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, ex
 
     # Assert
     patch_for_run_pre_annual_routines.assert_called_once()
-    assert patch_for_visualize_sim_progress.call_count == expected_day_count
     assert patch_for_daily_simulation.call_count == expected_day_count
     patch_for_run_post_annual_routines.assert_called_once()
 
