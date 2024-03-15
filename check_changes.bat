@@ -48,7 +48,7 @@ exit /b 0
 REM Function to display usage.
 :display_usage
 echo Usage: check_changes.bat [BASEBRANCH]
-echo For all files different between current branch and BASEBRANCH, lint them with Flake8 and run MyPy on them.
+echo For all files that are different between the current branch and BASEBRANCH, lint them with Flake8 and run MyPy on them.
 echo.
 echo With no BASEBRANCH, compare the current branch to main.
 goto :eof
