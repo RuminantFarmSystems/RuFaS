@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 from copy import deepcopy
@@ -513,6 +514,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
     info_map = {"timestamp": "dummy_timestamp"}
     om = OutputManager()
     om.set_metadata_prefix("dummy_prefix")
+    om.set_log_verbose(log_level)
     om._handle_log_output(name, msg, info_map, log_level)
     log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
     expected_message = log_format.format(
@@ -578,6 +580,7 @@ def output_manager_original_method_states(
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
+        "print_credits": mock_output_manager.print_credits,
     }
 
 
@@ -937,12 +940,13 @@ def test_exclude_info_maps(
 
 
 @pytest.mark.parametrize(
-    "mock_file_text",
+    "mock_file_text,filter_by_exclusion",
     [
-        "apples\nbananas\ncherries",
-        "apples\nbananas\ncherries\n\n\n",
-        "apples\nbananas\n\n\n\ncherries",
-        "apples\nbananas\n\n\ncherries\n\n\n",
+        ("apples\nbananas\ncherries", False),
+        ("apples\nbananas\ncherries\n\n\n", False),
+        ("apples\nbananas\n\n\n\ncherries", False),
+        ("apples\nbananas\n\n\ncherries\n\n\n", False),
+        ("exclude\napples\nbananas\ncherries", True),
     ],
 )
 @patch("builtins.open", new_callable=mock_open)
@@ -951,11 +955,12 @@ def test_load_filter_file_content_txt(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     mock_file_text: str,
+    filter_by_exclusion: bool,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
-    assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": False}]
+    assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
@@ -1861,7 +1866,7 @@ def test_get_error_and_warning_counts(
     expected: tuple[int, int],
 ) -> None:
     """
-    Unit test for the get_error_and_warning_counts() method in OutputManager class
+    Unit test for the get_error_and_warning_counts() method in OutputManager class.
     """
 
     # Arrange
@@ -1871,6 +1876,30 @@ def test_get_error_and_warning_counts(
 
     # Act and Assert
     assert om.get_error_and_warning_counts() == expected
+
+
+@pytest.mark.parametrize(
+    "log_verbose",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
+@patch('RUFAS.output_manager.date')
+def test_print_credits(
+    mock_date,
+    mock_output_manager: OutputManager,
+    log_verbose: LogVerbosity,
+    capfd
+) -> None:
+    """
+    Unit test for the print_credits() method in OutputManager class.
+    """
+    mock_date.today.return_value = datetime(2024, 1, 1)
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_credits()
+
+    # Assert
+    if log_verbose >= LogVerbosity.CREDITS:
+        captured = capfd.readouterr()
+        assert captured.out == "RuFaS: Ruminant Farm Systems Model 2024\n"
 
 
 @pytest.mark.parametrize(
