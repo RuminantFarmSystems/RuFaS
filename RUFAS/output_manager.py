@@ -54,7 +54,7 @@ class LogVerbosity(Enum):
             LogVerbosity.CREDITS: 1,
             LogVerbosity.ERRORS: 2,
             LogVerbosity.WARNINGS: 3,
-            LogVerbosity.LOGS: 4
+            LogVerbosity.LOGS: 4,
         }
 
         if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
