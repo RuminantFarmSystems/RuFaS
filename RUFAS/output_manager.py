@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import date
 
 import json
 import os
@@ -279,7 +280,6 @@ class OutputManager(object):
         """
         colors: Dict[LogVerbosity, str] = {
             LogVerbosity.NONE: "\033[0m",
-            LogVerbosity.CREDITS: "\033[0m",
             LogVerbosity.ERRORS: "\33[91m",
             LogVerbosity.WARNINGS: "\33[93m",
             LogVerbosity.LOGS: "\33[92m",
@@ -1143,3 +1143,11 @@ class OutputManager(object):
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
         return errors_count, warnings_count
+
+    def print_credits(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            current_year = date.today().year
+            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model {current_year}\n")
