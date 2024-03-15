@@ -498,8 +498,8 @@ def parse_gnu_args() -> argparse.Namespace:
     parser.add_argument(
         "-v",
         "--verbose",
-        choices=["errors", "warnings", "logs", "none"],
-        default="none",
+        choices=["errors", "warnings", "logs", "credits", "none"],
+        default="credits",
         help="Specify the log type to be printed",
     )
     parser.add_argument(
