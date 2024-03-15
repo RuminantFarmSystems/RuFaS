@@ -1882,13 +1882,8 @@ def test_get_error_and_warning_counts(
     "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
-@patch('RUFAS.output_manager.date')
-def test_print_credits(
-    mock_date,
-    mock_output_manager: OutputManager,
-    log_verbose: LogVerbosity,
-    capfd
-) -> None:
+@patch("RUFAS.output_manager.date")
+def test_print_credits(mock_date, mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
     """

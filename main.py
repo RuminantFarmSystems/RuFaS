@@ -64,9 +64,11 @@ def main():
             cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
-        output_manager.add_error("Early termination",
-                                 "Unexpected early termination of the simulation. Please see logs for details.\n",
-                                 info_map)
+        output_manager.add_error(
+            "Early termination",
+            "Unexpected early termination of the simulation. Please see logs for details.\n",
+            info_map,
+        )
 
 
 def run_rufas(
@@ -420,8 +422,9 @@ def execute_simulations(
         output_manager.set_metadata_prefix(metadata_file["prefix"])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log("Validation complete", f"Data is valid. \nSimulating...{metadata_file['prefix']}"
-                                   " scenario", info_map)
+            output_manager.add_log(
+                "Validation complete", f"Data is valid. \nSimulating...{metadata_file['prefix']}" " scenario", info_map
+            )
             set_random_seed(input_manager)
             try:
                 initialize_herd(
@@ -457,8 +460,9 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
         error_count, warning_count = output_manager.get_error_and_warning_counts()
-        output_manager.add_log("error and warning count", f"{error_count} error(s) and "
-                               f"{warning_count} warning(s) found.\n", info_map)
+        output_manager.add_log(
+            "error and warning count", f"{error_count} error(s) and " f"{warning_count} warning(s) found.\n", info_map
+        )
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
