@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 import pytest
-from mock import patch
+from mock import ANY, call, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
@@ -165,12 +165,13 @@ def test_main(
             )
 
 
-def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
+def test_main_exception_handling(mocker: MockerFixture) -> None:
     """Test to check the handling of exceptions in the main function"""
     # Arrange
     mock_run_rufas = mocker.patch("main.run_rufas")
     mock_parse_gnu_args = mocker.patch("main.parse_gnu_args")
     mock_parse_gnu_args.return_value = mocker.MagicMock()
+    mock_parse_gnu_args.return_value.verbose = LogVerbosity.CREDITS
     mock_run_rufas.side_effect = RuntimeError("Test Error")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.add_error.return_value = None
@@ -180,12 +181,16 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
     # Act
     main()
 
+    expected_calls = [
+        call("Dumping all logs from main.py because of error 'Test Error'", ANY,
+             {'class': 'No caller class', 'function': 'main'}),
+        call('Early termination', 'Unexpected early termination of the simulation. Please see logs for details.\n',
+             {'class': 'No caller class', 'function': 'main'})
+    ]
+
     # Assert
-    mock_output_manager.add_error.assert_called_once()
+    mock_output_manager.add_error.assert_has_calls(expected_calls, any_order=False)
     mock_output_manager.dump_all_nondata_pools.assert_called_once()
-    captured = capsys.readouterr()
-    expected_message = "Unexpected early termination of the simulation. Please see logs for details."
-    assert expected_message in captured.out
 
 
 @pytest.mark.parametrize(
@@ -480,7 +485,6 @@ def test_run_rufas(
     save_animals_dir: str,
     terminate_simulation_post_herd_generation: bool,
     mocker: MockerFixture,
-    capsys,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
@@ -534,7 +538,6 @@ def test_run_rufas(
             metadata_file_list,
             exclude_info_maps,
             format_option,
-            verbose,
             output_dir,
         )
     else:
@@ -544,7 +547,6 @@ def test_run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
-            verbose,
             output_dir,
             filters_dir,
             csv_dir,
@@ -558,10 +560,6 @@ def test_run_rufas(
         assert mock_output_manager.clear_output_dir.call_count == 1
     else:
         assert mock_output_manager.clear_output_dir.call_count == 0
-
-    captured = capsys.readouterr()
-    expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
-    assert expected_message in captured.out
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
@@ -586,10 +584,9 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_input_manager.start_data_processing.return_value = is_data_valid
     exclude_info_maps = False
     format_option = "verbose"
-    verbose = LogVerbosity.NONE
     output_dir = Path("output/")
 
-    run_validation(metadata_file_list, exclude_info_maps, format_option, verbose, output_dir)
+    run_validation(metadata_file_list, exclude_info_maps, format_option, output_dir)
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
@@ -732,9 +729,7 @@ def test_execute_simulations(
     filters_dir = Path("output/output_filters/")
     csv_dir = Path("output/CSVs/")
     graphics_dir = Path("")
-    verbose = LogVerbosity("none")
     mock_output_manager.get_error_and_warning_counts.return_value = (1, 2)
-    patch_for_stdout_write = mocker.patch("main.sys.stdout.write")
 
     # Act
     execute_simulations(
@@ -743,7 +738,6 @@ def test_execute_simulations(
         produce_graphics=produce_graphics,
         graphics_dir=graphics_dir,
         format_option=format_option,
-        verbose=verbose,
         output_dir=output_dir,
         filters_dir=filters_dir,
         csv_dir=csv_dir,
@@ -775,9 +769,6 @@ def test_execute_simulations(
             csv_dir,
         ),
     ] * len(metadata_file_list)
-    patch_for_stdout_write.assert_has_calls(
-        [mocker.call("Simulating...\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
-    )
 
 
 @pytest.mark.parametrize(
@@ -833,7 +824,6 @@ def test_execute_simulations_raises_exception(
     filters_dir = Path("output/output_filters/")
     csv_dir = Path("output/CSVs/")
     graphics_dir = Path("")
-    verbose = LogVerbosity("none")
 
     # Act
     with pytest.raises(Exception):
@@ -843,7 +833,6 @@ def test_execute_simulations_raises_exception(
             produce_graphics=produce_graphics,
             graphics_dir=graphics_dir,
             format_option=format_option,
-            verbose=verbose,
             output_dir=output_dir,
             filters_dir=filters_dir,
             csv_dir=csv_dir,
@@ -962,8 +951,8 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         mocker.call(
             "-v",
             "--verbose",
-            choices=["errors", "warnings", "logs", "none"],
-            default="none",
+            choices=["errors", "warnings", "logs", "credits", "none"],
+            default="credits",
             help="Specify the log type to be printed",
         ),
         mocker.call(
