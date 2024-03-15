@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 import pytest
-from mock import patch
+from mock import ANY, call, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
@@ -171,6 +171,7 @@ def test_main_exception_handling(mocker: MockerFixture) -> None:
     mock_run_rufas = mocker.patch("main.run_rufas")
     mock_parse_gnu_args = mocker.patch("main.parse_gnu_args")
     mock_parse_gnu_args.return_value = mocker.MagicMock()
+    mock_parse_gnu_args.return_value.verbose = LogVerbosity.CREDITS
     mock_run_rufas.side_effect = RuntimeError("Test Error")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.add_error.return_value = None
@@ -180,8 +181,15 @@ def test_main_exception_handling(mocker: MockerFixture) -> None:
     # Act
     main()
 
+    expected_calls = [
+        call("Dumping all logs from main.py because of error 'Test Error'", ANY,
+             {'class': 'No caller class', 'function': 'main'}),
+        call('Early termination', 'Unexpected early termination of the simulation. Please see logs for details.\n',
+             {'class': 'No caller class', 'function': 'main'})
+    ]
+
     # Assert
-    mock_output_manager.add_error.assert_called()
+    mock_output_manager.add_error.assert_has_calls(expected_calls, any_order=False)
     mock_output_manager.dump_all_nondata_pools.assert_called_once()
 
 
@@ -552,11 +560,6 @@ def test_run_rufas(
         assert mock_output_manager.clear_output_dir.call_count == 1
     else:
         assert mock_output_manager.clear_output_dir.call_count == 0
-
-    # if verbose >= LogVerbosity.CREDITS:
-    #     captured = capsys.readouterr()
-    #     expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
-    #     assert expected_message in captured.out
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])

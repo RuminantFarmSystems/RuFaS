@@ -1880,7 +1880,7 @@ def test_get_error_and_warning_counts(
 
 @pytest.mark.parametrize(
     "log_verbose",
-    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+    [LogVerbosity.NONE, LogVerbosity.CREDITS, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 @patch("RUFAS.output_manager.date")
 def test_print_credits(mock_date, mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
