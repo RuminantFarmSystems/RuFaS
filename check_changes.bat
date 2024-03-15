@@ -34,6 +34,7 @@ IF EXIST ".\.changed_python_files.txt" (
     
     REM Run Flake8 on the changed Python files
     flake8 %changed_python_files%
+    mypy %changed_python_files%
 ) ELSE (
     call echo No Python files modified on this branch yet.
 )
