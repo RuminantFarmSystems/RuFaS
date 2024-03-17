@@ -17,6 +17,7 @@ from RUFAS.routines.animal.manure.general_manure import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -230,7 +231,7 @@ class Pen:
         # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
         self.populated = False
 
-        self.classes_in_pen = set()
+        # self.classes_in_pen = set()
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -307,6 +308,11 @@ class Pen:
 
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
+
+        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
+        else:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
 
     @property
     def current_stocking_density(self) -> float:
@@ -396,14 +402,14 @@ class Pen:
         self.animal_combination = animal_combination
 
     # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    def update_classes_in_pen(self) -> None:
-        """
-        Updates the classes contained within the pen
-        """
-        self.classes_in_pen = set()
-        for animal in list(self.animals_in_pen.values()):
-            life_cycle_stage = type(animal).__name__
-            self.classes_in_pen.add(life_cycle_stage)
+    # def update_classes_in_pen(self) -> None:
+    #     """
+    #     Updates the classes contained within the pen
+    #     """
+    #     self.classes_in_pen = set()
+    #     for animal in list(self.animals_in_pen.values()):
+    #         life_cycle_stage = type(animal).__name__
+    #         self.classes_in_pen.add(life_cycle_stage)
 
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
@@ -421,7 +427,7 @@ class Pen:
         self.update_pen_populated()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        self.update_classes_in_pen()
+        # self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -533,10 +539,14 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if "Cow" in self.classes_in_pen:
+        if AnimalType.DRY_COW or AnimalType.LAC_COW in list(self.animal_grouping_scenario.values()):
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+        # if "Cow" in self.classes_in_pen:
+        #     for animal in list(self.animals_in_pen.values()):
+        #         if type(animal).__name__ == "Cow":
+        #             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
         """
