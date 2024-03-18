@@ -1882,19 +1882,17 @@ def test_get_error_and_warning_counts(
     "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.CREDITS, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
-@patch("RUFAS.output_manager.date")
-def test_print_credits(mock_date, mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
+def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
     """
-    mock_date.today.return_value = datetime(2024, 1, 1)
     mock_output_manager._OutputManager__log_verbose = log_verbose
     mock_output_manager.print_credits()
 
     # Assert
     if log_verbose >= LogVerbosity.CREDITS:
         captured = capfd.readouterr()
-        assert captured.out == "RuFaS: Ruminant Farm Systems Model 2024\n"
+        assert captured.out == "RuFaS: Ruminant Farm Systems Model.\n"
 
 
 @pytest.mark.parametrize(

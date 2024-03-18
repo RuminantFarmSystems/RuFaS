@@ -1233,5 +1233,4 @@ class OutputManager(object):
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            current_year = date.today().year
-            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model {current_year}\n")
+            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
