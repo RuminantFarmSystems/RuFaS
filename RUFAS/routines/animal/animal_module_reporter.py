@@ -254,19 +254,6 @@ class AnimalModuleReporter:
                 simulation_day,
                 info_map,
             )
-            avg_nutrient_rqmts_units = {
-                "NEmaint_requirement": "Mcal",
-                "NEa_requirement": "Mcal",
-                "NEg_requirement": "Mcal",
-                "NEpreg_requirement": "Mcal",
-                "NEl_requirement": "Mcal",
-                "MP_requirement": "g",
-                "Ca_requirement": "g",
-                "P_req": "g",
-                "DMIest_requirement": "kg",
-                "avg_BW": "kg",
-                "avg_milk_production_reduction_pen": "kg/animal",
-            }
             om.add_variable(
                 f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
                 pen.avg_nutrient_rqmts,
@@ -280,7 +267,6 @@ class AnimalModuleReporter:
                 simulation_day,
                 info_map,
             )
-            ration_per_animal_units = {key: "kg" for key in ration_per_animal.keys()}
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_per_animal,
