@@ -369,7 +369,7 @@ class Cow(HeiferIII):
         body weight during lactation, and dry matter intake
         are coded here with equations containing hard-coded parameters
         just to validate the simulation model. They indicate places for future adjustment
-        in regards to ration formulation and economics calculation. 
+        in regards to ration formulation and economics calculation.
 
         References
         ------
