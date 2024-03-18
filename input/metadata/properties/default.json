@@ -1954,7 +1954,7 @@
       "properties": {  
         "type": "number",
         "minimum": 0,
-        "default": 300
+        "default": 306
       }
     },
     "corn_silage_tillage_emissions": {
@@ -3068,7 +3068,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300,
+        "maximum": 306,
         "default": 155
       }
     },
@@ -3078,7 +3078,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "close_up_feeds": {
@@ -3087,7 +3087,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "lac_cow_feeds": {
@@ -3096,7 +3096,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "purchased_feeds": {
@@ -3108,7 +3108,7 @@
           "type": "number",
           "description": "Purchased Feed",
           "minimum": 1,
-          "maximum": 300
+          "maximum": 306
         },
         "purchased_feed_cost": {
           "type": "number",
@@ -3123,7 +3123,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "storage_options": {
@@ -3201,7 +3201,7 @@
             "type": "number",
             "description": "Calf Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 155
           },
           "ration_percentage": {
@@ -3221,7 +3221,7 @@
             "type": "number",
             "description": "Growing Heifers Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -3241,7 +3241,7 @@
             "type": "number",
             "description": "Close UP Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -3261,7 +3261,7 @@
             "type": "number",
             "description": "Lactating Cow Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
