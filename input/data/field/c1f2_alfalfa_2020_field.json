@@ -4,6 +4,7 @@
   "crop_specification": "Alfalfa 2020 Crop data",
   "manure_management_specification": "Alfalfa 2020 Manure schedule",
   "tillage_management_specification": "Alfalfa 2020 Tillage schedule",
+  "fertilizer_management_specification": "no_fert",
   "field_size": 540,
   "absolute_latitude": 46.1429,
   "longitude": 120.0370,
