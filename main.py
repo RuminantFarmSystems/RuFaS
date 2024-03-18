@@ -60,7 +60,7 @@ def main():
             info_map,
         )
         output_manager.dump_all_nondata_pools(
-            Path(cmd_arguments.output_dir),
+            cmd_arguments.output_dir,
             cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
