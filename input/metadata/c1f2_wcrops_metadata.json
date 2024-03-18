@@ -73,7 +73,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/c1f2_weather.csv",
+      "path": "input/data/weather/barnyard_100yr.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -97,7 +97,6 @@
       "path": "input/data/fertilizer_schedule/no_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
-    }
     },
     "Corn 2020 Crop data": {
       "title": "Corn 2020 Crop data",
@@ -189,6 +188,6 @@
       "path": "input/data/tillage_schedule/c1f2_alfalfa_2020_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
-    },
+    }},
   "cross-validation": {}
 }
