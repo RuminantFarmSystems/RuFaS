@@ -134,7 +134,7 @@ class Storage:
         float
             The amount of dry matter lost to gas.
         """
-        pass
+        
 
     def calculate_dry_matter_loss_to_effluent(
         self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
