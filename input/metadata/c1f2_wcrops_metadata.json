@@ -129,7 +129,7 @@
     "Corn 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_corn_2020_crop_field.json",
+      "path": "input/data/field/c1f2_corn_2020_field.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -143,7 +143,7 @@
     "Wheat 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_wheat_2020_crop_field.json",
+      "path": "input/data/field/c1f2_wheat_2020_field.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -171,7 +171,7 @@
     "Alfalfa 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_alfalfa_2020_crop_field.json",
+      "path": "input/data/field/c1f2_alfalfa_2020_field.json",
       "type": "json",
       "properties": "field_properties"
     },
