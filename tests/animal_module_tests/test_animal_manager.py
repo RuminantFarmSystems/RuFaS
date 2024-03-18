@@ -1904,8 +1904,8 @@ def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     mock_pen_0.calc_manure = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.reset_manure = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mocked_pens = [mock_pen_0, mock_pen_1]
 
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
@@ -1972,8 +1972,8 @@ def test_calc_p_rqmts(mocker: MockerFixture) -> None:
     mock_pen_0.call_p_rqmts = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.call_p_rqmts = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mock_pens = [mock_pen_0, mock_pen_1]
     mock_animal_manager.all_pens = mock_pens
     # Act
@@ -1991,8 +1991,8 @@ def test_daily_p_update(mocker: MockerFixture) -> None:
     mock_pen_0.daily_p_update = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.daily_p_update = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mock_pens = [mock_pen_0, mock_pen_1]
     mock_animal_manager.all_pens = mock_pens
     # Act
