@@ -2458,50 +2458,34 @@ def test_add_variable_to_pool_valid(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    is_dict_variable: bool,
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
-    mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 0,
-        "is_valid": True,
-    }
+    """Unit test for add_variable_to_pool() method in file input_manager.py with valid data."""
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=True)
     expected_add_warning_count = 1 if starting_im_pool else 0
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result = mock_input_manager._add_variable_to_pool(
-                    variable_name=variable_name,
-                    data=data,
-                    properties_blob_key=properties_blob_key,
-                    eager_termination=False,
-                    is_variable_dict=is_dict_variable,
-                )
+    # Act
+    result = input_manager._add_variable_to_pool(
+        variable_name=variable_name,
+        input_data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
 
-    assert result is True
-    assert mock_om_add_log.call_count == 4
-    assert mock_om_add_warning.call_count == expected_add_warning_count
-    assert mock_om_add_error.call_count == 0
-    assert variable_name in mock_input_manager._InputManager__pool
-    assert mock_input_manager.get_data(variable_name) == data
-
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+    # Assert
+    assert result
+    assert patch_for_add_warning.call_count == expected_add_warning_count
+    assert patch_for_add_error.call_count == 0
+    assert variable_name in getattr(input_manager, "_InputManager__pool")
+    assert input_manager.get_data(variable_name) == data
 
 
 @pytest.mark.parametrize(
@@ -2600,38 +2584,31 @@ def test_add_variable_to_pool_invalid(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    is_dict_variable: bool,
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
-    mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
+    """
+    Unit test for add_variable_to_pool() method in file input_manager.py with invalid data.
+    """
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result = mock_input_manager._add_variable_to_pool(
-                    variable_name=variable_name,
-                    data=data,
-                    properties_blob_key=properties_blob_key,
-                    eager_termination=False,
-                    is_variable_dict=is_dict_variable,
-                )
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=False)
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    mock_elements_counter = mocker.MagicMock()
+    mock_elements_counter.invalid_elements = 1
+    mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
+
+    # Act
+    result = input_manager._add_variable_to_pool(
+        variable_name=variable_name,
+        input_data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
 
     # Assert
     assert result is False
@@ -2641,11 +2618,7 @@ def test_add_variable_to_pool_invalid(
     if starting_im_pool:
         assert starting_im_pool[variable_name] == input_manager.get_data(variable_name)
     else:
-        assert variable_name not in mock_input_manager._InputManager__pool
-
-    mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
-    mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
+        assert variable_name not in getattr(input_manager, "_InputManager__pool")
 
 
 @pytest.mark.parametrize(
@@ -2744,39 +2717,32 @@ def test_add_variable_to_pool_eager_termination(
     data: Any,
     properties_blob_key: str,
     starting_im_pool: Dict[str, Any],
-    is_dict_variable: bool,
-    mock_input_manager: InputManager,
     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
-    mock_input_manager._InputManager__metadata = mock_metadata_for_add_variable_to_pool
-    mock_input_manager._InputManager__pool = starting_im_pool
-    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
-    mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {
-        "fixed_elements": 1,
-        "valid_elements": 1,
-        "total_elements": 1,
-        "invalid_elements": 1,
-        "is_valid": False,
-    }
+    """
+    Unit test for add_variable_to_pool() method in file input_manager.py with eager_termination=True.
+    """
 
-    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                with pytest.raises(ValueError):
-                    mock_input_manager._add_variable_to_pool(
-                        variable_name=variable_name,
-                        data=data,
-                        properties_blob_key=properties_blob_key,
-                        eager_termination=True,
-                        is_variable_dict=is_dict_variable,
-                    )
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
+    mocker.patch.object(input_manager, "_dict_type_validator", return_value=False)
+    mock_elements_counter = mocker.MagicMock()
+    mock_elements_counter.invalid_elements = 1
+    mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+
+    # Act
+    with pytest.raises(ValueError):
+        input_manager._add_variable_to_pool(
+            variable_name=variable_name,
+            input_data=data,
+            properties_blob_key=properties_blob_key,
+            eager_termination=True,
+        )
 
     # Assert
     assert patch_for_add_warning.call_count == 0
