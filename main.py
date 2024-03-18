@@ -423,7 +423,7 @@ def execute_simulations(
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log(
-                "Validation complete", f"Data is valid. \nSimulating...{metadata_file['prefix']}" " scenario", info_map
+                "Validation complete", f"Data is valid. Simulating {metadata_file['prefix']} scenario", info_map
             )
             set_random_seed(input_manager)
             try:
