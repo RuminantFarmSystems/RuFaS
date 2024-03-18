@@ -89,12 +89,12 @@ class AnimalManager:
 
     def __init__(
         self,
-        data,
+        data: Dict[str, Any],
         feed: Feed,
         weather: Weather,
         time: Time,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
-    ):
+    ) -> None:
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -102,7 +102,7 @@ class AnimalManager:
 
         Parameters
         ----------
-        data : Dict
+        data : Dict[str, Any]
             dictionary with animal information from the input JSON file
         feed : Feed
             instance of the Feed class
@@ -468,7 +468,6 @@ class AnimalManager:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
                 pen.remove_animals_by_ids([animal.id])
-                pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
     def track_former_pen_population(self) -> List[int]:
@@ -587,10 +586,7 @@ class AnimalManager:
             group = animal_type_mapping_dict.get(animal_class)["animal_group"]
 
             candidate_pens = self.pens_by_animal_combination[group]
-            pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
-
-            new_pen_population = (pen_for_insert.stocking_density * pen_for_insert.num_stalls) + 1
-            pen_for_insert.stocking_density = new_pen_population / pen_for_insert.num_stalls
+            pen_for_insert = min(candidate_pens, key=lambda p: p.current_stocking_density)
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(
@@ -781,15 +777,68 @@ class AnimalManager:
             max_stocking_density=max_stocking_density,
         )
 
-    def _create_default_pens_for_potential_space_shortage(
+    @classmethod
+    def _create_duplicate_pen(
+        cls,
+        pen_id: int,
+        animal_combination: AnimalCombination,
+        num_stalls: int,
+        max_stocking_density: float,
+        reference_pen: Pen,
+    ) -> Pen:
+        """
+        Duplicate a Pen object using a handful of parameters and a reference Pen.
+
+        Parameters
+        ----------
+        pen_id : int
+            The unique identifier for the pen.
+        animal_combination : AnimalCombination
+            The animal combination for the pen.
+        num_stalls : int
+            The number of stalls in the pen.
+        max_stocking_density : float
+            The maximum stocking density for the pen.
+        reference_pen : Pen
+            Pen object that has more animals than available space.
+
+        Returns
+        -------
+        Pen
+            A new Pen object with the specified parameters and duplicate values for other attributes of reference pen.
+
+        """
+
+        return Pen(
+            pen_id=pen_id,
+            pen_name=str(pen_id),
+            vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
+            horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
+            number_of_stalls=num_stalls,
+            housing_type=reference_pen.housing_type,
+            bedding_type=reference_pen.bedding_type,
+            pen_type=reference_pen.pen_type,
+            manure_handling=reference_pen.manure_handling,
+            manure_separator=reference_pen.manure_separator,
+            manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
+            manure_storage=reference_pen.manure_storage,
+            animal_combination=animal_combination,
+            max_stocking_density=max_stocking_density,
+        )
+
+    def _create_additional_pens_for_potential_space_shortage(
         self,
         num_animals: int,
         pens: List[Pen],
         animal_combination: AnimalCombination,
-        start_pen_id=0,
+        start_pen_id: int = 0,
     ) -> List[Pen]:
         """
-        Create a list of default pens to accommodate potential animal space shortage.
+        Create a list of additional pens to accommodate potential animal space shortage.
+
+        This method defines the first pen in the pens list as the 'reference' pen, which means that it uses those
+        attributes as a template for the creation of new pens. This assumes the incoming pen list is uniform, as they
+        are the same AnimalCombination.
 
         Parameters
         ----------
@@ -799,8 +848,8 @@ class AnimalManager:
             A list of Pen objects representing the currently available pens.
         animal_combination : AnimalCombination
             The animal combination for the new default pens.
-        start_pen_id : int, optional, default=0
-            The starting pen ID for the new default pens. The default value is 0.
+        start_pen_id : int, default=0
+            The starting pen ID for the new pens.
 
         Returns
         -------
@@ -810,27 +859,32 @@ class AnimalManager:
         """
 
         animal_space_shortage = self._calc_animal_space_shortage(num_animals=num_animals, pens=pens)
-        new_default_pens: List[Pen] = []
+        additional_pens: List[Pen] = []
 
         if animal_space_shortage > 0:
-            num_stalls_per_pen = self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
-            max_stocking_density = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
-
-            max_animal_spaces_per_default_pen = self._calc_max_animal_spaces_per_pen(
-                num_stalls=num_stalls_per_pen, max_stocking_density=max_stocking_density
+            reference_pen = pens[0]
+            max_stocking_density = reference_pen.max_stocking_density
+            num_stalls_custom_pen = int(math.ceil(animal_space_shortage * max_stocking_density))
+            num_stalls_per_additional_pen = min(
+                self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination], num_stalls_custom_pen
             )
-            num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
-            for i in range(num_new_default_pens):
-                new_default_pens.append(
-                    self._create_default_pen(
+
+            max_animal_spaces_per_additional_pen = self._calc_max_animal_spaces_per_pen(
+                num_stalls=num_stalls_per_additional_pen, max_stocking_density=max_stocking_density
+            )
+            num_new_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_additional_pen)
+            for i in range(num_new_pens):
+                additional_pens.append(
+                    self._create_duplicate_pen(
                         pen_id=start_pen_id + i,
                         animal_combination=animal_combination,
-                        num_stalls=num_stalls_per_pen,
+                        num_stalls=num_stalls_per_additional_pen,
                         max_stocking_density=max_stocking_density,
+                        reference_pen=reference_pen,
                     )
                 )
 
-        return new_default_pens
+        return additional_pens
 
     @classmethod
     def _calc_density(cls, num_animals: int, num_spaces: int) -> float:
@@ -1068,7 +1122,7 @@ class AnimalManager:
             animals_by_combination[animal_combination].append(animal)
 
         for animal_combination, animals in animals_by_combination.items():
-            new_default_pens = self._create_default_pens_for_potential_space_shortage(
+            new_default_pens = self._create_additional_pens_for_potential_space_shortage(
                 num_animals=len(animals),
                 pens=self.pens_by_animal_combination[animal_combination],
                 animal_combination=animal_combination,
@@ -1621,7 +1675,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1701,7 +1755,7 @@ class AnimalManager:
                 self.clear_pens()
                 self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)
-                AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
+                AnimalModuleReporter.report_ration_interval_data(self.all_pens, feed, self.simulation_day)
                 self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":

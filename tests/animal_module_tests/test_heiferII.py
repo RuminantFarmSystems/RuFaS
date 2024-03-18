@@ -132,15 +132,15 @@ def test_compare_randomized_rate_less_than(
     "event_day, sim_day, event_note",
     [
         # Normal case
-        (100, 120, "Test Event 1"),
-        # Event day 0
-        (0, 1, "Event Day 0"),
+        (100, 120, "Test BaseFieldManagementEvent 1"),
+        # BaseFieldManagementEvent day 0
+        (0, 1, "BaseFieldManagementEvent Day 0"),
         # Simulation day 0
         (1, 0, "Simulation Day 0"),
         # End of first year
-        (365, 365, "End of Year Event"),
+        (365, 365, "End of Year BaseFieldManagementEvent"),
         # Negative event day
-        (-1, 0, "Negative Event Day"),
+        (-1, 0, "Negative BaseFieldManagementEvent Day"),
         # Negative simulation day
         (0, -1, "Negative Simulation Day"),
     ],
