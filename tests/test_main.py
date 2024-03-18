@@ -19,6 +19,7 @@ from main import (
     run_validation,
     METADATA_PATHS,
     initialize_herd,
+    set_random_seed,
 )
 
 
