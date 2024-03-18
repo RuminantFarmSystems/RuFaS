@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union, Tuple
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -55,7 +55,7 @@ class LogVerbosity(Enum):
             return False
         return False
 
-    def __str__(self) -> bool:
+    def __str__(self) -> str:
         if self.value == "none":
             return "NONE"
         return self.value[:-1].upper()
@@ -379,21 +379,105 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
+                data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         indent=2,
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
             raise e
+
+    def _add_detailed_data_origin(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Adds a `detailed_data_origins` list to each sub-dictionary that has information about data origins.
+
+        Notes
+        -----
+        This method iterates over each key in the provided dictionary. For keys that correspond to
+        dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
+        named `detailed_data_origins`. This list contains details about the data origin, including the class name,
+        function name, and the key itself, paired with each corresponding value from the `values` list.
+        The format used for detailing the origin is "[class_name.function_name]->[key]",
+        where `class_name` and `function_name` are derived from the `data_origin`
+        entries within `info_maps`.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The input dictionary containing keys that may map to other dictionaries with `info_maps` and `values` keys.
+            `info_maps` should contain a list of dictionaries, each with a `data_origin` key indicating the source
+            of the data. `values` should contain a list of values corresponding to these origins.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The modified dictionary with a `detailed_data_origins` list added to each sub-dictionary that meets the
+            criteria. This list provides detailed information on the origin of each value.
+
+        Examples
+        --------
+        >>> example_data_dict = {
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals": {
+        ...         "info_maps": [
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"},
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"}
+        ...         ],
+        ...         "values": [193, 194]
+        ...     }
+        ... }
+        >>> output_manager = OutputManager()
+        >>> modified_data_dict = output_manager._add_detailed_data_origin(example_data_dict)
+        >>> assert modified_data_dict[
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_data_origins"
+        ... ] == [
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     193)],
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     194)]
+        ... ]
+        """
+
+        for key in data_dict:
+            if not isinstance(data_dict[key], dict):
+                continue
+
+            sub_data_dict = data_dict[key]
+            if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+                continue
+
+            if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+                continue
+
+            data_origins: List[List[Tuple[str, str]]] = []
+            for info_map in sub_data_dict["info_maps"]:
+                if "data_origin" not in info_map:
+                    break
+                data_origins.append(info_map["data_origin"])
+
+            if len(data_origins) != len(sub_data_dict["values"]):
+                continue
+
+            detailed_data_origins: List[List[Tuple[str, Any]]] = []
+            for index, value in enumerate(sub_data_dict["values"]):
+                detailed_origin_for_value = []
+                for origin in data_origins[index]:
+                    class_name, function_name = origin
+                    origin_key = f"[{class_name}.{function_name}]->[{key}]"
+                    detailed_origin_for_value.append((origin_key, value))
+                detailed_data_origins.append(detailed_origin_for_value)
+
+            sub_data_dict["detailed_data_origins"] = detailed_data_origins
+
+        return data_dict
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
@@ -611,7 +695,10 @@ class OutputManager(object):
                         result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = [element for element in filter_file.read().splitlines() if element]
-                    result = [{"filters": list_of_elements}]
+                    filter_by_exclusion = list_of_elements[0] == "exclude"
+                    if filter_by_exclusion:
+                        list_of_elements.pop(0)
+                    result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
                 else:
                     raise Exception("Unsupported file format; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
@@ -629,9 +716,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(
-        self, filter_patterns: List[str], input_file_name: Optional[str]
-    ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -661,27 +746,22 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._filter_variables_pool.__name__,
         }
-        exclude_keyword_location = 0
-        exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
+        filter_name = filter_content.get("filter_name", "NO_NAME")
         if filter_by_exclusion:
-            filter_vars_msg = (
-                f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
-                f" position {exclude_keyword_location}. Performing filtering by exclusion."
-            )
+            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_vars_msg = (
-                f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
-                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
-            )
-        filter_pattern_matches = Utility.filter_pool(self.variables_pool, filter_patterns, filter_by_exclusion)
-        self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = (
-            f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter pattern(s) in the {input_file_name} file."
+            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+        self.add_log("filtering_log", filter_excl_msg, info_map)
+        filtered_pool = Utility.filter_dictionary(
+            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
         )
-        self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
-        return filter_pattern_matches
+        self.add_log(
+            "num_filter_pattern_matches",
+            f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
+            info_map,
+        )
+        return filtered_pool
 
     def save_results(
         self,
@@ -757,11 +837,16 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
+                    filtered_pool = self._filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                    if filter_content.get("graph_details"):
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["produce_graphics"] = produce_graphics
+                        filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:
@@ -819,10 +904,7 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
+                        filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
                     self._route_logs(log_pool)
                 except Exception as e:
@@ -1003,10 +1085,10 @@ class OutputManager(object):
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.variables_pool = {}
+        self.warnings_pool = {}
+        self.errors_pool = {}
+        self.logs_pool = {}
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
