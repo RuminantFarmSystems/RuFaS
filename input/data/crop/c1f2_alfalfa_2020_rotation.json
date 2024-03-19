@@ -45,7 +45,7 @@
         },
 
         {
-            "crop_species": "wheat_silage",
+            "crop_species": "winter_wheat_silage",
             "planting_years": [2003],
             "pattern_repeat": 3,
             "planting_skip": 6,
