@@ -174,7 +174,7 @@ class Storage:
         """
         raise NotImplementedError("Cannot use Storage.calculate_heat_generated, use a child class.")
 
-    def calculate_bale_density(self, initial_dry_matter: float) -> float:
+    def calculate_bale_density(self, moisture_at_baling: float) -> float:
         """
         Calculates the density of a bale.
 
@@ -189,7 +189,7 @@ class Storage:
             The density of the bale.
 
         """
-        raise NotImplementedError("Cannot use Storage.calculate_bale_density, use a child class.")
+        return 100 + 440 * (moisture_at_baling)
 
     def recalculate_nutrient_fractions(self) -> None:
         """
