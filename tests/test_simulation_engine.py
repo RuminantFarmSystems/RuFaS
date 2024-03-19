@@ -7,19 +7,33 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.time import Time
 
 
-def test_simulation_engine_init(mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "auto_generate_simulation_day, expected_set_callback_call_count",
+    [
+        (True, 1),
+        (False, 0),
+    ],
+)
+def test_simulation_engine_init(
+    auto_generate_simulation_day: bool, expected_set_callback_call_count: int, mocker: MockerFixture
+) -> None:
     """
     Unit test for the __init__ method in the SimulationEngine class.
     """
 
     # Arrange
     mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
+    patch_for_get_data = mocker.patch("RUFAS.simulation_engine.im.get_data", return_value=auto_generate_simulation_day)
+    patch_for_callback = mocker.patch("RUFAS.simulation_engine.om.set_get_simulation_day_callback")
 
     # Act
-    _ = SimulationEngine()
+    simulation_engine = SimulationEngine()
 
     # Assert
+    assert simulation_engine.day_counter == 0
     mock_initialize_simulation.assert_called_once()
+    patch_for_get_data.assert_called_once_with("config.auto_generate_simulation_day")
+    assert patch_for_callback.call_count == expected_set_callback_call_count
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
