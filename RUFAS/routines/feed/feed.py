@@ -138,7 +138,7 @@ class Feed:
             for dict in self.user_defined_ration_percentages["growing"]
         }
         if not math.isclose(
-            sum(udrm.calf_ration.values()),
+            sum(udrm.growing_ration.values()),
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
@@ -153,7 +153,7 @@ class Feed:
             for dict in self.user_defined_ration_percentages["close_up"]
         }
         if not math.isclose(
-            sum(udrm.calf_ration.values()),
+            sum(udrm.close_up_ration.values()),
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
@@ -168,7 +168,7 @@ class Feed:
             for dict in self.user_defined_ration_percentages["lac_cow"]
         }
         if not math.isclose(
-            sum(udrm.calf_ration.values()),
+            sum(udrm.lactating_cow_ration.values()),
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
