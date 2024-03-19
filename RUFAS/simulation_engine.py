@@ -54,6 +54,9 @@ class SimulationEngine:
         self.day_counter: int = 0
         self._initialize_simulation()
 
+        if im.get_data("config.auto_generate_simulation_day"):
+            om.set_get_simulation_day_callback(lambda: self.day_counter)
+
     def simulate(self) -> None:
         """
         Executes the simulation.
