@@ -91,17 +91,13 @@ class Storage:
         storage_crop = copy.deepcopy(crop)
         self.stored.append(storage_crop)
 
-    def process_degradations(self):
+    def process_degradations(self) -> None:
         """
         Processes the degradations and losses of the stored crops.
-
-        Returns
-        -------
-        None
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.process_degradations, use a child class.")
 
-    def give_feed(self, amount: float, crop_type: CropType):
+    def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
         Gives out a specified amount of feed of a certain crop type.
 
@@ -133,12 +129,13 @@ class Storage:
         -------
         float
             The amount of dry matter lost to gas.
+
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class.")
 
     def calculate_dry_matter_loss_to_effluent(
         self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
-    ):
+    ) -> float:
         """
         Calculates the dry matter loss to effluent.
 
@@ -155,18 +152,15 @@ class Storage:
         -------
         float
             The amount of dry matter lost to effluent.
-        """
-        pass
 
-    def calculate_protein_degradation(self):
+        """
+        raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class.")
+
+    def calculate_protein_degradation(self) -> None:
         """
         Calculates protein degradation.
-
-        Returns
-        -------
-        None
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.calculate_protein_degradation, use a child class.")
 
     def calculate_heat_generated(self) -> float:
         """
@@ -176,8 +170,9 @@ class Storage:
         -------
         float
             The total sensible heat generated in kJ/kg.
+
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.calculate_heat_generated, use a child class.")
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
@@ -192,15 +187,12 @@ class Storage:
         -------
         float
             The density of the bale.
-        """
-        pass
 
-    def recalculate_nutrient_fractions(self):
+        """
+        raise NotImplementedError("Cannot use Storage.calculate_bale_density, use a child class.")
+
+    def recalculate_nutrient_fractions(self) -> None:
         """
         Recalculates the relative nutrient concentrations after dry matter loss.
-
-        Returns
-        -------
-        None
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.recalculate_nutrient_fractions, use a child class.")
