@@ -1,6 +1,5 @@
 # !/usr/bin/env python3
 
-import sys
 import time as timer
 from enum import Enum
 from typing import Optional
@@ -82,7 +81,7 @@ class SimulationEngine:
         )
         t_end_sim = timer.time()
 
-        sys.stdout.write("\nSimulation Completed.\n\n")
+        om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
@@ -96,7 +95,6 @@ class SimulationEngine:
         """
         The main loop for simulation.
         """
-
         while not self.time.end_simulation():
             self._annual_simulation()
 
@@ -146,32 +144,12 @@ class SimulationEngine:
         self.annual_reset()
         self.time.advance()
 
-    @staticmethod
-    def _visualize_sim_progress(day: int, update_interval: int = 50) -> None:
-        """
-        Shows a rotating char on console to confirm simulation is alive.
-
-        Parameters
-        ----------
-        day : int
-            day of year
-        update_interval : int, optional, default=50
-            the interval at which the char symbol is updated. Default is 50 days.
-        """
-
-        chars = ["-", "\\", "|", "/"]
-        if day % update_interval == 0:
-            sys.stdout.write("\b")
-            sys.stdout.write(chars[(day // update_interval) % len(chars)])
-
     def _annual_simulation(self) -> None:
         """
         Executes the annual simulation routines.
         """
-
         self._run_pre_annual_routines()
         while not self.time.end_year():
-            self._visualize_sim_progress(self.time.day)
             self._daily_simulation()
 
         self._run_post_annual_routines()
