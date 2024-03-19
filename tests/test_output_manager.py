@@ -1997,3 +1997,25 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+def test_set_get_simulation_day_callback() -> None:
+    """
+    Unit test for the set_get_simulation_day_callback() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    mock_callback = MagicMock()
+
+    # Act
+    output_manager.set_get_simulation_day_callback(mock_callback)
+
+    # Assert
+    assert output_manager._get_simulation_day_callback == mock_callback
+
+    # Act
+    output_manager.set_get_simulation_day_callback(None)
+
+    # Assert
+    assert output_manager._get_simulation_day_callback is None
