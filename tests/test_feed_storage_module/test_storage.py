@@ -77,7 +77,9 @@ def test_process_degradations(storage: Storage) -> None:
     """
     Test the process_degradations method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.process_degradations()
+    assert "Cannot use Storage.process_degradations, use a child class." in str(e.value)
 
 
 def test_give_feed(storage: Storage) -> None:
@@ -91,39 +93,51 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_gas method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_dry_matter_loss_to_gas(100.0, 30)
+    assert "Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class." in str(e.value)
 
 
 def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_dry_matter_loss_to_effluent(100.0, 10.0, 30)
+    assert "Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class." in str(e.value)
 
 
 def test_calculate_protein_degradation(storage: Storage):
     """
     Test the calculate_protein_degradation method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_protein_degradation()
+    assert "Cannot use Storage.calculate_protein_degradation, use a child class." in str(e.value)
 
 
 def test_calculate_heat_generated(storage: Storage):
     """
     Test the calculate_heat_generated method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_heat_generated()
+    assert "Cannot use Storage.calculate_heat_generated, use a child class." in str(e.value)
 
 
 def test_calculate_bale_density(storage: Storage):
     """
     Test the calculate_bale_density method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_bale_density(50.0)
+    assert "Cannot use Storage.calculate_bale_density, use a child class." in str(e.value)
 
 
 def test_recalculate_nutrient_fractions(storage: Storage):
     """
     Test the recalculate_nutrient_fractions method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.recalculate_nutrient_fractions()
+    assert "Cannot use Storage.recalculate_nutrient_fractions, use a child class." in str(e.value)
