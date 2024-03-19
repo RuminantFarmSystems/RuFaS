@@ -6,5 +6,5 @@
     "simulate_animals": true,
     "nutrient_standard": "NASEM",
     "FIPS_county_code": 55025,
-    "auto_generate_simulation_day": true
+    "auto_generate_simulation_day": false
 }
