@@ -40,6 +40,11 @@
       "maximum": 56045,
       "default": null,
       "description": "Unique 5-digit code that represents a specific U.S. county."
+    },
+    "auto_generate_simulation_day": {
+        "type": "bool",
+        "description": "Whether or not to automatically associate a simulation day with each output value if one is not provided",
+        "default": false
     }
   },
   "animal_properties": {
