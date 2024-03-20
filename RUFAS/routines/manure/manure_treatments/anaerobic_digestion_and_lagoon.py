@@ -31,10 +31,10 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
     """
 
     def __init__(
-        self,
-        weather,
-        time,
-        manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
+            self,
+            weather,
+            time,
+            manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self.storage_time_period = self.config[1].storage_time_period
@@ -74,20 +74,19 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             else None
         )
 
-        self._adjust_accumulated_output(
-            ManureTreatmentDailyOutput.from_manure_separator_daily_output(
-                self._manure_separator_after_digestion_daily_output
-            )
-            or self.anaerobic_digestion_daily_output
-        )
-
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
             manure_handler_daily_output=self._manure_handler_daily_output,
-            manure_treatment_daily_input=self._accumulated_output,
+            manure_treatment_daily_input=self._manure_separator_after_digestion_daily_output or self.anaerobic_digestion_daily_output,
             pen=self._current_pen,
             sim_day=self._sim_day,
         )
 
-        self._accumulated_output = anaerobic_lagoon_daily_output
+        self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = \
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids
+
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = \
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+
 
         return anaerobic_lagoon_daily_output
