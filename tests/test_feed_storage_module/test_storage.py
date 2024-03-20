@@ -107,31 +107,32 @@ def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
     assert "Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class." in str(e.value)
 
 
-def test_calculate_protein_degradation(storage: Storage):
-    """
-    Test the calculate_protein_degradation method of the Storage class.
-    """
-    with pytest.raises(NotImplementedError) as e:
-        storage.calculate_protein_degradation()
-    assert "Cannot use Storage.calculate_protein_degradation, use a child class." in str(e.value)
-
-
-def test_calculate_heat_generated(storage: Storage):
+@pytest.mark.parametrize("moisture,density,expected", [
+    (0.0, 100.0, 0.0),
+    (7.5, 600.0, 233813.848370),
+    (25.0, 10_000.0, 13327549.589989),
+])
+def test_calculate_heat_generated(storage: Storage, moisture: float, density: float, expected: float) -> None:
     """
     Test the calculate_heat_generated method of the Storage class.
     """
-    with pytest.raises(NotImplementedError) as e:
-        storage.calculate_heat_generated()
-    assert "Cannot use Storage.calculate_heat_generated, use a child class." in str(e.value)
+    actual = storage.calculate_heat_generated(moisture, density)
+
+    assert pytest.approx(actual) == expected
 
 
-def test_calculate_bale_density(storage: Storage):
+@pytest.mark.parametrize("moisture,expected", [
+    (0.0, 100.0),
+    (10.0, 4500.0),
+    (25.0, 11100.0)
+])
+def test_calculate_bale_density(storage: Storage, moisture: float, expected: float) -> None:
     """
     Test the calculate_bale_density method of the Storage class.
     """
-    with pytest.raises(NotImplementedError) as e:
-        storage.calculate_bale_density(50.0)
-    assert "Cannot use Storage.calculate_bale_density, use a child class." in str(e.value)
+    actual = storage.calculate_bale_density(moisture)
+
+    assert actual == expected
 
 
 def test_recalculate_nutrient_fractions(storage: Storage):
