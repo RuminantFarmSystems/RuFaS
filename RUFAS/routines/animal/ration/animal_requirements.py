@@ -129,6 +129,7 @@ class AnimalRequirements:
             list of milk_production_reduction values for all animals in the pen (kg)
         calc_method: str
             The summary statistic to be used (e.g. mean, median, etc)
+
         """
 
         attr_names_to_args_map = {

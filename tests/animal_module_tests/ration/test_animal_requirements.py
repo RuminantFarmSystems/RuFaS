@@ -14,6 +14,7 @@ def test_default_initialization() -> None:
 
     This test checks that when a AnimalRequirements object is instantiated without
     any parameters, all its attributes are correctly set to their default values.
+
     """
 
     # Act
@@ -181,6 +182,7 @@ def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: s
 
     This test checks that when a calc_pen_requirements() function is called, the correct value is set for a pen's
     requirement based on some list of cow values and a statistical method.
+
     """
     animal_requirements = AnimalRequirements()
     animal_requirements.calc_pen_requirements(*argument_lists, stat_method)
