@@ -1850,48 +1850,77 @@ def test_log_verbosity_enum_values() -> None:
 
 
 @pytest.mark.parametrize(
-    "errors_pool, warnings_pool, expected",
+    "errors_pool, warnings_pool, logs_pool, expected",
     [
-        ({}, {}, (0, 0)),
-        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
-        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
-        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
+        ({}, {}, {}, (0, 0, 0)),
+        ({"key1": {"values": [1, 2, 3]}}, {}, {}, (3, 0, 0)),
+        ({}, {"key1": {"values": [1, 2]}}, {}, (0, 2, 0)),
+        ({}, {}, {"key1": {"values": [1, 2, 3, 4]}}, (0, 0, 4)),
+        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, {}, (3, 4, 0)),
+        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}},
+         {"key1": {"values": [1, 2, 3]}}, (3, 4, 3)),
     ],
 )
 def test_get_error_and_warning_counts(
     mocker: MockerFixture,
     errors_pool: dict[str, dict[str, list]],
     warnings_pool: dict[str, dict[str, list]],
+    logs_pool: dict[str, dict[str, list]],
     expected: tuple[int, int],
 ) -> None:
     """
-    Unit test for the get_error_and_warning_counts() method in OutputManager class.
+    Unit test for the _get_errors_warnings_logs_counts() method in OutputManager class.
     """
 
     # Arrange
     om = OutputManager()
     mocker.patch.object(om, "errors_pool", errors_pool)
     mocker.patch.object(om, "warnings_pool", warnings_pool)
+    mocker.patch.object(om, "logs_pool", logs_pool)
 
     # Act and Assert
-    assert om.get_error_and_warning_counts() == expected
+    assert om._get_errors_warnings_logs_counts() == expected
 
 
 @pytest.mark.parametrize(
-    "log_verbose",
-    [LogVerbosity.NONE, LogVerbosity.CREDITS, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+    "log_verbose, expected_output",
+    [
+        (LogVerbosity.NONE, ""),
+        (LogVerbosity.CREDITS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n")
+    ],
 )
-def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
+def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str,
+                       capfd) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
     mock_output_manager.print_credits()
 
-    # Assert
-    if log_verbose >= LogVerbosity.CREDITS:
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+
+@pytest.mark.parametrize(
+    "log_verbose, expected_output",
+    [
+        (LogVerbosity.NONE, ""),
+        (LogVerbosity.CREDITS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.ERRORS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.WARNINGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.LOGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+    ]
+)
+def test_print_errors_warnings_logs(mock_output_manager: OutputManager, log_verbose: LogVerbosity,
+                                    expected_output: str, capfd):
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
+        mock_output_manager.print_errors_warnings_logs_counts()
         captured = capfd.readouterr()
-        assert captured.out == "RuFaS: Ruminant Farm Systems Model.\n"
+        assert captured.out == expected_output
 
 
 @pytest.mark.parametrize(
