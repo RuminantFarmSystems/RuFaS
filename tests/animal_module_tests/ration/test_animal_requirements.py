@@ -8,7 +8,7 @@ from pytest import approx
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 
-def test_default_initialization():
+def test_default_initialization() -> None:
     """
     Test the default initialization of the AnimalRequirements class.
 
@@ -175,7 +175,7 @@ def test_default_initialization():
          [73.2, 92.8, 92.4, 84.0, 95.6, 96.0, 68.4, 94.3, 75.4, 88.6, 76.7, 9.1, 5.0]),
     ]
 )
-def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: str, expected: List[float]):
+def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: str, expected: List[float]) -> None:
     """
     Test the calc_pen_requirement() method across varying statistical methods within the AnimalRequirements class.
 
