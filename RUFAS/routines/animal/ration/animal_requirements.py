@@ -1,13 +1,13 @@
+from typing import Dict, List
+
 import math
 import numpy as np
 
-from typing import Dict, List
-
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 om = OutputManager()
 
@@ -96,8 +96,8 @@ class AnimalRequirements:
         calc_method: str = "mean",
     ) -> None:
         """
-        This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats
-        generated in ration_driver.set_requirements
+        This functions sets the average (or median or #th percentile) pen requirements. Each input parameter is a list
+        of floats generated in ration_driver.set_requirements
 
         Parameters
         ----------
@@ -130,37 +130,34 @@ class AnimalRequirements:
         calc_method: str
             The summary statistic to be used (e.g. mean, median, etc)
         """
-        if calc_method == "mean":
-            # populating the class variables as an average across cows for each requirement
-            self.NEmaint_requirement = np.mean(NEmaint_requirement_list)
-            self.NEa_requirement = np.mean(NEa_requirement_list)
-            self.NEg_requirement = np.mean(NEg_requirement_list)
-            self.NEpreg_requirement = np.mean(NEpreg_requirement_list)
-            self.NEl_requirement = np.mean(NEl_requirement_list)
-            self.MP_requirement = np.mean(MP_requirement_list)
-            self.Ca_requirement = np.mean(Ca_requirement_list)
-            self.P_requirement = np.mean(P_requirement_list)
-            self.DMIest_requirement = np.mean(DMIest_requirement_list)
-            self.avg_BW = np.mean(BW)
-            self.avg_milk = np.mean(milk)
-            self.avg_CP_milk = np.mean(CP_milk)
-            self.avg_milk_production_reduction = np.mean(milk_production_reduction)
-        else:
-            # here we'd implement another method, e.g. percentile, median, etc.
-            requirement_percentile = 90
-            self.NEmaint_requirement = np.percentile(NEmaint_requirement_list, requirement_percentile)
-            self.NEa_requirement = np.percentile(NEa_requirement_list, requirement_percentile)
-            self.NEg_requirement = np.percentile(NEg_requirement_list, requirement_percentile)
-            self.NEpreg_requirement = np.percentile(NEpreg_requirement_list, requirement_percentile)
-            self.NEl_requirement = np.percentile(NEl_requirement_list, requirement_percentile)
-            self.MP_requirement = np.percentile(MP_requirement_list, requirement_percentile)
-            self.Ca_requirement = np.percentile(Ca_requirement_list, requirement_percentile)
-            self.P_requirement = np.percentile(P_requirement_list, requirement_percentile)
-            self.DMIest_requirement = np.percentile(DMIest_requirement_list, requirement_percentile)
-            self.avg_BW = np.percentile(BW, requirement_percentile)
-            self.avg_milk = np.percentile(milk, requirement_percentile)
-            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
+
+        attr_names_to_args_map = {
+            'NEmaint_requirement': NEmaint_requirement_list,
+            'NEa_requirement': NEa_requirement_list,
+            'NEg_requirement': NEg_requirement_list,
+            'NEpreg_requirement': NEpreg_requirement_list,
+            'NEl_requirement': NEl_requirement_list,
+            'MP_requirement': MP_requirement_list,
+            'Ca_requirement': Ca_requirement_list,
+            'P_requirement': P_requirement_list,
+            'DMIest_requirement': DMIest_requirement_list,
+            'avg_BW': BW,
+            'avg_milk': milk,
+            'avg_CP_milk': CP_milk,
+            'avg_milk_production_reduction': milk_production_reduction,
+        }
+
+        calc_method_to_function_map = {
+            "mean": np.mean,
+            "median": np.median,
+            "percentile": np.percentile,
+        }
+
+        default_percentile = 90
+        stats_args = [default_percentile] if calc_method == 'percentile' else []
+
+        for attribute_name, arg in attr_names_to_args_map.items():
+            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
         """
@@ -309,9 +306,8 @@ class AnimalRequirements:
             animal.DMIest_requirement = req["DMIest_requirement"]
             # these animal class variables are only used for grouping purposes
             if animal_type in [AnimalType.LAC_COW]:
-                animal.DNED_requirement = (
-                    req["NEmaint_requirement"] + req["NEl_requirement"]
-                ) / animal.DMIest_requirement
+                animal.DNED_requirement = (req["NEmaint_requirement"]
+                                           + req["NEl_requirement"]) / animal.DMIest_requirement
                 animal.DMDP_requirement = (req["MP_requirement"]) / animal.DMIest_requirement
 
                 # calculating the activity requirement for energy
@@ -319,7 +315,7 @@ class AnimalRequirements:
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
-                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
+                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
                 requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
@@ -370,7 +366,7 @@ class AnimalRequirements:
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
-                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
+                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
                 requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
@@ -748,7 +744,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
         """
         if day_of_pregnancy is None:
-            net_energy_maintenance = 0.10 * body_weight**0.75
+            net_energy_maintenance = 0.10 * body_weight ** 0.75
             gravid_uterine_weight = 0.0
             uterine_weight = 0.0
         else:
@@ -851,7 +847,7 @@ class AnimalRequirements:
         EQEBW = 0.891 * equivalent_shrunk_body_weight
         # [A.Cow.A.14]-[A.Heifer.A.15]
         # Net energy for growth requirement (Mcal)
-        net_energy_growth = 0.0635 * EQEBW**0.75 * EQEBG**1.097
+        net_energy_growth = 0.0635 * EQEBW ** 0.75 * EQEBG ** 1.097
         return net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight
 
     def calculate_NASEM_energy_growth_requirements(
@@ -1413,7 +1409,7 @@ class AnimalRequirements:
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
         # [A.Cow.C.2]-[A.Heifer.C.2]
         # Calcium growth requirement (g)
-        Ca_growth = 9.83 * mature_body_weight**0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
+        Ca_growth = 9.83 * mature_body_weight ** 0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
         # [A.Cow.C.3]-[A.Heifer.C.3]
         # Calcium pregnancy requirement (g)
         if day_of_pregnancy is None:
@@ -1493,7 +1489,7 @@ class AnimalRequirements:
         """
         Ca_Maint = 0.90 * dry_matter_intake_estimate
         if parity <= 2:
-            Ca_Growth = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
+            Ca_Growth = ((9.83 * mature_body_weight ** -0.22) * body_weight ** -0.22) * average_daily_gain
         else:
             Ca_Growth = 0.0
         if day_of_pregnancy is None:
@@ -1549,7 +1545,7 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+        P_growth = (1.2 + 4.635 * mature_body_weight ** 0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
         if day_of_pregnancy is None:
             P_preg = 0.0
         elif day_of_pregnancy > 190:
@@ -1640,7 +1636,7 @@ class AnimalRequirements:
         else:
             P_Maint = 0.0
         if parity <= 2:
-            P_Growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
+            P_Growth = (1.2 + 4.635 * mature_body_weight ** 0.22 * body_weight ** -0.22) * average_daily_gain
         else:
             P_Growth = 0.0
         if day_of_pregnancy is None:
@@ -1714,7 +1710,7 @@ class AnimalRequirements:
 
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
+            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) * (
                 1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
             )
         elif animal_type in [AnimalType.DRY_COW]:
@@ -1725,7 +1721,7 @@ class AnimalRequirements:
             else:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
-                body_weight**0.75 * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use) / DivFact
+                body_weight ** 0.75 * (0.2435 * DivFact - 0.0466 * DivFact ** 2 - value_to_use) / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
