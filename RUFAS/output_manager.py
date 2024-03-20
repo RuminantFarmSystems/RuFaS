@@ -938,14 +938,25 @@ class OutputManager(object):
         """
         for log in log_pool:
             if "error" in log:
-                if isinstance(log["error"], str) and isinstance(log["message"], str) and isinstance(log["info_map"], dict):
+                if (
+                    isinstance(log["error"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
                     self.add_error(log["error"], log["message"], log["info_map"])
             elif "log" in log:
-                if isinstance(log["log"], str) and isinstance(log["message"], str) and isinstance(log["info_map"], dict):
+                if (
+                    isinstance(log["log"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
                     self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
-                if isinstance(log["warning"], str) and isinstance(log["message"], str) and isinstance(log["info_map"],
-                                                                                                    dict):
+                if (
+                    isinstance(log["warning"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
