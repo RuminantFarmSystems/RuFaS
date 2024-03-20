@@ -194,6 +194,30 @@ class Storage:
         """
         return 100 + 440 * (moisture_at_baling)
 
+    def estimate_maximum_effluent(self, dry_matter_percentage: float, fresh_mass: float) -> float:
+        """
+        Estimates the maximum effluence of a stored crop.
+
+        Parameters
+        ----------
+        dry_matter_percentage : float
+            Percentage of a stored crop's fresh mass that is dry matter.
+        fresh_mass : float
+            Fresh mass of a stored crop in kg.
+
+        Returns
+        -------
+        float
+            Estimated maximum effluent of the stored crop.
+
+        """
+        dry_matter_fraction = dry_matter_percentage / 100
+
+        if dry_matter_fraction >= 0.3:
+            return 0.0
+
+        return fresh_mass * ((1 - dry_matter_fraction) - 0.7)
+
     def recalculate_nutrient_fractions(self) -> None:
         """
         Recalculates the relative nutrient concentrations after dry matter loss.

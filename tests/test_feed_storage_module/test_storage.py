@@ -107,11 +107,14 @@ def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
     assert "Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class." in str(e.value)
 
 
-@pytest.mark.parametrize("moisture,density,expected", [
-    (0.0, 100.0, 0.0),
-    (7.5, 600.0, 233813.848370),
-    (25.0, 10_000.0, 13327549.589989),
-])
+@pytest.mark.parametrize(
+    "moisture,density,expected",
+    [
+        (0.0, 100.0, 0.0),
+        (7.5, 600.0, 233813.848370),
+        (25.0, 10_000.0, 13327549.589989),
+    ],
+)
 def test_calculate_heat_generated(storage: Storage, moisture: float, density: float, expected: float) -> None:
     """
     Test the calculate_heat_generated method of the Storage class.
@@ -121,11 +124,7 @@ def test_calculate_heat_generated(storage: Storage, moisture: float, density: fl
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("moisture,expected", [
-    (0.0, 100.0),
-    (10.0, 4500.0),
-    (25.0, 11100.0)
-])
+@pytest.mark.parametrize("moisture,expected", [(0.0, 100.0), (10.0, 4500.0), (25.0, 11100.0)])
 def test_calculate_bale_density(storage: Storage, moisture: float, expected: float) -> None:
     """
     Test the calculate_bale_density method of the Storage class.
@@ -133,6 +132,25 @@ def test_calculate_bale_density(storage: Storage, moisture: float, expected: flo
     actual = storage.calculate_bale_density(moisture)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "dry_matter,mass,expected",
+    [
+        (31, 100.0, 0.0),
+        (30, 100.0, 0.0),
+        (25, 200.0, 10.0),
+        (1, 150.0, 43.5),
+        (0, 250.0, 75.0),
+    ],
+)
+def test_estimate_maximum_effluent(storage: Storage, dry_matter: float, mass: float, expected: float) -> None:
+    """
+    Test the estimate_maximum_effluent method of the Storage class.
+    """
+    actual = storage.estimate_maximum_effluent(dry_matter, mass)
+
+    assert pytest.approx(actual) == expected
 
 
 def test_recalculate_nutrient_fractions(storage: Storage):
