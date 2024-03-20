@@ -1,5 +1,5 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
-[![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
+[![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/a
 [![Coverage](https://img.shields.io/badge/coverage-94%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 [![Mypy](https://img.shields.io/badge/mypy-4424%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/mypy_type_checker.yml)
 

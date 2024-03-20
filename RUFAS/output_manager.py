@@ -1213,19 +1213,20 @@ class OutputManager(object):
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
 
-    def get_error_and_warning_counts(self) -> tuple[int, int]:
+    def _get_errors_warnings_logs_counts(self) -> tuple[int, int, int]:
         """
-        Get the total number of errors and warnings in the output manager's error and warning pools.
+        Get the total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
 
         Returns
         -------
-        tuple[int, int]
-            The total number of errors and warnings in the output manager's error and warning pools.
+        tuple[int, int, int]
+            The total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
-        return errors_count, warnings_count
+        logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
+        return errors_count, warnings_count, logs_count
 
     def print_credits(self) -> None:
         """
@@ -1233,3 +1234,11 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def print_errors_warnings_logs_counts(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
+            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
