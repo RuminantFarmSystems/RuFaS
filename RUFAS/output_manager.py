@@ -321,10 +321,14 @@ class OutputManager(object):
             raise KeyError("'function' was not found in info_map")
 
         prefix = ""
-        if info_map.get("prefix") is not None:
-            prefix = info_map.get("prefix") + "."
+        prefix_value = info_map.get("prefix")
+        if isinstance(prefix_value, str):
+            prefix = prefix_value + "."
         elif not info_map.get("suppress_prefix", False):
-            prefix = self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            class_value = info_map.get("class")
+            function_value = info_map.get("function")
+            if isinstance(class_value, str) and isinstance(function_value, str):
+                prefix = self._get_prefix(class_value, function_value) + "."
 
         suffix = f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
 
@@ -934,11 +938,15 @@ class OutputManager(object):
         """
         for log in log_pool:
             if "error" in log:
-                self.add_error(log["error"], log["message"], log["info_map"])
+                if isinstance(log["error"], str) and isinstance(log["message"], str) and isinstance(log["info_map"], dict):
+                    self.add_error(log["error"], log["message"], log["info_map"])
             elif "log" in log:
-                self.add_log(log["log"], log["message"], log["info_map"])
+                if isinstance(log["log"], str) and isinstance(log["message"], str) and isinstance(log["info_map"], dict):
+                    self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
-                self.add_warning(log["warning"], log["message"], log["info_map"])
+                if isinstance(log["warning"], str) and isinstance(log["message"], str) and isinstance(log["info_map"],
+                                                                                                    dict):
+                    self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
