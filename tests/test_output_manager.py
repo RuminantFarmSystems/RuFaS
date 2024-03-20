@@ -1890,9 +1890,9 @@ def test_get_error_and_warning_counts(
         (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
         (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
         (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n")
-        ],
+    ],
 )
-def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, 
+def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str,
                        capfd) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
