@@ -1857,8 +1857,12 @@ def test_log_verbosity_enum_values() -> None:
         ({}, {"key1": {"values": [1, 2]}}, {}, (0, 2, 0)),
         ({}, {}, {"key1": {"values": [1, 2, 3, 4]}}, (0, 0, 4)),
         ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, {}, (3, 4, 0)),
-        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}},
-         {"key1": {"values": [1, 2, 3]}}, (3, 4, 3)),
+        (
+            {"key1": {"values": [1]}, "key2": {"values": [2, 3]}},
+            {"key1": {"values": [1, 2, 3, 4]}},
+            {"key1": {"values": [1, 2, 3]}},
+            (3, 4, 3),
+        ),
     ],
 )
 def test_get_error_and_warning_counts(
@@ -1889,11 +1893,12 @@ def test_get_error_and_warning_counts(
         (LogVerbosity.CREDITS, "RuFaS: Ruminant Farm Systems Model.\n"),
         (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
         (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n")
+        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n"),
     ],
 )
-def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str,
-                       capfd) -> None:
+def test_print_credits(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+) -> None:
     """
     Unit test for the print_credits() method in OutputManager class.
     """
@@ -1912,10 +1917,11 @@ def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbo
         (LogVerbosity.ERRORS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
         (LogVerbosity.WARNINGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
         (LogVerbosity.LOGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-    ]
+    ],
 )
-def test_print_errors_warnings_logs(mock_output_manager: OutputManager, log_verbose: LogVerbosity,
-                                    expected_output: str, capfd):
+def test_print_errors_warnings_logs(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+):
     mock_output_manager._OutputManager__log_verbose = log_verbose
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
         mock_output_manager.print_errors_warnings_logs_counts()
