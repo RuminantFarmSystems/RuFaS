@@ -13,9 +13,7 @@
     "harvest_operations": [
       "harvest_kill"
     ],
-    "harvest_type": [
-      "optimal"
-    ],
+    "harvest_type": "optimal",
     "planting_days": [
       89
     ],
@@ -39,9 +37,7 @@
     "harvest_operations": [
       "harvest_kill"
     ],
-    "harvest_type": [
-      "scheduled"
-    ],
+    "harvest_type": "scheduled",
     "planting_days": [
       127
     ],

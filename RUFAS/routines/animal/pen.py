@@ -47,10 +47,6 @@ class Pen:
         The number of stalls.
         Obtained from the input file.
 
-    stocking_density : float
-        The stocking density of the pen.
-        Calculated when animals in pen are updated in update_animals()
-
     housing_type : string
         The housing type of the pen.
         Obtained from the input file.
@@ -89,9 +85,6 @@ class Pen:
 
     classes_in_pen : set
         The set (no repeats) of all the classes to which the animals in the pen belong.
-
-    populated : bool
-        True iff there is at least 1 animal in the pen, and false otherwise.
 
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
@@ -231,12 +224,8 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-        # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
-        self.populated = False
 
         self.classes_in_pen = set()
-        # TODO: To be removed. Use the property 'current_stocking_density' instead. GitHub Issue #1206
-        self.stocking_density = 0.0
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -314,8 +303,6 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
-    # TODO: (Not used yet) Use this property instead of self.stocking_density because it is dynamically calculated
-    # GitHub Issue #1206
     @property
     def current_stocking_density(self) -> float:
         """
@@ -386,18 +373,6 @@ class Pen:
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
 
-    def update_pen_populated(self) -> None:
-        """
-        Updates whether the pen is populated
-        """
-        self.populated = len(self.animals_in_pen) != 0
-
-    def update_stocking_density(self) -> None:
-        """
-        Updates the stocking density of the pen
-        """
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls
-
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
@@ -432,15 +407,42 @@ class Pen:
         """
 
         self.add_new_animals(new_animals)
-        self.update_pen_populated()
-        self.update_stocking_density()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
+    def manure_sums(
+        self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
+    ) -> Tuple[Dict[float, int], Dict[float, int]]:
+        """
+        Accumulator helper function for calc_manure.
+        The function finds sums of manure components for each
+        animal in the pen and the total manure for each animal type.
+
+        Parameters
+        ----------
+        manure: Dict[float, int]
+            A dictionary that contains the the accumulated manure excretion values for all animals
+        curr_manure: AnimalManureExcretions
+            A dictionary that contains the manure excretion values used to update the manure and animal dictionaries
+            in the AnimalManureExcretions class definition.
+        animal_dict: Dict[float, int]
+            A dictionary that contains the manure excretion values for specific animals in the pen
+
+        Returns
+        -------
+        Tuple[Dict[float, int], Dict[float, int]]
+            A tuple containing the updated manure dictionary and the updated animal dictionary.
+        """
+
+        for key in manure.keys():
+            manure[key] += curr_manure[key]
+            animal_dict[key] += curr_manure[key]
+        return manure, animal_dict
+
     def calc_manure(self, feed, methane_model: str):  # noqa
         """
-        Calculate the manure excretion of the animals in the pen.
+        Calculates the manure excretion of the animals in the pen.
 
         Parameters
         ----------
@@ -474,25 +476,16 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
-        # TODO: Write an accumulator function GitHub Issue # 1211
         for animal in animals:
             curr_manure = animal.manure_excretion
             if type(animal) == Calf:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    calf_total[key] += curr_manure[key]
+                manure, calf_total = self.manure_sums(manure, curr_manure, calf_total)
             elif type(animal) in [HeiferI, HeiferII, HeiferIII]:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    heifer_total[key] += curr_manure[key]
+                manure, heifer_total = self.manure_sums(manure, curr_manure, heifer_total)
             elif type(animal) == Cow and not animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    dry_total[key] += curr_manure[key]
+                manure, dry_total = self.manure_sums(manure, curr_manure, dry_total)
             elif type(animal) == Cow and animal.milking:  # noqa
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    lactating_total[key] += curr_manure[key]
+                manure, lactating_total = self.manure_sums(manure, curr_manure, lactating_total)
 
         self.manure = manure
         self.calf_total = calf_total
@@ -515,7 +508,7 @@ class Pen:
         Calculates the average growth of the animals in the pen.
         """
 
-        if not self.populated:
+        if not self.is_populated:
             return
 
         total_growth = 0
@@ -706,7 +699,6 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = {}
-        self.populated = False
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):

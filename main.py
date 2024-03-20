@@ -8,9 +8,7 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 """
 import argparse
 import random
-import sys
 import traceback
-from typing import Dict, Any
 from pathlib import Path
 from typing import List
 
@@ -62,11 +60,15 @@ def main():
             info_map,
         )
         output_manager.dump_all_nondata_pools(
-            Path(cmd_arguments.output_dir),
+            cmd_arguments.output_dir,
             cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
-        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
+        output_manager.add_error(
+            "Early termination",
+            "Unexpected early termination of the simulation. Please see logs for details.\n",
+            info_map,
+        )
 
 
 def run_rufas(
@@ -125,9 +127,10 @@ def run_rufas(
     terminate_simulation_post_herd_generation: bool
         User input indicating whether to terminate the simulation after herd generation.
     """
-    sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     output_manager = OutputManager()
+    output_manager.set_log_verbose(verbose)
+    output_manager.print_credits()
     output_manager.create_directory(output_dir)
 
     if load_pool:
@@ -149,7 +152,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_files, exclude_info_maps, format_option, verbose, output_dir)
+        run_validation(metadata_files, exclude_info_maps, format_option, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -157,7 +160,6 @@ def run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
-            verbose,
             output_dir,
             filters_dir,
             csv_dir,
@@ -224,7 +226,6 @@ def run_validation(
     metadata_files: List[Path],
     exclude_info_maps: bool,
     format_option: str,
-    verbose: LogVerbosity,
     output_dir: Path,
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
@@ -237,8 +238,6 @@ def run_validation(
         Flag for whether the user wants to include info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
-    verbose : LogVerbosity
-        The verbose option set by the user.
     output_dir : Path
         The directory for saving output.
     """
@@ -253,7 +252,6 @@ def run_validation(
         "***Only validating data, no simulation will follow.***",
         info_map,
     )
-    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -274,8 +272,39 @@ def run_validation(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
+def set_random_seed(input_manager: InputManager) -> None:
+    """
+    Sets the random seed for this simulation, if one is provided.
+
+    Parameters
+    ----------
+    input_manager : InputManager
+        The Input Manager instance that contains all input data.
+
+    Notes
+    -----
+    The packages seeded are Python's builtin `random` library and the NumPy `random` library. If the input indicates
+    that there should be no random seeding, the random libraries are "seeded" with `None`, which seeds the random
+    libraries with the system time.
+
+    """
+    set_seed = input_manager.get_data("config.set_seed")
+
+    if set_seed:
+        seed = input_manager.get_data("config.random_seed")
+        om = OutputManager()
+        info_map = {"class": "No caller class", "function": set_random_seed.__name__}
+        log_name = "Randomization seed set."
+        log_message = f"Randomization libraries being seeded with {seed}."
+        om.add_log(log_name, log_message, info_map)
+    else:
+        seed = None
+
+    random.seed(seed)
+    numpy.random.seed(seed)
+
+
 def initialize_herd(
-    simulation_config: Dict[str, Any],
     init_herd: bool = False,
     save_animals: bool = False,
     save_animals_dir: Path = Path("output/"),
@@ -286,8 +315,6 @@ def initialize_herd(
 
     Parameters
     ----------
-    simulation_config : Dict[str, Any]
-        Dictionary object containing parameters and settings for the simulation.
     init_herd: bool
         User input indicating whether to initialize herd with simulation.
     save_animals: bool
@@ -317,10 +344,6 @@ def initialize_herd(
     }
     output_manager = OutputManager()
 
-    if "set_seed" in simulation_config.keys() and simulation_config["set_seed"]:
-        random.seed(simulation_config["random_seed"])
-        numpy.random.seed(simulation_config["random_seed"])
-
     output_manager.add_log("Herd initialization start", "Initializing herd data...\n", info_map)
     herd_factory = HerdFactory(
         init_herd=init_herd,
@@ -344,7 +367,6 @@ def execute_simulations(
     produce_graphics: bool,
     graphics_dir: Path,
     format_option: str,
-    verbose: LogVerbosity,
     output_dir: Path,
     filters_dir: Path,
     csv_dir: Path,
@@ -368,8 +390,6 @@ def execute_simulations(
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
-    verbose : LogVerbosity
-        The verbose option set by the user.
     output_dir : Path
         The directory for saving output.
     filters_dir : Path
@@ -389,10 +409,8 @@ def execute_simulations(
         "class": "No caller class",
         "function": execute_simulations.__name__,
     }
-    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
-    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -404,11 +422,12 @@ def execute_simulations(
         output_manager.set_metadata_prefix(metadata_file["prefix"])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
-            simulation_config = input_manager.get_data("config")
+            output_manager.add_log(
+                "Validation complete", f"Data is valid. Simulating {metadata_file['prefix']} scenario", info_map
+            )
+            set_random_seed(input_manager)
             try:
                 initialize_herd(
-                    simulation_config=simulation_config,
                     init_herd=init_herd,
                     save_animals=save_animals,
                     save_animals_dir=save_animals_dir,
@@ -421,7 +440,7 @@ def execute_simulations(
                     format_option=format_option,
                 )
                 raise e
-
+            output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
             if not terminate_simulation_post_herd_generation:
                 simulator = SimulationEngine()
                 simulator.simulate()
@@ -439,6 +458,11 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+
+        error_count, warning_count = output_manager.get_error_and_warning_counts()
+        output_manager.add_log(
+            "error and warning count", f"{error_count} error(s) and " f"{warning_count} warning(s) found.\n", info_map
+        )
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
@@ -472,8 +496,8 @@ def parse_gnu_args() -> argparse.Namespace:
     parser.add_argument(
         "-v",
         "--verbose",
-        choices=["errors", "warnings", "logs", "none"],
-        default="none",
+        choices=["errors", "warnings", "logs", "credits", "none"],
+        default="credits",
         help="Specify the log type to be printed",
     )
     parser.add_argument(

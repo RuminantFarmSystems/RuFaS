@@ -513,6 +513,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
     info_map = {"timestamp": "dummy_timestamp"}
     om = OutputManager()
     om.set_metadata_prefix("dummy_prefix")
+    om.set_log_verbose(log_level)
     om._handle_log_output(name, msg, info_map, log_level)
     log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
     expected_message = log_format.format(
@@ -578,6 +579,7 @@ def output_manager_original_method_states(
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
+        "print_credits": mock_output_manager.print_credits,
     }
 
 
@@ -937,12 +939,13 @@ def test_exclude_info_maps(
 
 
 @pytest.mark.parametrize(
-    "mock_file_text",
+    "mock_file_text,filter_by_exclusion",
     [
-        "apples\nbananas\ncherries",
-        "apples\nbananas\ncherries\n\n\n",
-        "apples\nbananas\n\n\n\ncherries",
-        "apples\nbananas\n\n\ncherries\n\n\n",
+        ("apples\nbananas\ncherries", False),
+        ("apples\nbananas\ncherries\n\n\n", False),
+        ("apples\nbananas\n\n\n\ncherries", False),
+        ("apples\nbananas\n\n\ncherries\n\n\n", False),
+        ("exclude\napples\nbananas\ncherries", True),
     ],
 )
 @patch("builtins.open", new_callable=mock_open)
@@ -951,11 +954,12 @@ def test_load_filter_file_content_txt(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     mock_file_text: str,
+    filter_by_exclusion: bool,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
-    assert result == [{"filters": ["apples", "bananas", "cherries"]}]
+    assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
@@ -1075,11 +1079,10 @@ def test_filter_variables_pool_include_empty_filter_pattern_pool(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = []
+    filter_content = {"filters": []}
     expected_result = {}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1097,11 +1100,10 @@ def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["exclude"]
+    filter_content = {"filters": [], "filter_by_exclusion": True}
     expected_result = {"key1": "value1", "key2": "value2", "key3": "value3"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1118,11 +1120,10 @@ def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["key1", "key2"]
+    filter_content = {"filters": ["key1", "key2"]}
     expected_result = {"key1": "value1", "key2": "value2"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1140,11 +1141,10 @@ def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["exclude", "key1", "key2"]
+    filter_content = {"filters": ["key1", "key2"], "filter_by_exclusion": True}
     expected_result = {"key3": "value3"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1162,11 +1162,10 @@ def test_filter_variables_pool_non_matching_pattern(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["key1", "key4"]
+    filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": False}
     expected_result = {"key1": "value1"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1184,11 +1183,10 @@ def test_filter_variables_pool_exclude_non_matching_pattern(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["exclude", "key1", "key4"]
+    filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": True}
     expected_result = {"key2": "value2", "key3": "value3"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
 
 def test_filter_variables_pool_duplicate_patterns(
@@ -1202,11 +1200,10 @@ def test_filter_variables_pool_duplicate_patterns(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["key1", "key1"]
+    filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": False}
     expected_result = {"key1": "value1"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1224,11 +1221,10 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
         "key2": "value2",
         "key3": "value3",
     }
-    dummy_input_file = ""
-    filter_patterns = ["exclude", "key1", "key1"]
+    filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": True}
     expected_result = {"key2": "value2", "key3": "value3"}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1257,37 +1253,36 @@ def test_filter_variables_pool_regex_patterns(
     """Test case for pattern pool using regex patterns with
     function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool
-    dummy_input_file = ""
 
     # get all Class1 vars
-    filter_patterns = ["^DummyClass1.*"]
+    filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False}
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": "value1",
         "DummyClass1.dummy_fun1.dummy_var2": "value2",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get only vars from fun2s
-    filter_patterns = [".*fun2.*"]
+    filter_content = {"filters": [".*fun2.*"], "filter_by_exclusion": False}
     expected_result = {
         "DummyClass2.dummy_fun2.dummy_var3": "value3",
         "DummyClass4.dummy_fun2.dummy_var5": "value7",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get Class2 with var4 but not Class2 with var3
-    filter_patterns = ["^DummyClass2.*var4$"]
+    filter_content = {"filters": ["^DummyClass2.*var4$"], "filter_by_exclusion": False}
     expected_result = {
         "DummyClass2.dummy_fun3.dummy_var4": "value4",
         "DummyClass2.dummy_fun4.dummy_var4": "value5",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get all var2s and var4s
-    filter_patterns = [".*var2$", ".*var4$"]
+    filter_content = {"filters": [".*var2$", ".*var4$"], "filter_by_exclusion": False}
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var2": "value2",
         "DummyClass2.dummy_fun3.dummy_var4": "value4",
@@ -1295,7 +1290,7 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass3.dummy_fun4.dummy_var2": "value6",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1310,10 +1305,9 @@ def test_filter_variables_pool_exclude_regex_patterns(
     """Test case for pattern pool with regex patterns and exclude keyword with
     function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = mock_variables_pool
-    dummy_input_file = ""
 
     # get everything except Class1 vars
-    filter_patterns = ["exclude", "^DummyClass1.*"]
+    filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": True}
     expected_result = {
         "DummyClass2.dummy_fun2.dummy_var3": "value3",
         "DummyClass2.dummy_fun3.dummy_var4": "value4",
@@ -1322,10 +1316,10 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get everything except vars from fun2s
-    filter_patterns = ["exclude", ".*fun2.*"]
+    filter_content = {"filters": ["exclude", ".*fun2.*"], "filter_by_exclusion": True}
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": "value1",
         "DummyClass1.dummy_fun1.dummy_var2": "value2",
@@ -1334,10 +1328,10 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass3.dummy_fun4.dummy_var2": "value6",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get everything without Class2 with var4
-    filter_patterns = ["exclude", "^DummyClass2.*var4$"]
+    filter_content = {"filters": ["^DummyClass2.*var4$"], "filter_by_exclusion": True}
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": "value1",
         "DummyClass1.dummy_fun1.dummy_var2": "value2",
@@ -1346,17 +1340,17 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # get everything that doesn't have var2s and var4s
-    filter_patterns = ["exclude", ".*var2$", ".*var4$"]
+    filter_content = {"filters": [".*var2$", ".*var4$"], "filter_by_exclusion": True}
     expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": "value1",
         "DummyClass2.dummy_fun2.dummy_var3": "value3",
         "DummyClass4.dummy_fun2.dummy_var5": "value7",
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states["_filter_variables_pool"]
@@ -1453,6 +1447,7 @@ def test_save_results(
         (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False),
     ],
 )
 def test_save_results_report_generation(
@@ -1478,6 +1473,8 @@ def test_save_results_report_generation(
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
     mocker.patch.object(mock_output_manager, "_route_logs", return_value=None)
+    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
+    mock_output_manager.create_directory = MagicMock()
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
@@ -1498,6 +1495,13 @@ def test_save_results_report_generation(
                 mock_output_manager._list_filter_files_in_dir.return_value
             )
 
+        if not is_faulty and any("graph_details" in content for content in filter_content):
+            for content in filter_content:
+                if "graph_details" in content:
+                    assert "graphics_dir" in content["graph_details"]
+                    assert content["graph_details"]["graphics_dir"] == "graphics_dir"
+                    assert content["graph_details"]["metadata_prefix"] == "test_prefix"
+
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states["save_results"]
     mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
@@ -1506,6 +1510,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
     mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
 
 
 def test_route_save_functions_csv(
@@ -1583,10 +1588,7 @@ def test_route_save_functions_graph(
         )
 
         mock_generate_graph.assert_called_once_with(
-            {"key": [1, 2, 3, 4]},
-            graph_data,
-            "graph_file",
-            Path("graphics_dir"),
+            {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
         )
 
         mock_generate_graph.side_effect = Exception("test exception")
@@ -1863,7 +1865,7 @@ def test_get_error_and_warning_counts(
     expected: tuple[int, int],
 ) -> None:
     """
-    Unit test for the get_error_and_warning_counts() method in OutputManager class
+    Unit test for the get_error_and_warning_counts() method in OutputManager class.
     """
 
     # Arrange
@@ -1873,3 +1875,146 @@ def test_get_error_and_warning_counts(
 
     # Act and Assert
     assert om.get_error_and_warning_counts() == expected
+
+
+@pytest.mark.parametrize(
+    "log_verbose",
+    [LogVerbosity.NONE, LogVerbosity.CREDITS, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
+def test_print_credits(mock_output_manager: OutputManager, log_verbose: LogVerbosity, capfd) -> None:
+    """
+    Unit test for the print_credits() method in OutputManager class.
+    """
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_credits()
+
+    # Assert
+    if log_verbose >= LogVerbosity.CREDITS:
+        captured = capfd.readouterr()
+        assert captured.out == "RuFaS: Ruminant Farm Systems Model.\n"
+
+
+@pytest.mark.parametrize(
+    "input_data,expected",
+    [
+        # Basic test case with a single data_origin per value
+        (
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                }
+            },
+            {
+                "ModuleA.variable_x": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                    ],
+                    "values": [10, 20],
+                    "detailed_data_origins": [
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
+                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
+                    ],
+                }
+            },
+        ),
+        # Test case with multiple data_origin entries for a single value
+        (
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                }
+            },
+            {
+                "ModuleB.variable_y": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
+                            "units": "units_b",
+                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                    ],
+                    "values": [30, 40],
+                    "detailed_data_origins": [
+                        [
+                            ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
+                            ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
+                        ],
+                        [("[SourceClassB.method_b]->[ModuleB.variable_y]", 40)],
+                    ],
+                }
+            },
+        ),
+        (
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+            {
+                "ModuleC.non_dict": "This is a string, not a dict",
+            },
+        ),
+        # Missing both keys
+        (
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+            {
+                "ModuleD.missing_both": {
+                    "other_key": "some_value",
+                }
+            },
+        ),
+        # Missing `info_maps` key
+        (
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+            {
+                "ModuleE.missing_info_maps": {
+                    "values": [50, 60],
+                }
+            },
+        ),
+        # Missing `values` key
+        (
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+            {
+                "ModuleF.missing_values": {
+                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                }
+            },
+        ),
+    ],
+)
+def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expected: Dict[str, Dict[str, Any]]) -> None:
+    """
+    Unit test for the _add_detailed_data_origin() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Act
+    result = output_manager._add_detailed_data_origin(input_data)
+
+    # Assert
+    assert result == expected

@@ -1,10 +1,13 @@
 from typing import Any
 from typing import List, Dict, Union
-from mock import MagicMock, patch, call
 
 import pytest
+from mock import MagicMock, patch, call
 from pytest_mock import MockerFixture
 
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -13,14 +16,11 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
     PurchasedFeedEmissionsEstimator,
 )
-from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.feed.feed import Feed
 
 om = OutputManager()
 
@@ -60,7 +60,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 0,
             "vertical_dist_to_parlor": 1.0,
             "horizontal_dist_to_parlor": 2.0,
-            "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {0: 100000, 1: 100001},
         },
@@ -68,7 +67,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 1,
             "vertical_dist_to_parlor": 5.0,
             "horizontal_dist_to_parlor": 10.0,
-            "stocking_density": 1.075,
             "num_stalls": 50,
             "animals_in_pen": {1: 200000, 2: 200001},
         },
@@ -76,7 +74,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 2,
             "vertical_dist_to_parlor": 4.0,
             "horizontal_dist_to_parlor": 8.0,
-            "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {1: 300000, 2: 300001},
         },
@@ -84,7 +81,6 @@ def mock_pens() -> List[MagicMock]:
             "id": 3,
             "vertical_dist_to_parlor": 2.0,
             "horizontal_dist_to_parlor": 4.0,
-            "stocking_density": 1.075,
             "num_stalls": 200,
             "animals_in_pen": {3: 400000, 4: 400001},
         },
@@ -274,8 +270,8 @@ def input_manager(mocker: MockerFixture) -> InputManager:
 
 
 @pytest.fixture
-def mock_im_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
-    return {"config": {"nutrient_standard": "NASEM"}}
+def mock_im_pool() -> Dict[str, Dict[str, Any]]:
+    return {"config": {"nutrient_standard": "NASEM"}, "animal": {"herd_information": {"breed": "HO"}}}
 
 
 @pytest.fixture
@@ -1548,7 +1544,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                 175830: 1,
                 182621: 1,
                 190070: 1,
-                110810: 2,
+                110810: 1,
                 114067: 2,
                 119819: 2,
                 166593: 2,
@@ -1690,7 +1686,6 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
 
     for animal in animal_list:
         dummy_pen.animals_in_pen[animal.id] = animal
-    dummy_pen.stocking_density = len(animal_list) / num_stalls
 
     return dummy_pen
 
@@ -1764,7 +1759,7 @@ def test_remove_animals_from_herd(info_dict: dict[Any], animal_manager: AnimalMa
 
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict["animal_to_pen_id_map_after_removals"]
     for idx, pen_dict in enumerate(info_dict["pen_data"].values()):
-        assert dummy_animal_manager.all_pens[idx].stocking_density == pen_dict["post_removal_stocking_density"]
+        assert dummy_animal_manager.all_pens[idx].current_stocking_density == pen_dict["post_removal_stocking_density"]
         assert set(dummy_animal_manager.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
 
 
@@ -1909,8 +1904,8 @@ def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     mock_pen_0.calc_manure = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.reset_manure = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mocked_pens = [mock_pen_0, mock_pen_1]
 
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
@@ -1977,8 +1972,8 @@ def test_calc_p_rqmts(mocker: MockerFixture) -> None:
     mock_pen_0.call_p_rqmts = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.call_p_rqmts = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mock_pens = [mock_pen_0, mock_pen_1]
     mock_animal_manager.all_pens = mock_pens
     # Act
@@ -1996,8 +1991,8 @@ def test_daily_p_update(mocker: MockerFixture) -> None:
     mock_pen_0.daily_p_update = MagicMock()
     mock_pen_1 = MagicMock()
     mock_pen_1.daily_p_update = MagicMock()
-    mock_pen_0.populated = True
-    mock_pen_1.populated = False
+    mock_pen_0.is_populated = True
+    mock_pen_1.is_populated = False
     mock_pens = [mock_pen_0, mock_pen_1]
     mock_animal_manager.all_pens = mock_pens
     # Act
@@ -2016,30 +2011,30 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             animal.milk_production_reduction = 100.1
 
     # mock an animal_manager object, but specifically so it returns a list of pens
-    penlist = MagicMock()
-    penlist.all_pens = pens_with_mock_animals
-    for pen in penlist.all_pens:
+    pen_list = MagicMock()
+    pen_list.all_pens = pens_with_mock_animals
+    for pen in pen_list.all_pens:
         pen.animal_combination.name = "NOT_LAC_COW"
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # call the function once on the list of pens
-    AnimalManager.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(pen_list)
 
     # then assert that all animals in all pens are still 100.1
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # now set that they are LAC_COW
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         pen.animal_combination.name = "LAC_COW"
 
     # call the function again on the list of pens
-    AnimalManager.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(pen_list)
 
     # then assert that all animals in all pens are now 0.0
-    for pen in penlist.all_pens:
+    for pen in pen_list.all_pens:
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 0.0
 
@@ -2469,7 +2464,7 @@ def test_remove_animal_from_pen_and_id_map(mocker: MockerFixture):
     assert mock_animal.id not in animal_manager.animal_to_pen_id_map
 
 
-def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
+def test_add_animal_to_pen_and_id_map(mocker: MockerFixture) -> None:
     """
     Unit test for the function _add_animal_to_pen_and_id_map() in file animal_manager.py
 
@@ -2481,22 +2476,22 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        feed_emissions_estimator=mocker.MagicMock(),
     )
 
     mock_animal = mocker.MagicMock()
     mock_animal.id = 1
 
     mock_pen_1 = mocker.MagicMock()
-    mock_pen_1.current_stocking_density = 10
+    type(mock_pen_1).current_stocking_density = mocker.PropertyMock(return_value=10)
     mock_pen_1.id = 1
     mock_pen_1.add_animal = mocker.MagicMock()
 
     mock_pen_2 = mocker.MagicMock()
-    mock_pen_2.current_stocking_density = 5
+    type(mock_pen_2).current_stocking_density = mocker.PropertyMock(return_value=5)
     mock_pen_2.id = 2
     mock_pen_2.add_animal = mocker.MagicMock()
 
@@ -2509,8 +2504,7 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
 
     mock_pens_by_animal_combination = {mock_animal_combination: [mock_pen_1, mock_pen_2]}
 
-    original_ANIMAL_GROUPING_SCENARIO = AnimalManager.ANIMAL_GROUPING_SCENARIO
-    AnimalManager.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
+    mocker.patch.object(animal_manager, "ANIMAL_GROUPING_SCENARIO", mock_animal_grouping_scenario)
     animal_manager.pens_by_animal_combination = mock_pens_by_animal_combination
     animal_manager.phosphorus_concentration_by_animal_class = {type(mock_animal): 0.0}
     animal_manager.animal_to_pen_id_map = {}
@@ -2522,9 +2516,6 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
     mock_pen_1.add_animal.assert_not_called()
     mock_pen_2.add_animal.assert_called_once_with(mock_animal, mock_animal_grouping_scenario, mock_feed, mock_temp, 0.0)
     assert animal_manager.animal_to_pen_id_map[mock_animal.id] == mock_pen_2.id
-
-    # Reset ANIMAL_GROUPING_SCENARIO
-    AnimalManager.ANIMAL_GROUPING_SCENARIO = original_ANIMAL_GROUPING_SCENARIO
 
 
 @pytest.mark.parametrize("is_end_ration_interval", [True, False])
@@ -2575,6 +2566,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.methane_mitigation_additive_amount = mock_methane_mitigation_additive_amount = (
         mocker.MagicMock()
     )
+    mock_animal_manager.formulation_interval = mocker.MagicMock()
     patch_for_end_ration_interval = mocker.patch.object(
         AnimalManager, "end_ration_interval", return_value=is_end_ration_interval
     )
