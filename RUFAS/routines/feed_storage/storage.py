@@ -142,19 +142,19 @@ class Storage:
         Parameters
         ----------
         dry_matter : float
-            The amount of dry matter.
+            The amount of dry matter in kg.
         estimated_maximum_effluent : float
-            The estimated maximum effluent.
+            The estimated maximum effluent in kg.
         time_in_silo : int
             Time in days the crop has been in the silo.
 
         Returns
         -------
         float
-            The amount of dry matter lost to effluent.
+            The amount of dry matter lost to effluent in kg.
 
         """
-        raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class.")
+        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) * (1 / dry_matter)
 
     def calculate_heat_generated(self, moisture_at_baling: float, bale_density: float) -> float:
         """
