@@ -33,7 +33,6 @@
       110,
       187,
       51,
-      40,
       167,
       31,
       79,
@@ -235,7 +234,7 @@
         },
         {
           "feed_type": 40,
-          "ration_percentage": 20.1
+          "ration_percentage": 35.8
         },
         {
           "feed_type": 110,
@@ -248,10 +247,6 @@
         {
           "feed_type": 51,
           "ration_percentage": 22.7
-        },
-        {
-          "feed_type": 40,
-          "ration_percentage": 15.7
         },
         {
           "feed_type": 167,
