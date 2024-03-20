@@ -165,7 +165,7 @@ class Storage:
         moisture_at_baling : float
             Percentage of fresh mass that is not dry matter when a crop is baled.
         bale_density : float
-            Density of the bale (units???).
+            Density of the bale in kg dry matter per cubic meter.
 
         Returns
         -------
@@ -177,22 +177,22 @@ class Storage:
             bale_density**0.94
         )
 
-    def calculate_bale_density(self, moisture_at_baling: float) -> float:
+    def calculate_bale_density(self, dry_matter_percentage: float) -> float:
         """
         Calculates the density of a bale.
 
         Parameters
         ----------
-        moisture_at_baling : float
-            Percentage of fresh mass that is not dry matter when a crop is baled.
+        dry_matter_percentage : float
+            Percentage of fresh mass that is dry matter at storage.
 
         Returns
         -------
         float
-            The density of the bale (units???).
+            The density of the bale in kg dry matter per cubic meter.
 
         """
-        moisture_fraction = moisture_at_baling / 100
+        moisture_fraction = 1 - (dry_matter_percentage / 100)
         return 100 + 440 * moisture_fraction
 
     def estimate_maximum_effluent(self, dry_matter_percentage: float, fresh_mass: float) -> float:

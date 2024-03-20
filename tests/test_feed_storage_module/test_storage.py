@@ -134,12 +134,12 @@ def test_calculate_heat_generated(storage: Storage, moisture: float, density: fl
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("moisture,expected", [(0.0, 100.0), (10.0, 144.0), (25.0, 210.0)])
-def test_calculate_bale_density(storage: Storage, moisture: float, expected: float) -> None:
+@pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])
+def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: float) -> None:
     """
     Test the calculate_bale_density method of the Storage class.
     """
-    actual = storage.calculate_bale_density(moisture)
+    actual = storage.calculate_bale_density(dry_matter)
 
     assert actual == expected
 
