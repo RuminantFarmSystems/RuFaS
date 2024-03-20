@@ -32,7 +32,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
     patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    patch_for_sys_stdout_write = mocker.patch("RUFAS.simulation_engine.sys.stdout.write")
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
     simulation_engine.day_counter = 100
@@ -65,9 +64,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
-    patch_for_sys_stdout_write.assert_has_calls(
-        [mocker.call("\nSimulation Completed.\n\n"), mocker.call("1 error(s) and 2 warning(s) found.\n")]
-    )
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:
@@ -85,6 +81,8 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.weather = mocker.MagicMock()
     simulation_engine.time = mocker.MagicMock()
+    simulation_engine.animal_manager.all_pens = mocker.MagicMock()
+    simulation_engine.animal_manager.simulation_day = mocker.MagicMock()
 
     patch_for_simulate_daily_manure_manager = mocker.patch("RUFAS.simulation_engine.simulate_daily_manure_manager")
     patch_for_daily_feed_routine = mocker.patch("RUFAS.simulation_engine.routines.daily_feed_routine")
@@ -95,10 +93,14 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
 
     # Assert
     simulation_engine.animal_manager.daily_updates.assert_called_once_with(
-        simulation_engine.feed, simulation_engine.weather, simulation_engine.time
+        simulation_engine.feed,
+        simulation_engine.weather,
+        simulation_engine.time,
     )
     patch_for_simulate_daily_manure_manager.assert_called_once_with(
-        simulation_engine.manure_manager, simulation_engine.animal_manager
+        simulation_engine.manure_manager,
+        simulation_engine.animal_manager.all_pens,
+        simulation_engine.animal_manager.simulation_day,
     )
     simulation_engine.field_manager.daily_update_routine.assert_called_once_with(
         simulation_engine.weather, simulation_engine.time
@@ -122,10 +124,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
 
-    config_data = {"set_seed": True, "random_seed": 42}
     patch_for_get_data = mocker.patch(
         "RUFAS.simulation_engine.im.get_data",
-        side_effect=[config_data, {}, {}, {"manure_management_scenarios": {}}, {}],
+        side_effect=[{}, {}, {"manure_management_scenarios": {}}, {}],
     )
 
     mock_weather = mocker.MagicMock()
@@ -138,6 +139,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_feed = mocker.patch("RUFAS.simulation_engine.Feed", return_value=mock_feed)
 
     mock_animal_manager = mocker.MagicMock()
+    mock_animal_manager.all_pens = mocker.MagicMock()
     patch_for_animal_manager = mocker.patch("RUFAS.simulation_engine.AnimalManager", return_value=mock_animal_manager)
 
     mock_manure_manager = mocker.MagicMock()
@@ -149,24 +151,18 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mock_feed_manager = mocker.MagicMock()
     patch_for_feed_manager = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
 
-    patch_for_random_seed = mocker.patch("RUFAS.simulation_engine.random.seed")
-    patch_for_numpy_seed = mocker.patch("RUFAS.simulation_engine.numpy.random.seed")
-
     # Act
     simulation_engine._initialize_simulation()
 
     # Assert
     patch_for_get_data.assert_has_calls(
         [
-            mocker.call("config"),
             mocker.call("weather"),
             mocker.call("feed"),
             mocker.call("manure_management"),
             mocker.call("animal"),
         ]
     )
-    patch_for_random_seed.assert_called_once_with(42)
-    patch_for_numpy_seed.assert_called_once_with(42)
 
     patch_for_weather.assert_called_once_with({}, mock_time)
     patch_for_time.assert_called_once_with()
@@ -175,49 +171,10 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         {"manure_management_scenarios": {}}, mock_feed, mock_weather, mock_time
     )
     patch_for_manure_manager.assert_called_once_with(
-        mock_animal_manager, mock_weather, mock_time, {"manure_management_scenarios": {}}
+        mock_animal_manager.all_pens, mock_weather, mock_time, {"manure_management_scenarios": {}}
     )
     patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager, feed_manager=mock_feed_manager)
     patch_for_feed_manager.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    "day, update_interval, expected_output, should_write",
-    [
-        # Day is a multiple of update_interval, should write first char
-        (0, 50, "-", True),
-        # Day is a multiple of update_interval, should write second char
-        (50, 50, "\\", True),
-        # Day is a multiple of update_interval, should write third char
-        (100, 50, "|", True),
-        # Day is a multiple of update_interval, should write fourth char
-        (150, 50, "/", True),
-        # Day is not a multiple of update_interval, should not write
-        (51, 50, "", False),
-    ],
-)
-def test_visualize_sim_progress(
-    mocker: MockerFixture,
-    day: int,
-    update_interval: int,
-    expected_output: str,
-    should_write: bool,
-) -> None:
-    """
-    Unit test for function _visualize_sim_progress in file RUFAS/simulation_engine.py
-    """
-
-    # Arrange
-    mock_stdout = mocker.patch("RUFAS.simulation_engine.sys.stdout")
-
-    # Act
-    SimulationEngine._visualize_sim_progress(day, update_interval)
-
-    # Assert
-    if should_write:
-        mock_stdout.write.assert_called_with(expected_output)
-    else:
-        mock_stdout.write.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -243,7 +200,6 @@ def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, ex
     patch_for_run_pre_annual_routines = mocker.patch.object(simulation_engine, "_run_pre_annual_routines")
     patch_for_run_post_annual_routines = mocker.patch.object(simulation_engine, "_run_post_annual_routines")
     patch_for_daily_simulation = mocker.patch.object(simulation_engine, "_daily_simulation")
-    patch_for_visualize_sim_progress = mocker.patch.object(simulation_engine, "_visualize_sim_progress")
 
     simulation_engine.time = mocker.MagicMock()
     simulation_engine.time.end_year.side_effect = end_year_side_effect
@@ -253,7 +209,6 @@ def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, ex
 
     # Assert
     patch_for_run_pre_annual_routines.assert_called_once()
-    assert patch_for_visualize_sim_progress.call_count == expected_day_count
     assert patch_for_daily_simulation.call_count == expected_day_count
     patch_for_run_post_annual_routines.assert_called_once()
 

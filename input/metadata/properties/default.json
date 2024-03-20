@@ -826,7 +826,7 @@
         "pen_type": {
           "type": "string",
           "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
-          "pattern": "^{freestall|tiestall|open lot|compost bedded pack barn}$",
+          "pattern": "^(freestall|tiestall|open lot|compost bedded pack barn)$",
           "default": "freestall"
         },
         "max_stocking_density": {
@@ -1054,7 +1054,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1185,7 +1186,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1316,7 +1318,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1477,7 +1480,8 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0
+          "minimum": 0,
+          "default": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1950,7 +1954,7 @@
       "properties": {  
         "type": "number",
         "minimum": 0,
-        "default": 300
+        "default": 306
       }
     },
     "corn_silage_tillage_emissions": {
@@ -3064,7 +3068,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300,
+        "maximum": 306,
         "default": 155
       }
     },
@@ -3074,7 +3078,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "close_up_feeds": {
@@ -3083,7 +3087,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "lac_cow_feeds": {
@@ -3092,7 +3096,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "purchased_feeds": {
@@ -3104,7 +3108,7 @@
           "type": "number",
           "description": "Purchased Feed",
           "minimum": 1,
-          "maximum": 300
+          "maximum": 306
         },
         "purchased_feed_cost": {
           "type": "number",
@@ -3119,7 +3123,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 300
+        "maximum": 306
       }
     },
     "storage_options": {
@@ -3145,18 +3149,24 @@
           "pattern": "^(preservative|nutrient additive|absorbant)$",
           "default": "preservative"
         },
-        "package_density": {
+        "packing_density": {
           "type": "number",
-          "description": "Package Density -- The density of ensiled feed material, kg DM /m3",
+          "description": "Packing Density -- The density of ensiled feed material, kg DM /m3",
           "minimum": 200,
           "maximum": 800,
-          "default": 14
+          "default": 200
         },
         "inoculation": {
           "type": "string",
           "description": "Inoculation",
           "pattern": "^(None|heterofermentative|homofermentative)$",
           "default": "None"
+        },
+        "bunk_type": {
+          "type": "string",
+          "description": "Bunk Type -- The type of bunk used to store the feed.",
+          "pattern": "^(open_floor)$",
+          "default": "open_floor"
         },
         "ventilation": {
           "type": "bool",
@@ -3191,7 +3201,7 @@
             "type": "number",
             "description": "Calf Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 155
           },
           "ration_percentage": {
@@ -3211,7 +3221,7 @@
             "type": "number",
             "description": "Growing Heifers Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -3231,7 +3241,7 @@
             "type": "number",
             "description": "Close UP Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -3251,7 +3261,7 @@
             "type": "number",
             "description": "Lactating Cow Feed",
             "minimum": 1,
-            "maximum": 300,
+            "maximum": 306,
             "default": 1
           },
           "ration_percentage": {
@@ -4352,7 +4362,7 @@
         "bedding_type": {
           "type": "string",
           "description": "Bedding Type -- The material used for bedding pack.",
-          "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
+          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "manure_handler": {
           "type": "string",
@@ -4363,10 +4373,15 @@
           "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
           "pattern": "^(screw press|rotary screen|none)$"
         },
+        "manure_separator_after_digestion": {
+          "type": "string",
+          "description": "Manure Separator Type After Digestion -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand after digestion",
+          "pattern": "^(screw press|rotary screen|none)$"
+        },
         "manure_treatment": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
         }
       }
     },
@@ -4377,7 +4392,7 @@
         "bedding_type": {
           "type": "string",
           "description": "Bedding Type -- The material used for bedding pack.",
-          "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
+          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "bedding_mass_per_day": {
           "type": "number"
@@ -4424,6 +4439,11 @@
         },
         "cleanings_per_day": {
           "type": "number",
+          "minimum": 0
+        },
+        "daily_tillage_frequency": {
+          "type": "number",
+          "description": "Daily Tillage Frequency -- The number of times per day that tillage is performed.",
           "minimum": 0
         },
         "cleaning_water_recycle_fraction": {
@@ -4473,7 +4493,7 @@
         "manure_treatment_type": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
           "type": "number",
@@ -4544,6 +4564,51 @@
           "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
           "pattern": "(cover|no cover|N/A)",
           "default": "no cover"
+        },
+        "hydraulic_retention_time": {
+          "type": "number",
+          "description": "Hydraulic Retention Time -- The average time that manure is retained in the treatment system (day).",
+          "default": 0,
+          "minimum": 0
+        },
+        "sludge_accumulation_period": {
+          "type": "number",
+          "description": "Sludge Accumulation Period -- The number of days that sludge is accumulated in the treatment system (day).",
+          "default": 0,
+          "minimum": 0
+        },
+        "sludge_accumulation_volume_fraction": {
+          "type": "number",
+          "description": "Sludge Accumulation Volume Fraction -- Based on the manure solids entering the treatment system.",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "top_cover_volume_fraction": {
+          "type": "number",
+          "description": "Top Cover Volume Fraction -- Fraction of the total volume of the treatment system that is assumed to be the top cover volume.",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evaporation_fraction": {
+          "type": "number",
+          "description": "Evaporation Fraction -- The fraction of the liquid portion evaporated from the treatment system.",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "anaerobic_digestion_temperature_set_point": {
+          "type": "number",
+          "description": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius).",
+          "default": 0,
+          "minimum": 0
+        },
+        "anaerobic_digestion_temperature_celsius": {
+          "type": "number",
+          "description": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius).",
+          "default": 0,
+          "minimum": 0
         }
       }
     }

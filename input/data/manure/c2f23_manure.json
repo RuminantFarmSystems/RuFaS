@@ -28,7 +28,7 @@
       "scenario_id": 3,
       "bedding_type": "manure solids",
       "manure_handler": "flush system",
-      "manure_separator": "biofiltro",
+      "manure_separator": "rotary screen",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     }
@@ -144,7 +144,7 @@
   ],
   "manure_separator_configs": [
     {
-      "manure_separator_type": "biofiltro",
+      "manure_separator_type": "rotary screen",
       "percent_dry_solids": 0.20,
       "total_solids_removal_efficiency_for_separator": 0.97,
       "volatile_solids_removal_efficiency_for_separator": 0.87,
