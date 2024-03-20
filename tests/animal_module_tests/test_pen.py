@@ -176,20 +176,6 @@ def test_add_new_animals(
 
 
 @pytest.mark.parametrize(
-    "pen_to_test, expected_pen_populated",
-    [
-        (lazy_fixture("pen"), False),
-        (lazy_fixture("pen_with_animals"), True),
-    ],
-)
-def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool) -> None:
-    """Unit test for function update_pen_populated in file routines/animal/pen.py"""
-    pen_to_test.update_pen_populated()
-
-    assert pen_to_test.populated == expected_pen_populated
-
-
-@pytest.mark.parametrize(
     "pen_to_test, expected_stocking_density",
     [
         (lazy_fixture("pen"), 0),
@@ -223,7 +209,6 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
-    mocker.patch("RUFAS.routines.animal.pen.Pen.update_pen_populated")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_animal_combination")
     mocker.patch("RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_classes_in_pen")
@@ -231,7 +216,6 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     pen.update_animals(MagicMock(), MagicMock())
 
     pen.add_new_animals.assert_called_once()
-    pen.update_pen_populated.assert_called_once()
     pen.update_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
     pen.update_classes_in_pen.assert_called_once()
@@ -381,22 +365,20 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
 
 
 @pytest.mark.parametrize(
-    "pen_animals, pen_populated, expected",
+    "pen_animals, expected",
     [
         (
             lazy_fixture("mock_calves_with_daily_growth"),
-            True,
             lazy_fixture("avg_calf_daily_growth_values"),
         ),
-        ([], False, 0),
+        ([], 0),
     ],
 )
-def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
+def test_calc_avg_growth(pen: Pen, pen_animals, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
     for animal in pen_animals:
         pen.animals_in_pen[animal.id] = animal
     # pen.animals_in_pen = pen_animals
-    pen.populated = pen_populated
     pen.calc_avg_growth()
 
     actual = pen.avg_growth
@@ -427,13 +409,13 @@ def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
     calves = {0: MagicMock()}
     pen.animals_in_pen = calves
-    pen.populated = True
+    assert pen.is_populated is True
     pen.avg_p_animal = 1.0
 
     pen.clear()
 
     assert pen.animals_in_pen == {}
-    assert pen.populated is False
+    assert pen.is_populated is False
     assert pen.avg_p_animal == 0
 
 
