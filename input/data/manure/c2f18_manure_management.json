@@ -10,7 +10,7 @@
     },
     {
       "scenario_id": 1,
-      "bedding_type": "Straw",
+      "bedding_type": "straw",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
