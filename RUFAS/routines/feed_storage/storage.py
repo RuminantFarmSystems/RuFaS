@@ -156,15 +156,16 @@ class Storage:
         """
         raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_effluent, use a child class.")
 
-    def calculate_protein_degradation(self) -> None:
-        """
-        Calculates protein degradation.
-        """
-        raise NotImplementedError("Cannot use Storage.calculate_protein_degradation, use a child class.")
-
-    def calculate_heat_generated(self) -> float:
+    def calculate_heat_generated(self, moisture_at_baling: float, bale_density: float) -> float:
         """
         Calculates the total sensible heat generated.
+
+        Parameters
+        ----------
+        moisture_at_baling : float
+            Percentage of fresh mass that is not dry matter when a crop is baled.
+        bale_density : float
+            Density of the bale (units???).
 
         Returns
         -------
@@ -172,7 +173,9 @@ class Storage:
             The total sensible heat generated in kJ/kg.
 
         """
-        raise NotImplementedError("Cannot use Storage.calculate_heat_generated, use a child class.")
+        return 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (moisture_at_baling**1.23) * (
+            bale_density**0.94
+        )
 
     def calculate_bale_density(self, moisture_at_baling: float) -> float:
         """
@@ -180,13 +183,13 @@ class Storage:
 
         Parameters
         ----------
-        initial_dry_matter : float
-            The initial dry matter of the bale.
+        moisture_at_baling : float
+            Percentage of fresh mass that is not dry matter when a crop is baled.
 
         Returns
         -------
         float
-            The density of the bale.
+            The density of the bale (units???).
 
         """
         return 100 + 440 * (moisture_at_baling)
