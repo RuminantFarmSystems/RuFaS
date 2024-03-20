@@ -105,7 +105,7 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
         (350.0, 40.0, 2, 0.002365714),
         (30.0, 55.0, 12, 0.2277),
         (400.0, 12.0, 1, 0.0003105),
-        (100.0, 0.0, 4, 0.0)
+        (100.0, 0.0, 4, 0.0),
     ],
 )
 def test_calculate_dry_matter_loss_to_effluent(storage: Storage, dry_matter: float, max_effluent: float, days: int, expected: float) -> None:
@@ -134,7 +134,7 @@ def test_calculate_heat_generated(storage: Storage, moisture: float, density: fl
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("moisture,expected", [(0.0, 100.0), (10.0, 4500.0), (25.0, 11100.0)])
+@pytest.mark.parametrize("moisture,expected", [(0.0, 100.0), (10.0, 144.0), (25.0, 210.0)])
 def test_calculate_bale_density(storage: Storage, moisture: float, expected: float) -> None:
     """
     Test the calculate_bale_density method of the Storage class.

@@ -192,7 +192,8 @@ class Storage:
             The density of the bale (units???).
 
         """
-        return 100 + 440 * (moisture_at_baling)
+        moisture_fraction = moisture_at_baling / 100
+        return 100 + 440 * moisture_fraction
 
     def estimate_maximum_effluent(self, dry_matter_percentage: float, fresh_mass: float) -> float:
         """
