@@ -219,8 +219,37 @@ class Storage:
 
         return fresh_mass * ((1 - dry_matter_fraction) - 0.7)
 
-    def recalculate_nutrient_fractions(self) -> None:
+    def recalculate_nutrient_concentration(
+        self,
+        initial_nutrient_concentration: float,
+        loss_coefficient: float,
+        dry_matter_loss: float,
+        initial_dry_matter: float,
+    ) -> None:
         """
-        Recalculates the relative nutrient concentrations after dry matter loss.
+        Recalculates the relative nutrient concentration after dry matter loss.
+
+        Parameters
+        ----------
+        initial_nutrient_concentration : float
+            Nutrient concentration in stored crop before loss (units???).
+        loss_coefficient : float
+            Unitless coefficient that regulates how quickly this nutrient is lost.
+        dry_matter_loss : float
+            Amount of dry matter lost from stored crop in kg.
+        initial_dry_matter : float
+            Amount of dry matter stored crop contained before loss in kg.
+
+        Returns
+        -------
+        float
+            The nutrient concentration after loss (units???).
+
         """
-        raise NotImplementedError("Cannot use Storage.recalculate_nutrient_fractions, use a child class.")
+        dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
+        bounded_loss_coefficient = min(initial_nutrient_concentration, loss_coefficient)
+        return (
+            (initial_nutrient_concentration - bounded_loss_coefficient)
+            * dry_matter_loss_fraction
+            / (1 - dry_matter_loss_fraction)
+        )

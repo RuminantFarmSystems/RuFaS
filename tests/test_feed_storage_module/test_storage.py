@@ -108,7 +108,9 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
         (100.0, 0.0, 4, 0.0),
     ],
 )
-def test_calculate_dry_matter_loss_to_effluent(storage: Storage, dry_matter: float, max_effluent: float, days: int, expected: float) -> None:
+def test_calculate_dry_matter_loss_to_effluent(
+    storage: Storage, dry_matter: float, max_effluent: float, days: int, expected: float
+) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
     """
@@ -163,10 +165,26 @@ def test_estimate_maximum_effluent(storage: Storage, dry_matter: float, mass: fl
     assert pytest.approx(actual) == expected
 
 
-def test_recalculate_nutrient_fractions(storage: Storage):
+@pytest.mark.parametrize(
+    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected",
+    [
+        (8.0, 0.4, 20.0, 100.0, 1.9),
+        (4.0, 0.17, 21.0, 150.0, 0.623488),
+        (0.5, 0.7, 100.0, 200.0, 0.0),
+        (3.4, 0.8, 0.0, 200.0, 0.0),
+    ],
+)
+def test_recalculate_nutrient_concentration(
+    storage: Storage,
+    nutrients: float,
+    loss_coefficient: float,
+    dry_matter_loss: float,
+    dry_matter: float,
+    expected: float,
+) -> None:
     """
-    Test the recalculate_nutrient_fractions method of the Storage class.
+    Test the recalculate_nutrient_concentration method of the Storage class.
     """
-    with pytest.raises(NotImplementedError) as e:
-        storage.recalculate_nutrient_fractions()
-    assert "Cannot use Storage.recalculate_nutrient_fractions, use a child class." in str(e.value)
+    actual = storage.recalculate_nutrient_concentration(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
+
+    assert pytest.approx(actual) == expected
