@@ -133,19 +133,19 @@ class AnimalRequirements:
         """
 
         attr_names_to_args_map = {
-            'NEmaint_requirement': NEmaint_requirement_list,
-            'NEa_requirement': NEa_requirement_list,
-            'NEg_requirement': NEg_requirement_list,
-            'NEpreg_requirement': NEpreg_requirement_list,
-            'NEl_requirement': NEl_requirement_list,
-            'MP_requirement': MP_requirement_list,
-            'Ca_requirement': Ca_requirement_list,
-            'P_requirement': P_requirement_list,
-            'DMIest_requirement': DMIest_requirement_list,
-            'avg_BW': BW,
-            'avg_milk': milk,
-            'avg_CP_milk': CP_milk,
-            'avg_milk_production_reduction': milk_production_reduction,
+            "NEmaint_requirement": NEmaint_requirement_list,
+            "NEa_requirement": NEa_requirement_list,
+            "NEg_requirement": NEg_requirement_list,
+            "NEpreg_requirement": NEpreg_requirement_list,
+            "NEl_requirement": NEl_requirement_list,
+            "MP_requirement": MP_requirement_list,
+            "Ca_requirement": Ca_requirement_list,
+            "P_requirement": P_requirement_list,
+            "DMIest_requirement": DMIest_requirement_list,
+            "avg_BW": BW,
+            "avg_milk": milk,
+            "avg_CP_milk": CP_milk,
+            "avg_milk_production_reduction": milk_production_reduction,
         }
 
         calc_method_to_function_map = {
@@ -155,7 +155,7 @@ class AnimalRequirements:
         }
 
         default_percentile = 90
-        stats_args = [default_percentile] if calc_method == 'percentile' else []
+        stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
             setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
@@ -307,8 +307,9 @@ class AnimalRequirements:
             animal.DMIest_requirement = req["DMIest_requirement"]
             # these animal class variables are only used for grouping purposes
             if animal_type in [AnimalType.LAC_COW]:
-                animal.DNED_requirement = (req["NEmaint_requirement"]
-                                           + req["NEl_requirement"]) / animal.DMIest_requirement
+                animal.DNED_requirement = (
+                    req["NEmaint_requirement"] + req["NEl_requirement"]
+                ) / animal.DMIest_requirement
                 animal.DMDP_requirement = (req["MP_requirement"]) / animal.DMIest_requirement
 
                 # calculating the activity requirement for energy
@@ -316,7 +317,7 @@ class AnimalRequirements:
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
-                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)),
+                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
                 requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
@@ -367,7 +368,7 @@ class AnimalRequirements:
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
-                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)),
+                    (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
                 requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
@@ -745,7 +746,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
         """
         if day_of_pregnancy is None:
-            net_energy_maintenance = 0.10 * body_weight ** 0.75
+            net_energy_maintenance = 0.10 * body_weight**0.75
             gravid_uterine_weight = 0.0
             uterine_weight = 0.0
         else:
@@ -848,7 +849,7 @@ class AnimalRequirements:
         EQEBW = 0.891 * equivalent_shrunk_body_weight
         # [A.Cow.A.14]-[A.Heifer.A.15]
         # Net energy for growth requirement (Mcal)
-        net_energy_growth = 0.0635 * EQEBW ** 0.75 * EQEBG ** 1.097
+        net_energy_growth = 0.0635 * EQEBW**0.75 * EQEBG**1.097
         return net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight
 
     def calculate_NASEM_energy_growth_requirements(
@@ -1410,7 +1411,7 @@ class AnimalRequirements:
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
         # [A.Cow.C.2]-[A.Heifer.C.2]
         # Calcium growth requirement (g)
-        Ca_growth = 9.83 * mature_body_weight ** 0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
+        Ca_growth = 9.83 * mature_body_weight**0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
         # [A.Cow.C.3]-[A.Heifer.C.3]
         # Calcium pregnancy requirement (g)
         if day_of_pregnancy is None:
@@ -1490,7 +1491,7 @@ class AnimalRequirements:
         """
         Ca_Maint = 0.90 * dry_matter_intake_estimate
         if parity <= 2:
-            Ca_Growth = ((9.83 * mature_body_weight ** -0.22) * body_weight ** -0.22) * average_daily_gain
+            Ca_Growth = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
         else:
             Ca_Growth = 0.0
         if day_of_pregnancy is None:
@@ -1546,7 +1547,7 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth = (1.2 + 4.635 * mature_body_weight ** 0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+        P_growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
         if day_of_pregnancy is None:
             P_preg = 0.0
         elif day_of_pregnancy > 190:
@@ -1637,7 +1638,7 @@ class AnimalRequirements:
         else:
             P_Maint = 0.0
         if parity <= 2:
-            P_Growth = (1.2 + 4.635 * mature_body_weight ** 0.22 * body_weight ** -0.22) * average_daily_gain
+            P_Growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
             P_Growth = 0.0
         if day_of_pregnancy is None:
@@ -1711,7 +1712,7 @@ class AnimalRequirements:
 
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) * (
+            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
                 1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
             )
         elif animal_type in [AnimalType.DRY_COW]:
@@ -1722,7 +1723,7 @@ class AnimalRequirements:
             else:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
-                body_weight ** 0.75 * (0.2435 * DivFact - 0.0466 * DivFact ** 2 - value_to_use) / DivFact
+                body_weight**0.75 * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use) / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)

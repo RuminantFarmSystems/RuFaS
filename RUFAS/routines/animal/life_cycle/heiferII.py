@@ -22,6 +22,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
     manure_calculations,
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 om = OutputManager()
 
@@ -1452,7 +1453,7 @@ class HeiferII(HeiferI):
         None
         """
 
-        preg_check_configs = [
+        preg_check_configs: list[PregCheckConfig] = [
             {
                 "day": AnimalBase.config["preg_check_day_1"],
                 "loss_rate": AnimalBase.config["preg_loss_rate_1"],
@@ -1478,13 +1479,13 @@ class HeiferII(HeiferI):
             if self.days_born == self.ai_day + preg_check_config["day"]:
                 self._handle_preg_check(preg_check_config, sim_day)
 
-    def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day):
+    def _handle_preg_check(self, preg_check_config: PregCheckConfig, sim_day):
         """
         Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
 
         Parameters
         ----------
-        preg_check_config : dict[str, int | str]
+        preg_check_config : dict[str, str | int | float]
             A dictionary of pregnancy check configuration values.
         sim_day : int
             The current day of the entire simulation.
