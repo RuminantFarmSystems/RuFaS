@@ -1,0 +1,63 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "alfalfa_hay",
+            "planting_years": [2000],
+            "pattern_repeat": 3,
+            "planting_skip": 6,
+            "harvesting_skip": 3,
+            "planting_days": [182],
+            "harvest_years": [2001, 2001, 2001, 2001, 2001, 2001, 2002, 2002, 2002, 2002, 2002, 2002, 2003, 2003, 2003, 2003, 2003, 2003, 2004],
+            "harvest_days": [121, 155, 181, 212, 237, 305, 121, 155, 181, 212, 237, 305, 121, 155, 181, 212, 237, 305, 121],
+            "harvest_operations": ["harvest_only", "harvest_only","harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        {
+            "crop_species": "corn_silage",
+            "planting_years": [2004, 2005, 2006],
+            "pattern_repeat": 3,
+            "planting_skip": 4,
+            "harvesting_skip": 4,
+            "planting_days": [122],
+            "harvest_years": [2004, 2005, 2006],
+            "harvest_days": [273],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+{
+            "crop_species": "triticale_silage",
+            "planting_years": [2004, 2005],
+            "pattern_repeat": 3,
+            "planting_skip": 5,
+            "harvesting_skip": 5,
+            "planting_days": [274],
+            "harvest_years": [2005, 2006],
+            "harvest_days": [121],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+        },
+
+        {
+            "crop_species": "winter_wheat_silage",
+            "planting_years": [2006],
+            "pattern_repeat": 3,
+            "planting_skip": 6,
+            "harvesting_skip": 6,
+            "planting_days": [274],
+            "harvest_years": [2007],
+            "harvest_days": [181],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        }
+]
+}
