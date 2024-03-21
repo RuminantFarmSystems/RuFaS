@@ -355,24 +355,21 @@ class InputManager:
 
         filtered_array_data = []
 
-        if isinstance(input_array_data[0], dict):
-            for array_element in input_array_data:
+        for array_element in input_array_data:
+            if isinstance(array_element, dict):
                 nested_input_data = self._filter_input_data_by_metadata(
                     array_element, metadata_properties["properties"]
                 )
                 if nested_input_data:
                     filtered_array_data.append(nested_input_data)
-
-        elif isinstance(input_array_data[0], list):
-            for array_element in input_array_data:
+            elif isinstance(array_element, list):
                 nested_input_data = self._filter_input_array_data_by_metadata(
                     array_element, metadata_properties["properties"]
                 )
                 if nested_input_data:
                     filtered_array_data.append(nested_input_data)
-
-        elif isinstance(input_array_data[0], (int | float | str | bool)):
-            return input_array_data
+            elif isinstance(array_element, (int | float | str | bool)):
+                filtered_array_data.append(array_element)
 
         return filtered_array_data
 
