@@ -29,16 +29,24 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
+    estimate_maximum_effluent(initial_dry_matter_percentage: float, initial_fresh_mass: float)
+        Estimates the maximum amount of effluent for a stored crop.
     calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int)
         Calculates the dry matter loss to effluent.
-    calculate_protein_degradation()
-        Calculates protein degradation.
-    calculate_heat_generated()
+    calculate_heat_generated(initial_dry_matter_percentage: float, bale_density: float)
         Calculates the total sensible heat generated.
     calculate_bale_density(initial_dry_matter: float)
         Calculates the density of a bale.
     recalculate_nutrient_fractions()
         Recalculates the relative nutrient concentrations after dry matter loss.
+    recalculate_nutrient_concentration(
+        initial_nutrient_concentration: float,
+        loss_coefficient: float,
+        dry_matter_loss: float,
+        initial_dry_matter: float
+    )
+        Recalculates a single nutrient concentration after dry matter loss.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -224,7 +232,6 @@ class Storage:
         Recalculates the relative nutrient concentrations after dry matter loss.
         """
         raise NotImplementedError("Cannot use Storage.recalculate_nutrient_fractions, use a child class.")
-
 
     def recalculate_nutrient_concentration(
         self,

@@ -93,7 +93,9 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_gas method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.calculate_dry_matter_loss_to_gas(100.0, 30)
+    assert "Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class." in str(e.value)
 
 
 @pytest.mark.parametrize(

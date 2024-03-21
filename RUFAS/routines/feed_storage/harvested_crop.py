@@ -105,6 +105,6 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
-        
+
         self.initial_fresh_mass = self.fresh_mass
         self.initial_dry_matter_percentage = self.dry_matter_percentage
