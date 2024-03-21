@@ -31,14 +31,13 @@ class Storage:
         Calculates the dry matter loss to gas.
     calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int)
         Calculates the dry matter loss to effluent.
-    calculate_protein_degradation()
-        Calculates protein degradation.
-    calculate_heat_generated()
+    calculate_heat_generated(moisture_at_baleing: float, bale_density: float)
         Calculates the total sensible heat generated.
     calculate_bale_density(initial_dry_matter: float)
         Calculates the density of a bale.
-    recalculate_nutrient_fractions()
-        Recalculates the relative nutrient concentrations after dry matter loss.
+    recalculate_nutrient_concentration()
+        Recalculates a relative nutrient concentration after dry matter loss.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -232,7 +231,7 @@ class Storage:
         Parameters
         ----------
         initial_nutrient_concentration : float
-            Nutrient concentration in stored crop before loss (units???).
+            Nutrient concentration in stored crop before loss.
         loss_coefficient : float
             Unitless coefficient that regulates how quickly this nutrient is lost.
         dry_matter_loss : float
@@ -243,7 +242,7 @@ class Storage:
         Returns
         -------
         float
-            The nutrient concentration after loss (units???).
+            The nutrient concentration after loss.
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
