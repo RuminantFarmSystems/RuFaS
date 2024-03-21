@@ -295,40 +295,32 @@ def test_filter_input_data_by_metadata(
         ),
         (
             [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {"type": "array", "properties": {
-                "type": "object",
-                "a": {"type": "number"},
-                "b": {"type": "string"},
-                "c": {"type": "bool"}
-            }},
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}]
+            {
+                "type": "array",
+                "properties": {
+                    "type": "object",
+                    "a": {"type": "number"},
+                    "b": {"type": "string"},
+                    "c": {"type": "bool"},
+                },
+            },
+            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
         ),
         (
             [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {"type": "array", "properties": {
-                "type": "object",
-                "a": {"type": "number"},
-                "b": {"type": "string"}
-            }},
-            [{"a": 1, "b": "A"}, {"a": 2, "b": "B"}, {"a": 3, "b": "C"}]
+            {"type": "array", "properties": {"type": "object", "a": {"type": "number"}, "b": {"type": "string"}}},
+            [{"a": 1, "b": "A"}, {"a": 2, "b": "B"}, {"a": 3, "b": "C"}],
         ),
         (
-                [[1, 2, 3, 1.1, 2.2, 3.3]],
-                {"type": "array", "properties": {
-                    "type": "number"
-                }},
-                [[1, 2, 3, 1.1, 2.2, 3.3]],
+            [[1, 2, 3, 1.1, 2.2, 3.3]],
+            {"type": "array", "properties": {"type": "number"}},
+            [[1, 2, 3, 1.1, 2.2, 3.3]],
         ),
         (
             [[1, 2, 3], [1.1, 2.2, 3.3]],
-            {"type": "array", "properties": {
-                "type": "array",
-                "properties": {
-                    "type": "number"
-                }
-            }},
+            {"type": "array", "properties": {"type": "array", "properties": {"type": "number"}}},
             [[1, 2, 3], [1.1, 2.2, 3.3]],
-        )
+        ),
     ],
 )
 def test_filter_input_array_data_by_metadata(
