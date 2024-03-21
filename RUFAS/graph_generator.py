@@ -103,8 +103,9 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
-    def __init__(self, metadata_prefix: str = "") -> None:
+    def __init__(self, metadata_prefix: str = "", time_converter: Callable[..., Any] | None = None) -> None:
         self.metadata_prefix = metadata_prefix
+        self._time_converter = time_converter
 
     def generate_graph(
         self,
@@ -167,15 +168,16 @@ class GraphGenerator:
 
             figure_width = 10
             figure_height = 6
-            fig, _ = plt.subplots(figsize=(figure_width, figure_height))
+            fig, ax = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
-            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
-            self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
+            self._draw_graph(
+                graph_details["type"], prepared_data, prepared_data.keys(), graph_details.get("time_format")
+            )
             legend = graph_details.get("legend")
             if not legend:
                 graph_details["legend"] = list(prepared_data.keys())
-            self._customize_graph(fig, graph_details)
+            self._customize_graph(fig, ax, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
             return all_logs
@@ -203,7 +205,11 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
+        optional_graph_filter_keys = (
+            list(FIGURE_SETTERS.keys())
+            + list(AXES_SETTERS.keys())
+            + ["variables", "time_format", "time_locator", "time_interval"]
+        )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
@@ -330,6 +336,7 @@ class GraphGenerator:
         graph_type: str,
         data: Dict[str, List[int | float]],
         selected_variables: Optional[List[str]] = None,
+        time_format: Optional[str] = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -358,9 +365,12 @@ class GraphGenerator:
             plot_function(indices_list, values_tuple)
         else:
             for value in data.values():
-                plot_function(value)
+                time_data = list(range(1, len(value) + 1))  # As simulation days
+                if self._time_converter and time_format and time_format != "default":
+                    time_data = [self._time_converter(time) for time in time_data]  # As date objects
+                plot_function(time_data, value)
 
-    def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
+    def _customize_graph(self, fig: Figure, ax: Axes, customization_details: Dict[str, Any]) -> None:
         """
         Apply customizations to the graph.
 
@@ -381,6 +391,54 @@ class GraphGenerator:
                 AXES_SETTERS[attrib](fig.axes[0], value, loc=legend_location, bbox_to_anchor=placement_of_legend)
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
+            elif attrib == "time_format":
+                self._set_time_axis(
+                    ax, value, customization_details.get("time_locator"), customization_details.get("time_interval")
+                )
+
+    def _set_time_axis(self, ax: Axes, time_format: str, time_locator: str | None, time_interval: int | None) -> None:
+        """
+        Set the time axis for the graph.
+
+        Parameters
+        ----------
+        ax : Axes
+            The matplotlib Axes object to customize.
+        time_format : str
+            The time format to use for the x-axis.
+        time_locator : str
+            The time locator to use for the x-axis.
+        time_interval : int
+            The time interval to use for the x-axis.
+        """
+
+        if time_format == "default":
+            locator = (
+                matplotlib.dates.AutoDateLocator()
+                if time_interval is None
+                else matplotlib.dates.DayLocator(interval=time_interval)
+            )
+            ax.xaxis.set_major_locator(locator)
+            return
+
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter(time_format))
+        locator = None
+        if time_locator == "month":
+            locator = (
+                matplotlib.dates.MonthLocator()
+                if time_interval is None
+                else matplotlib.dates.MonthLocator(interval=time_interval)
+            )
+        elif time_locator == "day":
+            locator = (
+                matplotlib.dates.DayLocator()
+                if time_interval is None
+                else matplotlib.dates.DayLocator(interval=time_interval)
+            )
+        elif time_locator == "year":
+            locator = matplotlib.dates.YearLocator()
+        if locator:
+            ax.xaxis.set_major_locator(locator)
 
     def _save_graph(
         self,

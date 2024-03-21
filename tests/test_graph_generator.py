@@ -1,6 +1,8 @@
 from pathlib import Path
+
+import matplotlib
 from freezegun import freeze_time
-from typing import Dict, List
+from typing import Dict, List, Type
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
@@ -142,8 +144,8 @@ def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None
         "facecolor": "red",
         "dpi": 100,
     }
-    fig = plt.figure()
-    graph_generator._customize_graph(fig, customization_details)
+    fig, ax = plt.subplots()
+    graph_generator._customize_graph(fig, ax, customization_details)
     assert (fig.get_size_inches() == (6, 4)).all()
     assert fig.get_facecolor() == (1.0, 0.0, 0.0, 1.0)  # RGBA
     assert fig.get_dpi() == 100
@@ -157,7 +159,7 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
         "xlabel": "X-axis Label",
         "ylabel": "Y-axis Label",
     }
-    graph_generator._customize_graph(fig, customization_details)
+    graph_generator._customize_graph(fig, ax, customization_details)
     assert ax.get_title() == "Test Plot"
     assert ax.get_xlabel() == "X-axis Label"
     assert ax.get_ylabel() == "Y-axis Label"
@@ -198,7 +200,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys())
+    graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys(), None)
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
 
@@ -255,7 +257,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
         graph_generator._draw_graph("plot", data)
 
         for value in data.values():
-            mock_plot_functions_dict["plot"].assert_any_call(value)
+            mock_plot_functions_dict["plot"].assert_any_call([i for i in range(1, len(value) + 1)], value)
 
 
 @pytest.mark.parametrize(
@@ -471,3 +473,43 @@ def test_validate_graph_filter(
 
     if expected_length > 0:
         assert expected_message in result[0]["message"]
+
+
+@pytest.mark.parametrize(
+    "time_format, time_locator, time_interval, " "expected_format, expected_locator, expected_interval",
+    [
+        ("default", None, None, None, matplotlib.dates.AutoDateLocator, None),
+        ("default", None, 5, None, matplotlib.dates.DayLocator, 5),
+        ("%Y-%m-%d", "day", 365, "%Y-%m-%d", matplotlib.dates.DayLocator, 365),
+        ("%Y-%m-%d", "month", 1, "%Y-%m-%d", matplotlib.dates.MonthLocator, 1),
+        ("%Y-%m-%d", "year", None, "%Y-%m-%d", matplotlib.dates.YearLocator, None),
+    ],
+)
+def test_set_time_axis(
+    time_format: str,
+    time_locator: str | None,
+    time_interval: int | None,
+    expected_format: str | None,
+    expected_locator: Type[matplotlib.dates.DateLocator],
+    expected_interval: int | None,
+) -> None:
+    """
+    Unit test for the _set_time_axis() method in the GraphGenerator class.
+    """
+
+    # Arrange
+    graph_generator = GraphGenerator()
+    fig, ax = plt.subplots()
+
+    # Act
+    graph_generator._set_time_axis(ax, time_format, time_locator, time_interval)
+
+    # Assert
+    if expected_format is not None:
+        assert isinstance(ax.xaxis.get_major_formatter(), matplotlib.dates.DateFormatter)
+        assert ax.xaxis.get_major_formatter().fmt == expected_format
+
+    assert isinstance(ax.xaxis.get_major_locator(), expected_locator)
+
+    if expected_interval is not None and hasattr(ax.xaxis.get_major_locator(), "interval"):
+        assert ax.xaxis.get_major_locator().interval == expected_interval

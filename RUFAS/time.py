@@ -1,3 +1,5 @@
+import datetime
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -157,3 +159,24 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
+
+    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.date:
+        """
+        Convert the simulation day to a date object that is relative to the start date of the simulation.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The simulation day to convert to a date object.
+
+        Returns
+        -------
+        datetime.date
+            The date object that corresponds to the simulation day.
+        """
+
+        start_year = int(self.start_full_date[0])
+        start_day_of_year = int(self.start_full_date[1])
+        start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
+        actual_date = start_date + datetime.timedelta(days=simulation_day - 1)
+        return actual_date
