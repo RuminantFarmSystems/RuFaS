@@ -346,7 +346,6 @@ class InputManager:
         -----------
         input_array_data : List[Any]
             The input array data to be filtered.
-
         metadata_properties : Dict[str, Any]
             The dictionary containing metadata properties used as a filter for input_array_data.
         """
