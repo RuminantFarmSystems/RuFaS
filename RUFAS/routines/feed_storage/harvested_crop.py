@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
 
@@ -40,6 +40,10 @@ class HarvestedCrop:
         Percent of mass that is labile carbohydrate.
     ash : float
         Percent of mass that is ash.
+    initial_fresh_mass : float
+        The initial fresh mass of the crop in kg.
+    initial_dry_matter_percentage : float
+        The initial percentage of the fresh mass in kg.
 
     Methods
     -------
@@ -62,10 +66,12 @@ class HarvestedCrop:
     lignin: float
     sugar: float
     ash: float
+    initial_fresh_mass: float = field(init=False)
+    initial_dry_matter_percentage: float = field(init=False)
 
     def __post_init__(self):
         """
-        Validates that the type of the crop is consistent with its category.
+        Validates that the type of the crop is consistent with its category and records initial crop values.
 
         Raises
         ------
@@ -99,3 +105,6 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+        self.initial_fresh_mass = self.fresh_mass
+        self.initial_dry_matter_percentage = self.dry_matter_percentage
