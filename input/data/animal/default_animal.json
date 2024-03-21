@@ -7,7 +7,9 @@
     "cow_num": 100,
     "replace_num": 500,
     "herd_num": 100,
-    "breed": "HO"
+    "breed": "HO",
+	"parity_percentages": [0.386, 0.281, 0.333],
+	"annual_milk_yield_lbs": null
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
