@@ -69,7 +69,7 @@ class HarvestedCrop:
     initial_fresh_mass: float = field(init=False)
     initial_dry_matter_percentage: float = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Validates that the type of the crop is consistent with its category and records initial crop values.
 
