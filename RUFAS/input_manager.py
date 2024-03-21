@@ -399,12 +399,11 @@ class InputManager:
                     nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
-                if isinstance(metadata_properties[key], dict) and isinstance(value, list):
+                elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
                     array_input_data = self._filter_input_array_data_by_metadata(
                         value, metadata_properties[key])
                     if array_input_data:
                         filtered_input_data[key] = array_input_data
-
                 else:
                     filtered_input_data[key] = value
 
