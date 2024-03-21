@@ -136,6 +136,30 @@ class Storage:
         """
         pass
 
+    def estimate_maximum_effluent(self, initial_dry_matter_percentage: float, initial_fresh_mass: float) -> float:
+        """
+        Estimates the maximum effluence of a stored crop.
+
+        Parameters
+        ----------
+        dry_matter_percentage : float
+            Initial percentage of a stored crop's fresh mass that is dry matter.
+        fresh_mass : float
+            Initial fresh mass of a stored crop in kg.
+
+        Returns
+        -------
+        float
+            Estimated maximum effluent of the stored crop in kg water.
+
+        """
+        initial_dry_matter_fraction = initial_dry_matter_percentage / 100
+
+        if initial_dry_matter_fraction >= 0.3:
+            return 0.0
+
+        return initial_fresh_mass * ((1 - initial_dry_matter_fraction) - 0.7)
+
     def calculate_dry_matter_loss_to_effluent(
         self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
     ):

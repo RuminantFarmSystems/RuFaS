@@ -94,6 +94,25 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
     pass
 
 
+@pytest.mark.parametrize(
+    "dry_matter,mass,expected",
+    [
+        (31, 100.0, 0.0),
+        (30, 100.0, 0.0),
+        (25, 200.0, 10.0),
+        (1, 150.0, 43.5),
+        (0, 250.0, 75.0),
+    ],
+)
+def test_estimate_maximum_effluent(storage: Storage, dry_matter: float, mass: float, expected: float) -> None:
+    """
+    Test the estimate_maximum_effluent method of the Storage class.
+    """
+    actual = storage.estimate_maximum_effluent(dry_matter, mass)
+
+    assert pytest.approx(actual) == expected
+
+
 def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
