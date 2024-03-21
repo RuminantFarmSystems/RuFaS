@@ -209,7 +209,7 @@ class Storage:
             The total sensible heat generated in kJ/kg.
 
         """
-        moisture_at_baling = 1 - initial_dry_matter_percentage
+        moisture_at_baling = 100 - initial_dry_matter_percentage
         return 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (moisture_at_baling**1.23) * (
             bale_density**0.94
         )
