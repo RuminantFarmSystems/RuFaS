@@ -77,7 +77,9 @@ def test_process_degradations(storage: Storage) -> None:
     """
     Test the process_degradations method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.process_degradations()
+    assert "Cannot use Storage.process_degradations, use a child class." in str(e.value)
 
 
 def test_give_feed(storage: Storage) -> None:
@@ -113,18 +115,25 @@ def test_estimate_maximum_effluent(storage: Storage, dry_matter: float, mass: fl
     assert pytest.approx(actual) == expected
 
 
-def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
+@pytest.mark.parametrize(
+    "dry_matter,max_effluent,days,expected",
+    [
+        (100.0, 25.0, 8, 0.0207),
+        (350.0, 40.0, 2, 0.002365714),
+        (30.0, 55.0, 12, 0.2277),
+        (400.0, 12.0, 1, 0.0003105),
+        (100.0, 0.0, 4, 0.0),
+    ],
+)
+def test_calculate_dry_matter_loss_to_effluent(
+    storage: Storage, dry_matter: float, max_effluent: float, days: int, expected: float
+) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
     """
-    pass
+    actual = storage.calculate_dry_matter_loss_to_effluent(dry_matter, max_effluent, days)
 
-
-def test_calculate_protein_degradation(storage: Storage):
-    """
-    Test the calculate_protein_degradation method of the Storage class.
-    """
-    pass
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
@@ -154,8 +163,35 @@ def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: f
     assert actual == expected
 
 
-def test_recalculate_nutrient_fractions(storage: Storage):
+def test_recalculate_nutrient_fractions(storage: Storage) -> None:
     """
     Test the recalculate_nutrient_fractions method of the Storage class.
     """
-    pass
+    with pytest.raises(NotImplementedError) as e:
+        storage.recalculate_nutrient_fractions()
+    assert "Cannot use Storage.recalculate_nutrient_fractions, use a child class." in str(e.value)
+
+
+@pytest.mark.parametrize(
+    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected",
+    [
+        (8.0, 0.4, 20.0, 100.0, 1.9),
+        (4.0, 0.17, 21.0, 150.0, 0.623488),
+        (0.5, 0.7, 100.0, 200.0, 0.0),
+        (3.4, 0.8, 0.0, 200.0, 0.0),
+    ],
+)
+def test_recalculate_nutrient_concentration(
+    storage: Storage,
+    nutrients: float,
+    loss_coefficient: float,
+    dry_matter_loss: float,
+    dry_matter: float,
+    expected: float,
+) -> None:
+    """
+    Test the recalculate_nutrient_concentration method of the Storage class.
+    """
+    actual = storage.recalculate_nutrient_concentration(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
+
+    assert pytest.approx(actual) == expected
