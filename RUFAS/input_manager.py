@@ -396,12 +396,14 @@ class InputManager:
             if key in metadata_properties:
                 if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
                     nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
-                        value, metadata_properties[key])
+                        value, metadata_properties[key]
+                    )
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
                 elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
                     array_input_data: List[Any] = self._filter_input_array_data_by_metadata(
-                        value, metadata_properties[key])
+                        value, metadata_properties[key]
+                    )
                     if array_input_data:
                         filtered_input_data[key] = array_input_data
                 else:
