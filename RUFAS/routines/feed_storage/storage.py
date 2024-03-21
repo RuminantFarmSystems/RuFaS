@@ -29,16 +29,24 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
+    estimate_maximum_effluent(initial_dry_matter_percentage: float, initial_fresh_mass: float)
+        Estimates the maximum amount of effluent for a stored crop.
     calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int)
         Calculates the dry matter loss to effluent.
-    calculate_protein_degradation()
-        Calculates protein degradation.
-    calculate_heat_generated()
+    calculate_heat_generated(initial_dry_matter_percentage: float, bale_density: float)
         Calculates the total sensible heat generated.
     calculate_bale_density(initial_dry_matter: float)
         Calculates the density of a bale.
     recalculate_nutrient_fractions()
         Recalculates the relative nutrient concentrations after dry matter loss.
+    recalculate_nutrient_concentration(
+        initial_nutrient_concentration: float,
+        loss_coefficient: float,
+        dry_matter_loss: float,
+        initial_dry_matter: float
+    )
+        Recalculates a single nutrient concentration after dry matter loss.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -91,17 +99,13 @@ class Storage:
         storage_crop = copy.deepcopy(crop)
         self.stored.append(storage_crop)
 
-    def process_degradations(self):
+    def process_degradations(self) -> None:
         """
         Processes the degradations and losses of the stored crops.
-
-        Returns
-        -------
-        None
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.process_degradations, use a child class.")
 
-    def give_feed(self, amount: float, crop_type: CropType):
+    def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
         Gives out a specified amount of feed of a certain crop type.
 
@@ -112,9 +116,6 @@ class Storage:
         crop_type : CropType
             The type of crop to give out.
 
-        Returns
-        -------
-        None
         """
         pass
 
@@ -134,50 +135,76 @@ class Storage:
         float
             The amount of dry matter lost to gas.
         """
-        pass
+        raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class.")
+
+    def estimate_maximum_effluent(self, initial_dry_matter_percentage: float, initial_fresh_mass: float) -> float:
+        """
+        Estimates the maximum effluence of a stored crop.
+
+        Parameters
+        ----------
+        dry_matter_percentage : float
+            Initial percentage of a stored crop's fresh mass that is dry matter.
+        fresh_mass : float
+            Initial fresh mass of a stored crop in kg.
+
+        Returns
+        -------
+        float
+            Estimated maximum effluent of the stored crop in kg water.
+
+        """
+        initial_dry_matter_fraction = initial_dry_matter_percentage / 100
+
+        if initial_dry_matter_fraction >= 0.3:
+            return 0.0
+
+        return initial_fresh_mass * ((1 - initial_dry_matter_fraction) - 0.7)
 
     def calculate_dry_matter_loss_to_effluent(
         self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
-    ):
+    ) -> float:
         """
         Calculates the dry matter loss to effluent.
 
         Parameters
         ----------
         dry_matter : float
-            The amount of dry matter.
+            The amount of dry matter in kg.
         estimated_maximum_effluent : float
-            The estimated maximum effluent.
+            The estimated maximum effluent in kg.
         time_in_silo : int
             Time in days the crop has been in the silo.
 
         Returns
         -------
         float
-            The amount of dry matter lost to effluent.
-        """
-        pass
+            The amount of dry matter lost to effluent in kg.
 
-    def calculate_protein_degradation(self):
         """
-        Calculates protein degradation.
+        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) * (1 / dry_matter)
 
-        Returns
-        -------
-        None
-        """
-        pass
-
-    def calculate_heat_generated(self) -> float:
+    def calculate_heat_generated(self, initial_dry_matter_percentage: float, bale_density: float) -> float:
         """
         Calculates the total sensible heat generated.
+
+        Parameters
+        ----------
+        initial_dry_matter_percentage : float
+            Initial percentage of fresh mass that is not dry matter when a crop is baled.
+        bale_density : float
+            Density of the bale in kg dry matter per cubic meter.
 
         Returns
         -------
         float
             The total sensible heat generated in kJ/kg.
+
         """
-        pass
+        moisture_at_baling: float = 100 - initial_dry_matter_percentage
+        heat_generated: float = 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (
+            moisture_at_baling**1.23) * (bale_density**0.94)
+        return heat_generated
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
@@ -185,22 +212,55 @@ class Storage:
 
         Parameters
         ----------
-        initial_dry_matter : float
-            The initial dry matter of the bale.
+        initial_dry_matter_percentage : float
+            The initial dry matter percentage of the bale.
 
         Returns
         -------
         float
-            The density of the bale.
-        """
-        pass
+            The density of the bale in kg dry matter per cubic meter.
 
-    def recalculate_nutrient_fractions(self):
+        """
+        moisture_fraction = 1 - (initial_dry_matter / 100)
+        return 100 + 440 * moisture_fraction
+
+    def recalculate_nutrient_fractions(self) -> None:
         """
         Recalculates the relative nutrient concentrations after dry matter loss.
+        """
+        raise NotImplementedError("Cannot use Storage.recalculate_nutrient_fractions, use a child class.")
+
+    def recalculate_nutrient_concentration(
+        self,
+        initial_nutrient_concentration: float,
+        loss_coefficient: float,
+        dry_matter_loss: float,
+        initial_dry_matter: float,
+    ) -> float:
+        """
+        Recalculates the relative nutrient concentration after dry matter loss.
+
+        Parameters
+        ----------
+        initial_nutrient_concentration : float
+            Nutrient concentration in stored crop before loss.
+        loss_coefficient : float
+            Unitless coefficient that regulates how quickly this nutrient is lost.
+        dry_matter_loss : float
+            Amount of dry matter lost from stored crop in kg.
+        initial_dry_matter : float
+            Amount of dry matter stored crop contained before loss in kg.
 
         Returns
         -------
-        None
+        float
+            The nutrient concentration after loss.
+
         """
-        pass
+        dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
+        bounded_loss_coefficient = min(initial_nutrient_concentration, loss_coefficient)
+        return (
+            (initial_nutrient_concentration - bounded_loss_coefficient)
+            * dry_matter_loss_fraction
+            / (1 - dry_matter_loss_fraction)
+        )
