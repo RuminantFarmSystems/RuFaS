@@ -99,3 +99,11 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+    def _calculate_bale_density(self) -> float:
+        """
+        Calculates the density of baled crop.
+
+        
+
+        """
