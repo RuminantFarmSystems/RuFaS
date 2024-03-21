@@ -46,6 +46,17 @@ def test_invalid_category_type_combinations(category: CropCategory, crop_type: C
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
+def test_post_init() -> None:
+    """Tests that variables are correctly intialized by the post init method."""
+    expected_initial_fresh_mass = sample_crop_data["fresh_mass"]
+    expected_initial_dry_matter_percentage = sample_crop_data["dry_matter_percentage"]
+
+    actual = HarvestedCrop(category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data)
+
+    assert actual.initial_fresh_mass == expected_initial_fresh_mass
+    assert actual.initial_dry_matter_percentage == expected_initial_dry_matter_percentage
+
+
 def test_attributes() -> None:
     crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]

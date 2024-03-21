@@ -185,15 +185,17 @@ class Storage:
 
         Parameters
         ----------
-        initial_dry_matter : float
-            The initial dry matter of the bale.
+        initial_dry_matter_percentage : float
+            The initial dry matter percentage of the bale.
 
         Returns
         -------
         float
-            The density of the bale.
+            The density of the bale in kg dry matter per cubic meter.
+
         """
-        pass
+        moisture_fraction = 1 - (initial_dry_matter / 100)
+        return 100 + 440 * moisture_fraction
 
     def recalculate_nutrient_fractions(self):
         """

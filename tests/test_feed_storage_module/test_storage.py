@@ -115,11 +115,14 @@ def test_calculate_heat_generated(storage: Storage):
     pass
 
 
-def test_calculate_bale_density(storage: Storage):
+@pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])
+def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: float) -> None:
     """
     Test the calculate_bale_density method of the Storage class.
     """
-    pass
+    actual = storage.calculate_bale_density(dry_matter)
+
+    assert actual == expected
 
 
 def test_recalculate_nutrient_fractions(storage: Storage):
