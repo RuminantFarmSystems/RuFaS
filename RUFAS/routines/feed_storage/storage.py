@@ -105,7 +105,7 @@ class Storage:
         """
         raise NotImplementedError("Cannot use Storage.process_degradations, use a child class.")
 
-    def give_feed(self, amount: float, crop_type: CropType):
+    def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
         Gives out a specified amount of feed of a certain crop type.
 
@@ -116,9 +116,6 @@ class Storage:
         crop_type : CropType
             The type of crop to give out.
 
-        Returns
-        -------
-        None
         """
         pass
 
@@ -204,10 +201,10 @@ class Storage:
             The total sensible heat generated in kJ/kg.
 
         """
-        moisture_at_baling = 100 - initial_dry_matter_percentage
-        return 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (moisture_at_baling**1.23) * (
-            bale_density**0.94
-        )
+        moisture_at_baling: float = 100 - initial_dry_matter_percentage
+        heat_generated: float = 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (
+            moisture_at_baling**1.23) * (bale_density**0.94)
+        return heat_generated
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
@@ -239,7 +236,7 @@ class Storage:
         loss_coefficient: float,
         dry_matter_loss: float,
         initial_dry_matter: float,
-    ) -> None:
+    ) -> float:
         """
         Recalculates the relative nutrient concentration after dry matter loss.
 

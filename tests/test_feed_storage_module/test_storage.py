@@ -30,7 +30,7 @@ def harvested_crop() -> HarvestedCrop:
     """
     category = CropCategory.SMALL_GRAIN
     crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
@@ -60,7 +60,9 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
+    incompatible_crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
 
