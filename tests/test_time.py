@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Dict, Any
 
 import pytest
@@ -469,3 +470,35 @@ def test_is_last_day_of_simulation(mock_time: Time) -> None:
         assert not time.is_last_day_of_simulation
         time.advance()
     assert time.is_last_day_of_simulation
+
+
+@pytest.mark.parametrize(
+    "start_date_str, simulation_day, expected_date",
+    [
+        # Year 2023
+        ("2023:1", 1, date(2023, 1, 1)),
+        ("2023:1", 365, date(2023, 12, 31)),
+        # Year 2024 (Leap Year)
+        ("2024:1", 1, date(2024, 1, 1)),
+        ("2024:1", 366, date(2024, 12, 31)),
+        ("2024:15", 17, date(2024, 1, 31)),
+    ],
+)
+def test_convert_simulation_day_to_date(
+    mocker: MockerFixture, start_date_str: str, simulation_day: int, expected_date: date
+) -> None:
+    """
+    Unit test for the convert_simulation_day_to_date method of the Time class.
+    """
+
+    # Arrange
+    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    time = Time()
+    year, doy = start_date_str.split(":")
+    time.start_full_date = [year, doy]
+
+    # Act
+    actual_date = time.convert_simulation_day_to_date(simulation_day)
+
+    # Assert
+    assert actual_date == expected_date
