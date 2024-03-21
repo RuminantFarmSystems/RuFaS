@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple
+from typing import Any, Dict, List, Union, Tuple, Callable
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -120,6 +120,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self._time_converter: Callable[..., Any] | None = None
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -908,7 +909,7 @@ class OutputManager(object):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    graph_generator = GraphGenerator(self.__metadata_prefix, self._time_converter)
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
@@ -1233,3 +1234,6 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def set_time_converter(self, time_converter: Callable[..., Any]) -> None:
+        self._time_converter = time_converter
