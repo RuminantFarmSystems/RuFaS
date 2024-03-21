@@ -127,11 +127,21 @@ def test_calculate_protein_degradation(storage: Storage):
     pass
 
 
-def test_calculate_heat_generated(storage: Storage):
+@pytest.mark.parametrize(
+    "dry_matter,density,expected",
+    [
+        (100.0, 100.0, 0.0),
+        (92.5, 600.0, 233813.848370),
+        (75.0, 10_000.0, 13327549.589989),
+    ],
+)
+def test_calculate_heat_generated(storage: Storage, dry_matter: float, density: float, expected: float) -> None:
     """
     Test the calculate_heat_generated method of the Storage class.
     """
-    pass
+    actual = storage.calculate_heat_generated(dry_matter, density)
+
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])

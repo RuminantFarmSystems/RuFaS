@@ -192,16 +192,27 @@ class Storage:
         """
         pass
 
-    def calculate_heat_generated(self) -> float:
+    def calculate_heat_generated(self, initial_dry_matter_percentage: float, bale_density: float) -> float:
         """
         Calculates the total sensible heat generated.
+
+        Parameters
+        ----------
+        initial_dry_matter_percentage : float
+            Initial percentage of fresh mass that is not dry matter when a crop is baled.
+        bale_density : float
+            Density of the bale in kg dry matter per cubic meter.
 
         Returns
         -------
         float
             The total sensible heat generated in kJ/kg.
+
         """
-        pass
+        moisture_at_baling = 1 - initial_dry_matter_percentage
+        return 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (moisture_at_baling**1.23) * (
+            bale_density**0.94
+        )
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
