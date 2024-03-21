@@ -336,9 +336,9 @@ class InputManager:
 
         return self.elements_counter.invalid_elements == 0
 
-    def _filter_input_array_data_by_metadata(self,
-                                             input_array_data: List[Any],
-                                             metadata_properties: Dict[str, Any]) -> List[Any]:
+    def _filter_input_array_data_by_metadata(
+        self, input_array_data: List[Any], metadata_properties: Dict[str, Any]
+    ) -> List[Any]:
         """
         Filter input array data based on provided metadata properties.
 
@@ -358,14 +358,16 @@ class InputManager:
         if isinstance(input_array_data[0], dict):
             for array_element in input_array_data:
                 nested_input_data = self._filter_input_data_by_metadata(
-                    array_element, metadata_properties["properties"])
+                    array_element, metadata_properties["properties"]
+                )
                 if nested_input_data:
                     filtered_array_data.append(nested_input_data)
 
         elif isinstance(input_array_data[0], list):
             for array_element in input_array_data:
                 nested_input_data = self._filter_input_array_data_by_metadata(
-                    array_element, metadata_properties["properties"])
+                    array_element, metadata_properties["properties"]
+                )
                 if nested_input_data:
                     filtered_array_data.append(nested_input_data)
 
@@ -400,8 +402,7 @@ class InputManager:
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
                 elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
-                    array_input_data = self._filter_input_array_data_by_metadata(
-                        value, metadata_properties[key])
+                    array_input_data = self._filter_input_array_data_by_metadata(value, metadata_properties[key])
                     if array_input_data:
                         filtered_input_data[key] = array_input_data
                 else:
