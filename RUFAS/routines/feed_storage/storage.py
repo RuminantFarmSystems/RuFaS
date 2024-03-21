@@ -203,7 +203,8 @@ class Storage:
         """
         moisture_at_baling: float = 100 - initial_dry_matter_percentage
         heat_generated: float = 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (
-            moisture_at_baling**1.23) * (bale_density**0.94)
+            moisture_at_baling**1.23
+        ) * (bale_density**0.94)
         return heat_generated
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
