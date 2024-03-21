@@ -336,6 +336,44 @@ class InputManager:
 
         return self.elements_counter.invalid_elements == 0
 
+    def _filter_input_array_data_by_metadata(self,
+                                             input_array_data: List[Any],
+                                             metadata_properties: Dict[str, Any]) -> List[Any]:
+        """
+        Filter input array data based on provided metadata properties.
+
+        Parameters:
+        -----------
+        input_array_data : List[Any]
+            The input array data to be filtered.
+
+        metadata_properties : Dict[str, Any]
+            The dictionary containing metadata properties used as a filter for input_array_data.
+        """
+        if len(input_array_data) == 0:
+            return input_array_data
+
+        filtered_array_data = []
+
+        if isinstance(input_array_data[0], dict):
+            for array_element in input_array_data:
+                nested_input_data = self._filter_input_data_by_metadata(
+                    array_element, metadata_properties["properties"])
+                if nested_input_data:
+                    filtered_array_data.append(nested_input_data)
+
+        elif isinstance(input_array_data[0], list):
+            for array_element in input_array_data:
+                nested_input_data = self._filter_input_array_data_by_metadata(
+                    array_element, metadata_properties["properties"])
+                if nested_input_data:
+                    filtered_array_data.append(nested_input_data)
+
+        elif isinstance(input_array_data[0], (int | float | str | bool)):
+            return input_array_data
+
+        return filtered_array_data
+
     def _filter_input_data_by_metadata(
         self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -361,6 +399,12 @@ class InputManager:
                     nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
+                if isinstance(metadata_properties[key], dict) and isinstance(value, list):
+                    array_input_data = self._filter_input_array_data_by_metadata(
+                        value, metadata_properties[key])
+                    if array_input_data:
+                        filtered_input_data[key] = array_input_data
+
                 else:
                     filtered_input_data[key] = value
 
