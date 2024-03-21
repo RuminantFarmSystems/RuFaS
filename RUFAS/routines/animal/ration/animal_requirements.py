@@ -1,13 +1,13 @@
+from typing import Dict, List
+
 import math
 import numpy as np
 
-from typing import Dict, List
-
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 om = OutputManager()
 
@@ -96,8 +96,8 @@ class AnimalRequirements:
         calc_method: str = "mean",
     ) -> None:
         """
-        This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats
-        generated in ration_driver.set_requirements
+        This functions sets the average (or median or #th percentile) pen requirements. Each input parameter is a list
+        of floats generated in ration_driver.set_requirements
 
         Parameters
         ----------
@@ -129,38 +129,36 @@ class AnimalRequirements:
             list of milk_production_reduction values for all animals in the pen (kg)
         calc_method: str
             The summary statistic to be used (e.g. mean, median, etc)
+
         """
-        if calc_method == "mean":
-            # populating the class variables as an average across cows for each requirement
-            self.NEmaint_requirement = np.mean(NEmaint_requirement_list)
-            self.NEa_requirement = np.mean(NEa_requirement_list)
-            self.NEg_requirement = np.mean(NEg_requirement_list)
-            self.NEpreg_requirement = np.mean(NEpreg_requirement_list)
-            self.NEl_requirement = np.mean(NEl_requirement_list)
-            self.MP_requirement = np.mean(MP_requirement_list)
-            self.Ca_requirement = np.mean(Ca_requirement_list)
-            self.P_requirement = np.mean(P_requirement_list)
-            self.DMIest_requirement = np.mean(DMIest_requirement_list)
-            self.avg_BW = np.mean(BW)
-            self.avg_milk = np.mean(milk)
-            self.avg_CP_milk = np.mean(CP_milk)
-            self.avg_milk_production_reduction = np.mean(milk_production_reduction)
-        else:
-            # here we'd implement another method, e.g. percentile, median, etc.
-            requirement_percentile = 90
-            self.NEmaint_requirement = np.percentile(NEmaint_requirement_list, requirement_percentile)
-            self.NEa_requirement = np.percentile(NEa_requirement_list, requirement_percentile)
-            self.NEg_requirement = np.percentile(NEg_requirement_list, requirement_percentile)
-            self.NEpreg_requirement = np.percentile(NEpreg_requirement_list, requirement_percentile)
-            self.NEl_requirement = np.percentile(NEl_requirement_list, requirement_percentile)
-            self.MP_requirement = np.percentile(MP_requirement_list, requirement_percentile)
-            self.Ca_requirement = np.percentile(Ca_requirement_list, requirement_percentile)
-            self.P_requirement = np.percentile(P_requirement_list, requirement_percentile)
-            self.DMIest_requirement = np.percentile(DMIest_requirement_list, requirement_percentile)
-            self.avg_BW = np.percentile(BW, requirement_percentile)
-            self.avg_milk = np.percentile(milk, requirement_percentile)
-            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
+
+        attr_names_to_args_map = {
+            "NEmaint_requirement": NEmaint_requirement_list,
+            "NEa_requirement": NEa_requirement_list,
+            "NEg_requirement": NEg_requirement_list,
+            "NEpreg_requirement": NEpreg_requirement_list,
+            "NEl_requirement": NEl_requirement_list,
+            "MP_requirement": MP_requirement_list,
+            "Ca_requirement": Ca_requirement_list,
+            "P_requirement": P_requirement_list,
+            "DMIest_requirement": DMIest_requirement_list,
+            "avg_BW": BW,
+            "avg_milk": milk,
+            "avg_CP_milk": CP_milk,
+            "avg_milk_production_reduction": milk_production_reduction,
+        }
+
+        calc_method_to_function_map = {
+            "mean": np.mean,
+            "median": np.median,
+            "percentile": np.percentile,
+        }
+
+        default_percentile = 90
+        stats_args = [default_percentile] if calc_method == "percentile" else []
+
+        for attribute_name, arg in attr_names_to_args_map.items():
+            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
         """
