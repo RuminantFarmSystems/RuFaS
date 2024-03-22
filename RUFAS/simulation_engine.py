@@ -123,7 +123,7 @@ class SimulationEngine:
             simulating_day_log = f"simulating day: {self.time}"
             om.add_log("simulation_day", simulating_day_log, info_map)
         self.time.advance()
-        self.animal_manager.simulation_day += 1 # todo
+        self.animal_manager.simulation_day += 1  # todo
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
