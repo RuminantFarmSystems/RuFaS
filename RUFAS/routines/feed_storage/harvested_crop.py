@@ -108,3 +108,28 @@ class HarvestedCrop:
 
         self.initial_fresh_mass = self.fresh_mass
         self.initial_dry_matter_percentage = self.dry_matter_percentage
+
+    @property
+    def dry_matter_mass(self) -> float:
+        """
+        Calculates the dry matter mass of this crop in kg.
+        """
+        return self.dry_matter_percentage * self.fresh_mass
+
+    @property
+    def days_stored(self, time: Time) -> int:
+        """
+        Calculates the number of days this crop has been stored for.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance tracking the current time of the RuFaS simulation.
+
+        Returns
+        -------
+        int
+            The number of days this crop has been stored for.
+        
+        """
+        return time.index - self.storage_time.index
