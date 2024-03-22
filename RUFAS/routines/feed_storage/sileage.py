@@ -1,5 +1,6 @@
 from .storage import Storage
 from .enums import CropCategory
+from RUFAS.time import Time
 from typing import Optional
 
 
@@ -18,6 +19,35 @@ class Sileage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+
+        self.crude_protein_loss_coefficient = 0.0
+        self.fiber_loss_coefficient = 0.0
+
+    def process_degradations(self, temperature: float, time: Time) -> None:
+        """
+        Processes the daily degradations and losses of ensiled crops.
+
+        Parameters
+        ----------
+        temperature : float
+            Ambient temperature in degrees C.
+        time : Time
+            The number of days this crop has been stored for.
+        
+        """
+        for crop in self.stored:
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, temperature)
+            estimated_max_effluent = self.estimate_maximum_effluent(crop.initial_dry_matter_percentage, crop.initial_fresh_mass)
+            time_in_silo = crop.days_stored(time)
+            effluent_loss = self.calculate_dry_matter_loss_to_effluent(crop.dry_matter, estimated_max_effluent, time_in_silo)
+
+            
+
+            crop.crude_protein_percent = self.recalculate_nutrient_concentration(crop.crude_protein_percent, self.crude_protein_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass)
+            crop.adf = self.recalculate_nutrient_concentration(crop.adf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass)
+            crop.ndf = self.recalculate_nutrient_concentration(crop.ndf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass)
+
+
 
     def calculate_dry_matter_loss_to_gas(
         self, dry_matter: float, dry_matter_percentage: float, crop_category: CropCategory, temperature: float
@@ -59,6 +89,67 @@ class Sileage(Storage):
 
         return dry_matter * dry_matter_loss_fraction
 
+    def calculate_protein_loss_to_effluent(self, initial_crude_protein: float, effluent_loss: float) -> float:
+        """
+        Calculate crude protein lost to effluent loss of dry matter.
+
+        Parameters
+        ----------
+        initial_crude_protein : float
+            Percentage of dry matter mass that is crude protein before loss to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
+
+        Notes
+        -----
+        If all dry matter mass is lost to effluent, all crude protein is lost too.
+
+        """
+        if effluent_loss == 1.0:
+            return initial_crude_protein
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif initial_crude_protein == 0.0:
+            return 0.0
+
+        return (initial_crude_protein - 0.3 * effluent_loss) / (1 - effluent_loss)
+
+    def calculate_non_protein_nitrogen_loss_to_effluent(
+        self, initial_non_protein_nitrogen: float, initial_crude_protein: float, effluent_loss: float
+    ) -> float:
+        """
+        Calculate non-protein nitrogen losst to effluent loss of dry matter.
+
+        Parameters
+        ----------
+        initial_non_protein_nitrogen : float
+            Percentage of dry matter mass that is non-protein nitrogen before loss to effluent.
+        initial_crude_protein : float
+            Percentage of dry matter mass that is crude protein before loss to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
+
+        """
+        if effluent_loss == 1.0:
+            return initial_non_protein_nitrogen
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif initial_non_protein_nitrogen == 0.0:
+            return 0.0
+
+        return (initial_non_protein_nitrogen * initial_crude_protein - 0.3 * effluent_loss) / (
+            initial_crude_protein - 0.3 * effluent_loss
+        )
 
 class Bunker(Sileage):
     """

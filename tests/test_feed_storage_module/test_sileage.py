@@ -38,6 +38,46 @@ def test_calculate_dry_matter_loss_to_gas(
     assert pytest.approx(actual) == expected
 
 
+@pytest.mark.parametrize(
+    "protein,effluent,expected",
+    [
+        (10.0, 0.05, 10.51052),
+        (8.0, 0.3, 11.3),
+        (2.0, 0.11, 2.210112),
+        (3.0, 1.0, 3.0),
+        (0.0, 0.13, 0.0),
+        (5.0, 0.0, 0.0),
+    ],
+)
+def test_calculate_crude_protein_loss_to_effluent(
+    sileage: Sileage, protein: float, effluent: float, expected: float
+) -> None:
+    """Test the calculate_protein_loss_to_effluent method in the Storage class."""
+    actual = sileage.calculate_protein_loss_to_effluent(protein, effluent)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "nitrogen,protein,effluent,expected",
+    [
+        (3.2, 10.0, 0.3, 3.2199798),
+        (2.3, 1.0, 0.1, 2.3402061),
+        (2.3, 0.0, 0.1, 1.0),
+        (1.3, 3.4, 1.0, 1.3),
+        (0.0, 2.1, 0.11, 0.0),
+        (2.3, 1.2, 0.0, 0.0),
+    ],
+)
+def test_calculate_non_protein_nitrogen_loss_to_effluent(
+    sileage: Sileage, nitrogen: float, protein: float, effluent: float, expected: float
+) -> None:
+    """Test the calculate_non_protein_nitrogen_loss_to_effluent method in the Storage class."""
+    actual = sileage.calculate_non_protein_loss_to_effluent(nitrogen, protein, effluent)
+
+    assert pytest.approx(actual) == expected
+
+
 @pytest.fixture
 def bunker() -> Bunker:
     return Bunker()
