@@ -3922,9 +3922,7 @@ def test_validate_input_by_type(
 
 def test_validate_input_by_type_key_error() -> None:
     input_manager = InputManager()
-    variable_properties = {
-        "a": "b"
-    }
+    variable_properties = {"a": "b"}
     variable_path = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
@@ -3940,9 +3938,7 @@ def test_validate_input_by_type_key_error() -> None:
 
 def test_validate_input_by_type_value_error() -> None:
     input_manager = InputManager()
-    variable_properties = {
-        "type": "b"
-    }
+    variable_properties = {"type": "b"}
     variable_path = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
