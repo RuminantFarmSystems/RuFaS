@@ -10,6 +10,7 @@ im = InputManager()
 class AnimalBase:
     config = {}
     nutrients = None
+    lactation_parameters = {}
 
     @staticmethod
     def set_nutrient_list(nutrients):
@@ -20,6 +21,30 @@ class AnimalBase:
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
+
+    @staticmethod
+    def set_lactation_curve_parameters():
+        print(im.get_data("lactation.adjustment_dict"))
+        print(im.get_data("lactation.fips_region"))
+        print(im.get_data("animal.herd_information.annual_milk_yield_lbs") == None)
+         
+       
+        #config input
+            
+        year = im.get_data("config.end_date")[:4] #str  
+        region = im.get_data("config.FIPS_county_code") #int
+
+        #animal input
+            
+        annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs") #int or None
+        milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day") #int
+        parirty_percentages= im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
+
+        #calculate parameters for each lactation group
+        
+        #assign final values to dictionary
+        AnimalBase.lactation_parameters = None  
+        
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
