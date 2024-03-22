@@ -1,5 +1,6 @@
-import os
+import copy
 import datetime
+import os
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Tuple
 
@@ -103,9 +104,9 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
-    def __init__(self, metadata_prefix: str = "", time_converter: Callable[..., Any] | None = None) -> None:
+    def __init__(self, metadata_prefix: str = "", time=None) -> None:
         self.metadata_prefix = metadata_prefix
-        self._time_converter = time_converter
+        self.time = time
 
     def generate_graph(
         self,
@@ -171,12 +172,7 @@ class GraphGenerator:
             fig, ax = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
-            self._draw_graph(
-                graph_details["type"], prepared_data, prepared_data.keys(), graph_details.get("time_format")
-            )
-            legend = graph_details.get("legend")
-            if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+            self._draw_graph(graph_details, prepared_data)
             self._customize_graph(fig, ax, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
@@ -206,9 +202,7 @@ class GraphGenerator:
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = (
-            list(FIGURE_SETTERS.keys())
-            + list(AXES_SETTERS.keys())
-            + ["variables", "time_format", "time_locator", "time_interval"]
+            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "time_step_unit", "time_step_value"]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
@@ -275,6 +269,10 @@ class GraphGenerator:
         filter_by_exclusion = graph_details.get("filter_by_exclusion", False)
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
+            info_maps = filtered_pool[key].get("info_maps", [])
+            simulation_days = [info_map["simulation_day"] for info_map in info_maps if "simulation_day" in info_map]
+            indices = list(range(len(values))) if not simulation_days else []
+
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
@@ -317,10 +315,22 @@ class GraphGenerator:
                     for filtered_key, filtered_value in filtered_data.items():
                         if filtered_key in prepared_pool:
                             prepared_pool[filtered_key].extend(filtered_value)
+                            if simulation_days:
+                                prepared_pool[f"{filtered_key}_simulation_days"].extend(simulation_days)
+                            else:
+                                prepared_pool[f"{filtered_key}_indices"].extend(indices)
                         else:
                             prepared_pool[filtered_key] = filtered_value
+                            if simulation_days:
+                                prepared_pool[f"{filtered_key}_simulation_days"] = copy.deepcopy(simulation_days)
+                            else:
+                                prepared_pool[f"{filtered_key}_indices"] = copy.deepcopy(indices)
             else:
                 prepared_pool[key] = values
+                if simulation_days:
+                    prepared_pool[f"{key}_simulation_days"] = simulation_days
+                else:
+                    prepared_pool[f"{key}_indices"] = indices
                 log_pool.append(
                     {
                         "log": f"Successfully added {title} data to prepared_pool",
@@ -333,42 +343,52 @@ class GraphGenerator:
 
     def _draw_graph(
         self,
-        graph_type: str,
+        graph_details: Dict[str, str | List[str]],
         data: Dict[str, List[int | float]],
-        selected_variables: Optional[List[str]] = None,
-        time_format: Optional[str] = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
 
         Parameters
         ----------
-        graph_type : str
-            The type of graph to draw.
+        graph_details : Dict[str, str | List[str]]
+            A dictionary containing details/metadata about the graph.
         data : Dict[str, List[int | float]]
             The data to use for plotting.
-        selected_variables : Optional[List[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
 
         Raises
         ------
         ValueError
-            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
+            if there is no data to plot or if the graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
+        if not data:
+            raise ValueError("No data to plot.")
+        graph_type = graph_details["type"]
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         if graph_type in TUPLE_BASED_FUNCTIONS:
-            values_tuple = tuple(data[variable] for variable in selected_variables)
+            plotted_variables = [
+                variable
+                for variable in data.keys()
+                if not variable.endswith("_simulation_days") and not variable.endswith("_indices")
+            ]
+            values_tuple = tuple(data[variable] for variable in plotted_variables)
             indices_list = list(range(len(values_tuple[0])))
             plot_function(indices_list, values_tuple)
         else:
-            for value in data.values():
-                time_data = list(range(1, len(value) + 1))  # As simulation days
-                if self._time_converter and time_format and time_format != "default":
-                    time_data = [self._time_converter(time) for time in time_data]  # As date objects
-                plot_function(time_data, value)
+            plotted_variables = []
+            for key, value in data.items():
+                if not key.endswith("_simulation_days") and not key.endswith("_indices"):
+                    xaxis_data = (
+                        data[f"{key}_simulation_days"] if f"{key}_simulation_days" in data else data[f"{key}_indices"]
+                    )
+                    if f"{key}_simulation_days" in data and self.time.add_formatted_time:
+                        xaxis_data = [self.time.convert_simulation_day_to_date(sim_day) for sim_day in xaxis_data]
+                    plot_function(xaxis_data, value)
+                    plotted_variables.append(key)
+        if "legend" not in graph_details:
+            graph_details["legend"] = plotted_variables
 
     def _customize_graph(self, fig: Figure, ax: Axes, customization_details: Dict[str, Any]) -> None:
         """
@@ -391,12 +411,12 @@ class GraphGenerator:
                 AXES_SETTERS[attrib](fig.axes[0], value, loc=legend_location, bbox_to_anchor=placement_of_legend)
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
-            elif attrib == "time_format":
+            elif attrib == "time_step_unit":
                 self._set_time_axis(
-                    ax, value, customization_details.get("time_locator"), customization_details.get("time_interval")
+                    ax, customization_details.get("time_step_unit"), customization_details.get("time_step_value")
                 )
 
-    def _set_time_axis(self, ax: Axes, time_format: str, time_locator: str | None, time_interval: int | None) -> None:
+    def _set_time_axis(self, ax: Axes, time_step_unit: str | None, time_step_value: int | None) -> None:
         """
         Set the time axis for the graph.
 
@@ -404,45 +424,51 @@ class GraphGenerator:
         ----------
         ax : Axes
             The matplotlib Axes object to customize.
-        time_format : str
-            The time format to use for the x-axis.
-        time_locator : str
+        time_step_unit : str | None
             The time locator to use for the x-axis.
-        time_interval : int
+        time_step_value : int | None
             The time interval to use for the x-axis.
         """
 
-        if time_format == "default":
-            locator = (
-                matplotlib.dates.AutoDateLocator()
-                if time_interval is None
-                else matplotlib.dates.DayLocator(interval=time_interval)
-            )
-            ax.xaxis.set_major_locator(locator)
+        if not self.time.add_formatted_time or not self.time.time_format:
             return
 
-        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter(time_format))
+        valid_time_step_units = ["month", "day", "year"]
+        if time_step_unit not in valid_time_step_units:
+            raise ValueError(
+                f"Unsupported time step unit: {time_step_unit}. Supported values are: {', '.join(valid_time_step_units)}"
+            )
+
+        if time_step_unit == "year" and time_step_value not in [None, 1]:
+            raise ValueError(
+                "When using 'year' as the time step unit, it is not required to provide a time step value. Default value is 1. If you "
+                "want to change the interval, use 'month' or 'day' as the time step unit."
+            )
+
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter(self.time.time_format))
+
         locator = None
-        if time_locator == "month":
+        if time_step_unit == "month":
             locator = (
                 matplotlib.dates.MonthLocator()
-                if time_interval is None
-                else matplotlib.dates.MonthLocator(interval=time_interval)
+                if time_step_value is None
+                else matplotlib.dates.MonthLocator(interval=time_step_value)
             )
-        elif time_locator == "day":
+        elif time_step_unit == "day":
             locator = (
                 matplotlib.dates.DayLocator()
-                if time_interval is None
-                else matplotlib.dates.DayLocator(interval=time_interval)
+                if time_step_value is None
+                else matplotlib.dates.DayLocator(interval=time_step_value)
             )
-        elif time_locator == "year":
+        elif time_step_unit == "year":
             locator = matplotlib.dates.YearLocator()
+
         if locator:
             ax.xaxis.set_major_locator(locator)
 
     def _save_graph(
         self,
-        graph_details: Dict[str, str],
+        graph_details: Dict[str, str | List[str]],
         filter_file_name: str,
         graphics_dir: Path,
     ) -> str:
@@ -451,7 +477,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        graph_details : Dict[str, str]
+        graph_details : Dict[str, str | List[str]]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.

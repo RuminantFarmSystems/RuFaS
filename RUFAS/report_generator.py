@@ -139,11 +139,12 @@ class ReportGenerator:
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, time) -> None:
         """
         Initializes the ReportGenerator.
         """
 
+        self.time = time
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
 
     def clear_reports(self) -> None:
@@ -199,7 +200,7 @@ class ReportGenerator:
             report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
-                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+                cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
                 report_data = self._perform_aggregations(cross_reference_data, filter_content)
             else:
@@ -256,11 +257,11 @@ class ReportGenerator:
             The name of the report to be graphed.
         """
 
-        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
+        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"], self.time)
         graph_details = {
             **filter_content["graph_details"],
             "title": filter_content["name"],
-            "filters": filter_content["filters"],
+            "filters": list(graph_data.keys()),
         }
         graphics_dir = graph_details.pop("graphics_dir", None)
         produce_graphics = graph_details.get("produce_graphics")

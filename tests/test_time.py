@@ -409,7 +409,7 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.leap_year_length == mock_config["leap_year_length"]
     assert time.year_length == mock_config["year_length"]
     assert time.day == 2
-    assert time.index == 0
+    assert time.simulation_day == 0
     assert time.year == 1
     assert time.years == mock_config["years"]
 
@@ -424,13 +424,13 @@ def test_advance(mock_time: Time) -> None:
     time = mock_time
     for n in range(364):
         time.advance()
-        assert time.index == 1 + n
+        assert time.simulation_day == 1 + n
         assert time.day == 3 + n
         assert time.year == 1
         assert time.calendar_year == 1999
 
     time.advance()
-    assert time.index == 365
+    assert time.simulation_day == 365
     assert time.day == 1
     assert time.year == 2
     assert time.calendar_year == 2000
