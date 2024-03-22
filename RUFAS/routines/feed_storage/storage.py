@@ -264,3 +264,41 @@ class Storage:
             * dry_matter_loss_fraction
             / (1 - dry_matter_loss_fraction)
         )
+
+    def calculate_protein_loss_to_effluent(self, initial_crude_protein: float, effluent_loss: float) -> float:
+        """
+        Calculate crude protein lost to effluent loss of dry matter.
+
+        Parameters
+        ----------
+        initial_crude_protein : float
+            Percentage of dry matter mass that is crude protein before loss to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in dry matter mass that was lost to effluent dry matter loss.
+
+        Notes
+        -----
+        If all dry matter mass is lost to effluent, all crude protein is lost too.
+
+        """
+        if effluent_loss == 1.0:
+            return initial_crude_protein
+        return (initial_crude_protein - 0.3 * effluent_loss) / (1 - effluent_loss)
+    
+    def calculate_non_protein_nitrogen_loss_to_effluent(self, initial_non_protein_nitrogen: float, initial_crude_protein: float, effluent_loss: float) -> float:
+        """
+        Calculate non-protein nitrogen losst to effluent loss of dry matter.
+
+        Parameters
+        ----------
+        initial_non_protein_nitrogen : float
+            Percentage of dry matter mass that is non-protein nitrogen before loss to effluent.
+        initial_crude_protein : float
+            Percentage
+        
+        """

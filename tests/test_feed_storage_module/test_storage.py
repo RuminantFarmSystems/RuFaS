@@ -199,3 +199,18 @@ def test_recalculate_nutrient_concentration(
     actual = storage.recalculate_nutrient_concentration(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "protein,effluent,expected",
+    [
+        (10.0, 0.05, 10.51052),
+        (8.0, 0.3, 11.3),
+        (2.0, 0.11, 2.21),
+    ]
+)
+def test_calculate_crude_protein_loss_to_effluent(storage: Storage, protein: float, effluent: float, expected: float) -> None:
+    """Test the calculate_protein_loss_to_effluent method in the Storage class."""
+    actual = storage.calculate_protein_loss_to_effluent(protein, effluent)
+
+    assert pytest.approx(actual) == expected

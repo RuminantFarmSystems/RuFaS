@@ -47,10 +47,6 @@ def test_bunker_initialization(bunker: Bunker) -> None:
     pass
 
 
-def test_calculate_protein_loss_in_bunker(bunker: Bunker) -> None:
-    pass
-
-
 def test_calculate_dry_matter_loss_to_gas_in_bunker(bunker: Bunker) -> None:
     pass
 
@@ -68,10 +64,6 @@ def test_pile_initialization(pile: Pile) -> None:
     pass
 
 
-def test_calculate_protein_loss_in_pile(pile: Pile) -> None:
-    pass
-
-
 def test_calculate_dry_matter_loss_to_gas_in_pile(pile: Pile) -> None:
     pass
 
@@ -86,10 +78,6 @@ def bag() -> Bag:
 
 
 def test_bag_initialization(bag: Bag) -> None:
-    pass
-
-
-def test_calculate_protein_loss_in_bag(bag: Bag) -> None:
     pass
 
 
