@@ -1,3 +1,6 @@
+import datetime
+from typing import Dict
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -25,7 +28,9 @@ class Time:
             else:
                 self.day = self.years[0][i]
                 break
-        self.index = 0
+        self.simulation_day = 0
+        self.time_format = im.get_data("config.time_format_string")
+        self.add_formatted_time = im.get_data("config.add_formatted_time")
 
     def _init_time_config(self) -> None:
         """
@@ -80,6 +85,7 @@ class Time:
 
         return sim_length + 1
 
+    # TODO: Remove this method
     def to_str(self):
         """
         Description:
@@ -97,7 +103,7 @@ class Time:
             Advances the time in the simulation by 1 day
             Automatically detects end of months and years
         """
-        self.index += 1
+        self.simulation_day += 1
 
         if self.end_year():
             self.day = 1
@@ -157,3 +163,84 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the current time.
+
+        Returns
+        -------
+        str
+            A string representation of the current time in the simulation in the format
+            "{simulation_day: <simulation_day>, formatted_time: <formatted_time>}"
+        """
+
+        result: Dict[str, str | int] = {
+            "simulation_day": self.simulation_day,
+        }
+
+        if self.add_formatted_time:
+            result["formatted_time"] = str(self.convert_simulation_day_to_date(self.simulation_day))
+
+        return repr(result)
+
+    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.date:
+        """
+        Convert the simulation day to a date object that is relative to the start date of the simulation.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The simulation day to convert to a date object.
+
+        Returns
+        -------
+        datetime.date
+            The date object that corresponds to the simulation day.
+        """
+
+        start_year = int(self.start_full_date[0])
+        start_day_of_year = int(self.start_full_date[1])
+        start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
+        actual_date = start_date + datetime.timedelta(days=simulation_day - 1)
+        return actual_date
+
+    def convert_simulation_day_to_formatted_date(self, simulation_day: int) -> str:
+        """
+        Convert the simulation day to a formatted date string that is relative to the start date of the simulation.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The simulation day to convert to a date object.
+
+        Returns
+        -------
+        str
+            The formatted date string that corresponds to the simulation day.
+        """
+
+        actual_date = self.convert_simulation_day_to_date(simulation_day)
+        return actual_date.strftime(self.time_format)
+
+    def convert_formatted_date_to_simulation_day(self, formatted_date: str) -> int:
+        """
+        Convert the formatted date string to a simulation day that is relative to the start date of the simulation.
+
+        Parameters
+        ----------
+        formatted_date : str
+            The formatted date string to convert to a simulation day.
+
+        Returns
+        -------
+        int
+            The simulation day that corresponds to the formatted date string.
+        """
+
+        start_year = int(self.start_full_date[0])
+        start_day_of_year = int(self.start_full_date[1])
+        start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
+        actual_date = datetime.datetime.strptime(formatted_date, self.time_format).date()
+        simulation_day = (actual_date - start_date).days + 1
+        return simulation_day

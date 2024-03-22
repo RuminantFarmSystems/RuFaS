@@ -51,7 +51,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
-        self.day_counter: int = 0
+        self.time = Time()
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -65,7 +65,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.day_counter)
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.time.simulation_day)
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -84,7 +84,7 @@ class SimulationEngine:
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
         om.add_variable(
             "day_counter_final_value",
-            self.day_counter,
+            str(self.time),
             {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
         )
 
@@ -97,7 +97,6 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        self.day_counter += 1
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         simulate_daily_manure_manager(
             self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
@@ -121,10 +120,10 @@ class SimulationEngine:
             "print_day": print_day,
         }
         if print_day:
-            simulating_day_log = f"simulating day: {self.time.to_str()}"
+            simulating_day_log = f"simulating day: {self.time}"
             om.add_log("simulation_day", simulating_day_log, info_map)
         self.time.advance()
-        self.animal_manager.simulation_day += 1
+        self.animal_manager.simulation_day += 1 # todo
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
@@ -167,7 +166,7 @@ class SimulationEngine:
 
         weather_data = im.get_data("weather")
 
-        self.time = Time()
+        om.set_time(self.time)
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
