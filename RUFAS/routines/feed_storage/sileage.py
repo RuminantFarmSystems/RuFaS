@@ -19,55 +19,45 @@ class Sileage(Storage):
             CropCategory.SMALL_GRAIN,
         ]
 
-    def calculate_protein_loss(self):
-        """
-        Placeholder method to calculate protein loss specific to Sileage.
-
-        Returns
-        -------
-        None
-        """
-        pass
-
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, dry_matter: float, dry_matter_percentage: float, crop_category: CropCategory, temperature: float
+    ) -> float:
         """
         Calculates the dry matter loss to gas, specific to Sileage.
 
         Parameters
         ----------
         dry_matter : float
-            The amount of dry matter.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
+            The amount of dry matter in kg.
+        dry_matter_percentage : float
+            Pecentage of fresh mass that is dry matter.
+        crop_category : CropCategory
+            Type of the crop.
+        temperature : float
+            Ambient temperature outside the silo in degrees C.
 
         Returns
         -------
         float
             The amount of dry matter lost to gas, specific to Sileage.
-        """
-        pass
 
-    def calculate_dry_matter_loss_to_effluent(
-        self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
-    ) -> float:
-        """
-        Calculates the dry matter loss to effluent, specific to Sileage.
+        Notes
+        -----
+        The equations and conditions for gaseous dry matter loss in Alfalfa silage follow the same structure as those
+        for other crops, but use different values.
 
-        Parameters
-        ----------
-        dry_matter : float
-            The amount of dry matter.
-        estimated_maximum_effluent : float
-            The estimated maximum effluent.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
-
-        Returns
-        -------
-        float
-            The amount of dry matter lost to effluent, specific to Sileage.
         """
-        pass
+        dry_matter_fraction = dry_matter_percentage / 100
+        if crop_category is CropCategory.ALFALFA:
+            if (not 5.0 <= temperature <= 45.0) or (not 20.0 <= dry_matter_percentage <= 60.0):
+                return 0.0
+            dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
+        else:
+            if (not 0.0 <= temperature <= 40.0) or (not 15.0 <= dry_matter_percentage <= 60.0):
+                return 0.0
+            dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
+
+        return dry_matter * dry_matter_loss_fraction
 
 
 class Bunker(Sileage):
