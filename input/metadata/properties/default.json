@@ -93,6 +93,21 @@
         "default": "HO",
         "pattern": "(HO|JE)",
         "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
+      },
+      "parity_percentages": {
+        "type": "array",
+        "description": "Percentage of total herd represented by parity 1, 2, and 3+",
+        "properties": {
+          "type": "number",
+          "description": "Percentage of total herd made up by each parity group, 1, 2, and 3+",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "annual_milk_yield_lbs": {
+        "type": "number",
+        "minimum": 0,
+        "default": null
       }
     },
     "herd_initialization": {
