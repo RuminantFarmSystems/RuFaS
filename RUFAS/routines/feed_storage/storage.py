@@ -203,7 +203,8 @@ class Storage:
         """
         moisture_at_baling: float = 100 - initial_dry_matter_percentage
         heat_generated: float = 104 * (moisture_at_baling**2.18) * (bale_density**0.5) + 5.72 * (
-            moisture_at_baling**1.23) * (bale_density**0.94)
+            moisture_at_baling**1.23
+        ) * (bale_density**0.94)
         return heat_generated
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
@@ -279,7 +280,7 @@ class Storage:
         Returns
         -------
         float
-            The percentage of crude protein in dry matter mass that was lost to effluent dry matter loss.
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
 
         Notes
         -----
@@ -288,9 +289,16 @@ class Storage:
         """
         if effluent_loss == 1.0:
             return initial_crude_protein
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif initial_crude_protein == 0.0:
+            return 0.0
+
         return (initial_crude_protein - 0.3 * effluent_loss) / (1 - effluent_loss)
-    
-    def calculate_non_protein_nitrogen_loss_to_effluent(self, initial_non_protein_nitrogen: float, initial_crude_protein: float, effluent_loss: float) -> float:
+
+    def calculate_non_protein_nitrogen_loss_to_effluent(
+        self, initial_non_protein_nitrogen: float, initial_crude_protein: float, effluent_loss: float
+    ) -> float:
         """
         Calculate non-protein nitrogen losst to effluent loss of dry matter.
 
@@ -299,6 +307,23 @@ class Storage:
         initial_non_protein_nitrogen : float
             Percentage of dry matter mass that is non-protein nitrogen before loss to effluent.
         initial_crude_protein : float
-            Percentage
-        
+            Percentage of dry matter mass that is crude protein before loss to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
+
         """
+        if effluent_loss == 1.0:
+            return initial_non_protein_nitrogen
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif initial_non_protein_nitrogen == 0.0:
+            return 0.0
+
+        return (initial_non_protein_nitrogen * initial_crude_protein - 0.3 * effluent_loss) / (
+            initial_crude_protein - 0.3 * effluent_loss
+        )
