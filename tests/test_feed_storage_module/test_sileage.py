@@ -73,7 +73,7 @@ def test_calculate_non_protein_nitrogen_loss_to_effluent(
     sileage: Sileage, nitrogen: float, protein: float, effluent: float, expected: float
 ) -> None:
     """Test the calculate_non_protein_nitrogen_loss_to_effluent method in the Storage class."""
-    actual = sileage.calculate_non_protein_loss_to_effluent(nitrogen, protein, effluent)
+    actual = sileage.calculate_non_protein_nitrogen_loss_to_effluent(nitrogen, protein, effluent)
 
     assert pytest.approx(actual) == expected
 
