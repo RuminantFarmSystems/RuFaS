@@ -2,7 +2,7 @@ import copy
 import datetime
 import os
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Tuple
+from typing import Dict, List, Any, Callable, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -180,7 +180,7 @@ class GraphGenerator:
         except Exception as e:
             all_logs = {
                 "error": f"Error plotting {graph_details.get('title')} data set",
-                "message": f"Unforeseen error {e} when trying to graph data.",
+                "message": f"Error: {e}",
                 "info_map": info_map,
             }
 
@@ -366,6 +366,13 @@ class GraphGenerator:
         graph_type = graph_details["type"]
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
+        if any([variable.endswith("_indices") for variable in data.keys()]) and (
+            "time_step_unit" in graph_details or "time_step_value" in graph_details
+        ):
+            raise ValueError(
+                "Because there is no information about simulation days in info maps, 'time_step_unit' and 'time_step_value' are not supported."
+            )
+
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         if graph_type in TUPLE_BASED_FUNCTIONS:
             plotted_variables = [
