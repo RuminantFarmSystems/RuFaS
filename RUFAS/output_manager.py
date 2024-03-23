@@ -120,6 +120,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self.time = None
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -769,6 +770,35 @@ class OutputManager(object):
         )
         return filtered_pool
 
+    def _handle_simulation_day_in_info_maps(
+        self, filtered_pool: Dict[str, pool_element_type]
+    ) -> Dict[str, pool_element_type]:
+        """
+        Convert simulation_day to formatted_time in info_maps if time.add_formatted_time is True
+        and simulation_day is present.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered pool of variables.
+
+        Returns
+        -------
+        Dict[str, pool_element_type]
+            The filtered pool of variables with simulation_day converted to formatted_time.
+        """
+
+        if not self.time.add_formatted_time:
+            return filtered_pool
+
+        for key, value in filtered_pool.items():
+            for info_map in value["info_maps"]:
+                if "simulation_day" in info_map:
+                    info_map["formatted_time"] = self.time.convert_simulation_day_to_formatted_date(
+                        info_map["simulation_day"]
+                    )
+        return filtered_pool
+
     def save_results(
         self,
         save_path: Path,
@@ -815,7 +845,7 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator()
+        report_generator = ReportGenerator(self.time)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -844,8 +874,11 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self._filter_variables_pool(filter_content)
+
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
+                else:
+                    filtered_pool = self._handle_simulation_day_in_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if filter_content.get("graph_details"):
@@ -908,7 +941,7 @@ class OutputManager(object):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    graph_generator = GraphGenerator(self.__metadata_prefix, self.time)
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
@@ -1233,3 +1266,6 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def set_time(self, time_obj: Time) -> None:
+        self.time = time_obj
