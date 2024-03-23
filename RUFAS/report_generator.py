@@ -225,7 +225,11 @@ class ReportGenerator:
                 if f"{key}_simulation_days" in report_data:
                     simulation_days = report_data[f"{key}_simulation_days"]
                     reconstructed_report_data[key]["info_maps"] = [{"simulation_day": day} for day in simulation_days]
-                    report_data[f"{key}_simulation_days"] = list(map(self.time.convert_simulation_day_to_formatted_date, simulation_days)) if self.time.add_formatted_time else simulation_days
+                    report_data[f"{key}_simulation_days"] = (
+                        list(map(self.time.convert_simulation_day_to_formatted_date, simulation_days))
+                        if self.time.add_formatted_time
+                        else simulation_days
+                    )
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
