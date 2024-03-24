@@ -1,3 +1,4 @@
+from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropCategory
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -21,9 +22,6 @@ class Sileage(Storage):
             CropCategory.SMALL_GRAIN,
         ]
 
-        self.crude_protein_loss_coefficient = 0.0
-        self.fiber_loss_coefficient = 0.0
-
     def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Processes the daily degradations and losses of ensiled crops.
@@ -36,23 +34,8 @@ class Sileage(Storage):
             The number of days this crop has been stored for.
 
         """
+        super().process_degradations(current_conditions, time)
         for crop in self.stored:
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(
-                crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
-            )
-            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
-                crop.crude_protein_percent,
-                self.crude_protein_loss_coefficient,
-                gaseous_dry_matter_loss,
-                crop.dry_matter_mass,
-            )
-            crop.adf = self.recalculate_nutrient_concentration(
-                crop.adf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.ndf = self.recalculate_nutrient_concentration(
-                crop.ndf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-
             estimated_max_effluent = self.estimate_maximum_effluent(
                 crop.initial_dry_matter_percentage, crop.initial_fresh_mass
             )
@@ -74,11 +57,10 @@ class Sileage(Storage):
                 crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
             )
 
-            total_loss = gaseous_dry_matter_loss + effluent_loss
-            self.set_mass_attributes_after_loss(crop, total_loss)
+            self.set_mass_attributes_after_loss(crop, effluent_loss)
 
     def calculate_dry_matter_loss_to_gas(
-        self, dry_matter: float, dry_matter_percentage: float, crop_category: CropCategory, temperature: float
+        self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to Sileage.
@@ -105,17 +87,18 @@ class Sileage(Storage):
         for other crops, but use different values.
 
         """
-        dry_matter_fraction = dry_matter_percentage / 100
-        if crop_category is CropCategory.ALFALFA:
-            if (not 5.0 <= temperature <= 45.0) or (not 20.0 <= dry_matter_percentage <= 60.0):
+        dry_matter_fraction = crop.dry_matter_percentage / 100
+        average_temperature = current_conditions.mean_air_temperature
+        if crop.category is CropCategory.ALFALFA:
+            if (not 5.0 <= average_temperature <= 45.0) or (not 20.0 <= crop.dry_matter_percentage <= 60.0):
                 return 0.0
             dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
         else:
-            if (not 0.0 <= temperature <= 40.0) or (not 15.0 <= dry_matter_percentage <= 60.0):
+            if (not 0.0 <= average_temperature <= 40.0) or (not 15.0 <= crop.dry_matter_percentage <= 60.0):
                 return 0.0
             dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
 
-        return dry_matter * dry_matter_loss_fraction
+        return crop.dry_matter_mass * dry_matter_loss_fraction
 
     def calculate_protein_loss_to_effluent(self, initial_crude_protein: float, effluent_loss: float) -> float:
         """

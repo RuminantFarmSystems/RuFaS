@@ -2,6 +2,8 @@ import copy
 from typing import List
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.time import Time
 
 
 class Storage:
@@ -16,6 +18,12 @@ class Storage:
         The maximum capacity of the storage, currently set to infinity.
     stored : List[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
+    crude_protein_loss_coefficient : float, default 0.0
+        Unitless coefficient used to adjust crude protein loss.
+    adf_loss_coefficient : float, default 0.0
+        Unitless coefficient used to adjust ADF loss.
+    ndf_loss_coefficient : float, default 0.0
+        Unitless coefficient used to adjust NDF loss.
 
     Methods
     -------
@@ -53,6 +61,9 @@ class Storage:
         self.acceptable_crops: List[CropCategory] = []
         self.capacity = capacity
         self.stored: List[HarvestedCrop] = []
+        self.crude_protein_loss_coefficient = 0.0
+        self.adf_loss_coefficient = 0.0
+        self.ndf_loss_coefficient = 0.0
 
     @property
     def stored_mass(self) -> float:
@@ -99,11 +110,36 @@ class Storage:
         storage_crop = copy.deepcopy(crop)
         self.stored.append(storage_crop)
 
-    def process_degradations(self) -> None:
+    def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Processes the degradations and losses of the stored crops.
+
+        Parameters
+        ----------
+        current_conditions : float
+            Conditions on the current day of the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
         """
-        raise NotImplementedError("Cannot use Storage.process_degradations, use a child class.")
+        for crop in self.stored:
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(
+                crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
+            )
+            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
+                crop.crude_protein_percent,
+                self.crude_protein_loss_coefficient,
+                gaseous_dry_matter_loss,
+                crop.dry_matter_mass,
+            )
+            crop.adf = self.recalculate_nutrient_concentration(
+                crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+            crop.ndf = self.recalculate_nutrient_concentration(
+                crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+
+            self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
@@ -135,16 +171,20 @@ class Storage:
         crop.fresh_mass -= dry_matter_loss
         crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * 100
 
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
+    ) -> float:
         """
         Calculates the dry matter loss to gas.
 
         Parameters
         ----------
-        dry_matter : float
-            The amount of dry matter.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
+        crop : HarvestedCrop
+            The stored crop that is losing dry matter.
+        current_conditions : CurrentDayConditions
+            Current conditions of the simulated day.
+        time : Time
+            Time instance containing the current time of the simulation.
 
         Returns
         -------

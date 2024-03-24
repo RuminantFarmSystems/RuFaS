@@ -16,6 +16,8 @@ class Hay(Storage):
         Enum representing the diameter of the hay bale in meters.
     additional_loss_coefficient : float, default 0.0
         Unitless factor used to determine the amount of additional gaseous dry matter loss.
+    crude_protein_loss_coefficient : float, default 0.4
+        Unitless coefficient used to adjust crude protein loss.
     bale_density : float
         Density of the hay bale calculated based on its moisture content.
     bale_size : float
@@ -36,6 +38,7 @@ class Hay(Storage):
         ]
         self.bale_diameter = bale_diameter
         self.additional_loss_coefficient = 0.0
+        self.crude_protein_loss_coefficient = 0.4
 
     @property
     def bale_density(self) -> float:
@@ -203,9 +206,12 @@ class Unprotected(Hay):
     ----------
     additional_loss_coefficient : float, default 0.00006
         Unitless factor used to determine the amount of additional gaseous dry matter loss.
+    ndf_loss_coefficient : float, default 0.17
+        Unitless coefficient used to adjust NDF loss.
 
     """
 
     def __init__(self, bale_diameter: BaleSize, capacity: float = float("inf")):
         super().__init__(bale_diameter, capacity)
         self.additional_loss_coefficient = 0.000_06
+        self.ndf_loss_coefficient = 0.17
