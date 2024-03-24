@@ -41,7 +41,10 @@ class Sileage(Storage):
                 crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
             )
             crop.crude_protein_percent = self.recalculate_nutrient_concentration(
-                crop.crude_protein_percent, self.crude_protein_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+                crop.crude_protein_percent,
+                self.crude_protein_loss_coefficient,
+                gaseous_dry_matter_loss,
+                crop.dry_matter_mass,
             )
             crop.adf = self.recalculate_nutrient_concentration(
                 crop.adf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
@@ -57,8 +60,12 @@ class Sileage(Storage):
             effluent_loss = self.calculate_dry_matter_loss_to_effluent(
                 crop.dry_matter, estimated_max_effluent, time_in_silo
             )
-            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(crop.crude_protein_percent, effluent_loss)
-            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(crop.non_protein_nitrogen, crop.crude_protein_percent, effluent_loss)
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(
+                crop.crude_protein_percent, effluent_loss
+            )
+            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(
+                crop.non_protein_nitrogen, crop.crude_protein_percent, effluent_loss
+            )
 
             crop.crude_protein_percent = self.recalculate_nutrient_concentration(
                 crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
