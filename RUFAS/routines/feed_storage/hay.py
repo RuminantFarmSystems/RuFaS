@@ -14,8 +14,8 @@ class Hay(Storage):
     ----------
     bale_diameter : BaleSize
         Enum representing the diameter of the hay bale in meters.
-    additional_loss_coefficient : float
-        Unitless factor sed to determine the amount of additional gaseous dry matter loss.
+    additional_loss_coefficient : float, default 0.0
+        Unitless factor used to determine the amount of additional gaseous dry matter loss.
     bale_density : float
         Density of the hay bale calculated based on its moisture content.
     bale_size : float
@@ -67,16 +67,6 @@ class Hay(Storage):
         """
         return self.bale_diameter.value()
 
-    def calculate_protein_loss(self):
-        """
-        Calculates the protein loss in the hay.
-
-        Returns
-        -------
-        None
-        """
-        pass
-
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
     ) -> float:
@@ -96,7 +86,7 @@ class Hay(Storage):
         -------
         float
             Amount of gaseous dry matter lost from the crop on the current day in kg.
-        
+
         """
         cumulative_dry_matter_loss = self._calculate_cumulative_gaseous_dry_matter_loss(crop, current_conditions, time)
         cumulative_dry_matter_loss += self._calculate_additional_gaseous_loss(crop, current_conditions)
@@ -176,22 +166,46 @@ class ProtectedIndoors(Hay):
 class ProtectedWrapped(Hay):
     """
     Represents protected wrapped hay storage, a subclass of Hay.
+
+    Attributes
+    ----------
+    additional_loss_coefficient : float, default 0.0000216
+        Unitless factor used to determine the amount of additional gaseous dry matter loss.
+
     """
 
-    pass
+    def __init__(self, bale_diameter: BaleSize, capacity: float = float("inf")):
+        super().__init__(bale_diameter, capacity)
+        self.additional_loss_coefficient = 0.000_021_6
 
 
 class ProtectedTarped(Hay):
     """
     Represents protected tarped hay storage, a subclass of Hay.
+
+    Attributes
+    ----------
+    additional_loss_coefficient : float, default 0.0000216
+        Unitless factor used to determine the amount of additional gaseous dry matter loss.
+
     """
 
-    pass
+    def __init__(self, bale_diameter: BaleSize, capacity: float = float("inf")):
+        super().__init__(bale_diameter, capacity)
+        self.additional_loss_coefficient = 0.000_010_8
 
 
 class Unprotected(Hay):
     """
     Represents unprotected hay storage, a subclass of Hay.
+
+    Attributes
+    ----------
+    additional_loss_coefficient : float, default 0.0000216
+        Unitless factor used to determine the amount of additional gaseous dry matter loss.
+
     """
 
-    pass
+    def __init__(self, bale_diameter: BaleSize, capacity: float = float("inf")):
+        super().__init__(bale_diameter, capacity)
+        self.additional_loss_coefficient = 0.000_06
