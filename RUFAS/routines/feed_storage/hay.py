@@ -185,7 +185,7 @@ class ProtectedTarped(Hay):
 
     Attributes
     ----------
-    additional_loss_coefficient : float, default 0.0000216
+    additional_loss_coefficient : float, default 0.0000108
         Unitless factor used to determine the amount of additional gaseous dry matter loss.
 
     """
@@ -201,7 +201,7 @@ class Unprotected(Hay):
 
     Attributes
     ----------
-    additional_loss_coefficient : float, default 0.0000216
+    additional_loss_coefficient : float, default 0.00006
         Unitless factor used to determine the amount of additional gaseous dry matter loss.
 
     """
