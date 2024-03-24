@@ -1,6 +1,6 @@
-from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropCategory
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from typing import Optional
 
@@ -24,7 +24,7 @@ class Sileage(Storage):
         self.crude_protein_loss_coefficient = 0.0
         self.fiber_loss_coefficient = 0.0
 
-    def process_degradations(self, temperature: float, time: Time) -> None:
+    def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Processes the daily degradations and losses of ensiled crops.
 
@@ -38,8 +38,18 @@ class Sileage(Storage):
         """
         for crop in self.stored:
             gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(
-                crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, temperature
+                crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
             )
+            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
+                crop.crude_protein_percent, self.crude_protein_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+            crop.adf = self.recalculate_nutrient_concentration(
+                crop.adf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+            crop.ndf = self.recalculate_nutrient_concentration(
+                crop.ndf, self.fiber_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+
             estimated_max_effluent = self.estimate_maximum_effluent(
                 crop.initial_dry_matter_percentage, crop.initial_fresh_mass
             )
@@ -47,17 +57,18 @@ class Sileage(Storage):
             effluent_loss = self.calculate_dry_matter_loss_to_effluent(
                 crop.dry_matter, estimated_max_effluent, time_in_silo
             )
-            total_loss = gaseous_dry_matter_loss + effluent_loss
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(crop.crude_protein_percent, effluent_loss)
+            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(crop.non_protein_nitrogen, crop.crude_protein_percent, effluent_loss)
 
             crop.crude_protein_percent = self.recalculate_nutrient_concentration(
-                crop.crude_protein_percent, self.crude_protein_loss_coefficient, total_loss, crop.dry_matter_mass
+                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
             )
-            crop.adf = self.recalculate_nutrient_concentration(
-                crop.adf, self.fiber_loss_coefficient, total_loss, crop.dry_matter_mass
+            crop.non_protein_nitrogen = self.recalculate_nutrient_concentration(
+                crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
             )
-            crop.ndf = self.recalculate_nutrient_concentration(
-                crop.ndf, self.fiber_loss_coefficient, total_loss, crop.dry_matter_mass
-            )
+
+            total_loss = gaseous_dry_matter_loss + effluent_loss
+            self.set_mass_attributes_after_loss(crop, total_loss)
 
     def calculate_dry_matter_loss_to_gas(
         self, dry_matter: float, dry_matter_percentage: float, crop_category: CropCategory, temperature: float

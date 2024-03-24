@@ -130,6 +130,6 @@ class HarvestedCrop:
         -------
         int
             The number of days this crop has been stored for.
-        
+
         """
         return time.index - self.storage_time.index

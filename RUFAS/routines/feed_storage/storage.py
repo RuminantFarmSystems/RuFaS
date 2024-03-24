@@ -119,6 +119,22 @@ class Storage:
         """
         pass
 
+    def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
+        """
+        Resets the mass attributes of a crop after dry matter loss.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The stored crop that has lost dry matter.
+        dry_matter_loss : float
+            Amount of dry matter the crop lost on the current day in kg.
+
+        """
+        new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
+        crop.fresh_mass -= dry_matter_loss
+        crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * 100
+
     def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
         """
         Calculates the dry matter loss to gas.
