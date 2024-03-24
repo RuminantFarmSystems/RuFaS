@@ -39,10 +39,6 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
-    estimate_maximum_effluent(initial_dry_matter_percentage: float, initial_fresh_mass: float)
-        Estimates the maximum amount of effluent for a stored crop.
-    calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int)
-        Calculates the dry matter loss to effluent.
     calculate_heat_generated(initial_dry_matter_percentage: float, bale_density: float)
         Calculates the total sensible heat generated.
     calculate_bale_density(initial_dry_matter: float)
@@ -212,53 +208,6 @@ class Storage:
             dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
-
-    def estimate_maximum_effluent(self, initial_dry_matter_percentage: float, initial_fresh_mass: float) -> float:
-        """
-        Estimates the maximum effluence of a stored crop.
-
-        Parameters
-        ----------
-        dry_matter_percentage : float
-            Initial percentage of a stored crop's fresh mass that is dry matter.
-        fresh_mass : float
-            Initial fresh mass of a stored crop in kg.
-
-        Returns
-        -------
-        float
-            Estimated maximum effluent of the stored crop in kg water.
-
-        """
-        initial_dry_matter_fraction = initial_dry_matter_percentage / 100
-
-        if initial_dry_matter_fraction >= 0.3:
-            return 0.0
-
-        return initial_fresh_mass * ((1 - initial_dry_matter_fraction) - 0.7)
-
-    def calculate_dry_matter_loss_to_effluent(
-        self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
-    ) -> float:
-        """
-        Calculates the dry matter loss to effluent.
-
-        Parameters
-        ----------
-        dry_matter : float
-            The amount of dry matter in kg.
-        estimated_maximum_effluent : float
-            The estimated maximum effluent in kg.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
-
-        Returns
-        -------
-        float
-            The amount of dry matter lost to effluent in kg.
-
-        """
-        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) * (1 / dry_matter)
 
     def calculate_heat_generated(self, initial_dry_matter_percentage: float, bale_density: float) -> float:
         """
