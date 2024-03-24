@@ -67,14 +67,12 @@ class Sileage(Storage):
 
         Parameters
         ----------
-        dry_matter : float
-            The amount of dry matter in kg.
-        dry_matter_percentage : float
-            Pecentage of fresh mass that is dry matter.
-        crop_category : CropCategory
-            Type of the crop.
-        temperature : float
-            Ambient temperature outside the silo in degrees C.
+        crop : HarvestedCrop
+            The stored crop that is losing dry matter.
+        current_conditions : CurrentDayConditions
+            Current conditions of the simulated day.
+        time : Time
+            Time instance containing the current time of the simulation.
 
         Returns
         -------
