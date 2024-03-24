@@ -24,6 +24,8 @@ class Storage:
         Unitless coefficient used to adjust ADF loss.
     ndf_loss_coefficient : float, default 0.0
         Unitless coefficient used to adjust NDF loss.
+    loses_to_effluent : bool, default False
+        Indicates if stored crops lose dry matter to effluent.
 
     Methods
     -------
@@ -64,6 +66,7 @@ class Storage:
         self.crude_protein_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
+        self.loses_effluent = False
 
     @property
     def stored_mass(self) -> float:
@@ -175,7 +178,7 @@ class Storage:
         self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
     ) -> float:
         """
-        Calculates the dry matter loss to gas.
+        Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
 
         Parameters
         ----------
@@ -189,9 +192,26 @@ class Storage:
         Returns
         -------
         float
-            The amount of dry matter lost to gas.
+            The amount of dry matter lost to gas, specific to fermentation.
+
+        Notes
+        -----
+        The equations and conditions for gaseous dry matter loss in Alfalfa follow the same structure as those for other
+        crops, but use different values.
+
         """
-        raise NotImplementedError("Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class.")
+        dry_matter_fraction = crop.dry_matter_percentage / 100
+        average_temperature = current_conditions.mean_air_temperature
+        if crop.category is CropCategory.ALFALFA:
+            if (not 5.0 <= average_temperature <= 45.0) or (not 20.0 <= crop.dry_matter_percentage <= 60.0):
+                return 0.0
+            dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
+        else:
+            if (not 0.0 <= average_temperature <= 40.0) or (not 15.0 <= crop.dry_matter_percentage <= 60.0):
+                return 0.0
+            dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
+
+        return crop.dry_matter_mass * dry_matter_loss_fraction
 
     def estimate_maximum_effluent(self, initial_dry_matter_percentage: float, initial_fresh_mass: float) -> float:
         """

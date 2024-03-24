@@ -1,4 +1,3 @@
-from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropCategory
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -33,8 +32,12 @@ class Sileage(Storage):
         time : Time
             The number of days this crop has been stored for.
 
+        Notes
+        -----
+        Silage calls the Storage class to handle gaseous dry matter loss, but handles dry matter loss to effluent in
+        this routine.
+
         """
-        super().process_degradations(current_conditions, time)
         for crop in self.stored:
             estimated_max_effluent = self.estimate_maximum_effluent(
                 crop.initial_dry_matter_percentage, crop.initial_fresh_mass
@@ -58,45 +61,7 @@ class Sileage(Storage):
             )
 
             self.set_mass_attributes_after_loss(crop, effluent_loss)
-
-    def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
-    ) -> float:
-        """
-        Calculates the dry matter loss to gas, specific to Sileage.
-
-        Parameters
-        ----------
-        crop : HarvestedCrop
-            The stored crop that is losing dry matter.
-        current_conditions : CurrentDayConditions
-            Current conditions of the simulated day.
-        time : Time
-            Time instance containing the current time of the simulation.
-
-        Returns
-        -------
-        float
-            The amount of dry matter lost to gas, specific to Sileage.
-
-        Notes
-        -----
-        The equations and conditions for gaseous dry matter loss in Alfalfa silage follow the same structure as those
-        for other crops, but use different values.
-
-        """
-        dry_matter_fraction = crop.dry_matter_percentage / 100
-        average_temperature = current_conditions.mean_air_temperature
-        if crop.category is CropCategory.ALFALFA:
-            if (not 5.0 <= average_temperature <= 45.0) or (not 20.0 <= crop.dry_matter_percentage <= 60.0):
-                return 0.0
-            dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
-        else:
-            if (not 0.0 <= average_temperature <= 40.0) or (not 15.0 <= crop.dry_matter_percentage <= 60.0):
-                return 0.0
-            dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
-
-        return crop.dry_matter_mass * dry_matter_loss_fraction
+        super().process_degradations(current_conditions, time)
 
     def calculate_protein_loss_to_effluent(self, initial_crude_protein: float, effluent_loss: float) -> float:
         """
