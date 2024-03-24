@@ -3,6 +3,7 @@ class GeneralConstants:
 
     Attributes:
         MM_TO_M: The conversion factor from millimeters to meters.
+        MM_TO_CM: The conversion factor from millimeters to centimeters.
 
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
@@ -22,6 +23,7 @@ class GeneralConstants:
 
     # Length-related
     MM_TO_M = 0.001
+    MM_TO_CM = 10.0
 
     # Mass-related
     GRAMS_TO_KG = 0.001

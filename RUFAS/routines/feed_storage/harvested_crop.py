@@ -44,6 +44,8 @@ class HarvestedCrop:
         The initial fresh mass of the crop in kg.
     initial_dry_matter_percentage : float
         The initial percentage of the fresh mass in kg.
+    previous_cumulative_dry_matter_loss : float, default 0.0
+        Cumulative total amount of gaseous dry matter loss this crop had experienced the day before the current day.
 
     Methods
     -------
@@ -68,6 +70,7 @@ class HarvestedCrop:
     ash: float
     initial_fresh_mass: float = field(init=False)
     initial_dry_matter_percentage: float = field(init=False)
+    previous_cumulative_dry_matter_loss: float = 0.0
 
     def __post_init__(self) -> None:
         """
