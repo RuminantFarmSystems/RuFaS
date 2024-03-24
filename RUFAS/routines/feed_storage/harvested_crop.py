@@ -40,10 +40,10 @@ class HarvestedCrop:
         Percent of mass that is labile carbohydrate.
     ash : float
         Percent of mass that is ash.
-    initial_fresh_mass : float
-        The initial fresh mass of the crop in kg.
-    initial_dry_matter_percentage : float
-        The initial percentage of the fresh mass in kg.
+    stored_fresh_mass : float
+        The fresh mass of the crop when it was stored in kg.
+    stored_dry_matter_percentage : float
+        The percentage of the fresh mass that was dry matter when it was stored in kg.
     previous_cumulative_dry_matter_loss : float, default 0.0
         Cumulative total amount of gaseous dry matter loss this crop had experienced the day before the current day.
 
@@ -51,6 +51,9 @@ class HarvestedCrop:
     -------
     __post_init__():
         Validates the category and type relationship.
+    days_stored(time: Time)
+        Calculates the number of days the crop has been stored for.
+
     """
 
     category: CropCategory
@@ -68,8 +71,8 @@ class HarvestedCrop:
     lignin: float
     sugar: float
     ash: float
-    initial_fresh_mass: float = field(init=False)
-    initial_dry_matter_percentage: float = field(init=False)
+    stored_fresh_mass: float = field(init=False)
+    stored_dry_matter_percentage: float = field(init=False)
     previous_cumulative_dry_matter_loss: float = 0.0
 
     def __post_init__(self) -> None:
@@ -109,17 +112,16 @@ class HarvestedCrop:
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
 
-        self.initial_fresh_mass = self.fresh_mass
-        self.initial_dry_matter_percentage = self.dry_matter_percentage
+        self.stored_fresh_mass = self.fresh_mass
+        self.stored_dry_matter_percentage = self.dry_matter_percentage
 
     @property
     def dry_matter_mass(self) -> float:
         """
         Calculates the dry matter mass of this crop in kg.
         """
-        return self.dry_matter_percentage * self.fresh_mass
+        return self.dry_matter_percentage * 0.01 * self.fresh_mass
 
-    @property
     def days_stored(self, time: Time) -> int:
         """
         Calculates the number of days this crop has been stored for.

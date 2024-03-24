@@ -27,8 +27,6 @@ class Storage:
         Unitless coefficient used to adjust ADF loss.
     ndf_loss_coefficient : float, default 0.0
         Unitless coefficient used to adjust NDF loss.
-    loses_to_effluent : bool, default False
-        Indicates if stored crops lose dry matter to effluent.
 
     Methods
     -------
@@ -65,7 +63,6 @@ class Storage:
         self.crude_protein_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
-        self.loses_effluent = False
 
     @property
     def stored_mass(self) -> float:
