@@ -1,5 +1,5 @@
 from .storage import Storage
-from .enums import CropCategory
+from .enums import CropCategory, BaleSize
 
 
 class Hay(Storage):
@@ -19,13 +19,14 @@ class Hay(Storage):
         Calculates the protein loss in the hay.
     """
 
-    def __init__(self, capacity: float = float("inf")):
+    def __init__(self, bale_diameter: BaleSize, capacity: float = float("inf")):
         super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.bale_diameter = bale_diameter
 
     @property
     def bale_density(self) -> float:
@@ -37,7 +38,13 @@ class Hay(Storage):
         float
             The density of the hay bale.
         """
-        pass
+        densities = []
+        for crop in self.stored:
+            moisture_at_baling = 100 - crop.initial_dry_matter_percentage
+            bale_density = self.calculate_bale_density(moisture_at_baling)
+            densities.append(bale_density)
+        average_density = sum(densities) / len(densities)
+        return average_density
 
     @property
     def bale_size(self) -> float:
@@ -49,7 +56,7 @@ class Hay(Storage):
         float
             The diameter of the hay bale in meters.
         """
-        pass
+        return self.bale_diameter.value()
 
     def calculate_protein_loss(self):
         """
