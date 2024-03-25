@@ -1,5 +1,5 @@
 import math
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -19,6 +19,8 @@ def manure_calculations(
     urine_phosphorus_required: float,
     methane_model: str,
     metabolizable_energy_intake: float,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
@@ -53,7 +55,9 @@ def manure_calculations(
     # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
     # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
     # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     # ash_diet_content = nutrient_amounts['ash']
     CP_concentration = nutrient_concentrations["CP"]
