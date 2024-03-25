@@ -11,8 +11,6 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     daily_milk_production: float,
     fecal_phosphorus: float,

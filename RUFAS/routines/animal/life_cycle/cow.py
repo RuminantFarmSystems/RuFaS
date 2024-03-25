@@ -452,7 +452,6 @@ class Cow(HeiferIII):
 
     def calc_manure_excretion(
         self,
-        feed,
         methane_model,
         methane_mitigation_method,
         methane_mitigation_additive_amount,
@@ -463,7 +462,6 @@ class Cow(HeiferIII):
         """
         Calculates and sets the manure excretion components.
         Args:
-            feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
             ME_intake: metabolizable energy intake, Mcal/kg DM
         """
@@ -471,8 +469,6 @@ class Cow(HeiferIII):
 
         if self.milking:
             self.p_excrt, self.manure_excretion = lactating_manure_calculations(
-                self.ration_formulation,
-                feed,
                 self.body_weight,
                 self.days_in_milk,
                 self.mPrt,
@@ -489,8 +485,6 @@ class Cow(HeiferIII):
             )
         else:
             self.p_excrt, self.manure_excretion = dry_manure_calculations(
-                self.ration_formulation,
-                feed,
                 self.body_weight,
                 self.estimated_daily_milk_produced,
                 p_feces_excrt,
