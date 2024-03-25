@@ -6,7 +6,6 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
@@ -71,8 +70,6 @@ def methane_mitigation(
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     days_in_milk: int,
     milk_protein: float,
