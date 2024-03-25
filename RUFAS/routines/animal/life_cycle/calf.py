@@ -146,8 +146,6 @@ class Calf(AnimalBase):
 
         Parameters
         ----------
-        feed: Dict[str, float]
-            instance of the Feed class
         methane_model : str
             methane model used for methane emission calculations
 
