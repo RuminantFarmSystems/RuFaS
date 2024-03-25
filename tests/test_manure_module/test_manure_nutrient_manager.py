@@ -672,26 +672,38 @@ def test_remove_nutrients(
         ),
     ],
 )
-def test_remove_nutrients_exceptions(
+def test_remove_nutrients_more_than_available(
     manure_type: ManureType,
     initial_nutrients: ManureNutrients,
     nutrients_to_remove: NutrientRequestResults,
     exceeding_nutrient_type: str,
-):
+    mocker: MockerFixture,
+) -> None:
     """
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class in exception scenarios.
 
-    This test verifies that the _remove_nutrients() method raises appropriate exceptions when trying to remove
+    This test verifies that the _remove_nutrients() method adds a warning to the OM when trying to remove
     more nutrients than available in the manager.
 
     """
     # Arrange
     manager = ManureNutrientManager()
     manager.add_nutrients(initial_nutrients)
+    patch_for_om_add_warning = mocker.patch(
+        "RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.om.add_warning"
+    )
+    removed_amount = getattr(nutrients_to_remove, exceeding_nutrient_type)
+    available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
 
-    # Act & Assert
-    with pytest.raises(
-        ValueError,
-        match=f"Remove more nutrients than available: {exceeding_nutrient_type}",
-    ):
-        manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+    # Act
+    manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+
+    # Assert
+    patch_for_om_add_warning.assert_called_once_with(
+        "Remove more nutrients than available",
+        f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available ({float(available_amount)})",
+        {
+            "class": "ManureNutrientManager",
+            "function": "_remove_nutrients",
+        },
+    )
