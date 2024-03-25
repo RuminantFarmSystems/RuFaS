@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import astuple, fields
 from dataclasses import dataclass
 
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
