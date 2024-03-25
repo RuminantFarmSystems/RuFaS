@@ -67,7 +67,7 @@ class HarvestedCrop:
 
     def __post_init__(self) -> None:
         """
-        Validates that the type of the crop is consistent with its category and sets initial crop values.
+        Validates that the type of the crop is consistent with its category.
 
         Raises
         ------
