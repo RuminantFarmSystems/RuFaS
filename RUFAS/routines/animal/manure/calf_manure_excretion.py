@@ -5,12 +5,9 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
@@ -22,10 +19,6 @@ def manure_calculations(
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
     body_weight : float
         Body weight of the current animal, kg.
     fecal_phosphorus : float
