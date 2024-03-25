@@ -44,6 +44,7 @@ class HarvestedCrop:
         The fresh mass of the crop when it was initially stored in kg.
     stored_dry_matter_percentage : float
         The percentage of the fresh mass that was dry matter when it was initially stored in kg.
+    dry_matter_mass
 
     Methods
     -------
