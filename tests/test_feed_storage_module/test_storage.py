@@ -1,5 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
+from unittest.mock import call
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
@@ -78,13 +79,47 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
     assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
 
 
-def test_process_degradations(storage: Storage) -> None:
+@pytest.mark.parametrize(
+    "loss,percentage,expected_loss",
+    [
+        (20.0, 5.0, 40.0),
+        (15.0, 6.0, 30.0),
+        (0.0, 0.0, 0.0),
+    ]
+)
+def test_process_degradations(storage: Storage, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float) -> None:
     """
     Test the process_degradations method of the Storage class.
     """
-    with pytest.raises(NotImplementedError) as e:
-        storage.process_degradations()
-    assert "Cannot use Storage.process_degradations, use a child class." in str(e.value)
+    mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    mock_time = mocker.MagicMock(autospec=Time)
+    mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
+    mock_second_crop = mocker.MagicMock(autospec=HarvestedCrop)
+    storage.stored = [mock_first_crop, mock_second_crop]
+    mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
+    mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
+    mock_set_mass = mocker.patch.object(storage, "set_mass_attributes_after_loss")
+    mock_record = mocker.patch.object(storage, "record_stored_crops")
+
+    storage.process_degradations(mock_conditions, mock_time)
+
+    expected_dry_mass_loss_calls = [
+        call(mock_first_crop, mock_conditions, mock_time),
+        call(mock_second_crop, mock_conditions, mock_time),
+    ]
+    expected_recalculate_percentage_call_count = 6
+    expected_set_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
+
+    mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
+    assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
+    mock_set_mass.assert_has_calls(expected_set_mass_calls)
+    mock_record.assert_called_once_with(expected_loss)
+    mock_first_crop.crude_protein_percent = percentage
+    mock_first_crop.adf = percentage
+    mock_first_crop.ndf = percentage
+    mock_second_crop.crude_protein_percent = percentage
+    mock_second_crop.adf = percentage
+    mock_second_crop.ndf = percentage
 
 
 def test_give_feed(storage: Storage) -> None:

@@ -122,9 +122,7 @@ class Storage:
         """
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(
-                crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
-            )
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, current_conditions, time)
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent,
@@ -140,7 +138,7 @@ class Storage:
             )
 
             self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
-        self.record_stored_crops(gaseous_dry_matter_loss)
+        self.record_stored_crops(total_gaseous_dry_matter_loss)
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
@@ -373,5 +371,5 @@ class Storage:
         return (
             (initial_nutrient_percentage - bounded_loss_coefficient)
             * dry_matter_loss_fraction
-            / dry_matter_loss_fraction
+            / (1 - dry_matter_loss_fraction)
         )
