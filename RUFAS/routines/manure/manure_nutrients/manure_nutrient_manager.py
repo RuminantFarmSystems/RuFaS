@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
@@ -8,6 +10,8 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequ
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
     NutrientRequestResults,
 )
+
+om = OutputManager()
 
 
 class ManureNutrientManager:
@@ -268,17 +272,33 @@ class ManureNutrientManager:
             If any of the nutrients in the results is greater than what is currently available in the manager.
 
         """
-        for attr in ["nitrogen", "phosphorus", "total_manure_mass", "dry_matter"]:
-            if getattr(self._nutrients_by_manure_type[manure_type], attr) < getattr(results, attr):
-                raise ValueError(f"Remove more nutrients than available: {attr}")
 
-        current_nutrients = self._nutrients_by_manure_type.get(manure_type)
+        if manure_type not in self._nutrients_by_manure_type:
+            raise ValueError(f"Invalid manure type: {manure_type}. Supported types are: {ManureType}")
+
+        current_nutrients = self._nutrients_by_manure_type[manure_type]
+        attrs_list = ["nitrogen", "phosphorus", "total_manure_mass", "dry_matter"]
+        updated_results_data = {attr: 0.0 for attr in attrs_list}
+
+        for attr in attrs_list:
+            requested_amount = getattr(results, attr)
+            available_amount = getattr(current_nutrients, attr)
+            if requested_amount > available_amount:
+                om.add_warning(
+                    "Remove more nutrients than available",
+                    f"Requested {attr} ({requested_amount}) is more than available ({available_amount})",
+                )
+                updated_results_data[attr] = available_amount
+            else:
+                updated_results_data[attr] = requested_amount
+
+        updated_results = NutrientRequestResults(**updated_results_data)
 
         updated_nutrients = ManureNutrients(
-            nitrogen=current_nutrients.nitrogen - results.nitrogen,
-            phosphorus=current_nutrients.phosphorus - results.phosphorus,
-            dry_matter=current_nutrients.dry_matter - results.dry_matter,
-            total_manure_mass=current_nutrients.total_manure_mass - results.total_manure_mass,
+            nitrogen=current_nutrients.nitrogen - updated_results.nitrogen,
+            phosphorus=current_nutrients.phosphorus - updated_results.phosphorus,
+            dry_matter=current_nutrients.dry_matter - updated_results.dry_matter,
+            total_manure_mass=current_nutrients.total_manure_mass - updated_results.total_manure_mass,
             manure_type=manure_type,
         )
 
