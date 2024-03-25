@@ -202,7 +202,8 @@ class Storage:
         Notes
         -----
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
-        no dry matter loss occurs.
+        no dry matter loss occurs. Alfalfa uses different parameters and thresholds for calculating dry matter loss,
+        but the structure of the loss equation remains the same.
 
         """
         dry_matter_fraction = crop.dry_matter_percentage / 100
@@ -265,7 +266,7 @@ class Storage:
         initial_dry_matter: float,
     ) -> float:
         """
-        Recalculates the relative nutrient percentage after dry matter loss.
+        Recalculates the relative nutrient percentage after dry matter has been lost from a stored crop.
 
         Parameters
         ----------
