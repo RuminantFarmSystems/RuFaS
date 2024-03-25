@@ -35,7 +35,7 @@ class Storage:
         The total mass (kg) of currently stored crops
     receive_crop(crop: HarvestedCrop, time: Time)
         Receives a harvested crop and adds it to the storage.
-    process_degradations()
+    process_degradations(current_conditions: CurrentDayConditions, time: Time)
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
@@ -45,15 +45,13 @@ class Storage:
         Calculates the total sensible heat generated.
     calculate_bale_density(initial_dry_matter: float)
         Calculates the density of a bale.
-    recalculate_nutrient_fractions()
-        Recalculates the relative nutrient concentrations after dry matter loss.
-    recalculate_nutrient_concentration(
-        initial_nutrient_concentration: float,
+    recalculate_nutrient_percentage(
+        initial_nutrient_percentage: float,
         loss_coefficient: float,
         dry_matter_loss: float,
         initial_dry_matter: float
     )
-        Recalculates a single nutrient concentration after dry matter loss.
+        Recalculates a single nutrient percentage after dry matter loss.
 
     """
 
@@ -128,16 +126,16 @@ class Storage:
                 crop.dry_matter_mass, crop.dry_matter_percentage, crop.category, current_conditions.mean_air_temperature
             )
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
-            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
+            crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent,
                 self.crude_protein_loss_coefficient,
                 gaseous_dry_matter_loss,
                 crop.dry_matter_mass,
             )
-            crop.adf = self.recalculate_nutrient_concentration(
+            crop.adf = self.recalculate_nutrient_percentage(
                 crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
-            crop.ndf = self.recalculate_nutrient_concentration(
+            crop.ndf = self.recalculate_nutrient_percentage(
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
@@ -189,6 +187,8 @@ class Storage:
 
         total_dry_matter_mass = sum([crop.dry_matter_percentage * crop.fresh_mass for crop in self.stored])
         om.add_variable("total_dry_matter_mass", total_dry_matter_mass)
+
+        om.add_variable("gaseous_dry_matter_loss", gaseous_dry_matter_loss, info_map)
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
         om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
@@ -337,26 +337,20 @@ class Storage:
         moisture_fraction = 1 - (initial_dry_matter / 100)
         return 100 + 440 * moisture_fraction
 
-    def recalculate_nutrient_fractions(self) -> None:
-        """
-        Recalculates the relative nutrient concentrations after dry matter loss.
-        """
-        raise NotImplementedError("Cannot use Storage.recalculate_nutrient_fractions, use a child class.")
-
-    def recalculate_nutrient_concentration(
+    def recalculate_nutrient_percentage(
         self,
-        initial_nutrient_concentration: float,
+        initial_nutrient_percentage: float,
         loss_coefficient: float,
         dry_matter_loss: float,
         initial_dry_matter: float,
     ) -> float:
         """
-        Recalculates the relative nutrient concentration after dry matter loss.
+        Recalculates the relative nutrient percentage after dry matter loss.
 
         Parameters
         ----------
-        initial_nutrient_concentration : float
-            Nutrient concentration in stored crop before loss.
+        initial_nutrient_percentage : float
+            Nutrient percentage in stored crop before loss.
         loss_coefficient : float
             Unitless coefficient that regulates how quickly this nutrient is lost.
         dry_matter_loss : float
@@ -369,11 +363,15 @@ class Storage:
         float
             The nutrient concentration after loss.
 
+        Notes
+        -----
+        The loss coefficient is upper-bounded to prevent a negative nutrient percentage from being calculated.
+
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
-        bounded_loss_coefficient = min(initial_nutrient_concentration, loss_coefficient)
+        bounded_loss_coefficient = min(initial_nutrient_percentage, loss_coefficient)
         return (
-            (initial_nutrient_concentration - bounded_loss_coefficient)
+            (initial_nutrient_percentage - bounded_loss_coefficient)
             * dry_matter_loss_fraction
-            / (1 - dry_matter_loss_fraction)
+            / dry_matter_loss_fraction
         )

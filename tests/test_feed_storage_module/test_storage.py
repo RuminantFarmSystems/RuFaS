@@ -149,15 +149,6 @@ def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: f
     assert actual == expected
 
 
-def test_recalculate_nutrient_fractions(storage: Storage) -> None:
-    """
-    Test the recalculate_nutrient_fractions method of the Storage class.
-    """
-    with pytest.raises(NotImplementedError) as e:
-        storage.recalculate_nutrient_fractions()
-    assert "Cannot use Storage.recalculate_nutrient_fractions, use a child class." in str(e.value)
-
-
 @pytest.mark.parametrize(
     "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected",
     [
@@ -168,7 +159,7 @@ def test_recalculate_nutrient_fractions(storage: Storage) -> None:
         (3.4, 0.8, 0.0, 200.0, 0.0),
     ],
 )
-def test_recalculate_nutrient_concentration(
+def test_recalculate_nutrient_percentage(
     storage: Storage,
     nutrients: float,
     loss_coefficient: float,
@@ -177,8 +168,8 @@ def test_recalculate_nutrient_concentration(
     expected: float,
 ) -> None:
     """
-    Test the recalculate_nutrient_concentration method of the Storage class.
+    Test the recalculate_nutrient_percentage method of the Storage class.
     """
-    actual = storage.recalculate_nutrient_concentration(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
+    actual = storage.recalculate_nutrient_percentage(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
 
     assert pytest.approx(actual) == expected
