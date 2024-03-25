@@ -138,7 +138,7 @@ class Calf(AnimalBase):
         self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
-    def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str) -> None:
+    def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str, nutrient_amount, nutrient_conc) -> None:
         """
         Calculates and sets the manure excretion components.
 
@@ -163,6 +163,8 @@ class Calf(AnimalBase):
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc
         )
 
     def phosphorus_rqmts(self, DMI):
