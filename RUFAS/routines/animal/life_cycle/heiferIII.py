@@ -123,7 +123,7 @@ class HeiferIII(HeiferII):
             p_urine,
             methane_model,
             nutrient_amount=nutrient_amount,
-            nutrient_conc=nutrient_conc
+            nutrient_conc=nutrient_conc,
         )
 
     def update(self, sim_day):

@@ -302,7 +302,7 @@ class HeiferII(HeiferI):
             p_urine,
             methane_model,
             nutrient_amount=nutrient_amount,
-            nutrient_conc=nutrient_conc
+            nutrient_conc=nutrient_conc,
         )
 
     def phosphorus_rqmts(self, DMI):

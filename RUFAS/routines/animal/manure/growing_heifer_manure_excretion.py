@@ -14,7 +14,7 @@ def manure_calculations(
     urine_phosphorus_required: float,
     methane_model: str,
     nutrient_amount: Dict[str, float],
-    nutrient_conc: Dict[str, float]
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 

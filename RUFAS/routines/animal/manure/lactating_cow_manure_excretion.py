@@ -82,7 +82,7 @@ def manure_calculations(
     milk_fat: float,
     metabolizable_energy_intake: float,
     nutrient_amount: Dict[str, float],
-    nutrient_conc: Dict[str, float]
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a cow with information from the ration formulation.
 
