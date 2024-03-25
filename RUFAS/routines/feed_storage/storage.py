@@ -4,6 +4,7 @@ from .feed_storage_constants import FeedStorageConstants
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 
 
@@ -165,7 +166,12 @@ class Storage:
             Amount of dry matter the crop lost on the current day in kg.
 
         """
-        pass
+        new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
+        crop.fresh_mass -= dry_matter_loss
+        if crop.fresh_mass == 0.0:
+            crop.dry_matter_percentage = 0.0
+            return
+        crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def record_stored_crops(self, gaseous_dry_matter_loss: float) -> None:
         """

@@ -131,9 +131,25 @@ def test_give_feed(storage: Storage) -> None:
     pass
 
 
-def test_set_mass_attributes() -> None:
+@pytest.mark.parametrize(
+    "loss,fresh,percentage,expected_fresh,expected_percentage",
+    [
+        (50.0, 1000.0, 15.0, 950.0, 10.526316),
+        (200.0, 500.0, 50.0, 300.0, 16.666667),
+        (150.0, 150.0, 100.0, 0.0, 0.0),
+        (0.0, 200.0, 10.0, 200.0, 10.0),
+    ]
+)
+def test_set_mass_attributes(storage: Storage, loss: float, fresh: float, percentage: float, expected_fresh: float, expected_percentage: float) -> None:
     """Test set_mass_attributes method of Storage class."""
-    pass
+    crop = HarvestedCrop(category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data)
+    crop.fresh_mass = fresh
+    crop.dry_matter_percentage = percentage
+
+    storage.set_mass_attributes_after_loss(crop, loss)
+
+    assert crop.fresh_mass == expected_fresh
+    assert pytest.approx(crop.dry_matter_percentage) == expected_percentage
 
 
 def test_record_stored_crops() -> None:
