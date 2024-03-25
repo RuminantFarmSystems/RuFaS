@@ -42,7 +42,7 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
         Sets mass related attributes after loss of dry matter.
-    record_stored_crops(self, gaseous_dry_matter_loss: float)
+    record_stored_crops(self)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
@@ -122,6 +122,10 @@ class Storage:
         time : Time
             Time instance tracking the current time of the simulation.
 
+        Notes
+        -----
+        This method also records the total amount of gaseous dry matter loss happened from all stored crops.
+
         """
         info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
         total_gaseous_dry_matter_loss = 0.0
@@ -161,7 +165,8 @@ class Storage:
 
     def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
         """
-        Resets the mass attributes of a crop after dry matter loss.
+        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after a loss of dry
+        matter.
 
         Parameters
         ----------
