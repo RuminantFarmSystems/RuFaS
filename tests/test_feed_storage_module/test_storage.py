@@ -1,5 +1,4 @@
 import pytest
-import copy
 from pytest_mock import MockerFixture
 from unittest.mock import call
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -193,18 +192,32 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture, loss: floa
         ("crude_protein_percent", 100, [10.0, 20.0, 30.0], 60.0),
         ("adf", 45.0, [3.0, 0.0, 5.3], 3.735),
         ("ndf", 60.0, [0.0, 0.0, 0.0], 0.0),
-    ]
+    ],
 )
-def test_get_total_nutritive_amount(storage: Storage, mocker: MockerFixture, harvested_crop: HarvestedCrop, nutrient: str, dry_mass: float, percentages: list[float], expected: float) -> None:
+def test_get_total_nutritive_amount(
+    storage: Storage,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    nutrient: str,
+    dry_mass: float,
+    percentages: list[float],
+    expected: float,
+) -> None:
     """Test _get_total_nutritive_amount in Storage class."""
     storage.stored = [harvested_crop] * len(percentages)
-    mock_dry_matter_mass = mocker.patch("RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass", new_callable=PropertyMock, return_value=dry_mass)
-    mock_getattr = mocker.patch("builtins.getattr", side_effect=percentages)
+    mock_dry_matter_mass = mocker.patch(
+        "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
+        new_callable=mocker.PropertyMock,
+        return_value=dry_mass,
+    )
+    mock_getattr = mocker.patch("RUFAS.routines.feed_storage.storage.getattr", side_effect=percentages)
     expected_getattr_calls = [call(crop, nutrient) for crop in storage.stored]
 
-    actual = stored._get_total_nutritive_amount(nutrient)
+    actual = storage._get_total_nutritive_amount(nutrient)
 
-    assert actual == expected
+    assert pytest.approx(actual) == expected
+    assert mock_dry_matter_mass.call_count == len(percentages)
+    mock_getattr.assert_has_calls(expected_getattr_calls)
 
 
 @pytest.mark.parametrize(

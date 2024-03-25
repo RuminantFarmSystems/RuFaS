@@ -190,7 +190,7 @@ class Storage:
         om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
-        om.add_variable("total_dry_matter_mass", total_dry_matter_mass)
+        om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
 
         om.add_variable("gaseous_dry_matter_loss", gaseous_dry_matter_loss, info_map)
 
@@ -236,9 +236,13 @@ class Storage:
             Total amount of the target nutrient in the stored crops in kg.
 
         """
-        return sum(
-            [getattr(crop, nutrient_name) * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass for crop in self.stored]
+        total_nutrient: float = sum(
+            [
+                getattr(crop, nutrient_name) * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass
+                for crop in self.stored
+            ]
         )
+        return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
