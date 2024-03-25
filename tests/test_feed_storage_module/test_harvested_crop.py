@@ -1,4 +1,5 @@
 import pytest
+import copy
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from .sample_crop_data import sample_crop_data
@@ -87,7 +88,7 @@ def test_attributes() -> None:
 )
 def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> None:
     """Test dry_matter_mass property in Harvested Crop."""
-    crop_data = sample_crop_data
+    crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
     crop = HarvestedCrop(
