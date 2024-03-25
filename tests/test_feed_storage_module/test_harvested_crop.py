@@ -54,8 +54,8 @@ def test_post_init() -> None:
     actual = HarvestedCrop(
         category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data  # type: ignore[arg-type]
     )
-    assert actual.initial_fresh_mass == expected_initial_fresh_mass
-    assert actual.initial_dry_matter_percentage == expected_initial_dry_matter_percentage
+    assert actual.stored_fresh_mass == expected_initial_fresh_mass
+    assert actual.stored_dry_matter_percentage == expected_initial_dry_matter_percentage
 
 
 def test_attributes() -> None:
@@ -73,3 +73,27 @@ def test_attributes() -> None:
     assert crop.lignin == sample_crop_data["lignin"]
     assert crop.sugar == sample_crop_data["sugar"]
     assert crop.ash == sample_crop_data["ash"]
+
+
+@pytest.mark.parametrize(
+    "mass,percentage,expected",
+    [
+        (100.0, 25.0, 25.0),
+        (230.0, 22.0, 50.6),
+        (145.0, 100.0, 145.0),
+        (20.4, 0.0, 0.0),
+        (0.0, 0.0, 0.0),
+    ]
+)
+def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> None:
+    """Test dry_matter_mass property in Harvested Crop."""
+    crop_data = sample_crop_data
+    crop_data["fresh_mass"] = mass
+    crop_data["dry_matter_percentage"] = percentage
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data  # type: ignore[arg-type]
+    )
+
+    actual = crop.dry_matter_mass
+
+    assert actual == expected
