@@ -76,13 +76,21 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
 
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
             manure_handler_daily_output=self._manure_handler_daily_output,
-            manure_treatment_daily_input=(
-                self._manure_separator_after_digestion_daily_output or self.anaerobic_digestion_daily_output
-            ),
+            manure_treatment_daily_input=self._manure_separator_after_digestion_daily_output
+            or self.anaerobic_digestion_daily_output,
             pen=self._current_pen,
             sim_day=self._sim_day,
         )
 
-        self._adjust_accumulated_output(self.anaerobic_digestion_daily_output)
         self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+        )
+
+        anaerobic_lagoon_daily_output.biogas = self.anaerobic_digestion_daily_output.biogas
+
         return anaerobic_lagoon_daily_output
