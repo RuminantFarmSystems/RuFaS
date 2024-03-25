@@ -20,6 +20,7 @@ class FeedStorageConstants:
         Dry matter percentage below which ensiled crops do not lose dry matter to fermentation.
 
     """
+
     ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD = 5.0
     ALFALFA_GASEOUS_LOSS_UPPER_TEMP_THRESHOLD = 45.0
     NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD = 0.0
