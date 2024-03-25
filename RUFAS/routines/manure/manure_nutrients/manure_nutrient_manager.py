@@ -15,7 +15,7 @@ om = OutputManager()
 
 
 class ManureNutrientManager:
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
 
         self._nutrients_by_manure_type = {
@@ -276,6 +276,10 @@ class ManureNutrientManager:
         if manure_type not in self._nutrients_by_manure_type:
             raise ValueError(f"Invalid manure type: {manure_type}. Supported types are: {ManureType}")
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._remove_nutrients.__name__,
+        }
         current_nutrients = self._nutrients_by_manure_type[manure_type]
         attrs_list = ["nitrogen", "phosphorus", "total_manure_mass", "dry_matter"]
         updated_results_data = {attr: 0.0 for attr in attrs_list}
@@ -287,6 +291,7 @@ class ManureNutrientManager:
                 om.add_warning(
                     "Remove more nutrients than available",
                     f"Requested {attr} ({requested_amount}) is more than available ({available_amount})",
+                    info_map,
                 )
                 updated_results_data[attr] = available_amount
             else:
