@@ -1,5 +1,6 @@
 import copy
 from typing import List
+from .feed_storage_constants import FeedStorageConstants
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -257,19 +258,40 @@ class Storage:
 
         Notes
         -----
-        The equations and conditions for gaseous dry matter loss in Alfalfa follow the same structure as those for other
-        crops, but use different values.
+        If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
+        no dry matter loss occurs.
 
         """
         dry_matter_fraction = crop.dry_matter_percentage / 100
         average_temperature = current_conditions.mean_air_temperature
-        if crop.category is CropCategory.ALFALFA:
-            if (not 5.0 <= average_temperature <= 45.0) or (not 20.0 <= crop.dry_matter_percentage <= 60.0):
-                return 0.0
+
+        is_alfalfa = crop.category is CropCategory.ALFALFA
+        lower_temp_threshold = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD
+            if is_alfalfa
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD
+        )
+        upper_temp_threshold = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_TEMP_THRESHOLD
+            if is_alfalfa
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_THRESHOLD
+        )
+        lower_dry_matter_threshold = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_THRESHOLD
+            if is_alfalfa
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_THRESHOLD
+        )
+
+        if (not lower_temp_threshold <= average_temperature <= upper_temp_threshold) or (
+            not lower_dry_matter_threshold
+            <= crop.dry_matter_percentage
+            <= FeedStorageConstants.GASEOUS_LOSS_UPPER_DRY_MATTER_THRESHOLD
+        ):
+            return 0.0
+
+        if is_alfalfa:
             dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
         else:
-            if (not 0.0 <= average_temperature <= 40.0) or (not 15.0 <= crop.dry_matter_percentage <= 60.0):
-                return 0.0
             dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
