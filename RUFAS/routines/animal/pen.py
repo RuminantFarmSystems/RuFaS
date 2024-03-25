@@ -795,7 +795,9 @@ class Pen:
                 nutrient_conc = self.ration_nutrient_conc
             )
         else:
-            animal.calc_manure_excretion(feed, methane_model)
+            animal.calc_manure_excretion(feed, methane_model,
+                nutrient_amount = self.ration_nutrient_amount,
+                nutrient_conc = self.ration_nutrient_conc)
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
     @staticmethod
