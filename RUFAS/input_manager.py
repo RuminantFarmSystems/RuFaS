@@ -254,7 +254,7 @@ class InputManager:
         om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path, "r") as csv_file:
-                data_frame = pd.read_csv(csv_file)
+                data_frame = pd.read_csv(csv_file, encoding="utf16")
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
                     om.add_log(
@@ -336,6 +336,42 @@ class InputManager:
 
         return self.elements_counter.invalid_elements == 0
 
+    def _filter_input_array_data_by_metadata(
+        self, input_array_data: List[Any], metadata_properties: Dict[str, Any]
+    ) -> List[Any]:
+        """
+        Filter input array data based on provided metadata properties.
+
+        Parameters:
+        -----------
+        input_array_data : List[Any]
+            The input array data to be filtered.
+        metadata_properties : Dict[str, Any]
+            The dictionary containing metadata properties used as a filter for input_array_data.
+        """
+        if len(input_array_data) == 0:
+            return input_array_data
+
+        filtered_array_data: List[Any] = []
+
+        for array_element in input_array_data:
+            if isinstance(array_element, dict):
+                nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
+                    array_element, metadata_properties["properties"]
+                )
+                if nested_input_data:
+                    filtered_array_data.append(nested_input_data)
+            elif isinstance(array_element, list):
+                nested_input_data: List[Any] = self._filter_input_array_data_by_metadata(
+                    array_element, metadata_properties["properties"]
+                )
+                if nested_input_data:
+                    filtered_array_data.append(nested_input_data)
+            elif isinstance(array_element, (int | float | str | bool)):
+                filtered_array_data.append(array_element)
+
+        return filtered_array_data
+
     def _filter_input_data_by_metadata(
         self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -354,13 +390,21 @@ class InputManager:
         metadata_properties : Dict[str, Any]
             The dictionary containing metadata properties used as a filter for input_data.
         """
-        filtered_input_data = {}
+        filtered_input_data: Dict[str, Any] = {}
         for key, value in input_data.items():
             if key in metadata_properties:
                 if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
-                    nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
+                    nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
+                        value, metadata_properties[key]
+                    )
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
+                elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
+                    array_input_data: List[Any] = self._filter_input_array_data_by_metadata(
+                        value, metadata_properties[key]
+                    )
+                    if array_input_data:
+                        filtered_input_data[key] = array_input_data
                 else:
                     filtered_input_data[key] = value
 

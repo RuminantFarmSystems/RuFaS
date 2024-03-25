@@ -38,6 +38,7 @@ def input_manager_original_method_states(
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
         "_populate_pool": mock_input_manager._populate_pool,
+        "_filter_input_array_data_by_metadata": mock_input_manager._filter_input_array_data_by_metadata,
         "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
         "_log_missing_data": mock_input_manager._log_missing_data,
@@ -256,6 +257,16 @@ def test_start_data_processing(
             {"key1": {"nested_key1": {"default": "value2"}}},
             {"key1": {"nested_key1": "value1"}},
         ),
+        (
+            {"key1": {"nested_key1": ["value1", "value2"], "nested_key2": "value2"}},
+            {"key1": {"nested_key1": {"type": "array", "properties": {"default": "value1"}}}},
+            {"key1": {"nested_key1": ["value1", "value2"]}},
+        ),
+        (
+            {"key1": {"nested_key1": [{"key3": 1, "key4": 2}, {"key3": 3, "key4": 4}], "nested_key2": "value2"}},
+            {"key1": {"nested_key1": {"type": "array", "properties": {"key3": {"default": 2}}}}},
+            {"key1": {"nested_key1": [{"key3": 1}, {"key3": 3}]}},
+        ),
     ],
 )
 def test_filter_input_data_by_metadata(
@@ -271,6 +282,60 @@ def test_filter_input_data_by_metadata(
 
     mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
         "_filter_input_data_by_metadata"
+    ]
+
+
+@pytest.mark.parametrize(
+    "input_data, metadata_properties, expected_result",
+    [
+        (
+            [],
+            {"key1": {"default": "value3"}},
+            [],
+        ),
+        (
+            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
+            {
+                "type": "array",
+                "properties": {
+                    "type": "object",
+                    "a": {"type": "number"},
+                    "b": {"type": "string"},
+                    "c": {"type": "bool"},
+                },
+            },
+            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
+        ),
+        (
+            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
+            {"type": "array", "properties": {"type": "object", "a": {"type": "number"}, "b": {"type": "string"}}},
+            [{"a": 1, "b": "A"}, {"a": 2, "b": "B"}, {"a": 3, "b": "C"}],
+        ),
+        (
+            [[1, 2, 3, 1.1, 2.2, 3.3]],
+            {"type": "array", "properties": {"type": "number"}},
+            [[1, 2, 3, 1.1, 2.2, 3.3]],
+        ),
+        (
+            [[1, 2, 3], [1.1, 2.2, 3.3]],
+            {"type": "array", "properties": {"type": "array", "properties": {"type": "number"}}},
+            [[1, 2, 3], [1.1, 2.2, 3.3]],
+        ),
+    ],
+)
+def test_filter_input_array_data_by_metadata(
+    mock_input_manager: InputManager,
+    input_data: List[Any],
+    metadata_properties: Dict[str, Any],
+    expected_result: List[Any],
+    input_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Unit test for function _filter_input_array_data_by_metadata() in file input_manager.py"""
+    filtered_input_data = mock_input_manager._filter_input_array_data_by_metadata(input_data, metadata_properties)
+    assert filtered_input_data == expected_result
+
+    mock_input_manager._filter_input_array_data_by_metadata = input_manager_original_method_states[
+        "_filter_input_array_data_by_metadata"
     ]
 
 

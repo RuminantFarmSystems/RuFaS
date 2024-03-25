@@ -29,11 +29,12 @@ FOR /F "tokens=*" %%G IN ('findstr /r "\.py$" .\.changed_files.txt') DO (
 
 REM Run Flake8 on the Python files modified in this branch.
 IF EXIST ".\.changed_python_files.txt" (
-    REM Write the changed Python files in to a variable that can be accessed by Flake8.
+    REM Write the changed Python files in to a variable that can be accessed by Flake8 and MyPy.
     FOR /F "tokens=*" %%G IN (.\.changed_python_files.txt) DO (set changed_python_files=%%G)
     
-    REM Run Flake8 on the changed Python files
+    REM Run Flake8 and MyPy on the changed Python files
     flake8 %changed_python_files%
+    mypy %changed_python_files%
 ) ELSE (
     call echo No Python files modified on this branch yet.
 )
@@ -46,8 +47,8 @@ exit /b 0
 
 REM Function to display usage.
 :display_usage
-echo Usage: cleanup.bat [BASEBRANCH]
-echo Lint all files different between current branch and BASEBRANCH with Flake8.
+echo Usage: check_changes.bat [BASEBRANCH]
+echo For all files that are different between the current branch and BASEBRANCH, lint them with Flake8 and run MyPy on them.
 echo.
 echo With no BASEBRANCH, compare the current branch to main.
 goto :eof
