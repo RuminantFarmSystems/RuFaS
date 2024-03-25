@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import astuple, fields
 from dataclasses import dataclass
 
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
@@ -368,3 +369,46 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
         """
         return ManureTreatmentDailyOutput(*astuple(self))
+
+    @staticmethod
+    def from_manure_separator_daily_output(
+        manure_separator_daily_output: ManureSeparatorDailyOutput,
+    ) -> ManureTreatmentDailyOutput | None:
+        """
+        Create a ManureTreatmentDailyOutput object from a ManureSeparatorDailyOutput object.
+
+        Parameters
+        ----------
+        manure_separator_daily_output : ManureSeparatorDailyOutput
+            ManureSeparatorDailyOutput object to convert.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput | None
+            ManureTreatmentDailyOutput object created from the ManureSeparatorDailyOutput object
+            or None if the input is None.
+        """
+
+        if ManureSeparatorDailyOutput is None:
+            return None
+
+        return ManureTreatmentDailyOutput(
+            pen_id=manure_separator_daily_output.pen_id,
+            simulation_day=manure_separator_daily_output.simulation_day,
+            liquid_manure_total_ammoniacal_nitrogen=(
+                manure_separator_daily_output.liquid_manure_total_ammoniacal_nitrogen
+            ),
+            liquid_manure_nitrogen=manure_separator_daily_output.liquid_manure_nitrogen,
+            liquid_manure_total_solids=manure_separator_daily_output.liquid_manure_total_solids,
+            liquid_manure_phosphorus=manure_separator_daily_output.liquid_manure_phosphorus,
+            liquid_manure_potassium=manure_separator_daily_output.liquid_manure_potassium,
+            # TODO: Check if this is correct
+            daily_final_manure_volume=manure_separator_daily_output.liquid_manure_daily_volume,
+            liquid_manure_total_volatile_solids=manure_separator_daily_output.liquid_manure_total_volatile_solids,
+            liquid_manure_total_degradable_volatile_solids=(
+                manure_separator_daily_output.liquid_manure_total_degradable_volatile_solids
+            ),
+            liquid_manure_total_non_degradable_volatile_solids=(
+                manure_separator_daily_output.liquid_manure_total_non_degradable_volatile_solids
+            ),
+        )
