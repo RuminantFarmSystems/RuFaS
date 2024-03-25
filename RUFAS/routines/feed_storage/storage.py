@@ -123,6 +123,7 @@ class Storage:
             Time instance tracking the current time of the simulation.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
             gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, current_conditions, time)
@@ -141,7 +142,8 @@ class Storage:
             )
 
             self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
-        self.record_stored_crops(total_gaseous_dry_matter_loss)
+        om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        self.record_stored_crops()
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
@@ -176,23 +178,15 @@ class Storage:
             return
         crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-    def record_stored_crops(self, gaseous_dry_matter_loss: float) -> None:
+    def record_stored_crops(self) -> None:
         """
         Records the total mass and nutrient amounts held in storage.
-
-        Parameters
-        ----------
-        gaseous_dry_matter_loss : float
-            Total amount of gaseous dry matter lost from storage in kg.
-
         """
         info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
         om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
         om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
-
-        om.add_variable("gaseous_dry_matter_loss", gaseous_dry_matter_loss, info_map)
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
         om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
