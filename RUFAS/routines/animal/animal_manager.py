@@ -1166,7 +1166,7 @@ class AnimalManager:
 
         """
         for pen in self.all_pens:
-            if pen.populated:
+            if pen.is_populated:
                 pen.calc_manure(feed, methane_model)
             else:
                 pen.reset_manure()
@@ -1230,7 +1230,7 @@ class AnimalManager:
 
         """
         for pen in self.all_pens:
-            if pen.populated:
+            if pen.is_populated:
                 pen.call_p_rqmts()
 
     def daily_p_update(self) -> None:
@@ -1239,7 +1239,7 @@ class AnimalManager:
         update. This method is called daily.
         """
         for pen in self.all_pens:
-            if pen.populated:
+            if pen.is_populated:
                 pen.daily_p_update()
 
     def end_ration_interval(self) -> bool:

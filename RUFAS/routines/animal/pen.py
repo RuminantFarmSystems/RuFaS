@@ -86,9 +86,6 @@ class Pen:
     classes_in_pen : set
         The set (no repeats) of all the classes to which the animals in the pen belong.
 
-    populated : bool
-        True iff there is at least 1 animal in the pen, and false otherwise.
-
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
         Used for ration formulation.
@@ -227,8 +224,6 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-        # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
-        self.populated = False
 
         self.classes_in_pen = set()
 
@@ -378,12 +373,6 @@ class Pen:
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
 
-    def update_pen_populated(self) -> None:
-        """
-        Updates whether the pen is populated
-        """
-        self.populated = len(self.animals_in_pen) != 0
-
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
@@ -418,7 +407,6 @@ class Pen:
         """
 
         self.add_new_animals(new_animals)
-        self.update_pen_populated()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
@@ -520,7 +508,7 @@ class Pen:
         Calculates the average growth of the animals in the pen.
         """
 
-        if not self.populated:
+        if not self.is_populated:
             return
 
         total_growth = 0
@@ -711,7 +699,6 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = {}
-        self.populated = False
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):
