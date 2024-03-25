@@ -1,7 +1,10 @@
 import pytest
+from pytest_mock import MockerFixture
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.time import Time
 from .sample_crop_data import sample_crop_data
 
 
@@ -91,51 +94,30 @@ def test_give_feed(storage: Storage) -> None:
     pass
 
 
-def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
-    """
-    Test the calculate_dry_matter_loss_to_gas method of the Storage class.
-    """
-    with pytest.raises(NotImplementedError) as e:
-        storage.calculate_dry_matter_loss_to_gas(100.0, 30)
-    assert "Cannot use Storage.calculate_dry_matter_loss_to_gas, use a child class." in str(e.value)
-
-
 @pytest.mark.parametrize(
-    "dry_matter,mass,expected",
+    "dry_matter,percentage,category,temp,expected",
     [
-        (31, 100.0, 0.0),
-        (30, 100.0, 0.0),
-        (25, 200.0, 10.0),
-        (1, 150.0, 43.5),
-        (0, 250.0, 75.0),
+        (100.0, 25.0, CropCategory.ALFALFA, 20.0, 1.378),
+        (40.0, 20.0, CropCategory.ALFALFA, 6.0, 0.624),
+        (150.0, 19.0, CropCategory.ALFALFA, 10.0, 0.0),
+        (200.0, 23.0, CropCategory.ALFALFA, 46.0, 0.0),
+        (140.0, 15.0, CropCategory.CORN, 30.0, 1.2096),
+        (55.0, 66.0, CropCategory.GRASS, 25.0, 0.0),
+        (120.0, 4.0, CropCategory.SMALL_GRAIN, 15.0, 0.0),
     ],
 )
-def test_estimate_maximum_effluent(storage: Storage, dry_matter: float, mass: float, expected: float) -> None:
-    """
-    Test the estimate_maximum_effluent method of the Storage class.
-    """
-    actual = storage.estimate_maximum_effluent(dry_matter, mass)
-
-    assert pytest.approx(actual) == expected
-
-
-@pytest.mark.parametrize(
-    "dry_matter,max_effluent,days,expected",
-    [
-        (100.0, 25.0, 8, 0.0207),
-        (350.0, 40.0, 2, 0.002365714),
-        (30.0, 55.0, 12, 0.2277),
-        (400.0, 12.0, 1, 0.0003105),
-        (100.0, 0.0, 4, 0.0),
-    ],
-)
-def test_calculate_dry_matter_loss_to_effluent(
-    storage: Storage, dry_matter: float, max_effluent: float, days: int, expected: float
+def test_calculate_dry_matter_loss_to_gas(
+    storage: Storage, harvested_crop: HarvestedCrop, mocker: MockerFixture, dry_matter: float, percentage: float, category: CropCategory, temp: float, expected: float
 ) -> None:
-    """
-    Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
-    """
-    actual = storage.calculate_dry_matter_loss_to_effluent(dry_matter, max_effluent, days)
+    """Tests calculate_dry_matter_loss_to_gas in Sileage."""
+    mocker.patch("RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass", new_callable=mocker.PropertyMock, return_value=dry_matter)
+    harvested_crop.dry_matter_percentage = percentage
+    harvested_crop.category = category
+    mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    mock_conditions.mean_air_temperature = temp
+    mock_time = mocker.MagicMock(autospec=Time)
+
+    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions, mock_time)
 
     assert pytest.approx(actual) == expected
 
