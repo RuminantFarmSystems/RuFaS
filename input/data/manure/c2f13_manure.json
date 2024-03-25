@@ -6,7 +6,7 @@
         "manure_handler": "harrowing",
         "manure_separator": "none",
         "manure_separator_after_digestion": "none",
-        "manure_treatment": "open lot"
+        "manure_treatment": "open lots"
       },
       {
         "scenario_id": 1,
@@ -28,7 +28,7 @@
         "scenario_id": 3,
         "bedding_type": "manure solids",
         "manure_handler": "flush system",
-        "manure_separator": "rotary + screw press",
+        "manure_separator": "screw press",
         "manure_separator_after_digestion": "none",
         "manure_treatment": "composting"
       }
@@ -155,16 +155,6 @@
       },
       {
         "manure_separator_type": "screw press",
-        "percent_dry_solids": 0.35,
-        "total_solids_removal_efficiency_for_separator": 0.25,
-        "volatile_solids_removal_efficiency_for_separator": 0.30,
-        "nitrogen_removal_efficiency_for_separator": 0.30,
-        "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
-        "phosphorus_removal_efficiency_for_separator": 0.20,
-        "potassium_removal_efficiency_for_separator": 0.23
-      },
-      {
-        "manure_separator_type": "rotary + screw press",
         "percent_dry_solids": 0.35,
         "total_solids_removal_efficiency_for_separator": 0.95,
         "volatile_solids_removal_efficiency_for_separator": 0.52,
