@@ -1810,7 +1810,7 @@ class InputManager:
                 input_data=data,
                 eager_termination=eager_termination,
                 properties_blob_key=properties_blob_key,
-                elements_counter=self.elements_counter,
+                elements_counter=elements_counter,
                 called_during_initialization=False,
             )
 
@@ -1826,7 +1826,7 @@ class InputManager:
                 )
 
             self.__pool[variable_name] = validated_data
-            self.elements_counter += elements_counter
+            elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
             om.add_error(
