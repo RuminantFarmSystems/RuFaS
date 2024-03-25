@@ -40,11 +40,13 @@ class HarvestedCrop:
         Percent of mass that is labile carbohydrate.
     ash : float
         Percent of mass that is ash.
+    dry_matter_mass
 
     Methods
     -------
     __post_init__():
         Validates the category and type relationship.
+
     """
 
     category: CropCategory
@@ -63,7 +65,7 @@ class HarvestedCrop:
     sugar: float
     ash: float
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Validates that the type of the crop is consistent with its category.
 
@@ -99,3 +101,10 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+    @property
+    def dry_matter_mass(self) -> float:
+        """
+        Calculates the dry matter mass of this crop in kg.
+        """
+        return self.dry_matter_percentage * 0.01 * self.fresh_mass
