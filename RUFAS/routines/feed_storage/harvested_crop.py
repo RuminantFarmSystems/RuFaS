@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
 
@@ -40,11 +41,13 @@ class HarvestedCrop:
         Percent of mass that is labile carbohydrate.
     ash : float
         Percent of mass that is ash.
+    dry_matter_mass
 
     Methods
     -------
     __post_init__():
         Validates the category and type relationship.
+
     """
 
     category: CropCategory
@@ -63,7 +66,7 @@ class HarvestedCrop:
     sugar: float
     ash: float
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Validates that the type of the crop is consistent with its category.
 
@@ -99,3 +102,11 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+    @property
+    def dry_matter_mass(self) -> float:
+        """
+        Calculates the dry matter mass of this crop in kg.
+        """
+        dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        return dry_matter_fraction * self.fresh_mass
