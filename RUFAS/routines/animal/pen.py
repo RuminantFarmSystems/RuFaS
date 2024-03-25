@@ -791,6 +791,8 @@ class Pen:
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
                 self.MEdiet,
+                nutrient_amount = self.ration_nutrient_amount,
+                nutrient_conc = self.ration_nutrient_conc
             )
         else:
             animal.calc_manure_excretion(feed, methane_model)
