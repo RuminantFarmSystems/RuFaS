@@ -380,7 +380,5 @@ class BaseManureTreatment(ABC):
                     },
                 )
             self._accumulated_output = manure_treatment_daily_output.clone()
-            # TODO: Add the following logic
-            # Accumulate the output with repeated calls
         else:
             self._accumulated_output += manure_treatment_daily_output
