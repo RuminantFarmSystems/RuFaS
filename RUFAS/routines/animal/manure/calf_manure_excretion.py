@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -15,6 +15,8 @@ def manure_calculations(
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a calf with information from the ration formulation.
 
@@ -42,7 +44,9 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
 

@@ -84,7 +84,7 @@ class HeiferI(Calf):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(self, feed, methane_model, nutrient_amount, nutrient_conc):
         """
         Calculates and sets the manure excretion components.
 
@@ -100,6 +100,8 @@ class HeiferI(Calf):
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc
         )
 
     def phosphorus_rqmts(self, DMI):
