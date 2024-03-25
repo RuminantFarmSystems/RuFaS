@@ -237,7 +237,7 @@ class Storage:
 
         """
         return sum(
-            [getattr(crop, nutrient_name) * crop.dry_matter_percentage * crop.fresh_mass for crop in self.stored]
+            [getattr(crop, nutrient_name) * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass for crop in self.stored]
         )
 
     def calculate_dry_matter_loss_to_gas(
