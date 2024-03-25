@@ -109,7 +109,7 @@ class Storage:
 
     def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
-        Processes the degradations and losses of the stored crops.
+        Processes the degradations and losses of nutrients and dry matter in the stored crops.
 
         Parameters
         ----------
@@ -202,7 +202,7 @@ class Storage:
         Notes
         -----
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
-        no dry matter loss occurs. Alfalfa uses different parameters and thresholds for calculating dry matter loss,
+        no dry matter loss occurs. Alfalfa uses different parameters and limits for calculating dry matter loss,
         but the structure of the loss equation remains the same.
 
         """
@@ -210,26 +210,29 @@ class Storage:
         average_temperature = current_conditions.mean_air_temperature
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
-        lower_temp_threshold = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD
+        lower_temp_limit = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_THRESHOLD
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
         )
-        upper_temp_threshold = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_TEMP_THRESHOLD
+        upper_temp_limit = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_THRESHOLD
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
         )
-        lower_dry_matter_threshold = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_THRESHOLD
+        lower_dry_matter_limit = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_THRESHOLD
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
+        )
+        upper_dry_matter_limit = (
+            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
+            if is_alfalfa
+            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
         )
 
-        if (not lower_temp_threshold <= average_temperature <= upper_temp_threshold) or (
-            not lower_dry_matter_threshold
-            <= crop.dry_matter_percentage
-            <= FeedStorageConstants.GASEOUS_LOSS_UPPER_DRY_MATTER_THRESHOLD
+        if (not lower_temp_limit <= average_temperature <= upper_temp_limit) or (
+            not lower_dry_matter_limit <= crop.dry_matter_percentage <= upper_dry_matter_limit
         ):
             return 0.0
 

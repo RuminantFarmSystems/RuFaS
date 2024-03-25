@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
 
@@ -107,4 +108,5 @@ class HarvestedCrop:
         """
         Calculates the dry matter mass of this crop in kg.
         """
-        return self.dry_matter_percentage * 0.01 * self.fresh_mass
+        dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        return dry_matter_fraction * self.fresh_mass
