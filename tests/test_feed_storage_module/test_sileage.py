@@ -57,7 +57,6 @@ def test_calculate_dry_matter_loss_to_effluent(
     assert pytest.approx(actual) == expected
 
 
-
 @pytest.mark.parametrize(
     "protein,effluent,expected",
     [
