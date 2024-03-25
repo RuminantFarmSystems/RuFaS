@@ -93,6 +93,7 @@ class BaleSize(Enum):
         Represents a hay bale diameter of 1.8 meters.
 
     """
+
     SMALL = 1.2
     MEDIUM = 1.5
     LARGE = 1.8

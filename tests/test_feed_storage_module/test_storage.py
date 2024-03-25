@@ -85,9 +85,11 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
         (20.0, 5.0, 40.0),
         (15.0, 6.0, 30.0),
         (0.0, 0.0, 0.0),
-    ]
+    ],
 )
-def test_process_degradations(storage: Storage, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float) -> None:
+def test_process_degradations(
+    storage: Storage, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float
+) -> None:
     """
     Test the process_degradations method of the Storage class.
     """
@@ -142,10 +144,21 @@ def test_give_feed(storage: Storage) -> None:
     ],
 )
 def test_calculate_dry_matter_loss_to_gas(
-    storage: Storage, harvested_crop: HarvestedCrop, mocker: MockerFixture, dry_matter: float, percentage: float, category: CropCategory, temp: float, expected: float
+    storage: Storage,
+    harvested_crop: HarvestedCrop,
+    mocker: MockerFixture,
+    dry_matter: float,
+    percentage: float,
+    category: CropCategory,
+    temp: float,
+    expected: float,
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Sileage."""
-    mocker.patch("RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass", new_callable=mocker.PropertyMock, return_value=dry_matter)
+    mocker.patch(
+        "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
+        new_callable=mocker.PropertyMock,
+        return_value=dry_matter,
+    )
     harvested_crop.dry_matter_percentage = percentage
     harvested_crop.category = category
     mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
