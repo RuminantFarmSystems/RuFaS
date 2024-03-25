@@ -1,12 +1,11 @@
 import math
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
@@ -71,8 +70,6 @@ def methane_mitigation(
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     days_in_milk: int,
     milk_protein: float,
@@ -84,6 +81,8 @@ def manure_calculations(
     methane_mitigation_additive_amount: float,
     milk_fat: float,
     metabolizable_energy_intake: float,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float]
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a cow with information from the ration formulation.
 
@@ -121,7 +120,9 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     ASH_diet_content = nutrient_amounts["ash"]
     ASH_concentration = nutrient_concentrations["ash"]

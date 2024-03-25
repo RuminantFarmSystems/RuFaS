@@ -1,30 +1,25 @@
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float]
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
     body_weight : float
         Body weight of the current animal, kg.
     fecal_phosphorus : float
@@ -44,7 +39,9 @@ def manure_calculations(
 
     """
     # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
     potassium_concentration = nutrient_concentrations["potassium"]

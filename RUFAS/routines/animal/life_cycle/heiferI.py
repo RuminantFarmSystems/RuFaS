@@ -1,3 +1,4 @@
+from typing import Dict
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -84,22 +85,21 @@ class HeiferI(Calf):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(self, methane_model, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]):
         """
         Calculates and sets the manure excretion components.
 
         Args:
-                feed: instance of the Feed class
                 methane_model: methane model used for methane emission calculations
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation,
-            feed,
             self.body_weight,
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc
         )
 
     def phosphorus_rqmts(self, DMI):
