@@ -72,16 +72,14 @@ def test_attributes() -> None:
         (145.0, 100.0, 145.0),
         (20.4, 0.0, 0.0),
         (0.0, 0.0, 0.0),
-    ]
+    ],
 )
 def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> None:
     """Test dry_matter_mass property in Harvested Crop."""
     crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data  # type: ignore[arg-type]
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)  # type: ignore[arg-type]
 
     actual = crop.dry_matter_mass
 
