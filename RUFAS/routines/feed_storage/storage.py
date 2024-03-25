@@ -6,6 +6,9 @@ from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 class Storage:
@@ -183,7 +186,59 @@ class Storage:
             Total amount of gaseous dry matter lost from storage in kg.
 
         """
-        pass
+        info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
+        om.add_variable("total_fresh_mass", self.stored_mass, info_map)
+
+        total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
+        om.add_variable("total_dry_matter_mass", total_dry_matter_mass)
+
+        om.add_variable("gaseous_dry_matter_loss", gaseous_dry_matter_loss, info_map)
+
+        total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
+        om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
+
+        total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
+        om.add_variable("total_crude_protein", total_crude_protein, info_map)
+
+        total_non_protein_nitrogen = self._get_total_nutritive_amount("non_protein_nitrogen")
+        om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
+
+        total_starch = self._get_total_nutritive_amount("starch")
+        om.add_variable("total_starch", total_starch, info_map)
+
+        total_adf = self._get_total_nutritive_amount("adf")
+        om.add_variable("total_adf", total_adf, info_map)
+
+        total_ndf = self._get_total_nutritive_amount("ndf")
+        om.add_variable("total_ndf", total_ndf, info_map)
+
+        total_lignin = self._get_total_nutritive_amount("lignin")
+        om.add_variable("total_lignin", total_lignin, info_map)
+
+        total_sugar = self._get_total_nutritive_amount("sugar")
+        om.add_variable("total_sugar", total_sugar, info_map)
+
+        total_ash = self._get_total_nutritive_amount("ash")
+        om.add_variable("total_ash", total_ash, info_map)
+
+    def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
+        """
+        Calculates the total amount of the specifed nutrient that is currently held in storage.
+
+        Parameters
+        ----------
+        nutrient_name : str
+            The name of the target nutrient attribute in HarvestedCrop.
+
+        Returns
+        -------
+        float
+            Total amount of the target nutrient in the stored crops in kg.
+
+        """
+        return sum(
+            [getattr(crop, nutrient_name) * crop.dry_matter_percentage * crop.fresh_mass for crop in self.stored]
+        )
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time

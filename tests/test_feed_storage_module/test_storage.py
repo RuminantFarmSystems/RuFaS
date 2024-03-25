@@ -1,4 +1,5 @@
 import pytest
+import copy
 from pytest_mock import MockerFixture
 from unittest.mock import call
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -6,7 +7,10 @@ from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from .sample_crop_data import sample_crop_data
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -140,21 +144,38 @@ def test_give_feed(storage: Storage) -> None:
         (0.0, 200.0, 10.0, 200.0, 10.0),
     ]
 )
-def test_set_mass_attributes(storage: Storage, loss: float, fresh: float, percentage: float, expected_fresh: float, expected_percentage: float) -> None:
+def test_set_mass_attributes(storage: Storage, harvested_crop: HarvestedCrop, loss: float, fresh: float, percentage: float, expected_fresh: float, expected_percentage: float) -> None:
     """Test set_mass_attributes method of Storage class."""
-    crop = HarvestedCrop(category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data)
-    crop.fresh_mass = fresh
-    crop.dry_matter_percentage = percentage
+    harvested_crop.fresh_mass = fresh
+    harvested_crop.dry_matter_percentage = percentage
 
-    storage.set_mass_attributes_after_loss(crop, loss)
+    storage.set_mass_attributes_after_loss(harvested_crop, loss)
 
-    assert crop.fresh_mass == expected_fresh
-    assert pytest.approx(crop.dry_matter_percentage) == expected_percentage
+    assert harvested_crop.fresh_mass == expected_fresh
+    assert pytest.approx(harvested_crop.dry_matter_percentage) == expected_percentage
 
 
-def test_record_stored_crops() -> None:
+@pytest.mark.parametrize(
+    "loss",
+    (
+        100.0,
+        0.0,
+        50.0,
+    )
+)
+def test_record_stored_crops(storage: Storage, mocker: MockerFixture, loss: float) -> None:
     """Test record_stored_crops method of Storage class."""
-    pass
+    mock_stored_mass = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.stored_mass", new_callable=mocker.PropertyMock)
+    mock_total_amount = mocker.patch.object(storage, "_get_total_nutritive_amount")
+    mock_add_var = mocker.patch.object(om, "add_variable")
+    expected_get_total_amount_call_count = 9
+    expected_add_var_call_count = 12
+
+    storage.record_stored_crops(loss)
+
+    mock_stored_mass.assert_called_once()
+    assert mock_total_amount.call_count == expected_get_total_amount_call_count
+    assert mock_add_var.call_count == expected_add_var_call_count
 
 
 @pytest.mark.parametrize(
