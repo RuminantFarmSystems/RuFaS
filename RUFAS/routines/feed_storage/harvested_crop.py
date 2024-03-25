@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
 
@@ -40,11 +40,20 @@ class HarvestedCrop:
         Percent of mass that is labile carbohydrate.
     ash : float
         Percent of mass that is ash.
+    stored_fresh_mass : float
+        The fresh mass of the crop when it was stored in kg.
+    stored_dry_matter_percentage : float
+        The percentage of the fresh mass that was dry matter when it was stored in kg.
+    previous_cumulative_dry_matter_loss : float, default 0.0
+        Cumulative total amount of gaseous dry matter loss this crop had experienced the day before the current day.
 
     Methods
     -------
     __post_init__():
         Validates the category and type relationship.
+    days_stored(time: Time)
+        Calculates the number of days the crop has been stored for.
+
     """
 
     category: CropCategory
@@ -62,10 +71,13 @@ class HarvestedCrop:
     lignin: float
     sugar: float
     ash: float
+    stored_fresh_mass: float = field(init=False)
+    stored_dry_matter_percentage: float = field(init=False)
+    previous_cumulative_dry_matter_loss: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
-        Validates that the type of the crop is consistent with its category.
+        Validates that the type of the crop is consistent with its category and records initial crop values.
 
         Raises
         ------
@@ -99,3 +111,30 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+        self.stored_fresh_mass = self.fresh_mass
+        self.stored_dry_matter_percentage = self.dry_matter_percentage
+
+    @property
+    def dry_matter_mass(self) -> float:
+        """
+        Calculates the dry matter mass of this crop in kg.
+        """
+        return self.dry_matter_percentage * 0.01 * self.fresh_mass
+
+    def days_stored(self, time: Time) -> int:
+        """
+        Calculates the number of days this crop has been stored for.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance tracking the current time of the RuFaS simulation.
+
+        Returns
+        -------
+        int
+            The number of days this crop has been stored for.
+
+        """
+        return time.index - self.storage_time.index

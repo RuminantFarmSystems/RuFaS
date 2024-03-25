@@ -79,3 +79,20 @@ class CropType(Enum):
     FINE_FESCUE = "Fine Fescue"
     TALL_FESCUE = "Tall Fescue"
     MEADOW_FESCUE = "Meadow Fescue"
+
+
+class BaleSize(Enum):
+    """
+    Enum of bale diameters for hay bales.
+
+    SMALL : float
+        Represents a hay bale diameter of 1.2 meters.
+    MEDIUM : float
+        Represents a hay bale diameter of 1.5 meters.
+    LARGE : float
+        Represents a hay bale diameter of 1.8 meters.
+
+    """
+    SMALL = 1.2
+    MEDIUM = 1.5
+    LARGE = 1.8

@@ -27,7 +27,7 @@ from .sample_crop_data import sample_crop_data
 )
 def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     try:
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
     except ValueError:
         pytest.fail(f"Unexpected ValueError with {category} and {crop_type}")
 
@@ -43,11 +43,25 @@ def test_valid_category_type_combinations(category: CropCategory, crop_type: Cro
 )
 def test_invalid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     with pytest.raises(ValueError):
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+
+
+def test_post_init() -> None:
+    """Tests that variables are correctly intialized by the post init method."""
+    expected_initial_fresh_mass = sample_crop_data["fresh_mass"]
+    expected_initial_dry_matter_percentage = sample_crop_data["dry_matter_percentage"]
+
+    actual = HarvestedCrop(
+        category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data  # type: ignore[arg-type]
+    )
+    assert actual.initial_fresh_mass == expected_initial_fresh_mass
+    assert actual.initial_dry_matter_percentage == expected_initial_dry_matter_percentage
 
 
 def test_attributes() -> None:
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.dry_matter_digestibility == sample_crop_data["dry_matter_digestibility"]
