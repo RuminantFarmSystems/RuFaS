@@ -452,16 +452,16 @@ class Cow(HeiferIII):
 
     def calc_manure_excretion(
         self,
-        feed,
         methane_model,
         methane_mitigation_method,
         methane_mitigation_additive_amount,
         ME_intake,
+        nutrient_amount,
+        nutrient_conc,
     ):
         """
         Calculates and sets the manure excretion components.
         Args:
-            feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
             ME_intake: metabolizable energy intake, Mcal/kg DM
         """
@@ -469,8 +469,6 @@ class Cow(HeiferIII):
 
         if self.milking:
             self.p_excrt, self.manure_excretion = lactating_manure_calculations(
-                self.ration_formulation,
-                feed,
                 self.body_weight,
                 self.days_in_milk,
                 self.mPrt,
@@ -482,17 +480,19 @@ class Cow(HeiferIII):
                 methane_mitigation_additive_amount,
                 self.fat_percent,
                 ME_intake,
+                nutrient_amount=nutrient_amount,
+                nutrient_conc=nutrient_conc,
             )
         else:
             self.p_excrt, self.manure_excretion = dry_manure_calculations(
-                self.ration_formulation,
-                feed,
                 self.body_weight,
                 self.estimated_daily_milk_produced,
                 p_feces_excrt,
                 p_urine,
                 methane_model,
                 ME_intake,
+                nutrient_amount=nutrient_amount,
+                nutrient_conc=nutrient_conc,
             )
 
     def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}):
