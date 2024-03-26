@@ -1,10 +1,36 @@
 import copy
 from typing import List
-from .feed_storage_constants import FeedStorageConstants
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
+
+"""Temperature below which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
+ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 5.0
+
+"""Temperature above which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
+ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT = 45.0
+
+"""Temperature below which ensiled non-alfalfa crops does not lose dry matter to fermentation (degrees C)."""
+NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 0.0
+
+"""Temperature above which ensiled non-alfalfa crops does not lose dry matter to fermentation (degrees C)."""
+NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT = 40.0
+
+"""Dry matter percentage of fresh mass below which ensiled alfalfa does not lose dry matter to fermentation."""
+ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 20.0
+
+"""Dry matter percentage of fresh mass above which ensiled alfalfa does not lose dry matter to fermentation."""
+ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
+
+"""
+Dry matter percentage of fresh mass below which ensiled non-alfalfa crops does not lose dry matter to fermentation.
+"""
+NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 15.0
+
+"""
+Dry matter percentage of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
+NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
 
 
 class Storage:
@@ -211,24 +237,24 @@ class Storage:
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
         lower_temp_limit = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
+            else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
         )
         upper_temp_limit = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
+            else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
         )
         lower_dry_matter_limit = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
+            ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
+            else NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
         )
         upper_dry_matter_limit = (
-            FeedStorageConstants.ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
+            ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
             if is_alfalfa
-            else FeedStorageConstants.NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
+            else NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
         )
 
         if (not lower_temp_limit <= average_temperature <= upper_temp_limit) or (
