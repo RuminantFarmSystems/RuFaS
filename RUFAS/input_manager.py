@@ -354,21 +354,21 @@ class InputManager:
         if len(input_array_data) == 0:
             return input_array_data
 
-        filtered_array_data: List[Any] = []
+        filtered_array_data: List[Dict[str, Any] | List[Any] | (int | float | str | bool)] = []
 
         for array_element in input_array_data:
             if isinstance(array_element, dict):
-                nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
+                nested_input_dict_data: Dict[str, Any] = self._filter_input_data_by_metadata(
                     array_element, metadata_properties["properties"]
                 )
-                if nested_input_data:
-                    filtered_array_data.append(nested_input_data)
+                if nested_input_dict_data:
+                    filtered_array_data.append(nested_input_dict_data)
             elif isinstance(array_element, list):
-                nested_input_data: List[Any] = self._filter_input_array_data_by_metadata(
+                nested_input_array_data: List[Any] = self._filter_input_array_data_by_metadata(
                     array_element, metadata_properties["properties"]
                 )
-                if nested_input_data:
-                    filtered_array_data.append(nested_input_data)
+                if nested_input_array_data:
+                    filtered_array_data.append(nested_input_array_data)
             elif isinstance(array_element, (int | float | str | bool)):
                 filtered_array_data.append(array_element)
 
