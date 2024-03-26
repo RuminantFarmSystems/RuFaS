@@ -35,7 +35,7 @@ jobs:
           coverage report --rcfile=.github/.coveragerc
           coverage json --rcfile=.github/.coveragerc
           echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' coverage.json )" >> "$GITHUB_ENV"
-          echo "${{ env.COVERAGE_PERCENTAGE }}"
+          echo "Coverage Percentage: $(jq -r '.totals.percent_covered_display' coverage.json)"
 
       - name: Run mypy on the current branch
         run: |
@@ -64,7 +64,7 @@ jobs:
         run: |
           MY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
           if [ -n "$URL" ]; then
-            PYTEST_COVERAGE="Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%"
+            PYTEST_COVERAGE="Current Coverage: $COVERAGE_PERCENTAGE%"
             MYPY_ERRORS="Mypy found $MY_ERROR_COUNT errors."
             COMMIT_MESSAGE="$PYTEST_COVERAGE\n$MYPY_ERRORS"
             curl \
