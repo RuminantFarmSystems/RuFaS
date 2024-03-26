@@ -230,7 +230,6 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
 
 def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
     data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
-    selected_variables = ["key1", "key2"]
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"stackplot": MagicMock()}
     ) as mock_plot_functions_dict:

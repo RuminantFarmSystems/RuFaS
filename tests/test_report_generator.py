@@ -1084,7 +1084,8 @@ def test_add_simulation_days_or_indices_to_report_data(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for the _add_simulation_days_or_indices_to_report_data method of ReportGenerator class in report_generator.py file.
+    Unit test for the _add_simulation_days_or_indices_to_report_data method of
+    ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
