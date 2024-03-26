@@ -85,19 +85,7 @@ class Time:
 
         return sim_length + 1
 
-    # TODO: Remove this method
-    def to_str(self):
-        """
-        Description:
-            Returns a string representation of the current time.
-        Returns:
-            str: a String representation of the current time in the simulation
-                in the format "Year: <year> Day: <day>"
-        """
-
-        return "Year: {} Day: {}".format(self.year, self.day)
-
-    def advance(self):
+    def advance(self) -> None:
         """
         Description:
             Advances the time in the simulation by 1 day
@@ -112,7 +100,7 @@ class Time:
         else:
             self.day += 1
 
-    def end_year(self):
+    def end_year(self) -> bool:
         """
         Description:
             Returns a bool signifying the end of a year.
