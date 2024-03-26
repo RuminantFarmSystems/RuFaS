@@ -1665,10 +1665,9 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
+    def collect_manure_excretions_output_data(self, pen: Pen, manure_excretions_output_data: Dict):
         pen.classes_in_pen = self._determine_classes_in_pen(pen)
         pen.calc_total_manure(
-            feed,
             self.methane_model,
             self.methane_mitigation_method,
             self.methane_mitigation_additive_amount,
@@ -1764,7 +1763,7 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+                self.collect_manure_excretions_output_data(pen, manure_excretions_output_data)
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)

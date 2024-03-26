@@ -1,3 +1,4 @@
+from typing import Dict
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
@@ -106,26 +107,33 @@ class HeiferIII(HeiferII):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amount of nutrients in pen ration, calculated per animal.
+        nutrient_conc : Dict[str, float]
+            Concentration of nutrients in pen ration, calculated per animal.
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation,
-            feed,
             self.body_weight,
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc,
         )
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -133,9 +141,17 @@ class HeiferIII(HeiferII):
         ration formulation module next to it could build the function of
         ranking heifers.
 
-        Returns: cow_stage - heifer close to calving, move to cow stage
-        """
+        Parameters
+        ----------
+        sim_day : int
+            Day of simulation.
 
+        Returns
+        -------
+        bool
+            True if should be moved to "cow stage".
+        """
+        print("using it")
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1

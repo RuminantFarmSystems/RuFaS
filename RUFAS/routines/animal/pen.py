@@ -755,7 +755,6 @@ class Pen:
     def _calc_animal_manure_excretion(
         self,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -786,14 +785,17 @@ class Pen:
         is_lactating_cow = is_cow and animal.is_lactating
         if is_cow:
             animal.calc_manure_excretion(
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
                 self.MEdiet,
+                nutrient_amount=self.ration_nutrient_amount,
+                nutrient_conc=self.ration_nutrient_conc
             )
         else:
-            animal.calc_manure_excretion(feed, methane_model)
+            animal.calc_manure_excretion(methane_model,
+                                         nutrient_amount=self.ration_nutrient_amount,
+                                         nutrient_conc=self.ration_nutrient_conc)
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
     @staticmethod
@@ -833,7 +835,6 @@ class Pen:
 
     def calc_total_manure(
         self,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -871,7 +872,6 @@ class Pen:
         for animal in list(self.animals_in_pen.values()):
             prefix, manure = self._calc_animal_manure_excretion(
                 animal,
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
