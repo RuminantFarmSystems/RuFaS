@@ -74,11 +74,11 @@ class Sileage(Storage):
                 crop, effluent_loss
             )
 
-            crop.non_protein_nitrogen = super().recalculate_nutrient_percentage(
+            crop.non_protein_nitrogen = self.recalculate_nutrient_percentage(
                 crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
             )
 
-            crop.crude_protein_percent = super().recalculate_nutrient_percentage(
+            crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
             )
 

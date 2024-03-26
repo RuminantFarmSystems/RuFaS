@@ -74,9 +74,8 @@ def test_process_degradations(
     mock_npn_loss = mocker.patch.object(
         sileage, "calculate_non_protein_nitrogen_loss_to_effluent", return_value=loss_coeff
     )
-    mock_calc_nutrient_percentage = mocker.patch(
-        "RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_percentage"
-    )
+    mock_calc_nutrient_percentage = mocker.patch.object(sileage, "recalculate_nutrient_percentage")
+    mock_set_mass = mocker.patch.object(sileage, "set_mass_attributes_after_loss")
     mock_add_var = mocker.patch.object(om, "add_variable")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
 
@@ -90,14 +89,20 @@ def test_process_degradations(
     expected_protein_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_npn_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_calc_nutrient_percentage_call_count = len(sileage.stored) * 2
+    expected_set_mass_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
 
     mock_estimate_effluent.assert_has_calls(expected_estimate_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_matter_loss_calls)
     mock_protein_loss.assert_has_calls(expected_protein_loss_calls)
     mock_npn_loss.assert_has_calls(expected_npn_loss_calls)
     assert mock_calc_nutrient_percentage.call_count == expected_calc_nutrient_percentage_call_count
+    mock_set_mass.assert_has_calls(expected_set_mass_calls)
     mock_add_var.assert_called_once_with("effluent_dry_matter_loss", expected_loss, expected_info_map)
     mock_storage_process_degradations.assert_called_once_with(mock_conditions, mock_time)
+    mock_first_crop.crude_protein_percent = percentage
+    mock_first_crop.non_protein_nitrogen = percentage
+    mock_second_crop.crude_protein_percent = percentage
+    mock_second_crop.non_protein_nitrogen = percentage
 
 
 @pytest.mark.parametrize(
