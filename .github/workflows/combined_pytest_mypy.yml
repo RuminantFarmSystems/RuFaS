@@ -65,8 +65,11 @@ jobs:
           MY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${COVERAGE_PERCENTAGE}%"
+            echo "$PYTEST_COVERAGE"
             MYPY_ERRORS="Mypy found $MY_ERROR_COUNT errors."
+            echo "$MYPY_ERRORS"
             COMMIT_MESSAGE="$PYTEST_COVERAGE\n$MYPY_ERRORS"
+            echo "$COMMIT_MESSAGE"
             curl \
               -X POST \
               $URL \
