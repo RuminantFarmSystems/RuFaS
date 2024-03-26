@@ -3,6 +3,9 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.input_manager import InputManager
+import numpy as np
+from scipy.integrate import quad
+
 
 im = InputManager()
 
@@ -23,6 +26,53 @@ class AnimalBase:
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
 
     @staticmethod
+    def get_t_values(start=1, end=305, step=1):
+        return np.arange(start, end, step)
+
+    @staticmethod
+    def get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c):
+        return parameter_a * np.power(t, parameter_b) * np.exp(-1 * parameter_c * t)
+
+    @staticmethod
+    def calc_integral_wood_curve(parameter_a, parameter_b, parameter_c):
+        result, _ = quad(get_y_values_wood_curve, 1, 305, args=(parameter_a, parameter_b, parameter_c))
+        return result
+    
+    @staticmethod
+    def get_wood_parameters(lactation_group = None, year = None, month = None, region = None, milking_frequency = None, MY_305d = None): 
+        parameter_a = 19.9
+        parameter_b = 24.7 * 1e-2
+        parameter_c = 33.76 * 1e-4
+        t = get_t_values()
+        adjustment_dict = im.get_data("lactation.adjustment_dict")
+
+
+        for category in [lactation_group, year, month, region, milking_frequency]:
+            if category:
+                parameter_a += adjustment_dict[category][0]
+                parameter_b += adjustment_dict[category][1] * 1e-2
+                parameter_c += adjustment_dict[category][2] * 1e-4
+
+        if MY_305d == None:
+            MY_305d = calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
+            y = get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c)
+            return parameter_a, parameter_b, parameter_c, MY_305d
+
+        else:
+            min_diff = float('inf')
+            parameter_a_best_estimate = 0
+            MY_305d_best_estimate = 0
+
+            for parameter_a_error in np.arange(-10, 10, 0.01):
+                parameter_a_vary = parameter_a + parameter_a_error
+                MY_305d_vary = calc_integral_wood_curve(parameter_a_vary, parameter_b, parameter_c)
+                if abs(MY_305d_vary - MY_305d) < min_diff:
+                    min_diff =  abs(MY_305d_vary - MY_305d)
+                    parameter_a_best_estimate = parameter_a_vary
+                    MY_305d_best_estimate = MY_305d_vary
+            return parameter_a_best_estimate, parameter_b, parameter_c, MY_305d_best_estimate  
+        
+    @staticmethod
     def set_lactation_curve_parameters():
         print(im.get_data("lactation.adjustment_dict"))
         print(im.get_data("lactation.fips_region"))
@@ -37,14 +87,39 @@ class AnimalBase:
         #animal input
             
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs") #int or None
+        parity_percentages= im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
         milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day") #int
-        parirty_percentages= im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
+
+        if milking_freq >= 2.5 : 
+            milking_freq = 3 
+        else: 
+            milking_freq = 2
+
+        #calculate lactation group yield
+
+        # Assuming Y = 1632 and Z = 2196 based on the given assumptions
+        Y = 1632
+        Z = 2196
+
+        total_avg_305 = annual_MY_lbs * 305 / (365 * (305/365) * 2.205) 
+
+        # Extracting percentage distribution for each lactation group
+        percent_P1, percent_P2, percent_P3 = parity_percentages
+
+        # Solving for P1-305 using the provided equation
+        P1_305 = total_avg_305 - percent_P2 * Y / 100 - percent_P3 * Z / 100 
+
+        # Calculating 305-day milk yield for each lactation group
+        P2_305 = P1_305 + Y 
+        P3_305 = P1_305 + Z
 
         #calculate parameters for each lactation group
+        AnimalBase.lactation_parameters[1] = get_wood_parameters(lactation_group = '1', year = year, region = region, milking_frequency = milking_freq, MY_305d = P1_305)
+        AnimalBase.lactation_parameters[2] = get_wood_parameters(lactation_group = '2', year = year, region = region, milking_frequency = milking_freq, MY_305d = P2_305)
+        AnimalBase.lactation_parameters[3] = get_wood_parameters(lactation_group = '3', year = year, region = region, milking_frequency = milking_freq, MY_305d = P3_305)
         
         #assign final values to dictionary
-        AnimalBase.lactation_parameters = None  
-        
+        #AnimalBase.lactation_parameters = None    
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
