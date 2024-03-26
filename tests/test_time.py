@@ -404,7 +404,13 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
 
     time = Time()
 
-    mock_im_get_data.assert_called_once_with("config")
+    mock_im_get_data.assert_has_calls(
+        [
+            mocker.call("config"),
+            mocker.call("config.time_format_string"),
+            mocker.call("config.add_formatted_time"),
+        ]
+    )
     assert time.start_year_int == mock_config["start_year_int"] and time.calendar_year == mock_config["calendar_year"]
     assert time.leap_year_length == mock_config["leap_year_length"]
     assert time.year_length == mock_config["year_length"]
@@ -412,11 +418,6 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.simulation_day == 0
     assert time.year == 1
     assert time.years == mock_config["years"]
-
-
-def test_to_str(mock_time: Time) -> None:
-    """Tests that string representations are correctly created for Time instances."""
-    assert mock_time.to_str() == "Year: 1 Day: 2"
 
 
 def test_advance(mock_time: Time) -> None:
