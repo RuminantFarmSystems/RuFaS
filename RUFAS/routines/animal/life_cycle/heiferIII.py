@@ -107,13 +107,21 @@ class HeiferIII(HeiferII):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, methane_model, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]):
+    def calc_manure_excretion(self,
+                              methane_model: str,
+                              nutrient_amount: Dict[str, float],
+                              nutrient_conc: Dict[str, float]) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amount of nutrients in pen ration, calculated per animal.
+        nutrient_conc : Dict[str, float]
+            Concentration of nutrients in pen ration, calculated per animal.
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 

@@ -27,6 +27,10 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+    nutrient_amount : Dict[str, float]
+        Amount of nutrients in pen ration, calculated per animal.
+    nutrient_conc : Dict[str, float]
+        Concentration of nutrients in pen ration, calculated per animal.
 
     Returns
     -------

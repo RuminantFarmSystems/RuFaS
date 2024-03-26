@@ -110,6 +110,10 @@ def manure_calculations(
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amount of nutrients in pen ration, calculated per animal.
+    nutrient_conc : Dict[str, float]
+        Concentration of nutrients in pen ration, calculated per animal.
 
     Returns
     -------
