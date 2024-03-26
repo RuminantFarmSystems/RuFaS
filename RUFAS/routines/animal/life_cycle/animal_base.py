@@ -80,9 +80,10 @@ class AnimalBase:
          
        
         #config input
+        fips_region = im.get_data("lactation.fips_region")
             
         year = im.get_data("config.end_date")[:4] #str  
-        region = im.get_data("config.FIPS_county_code") #int
+        region = fips_region[int((im.get_data("config.FIPS_county_code")/1000))] #int
 
         #animal input
             
@@ -91,9 +92,9 @@ class AnimalBase:
         milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day") #int
 
         if milking_freq >= 2.5 : 
-            milking_freq = 3 
+            milking_freq = str(3) + "x/d"
         else: 
-            milking_freq = 2
+            milking_freq = str(2) + "x/d"
 
         #calculate lactation group yield
 
