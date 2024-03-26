@@ -37,32 +37,23 @@ jobs:
           echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' coverage.json )" >> "$GITHUB_ENV"
           echo "${{ env.COVERAGE_PERCENTAGE }}"
 
-      - name: Update Coverage Badge
-        run: |
-          ./.github/workflows/update_badge.sh
-
-      - name: Commit & Push changes to Readme for Coverage
-        uses: actions-js/push@master
-        with:
-          message: Update coverage on Readme
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
-
       - name: Run mypy on the current branch
         run: |
           python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
           grep -c "error:" mypy_current_branch_report.txt > mypy_current_branch_error_count.txt
 
-      - name: Update Mypy badge
+      - name: Update Coverage and Mypy Badges
         run: |
+          chmod +x ./.github/workflows/update_badge.sh
           chmod +x ./.github/workflows/update_mypy_badge.sh
+          ./.github/workflows/update_badge.sh
           ./.github/workflows/update_mypy_badge.sh $(cat mypy_current_branch_error_count.txt)
 
-      - name: Commit & Push changes to README for Mypy
+      - name: Commit & Push Badge Updates
         uses: EndBug/add-and-commit@v7
         with:
-          message: "Update mypy badge on README"
-          add: "README.md"
+          message: "Update coverage and mypy badges on README"
+          add: "README.md .github/badges/"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
