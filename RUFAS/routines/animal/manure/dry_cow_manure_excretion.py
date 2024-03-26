@@ -56,7 +56,6 @@ def manure_calculations(
     # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
     # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
     # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]

@@ -124,7 +124,6 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
