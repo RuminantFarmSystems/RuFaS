@@ -99,10 +99,11 @@ def test_calculate_dry_matter_loss_to_effluent(
     ],
 )
 def test_calculate_crude_protein_loss_to_effluent(
-    sileage: Sileage, protein: float, effluent: float, expected: float
+    sileage: Sileage, harvested_crop: HarvestedCrop, protein: float, effluent: float, expected: float
 ) -> None:
     """Test the calculate_protein_loss_to_effluent method in the Storage class."""
-    actual = sileage.calculate_protein_loss_to_effluent(protein, effluent)
+    harvested_crop.crude_protein_percent = protein
+    actual = sileage.calculate_protein_loss_to_effluent(harvested_crop, effluent)
 
     assert pytest.approx(actual) == expected
 
@@ -119,10 +120,12 @@ def test_calculate_crude_protein_loss_to_effluent(
     ],
 )
 def test_calculate_non_protein_nitrogen_loss_to_effluent(
-    sileage: Sileage, nitrogen: float, protein: float, effluent: float, expected: float
+    sileage: Sileage, harvested_crop: HarvestedCrop, nitrogen: float, protein: float, effluent: float, expected: float
 ) -> None:
     """Test the calculate_non_protein_nitrogen_loss_to_effluent method in the Storage class."""
-    actual = sileage.calculate_non_protein_nitrogen_loss_to_effluent(nitrogen, protein, effluent)
+    harvested_crop.crude_protein_percent = protein
+    harvested_crop.non_protein_nitrogen = nitrogen
+    actual = sileage.calculate_non_protein_nitrogen_loss_to_effluent(harvested_crop, effluent)
 
     assert pytest.approx(actual) == expected
 
