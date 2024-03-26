@@ -1,8 +1,8 @@
 from datetime import date
 from typing import Dict, Any
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
 from pytest_mock import MockerFixture
 
 from RUFAS.time import Time
@@ -503,3 +503,90 @@ def test_convert_simulation_day_to_date(
 
     # Assert
     assert actual_date == expected_date
+
+
+@pytest.mark.parametrize(
+    "simulation_day, add_formatted_time, formatted_time_return, expected_repr",
+    [
+        (10, True, "2023-04-01", "{'simulation_day': 10, 'formatted_time': '2023-04-01'}"),
+        (5, False, None, "{'simulation_day': 5}"),
+    ],
+)
+def test_time_repr(
+    mocker: MockerFixture, simulation_day: int, add_formatted_time: bool, formatted_time_return: str, expected_repr: str
+) -> None:
+    """
+    Unit test for the __repr__ method of the Time class.
+    """
+
+    # Arrange
+    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    time = Time()
+    time.simulation_day = simulation_day
+    time.add_formatted_time = add_formatted_time
+
+    if add_formatted_time:
+        mocker.patch.object(time, "convert_simulation_day_to_date", return_value=formatted_time_return)
+
+    # Act and Assert
+    assert repr(time) == expected_repr
+
+
+@pytest.mark.parametrize(
+    "simulation_day, start_full_date, time_format, expected_formatted_date",
+    [
+        (1, ["2023", "1"], "%Y-%m-%d", "2023-01-01"),
+        (365, ["2023", "1"], "%Y-%m-%d", "2023-12-31"),
+        (1, ["2024", "1"], "%Y-%m-%d", "2024-01-01"),
+        (366, ["2024", "1"], "%Y-%m-%d", "2024-12-31"),
+        (60, ["2024", "1"], "%Y-%m-%d", "2024-02-29"),
+    ],
+)
+def test_convert_simulation_day_to_formatted_date(
+    mocker: MockerFixture, simulation_day: int, start_full_date: list, time_format: str, expected_formatted_date: str
+) -> None:
+    """
+    Unit test for the convert_simulation_day_to_formatted_date method of the Time class.
+    """
+
+    # Arrange
+    mocker.patch.object(Time, "__init__", return_value=None)
+    time = Time()
+    time.start_full_date = start_full_date
+    time.time_format = time_format
+
+    # Act
+    formatted_date = time.convert_simulation_day_to_formatted_date(simulation_day)
+
+    # Assert
+    assert formatted_date == expected_formatted_date
+
+
+@pytest.mark.parametrize(
+    "formatted_date, start_full_date, time_format, expected_simulation_day",
+    [
+        ("2023-01-01", ["2023", "1"], "%Y-%m-%d", 1),
+        ("2023-12-31", ["2023", "1"], "%Y-%m-%d", 365),
+        ("2024-01-01", ["2024", "1"], "%Y-%m-%d", 1),
+        ("2024-12-31", ["2024", "1"], "%Y-%m-%d", 366),
+        ("2024-02-29", ["2024", "1"], "%Y-%m-%d", 60),
+    ],
+)
+def test_convert_formatted_date_to_simulation_day(
+    mocker: MockerFixture, formatted_date: str, start_full_date: list, time_format: str, expected_simulation_day: int
+) -> None:
+    """
+    Unit test for the convert_formatted_date_to_simulation_day method of the Time class.
+    """
+
+    # Arrange
+    mocker.patch.object(Time, "__init__", return_value=None)
+    time = Time()
+    time.start_full_date = start_full_date
+    time.time_format = time_format
+
+    # Act
+    simulation_day = time.convert_formatted_date_to_simulation_day(formatted_date)
+
+    # Assert
+    assert simulation_day == expected_simulation_day
