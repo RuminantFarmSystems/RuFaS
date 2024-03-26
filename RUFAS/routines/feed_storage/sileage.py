@@ -28,10 +28,11 @@ class Sileage(Storage):
         Estimates the maximum amount of effluent (water) that will flow out of an ensiled crop.
     calculate_dry_matter_loss_to_effluent(crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time)
         Calculates the amount of dry matter lost to effluent from an ensiled crop.
-    calculate_protein_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float)
-        Calculates the percentage of crude protein in the dry matter of an ensiled crop after effluent loss.
-    calculate_non_protein_nitrogen_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float)
-        Calculates the percentage of non-protein nitrogen in the dry matter of an ensiled crop after effluent loss.
+    calculate_protein_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float)
+        Calculates the loss coefficient of crude protein in the dry matter of an ensiled crop after effluent loss.
+    calculate_non_protein_nitrogen_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float)
+        Calculates the loss coefficient of non-protein nitrogen in the dry matter of an ensiled crop after effluent
+        loss.
 
     """
 
@@ -69,8 +70,8 @@ class Sileage(Storage):
             effluent_loss = self.calculate_dry_matter_loss_to_effluent(crop, estimated_max_effluent, time)
             total_effluent_loss += effluent_loss
 
-            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(crop, effluent_loss)
-            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_coefficient(crop, effluent_loss)
+            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_coefficient(
                 crop, effluent_loss
             )
 
@@ -134,9 +135,10 @@ class Sileage(Storage):
         time_in_silo = crop.days_stored(time)
         return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) / crop.dry_matter_mass
 
-    def calculate_protein_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float) -> float:
+    def calculate_protein_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float) -> float:
         """
-        Calculate the percentage of crude protein in the dry matter of an ensiled crop after loss to effluent.
+        Calculate the fractional loss coefficient for crude protein in the dry matter of an ensiled crop after loss to
+        effluent.
 
         Parameters
         ----------
@@ -148,11 +150,11 @@ class Sileage(Storage):
         Returns
         -------
         float
-            The percentage of crude protein in the dry matter mass that was lost to effluent.
+            The fractional coefficient of crude protein in the dry matter mass that was lost to effluent.
 
         Notes
         -----
-        If all dry matter mass is lost to effluent, all crude protein is lost too.
+        If all dry matter mass is lost to effluent, the loss coefficient is set to 0.
 
         """
         if effluent_loss == 1.0:
@@ -164,9 +166,10 @@ class Sileage(Storage):
 
         return (crop.crude_protein_percent - 0.3 * effluent_loss) / (1 - effluent_loss)
 
-    def calculate_non_protein_nitrogen_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float) -> float:
+    def calculate_non_protein_nitrogen_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float) -> float:
         """
-        Calculate the percentage of non-protein nitrogen in the dry matter of an ensiled crop after loss to effluent.
+        Calculate the fractional loss coefficient of non-protein nitrogen in the dry matter of an ensiled crop after
+        loss to effluent.
 
         Parameters
         ----------
@@ -178,12 +181,12 @@ class Sileage(Storage):
         Returns
         -------
         float
-            The percentage of crude protein in the dry matter mass that was lost to effluent.
+            The fractional coefficient of crude protein in the dry matter mass that was lost to effluent.
 
         Notes
         -----
-        Calculation of non-protein nitrogen loss uses the amount of crude protein in the crop that is present before
-        crude protein is lost to effluent.
+        Calculation of the non-protein nitrogen loss coefficient uses the amount of crude protein in the crop that is
+        present before crude protein is lost to effluent.
 
         """
         if effluent_loss == 1.0:
