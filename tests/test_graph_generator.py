@@ -1,10 +1,14 @@
 from pathlib import Path
-from freezegun import freeze_time
 from typing import Dict, List
 from unittest.mock import patch
-from matplotlib import pyplot as plt
-from mock.mock import MagicMock
+
 import pytest
+from freezegun import freeze_time
+from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
+from mock.mock import MagicMock
+from pytest_mock import MockFixture
+
 from RUFAS.graph_generator import GraphGenerator
 
 
@@ -118,7 +122,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
         expected_output = {
             "error": "Error plotting Example Graph data set",
-            "message": "Unforeseen error Test Exception when trying to graph data.",
+            "message": "Error: Test Exception",
             "info_map": {
                 "class": graph_generator.__class__.__name__,
                 "function": "generate_graph",
@@ -142,8 +146,8 @@ def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None
         "facecolor": "red",
         "dpi": 100,
     }
-    fig = plt.figure()
-    graph_generator._customize_graph(fig, customization_details)
+    fig, ax = plt.subplots()
+    graph_generator._customize_graph(fig, ax, customization_details)
     assert (fig.get_size_inches() == (6, 4)).all()
     assert fig.get_facecolor() == (1.0, 0.0, 0.0, 1.0)  # RGBA
     assert fig.get_dpi() == 100
@@ -157,7 +161,7 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
         "xlabel": "X-axis Label",
         "ylabel": "Y-axis Label",
     }
-    graph_generator._customize_graph(fig, customization_details)
+    graph_generator._customize_graph(fig, ax, customization_details)
     assert ax.get_title() == "Test Plot"
     assert ax.get_xlabel() == "X-axis Label"
     assert ax.get_ylabel() == "Y-axis Label"
@@ -198,7 +202,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys())
+    graph_generator._draw_graph.assert_called_once()
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
 
@@ -219,18 +223,8 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
 def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
     with pytest.raises(ValueError):
         graph_generator._draw_graph(
-            graph_type="invalid graph type",
+            graph_details={"type": "invalid graph type"},
             data={},
-            selected_variables=["var1", "var2"],
-        )
-    with pytest.raises(TypeError):
-        graph_generator._draw_graph(
-            graph_type="plot",
-            data={
-                "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            selected_variables=None,
         )
 
 
@@ -240,22 +234,26 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"stackplot": MagicMock()}
     ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("stackplot", data, selected_variables)
+        graph_generator._draw_graph({"type": "stackplot"}, data)
 
         mock_plot_functions_dict["stackplot"].assert_called_once_with(
             list(range(len(data["key1"]))), (data["key1"], data["key2"])
         )
 
 
-def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
-    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
+def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: MockFixture) -> None:
+    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8], "key1_indices": [0, 1, 2, 3], "key2_indices": [0, 1, 2, 3]}
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
     ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("plot", data)
+        graph_generator._draw_graph({"type": "plot"}, data)
 
-        for value in data.values():
-            mock_plot_functions_dict["plot"].assert_any_call(value)
+        mock_plot_functions_dict["plot"].assert_has_calls(
+            [
+                mocker.call(data["key1_indices"], data["key1"]),
+                mocker.call(data["key2_indices"], data["key2"]),
+            ]
+        )
 
 
 @pytest.mark.parametrize(
@@ -267,7 +265,12 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             None,
             None,
             (
-                {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+                {
+                    "variable1": [1, 2, 3],
+                    "variable1_indices": [0, 1, 2],
+                    "variable2": [4, 5, 6],
+                    "variable2_indices": [0, 1, 2],
+                },
                 [
                     {
                         "log": "Successfully added Test_1 data to prepared_pool",
@@ -294,7 +297,12 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             None,
             None,
             (
-                {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+                {
+                    "variable1": [1, 2, 3],
+                    "variable1_indices": [0, 1, 2],
+                    "variable2": [4, 5, 6],
+                    "variable2_indices": [0, 1, 2],
+                },
                 [
                     {
                         "log": "Successfully added Test_2 data to prepared_pool",
@@ -356,7 +364,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
                 {"a": [5, 7], "b": [6, 8], "c": [25, 25]},
             ],
             [{"a": [1, 3], "b": [2, 4]}, {"a": [5, 7], "b": [6, 8]}],
-            ({"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]}, []),
+            ({"a": [1, 3, 5, 7], "a_indices": [0, 1, 0, 1], "b": [2, 4, 6, 8], "b_indices": [0, 1, 0, 1]}, []),
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
@@ -383,7 +391,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             (
-                {"a": [1, 3], "b": [2, "ungraphable string"]},
+                {"a": [1, 3], "a_indices": [0, 1], "b": [2, "ungraphable string"], "b_indices": [0, 1]},
                 [
                     {
                         "error": "Can't plot Test_6 data set",
@@ -471,3 +479,55 @@ def test_validate_graph_filter(
 
     if expected_length > 0:
         assert expected_message in result[0]["message"]
+
+
+@pytest.mark.parametrize(
+    "time_step_unit, time_step_value, expected_locator_call, expected_formatter_call",
+    [
+        ("month", 1, True, True),
+        ("year", None, True, True),
+        (None, None, False, False),
+        ("day", 5, True, True),
+        ("unsupported", 1, False, False),
+    ],
+)
+def test_set_time_axis(
+    time_step_unit: str | None,
+    time_step_value: int | None,
+    expected_locator_call: bool,
+    expected_formatter_call: bool,
+    mocker: MockFixture,
+) -> None:
+    """
+    Unit test for the _set_time_axis() method in the GraphGenerator class.
+    """
+
+    # Arrange
+    fig = Figure()
+    ax = fig.subplots()
+    mock_time = mocker.MagicMock()
+    mock_time.add_formatted_time = True
+    mock_time.time_format = "%Y-%m-%d"
+    graph_generator = GraphGenerator(time=mock_time)
+
+    ax.xaxis.set_major_locator = MagicMock()
+    ax.xaxis.set_major_formatter = MagicMock()
+
+    # Act
+    if time_step_unit not in ["day", "month", "year"]:
+        with pytest.raises(ValueError):
+            graph_generator._set_time_axis(ax, time_step_unit, time_step_value)
+        return
+
+    graph_generator._set_time_axis(ax, time_step_unit, time_step_value)
+
+    # Assert
+    if expected_locator_call:
+        ax.xaxis.set_major_locator.assert_called_once()
+    else:
+        ax.xaxis.set_major_locator.assert_not_called()
+
+    if expected_formatter_call:
+        ax.xaxis.set_major_formatter.assert_called_once()
+    else:
+        ax.xaxis.set_major_formatter.assert_not_called()
