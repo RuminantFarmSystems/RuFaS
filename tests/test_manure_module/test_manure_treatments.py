@@ -2812,6 +2812,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
+    mock_anaerobic_digestion_daily_output.biogas = 1.0
     patch_for_create_anaerobic_digestion_daily_output = mocker.patch.object(
         anaerobic_digestion_and_lagoon,
         "_create_anaerobic_digestion_daily_output",
@@ -2840,6 +2841,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
     anaerobic_digestion_and_lagoon._manure_handler_daily_output = mock_manure_handler_daily_output = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._accumulated_output = mocker.MagicMock()
 
     # Act
     actual_anaerobic_lagoon_daily_output = anaerobic_digestion_and_lagoon._daily_update_helper()
@@ -2873,8 +2875,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         )
 
     assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
-    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_digestion_daily_output)
-    patch_for_adjust_accumulated_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
+    patch_for_adjust_accumulated_output.assert_called_once_with(mock_anaerobic_lagoon_daily_output)
 
 
 # Test CompostBeddedPackBarn specific methods
