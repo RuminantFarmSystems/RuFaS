@@ -160,7 +160,7 @@ class ReportGenerator:
 
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
 
-    def generate_report(
+    def generate_report(  # noqa: C901
         self,
         filter_content: Dict[str, Any],
         filtered_pool: Dict[str, Dict[str, List[Any]]],
