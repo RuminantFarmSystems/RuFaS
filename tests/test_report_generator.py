@@ -221,7 +221,7 @@ def test_apply_horizontal_aggregation(
                 "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
             },
             {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7], 'a_indices': [0, 1, 0, 1], "name": "value"},
+            {"a": [1, 3, 5, 7], "a_indices": [0, 1, 0, 1], "name": "value"},
             None,
         ),
         # Case without selected variables but required
@@ -1032,3 +1032,69 @@ def test_clear_reports(
     # Assert
     assert report_generator.time == mock_time
     assert report_generator.reports == {}
+
+
+@pytest.mark.parametrize(
+    "initial_report_data, key, values, simulation_days, indices, slice_start, slice_end, expected_report_data",
+    [
+        # Test case 1: Adding new simulation days to an empty report_data
+        (
+            {},
+            "test_key",
+            [100, 200, 300],
+            [1, 2, 3],
+            [],
+            0,
+            3,
+            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3]},
+        ),
+        # Test case 2: Adding indices to an empty report_data
+        (
+            {},
+            "test_key",
+            [400, 500, 600],
+            [],
+            [0, 1, 2],
+            0,
+            3,
+            {"test_key": [400, 500, 600], "test_key_indices": [0, 1, 2]},
+        ),
+        # Test case 3: Extending existing simulation days and indices in report_data
+        (
+            {"test_key": [100], "test_key_simulation_days": [1], "test_key_indices": [0]},
+            "test_key",
+            [200, 300],
+            [2, 3],
+            [1, 2],
+            0,
+            2,
+            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3], "test_key_indices": [0]},
+        ),
+    ],
+)
+def test_add_simulation_days_or_indices_to_report_data(
+    initial_report_data: Dict[str, List[Any]],
+    key: str,
+    values: List[int],
+    simulation_days: List[int],
+    indices: List[int],
+    slice_start: int,
+    slice_end: int,
+    expected_report_data: Dict[str, List[Any]],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the _add_simulation_days_or_indices_to_report_data method of ReportGenerator class in report_generator.py file.
+    """
+
+    # Arrange
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
+
+    # Act
+    report_generator._add_simulation_days_or_indices_to_report_data(
+        initial_report_data, key, values, simulation_days, indices, slice_start, slice_end
+    )
+
+    # Assert
+    assert initial_report_data == expected_report_data
