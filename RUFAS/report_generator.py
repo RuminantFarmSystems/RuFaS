@@ -1,4 +1,3 @@
-import copy
 import re
 from typing import Dict, List, Any, Callable
 
@@ -160,7 +159,7 @@ class ReportGenerator:
 
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
 
-    def generate_report(  # noqa: C901
+    def generate_report(
         self,
         filter_content: Dict[str, Any],
         filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -216,21 +215,7 @@ class ReportGenerator:
                 }
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
-
-            reconstructed_report_data = {
-                k: {"values": v}
-                for k, v in report_data.items()
-                if not k.endswith("_simulation_days") and not k.endswith("_indices")
-            }
-            for key in reconstructed_report_data.keys():
-                if f"{key}_simulation_days" in report_data:
-                    simulation_days = report_data[f"{key}_simulation_days"]
-                    reconstructed_report_data[key]["info_maps"] = [{"simulation_day": day} for day in simulation_days]
-                    report_data[f"{key}_simulation_days"] = (
-                        list(map(self.time.convert_simulation_day_to_formatted_date, simulation_days))
-                        if self.time.add_formatted_time
-                        else simulation_days
-                    )
+            reconstructed_report_data = self._rebuild_report_data_including_simulation_days(report_data)
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
@@ -266,6 +251,40 @@ class ReportGenerator:
             event_logs.append(error_event_log)
 
         return event_logs
+
+    def _rebuild_report_data_including_simulation_days(
+        self, report_data: Dict[str, List[Any]]
+    ) -> Dict[str, Dict[str, List[Any]]]:
+        """
+        Add back simulation days in info maps for each column in the report data if they were removed when indexing was
+        disabled.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[Any]]
+            The report data to be reconstructed.
+
+        Returns
+        -------
+        Dict[str, Dict[str, List[Any]]]
+            The reconstructed report data.
+        """
+
+        reconstructed_report_data = {
+            k: {"values": v}
+            for k, v in report_data.items()
+            if not k.endswith("_simulation_days") and not k.endswith("_indices")
+        }
+        for key in reconstructed_report_data.keys():
+            if f"{key}_simulation_days" in report_data:
+                simulation_days = report_data[f"{key}_simulation_days"]
+                reconstructed_report_data[key]["info_maps"] = [{"simulation_day": day} for day in simulation_days]
+                report_data[f"{key}_simulation_days"] = (
+                    list(map(self.time.convert_simulation_day_to_formatted_date, simulation_days))
+                    if self.time.add_formatted_time
+                    else simulation_days
+                )
+        return reconstructed_report_data
 
     def _prepare_report_data_to_be_graphed(
         self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
@@ -659,11 +678,11 @@ class ReportGenerator:
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(values[slice_start:slice_end])
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    self._add_simulation_days_or_indices_to_report_data(
+                    GraphGenerator.add_simulation_days_or_indices_to_report_data(
                         report_data, filtered_key, filtered_value, simulation_days, indices, slice_start, slice_end
                     )
             else:
-                self._add_simulation_days_or_indices_to_report_data(
+                GraphGenerator.add_simulation_days_or_indices_to_report_data(
                     report_data, key, values[slice_start:slice_end], simulation_days, indices, slice_start, slice_end
                 )
 
@@ -673,50 +692,6 @@ class ReportGenerator:
             raise
 
         return report_data
-
-    def _add_simulation_days_or_indices_to_report_data(
-        self,
-        report_data: Dict[str, List[Any]],
-        key: str,
-        values: List[Any],
-        simulation_days: List[int],
-        indices: List[int],
-        slice_start: int,
-        slice_end: int,
-    ) -> None:
-        """
-        Add associated simulation days or indices to each key in the report data.
-
-        Parameters
-        ----------
-        report_data : Dict[str, List[Any]]
-            The report data dictionary to update.
-        key : str
-            The key to use for updating the report data.
-        values : List[Any]
-            The values to add to the report data.
-        simulation_days : List[int]
-            The list of simulation days corresponding to the values.
-        indices : List[int]
-            The list of indices corresponding to the values.
-        slice_start : int
-            The starting index for slicing the values and simulation days/indices.
-        slice_end : int
-            The ending index for slicing the values and simulation days/indices.
-        """
-
-        if key in report_data:
-            if simulation_days:
-                report_data[f"{key}_simulation_days"].extend(simulation_days[slice_start:slice_end])
-            else:
-                report_data[f"{key}_indices"].extend(indices[slice_start:slice_end])
-            report_data[key].extend(values)
-        else:
-            if simulation_days:
-                report_data[f"{key}_simulation_days"] = copy.deepcopy(simulation_days[slice_start:slice_end])
-            else:
-                report_data[f"{key}_indices"] = copy.deepcopy(indices[slice_start:slice_end])
-            report_data[key] = values
 
     def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
         """

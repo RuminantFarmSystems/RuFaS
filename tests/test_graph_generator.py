@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Any
 from unittest.mock import patch
 
 import pytest
@@ -7,7 +7,7 @@ from freezegun import freeze_time
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from mock.mock import MagicMock
-from pytest_mock import MockFixture
+from pytest_mock import MockFixture, MockerFixture
 
 from RUFAS.graph_generator import GraphGenerator
 
@@ -530,3 +530,69 @@ def test_set_time_axis(
         ax.xaxis.set_major_formatter.assert_called_once()
     else:
         ax.xaxis.set_major_formatter.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "initial_report_data, key, values, simulation_days, indices, slice_start, slice_end, expected_report_data",
+    [
+        # Test case 1: Adding new simulation days to an empty report_data
+        (
+            {},
+            "test_key",
+            [100, 200, 300],
+            [1, 2, 3],
+            [],
+            0,
+            3,
+            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3]},
+        ),
+        # Test case 2: Adding indices to an empty report_data
+        (
+            {},
+            "test_key",
+            [400, 500, 600],
+            [],
+            [0, 1, 2],
+            0,
+            3,
+            {"test_key": [400, 500, 600], "test_key_indices": [0, 1, 2]},
+        ),
+        # Test case 3: Extending existing simulation days and indices in report_data
+        (
+            {"test_key": [100], "test_key_simulation_days": [1], "test_key_indices": [0]},
+            "test_key",
+            [200, 300],
+            [2, 3],
+            [1, 2],
+            0,
+            2,
+            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3], "test_key_indices": [0]},
+        ),
+    ],
+)
+def test_add_simulation_days_or_indices_to_report_data(
+    initial_report_data: Dict[str, List[Any]],
+    key: str,
+    values: List[int],
+    simulation_days: List[int],
+    indices: List[int],
+    slice_start: int,
+    slice_end: int,
+    expected_report_data: Dict[str, List[Any]],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the _add_simulation_days_or_indices_to_report_data method of
+    ReportGenerator class in report_generator.py file.
+    """
+
+    # Arrange
+    graph_generator = GraphGenerator()
+
+    # Act
+    graph_generator.add_simulation_days_or_indices_to_report_data(
+        initial_report_data, key, values, simulation_days, indices, slice_start, slice_end
+    )
+
+    # Assert
+    assert initial_report_data == expected_report_data

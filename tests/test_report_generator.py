@@ -4,8 +4,8 @@ from typing import Dict, List, Any, Optional, Type
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.graph_generator import GraphGenerator
 
+from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import (
     average_aggregator,
     division_aggregator,
@@ -1035,67 +1035,56 @@ def test_clear_reports(
 
 
 @pytest.mark.parametrize(
-    "initial_report_data, key, values, simulation_days, indices, slice_start, slice_end, expected_report_data",
+    "report_data, add_formatted_time, expected",
     [
-        # Test case 1: Adding new simulation days to an empty report_data
+        # Test case 1: No simulation days or indices, basic functionality
+        ({"key": [1, 2, 3]}, False, {"key": {"values": [1, 2, 3]}}),
+        # Test case 2: Adding back simulation days without conversion
         (
-            {},
-            "test_key",
-            [100, 200, 300],
-            [1, 2, 3],
-            [],
-            0,
-            3,
-            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3]},
+            {"key": [1, 2, 3], "key_simulation_days": [1, 2, 3]},
+            False,
+            {
+                "key": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                }
+            },
         ),
-        # Test case 2: Adding indices to an empty report_data
+        # Test case 3: Adding back simulation days with conversion
         (
-            {},
-            "test_key",
-            [400, 500, 600],
-            [],
-            [0, 1, 2],
-            0,
-            3,
-            {"test_key": [400, 500, 600], "test_key_indices": [0, 1, 2]},
-        ),
-        # Test case 3: Extending existing simulation days and indices in report_data
-        (
-            {"test_key": [100], "test_key_simulation_days": [1], "test_key_indices": [0]},
-            "test_key",
-            [200, 300],
-            [2, 3],
-            [1, 2],
-            0,
-            2,
-            {"test_key": [100, 200, 300], "test_key_simulation_days": [1, 2, 3], "test_key_indices": [0]},
+            {"key": [1, 2, 3], "key_simulation_days": [1, 2, 3]},
+            True,
+            {
+                "key": {
+                    "values": [1, 2, 3],
+                    "info_maps": [
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
+                        {"simulation_day": 3},
+                    ],
+                }
+            },
         ),
     ],
 )
-def test_add_simulation_days_or_indices_to_report_data(
-    initial_report_data: Dict[str, List[Any]],
-    key: str,
-    values: List[int],
-    simulation_days: List[int],
-    indices: List[int],
-    slice_start: int,
-    slice_end: int,
-    expected_report_data: Dict[str, List[Any]],
+def test_rebuild_report_data_including_simulation_days(
+    report_data: Dict[str, List[Any]],
+    add_formatted_time: bool,
+    expected: Dict[str, Dict[str, List[Any]]],
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for the _add_simulation_days_or_indices_to_report_data method of
-    ReportGenerator class in report_generator.py file.
+    Unit test for the _rebuild_report_data_including_simulation_days method in the ReportGenerator class.
     """
 
     # Arrange
     mock_time = mocker.MagicMock()
+    mock_time.add_formatted_time = add_formatted_time
     report_generator = ReportGenerator(mock_time)
 
     # Act
-    report_generator._add_simulation_days_or_indices_to_report_data(
-        initial_report_data, key, values, simulation_days, indices, slice_start, slice_end
-    )
+    rebuilt_report_data = report_generator._rebuild_report_data_including_simulation_days(report_data)
 
     # Assert
-    assert initial_report_data == expected_report_data
+    assert report_generator.time == mock_time
+    assert rebuilt_report_data == expected

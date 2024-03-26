@@ -236,7 +236,7 @@ class GraphGenerator:
                 )
         return graph_filter_validation_logs
 
-    def _prepare_plot_data(  # noqa: C901
+    def _prepare_plot_data(
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
@@ -313,24 +313,19 @@ class GraphGenerator:
                     )
                 else:
                     for filtered_key, filtered_value in filtered_data.items():
-                        if filtered_key in prepared_pool:
-                            prepared_pool[filtered_key].extend(filtered_value)
-                            if simulation_days:
-                                prepared_pool[f"{filtered_key}_simulation_days"].extend(simulation_days)
-                            else:
-                                prepared_pool[f"{filtered_key}_indices"].extend(indices)
-                        else:
-                            prepared_pool[filtered_key] = filtered_value
-                            if simulation_days:
-                                prepared_pool[f"{filtered_key}_simulation_days"] = copy.deepcopy(simulation_days)
-                            else:
-                                prepared_pool[f"{filtered_key}_indices"] = copy.deepcopy(indices)
+                        self.add_simulation_days_or_indices_to_report_data(
+                            prepared_pool,
+                            filtered_key,
+                            filtered_value,
+                            simulation_days,
+                            indices,
+                            0,
+                            len(filtered_value),
+                        )
             else:
-                prepared_pool[key] = values
-                if simulation_days:
-                    prepared_pool[f"{key}_simulation_days"] = simulation_days
-                else:
-                    prepared_pool[f"{key}_indices"] = indices
+                self.add_simulation_days_or_indices_to_report_data(
+                    prepared_pool, key, values, simulation_days, indices, 0, len(values)
+                )
                 log_pool.append(
                     {
                         "log": f"Successfully added {title} data to prepared_pool",
@@ -340,6 +335,50 @@ class GraphGenerator:
                 )
 
         return prepared_pool, log_pool
+
+    @staticmethod
+    def add_simulation_days_or_indices_to_report_data(
+        report_data: Dict[str, List[Any]],
+        key: str,
+        values: List[Any],
+        simulation_days: List[int],
+        indices: List[int],
+        slice_start: int,
+        slice_end: int,
+    ) -> None:
+        """
+        Add associated simulation days or indices to each key in the report data.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[Any]]
+            The report data dictionary to update.
+        key : str
+            The key to use for updating the report data.
+        values : List[Any]
+            The values to add to the report data.
+        simulation_days : List[int]
+            The list of simulation days corresponding to the values.
+        indices : List[int]
+            The list of indices corresponding to the values.
+        slice_start : int
+            The starting index for slicing the values and simulation days/indices.
+        slice_end : int
+            The ending index for slicing the values and simulation days/indices.
+        """
+
+        if key in report_data:
+            if simulation_days:
+                report_data[f"{key}_simulation_days"].extend(simulation_days[slice_start:slice_end])
+            else:
+                report_data[f"{key}_indices"].extend(indices[slice_start:slice_end])
+            report_data[key].extend(values)
+        else:
+            if simulation_days:
+                report_data[f"{key}_simulation_days"] = copy.deepcopy(simulation_days[slice_start:slice_end])
+            else:
+                report_data[f"{key}_indices"] = copy.deepcopy(indices[slice_start:slice_end])
+            report_data[key] = values
 
     def _draw_graph(
         self,
