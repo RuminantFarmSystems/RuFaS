@@ -1278,5 +1278,3 @@ class OutputManager(object):
         """
 
         self.time = time_obj
-
-
