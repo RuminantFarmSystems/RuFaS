@@ -5,7 +5,10 @@ from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from .sample_crop_data import sample_crop_data
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -55,6 +58,11 @@ def test_process_degradations(
     expected_loss: float,
 ) -> None:
     """Tests process_degradations in the Sileage class."""
+    expected_info_map = {
+        "class": sileage.__class__.__name__,
+        "function": sileage.process_degradations.__name__,
+        "units": "kg",
+    }
     mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
     mock_time = mocker.MagicMock(autospec=Time)
     mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
@@ -69,6 +77,7 @@ def test_process_degradations(
     mock_calc_nutrient_percentage = mocker.patch(
         "RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_percentage"
     )
+    mock_add_var = mocker.patch.object(om, "add_variable")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
 
     sileage.process_degradations(mock_conditions, mock_time)
@@ -87,6 +96,7 @@ def test_process_degradations(
     mock_protein_loss.assert_has_calls(expected_protein_loss_calls)
     mock_npn_loss.assert_has_calls(expected_npn_loss_calls)
     assert mock_calc_nutrient_percentage.call_count == expected_calc_nutrient_percentage_call_count
+    mock_add_var.assert_called_once_with("effluent_dry_matter_loss", expected_loss, expected_info_map)
     mock_storage_process_degradations.assert_called_once_with(mock_conditions, mock_time)
 
 
