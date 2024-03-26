@@ -48,20 +48,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
-      - name: Comment Coverage
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ ${{ env.URL }} != '' ]; then
-            curl \
-              -X POST \
-              $URL \
-              -H "Content-Type: application/json" \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
-          fi
-
       - name: Run mypy on the current branch
         run: |
           python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
@@ -80,17 +66,20 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
-      - name: Post a comment to current PR with the updated mypy badge
+      - name: Comment on Coverage and Mypy Errors
         env:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
-          MYPY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
+          MY_ERROR_COUNT: $(cat mypy_current_branch_error_count.txt)
           if [ -n "$URL" ]; then
+            PYTEST_COVERAGE="Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%"
+            MYPY_ERRORS="Mypy found $MY_ERROR_COUNT errors."
+            COMMIT_MESSAGE="$PYTEST_COVERAGE\n$MYPY_ERRORS"
             curl \
-              -X POST $URL \
-              -H "Authorization: token $GITHUB_TOKEN" \
+              -X POST \
+              $URL \
               -H "Content-Type: application/json" \
-              -d "{\"body\": \"Mypy found $MYPY_ERROR_COUNT errors.\"}"
+              -H "Authorization: token $GITHUB_TOKEN" \
+              --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
