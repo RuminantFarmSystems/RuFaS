@@ -3,7 +3,10 @@ from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from typing import Optional
+
+om = OutputManager()
 
 
 class Sileage(Storage):
@@ -52,29 +55,28 @@ class Sileage(Storage):
         this routine.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
+        total_effluent_loss = 0.0
         for crop in self.stored:
-            estimated_max_effluent = self.estimate_maximum_effluent(
-                crop.initial_dry_matter_percentage, crop.initial_fresh_mass
-            )
-            time_in_silo = crop.days_stored(time)
-            effluent_loss = self.calculate_dry_matter_loss_to_effluent(
-                crop.dry_matter, estimated_max_effluent, time_in_silo
-            )
-            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(
-                crop.crude_protein_percent, effluent_loss
-            )
+            estimated_max_effluent = self.estimate_maximum_effluent(crop)
+            effluent_loss = self.calculate_dry_matter_loss_to_effluent(crop, estimated_max_effluent, time)
+            total_effluent_loss += effluent_loss
+
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(crop, effluent_loss)
             non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(
-                crop.non_protein_nitrogen, crop.crude_protein_percent, effluent_loss
+                crop, effluent_loss
             )
 
-            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
-                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
-            )
-            crop.non_protein_nitrogen = self.recalculate_nutrient_concentration(
+            crop.non_protein_nitrogen = super().recalculate_nutrient_percentage(
                 crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
             )
 
+            crop.crude_protein_percent = super().recalculate_nutrient_percentage(
+                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
+            )
+
             self.set_mass_attributes_after_loss(crop, effluent_loss)
+        om.add_variable("effluent_dry_matter_loss", total_effluent_loss, info_map)
         super().process_degradations(current_conditions, time)
 
     def estimate_maximum_effluent(self, crop: HarvestedCrop) -> float:
@@ -168,6 +170,11 @@ class Sileage(Storage):
         -------
         float
             The percentage of crude protein in the dry matter mass that was lost to effluent.
+
+        Notes
+        -----
+        Calculation of non-protein nitrogen loss uses the amount of crude protein in the crop that is present before
+        crude protein is lost to effluent.
 
         """
         if effluent_loss == 1.0:
