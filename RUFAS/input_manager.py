@@ -315,7 +315,6 @@ class InputManager:
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
             self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
-
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
@@ -406,8 +405,7 @@ class InputManager:
                     array_input_data: List[Any] = self._filter_input_array_data_by_metadata(
                         value, metadata_properties[key]
                     )
-                    if array_input_data:
-                        filtered_input_data[key] = array_input_data
+                    filtered_input_data[key] = array_input_data
                 else:
                     filtered_input_data[key] = value
 
