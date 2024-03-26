@@ -20,11 +20,11 @@ class Storage:
     stored : List[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
     crude_protein_loss_coefficient : float, default 0.0
-        Unitless coefficient used to adjust crude protein loss.
+        Fractional coefficient used to adjust crude protein loss.
     adf_loss_coefficient : float, default 0.0
-        Unitless coefficient used to adjust ADF loss.
+        Fractional coefficient used to adjust ADF loss.
     ndf_loss_coefficient : float, default 0.0
-        Unitless coefficient used to adjust NDF loss.
+        Fractional coefficient used to adjust NDF loss.
 
     Methods
     -------
@@ -276,7 +276,7 @@ class Storage:
         initial_nutrient_percentage : float
             Nutrient percentage in stored crop before loss.
         loss_coefficient : float
-            Unitless coefficient that regulates how quickly this nutrient is lost.
+            Fractional loss coefficient that regulates how quickly this nutrient is lost.
         dry_matter_loss : float
             Amount of dry matter lost from stored crop in kg.
         initial_dry_matter : float
