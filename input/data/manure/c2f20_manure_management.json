@@ -10,7 +10,7 @@
     }, 
     {
       "scenario_id": 1,
-      "bedding_type": "Sand",
+      "bedding_type": "sand",
       "manure_handler": "harrowing",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
