@@ -35,23 +35,17 @@ jobs:
           coverage run --rcfile=.github/.coveragerc
           coverage report --rcfile=.github/.coveragerc
           coverage json --rcfile=.github/.coveragerc
-          echo "COVERAGE_PERCENTAGE=$(jq -r '.totals.percent_covered_display' coverage.json)" >> "$GITHUB_ENV"
-          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' coverage.json)" >> $GITHUB_OUTPUT
-          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' coverage.json)"
-
-      - name: Find coverage.json
-        uses: jeertmans/filesfinder@latest
-        id: ff
-        with:
-          args: "coverage.json"
-
-      - name: Print found coverage.json files
-        run: echo "${{ steps.ff.outputs.files }}"
+          echo "COVERAGE_PERCENTAGE=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> "$GITHUB_ENV"
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> $GITHUB_OUTPUT
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)"
 
       - name: Run mypy on the current branch
         run: |
           python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
           grep -c "error:" mypy_current_branch_report.txt > mypy_current_branch_error_count.txt
+
+      - name: List contents of .github/workflows
+        run: ls -la .github/workflows
 
       - name: Update Coverage and Mypy Badges
         run: |
