@@ -794,8 +794,8 @@ class Pen:
             )
         else:
             animal.calc_manure_excretion(methane_model,
-                nutrient_amount=self.ration_nutrient_amount,
-                nutrient_conc=self.ration_nutrient_conc)
+                                         nutrient_amount=self.ration_nutrient_amount,
+                                         nutrient_conc=self.ration_nutrient_conc)
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
     @staticmethod

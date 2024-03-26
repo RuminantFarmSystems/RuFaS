@@ -111,12 +111,14 @@ class HeiferI(Calf):
             nutrient_conc=nutrient_conc,
         )
 
-    def phosphorus_rqmts(self, DMI):
+    def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
 
-        Args:
-            DMI: the Dry Matter Intake (kg)
+        Parameters
+        ----------
+        DMI : float
+            The Dry Matter Intake (kg)
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000
@@ -138,7 +140,7 @@ class HeiferI(Calf):
         # requirement of P from the ration (g) (A.1B-D.E.7)
         self.p_req = p_absorb / 0.664
 
-    def get_non_preg_bw_change(self):
+    def get_non_preg_bw_change(self) -> float:
         """
         Calculates the body weight change for a heifer that is not pregnant.
         If the days_born of the animal is equal to 400,
@@ -152,7 +154,7 @@ class HeiferI(Calf):
 
         Returns
         -------
-        int
+        float
             The daily body weight change for a heifer that is not pregnant.
         """
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
@@ -163,18 +165,23 @@ class HeiferI(Calf):
             AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
         )
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls heifer's grow with average daily gain based on non-preg ADG based on NRC.
         Here is the place to change growth rate with heifer feeding methods later
-        when we have heifer nutrition from the ration furmulation module.
+        when we have heifer nutrition from the ration formulation module.
         Once reach the breeding start day,
-        this heifer would be move to next stage, the heiferII stage
+        this heifer would be move to next stage, the heiferII stage.
+
+        Parameters
+        ---------
+        sim_day : int
+            Day of simulation.
 
         Returns
         -------
-
-        the second stage of heifer -- breeding stage starts
+        bool
+            The second stage of heifer -- breeding stage starts.
         """
 
         self.update_body_weight_history(sim_day)

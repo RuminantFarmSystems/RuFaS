@@ -134,7 +134,7 @@ class HeiferIII(HeiferII):
             nutrient_conc=nutrient_conc,
         )
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -142,9 +142,17 @@ class HeiferIII(HeiferII):
         ration formulation module next to it could build the function of
         ranking heifers.
 
-        Returns: cow_stage - heifer close to calving, move to cow stage
-        """
+        Parameters
+        ----------
+        sim_day : int
+            Day of simulation.
 
+        Returns
+        -------
+        bool
+            True if should be moved to "cow stage".
+        """
+        print('using it')
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
