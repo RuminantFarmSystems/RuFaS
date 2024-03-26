@@ -4,7 +4,10 @@ import copy
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.output_manager import OutputManager
 from .sample_crop_data import sample_crop_data
+
+om = OutputManager()
 
 
 @pytest.mark.parametrize(
@@ -111,3 +114,21 @@ def test_days_stored(mocker: MockerFixture, current: int, stored: int, expected:
     actual = crop.days_stored(mock_current_time)
 
     assert actual == expected
+
+
+def test_error_days_stored(mocker: MockerFixture) -> None:
+    """Tests that days_stored method in HarvestedCrop class handles error case."""
+    mock_add_error = mocker.patch.object(om, "add_error")
+    mock_current_time = mocker.MagicMock(autospec=Time)
+    setattr(mock_current_time, "index", 1)
+    mock_stored_time = mocker.MagicMock(autospec=Time)
+    setattr(mock_stored_time, "index", 2)
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
+    crop.storage_time = mock_stored_time
+
+    with pytest.raises(ValueError):
+        crop.days_stored(mock_current_time)
+
+    mock_add_error.assert_called_once()

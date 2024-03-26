@@ -1,7 +1,10 @@
 from dataclasses import dataclass, field
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from .enums import CropCategory, CropType
+
+om = OutputManager()
 
 
 @dataclass
@@ -134,5 +137,17 @@ class HarvestedCrop:
         int
             The number of days this crop has been stored for.
 
+        Raises
+        ------
+        ValueError
+            If the crop is found to have been stored for a negative number of days.
+
         """
+        days_stored = time.index - self.storage_time.index
+        if days_stored < 0:
+            info_map = {"class": self.__class__.__name__, "function": self.days_stored.__name__}
+            title = "Harvested crop stored for impossible number of days."
+            message = "Calculated crop to be stored for {days_stored}."
+            om.add_error(title, message, info_map)
+            raise ValueError(f"{title} {message}")
         return time.index - self.storage_time.index
