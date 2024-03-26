@@ -4,8 +4,8 @@ from typing import Dict, List, Any, Optional, Type
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.graph_generator import GraphGenerator
 
+from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import (
     average_aggregator,
     division_aggregator,
@@ -112,7 +112,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: Dict[str, List[float]], aggregator_key: str, expected: List[float]
+    report_data: Dict[str, List[float]], aggregator_key: str, expected: List[float], mocker: MockerFixture
 ) -> None:
     """
     Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
@@ -120,7 +120,8 @@ def test_apply_vertical_aggregation(
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act
     result = report_generator._apply_vertical_aggregation(report_data, aggregator)
@@ -190,6 +191,7 @@ def test_apply_horizontal_aggregation(
     aggregator_key: str,
     expected: List[float],
     expected_exception: Type[Exception],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for _apply_horizontal_aggregation() static method in report_generator.py file.
@@ -197,7 +199,8 @@ def test_apply_horizontal_aggregation(
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act and assert
     if expected_exception:
@@ -218,7 +221,7 @@ def test_apply_horizontal_aggregation(
                 "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
             },
             {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7], "name": "value"},
+            {"a": [1, 3, 5, 7], "a_indices": [0, 1, 0, 1], "name": "value"},
             None,
         ),
         # Case without selected variables but required
@@ -232,7 +235,7 @@ def test_apply_horizontal_aggregation(
         (
             {"var1": {"values": [1, 2, 3, 4]}},
             {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"name": "value", "var1": [1, 2, 3, 4]},
+            {"name": "value", "var1": [1, 2, 3, 4], "var1_indices": [0, 1, 2, 3]},
             None,
         ),
     ],
@@ -249,7 +252,8 @@ def test_prepare_report_data_with_constants(
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     mocker.patch(
         "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
         side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
@@ -300,13 +304,15 @@ def test_add_constants_to_report_data(
     filter_content: Dict[str, Any],
     expected_report_data: Dict[str, List[Any]],
     expected_exception: Type[Exception],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _add_constants_to_report_data static method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act and assert
     if expected_exception:
@@ -340,13 +346,15 @@ def test_validate_constants(
     report_data: Dict[str, List[Any]],
     constant_config: Dict[str, Any],
     expected_exception: Type[Exception],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _validate_constants static method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act and assert
     if expected_exception:
@@ -466,7 +474,8 @@ def test_perform_aggregations(
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     mocker.patch.object(
         report_generator,
         "_prepare_report_data_with_constants",
@@ -541,13 +550,15 @@ def test_extract_and_check_aggregation_keys(
     expected_horizontal: str | None,
     expected_vertical: str | None,
     expected_exception: Type[Exception],
+    mocker: MockerFixture,
 ):
     """
     Unit test for _extract_and_check_aggregation_keys() method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act and assert
     if expected_exception:
@@ -605,13 +616,15 @@ def test_combine_aggregate_report_data(
     vertically_aggregated: List[int | float] | None,
     filter_content: Dict[str, Any],
     expected: Dict[str, List[int | float]] | None,
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for _combine_aggregate_report_data() method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
 
     # Act
     result = report_generator._combine_aggregate_report_data(
@@ -702,7 +715,7 @@ def test_check_for_missing_references(
     ],
 )
 def test_get_reports_by_regex(
-    regex_patterns: List[str], expected_matched_reports: Dict[str, Dict[str, List[Any]]]
+    regex_patterns: List[str], expected_matched_reports: Dict[str, Dict[str, List[Any]]], mocker: MockerFixture
 ) -> None:
     """
     Unit test for _get_reports_by_regex() method in report_generator.py file.
@@ -714,7 +727,8 @@ def test_get_reports_by_regex(
         "report2": {"data": []},
         "special_report-1": {"data": []},
     }
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     report_generator.reports = reports
 
     # Act
@@ -940,7 +954,8 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     """
     Unit test for the _prepare_report_data_to_be_graphed method in the ReportGenerator class.
     """
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     individual_report_name = "test_report"
     graph_data = {"some_data_key": [1, 2, 3]}
     filter_content = {
@@ -969,7 +984,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
             "other_details": "details",
             "produce_graphics": True,
             "title": "example_report",
-            "filters": ["filter1", "filter2"],
+            "filters": ["some_data_key"],
         },
         individual_report_name,
         "dir",
@@ -982,32 +997,94 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     }, "Graph event log did not match expected output"
 
 
-def test_report_generator_init() -> None:
+def test_report_generator_init(mocker: MockerFixture) -> None:
     """
     Unit test for the __init__ method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
     expected_reports = {}
+    mock_time = mocker.MagicMock()
 
     # Act
-    report_generator = ReportGenerator()
+    report_generator = ReportGenerator(mock_time)
 
     # Assert
+    assert report_generator.time == mock_time
     assert report_generator.reports == expected_reports
 
 
-def test_clear_reports() -> None:
+def test_clear_reports(
+    mocker: MockerFixture,
+) -> None:
     """
     Unit test for the clear_reports method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     report_generator.reports = {"report1": {}, "report2": {}}
 
     # Act
     report_generator.clear_reports()
 
     # Assert
+    assert report_generator.time == mock_time
     assert report_generator.reports == {}
+
+
+@pytest.mark.parametrize(
+    "report_data, add_formatted_time, expected",
+    [
+        # Test case 1: No simulation days or indices, basic functionality
+        ({"key": [1, 2, 3]}, False, {"key": {"values": [1, 2, 3]}}),
+        # Test case 2: Adding back simulation days without conversion
+        (
+            {"key": [1, 2, 3], "key_simulation_days": [1, 2, 3]},
+            False,
+            {
+                "key": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                }
+            },
+        ),
+        # Test case 3: Adding back simulation days with conversion
+        (
+            {"key": [1, 2, 3], "key_simulation_days": [1, 2, 3]},
+            True,
+            {
+                "key": {
+                    "values": [1, 2, 3],
+                    "info_maps": [
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
+                        {"simulation_day": 3},
+                    ],
+                }
+            },
+        ),
+    ],
+)
+def test_rebuild_report_data_including_simulation_days(
+    report_data: Dict[str, List[Any]],
+    add_formatted_time: bool,
+    expected: Dict[str, Dict[str, List[Any]]],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the _rebuild_report_data_including_simulation_days method in the ReportGenerator class.
+    """
+
+    # Arrange
+    mock_time = mocker.MagicMock()
+    mock_time.add_formatted_time = add_formatted_time
+    report_generator = ReportGenerator(mock_time)
+
+    # Act
+    rebuilt_report_data = report_generator._rebuild_report_data_including_simulation_days(report_data)
+
+    # Assert
+    assert report_generator.time == mock_time
+    assert rebuilt_report_data == expected

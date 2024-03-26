@@ -1389,6 +1389,7 @@ def test_save_results(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mock_output_manager.time = MagicMock()
 
     # Act
     mock_output_manager.save_results(
@@ -2018,3 +2019,72 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+def test_set_time(mocker: MockerFixture) -> None:
+    """
+    Unit test for the set_time() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    time_obj = mocker.MagicMock()
+
+    # Act
+    output_manager.set_time(time_obj)
+
+    # Assert
+    assert output_manager.time == time_obj
+
+
+@pytest.mark.parametrize(
+    "add_formatted_time, filtered_pool, expected_pool",
+    [
+        # Test case 1: add_formatted_time is True, expect formatted_time in info_maps
+        (
+            True,
+            {
+                "variable1": {"info_maps": [{"simulation_day": 1}, {"simulation_day": 2}], "values": [100, 200]},
+                "variable2": {"info_maps": [{"simulation_day": 3}], "values": [300]},
+            },
+            {
+                "variable1": {
+                    "info_maps": [
+                        {"formatted_time": "formatted_1", "simulation_day": 1},
+                        {"formatted_time": "formatted_2", "simulation_day": 2},
+                    ],
+                    "values": [100, 200],
+                },
+                "variable2": {"info_maps": [{"formatted_time": "formatted_3", "simulation_day": 3}], "values": [300]},
+            },
+        ),
+        # Test case 2: add_formatted_time is False, expect no change in info_maps
+        (
+            False,
+            {"variable1": {"info_maps": [{"simulation_day": 1}], "values": [100]}},
+            {"variable1": {"info_maps": [{"simulation_day": 1}], "values": [100]}},
+        ),
+    ],
+)
+def test_format_simulation_day_in_info_maps(
+    mocker: MockerFixture,
+    add_formatted_time: bool,
+    filtered_pool: Dict[str, Dict[str, Any]],
+    expected_pool: Dict[str, Dict[str, Any]],
+) -> None:
+    """
+    Unit test for the _format_simulation_day_in_info_maps() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    mock_time = mocker.MagicMock()
+    mock_time.add_formatted_time = add_formatted_time
+    mock_time.convert_simulation_day_to_formatted_date.side_effect = lambda day: f"formatted_{day}"
+    output_manager.time = mock_time
+
+    # Act
+    formatted_pool = output_manager._format_simulation_day_in_info_maps(filtered_pool)
+
+    # Assert
+    assert formatted_pool == expected_pool
