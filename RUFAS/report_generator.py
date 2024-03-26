@@ -1,6 +1,7 @@
 import copy
 import re
 from typing import Dict, List, Any, Callable
+
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
@@ -638,49 +639,33 @@ class ReportGenerator:
         ValueError
             If the name or value of any constant is not valid.
         """
+
         filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end")
         report_data: Dict[str, List[Any]] = {}
 
-        for key in filtered_pool.keys():
-            values: List[Any] = filtered_pool[key]["values"]
-            info_maps = filtered_pool[key].get("info_maps", [])
+        for key, pool_element in filtered_pool.items():
+            values: List[Any] = pool_element["values"]
+            info_maps = pool_element.get("info_maps", [])
             simulation_days = [info_map["simulation_day"] for info_map in info_maps if "simulation_day" in info_map]
             indices = list(range(len(values))) if not simulation_days else []
 
-            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
+            is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
                 raise KeyError("Can't generate report, use 'variables' arg to select items from data")
             if is_data_in_dict:
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
-                    filtered_pool[key]["values"][slice_start:slice_end]
-                )
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(values[slice_start:slice_end])
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    if filtered_key in report_data:
-                        if simulation_days:
-                            report_data[f"{filtered_key}_simulation_days"].extend(
-                                simulation_days[slice_start:slice_end]
-                            )
-                        else:
-                            report_data[f"{filtered_key}_indices"].extend(indices[slice_start:slice_end])
-                        report_data[filtered_key].extend(filtered_value)
-                    else:
-                        if simulation_days:
-                            report_data[f"{filtered_key}_simulation_days"] = copy.deepcopy(
-                                simulation_days[slice_start:slice_end]
-                            )
-                        else:
-                            report_data[f"{filtered_key}_indices"] = copy.deepcopy(indices[slice_start:slice_end])
-                        report_data[filtered_key] = filtered_value
+                    self._add_simulation_days_or_indices_to_report_data(
+                        report_data, filtered_key, filtered_value, simulation_days, indices, slice_start, slice_end
+                    )
             else:
-                if simulation_days:
-                    report_data[f"{key}_simulation_days"] = simulation_days[slice_start:slice_end]
-                else:
-                    report_data[f"{key}_indices"] = indices[slice_start:slice_end]
-                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
+                self._add_simulation_days_or_indices_to_report_data(
+                    report_data, key, values[slice_start:slice_end], simulation_days, indices, slice_start, slice_end
+                )
 
         try:
             self._add_constants_to_report_data(report_data, filter_content)
@@ -688,6 +673,50 @@ class ReportGenerator:
             raise
 
         return report_data
+
+    def _add_simulation_days_or_indices_to_report_data(
+        self,
+        report_data: Dict[str, List[Any]],
+        key: str,
+        values: List[Any],
+        simulation_days: List[int],
+        indices: List[int],
+        slice_start: int,
+        slice_end: int,
+    ) -> None:
+        """
+        Add associated simulation days or indices to each key in the report data.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[Any]]
+            The report data dictionary to update.
+        key : str
+            The key to use for updating the report data.
+        values : List[Any]
+            The values to add to the report data.
+        simulation_days : List[int]
+            The list of simulation days corresponding to the values.
+        indices : List[int]
+            The list of indices corresponding to the values.
+        slice_start : int
+            The starting index for slicing the values and simulation days/indices.
+        slice_end : int
+            The ending index for slicing the values and simulation days/indices.
+        """
+
+        if key in report_data:
+            if simulation_days:
+                report_data[f"{key}_simulation_days"].extend(simulation_days[slice_start:slice_end])
+            else:
+                report_data[f"{key}_indices"].extend(indices[slice_start:slice_end])
+            report_data[key].extend(values)
+        else:
+            if simulation_days:
+                report_data[f"{key}_simulation_days"] = copy.deepcopy(simulation_days[slice_start:slice_end])
+            else:
+                report_data[f"{key}_indices"] = copy.deepcopy(indices[slice_start:slice_end])
+            report_data[key] = values
 
     def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
         """
