@@ -770,7 +770,7 @@ class OutputManager(object):
         )
         return filtered_pool
 
-    def _handle_simulation_day_in_info_maps(
+    def _format_simulation_day_in_info_maps(
         self, filtered_pool: Dict[str, pool_element_type]
     ) -> Dict[str, pool_element_type]:
         """
@@ -878,7 +878,7 @@ class OutputManager(object):
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
                 else:
-                    filtered_pool = self._handle_simulation_day_in_info_maps(filtered_pool)
+                    filtered_pool = self._format_simulation_day_in_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if filter_content.get("graph_details"):
@@ -1267,5 +1267,16 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
 
-    def set_time(self, time_obj: Time) -> None:
+    def set_time(self, time_obj) -> None:
+        """
+        Sets the time object for the output manager.
+
+        Parameters
+        ----------
+        time_obj : Time
+            The time object to be set.
+        """
+
         self.time = time_obj
+
+
