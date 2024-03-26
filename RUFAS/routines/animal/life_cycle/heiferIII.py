@@ -151,7 +151,6 @@ class HeiferIII(HeiferII):
         bool
             True if should be moved to "cow stage".
         """
-        print("using it")
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
