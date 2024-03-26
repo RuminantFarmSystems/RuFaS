@@ -1,5 +1,7 @@
 import pytest
+from pytest_mock import MockerFixture
 import copy
+from RUFAS.time import Time
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from .sample_crop_data import sample_crop_data
@@ -62,6 +64,8 @@ def test_attributes() -> None:
     assert crop.lignin == sample_crop_data["lignin"]
     assert crop.sugar == sample_crop_data["sugar"]
     assert crop.ash == sample_crop_data["ash"]
+    assert crop.stored_fresh_mass == sample_crop_data["fresh_mass"]
+    assert crop.stored_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
 
 
 @pytest.mark.parametrize(
@@ -82,5 +86,28 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)  # type: ignore[arg-type]
 
     actual = crop.dry_matter_mass
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "current,stored,expected",
+    [
+        (10, 10, 0),
+        (100, 40, 60),
+    ],
+)
+def test_days_stored(mocker: MockerFixture, current: int, stored: int, expected: int) -> None:
+    """Tests the days_stored method in HarvestedCrop class."""
+    mock_current_time = mocker.MagicMock(autospec=Time)
+    setattr(mock_current_time, "index", current)
+    mock_stored_time = mocker.MagicMock(autospec=Time)
+    setattr(mock_stored_time, "index", stored)
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
+    crop.storage_time = mock_stored_time
+
+    actual = crop.days_stored(mock_current_time)
 
     assert actual == expected

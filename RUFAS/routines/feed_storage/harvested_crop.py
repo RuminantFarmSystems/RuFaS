@@ -119,11 +119,11 @@ class HarvestedCrop:
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         return dry_matter_fraction * self.fresh_mass
-    
+
     def days_stored(self, time: Time) -> int:
         """
         Calculates the number of days this crop has been stored for.
-        
+
         Parameters
         ----------
         time : Time
@@ -133,6 +133,6 @@ class HarvestedCrop:
         -------
         int
             The number of days this crop has been stored for.
-        
+
         """
         return time.index - self.storage_time.index

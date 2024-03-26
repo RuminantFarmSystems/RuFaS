@@ -46,7 +46,13 @@ def test_acceptable_crops(sileage: Sileage) -> None:
     ],
 )
 def test_process_degradations(
-    sileage: Sileage, mocker: MockerFixture, effluent: float, loss: float, loss_coeff: float, percentage: float, expected_loss: float
+    sileage: Sileage,
+    mocker: MockerFixture,
+    effluent: float,
+    loss: float,
+    loss_coeff: float,
+    percentage: float,
+    expected_loss: float,
 ) -> None:
     """Tests process_degradations in the Sileage class."""
     mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
@@ -57,14 +63,21 @@ def test_process_degradations(
     mock_estimate_effluent = mocker.patch.object(sileage, "estimate_maximum_effluent", return_value=effluent)
     mock_dry_matter_loss = mocker.patch.object(sileage, "calculate_dry_matter_loss_to_effluent", return_value=loss)
     mock_protein_loss = mocker.patch.object(sileage, "calculate_protein_loss_to_effluent", return_value=percentage)
-    mock_npn_loss = mocker.patch.object(sileage, "calculate_non_protein_nitrogen_loss_to_effluent", return_value=loss_coeff)
-    mock_calc_nutrient_percentage = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_percentage")
+    mock_npn_loss = mocker.patch.object(
+        sileage, "calculate_non_protein_nitrogen_loss_to_effluent", return_value=loss_coeff
+    )
+    mock_calc_nutrient_percentage = mocker.patch(
+        "RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_percentage"
+    )
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
 
     sileage.process_degradations(mock_conditions, mock_time)
 
     expected_estimate_calls = [mocker.call(mock_first_crop), mocker.call(mock_second_crop)]
-    expected_dry_matter_loss_calls = [mocker.call(mock_first_crop, effluent, mock_time), mocker.call(mock_second_crop, effluent, mock_time)]
+    expected_dry_matter_loss_calls = [
+        mocker.call(mock_first_crop, effluent, mock_time),
+        mocker.call(mock_second_crop, effluent, mock_time),
+    ]
     expected_protein_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_npn_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_calc_nutrient_percentage_call_count = len(sileage.stored) * 2
@@ -87,7 +100,14 @@ def test_process_degradations(
         (0, 250.0, 75.0),
     ],
 )
-def test_estimate_maximum_effluent(sileage: Sileage, harvested_crop: HarvestedCrop, mocker: MockerFixture, dry_matter: float, mass: float, expected: float) -> None:
+def test_estimate_maximum_effluent(
+    sileage: Sileage,
+    harvested_crop: HarvestedCrop,
+    mocker: MockerFixture,
+    dry_matter: float,
+    mass: float,
+    expected: float,
+) -> None:
     """
     Test the estimate_maximum_effluent method of the Sileage class.
     """
@@ -109,7 +129,13 @@ def test_estimate_maximum_effluent(sileage: Sileage, harvested_crop: HarvestedCr
     ],
 )
 def test_calculate_dry_matter_loss_to_effluent(
-    sileage: Sileage, mocker: MockerFixture, harvested_crop: HarvestedCrop, dry_matter: float, max_effluent: float, days: int, expected: float
+    sileage: Sileage,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    dry_matter: float,
+    max_effluent: float,
+    days: int,
+    expected: float,
 ) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Sileage class.
@@ -168,7 +194,7 @@ def test_calculate_non_protein_nitrogen_loss_to_effluent(
     harvested_crop.non_protein_nitrogen = nitrogen
     actual = sileage.calculate_non_protein_nitrogen_loss_to_effluent(harvested_crop, effluent)
 
-    assert pytest.approx(actual) == expected 
+    assert pytest.approx(actual) == expected
 
 
 @pytest.fixture
