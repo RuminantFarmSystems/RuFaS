@@ -1,0 +1,85 @@
+name: Test, Coverage, and Type Checking
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage mypy
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Test coverage
+        run: |
+          coverage run --rcfile=.github/.coveragerc
+          coverage report --rcfile=.github/.coveragerc
+          coverage json --rcfile=.github/.coveragerc
+          echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' coverage.json )" >> "$GITHUB_ENV"
+          echo "${{ env.COVERAGE_PERCENTAGE }}"
+
+      - name: Update Coverage Badge
+        run: |
+          ./.github/workflows/update_badge.sh
+
+      - name: Commit & Push changes to Readme for Coverage
+        uses: actions-js/push@master
+        with:
+          message: Update coverage on Readme
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+
+      - name: Run mypy on the current branch
+        run: |
+          python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
+          grep -c "error:" mypy_current_branch_report.txt > mypy_current_branch_error_count.txt
+
+      - name: Update Mypy badge
+        run: |
+          chmod +x ./.github/workflows/update_mypy_badge.sh
+          ./.github/workflows/update_mypy_badge.sh $(cat mypy_current_branch_error_count.txt)
+
+      - name: Commit & Push changes to README for Mypy
+        uses: EndBug/add-and-commit@v7
+        with:
+          message: "Update mypy badge on README"
+          add: "README.md"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+
+      - name: Comment on Coverage and Mypy Errors
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
+          if [ -n "$URL" ]; then
+            PYTEST_COVERAGE="Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%"
+            MYPY_ERRORS="Mypy found $MY_ERROR_COUNT errors."
+            COMMIT_MESSAGE="$PYTEST_COVERAGE\n$MYPY_ERRORS"
+            curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              --data "{\"body\": \"$COMMIT_MESSAGE\"}"
+          fi
