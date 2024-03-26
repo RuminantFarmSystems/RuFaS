@@ -1,5 +1,8 @@
 from .storage import Storage
 from .enums import CropCategory
+from .harvested_crop import HarvestedCrop
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.time import Time
 from typing import Optional
 
 
@@ -7,7 +10,19 @@ class Sileage(Storage):
     """
     Class representing the Sileage storage type, inheriting from Storage.
 
-    Methods are placeholders as per the design document and are to be implemented.
+    Methods
+    -------
+    process_degradations(current_conditions: CurrentDayConditions, time: Time)
+        Handles the processing of mass and nutritive loss to effluence and fermentation.
+    estimate_maximum_effluent(crop: HarvestedCrop)
+        Estimates the maximum amount of effluent (water) that will flow out of an ensiled crop.
+    calculate_dry_matter_loss_to_effluent(crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time)
+        Calculates the amount of dry matter lost to effluent from an ensiled crop.
+    calculate_protein_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float)
+        Calculates the percentage of crude protein in the dry matter of an ensiled crop after effluent loss.
+    calculate_non_protein_nitrogen_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float)
+        Calculates the percentage of non-protein nitrogen in the dry matter of an ensiled crop after effluent loss.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -19,55 +34,152 @@ class Sileage(Storage):
             CropCategory.SMALL_GRAIN,
         ]
 
-    def calculate_protein_loss(self):
+    def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
-        Placeholder method to calculate protein loss specific to Sileage.
-
-        Returns
-        -------
-        None
-        """
-        pass
-
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
-        """
-        Calculates the dry matter loss to gas, specific to Sileage.
+        Processes the daily degradations and losses of ensiled crops to effluence, and calls on Storage to calculate
+        loss to fermentation and record the state of ensiled crops.
 
         Parameters
         ----------
-        dry_matter : float
-            The amount of dry matter.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
+        current_conditions : float
+            Conditions on the current day of the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        Notes
+        -----
+        Silage calls the Storage class to handle gaseous dry matter loss, but handles dry matter loss to effluent in
+        this routine.
+
+        """
+        for crop in self.stored:
+            estimated_max_effluent = self.estimate_maximum_effluent(
+                crop.initial_dry_matter_percentage, crop.initial_fresh_mass
+            )
+            time_in_silo = crop.days_stored(time)
+            effluent_loss = self.calculate_dry_matter_loss_to_effluent(
+                crop.dry_matter, estimated_max_effluent, time_in_silo
+            )
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_to_effluent(
+                crop.crude_protein_percent, effluent_loss
+            )
+            non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_to_effluent(
+                crop.non_protein_nitrogen, crop.crude_protein_percent, effluent_loss
+            )
+
+            crop.crude_protein_percent = self.recalculate_nutrient_concentration(
+                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
+            )
+            crop.non_protein_nitrogen = self.recalculate_nutrient_concentration(
+                crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
+            )
+
+            self.set_mass_attributes_after_loss(crop, effluent_loss)
+        super().process_degradations(current_conditions, time)
+
+    def estimate_maximum_effluent(self, crop: HarvestedCrop) -> float:
+        """
+        Estimates the maximum amount of water (effluent) that will flow out of an ensiled crop.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            Crop for which the maximum amount of effluent is being estimated.
 
         Returns
         -------
         float
-            The amount of dry matter lost to gas, specific to Sileage.
+            Estimated maximum effluent of the stored crop in kg water.
+
         """
-        pass
+        initial_dry_matter_fraction = crop.stored_dry_matter_percentage / 100
+
+        if initial_dry_matter_fraction >= 0.3:
+            return 0.0
+
+        return crop.stored_fresh_mass * ((1 - initial_dry_matter_fraction) - 0.7)
 
     def calculate_dry_matter_loss_to_effluent(
-        self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
+        self, crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time
     ) -> float:
         """
-        Calculates the dry matter loss to effluent, specific to Sileage.
+        Calculates the amount of dry matter lost from an ensiled crop to effluent.
 
         Parameters
         ----------
-        dry_matter : float
-            The amount of dry matter.
+        crop : HarvestedCrop
+            The crop from which dry matter is being lost to effluent.
         estimated_maximum_effluent : float
-            The estimated maximum effluent.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
+            The estimated maximum effluent in kg.
+        time : Time
+            Time instance tracking the current time of the simulation.
 
         Returns
         -------
         float
-            The amount of dry matter lost to effluent, specific to Sileage.
+            The amount of dry matter the crop loses to effluent in kg.
+
         """
-        pass
+        time_in_silo = crop.days_stored(time)
+        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) * (1 / crop.dry_matter_mass)
+
+    def calculate_protein_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float) -> float:
+        """
+        Calculate the percentage of crude protein in the dry matter of an ensiled crop after loss to effluent.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The crop from which crude protein is being lost to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
+
+        Notes
+        -----
+        If all dry matter mass is lost to effluent, all crude protein is lost too.
+
+        """
+        if effluent_loss == 1.0:
+            return crop.crude_protein_percent
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif crop.crude_protein_percent == 0.0:
+            return 0.0
+
+        return (crop.crude_protein_percent - 0.3 * effluent_loss) / (1 - effluent_loss)
+
+    def calculate_non_protein_nitrogen_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float) -> float:
+        """
+        Calculate the percentage of non-protein nitrogen in the dry matter of an ensiled crop after loss to effluent.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            Crop from which non-protein nitrogen is being lost to effluent.
+        effluent_loss : float
+            Fraction of dry matter lost to effluent.
+
+        Returns
+        -------
+        float
+            The percentage of crude protein in the dry matter mass that was lost to effluent.
+
+        """
+        if effluent_loss == 1.0:
+            return crop.non_protein_nitrogen
+        elif effluent_loss == 0.0:
+            return 0.0
+        elif crop.non_protein_nitrogen == 0.0:
+            return 0.0
+
+        return (crop.non_protein_nitrogen * crop.crude_protein_percent - 0.3 * effluent_loss) / (
+            crop.crude_protein_percent - 0.3 * effluent_loss
+        )
 
 
 class Bunker(Sileage):
