@@ -2,11 +2,18 @@ from .storage import Storage
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 from typing import Optional
 
 om = OutputManager()
+
+"""
+If the fraction of water in the fresh mass of a crop is less than the threshold value at time of storage, no
+effluent loss occurs from the crop.
+"""
+MOISTURE_FRACTION_THRESHOLD_FOR_EFFLUENT = 0.7
 
 
 class Sileage(Storage):
@@ -93,13 +100,15 @@ class Sileage(Storage):
         float
             Estimated maximum effluent of the stored crop in kg water.
 
+        Notes
+        -----
+        If the amount of water in the fresh mass of a crop at storage is below the threshold value, then there will be
+        no effluent lost from this crop.
+
         """
-        initial_dry_matter_fraction = crop.stored_dry_matter_percentage / 100
+        initial_water_fraction = 1 - crop.stored_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
-        if initial_dry_matter_fraction >= 0.3:
-            return 0.0
-
-        return crop.stored_fresh_mass * ((1 - initial_dry_matter_fraction) - 0.7)
+        return crop.stored_fresh_mass * max(0.0, initial_water_fraction - MOISTURE_FRACTION_THRESHOLD_FOR_EFFLUENT)
 
     def calculate_dry_matter_loss_to_effluent(
         self, crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time
