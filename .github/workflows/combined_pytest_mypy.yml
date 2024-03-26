@@ -37,6 +37,15 @@ jobs:
           echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' coverage.json )" >> "$GITHUB_ENV"
           echo "Coverage Percentage: $(jq -r '.totals.percent_covered_display' coverage.json)"
 
+      - name: Check coverage.json file
+        run: |
+          pwd
+          ls -la
+          if [ ! -f coverage.json ]; then
+            echo "coverage.json file not found"
+            exit 1
+          fi
+
       - name: Run mypy on the current branch
         run: |
           python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
