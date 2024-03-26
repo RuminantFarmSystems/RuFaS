@@ -1,24 +1,23 @@
 import math
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     daily_milk_production: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
     metabolizable_energy_intake: float,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
@@ -40,20 +39,25 @@ def manure_calculations(
         Methane model used for methane emission calculations, including Mills, IPCC.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amount of nutrients in pen ration, calculated per animal.
+    nutrient_conc : Dict[str, float]
+        Concentration of nutrients in pen ration, calculated per animal.
 
     Returns
     -------
     float
         Total amount of phosphorus excreted by the given animal, g.
     AnimalManureExcretions
-        A dictionary that contains the manure excretion values as specified
-            in the AnimalManureExcretions class definition.
+    A dictionary that contains the manure excretion values as specified
+        in the AnimalManureExcretions class definition.
 
     """
     # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
     # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
     # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     # ash_diet_content = nutrient_amounts['ash']
     CP_concentration = nutrient_concentrations["CP"]

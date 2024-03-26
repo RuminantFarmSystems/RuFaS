@@ -138,16 +138,22 @@ class Calf(AnimalBase):
         self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
-    def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str) -> None:
+    def calc_manure_excretion(
+        self, methane_model: str,
+        nutrient_amount: Dict[str, float],
+        nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
         Parameters
         ----------
-        feed: Dict[str, float]
-            instance of the Feed class
         methane_model : str
-            methane model used for methane emission calculations
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amount of nutrients in pen ration, calculated per animal.
+        nutrient_conc : Dict[str, float]
+            Concentration of nutrients in pen ration, calculated per animal.
 
         Returns
         -------
@@ -157,12 +163,12 @@ class Calf(AnimalBase):
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation,
-            feed,
             self.body_weight,
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc,
         )
 
     def phosphorus_rqmts(self, DMI):
@@ -192,7 +198,7 @@ class Calf(AnimalBase):
         # requirement of P from the ration (g) (A.1A.E.7)
         self.p_req = p_absorb / 0.90
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls calf's grow with average daily gain based on user's input until
         wean day. Calculate the wean weight at wean day. Here is the place to

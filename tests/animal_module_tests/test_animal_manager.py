@@ -2697,7 +2697,6 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
 
     for mock_pen in mock_all_pens:
         mock_pen.calc_total_manure.assert_called_once_with(
-            mock_feed,
             mock_methane_model,
             mock_methane_mitigation_method,
             mock_methane_mitigation_additive_amount,
@@ -2730,7 +2729,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     pen = mocker.MagicMock()
     pen.calc_total_manure = mocker.MagicMock()
 
-    feed = mocker.MagicMock()
     manure_excretions_output_data = mocker.MagicMock()
 
     animal_manager = mocker.MagicMock()
@@ -2740,12 +2738,11 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     animal_manager.methane_mitigation_additive_amount = mocker.MagicMock()
 
     # act
-    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, feed, manure_excretions_output_data)
+    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, manure_excretions_output_data)
 
     # assert
     animal_manager._determine_classes_in_pen.assert_called_once_with(pen)
     pen.calc_total_manure.assert_called_once_with(
-        feed,
         animal_manager.methane_model,
         animal_manager.methane_mitigation_method,
         animal_manager.methane_mitigation_additive_amount,

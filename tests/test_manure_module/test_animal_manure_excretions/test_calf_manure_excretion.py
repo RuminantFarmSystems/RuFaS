@@ -11,8 +11,6 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None:
     """Unit test for the manure_calculations function in calf_manure_excretion.py."""
     # Arrange
-    mock_ration_formulation = mocker.MagicMock()
-    mock_feed = mocker.MagicMock()
     body_weight = 100.0
     fecal_phosphorus = 1.0
     urine_phosphorus_required = 2.0
@@ -21,10 +19,6 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     mock_nutrient_amounts = {"dm": dry_matter_intake}
     CP_concentration = 11.0
     mock_nutrient_concentrations = {"CP": CP_concentration}
-    patch_for_ration_report = mocker.patch(
-        "RUFAS.routines.animal.manure.calf_manure_excretion.RationReporter.report_ration",
-        return_value=(mock_nutrient_amounts, mock_nutrient_concentrations),
-    )
 
     total_manure_excreted = 3.45 * dry_matter_intake
     total_solids = 0.393 * dry_matter_intake
@@ -64,16 +58,15 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     actual_total_phosphorus_excreted: float
     manure_excretion_values: AnimalManureExcretions
     actual_total_phosphorus_excreted, manure_excretion_values = manure_calculations(
-        ration_formulation=mock_ration_formulation,
-        feed=mock_feed,
         body_weight=body_weight,
         fecal_phosphorus=fecal_phosphorus,
         urine_phosphorus_required=urine_phosphorus_required,
         methane_model=methane_model,
+        nutrient_amount=mock_nutrient_amounts,
+        nutrient_conc=mock_nutrient_concentrations
     )
 
     # Assert
-    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=0,
         total_manure_excreted=total_manure_excreted,
