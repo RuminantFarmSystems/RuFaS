@@ -49,8 +49,8 @@ def manure_calculations(
     float
         Total amount of phosphorus excreted by the given animal, g.
     AnimalManureExcretions
-    A dictionary that contains the manure excretion values as specified
-        in the AnimalManureExcretions class definition.
+        A dictionary that contains the manure excretion values as specified
+            in the AnimalManureExcretions class definition.
 
     """
     # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218

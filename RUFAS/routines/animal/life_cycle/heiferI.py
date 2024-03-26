@@ -173,7 +173,7 @@ class HeiferI(Calf):
         this heifer would be move to next stage, the heiferII stage.
 
         Parameters
-        ---------
+        ----------
         sim_day : int
             Day of simulation.
 
