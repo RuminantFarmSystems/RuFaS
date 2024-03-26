@@ -253,8 +253,8 @@ class InputManager:
         }
         om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
-            with open(file_path, "r") as csv_file:
-                data_frame = pd.read_csv(csv_file, encoding="utf16")
+            with open(file_path, "r", encoding="utf-8") as csv_file:
+                data_frame = pd.read_csv(csv_file)
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
                     om.add_log(
