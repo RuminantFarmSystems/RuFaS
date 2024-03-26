@@ -253,8 +253,8 @@ class InputManager:
         }
         om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
-            with open(file_path, "r") as csv_file:
-                data_frame = pd.read_csv(csv_file, encoding="utf16")
+            with open(file_path, "r", encoding="utf-8") as csv_file:
+                data_frame = pd.read_csv(csv_file)
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
                     om.add_log(
@@ -315,15 +315,17 @@ class InputManager:
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
             self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
-
             validated_data = {}
             for metadata_property in metadata_properties.keys():
-                is_element_acceptable = self._dict_type_validator(
-                    metadata_property,
-                    properties_blob_key,
-                    filtered_input_data,
-                    eager_termination,
-                    self.elements_counter,
+                variable_properties = metadata_properties[metadata_property]
+                is_element_acceptable = self._validate_input_by_type(
+                    variable_path=[metadata_property],
+                    variable_properties=variable_properties,
+                    input_data=filtered_input_data,
+                    eager_termination=eager_termination,
+                    properties_blob_key=properties_blob_key,
+                    elements_counter=self.elements_counter,
+                    called_during_initialization=False,
                 )
 
                 if is_element_acceptable:
@@ -335,6 +337,42 @@ class InputManager:
                 self.__pool[file_blob_key] = validated_data
 
         return self.elements_counter.invalid_elements == 0
+
+    def _filter_input_array_data_by_metadata(
+        self, input_array_data: List[Any], metadata_properties: Dict[str, Any]
+    ) -> List[Any]:
+        """
+        Filter input array data based on provided metadata properties.
+
+        Parameters:
+        -----------
+        input_array_data : List[Any]
+            The input array data to be filtered.
+        metadata_properties : Dict[str, Any]
+            The dictionary containing metadata properties used as a filter for input_array_data.
+        """
+        if len(input_array_data) == 0:
+            return input_array_data
+
+        filtered_array_data: List[Dict[str, Any] | List[Any] | (int | float | str | bool)] = []
+
+        for array_element in input_array_data:
+            if isinstance(array_element, dict):
+                nested_input_dict_data: Dict[str, Any] = self._filter_input_data_by_metadata(
+                    array_element, metadata_properties["properties"]
+                )
+                if nested_input_dict_data:
+                    filtered_array_data.append(nested_input_dict_data)
+            elif isinstance(array_element, list):
+                nested_input_array_data: List[Any] = self._filter_input_array_data_by_metadata(
+                    array_element, metadata_properties["properties"]
+                )
+                if nested_input_array_data:
+                    filtered_array_data.append(nested_input_array_data)
+            elif isinstance(array_element, (int | float | str | bool)):
+                filtered_array_data.append(array_element)
+
+        return filtered_array_data
 
     def _filter_input_data_by_metadata(
         self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
@@ -354,13 +392,20 @@ class InputManager:
         metadata_properties : Dict[str, Any]
             The dictionary containing metadata properties used as a filter for input_data.
         """
-        filtered_input_data = {}
+        filtered_input_data: Dict[str, Any] = {}
         for key, value in input_data.items():
             if key in metadata_properties:
                 if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
-                    nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
+                    nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
+                        value, metadata_properties[key]
+                    )
                     if nested_input_data:
                         filtered_input_data[key] = nested_input_data
+                elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
+                    array_input_data: List[Any] = self._filter_input_array_data_by_metadata(
+                        value, metadata_properties[key]
+                    )
+                    filtered_input_data[key] = array_input_data
                 else:
                     filtered_input_data[key] = value
 
@@ -821,55 +866,6 @@ class InputManager:
                 called_during_initialization,
             )
 
-    def _dict_type_validator(
-        self,
-        first_level_key: str,
-        properties_blob_key: str,
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
-    ) -> bool:
-        """
-        Receives data loaded from json input file, recursively finds and then validates nested elements,
-        attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
-        and total elements from the input file are checked.
-
-        Parameters
-        ----------
-        first_level_key : str
-            The name of the data element just under the level of properties_blob_key.
-        properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
-        input_data : Dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-        elements_counter : ElementsCounter
-            A counter to keep track of the number of valid, invalid, and fixed elements.
-        called_during_initialization: bool
-            Boolean variable indicating whether the function is being called during initialization
-
-        Returns
-        -------
-        bool
-            True if data is valid, otherwise False.
-        """
-
-        variable_properties = self._extract_value_by_key_list(
-            self.__metadata["properties"][properties_blob_key],
-            [first_level_key],
-        )
-        return self._validate_input_by_type(
-            variable_properties,
-            [first_level_key],
-            input_data,
-            eager_termination,
-            properties_blob_key,
-            elements_counter,
-            called_during_initialization,
-        )
-
     def _validate_array_container_properties(
         self,
         variable_path: List[str | int],
@@ -1040,14 +1036,16 @@ class InputManager:
         if not isinstance(object_value, dict):
             om.add_warning(
                 "Validation: object is not a dictionary",
-                f"Variable: '{variable_path_str}' is not ab object but has type: {type(object_value)}. "
+                f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
                 {"class": self.__class__.__name__, "function": self._object_type_validator.__name__},
             )
             return False
 
         is_whole_object_acceptable = True
-        for key in object_value.keys():
+        for key in variable_properties.keys():
+            if key in ["type", "description", "default"]:
+                continue
             is_element_acceptable = self._validate_input_by_type(
                 variable_properties[key],
                 variable_path + [key],
@@ -1803,12 +1801,15 @@ class InputManager:
         for metadata_property in metadata_properties.keys():
             if metadata_property in variable_properties_to_ignore:
                 continue
-            is_element_acceptable = self._dict_type_validator(
-                metadata_property,
-                properties_blob_key,
-                data,
-                eager_termination,
-                elements_counter,
+            variable_properties = metadata_properties[metadata_property]
+            is_element_acceptable = self._validate_input_by_type(
+                variable_path=[metadata_property],
+                variable_properties=variable_properties,
+                input_data=data,
+                eager_termination=eager_termination,
+                properties_blob_key=properties_blob_key,
+                elements_counter=elements_counter,
+                called_during_initialization=False,
             )
 
             if is_element_acceptable:
@@ -1823,7 +1824,7 @@ class InputManager:
                 )
 
             self.__pool[variable_name] = validated_data
-            self.elements_counter += elements_counter
+            elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
             om.add_error(
