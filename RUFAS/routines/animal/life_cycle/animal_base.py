@@ -74,11 +74,7 @@ class AnimalBase:
         
     @staticmethod
     def set_lactation_curve_parameters():
-        print(im.get_data("lactation.adjustment_dict"))
-        print(im.get_data("lactation.fips_region"))
-        print(im.get_data("animal.herd_information.annual_milk_yield_lbs") == None)
          
-       
         #config input
         fips_region = im.get_data("lactation.fips_region")
             
@@ -118,6 +114,9 @@ class AnimalBase:
         AnimalBase.lactation_parameters[1] = AnimalBase.get_wood_parameters(lactation_group = '1', year = year, region = region, milking_frequency = milking_freq, MY_305d = P1_305)
         AnimalBase.lactation_parameters[2] = AnimalBase.get_wood_parameters(lactation_group = '2', year = year, region = region, milking_frequency = milking_freq, MY_305d = P2_305)
         AnimalBase.lactation_parameters[3] = AnimalBase.get_wood_parameters(lactation_group = '3', year = year, region = region, milking_frequency = milking_freq, MY_305d = P3_305)
+        print("Params 1: " + str(AnimalBase.lactation_parameters[1]))
+        print("Params 2: " + str(AnimalBase.lactation_parameters[2]))
+        print("Params 3: " + str(AnimalBase.lactation_parameters[3]))
         
         #assign final values to dictionary
         #AnimalBase.lactation_parameters = None    
