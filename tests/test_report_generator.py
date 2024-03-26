@@ -940,7 +940,8 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     """
     Unit test for the _prepare_report_data_to_be_graphed method in the ReportGenerator class.
     """
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     individual_report_name = "test_report"
     graph_data = {"some_data_key": [1, 2, 3]}
     filter_content = {
@@ -982,32 +983,38 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     }, "Graph event log did not match expected output"
 
 
-def test_report_generator_init() -> None:
+def test_report_generator_init(mocker: MockerFixture) -> None:
     """
     Unit test for the __init__ method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
     expected_reports = {}
+    mock_time = mocker.MagicMock()
 
     # Act
-    report_generator = ReportGenerator()
+    report_generator = ReportGenerator(mock_time)
 
     # Assert
+    assert report_generator.time == mock_time
     assert report_generator.reports == expected_reports
 
 
-def test_clear_reports() -> None:
+def test_clear_reports(
+    mocker: MockerFixture,
+) -> None:
     """
     Unit test for the clear_reports method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(mock_time)
     report_generator.reports = {"report1": {}, "report2": {}}
 
     # Act
     report_generator.clear_reports()
 
     # Assert
+    assert report_generator.time == mock_time
     assert report_generator.reports == {}
