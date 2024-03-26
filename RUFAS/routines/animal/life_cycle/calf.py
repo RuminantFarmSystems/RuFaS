@@ -139,9 +139,7 @@ class Calf(AnimalBase):
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
     def calc_manure_excretion(
-        self, methane_model: str,
-        nutrient_amount: Dict[str, float],
-        nutrient_conc: Dict[str, float]
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
     ) -> None:
         """
         Calculates and sets the manure excretion components.

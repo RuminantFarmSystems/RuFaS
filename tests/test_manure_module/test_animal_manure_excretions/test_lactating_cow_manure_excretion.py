@@ -192,7 +192,8 @@ def test_lactating_cow_manure_calculations(  # noqa
         "NDF": NDF_concentration,
         "potassium": potassium_concentration,
         "EE": EE_concentration,
-        "starch": starch_concentration}
+        "starch": starch_concentration,
+    }
 
     patch_for_calculate_phosphorus_excretion_values = mocker.patch(
         "RUFAS.routines.animal.manure.lactating_cow_manure_excretion.calculate_phosphorus_excretion_values"
@@ -221,7 +222,7 @@ def test_lactating_cow_manure_calculations(  # noqa
         milk_fat=milk_fat,
         metabolizable_energy_intake=metabolizable_energy_intake,
         nutrient_amount=mock_nutrient_amounts,
-        nutrient_conc=mock_nutrient_concentrations
+        nutrient_conc=mock_nutrient_concentrations,
     )
 
     # Assert

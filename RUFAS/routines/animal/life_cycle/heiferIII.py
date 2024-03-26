@@ -107,10 +107,9 @@ class HeiferIII(HeiferII):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self,
-                              methane_model: str,
-                              nutrient_amount: Dict[str, float],
-                              nutrient_conc: Dict[str, float]) -> None:
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
@@ -152,7 +151,7 @@ class HeiferIII(HeiferII):
         bool
             True if should be moved to "cow stage".
         """
-        print('using it')
+        print("using it")
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1

@@ -1763,7 +1763,7 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                self.collect_manure_excretions_output_data(pen,  manure_excretions_output_data)
+                self.collect_manure_excretions_output_data(pen, manure_excretions_output_data)
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)

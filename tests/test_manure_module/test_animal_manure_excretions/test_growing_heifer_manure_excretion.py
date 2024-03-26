@@ -102,7 +102,8 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
         urine_phosphorus_required=urine_phosphorus_required,
         methane_model=methane_model,
         nutrient_amount=mock_nutrient_amounts,
-        nutrient_conc=mock_nutrient_concentrations)
+        nutrient_conc=mock_nutrient_concentrations,
+    )
 
     # Assert
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(

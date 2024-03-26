@@ -133,7 +133,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         methane_model=methane_model,
         metabolizable_energy_intake=metabolizable_energy_intake,
         nutrient_amount=mock_nutrient_amounts,
-        nutrient_conc=mock_nutrient_concentrations
+        nutrient_conc=mock_nutrient_concentrations,
     )
 
     # Assert

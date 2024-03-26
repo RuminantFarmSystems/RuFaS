@@ -63,7 +63,7 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
         urine_phosphorus_required=urine_phosphorus_required,
         methane_model=methane_model,
         nutrient_amount=mock_nutrient_amounts,
-        nutrient_conc=mock_nutrient_concentrations
+        nutrient_conc=mock_nutrient_concentrations,
     )
 
     # Assert

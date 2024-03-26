@@ -1608,16 +1608,16 @@ def test_heiferI_calc_manure_excretion(mocker: MockerFixture) -> None:
         "RUFAS.routines.animal.life_cycle.heiferI.manure_calculations",
         return_value=(None, None),
     )
-    HeiferI.calc_manure_excretion(heiferI, "methane_model",
-                                  nutrient_amount=nutrient_amount,
-                                  nutrient_conc=nutrient_conc)
+    HeiferI.calc_manure_excretion(
+        heiferI, "methane_model", nutrient_amount=nutrient_amount, nutrient_conc=nutrient_conc
+    )
     mocked_heifer_manure_excretion.assert_called_with(
         heiferI.body_weight,
         mock_numI[1],
         mock_numI[0],
         "methane_model",
         nutrient_amount=nutrient_amount,
-        nutrient_conc=nutrient_conc
+        nutrient_conc=nutrient_conc,
     )
     heiferI.calc_base_manure.assert_called()
 
@@ -1960,11 +1960,9 @@ def test_calf_calc_manure_excretion(mocker: MockerFixture) -> None:
     calf.manure_calculations.return_value = (one, two)
     Calf.calc_manure_excretion(calf, "methane_model", nutrient_amount, nutrient_conc)
     calf.calc_base_manure.assert_called()
-    mocked_calf_manure_excretion.assert_called_once_with(calf.body_weight,
-                                                         0.3, 1.2,
-                                                         "methane_model",
-                                                         nutrient_amount=nutrient_amount,
-                                                         nutrient_conc=nutrient_conc)
+    mocked_calf_manure_excretion.assert_called_once_with(
+        calf.body_weight, 0.3, 1.2, "methane_model", nutrient_amount=nutrient_amount, nutrient_conc=nutrient_conc
+    )
 
 
 def test_calf_phosphorus_rqmts(mocker: MockerFixture) -> None:
