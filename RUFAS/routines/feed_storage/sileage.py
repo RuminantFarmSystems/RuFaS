@@ -132,7 +132,7 @@ class Sileage(Storage):
 
         """
         time_in_silo = crop.days_stored(time)
-        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) * (1 / crop.dry_matter_mass)
+        return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) / crop.dry_matter_mass
 
     def calculate_protein_loss_to_effluent(self, crop: HarvestedCrop, effluent_loss: float) -> float:
         """
