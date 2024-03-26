@@ -236,7 +236,7 @@ class GraphGenerator:
                 )
         return graph_filter_validation_logs
 
-    def _prepare_plot_data(
+    def _prepare_plot_data(  # noqa: C901
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
