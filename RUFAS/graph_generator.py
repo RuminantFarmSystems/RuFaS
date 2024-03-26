@@ -370,7 +370,8 @@ class GraphGenerator:
             "time_step_unit" in graph_details or "time_step_value" in graph_details
         ):
             raise ValueError(
-                "Because there is no information about simulation days in info maps, 'time_step_unit' and 'time_step_value' are not supported."
+                "Because there is no information about simulation days in info maps, "
+                "'time_step_unit' and 'time_step_value' are not supported."
             )
 
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
@@ -443,13 +444,14 @@ class GraphGenerator:
         valid_time_step_units = ["month", "day", "year"]
         if time_step_unit not in valid_time_step_units:
             raise ValueError(
-                f"Unsupported time step unit: {time_step_unit}. Supported values are: {', '.join(valid_time_step_units)}"
+                f"Unsupported time step unit: {time_step_unit}. "
+                f"Supported values are: {', '.join(valid_time_step_units)}"
             )
 
         if time_step_unit == "year" and time_step_value not in [None, 1]:
             raise ValueError(
-                "When using 'year' as the time step unit, it is not required to provide a time step value. Default value is 1. If you "
-                "want to change the interval, use 'month' or 'day' as the time step unit."
+                "When using 'year' as the time step unit, it is not required to provide a time step value. "
+                "Default value is 1. For more granular control, please use 'month' or 'day' as the time step unit."
             )
 
         ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter(self.time.time_format))
