@@ -35,7 +35,7 @@ class AnimalBase:
 
     @staticmethod
     def calc_integral_wood_curve(parameter_a, parameter_b, parameter_c):
-        result, _ = quad(get_y_values_wood_curve, 1, 305, args=(parameter_a, parameter_b, parameter_c))
+        result, _ = quad(AnimalBase.get_y_values_wood_curve, 1, 305, args=(parameter_a, parameter_b, parameter_c))
         return result
     
     @staticmethod
@@ -43,7 +43,7 @@ class AnimalBase:
         parameter_a = 19.9
         parameter_b = 24.7 * 1e-2
         parameter_c = 33.76 * 1e-4
-        t = get_t_values()
+        t = AnimalBase.get_t_values()
         adjustment_dict = im.get_data("lactation.adjustment_dict")
 
 
@@ -54,8 +54,8 @@ class AnimalBase:
                 parameter_c += adjustment_dict[category][2] * 1e-4
 
         if MY_305d == None:
-            MY_305d = calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
-            y = get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c)
+            MY_305d = AnimalBase.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
+            y = AnimalBase.get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c)
             return parameter_a, parameter_b, parameter_c, MY_305d
 
         else:
@@ -65,7 +65,7 @@ class AnimalBase:
 
             for parameter_a_error in np.arange(-10, 10, 0.01):
                 parameter_a_vary = parameter_a + parameter_a_error
-                MY_305d_vary = calc_integral_wood_curve(parameter_a_vary, parameter_b, parameter_c)
+                MY_305d_vary = AnimalBase.calc_integral_wood_curve(parameter_a_vary, parameter_b, parameter_c)
                 if abs(MY_305d_vary - MY_305d) < min_diff:
                     min_diff =  abs(MY_305d_vary - MY_305d)
                     parameter_a_best_estimate = parameter_a_vary
@@ -114,9 +114,9 @@ class AnimalBase:
         P3_305 = P1_305 + Z
 
         #calculate parameters for each lactation group
-        AnimalBase.lactation_parameters[1] = get_wood_parameters(lactation_group = '1', year = year, region = region, milking_frequency = milking_freq, MY_305d = P1_305)
-        AnimalBase.lactation_parameters[2] = get_wood_parameters(lactation_group = '2', year = year, region = region, milking_frequency = milking_freq, MY_305d = P2_305)
-        AnimalBase.lactation_parameters[3] = get_wood_parameters(lactation_group = '3', year = year, region = region, milking_frequency = milking_freq, MY_305d = P3_305)
+        AnimalBase.lactation_parameters[1] = AnimalBase.get_wood_parameters(lactation_group = '1', year = year, region = region, milking_frequency = milking_freq, MY_305d = P1_305)
+        AnimalBase.lactation_parameters[2] = AnimalBase.get_wood_parameters(lactation_group = '2', year = year, region = region, milking_frequency = milking_freq, MY_305d = P2_305)
+        AnimalBase.lactation_parameters[3] = AnimalBase.get_wood_parameters(lactation_group = '3', year = year, region = region, milking_frequency = milking_freq, MY_305d = P3_305)
         
         #assign final values to dictionary
         #AnimalBase.lactation_parameters = None    
