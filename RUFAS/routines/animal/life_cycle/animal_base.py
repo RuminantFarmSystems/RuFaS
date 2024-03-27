@@ -76,18 +76,20 @@ class AnimalBase:
     def set_lactation_curve_parameters():
         fips_region = im.get_data("lactation.fips_region") 
         
-        year = im.get_data("config.end_date")[:4]   
+        year = im.get_data("config.end_date")[:4]
+        if int(year) > 2016:
+               year = "2016"
 
         region = im.get_data("config.FIPS_county_code")
-        print(int((region/1000)))
-        print(fips_region)
         if region != None:
             region = fips_region[int((region/1000))]
             if region == "":
                 region = None
             
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs") #int or None
-        parity_percentages= im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
+        parity_percentages = im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
+        num_milking_cows = im.get_data("animal.herd_information.cow_num")*(305/365)
+        print("num_milking_cows: " + str(num_milking_cows))
 
         milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
         if milking_freq >= 2.5 : 
@@ -102,10 +104,13 @@ class AnimalBase:
         Z = 2196
 
         if annual_MY_lbs != None:
-            total_avg_305 = annual_MY_lbs * 305 / (365 * (305/365) * 2.205) 
+            total_avg_305 = annual_MY_lbs * 305 / (365 * num_milking_cows * 2.205) 
 
             # Extracting percentage distribution for each lactation group
-            percent_P1, percent_P2, percent_P3 = parity_percentages
+            percent_P1= parity_percentages[0]*100
+            percent_P2= parity_percentages[1]*100
+            percent_P3= parity_percentages[2]*100
+            
 
             # Solving for P1-305 using the provided equation
             P1_305 = total_avg_305 - percent_P2 * Y / 100 - percent_P3 * Z / 100 
