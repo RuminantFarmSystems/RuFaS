@@ -39,6 +39,8 @@
 			"repro": {
                 "voluntary_waiting_period":60,
 				"conception_rate_decrease":0.026,
+				"decrease_conception_rate_in_rebreeding": false,
+       			"decrease_conception_rate_by_parity": false,
                 "avg_gestation_len":278,
 				"std_gestation_len":6,
 				"prefresh_day":20,
