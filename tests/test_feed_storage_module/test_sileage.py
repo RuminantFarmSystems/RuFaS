@@ -70,9 +70,9 @@ def test_process_degradations(
     sileage.stored = [mock_first_crop, mock_second_crop]
     mock_estimate_effluent = mocker.patch.object(sileage, "estimate_maximum_effluent", return_value=effluent)
     mock_dry_matter_loss = mocker.patch.object(sileage, "calculate_dry_matter_loss_to_effluent", return_value=loss)
-    mock_protein_loss = mocker.patch.object(sileage, "calculate_protein_loss_to_effluent", return_value=percentage)
+    mock_protein_loss = mocker.patch.object(sileage, "calculate_protein_loss_coefficient", return_value=percentage)
     mock_npn_loss = mocker.patch.object(
-        sileage, "calculate_non_protein_nitrogen_loss_to_effluent", return_value=loss_coeff
+        sileage, "calculate_non_protein_nitrogen_loss_coefficient", return_value=loss_coeff
     )
     mock_calc_nutrient_percentage = mocker.patch.object(sileage, "recalculate_nutrient_percentage")
     mock_set_mass = mocker.patch.object(sileage, "set_mass_attributes_after_loss")
@@ -180,12 +180,12 @@ def test_calculate_dry_matter_loss_to_effluent(
         (5.0, 0.0, 0.0),
     ],
 )
-def test_calculate_crude_protein_loss_to_effluent(
+def test_calculate_protein_loss_coefficient(
     sileage: Sileage, harvested_crop: HarvestedCrop, protein: float, effluent: float, expected: float
 ) -> None:
-    """Test the calculate_protein_loss_to_effluent method in the Storage class."""
+    """Test the calculate_protein_loss_coefficient method in the Storage class."""
     harvested_crop.crude_protein_percent = protein
-    actual = sileage.calculate_protein_loss_to_effluent(harvested_crop, effluent)
+    actual = sileage.calculate_protein_loss_coefficient(harvested_crop, effluent)
 
     assert pytest.approx(actual) == expected
 
@@ -201,13 +201,13 @@ def test_calculate_crude_protein_loss_to_effluent(
         (2.3, 1.2, 0.0, 0.0),
     ],
 )
-def test_calculate_non_protein_nitrogen_loss_to_effluent(
+def test_calculate_non_protein_nitrogen_loss_coefficient(
     sileage: Sileage, harvested_crop: HarvestedCrop, nitrogen: float, protein: float, effluent: float, expected: float
 ) -> None:
-    """Test the calculate_non_protein_nitrogen_loss_to_effluent method in the Storage class."""
+    """Test the calculate_non_protein_nitrogen_loss_coefficient method in the Storage class."""
     harvested_crop.crude_protein_percent = protein
     harvested_crop.non_protein_nitrogen = nitrogen
-    actual = sileage.calculate_non_protein_nitrogen_loss_to_effluent(harvested_crop, effluent)
+    actual = sileage.calculate_non_protein_nitrogen_loss_coefficient(harvested_crop, effluent)
 
     assert pytest.approx(actual) == expected
 
