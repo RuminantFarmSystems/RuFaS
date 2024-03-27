@@ -129,7 +129,6 @@ class AnimalManager:
 
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
-        print("OLD LOCATION")
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
