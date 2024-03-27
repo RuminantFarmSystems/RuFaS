@@ -10,10 +10,14 @@ from typing import Optional
 om = OutputManager()
 
 """
-If the fraction of water in the fresh mass of a crop is less than the threshold value at time of storage, no
-effluent loss occurs from the crop.
+If the fraction of water in the fresh mass of a crop is less than the threshold value at time of storage, no effluent
+loss occurs from the crop.
 """
 MOISTURE_FRACTION_THRESHOLD_FOR_EFFLUENT = 0.7
+"""
+Constant that regulates how many days effluent loss occurs for and how much effluent is lost on a single day.
+"""
+EFFLUENT_LOSS_CONSTRAINER = 10
 
 
 class Sileage(Storage):
@@ -64,27 +68,31 @@ class Sileage(Storage):
 
         """
         info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
-        total_effluent_loss = 0.0
+        total_effluent_dry_matter_loss = 0.0
+        total_effluent_moisture_loss = 0.0
         for crop in self.stored:
             estimated_max_effluent = self.estimate_maximum_effluent(crop)
-            effluent_loss = self.calculate_dry_matter_loss_to_effluent(crop, estimated_max_effluent, time)
-            total_effluent_loss += effluent_loss
+            effluent_dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(crop, estimated_max_effluent, time)
+            total_effluent_dry_matter_loss += effluent_dry_matter_loss
+            effluent_moisture_loss = self.calculate_moisture_loss_to_effluent(crop, estimated_max_effluent, time)
+            total_effluent_moisture_loss += effluent_moisture_loss
 
-            crude_protein_effluent_coefficient = self.calculate_protein_loss_coefficient(crop, effluent_loss)
+            crude_protein_effluent_coefficient = self.calculate_protein_loss_coefficient(crop, effluent_dry_matter_loss)
             non_protein_nitrogen_loss_coefficient = self.calculate_non_protein_nitrogen_loss_coefficient(
-                crop, effluent_loss
+                crop, effluent_dry_matter_loss
             )
 
             crop.non_protein_nitrogen = self.recalculate_nutrient_percentage(
-                crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_loss, crop.dry_matter_mass
+                crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_dry_matter_loss, crop.dry_matter_mass
             )
 
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
-                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_loss, crop.dry_matter_mass
+                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_dry_matter_loss, crop.dry_matter_mass
             )
 
-            self.set_mass_attributes_after_loss(crop, effluent_loss)
-        om.add_variable("effluent_dry_matter_loss", total_effluent_loss, info_map)
+            self.set_mass_attributes_after_loss(crop, effluent_dry_matter_loss, effluent_moisture_loss)
+        om.add_variable("effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        om.add_variable("effluent_moisture_loss", total_effluent_moisture_loss, info_map)
         super().process_degradations(current_conditions, time)
 
     def estimate_maximum_effluent(self, crop: HarvestedCrop) -> float:
@@ -131,9 +139,48 @@ class Sileage(Storage):
         float
             The amount of dry matter the crop loses to effluent in kg.
 
+        Notes
+        -----
+        Effluent loss is zero beyond a specific number of days.
+
         """
         time_in_silo = crop.days_stored(time)
+        if time_in_silo > EFFLUENT_LOSS_CONSTRAINER:
+            return 0.0
+
         return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) / crop.dry_matter_mass
+
+    def calculate_moisture_loss_to_effluent(
+        self, crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time
+    ) -> float:
+        """
+        Calculates the amount of moisture lost from an ensiled crop to effluent.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The crop from which dry matter is being lost to effluent.
+        estimated_maximum_effluent : float
+            The estimated maximum effluent in kg.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        Returns
+        -------
+        float
+            The amount of moisture the crop loses to effluent in kg.
+
+        Notes
+        -----
+        Effluent loss is zero beyond a specific number of days. During the period of effluent loss, the same amount of
+        effluent will be lost every day.
+
+        """
+        time_in_silo = crop.days_stored(time)
+        if time_in_silo > EFFLUENT_LOSS_CONSTRAINER:
+            return 0.0
+
+        return estimated_maximum_effluent / EFFLUENT_LOSS_CONSTRAINER
 
     def calculate_protein_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float) -> float:
         """
