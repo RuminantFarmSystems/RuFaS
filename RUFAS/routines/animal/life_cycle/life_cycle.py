@@ -319,6 +319,12 @@ class LifeCycleManager:
         self.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
         self.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
 
+        self.sold_calves = []
+        self.sold_heiferIIIs = []
+        self.sold_heiferIIs = []
+        self.sold_cows = []
+        self.sold_and_died_cows = []
+
         return (
             animals_added,
             animals_removed,
