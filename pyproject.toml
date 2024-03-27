@@ -14,3 +14,4 @@ disallow_incomplete_defs = true # Require all variables to be explicitly typed
 show_column_numbers = true # Show column numbers in error messages
 strict = true
 exclude = ['^(?!.*(?:RUFAS|tests|main\.py|setup\.py)).*$']
+follow_imports = "silent"
