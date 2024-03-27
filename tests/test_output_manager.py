@@ -27,8 +27,18 @@ def mock_output_manager(mocker) -> OutputManager:
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     """Unit test for the function set_metadata_prefix in the file output_manager.py"""
+
+    # Assert before setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == ""
+
+    # Act
     mock_output_manager.set_metadata_prefix("dummy_prefix")
-    assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
+
+    # Assert after setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == "dummy_prefix"
+
+    # Cleanup
+    mock_output_manager.set_metadata_prefix("")
 
 
 @pytest.mark.parametrize(
@@ -37,8 +47,18 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 )
 def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
+
+    # Assert before setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == LogVerbosity.CREDITS
+
+    # Act
     mock_output_manager.set_log_verbose(log_verbose)
-    assert mock_output_manager._OutputManager__log_verbose == log_verbose
+
+    # Assert after setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == log_verbose
+
+    # Cleanup
+    mock_output_manager.set_log_verbose(LogVerbosity.CREDITS)
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
@@ -2053,3 +2073,25 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+@pytest.mark.parametrize("flag_value", [False, True])
+def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
+    """
+    Unit test for the set_exclude_info_maps_flag() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Assert before
+    assert not output_manager._exclude_info_maps_flag
+
+    # Act
+    output_manager.set_exclude_info_maps_flag(flag_value)
+
+    # Assert after
+    assert output_manager._exclude_info_maps_flag == flag_value
+
+    # Cleanup
+    output_manager._exclude_info_maps_flag = False
