@@ -136,13 +136,24 @@ class OutputManager(object):
         value: Any,
         info_map: Dict[str, Any],
     ) -> None:
-        """Adds value and info map at key in the given pool."""
+        """
+        Adds value and info map at key in the given pool.
+
+        Parameters
+        ----------
+        pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+            The pool to add the value and info_map to.
+        key : str
+            The key to add the value and info_map at.
+        value : Any
+            The value to be added to the pool.
+        info_map : Dict[str, Any]
+            The info map to be added to the pool.
+        """
+
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        # reduced_info_map is identical to info_map without the class key and
-        # the function key; as they are already stored in element key and
-        # having them increases the final file size.
         if not self._exclude_info_maps_flag:
             reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
             pool[key]["info_maps"].append(reduced_info_map)
