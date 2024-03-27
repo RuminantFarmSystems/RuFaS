@@ -74,23 +74,26 @@ class AnimalBase:
         
     @staticmethod
     def set_lactation_curve_parameters():
-         
-        #config input
-        fips_region = im.get_data("lactation.fips_region")
-            
-        year = im.get_data("config.end_date")[:4] #str  
-        region = fips_region[int((im.get_data("config.FIPS_county_code")/1000))] #int
+        fips_region = im.get_data("lactation.fips_region") 
+        
+        year = im.get_data("config.end_date")[:4]   
 
-        #animal input
+        region = im.get_data("config.FIPS_county_code")
+        print(int((region/1000)))
+        print(fips_region)
+        if region != None:
+            region = fips_region[int((region/1000))]
+            if region == "":
+                region = None
             
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs") #int or None
         parity_percentages= im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
-        milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day") #int
 
+        milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
         if milking_freq >= 2.5 : 
-            milking_freq = str(3) + "x/d"
+            milking_freq = "3x/d"
         else: 
-            milking_freq = str(2) + "x/d"
+            milking_freq = "2x/d"
 
         #calculate lactation group yield
 
@@ -98,17 +101,23 @@ class AnimalBase:
         Y = 1632
         Z = 2196
 
-        total_avg_305 = annual_MY_lbs * 305 / (365 * (305/365) * 2.205) 
+        if annual_MY_lbs != None:
+            total_avg_305 = annual_MY_lbs * 305 / (365 * (305/365) * 2.205) 
 
-        # Extracting percentage distribution for each lactation group
-        percent_P1, percent_P2, percent_P3 = parity_percentages
+            # Extracting percentage distribution for each lactation group
+            percent_P1, percent_P2, percent_P3 = parity_percentages
 
-        # Solving for P1-305 using the provided equation
-        P1_305 = total_avg_305 - percent_P2 * Y / 100 - percent_P3 * Z / 100 
+            # Solving for P1-305 using the provided equation
+            P1_305 = total_avg_305 - percent_P2 * Y / 100 - percent_P3 * Z / 100 
 
-        # Calculating 305-day milk yield for each lactation group
-        P2_305 = P1_305 + Y 
-        P3_305 = P1_305 + Z
+            # Calculating 305-day milk yield for each lactation group
+            P2_305 = P1_305 + Y 
+            P3_305 = P1_305 + Z
+
+        else:
+            P1_305 = None
+            P2_305 = None
+            P3_305 = None
 
         #calculate parameters for each lactation group
         AnimalBase.lactation_parameters[1] = AnimalBase.get_wood_parameters(lactation_group = '1', year = year, region = region, milking_frequency = milking_freq, MY_305d = P1_305)
