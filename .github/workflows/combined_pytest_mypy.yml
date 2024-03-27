@@ -107,12 +107,12 @@ jobs:
             MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
             DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
             if [ $DIFF -gt 0 ]; then
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF more errors on ${{ github.head_ref }} branch"
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
             elif [ $DIFF -lt 0 ]; then
               DIFF=$((DIFF * -1))
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF fewer errors on ${{ github.head_ref }} branch"
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF fewer errors on ${{ github.head_ref }} branch"
             else
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: No difference in error counts"
+              MYPY_ERRORS="$MYPY_ERRORS\nNo difference in error counts"
             fi
             echo "$MYPY_ERRORS"
             COMMIT_MESSAGE="$PYTEST_COVERAGE\n\n$MYPY_ERRORS"
