@@ -37,8 +37,18 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 )
 def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
+
+    # Assert before setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == LogVerbosity.CREDITS
+
+    # Act
     mock_output_manager.set_log_verbose(log_verbose)
-    assert mock_output_manager._OutputManager__log_verbose == log_verbose
+
+    # Assert after setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == log_verbose
+
+    # Cleanup
+    mock_output_manager.set_log_verbose(LogVerbosity.CREDITS)
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
