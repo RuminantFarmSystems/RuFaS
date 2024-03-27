@@ -713,6 +713,7 @@ def test_execute_simulations(
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
+    mock_output_manager.print_errors_warnings_logs_counts.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_file_path1 = Path("metadata_file1.json")
@@ -775,6 +776,7 @@ def test_execute_simulations(
             csv_dir,
         ),
     ] * len(metadata_file_list)
+    assert mock_output_manager.print_errors_warnings_logs_counts.call_count == len(metadata_file_list)
 
 
 @pytest.mark.parametrize(
