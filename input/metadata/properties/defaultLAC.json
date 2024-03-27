@@ -1871,10 +1871,10 @@
     },
     "fips_region": {
       "type": "array",
-      "description" : "",
+      "description" : "The corresponding region for each state/location that can be described by the FIPS code",
       "properties": {
         "type": "string",
-        "description": ""
+        "description": "Each index corresponds to the state/location with the FIPS code that has the same first two digits as that index. The value at that index is the corresponding region for that state/location."
       }
     }
   },
