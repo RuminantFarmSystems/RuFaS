@@ -70,6 +70,7 @@ def test_process_degradations(
     silage.stored = [mock_first_crop, mock_second_crop]
     mock_estimate_effluent = mocker.patch.object(silage, "estimate_maximum_effluent", return_value=effluent)
     mock_dry_matter_loss = mocker.patch.object(silage, "calculate_dry_matter_loss_to_effluent", return_value=loss)
+    mock_moisture_loss = mocker.patch.object(silage, "calculate_moisture_loss_to_effluent", return_value=loss)
     mock_protein_loss = mocker.patch.object(silage, "calculate_protein_loss_coefficient", return_value=percentage)
     mock_npn_loss = mocker.patch.object(
         silage, "calculate_non_protein_nitrogen_loss_coefficient", return_value=loss_coeff
@@ -82,7 +83,7 @@ def test_process_degradations(
     silage.process_degradations(mock_conditions, mock_time)
 
     expected_estimate_calls = [mocker.call(mock_first_crop), mocker.call(mock_second_crop)]
-    expected_dry_matter_loss_calls = [
+    expected_effluent_loss_calls = [
         mocker.call(mock_first_crop, effluent, mock_time),
         mocker.call(mock_second_crop, effluent, mock_time),
     ]
@@ -92,7 +93,8 @@ def test_process_degradations(
     expected_set_mass_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
 
     mock_estimate_effluent.assert_has_calls(expected_estimate_calls)
-    mock_dry_matter_loss.assert_has_calls(expected_dry_matter_loss_calls)
+    mock_dry_matter_loss.assert_has_calls(expected_effluent_loss_calls)
+    mock_moisture_loss.assert_has_calls(expected_effluent_loss_calls)
     mock_protein_loss.assert_has_calls(expected_protein_loss_calls)
     mock_npn_loss.assert_has_calls(expected_npn_loss_calls)
     assert mock_calc_nutrient_percentage.call_count == expected_calc_nutrient_percentage_call_count
@@ -156,7 +158,7 @@ def test_calculate_dry_matter_loss_to_effluent(
     Test the calculate_dry_matter_loss_to_effluent method of the Silage class.
     """
     mock_time = mocker.MagicMock(autospec=Time)
-    mock_dry_matter_mass = mocker.patch(
+    mocker.patch(
         "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
         new_callable=mocker.PropertyMock,
         return_value=dry_matter,
@@ -165,7 +167,6 @@ def test_calculate_dry_matter_loss_to_effluent(
     actual = silage.calculate_dry_matter_loss_to_effluent(harvested_crop, max_effluent, mock_time)
 
     assert pytest.approx(actual) == expected
-    mock_dry_matter_mass.assert_called_once()
     mock_days_stored.assert_called_once_with(mock_time)
 
 
