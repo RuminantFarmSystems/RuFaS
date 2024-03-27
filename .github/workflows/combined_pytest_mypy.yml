@@ -103,7 +103,7 @@ jobs:
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
             echo "$PYTEST_COVERAGE"
-            MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
+            MYPY_ERRORS="Mypy errors on the current branch (${{ github.head_ref }}): $MY_ERROR_COUNT"
             MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
             DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
             if [ $DIFF -gt 0 ]; then
