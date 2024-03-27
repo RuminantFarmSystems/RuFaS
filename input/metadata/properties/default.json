@@ -40,6 +40,16 @@
       "maximum": 56045,
       "default": null,
       "description": "Unique 5-digit code that represents a specific U.S. county."
+    },
+    "time_format_string": {
+      "type": "string",
+      "description": "The time format string used for the actual dates",
+      "default": "%m/%d/%Y"
+    },
+    "add_formatted_time": {
+      "type": "bool",
+      "description": "Whether or not to add formatted dates to the info maps",
+      "default": false
     }
   },
   "animal_properties": {
@@ -1559,7 +1569,9 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
-          "default": ["harvest_kill"],
+          "default": [
+            "harvest_kill"
+          ],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
@@ -1951,7 +1963,7 @@
     "corn_grain_tillage_emissions": {
       "type": "array",
       "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
-      "properties": {  
+      "properties": {
         "type": "number",
         "minimum": 0,
         "default": 300
@@ -1979,1085 +1991,1085 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
-        }
-      },
+        "minimum": 0.0
+      }
+    },
     "2": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "4": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "5": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "6": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "7": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "8": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "9": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "11": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "12": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "13": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "14": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "15": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "16": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "17": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "18": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "19": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "20": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "21": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "22": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "23": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "24": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "25": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "28": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "30": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "31": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "32": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "33": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "34": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "36": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "37": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "38": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "39": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "40": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "41": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "42": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "43": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "44": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "46": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "47": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "49": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "50": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "51": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "52": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "53": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "54": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "55": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "56": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "58": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "59": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "60": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "61": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "62": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "63": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "64": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "65": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "66": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "67": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "72": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "76": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "77": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "78": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "79": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "80": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "81": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "82": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "83": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "87": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "88": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "89": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "90": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "91": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "92": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "93": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "94": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "95": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "96": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "97": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "98": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "99": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "100": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "102": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "103": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "104": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "105": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "106": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "107": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "108": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "109": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "110": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "111": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "112": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "114": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "115": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "118": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "119": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "120": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "121": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "123": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "124": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "125": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "129": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "135": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "144": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "153": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "163": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "164": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "165": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "166": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "167": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "169": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "170": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "171": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "172": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "181": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "182": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "183": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "184": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "187": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "193": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "194": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "195": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "197": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "198": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "200": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "201": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "202": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "209": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "210": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "211": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "229": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "230": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "231": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "232": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "233": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "234": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "235": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "236": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "237": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "238": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "239": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "240": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "241": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "242": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "243": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "244": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "245": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "246": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "247": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "248": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "251": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "302": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "303": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "304": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     },
     "305": {
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0.0      
+        "minimum": 0.0
       }
     }
   },
@@ -3336,7 +3348,7 @@
       }
     },
     "feed_type": {
-      "type":"array",
+      "type": "array",
       "description": "The general type or category of the feed.",
       "properties": {
         "type": "string",
@@ -3358,7 +3370,7 @@
       "properties": {
         "type": "number",
         "minimum": 0,
-        "maximum": 288 
+        "maximum": 288
       }
     },
     "NDICP": {
@@ -3460,7 +3472,6 @@
         "maximum": 184,
         "default": 0
       }
-
     },
     "N_A": {
       "type": "array",
@@ -3611,7 +3622,7 @@
       "description": "",
       "properties": {
         "type": "string"
-      } 
+      }
     },
     "starch": {
       "type": "array",
@@ -3665,7 +3676,7 @@
     "feed_type": {
       "type": "array",
       "description": "The general type or category of the feed.",
-      "properties":{
+      "properties": {
         "type": "string",
         "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
       }
@@ -3695,7 +3706,7 @@
       "properties": {
         "type": "number",
         "minimum": 0,
-        "maximum": 288 
+        "maximum": 288
       }
     },
     "N_A": {
@@ -4317,7 +4328,7 @@
       "description": "",
       "properties": {
         "type": "string"
-      } 
+      }
     },
     "limit": {
       "type": "array",
@@ -4905,7 +4916,7 @@
     },
     "precip": {
       "description": "Amount of precipitation (mm H2O).",
-      "type":"array",
+      "type": "array",
       "properties": {
         "type": "number",
         "minimum": 0,
@@ -4977,7 +4988,7 @@
         "default": "medium"
       }
     },
-    "Operation": { 
+    "Operation": {
       "type": "array",
       "properties": {
         "type": "string"
