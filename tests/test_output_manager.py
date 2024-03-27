@@ -27,8 +27,18 @@ def mock_output_manager(mocker) -> OutputManager:
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     """Unit test for the function set_metadata_prefix in the file output_manager.py"""
+
+    # Assert before setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == ""
+
+    # Act
     mock_output_manager.set_metadata_prefix("dummy_prefix")
-    assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
+
+    # Assert after setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == "dummy_prefix"
+
+    # Cleanup
+    mock_output_manager.set_metadata_prefix("")
 
 
 @pytest.mark.parametrize(
