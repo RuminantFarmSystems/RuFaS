@@ -141,7 +141,7 @@ class OutputManager(object):
         # reduced_info_map is identical to info_map without the class key and
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
-        reduced_info_map = {k: info_map[k] for k in info_map.keys() - {"class", "function"}}
+        reduced_info_map: Dict[str, Any] = {}
         pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
