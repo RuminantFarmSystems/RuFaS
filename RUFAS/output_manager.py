@@ -104,6 +104,8 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self._exclude_info_maps_flag = False
+
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -141,8 +143,9 @@ class OutputManager(object):
         # reduced_info_map is identical to info_map without the class key and
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
-        reduced_info_map: Dict[str, Any] = {}
-        pool[key]["info_maps"].append(reduced_info_map)
+        if not self._exclude_info_maps_flag:
+            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+            pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
             pool[key]["values"].append(value)
@@ -1261,3 +1264,15 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+
+    def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
+        """
+        Sets the exclude_info_maps flag to the given value.
+
+        Parameters
+        ----------
+        exclude_info_maps : bool
+            The value to set the exclude_info_maps flag to.
+        """
+
+        self._exclude_info_maps_flag = exclude_info_maps
