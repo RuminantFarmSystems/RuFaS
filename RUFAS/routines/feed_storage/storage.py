@@ -171,7 +171,7 @@ class Storage:
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
+            self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, 0.0)
         om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
@@ -189,10 +189,10 @@ class Storage:
         """
         pass
 
-    def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
+    def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float) -> None:
         """
-        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after a loss of dry
-        matter.
+        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after loss of both dry
+        matter and moisture.
 
         Parameters
         ----------
@@ -200,10 +200,17 @@ class Storage:
             The stored crop that has lost dry matter.
         dry_matter_loss : float
             Amount of dry matter the crop lost on the current day in kg.
+        moisture_loss : float
+            Amount of moisture (water) the crop lost on the current day in kg.
+
+        Notes
+        -----
+        The amount of dry matter mass remaining is calculating first, then the remaining amount of fresh mass. After
+        these two attributes have been set, the dry matter percentage is recalculated and set.
 
         """
         new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
-        crop.fresh_mass -= dry_matter_loss
+        crop.fresh_mass -= (dry_matter_loss + moisture_loss)
         if crop.fresh_mass == 0.0:
             crop.dry_matter_percentage = 0.0
             return
