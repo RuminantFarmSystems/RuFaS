@@ -20,9 +20,9 @@ Constant that regulates how many days effluent loss occurs for and how much effl
 EFFLUENT_LOSS_CONSTRAINER = 10
 
 
-class Sileage(Storage):
+class Silage(Storage):
     """
-    Class representing the Sileage storage type, inheriting from Storage.
+    Class representing the Silage storage type, inheriting from Storage.
 
     Methods
     -------
@@ -248,9 +248,9 @@ class Sileage(Storage):
         )
 
 
-class Bunker(Sileage):
+class Bunker(Silage):
     """
-    Class representing the Bunker type of Sileage storage.
+    Class representing the Bunker type of Silage storage.
     """
 
     def __init__(self, bunker_size: Optional[str] = None):
@@ -266,9 +266,9 @@ class Bunker(Sileage):
         self.bunker_size = bunker_size
 
 
-class Pile(Sileage):
+class Pile(Silage):
     """
-    Class representing the Pile type of Sileage storage.
+    Class representing the Pile type of Silage storage.
     """
 
     def __init__(self, pile_size: Optional[str] = None):
@@ -284,9 +284,9 @@ class Pile(Sileage):
         self.pile_size = pile_size
 
 
-class Bag(Sileage):
+class Bag(Silage):
     """
-    Class representing the Bag type of Sileage storage.
+    Class representing the Bag type of Silage storage.
     """
 
     def __init__(self, bag_size: Optional[int] = None):
