@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
@@ -43,6 +43,41 @@ jobs:
           python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
           grep -c "error:" mypy_current_branch_report.txt > mypy_current_branch_error_count.txt
 
+      - name: Set current branch error count as output
+        id: set_current_branch_error_count
+        run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
+
+      - name: Run mypy on the main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git checkout main
+          python -m mypy . 2>&1 | tee mypy_main_branch_report.txt || true
+          grep -c "error:" mypy_main_branch_report.txt > mypy_main_branch_error_count.txt
+
+      - name: Set main branch error count as output
+        id: set_main_branch_error_count
+        if: github.ref != 'refs/heads/main'
+        run: echo "error_count=$(cat mypy_main_branch_error_count.txt)" >> $GITHUB_OUTPUT
+
+      - name: Compare mypy reports
+        if: github.ref != 'refs/heads/main'
+        run: |
+          CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
+          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
+          echo "Current branch mypy errors: $CURRENT_ERRORS"
+          echo "Main branch mypy errors: $MAIN_ERRORS"
+          if [ $CURRENT_ERRORS -gt $MAIN_ERRORS ]; then
+            echo "Mypy error count has increased from the main branch to the current branch ($MAIN_ERRORS -> $CURRENT_ERRORS)."
+            exit 1
+          else
+            echo "No increase in mypy errors found."
+          fi
+        continue-on-error: true
+
+      - name: Checkout current branch
+        if: github.ref != 'refs/heads/main'
+        run: git checkout ${{ github.head_ref }}
+
       - name: Update Coverage and Mypy Badges
         run: |
           chmod +x ./.github/workflows/update_badge.sh
@@ -64,12 +99,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           MY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
+          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
             echo "$PYTEST_COVERAGE"
-            MYPY_ERRORS="Mypy found $MY_ERROR_COUNT errors."
+            MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
+            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
+            DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
+            if [ $DIFF -gt 0 ]; then
+              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF more errors on ${{ github.head_ref }} branch"
+            elif [ $DIFF -lt 0 ]; then
+              DIFF=$((DIFF * -1))
+              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF fewer errors on ${{ github.head_ref }} branch"
+            else
+              MYPY_ERRORS="$MYPY_ERRORS\nDifference: No difference in error counts"
+            fi
             echo "$MYPY_ERRORS"
-            COMMIT_MESSAGE="$PYTEST_COVERAGE\n$MYPY_ERRORS"
+            COMMIT_MESSAGE="$PYTEST_COVERAGE\n\n$MYPY_ERRORS"
             echo "$COMMIT_MESSAGE"
             curl \
               -X POST \
