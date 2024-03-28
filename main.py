@@ -69,6 +69,7 @@ def main():
             "Unexpected early termination of the simulation. Please see logs for details.\n",
             info_map,
         )
+        raise e
 
 
 def run_rufas(
@@ -350,7 +351,21 @@ def initialize_herd(
         save_animals=save_animals,
         save_animals_path=save_animals_dir,
     )
-    herd_factory.initialize_herd()
+    while True:
+        try:
+            herd_factory.initialize_herd()
+            break
+        except Exception as e:
+            output_manager.add_warning(
+                "Herd initialization error",
+                f"Error during herd initialization: {e}",
+                info_map,
+            )
+            output_manager.add_error(
+                "Retry herd initialization",
+                "Retrying herd initialization...",
+                info_map,
+            )
     output_manager.add_log("Herd initialization complete", "Herd data initialized.\n", info_map)
 
     if terminate_simulation_post_herd_generation:

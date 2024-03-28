@@ -48,10 +48,11 @@ class MetadataPaths(TypedDict):
 
 
 METADATA_PATHS: List[MetadataPaths] = [
-    {"prefix": "default", "path": Path("input/metadata/default_metadata.json")},
-    {"prefix": "ARL", "path": Path("input/metadata/ARL_metadata.json")},
-    {"prefix": "barnyard", "path": Path("input/metadata/barnyard_metadata.json")},
-    {"prefix": "multi_crop", "path": Path("input/metadata/multi_crop_metadata.json")},
-    {"prefix": "swat", "path": Path("input/metadata/swat_metadata.json")},
-    {"prefix": "testing", "path": Path("input/metadata/testing_metadata.json")},
+    # {"prefix": "default", "path": Path("input/metadata/default_metadata.json")},
+    # {"prefix": "ARL", "path": Path("input/metadata/ARL_metadata.json")},
+    # {"prefix": "barnyard", "path": Path("input/metadata/barnyard_metadata.json")},
+    # {"prefix": "multi_crop", "path": Path("input/metadata/multi_crop_metadata.json")},
+    # {"prefix": "swat", "path": Path("input/metadata/swat_metadata.json")},
+    # {"prefix": "testing", "path": Path("input/metadata/testing_metadata.json")},
+    {"prefix": "c2f9", "path": Path("input/metadata/c2f9_metadata.json")},
 ]
