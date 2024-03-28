@@ -116,9 +116,6 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["heifer_repro_method"])
-                args.update(tai_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
-                args.update(synch_ed_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
-
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
             else:
@@ -152,10 +149,6 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["cow_repro_method"])
-                args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
-                args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
-                args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
-
                 cow = Cow(args)
 
                 self.pre_animal_population.cows.append(cow)
@@ -342,6 +335,11 @@ class HerdFactory:
         animal_num = im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
+
+        if len(pre_animals) == 0 and animal_num > 0:
+            print(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
+            raise ValueError(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
+
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
         for choice in random_choices:
             animal = copy.deepcopy(pre_animals[choice])
@@ -360,18 +358,21 @@ class HerdFactory:
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
-            if self.save_animals:
-                timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
-                save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
-                om.dict_to_file_json(
-                    self.pre_animal_population.__repr__(),
-                    save_path,
-                    minify_output_file=True,
-                )
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
+
+        # Only save to file on successful sampling
+        if self.init_herd and self.save_animals:
+            timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
+            save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
+            om.dict_to_file_json(
+                self.pre_animal_population.__repr__(),
+                save_path,
+                minify_output_file=True,
+            )
+
         im.add_dict_variable_to_pool(
             variable_name="runtime_animal_population",
             data=self.post_animal_population.__repr__(),
