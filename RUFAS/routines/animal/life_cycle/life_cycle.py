@@ -524,15 +524,6 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
-        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
-            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-            heiferI_vals.update(synch_ed_method_h="")
-        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-        else:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h="")
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 

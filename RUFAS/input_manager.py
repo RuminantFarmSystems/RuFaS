@@ -1077,7 +1077,7 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        if type(input_data_value) is not float and type(input_data_value) is not int:
+        if not isinstance(input_data_value, float) and not isinstance(input_data_value, int):
             warning_string = "Validation: value is not a number"
             warning_message = (
                 f"Variable: '{var_name}' has value: {input_data_value}, is type: "
