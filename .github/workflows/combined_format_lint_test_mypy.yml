@@ -63,7 +63,9 @@ jobs:
           git add -A
           git commit -m "Apply Black Formatting" --allow-empty
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
-          git push -f https://${GITHUB_TOKEN}@github.com/${{ github.repository }}/HEAD:$CLEAN_BRANCH_NAME
+          git fetch origin $CLEAN_BRANCH_NAME:$CLEAN_BRANCH_NAME
+          git checkout $CLEAN_BRANCH_NAME
+          git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:$CLEAN_BRANCH_NAME
   
   lint_test_type_check_unauthorized_changes:
     needs: format_code
