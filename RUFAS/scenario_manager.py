@@ -48,5 +48,5 @@ class MetadataPaths(TypedDict):
 
 
 METADATA_PATHS: List[MetadataPaths] = [
-    {"prefix": "default", "path": Path("input/metadata/default_metadata.json")},
+    {"prefix": "test", "path": Path("input/metadata/default_metadata.json")},
 ]
