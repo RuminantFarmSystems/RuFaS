@@ -51,9 +51,6 @@ class Cow(HeiferIII):
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
-            args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             args.repro_program: reproduction program used in cow,
@@ -126,13 +123,6 @@ class Cow(HeiferIII):
         self.first_ai = False
         self.fat_percent = 0
 
-        # TAI params
-        self.presynch_method = args["presynch_method"]
-        self.tai_method_c = args["tai_method_c"]
-        self.presynch_program_start_day = 0
-        self.tai_program_start_day_c = 0
-        self.resynch_method = args["resynch_method"]
-
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
 
@@ -155,6 +145,10 @@ class Cow(HeiferIII):
         if "days_in_milk" in args:
             self.days_in_milk = args["days_in_milk"]
             self.milking = self.days_in_milk != 0
+
+            if args["parity"] < 0:
+                raise ValueError("Parity must be a non-negative integer.")
+
             self.calves = args["parity"]
             self.CI = args["calving_interval"]
             self.set_parity_index()
@@ -171,15 +165,9 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
-            "tai_program_start_day_h": self.tai_program_start_day_h,
-            "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.conception_rate,
             "ai_day": self.ai_day,
             "abortion_day": self.abortion_day,
@@ -187,9 +175,6 @@ class Cow(HeiferIII):
             "gestation_length": self.gestation_length,
             "p_gest_for_calf": self.p_gest_for_calf,
             "calf_birth_weight": self.calf_birth_weight,
-            "presynch_method": self.presynch_method,
-            "tai_method_c": self.tai_method_c,
-            "resynch_method": self.resynch_method,
             "days_in_milk": self.days_in_milk,
             "parity": self.calves,
             "calving_interval": self.CI,
@@ -206,15 +191,9 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
-            "tai_program_start_day_h": self.tai_program_start_day_h,
-            "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.conception_rate,
             "ai_day": self.ai_day,
             "abortion_day": self.abortion_day,
@@ -222,9 +201,6 @@ class Cow(HeiferIII):
             "gestation_length": self.gestation_length,
             "p_gest_for_calf": self.p_gest_for_calf,
             "calf_birth_weight": self.calf_birth_weight,
-            "presynch_method": self.presynch_method,
-            "tai_method_c": self.tai_method_c,
-            "resynch_method": self.resynch_method,
         }
 
     @property

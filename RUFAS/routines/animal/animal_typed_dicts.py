@@ -89,14 +89,8 @@ class HeiferIIValuesTypedDict(TypedDict):
     events: str
 
     repro_program: str
-    tai_method_h: str
-    synch_ed_method_h: str
     estrus_count: int
     estrus_day: int
-    tai_program_start_day_h: int
-    synch_ed_program_start_day_h: int
-    synch_ed_estrus_day: int
-    synch_ed_stop_day: int
     conception_rate: float
     ai_day: int
     abortion_day: int
