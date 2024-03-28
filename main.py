@@ -69,7 +69,6 @@ def main():
             "Unexpected early termination of the simulation. Please see logs for details.\n",
             info_map,
         )
-        raise e
 
 
 def run_rufas(
@@ -351,8 +350,11 @@ def initialize_herd(
         save_animals=save_animals,
         save_animals_path=save_animals_dir,
     )
-    while True:
+    max_attempts = 5
+    attempts = 0
+    while attempts < max_attempts:
         try:
+            attempts += 1
             herd_factory.initialize_herd()
             break
         except Exception as e:
