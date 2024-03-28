@@ -998,7 +998,7 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1100,7 +1100,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1202,7 +1202,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1319,7 +1319,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "estrus_count": {
           "type": "number",
