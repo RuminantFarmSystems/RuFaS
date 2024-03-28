@@ -485,7 +485,7 @@ class OutputManager(object):
                     detailed_origin_for_value.append((origin_key, value))
                 detailed_data_origins.append(detailed_origin_for_value)
 
-            sub_data_dict["detailed_data_origins"] = detailed_data_origins
+            sub_data_dict["detailed_values"] = detailed_data_origins
 
         return data_dict
 
