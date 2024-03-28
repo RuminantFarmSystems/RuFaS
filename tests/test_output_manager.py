@@ -1950,7 +1950,7 @@ def test_print_errors_warnings_logs(
                         {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
                     ],
                     "values": [10, 20],
-                    "detailed_data_origins": [
+                    "detailed_values": [
                         [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
                         [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
                     ],
@@ -1981,7 +1981,7 @@ def test_print_errors_warnings_logs(
                         {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
                     ],
                     "values": [30, 40],
-                    "detailed_data_origins": [
+                    "detailed_values": [
                         [
                             ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
                             ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
