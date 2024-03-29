@@ -88,8 +88,7 @@ class AnimalBase:
             
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs") #int or None
         parity_percentages = im.get_data("animal.herd_information.parity_percentages") #list of 3 floats
-        num_milking_cows = im.get_data("animal.herd_information.cow_num")*(305/365)
-        print("num_milking_cows: " + str(num_milking_cows))
+        num_milking_cows =im.get_data("animal.herd_information.cow_num")*(305/365)
 
         milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
         if milking_freq >= 2.5 : 
@@ -100,8 +99,8 @@ class AnimalBase:
         #calculate lactation group yield
 
         # Assuming Y = 1632 and Z = 2196 based on the given assumptions
-        Y = 1632
-        Z = 2196
+        P2_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P2_adjustment")
+        P3_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P3_adjustment")
 
         if annual_MY_lbs != None:
             total_avg_305 = annual_MY_lbs * 305 / (365 * num_milking_cows * 2.205) 
@@ -113,11 +112,11 @@ class AnimalBase:
             
 
             # Solving for P1-305 using the provided equation
-            P1_305 = total_avg_305 - percent_P2 * Y / 100 - percent_P3 * Z / 100 
+            P1_305 = total_avg_305 - percent_P2 * P2_MY305_adj / 100 - percent_P3 * P3_MY305_adj / 100 
 
             # Calculating 305-day milk yield for each lactation group
-            P2_305 = P1_305 + Y 
-            P3_305 = P1_305 + Z
+            P2_305 = P1_305 + P2_MY305_adj 
+            P3_305 = P1_305 + P3_MY305_adj
 
         else:
             P1_305 = None
