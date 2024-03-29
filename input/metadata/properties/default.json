@@ -1003,12 +1003,12 @@
         "tai_method_h": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
+          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
         },
         "synch_ed_method_h": {
           "type": "string",
           "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(2P|CP|5dCG2P)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1135,12 +1135,12 @@
         "tai_method_h": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
+          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
         },
         "synch_ed_method_h": {
           "type": "string",
           "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(2P|CP|5dCG2P)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1262,17 +1262,17 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "tai_method_h": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
+          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
         },
         "synch_ed_method_h": {
           "type": "string",
           "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(2P|CP|5dCG2P)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1424,17 +1424,17 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "tai_method_h": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
+          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
         },
         "synch_ed_method_h": {
           "type": "string",
           "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(2P|CP|5dCG2P)$"
         },
         "estrus_count": {
           "type": "number",

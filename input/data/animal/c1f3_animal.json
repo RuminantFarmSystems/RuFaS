@@ -139,10 +139,10 @@
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 500,
+			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0
 		},
 		{
@@ -151,10 +151,10 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 900,
+			"number_of_stalls": 1200,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0
 		},
 		{
@@ -166,7 +166,7 @@
 			"number_of_stalls": 400,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 1
 		},
 		{
@@ -178,7 +178,7 @@
 			"number_of_stalls": 1210,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 5,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 1
 
 		},

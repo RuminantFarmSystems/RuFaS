@@ -6,13 +6,13 @@
       "manure_handler": "harrowing",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "other"
+      "manure_treatment": "open lots"
     },
     {
       "scenario_id": 1,
       "bedding_type": "none",
       "manure_handler": "flush system",
-      "manure_separator": "other",
+      "manure_separator": "none",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     }
