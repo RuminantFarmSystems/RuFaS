@@ -44,13 +44,13 @@ jobs:
                           tr " " "\n" |
                           grep -E "\.txt$|\.json$|\.csv$"  |
                           tr "\n" " ")" >> "$GITHUB_ENV"
-          echo "files_output=${{ env.FILES }}" >> $GITHUB_OUTPUT
-          echo "other_files_output=${{ env.OTHER_FILES }}" >> $GITHUB_OUTPUT
+          echo "FILES=${{ env.FILES }}" >> "$GITHUB_OUTPUT"
+          echo "OTHER_FILES=${{ env.OTHER_FILES }}" >> "$GITHUB_OUTPUT"
 
       - name: Format code with Black
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         run: |
-          black --line-length=120 ${{ env.FILES }}
+          black ${{ env.FILES }}
       - name: Commit and push formatting changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         env:
@@ -88,8 +88,8 @@ jobs:
       
       - name: Use FILES and OTHER_FILES from format_code job
         run: |
-          FILES="${{ needs.format_code.outputs.files_output }}"
-          OTHER_FILES="${{ needs.format_code.outputs.other_files_output }}"
+          FILES: ${{ needs.format_code.outputs.FILES }}
+          OTHER_FILES: "${{ needs.format_code.outputs.OTHER_FILES }}"
           echo "Using FILES: $FILES"
           echo "Using OTHER_FILES: $OTHER_FILES"
 
