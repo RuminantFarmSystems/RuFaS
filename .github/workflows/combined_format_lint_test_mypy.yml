@@ -10,6 +10,9 @@ on:
 jobs:
   format_code:
     runs-on: ubuntu-latest
+    outputs:
+      files_output: ${{ steps.set_outputs.outputs.files_output }}
+      other_files_output: ${{ steps.set_outputs.outputs.other_files_output }}
 
     steps:
       - name: Checkout repository
@@ -39,16 +42,16 @@ jobs:
           echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                           tr " " "\n" |
                           grep -E "\.py$" |
-                          tr "\n" " ")" >> "$GITHUB_ENV"
+                          tr "\n" " ")" >> $GITHUB_ENV
           echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                           tr " " "\n" |
                           grep -E "\.txt$|\.json$|\.csv$"  |
-                          tr "\n" " ")" >> "$GITHUB_ENV"
+                          tr "\n" " ")" >> $GITHUB_ENV
       
       - name: Set outputs
         run: |                        
-          echo "files_output=${{ env.FILES }}" >> "$GITHUB_OUTPUT"
-          echo "other_files_output=${{ env.OTHER_FILES }}" >> "$GITHUB_OUTPUT"
+          echo "files_output=${{ env.FILES }}" >> $GITHUB_OUTPUT
+          echo "other_files_output=${{ env.OTHER_FILES }}" >> $GITHUB_OUTPUT
 
       - name: Format code with Black
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
@@ -92,12 +95,10 @@ jobs:
       - name: Debug Output FILES
         run: echo "${{ needs.format_code.outputs.files_output }}"    
 
-      - name: Use FILES and OTHER_FILES from format_code job
+      - name: Set Environment Variables from Outputs
         run: |
-          FILES="${{ needs.format_code.outputs.files_output }}"
-          OTHER_FILES="${{ needs.format_code.outputs.other_files_output }}"
-          echo "FILES=$FILES" >> $GITHUB_ENV
-          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
+          echo "FILES=${{ needs.format_code.outputs.files_output }}" >> $GITHUB_ENV
+          echo "OTHER_FILES=${{ needs.format_code.outputs.other_files_output }}" >> $GITHUB_ENV
 
       - name: Lint with flake8
         if: env.FILES != ''
