@@ -33,7 +33,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
       - id: files
-        name: Set up dependency for gettting changed files
+        name: Set up dependency for getting changed files
         uses: jitterbit/get-changed-files@v1
       
       - name: Get all added or modified files
@@ -42,16 +42,18 @@ jobs:
           echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                           tr " " "\n" |
                           grep -E "\.py$" |
-                          tr "\n" " ")" >> $GITHUB_ENV
+                          tr "\n" " ")" >> "$GITHUB_ENV"
           echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                           tr " " "\n" |
                           grep -E "\.txt$|\.json$|\.csv$"  |
-                          tr "\n" " ")" >> $GITHUB_ENV
+                          tr "\n" " ")" >> "$GITHUB_ENV"
+        outputs:
+          files_output: 
       
       - name: Set outputs
         run: |                        
-          echo "files_output=${{ env.FILES }}" >> $GITHUB_OUTPUT
-          echo "other_files_output=${{ env.OTHER_FILES }}" >> $GITHUB_OUTPUT
+          echo "files_output=${{ env.FILES }}" >> "$GITHUB_OUTPUT"
+          echo "other_files_output=${{ env.OTHER_FILES }}" >> "$GITHUB_OUTPUT"
 
       - name: Format code with Black
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
@@ -96,10 +98,14 @@ jobs:
         run: echo "${{ needs.format_code.outputs.files_output }}"    
 
       - name: Set Environment Variables from Outputs
+        env:
+          FILES: ${{ needs.format_code.outputs.files_output }}
+          OTHER_FILES: ${{ needs.format_code.outputs.other_files_output }}
         run: |
+          echo "$FILES $OTHER_FILES"
           echo "FILES=${{ needs.format_code.outputs.files_output }}" >> $GITHUB_ENV
           echo "OTHER_FILES=${{ needs.format_code.outputs.other_files_output }}" >> $GITHUB_ENV
-
+          
       - name: Lint with flake8
         if: env.FILES != ''
         run: |
