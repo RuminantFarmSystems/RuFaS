@@ -66,7 +66,7 @@ class Storage:
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
-    set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
+    reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
         Sets mass related attributes after loss of dry matter.
     record_stored_crops(self, gaseous_dry_matter_loss: float)
         Records information about total mass and nutrient content of the stored crops.
@@ -166,7 +166,7 @@ class Storage:
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
+            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
         self.record_stored_crops(total_gaseous_dry_matter_loss)
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
@@ -183,7 +183,7 @@ class Storage:
         """
         pass
 
-    def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
+    def reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
         """
         Resets the mass attributes of a crop after dry matter loss.
 
