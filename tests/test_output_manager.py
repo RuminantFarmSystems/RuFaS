@@ -513,6 +513,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
     info_map = {"timestamp": "dummy_timestamp"}
     om = OutputManager()
     om.set_metadata_prefix("dummy_prefix")
+    om.set_log_verbose(log_level)
     om._handle_log_output(name, msg, info_map, log_level)
     log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
     expected_message = log_format.format(
@@ -578,6 +579,7 @@ def output_manager_original_method_states(
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
+        "print_credits": mock_output_manager.print_credits,
     }
 
 
@@ -937,12 +939,13 @@ def test_exclude_info_maps(
 
 
 @pytest.mark.parametrize(
-    "mock_file_text",
+    "mock_file_text,filter_by_exclusion",
     [
-        "apples\nbananas\ncherries",
-        "apples\nbananas\ncherries\n\n\n",
-        "apples\nbananas\n\n\n\ncherries",
-        "apples\nbananas\n\n\ncherries\n\n\n",
+        ("apples\nbananas\ncherries", False),
+        ("apples\nbananas\ncherries\n\n\n", False),
+        ("apples\nbananas\n\n\n\ncherries", False),
+        ("apples\nbananas\n\n\ncherries\n\n\n", False),
+        ("exclude\napples\nbananas\ncherries", True),
     ],
 )
 @patch("builtins.open", new_callable=mock_open)
@@ -951,11 +954,12 @@ def test_load_filter_file_content_txt(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     mock_file_text: str,
+    filter_by_exclusion: bool,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
-    assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": False}]
+    assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
@@ -1846,31 +1850,83 @@ def test_log_verbosity_enum_values() -> None:
 
 
 @pytest.mark.parametrize(
-    "errors_pool, warnings_pool, expected",
+    "errors_pool, warnings_pool, logs_pool, expected",
     [
-        ({}, {}, (0, 0)),
-        ({"key1": {"values": [1, 2, 3]}}, {}, (3, 0)),
-        ({}, {"key1": {"values": [1, 2]}}, (0, 2)),
-        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, (3, 4)),
+        ({}, {}, {}, (0, 0, 0)),
+        ({"key1": {"values": [1, 2, 3]}}, {}, {}, (3, 0, 0)),
+        ({}, {"key1": {"values": [1, 2]}}, {}, (0, 2, 0)),
+        ({}, {}, {"key1": {"values": [1, 2, 3, 4]}}, (0, 0, 4)),
+        ({"key1": {"values": [1]}, "key2": {"values": [2, 3]}}, {"key1": {"values": [1, 2, 3, 4]}}, {}, (3, 4, 0)),
+        (
+            {"key1": {"values": [1]}, "key2": {"values": [2, 3]}},
+            {"key1": {"values": [1, 2, 3, 4]}},
+            {"key1": {"values": [1, 2, 3]}},
+            (3, 4, 3),
+        ),
     ],
 )
 def test_get_error_and_warning_counts(
     mocker: MockerFixture,
     errors_pool: dict[str, dict[str, list]],
     warnings_pool: dict[str, dict[str, list]],
+    logs_pool: dict[str, dict[str, list]],
     expected: tuple[int, int],
 ) -> None:
     """
-    Unit test for the get_error_and_warning_counts() method in OutputManager class
+    Unit test for the _get_errors_warnings_logs_counts() method in OutputManager class.
     """
 
     # Arrange
     om = OutputManager()
     mocker.patch.object(om, "errors_pool", errors_pool)
     mocker.patch.object(om, "warnings_pool", warnings_pool)
+    mocker.patch.object(om, "logs_pool", logs_pool)
 
     # Act and Assert
-    assert om.get_error_and_warning_counts() == expected
+    assert om._get_errors_warnings_logs_counts() == expected
+
+
+@pytest.mark.parametrize(
+    "log_verbose, expected_output",
+    [
+        (LogVerbosity.NONE, ""),
+        (LogVerbosity.CREDITS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n"),
+    ],
+)
+def test_print_credits(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+) -> None:
+    """
+    Unit test for the print_credits() method in OutputManager class.
+    """
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_credits()
+
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+
+@pytest.mark.parametrize(
+    "log_verbose, expected_output",
+    [
+        (LogVerbosity.NONE, ""),
+        (LogVerbosity.CREDITS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.ERRORS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.WARNINGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.LOGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+    ],
+)
+def test_print_errors_warnings_logs(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+):
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
+        mock_output_manager.print_errors_warnings_logs_counts()
+        captured = capfd.readouterr()
+        assert captured.out == expected_output
 
 
 @pytest.mark.parametrize(

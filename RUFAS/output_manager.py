@@ -24,36 +24,42 @@ class LogVerbosity(Enum):
     ----------
     NONE : str
         Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    CREDITS : str
+        Selecting CREDITS will tell OutputManager to print out the credits.
     ERRORS : str
-        Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+        Selecting ERRORS will tell OutputManager to print out all credits and errors added during a simulation.
     WARNINGS : str
-        Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+        Selecting WARNINGS will tell OutputManager to print out the credits as well as warnings and errors added during
+        a simulation.
     LOGS : str
-        Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+        Selecting LOGS will tell OutputManager to print out the credits as well as logs, warnings, and errors added
+        during a simulation.
 
     Notes
     -----
-    NONE is the default setting.
+    CREDITS is the default setting.
 
     """
 
     NONE = "none"
+    CREDITS = "credits"
     ERRORS = "errors"
     WARNINGS = "warnings"
     LOGS = "logs"
 
     def __le__(self, other) -> bool:
-        if self == other:
-            return True
-        if self == LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
-            return True
-        if self == LogVerbosity.LOGS:
+        order = {
+            LogVerbosity.NONE: 0,
+            LogVerbosity.CREDITS: 1,
+            LogVerbosity.ERRORS: 2,
+            LogVerbosity.WARNINGS: 3,
+            LogVerbosity.LOGS: 4,
+        }
+
+        if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
             return False
-        return False
+
+        return order[self] <= order[other]
 
     def __str__(self) -> str:
         if self.value == "none":
@@ -105,7 +111,7 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
-            self.__log_verbose: LogVerbosity = LogVerbosity("none")
+            self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -294,7 +300,7 @@ class OutputManager(object):
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.CREDITS) -> None:
         """Sets the __log_verbose attribute"""
         self.__log_verbose = log_verbose
 
@@ -315,10 +321,14 @@ class OutputManager(object):
             raise KeyError("'function' was not found in info_map")
 
         prefix = ""
-        if info_map.get("prefix") is not None:
-            prefix = info_map.get("prefix") + "."
+        prefix_value = info_map.get("prefix")
+        if isinstance(prefix_value, str):
+            prefix = prefix_value + "."
         elif not info_map.get("suppress_prefix", False):
-            prefix = self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            class_value = info_map.get("class")
+            function_value = info_map.get("function")
+            if isinstance(class_value, str) and isinstance(function_value, str):
+                prefix = self._get_prefix(class_value, function_value) + "."
 
         suffix = f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
 
@@ -928,11 +938,26 @@ class OutputManager(object):
         """
         for log in log_pool:
             if "error" in log:
-                self.add_error(log["error"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["error"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_error(log["error"], log["message"], log["info_map"])
             elif "log" in log:
-                self.add_log(log["log"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["log"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
-                self.add_warning(log["warning"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["warning"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
@@ -1207,16 +1232,32 @@ class OutputManager(object):
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
 
-    def get_error_and_warning_counts(self) -> tuple[int, int]:
+    def _get_errors_warnings_logs_counts(self) -> tuple[int, int, int]:
         """
-        Get the total number of errors and warnings in the output manager's error and warning pools.
+        Get the total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
 
         Returns
         -------
-        tuple[int, int]
-            The total number of errors and warnings in the output manager's error and warning pools.
+        tuple[int, int, int]
+            The total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
-        return errors_count, warnings_count
+        logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
+        return errors_count, warnings_count, logs_count
+
+    def print_credits(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def print_errors_warnings_logs_counts(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
+            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
