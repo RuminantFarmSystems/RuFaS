@@ -535,45 +535,6 @@
         "milking": {
           "type": "object",
           "description": "",
-          "wood_l": {
-            "type": "array",
-            "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
-            "properties": {
-              "type": "array",
-              "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level,",
-              "properties": {
-                "type": "number",
-                "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
-                "minimum": 0
-              }
-            }
-          },
-          "wood_m": {
-            "type": "array",
-            "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
-            "properties": {
-              "type": "array",
-              "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
-              "properties": {
-                "type": "number",
-                "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
-                "minimum": 0
-              }
-            }
-          },
-          "wood_n": {
-            "type": "array",
-            "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
-            "properties": {
-              "type": "array",
-              "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
-              "properties": {
-                "type": "number",
-                "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
-                "minimum": 0
-              }
-            }
-          },
           "wood_l_std": {
             "type": "array",
             "description": "Standard deviation of parameter l ",
