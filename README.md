@@ -20,7 +20,7 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 N/A
 
 # Changelog
-Find the changelog Goolge Sheet [here](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
+Find the changelog Google Sheet [here](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
 
 # Priority Definitions for Project Tasks
 
