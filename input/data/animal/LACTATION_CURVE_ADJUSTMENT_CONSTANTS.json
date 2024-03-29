@@ -100,5 +100,9 @@
 		"Appalachian",
 		"Wisconsin",
 		"Mountain"		
-	] 
+	],
+	"parity_milk_adjustments": {
+		"MY305_P2_adjustment": 1632,
+		"MY305_P3_adjustment": 2196
+	} 
 }
