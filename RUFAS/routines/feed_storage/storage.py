@@ -3,7 +3,9 @@ from typing import List
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 
 """Temperature below which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
 ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 5.0
@@ -31,6 +33,8 @@ NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 15.0
 """
 Dry matter percentage of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
 NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
+
+om = OutputManager()
 
 
 class Storage:
@@ -237,14 +241,10 @@ class Storage:
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
         lower_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
         )
         upper_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
         )
         lower_dry_matter_limit = (
             ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
@@ -295,7 +295,7 @@ class Storage:
         initial_dry_matter: float,
     ) -> float:
         """
-        Recalculates the relative nutrient percentage after dry matter has been lost from a stored crop.
+        Calculates the updated relative nutrient percentage after dry matter has been lost from a stored crop.
 
         Parameters
         ----------
@@ -311,17 +311,39 @@ class Storage:
         Returns
         -------
         float
-            The nutrient concentration after loss.
+            The nutrient percentage after dry matter loss.
 
         Notes
         -----
-        The loss coefficient is upper-bounded to prevent a negative nutrient percentage from being calculated.
+        When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
+        composed of. In this case, the concentration of the nutrient within the dry matter changes which is why it must
+        be recalculated. If a negative nutrient percentage would be calculated after losing dry matter, the percentage
+        is calculated to be 0 and a warning is logged to the OuputManager. If a negative nutrient percentage would have
+        been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
+        is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
+        division by zero error.
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
-        bounded_loss_coefficient = min(initial_nutrient_percentage, loss_coefficient)
-        return (
-            (initial_nutrient_percentage - bounded_loss_coefficient)
-            * dry_matter_loss_fraction
-            / (1 - dry_matter_loss_fraction)
+        initial_nutrient_fraction = initial_nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+
+        if dry_matter_loss_fraction == 1.0:
+            return 0.0
+
+        fraction_of_nutrient_in_lost_dry_matter = loss_coefficient * dry_matter_loss_fraction
+        if initial_nutrient_fraction < fraction_of_nutrient_in_lost_dry_matter:
+            info_map = {"class": self.__class__.__name__, "function": self.recalculate_nutrient_percentage.__name__}
+            warning_title = (
+                f"Nutrient fraction {initial_nutrient_fraction} is less than nutrient fraction in dry matter loss "
+                + f"{fraction_of_nutrient_in_lost_dry_matter}"
+            )
+            warning_message = "Calculating updated percentage of nutrient in stored crop dry matter to be 0"
+            om.add_warning(warning_title, warning_message, info_map)
+            return 0.0
+
+        updated_nutrient_fraction = (initial_nutrient_fraction - fraction_of_nutrient_in_lost_dry_matter) / (
+            1 - dry_matter_loss_fraction
         )
+        updated_nutrient_percentage = updated_nutrient_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+        return updated_nutrient_percentage

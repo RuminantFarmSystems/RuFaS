@@ -6,7 +6,10 @@ from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from .sample_crop_data import sample_crop_data
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -191,26 +194,34 @@ def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: f
 
 
 @pytest.mark.parametrize(
-    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected",
+    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected,warned",
     [
-        (8.0, 0.4, 20.0, 100.0, 1.9),
-        (4.0, 0.17, 21.0, 150.0, 0.623488),
-        (6.0, 0.0, 10.0, 100.0, 0.666667),
-        (0.5, 0.7, 100.0, 200.0, 0.0),
-        (3.4, 0.8, 0.0, 200.0, 0.0),
+        (8.0, 0.4, 20.0, 100.0, 0.0, True),
+        (4.0, 0.17, 21.0, 150.0, 1.88372, False),
+        (6.0, 0.0, 10.0, 100.0, 6.666667, False),
+        (0.5, 0.7, 100.0, 200.0, 0.0, True),
+        (3.4, 0.8, 0.0, 200.0, 3.4, False),
+        (5.8, 0.08, 100.0, 100.0, 0.0, False),
     ],
 )
 def test_recalculate_nutrient_percentage(
     storage: Storage,
+    mocker: MockerFixture,
     nutrients: float,
     loss_coefficient: float,
     dry_matter_loss: float,
     dry_matter: float,
     expected: float,
+    warned: bool,
 ) -> None:
     """
     Test the recalculate_nutrient_percentage method of the Storage class.
     """
+    mock_warn = mocker.patch.object(om, "add_warning")
     actual = storage.recalculate_nutrient_percentage(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
 
     assert pytest.approx(actual) == expected
+    if warned:
+        mock_warn.assert_called_once()
+    else:
+        mock_warn.assert_not_called()
