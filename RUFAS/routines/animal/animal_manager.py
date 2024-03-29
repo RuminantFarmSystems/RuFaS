@@ -64,7 +64,7 @@ class AnimalManager:
         Parameters
         ----------
         scenario : AnimalGroupingScenario
-                The scenario to set the animal grouping scenario to.
+            The scenario to set the animal grouping scenario to.
 
         Returns
         -------
@@ -1179,7 +1179,17 @@ class AnimalManager:
         """
 
         for pen in self.all_pens:
-            pen.calc_avg_growth()
+            pen.calc_average_growth()
+
+    def calc_avg_body_weight(self) -> None:
+        """
+        Calls each pen's method to calculate the average growth of animals in
+        the pen. This is part of the routines that happen every
+        ration interval.
+        """
+
+        for pen in self.all_pens:
+            pen.calc_average_body_weight()
 
     def sum_daily_milk(self, cows: List[Cow]) -> float:
         """
@@ -1748,6 +1758,7 @@ class AnimalManager:
             self.daily_p_update()
             self._update_phosphorus_concentrations()
             self.record_pen_history()
+            self.calc_avg_body_weight()
 
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()

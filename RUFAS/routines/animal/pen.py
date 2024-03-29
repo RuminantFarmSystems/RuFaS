@@ -17,6 +17,7 @@ from RUFAS.routines.animal.manure.general_manure import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -89,17 +90,9 @@ class Pen:
     populated : bool
         True iff there is at least 1 animal in the pen, and false otherwise.
 
-    avg_DBW : float
-        The average daily change in (delta) body weight of the animals in the pen.
-        Used for ration formulation.
-
-    avg_BW : float
+    average_body_weight : float
         The average body weight of the animals in the pen.
         Used for ration formulation.
-
-    avg_DMIest : float
-        The average dry matter intake estimation of the animals in the pen.
-        Used for ration formulation
 
     avg_nutrient_rqmts : dict
         Contains the average nutrient requirements of the animals in the pen.
@@ -226,18 +219,16 @@ class Pen:
         self.avg_p_req = 0.0
         self.avg_p_animal = 0.0
 
-        self.animals_in_pen = {}
+        self.animals_in_pen: Dict[int, Calf | HeiferI | HeiferII | HeiferIII | Cow] = {}
         # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
         self.populated = False
 
         self.classes_in_pen = set()
 
-        self.avg_BW = 0.0
-        self.avg_DMIest = 0.0
-        self.avg_DBW = 0.0
+        self.average_body_weight = 0.0
 
-        self.avg_nutrient_rqmts = {}
-        self.avg_calf_nutrient_rqmts = {}
+        self.avg_nutrient_rqmts: Dict[str, float] = {}
+        self.avg_calf_nutrient_rqmts: Dict[str, float] = {}
         self.avg_milk = 0.0
         self.avg_CP_milk = 0.0
 
@@ -452,7 +443,11 @@ class Pen:
             animal_dict[key] += curr_manure[key]
         return manure, animal_dict
 
-    def calc_manure(self, feed, methane_model: str):  # noqa
+    def update_pen_averages(self) -> None:
+        self.calc_average_growth() # maybe only call in animal manager?
+        self.calc_average_body_weight() # maybe add to call in animal manager?
+
+    def calc_manure(self, feed, methane_model: str) -> None:  # noqa
         """
         Calculates the manure excretion of the animals in the pen.
 
@@ -508,14 +503,14 @@ class Pen:
     def _copy_manure_template(self):
         return copy.deepcopy(self._manure_dict_template)
 
-    def reset_manure(self):
+    def reset_manure(self) -> None:
         self.manure = self._copy_manure_template()
         self.calf_total = self._copy_manure_template()
         self.heifer_total = self._copy_manure_template()
         self.dry_total = self._copy_manure_template()
         self.lactating_total = self._copy_manure_template()
 
-    def calc_avg_growth(self):
+    def calc_average_growth(self) -> None:
         """
         Calculates the average growth of the animals in the pen.
         """
@@ -528,8 +523,19 @@ class Pen:
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
+    def calc_average_body_weight(self) -> None:
+        """
+        Calculates and sets the average body weight of the animals in the pen.
+        """
+        if not self.populated:
+            return
+
+        self.average_body_weight = sum(animal.body_weight for animal in list(self.animals_in_pen.values())) / len(
+            self.animals_in_pen
+        )
+
     # TODO: Fix this to use AnimalType enum GitHub Issue #1209
-    def calc_daily_walking_dist(self):
+    def calc_daily_walking_dist(self) -> None:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
@@ -538,7 +544,7 @@ class Pen:
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
-    def call_p_rqmts(self):
+    def call_p_rqmts(self) -> None:
         """
         Calls each animal's method to calculate phosphorus requirements.
         """
@@ -703,7 +709,7 @@ class Pen:
             if animal_id not in animal_ids
         }
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clears the pen attributes for re-allocation.
         """
@@ -727,7 +733,7 @@ class Pen:
 
     @staticmethod
     def _get_prefix_and_default_manure_excretion(
-        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow, is_lactating_cow=False
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow, is_lactating_cow: bool = False
     ) -> Tuple[str, AnimalManureExcretions]:
         """
         Get the prefix and default manure value for a given animal.
@@ -897,7 +903,12 @@ class Pen:
             )
 
     def _set_animal_nutrient_values(
-        self, animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
+        self,
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
+        animal_grouping_scenario: AnimalGroupingScenario,
+        feed,
+        temp: float,
+        phosphorus_concentration: float
     ) -> None:
         """
         Set the nutrient values for the animal.
@@ -906,10 +917,14 @@ class Pen:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             The animal to set the nutrient values for.
-        animal_grouping_scenario
-        feed
-        temp
+        animal_grouping_scenario : AnimalGroupingScenario
+            Enum of the groups of AnimalCombinations that can be in the same pens.
+        feed : Feed
+            Object of Feed Class.
+        temp: float
+            Current temperature in C.
         phosphorus_concentration : float
+            
 
         Returns
         -------
@@ -985,7 +1000,7 @@ class Pen:
             self.ration_nutrient_conc["phosphorus"],
         )
 
-    def _calc_new_ration(self, num_animals: int):
+    def _calc_new_ration(self, num_animals: int) -> Dict[str, Union[float, str]]:
         """
         Calculate the new ration for the pen based on the number of animals in the pen.
 

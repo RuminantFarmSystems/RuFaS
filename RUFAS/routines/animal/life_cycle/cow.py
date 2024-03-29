@@ -495,7 +495,9 @@ class Cow(HeiferIII):
                 ME_intake,
             )
 
-    def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}):
+    def set_nutrient_rqmts(self,
+                           animal_grouping_scenario,
+                           nutrient_conc: Dict[str, float] = {}) -> None:
         """
         Calculates this Cow's nutrient requirements.
         """

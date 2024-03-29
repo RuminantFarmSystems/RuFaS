@@ -858,8 +858,10 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
         AnimalModuleReporter.report_daily_pen_total(animal_manager.simulation_day, animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
-        AnimalModuleReporter.report_daily_pen_avg_BW(animal_manager.simulation_day, animal_manager.all_pens)
-        AnimalModuleReporter.report_daily_pen_avg_DMIest(animal_manager.simulation_day, animal_manager.all_pens)
+        AnimalModuleReporter.report_daily_pen_average_body_weight(animal_manager.simulation_day,
+        animal_manager.all_pens)
+        AnimalModuleReporter.report_daily_pen_average_growth(animal_manager.simulation_day,
+                                                             animal_manager.all_pens)
 
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen, animal_manager.simulation_day)
@@ -902,37 +904,39 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_pen_avg_BW(cls, simulation_day: int, pen_list: List[Pen]) -> None:
+    def report_daily_pen_average_body_weight(cls, simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
-        funcname = AnimalModuleReporter.report_daily_pen_avg_BW.__name__
+        funcname = AnimalModuleReporter.report_daily_pen_average_body_weight.__name__
         info_map = {
             "class": classname,
             "function": funcname,
         }
         for pen in pen_list:
-            variable_to_add = f"{classname}.{funcname}.avg_BW_in_pen_{pen.id}_{pen.animal_combination.name}"
-            reference_variable = f"{classname}.{funcname}.avg_BW_in_pen_0_CALF"
+            variable_to_add = (
+                f"{classname}.{funcname}.average_body_weight_in_pen_{pen.id}_{pen.animal_combination.name}"
+            )
+            reference_variable = f"{classname}.{funcname}.average_body_weight_in_pen_0_CALF"
             AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0, simulation_day, info_map)
             om.add_variable(
-                f"avg_BW_in_pen_{pen.id}_{pen.animal_combination.name}",
-                pen.avg_BW,
+                f"average_body_weight_in_pen_{pen.id}_{pen.animal_combination.name}",
+                pen.average_body_weight,
                 info_map,
             )
 
     @classmethod
-    def report_daily_pen_avg_DMIest(cls, simulation_day: int, pen_list: List[Pen]) -> None:
+    def report_daily_pen_average_growth(cls, simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
-        funcname = AnimalModuleReporter.report_daily_pen_avg_BW.__name__
+        funcname = AnimalModuleReporter.report_daily_pen_average_growth.__name__
         info_map = {
             "class": classname,
             "function": funcname,
         }
         for pen in pen_list:
-            variable_to_add = f"{classname}.{funcname}.avg_DMIest_in_pen_{pen.id}_{pen.animal_combination.name}"
-            reference_variable = f"{classname}.{funcname}.avg_DMIest_in_pen_0_CALF"
+            variable_to_add = f"{classname}.{funcname}.average_growth_in_pen_{pen.id}_{pen.animal_combination.name}"
+            reference_variable = f"{classname}.{funcname}.average_growth_in_pen_0_CALF"
             AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0, simulation_day, info_map)
             om.add_variable(
-                f"avg_DMIest_in_pen_{pen.id}_{pen.animal_combination.name}",
-                pen.avg_DMIest,
+                f"average_growth_in_pen_{pen.id}_{pen.animal_combination.name}",
+                pen.avg_growth,
                 info_map,
             )
