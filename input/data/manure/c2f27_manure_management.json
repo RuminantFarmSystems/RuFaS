@@ -12,7 +12,7 @@
       "scenario_id": 1,
       "bedding_type": "none",
       "manure_handler": "flush system",
-      "manure_separator": "weeping wall",
+      "manure_separator": "screw press",
       "manure_separator_after_digestion": "none",
       "manure_treatment": "anaerobic lagoon"
     }
@@ -137,18 +137,8 @@
       "phosphorus_removal_efficiency_for_separator": 0.40,
       "potassium_removal_efficiency_for_separator": 0.15
     },
-    {
-      "manure_separator_type": "screw press",
-      "percent_dry_solids": 0.35,
-      "total_solids_removal_efficiency_for_separator": 0.25,
-      "volatile_solids_removal_efficiency_for_separator": 0.30,
-      "nitrogen_removal_efficiency_for_separator": 0.30,
-      "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
-      "phosphorus_removal_efficiency_for_separator": 0.20,
-      "potassium_removal_efficiency_for_separator": 0.23
-        },
       {
-        "manure_separator_type": "weeping wall",
+        "manure_separator_type": "screw press",
         "percent_dry_solids": 0.35,
         "total_solids_removal_efficiency_for_separator": 0.58,
         "volatile_solids_removal_efficiency_for_separator": 0.58,
