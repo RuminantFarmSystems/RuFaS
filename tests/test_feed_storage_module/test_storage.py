@@ -103,7 +103,7 @@ def test_process_degradations(
     storage.stored = [mock_first_crop, mock_second_crop]
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
-    mock_set_mass = mocker.patch.object(storage, "set_mass_attributes_after_loss")
+    mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
 
     storage.process_degradations(mock_conditions, mock_time)
@@ -113,11 +113,11 @@ def test_process_degradations(
         call(mock_second_crop, mock_conditions, mock_time),
     ]
     expected_recalculate_percentage_call_count = 6
-    expected_set_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
+    expected_reset_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
 
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
-    mock_set_mass.assert_has_calls(expected_set_mass_calls)
+    mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
     mock_record.assert_called_once_with(expected_loss)
     mock_first_crop.crude_protein_percent = percentage
     mock_first_crop.adf = percentage
@@ -134,8 +134,8 @@ def test_give_feed(storage: Storage) -> None:
     pass
 
 
-def test_set_mass_attributes() -> None:
-    """Test set_mass_attributes method of Storage class."""
+def test_reset_mass_attributes_after_loss() -> None:
+    """Test set_mass_attributes_after_loss method of Storage class."""
     pass
 
 
