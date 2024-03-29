@@ -44,8 +44,11 @@ jobs:
                           tr " " "\n" |
                           grep -E "\.txt$|\.json$|\.csv$"  |
                           tr "\n" " ")" >> "$GITHUB_ENV"
-          echo "FILES=${{ env.FILES }}" >> "$GITHUB_OUTPUT"
-          echo "OTHER_FILES=${{ env.OTHER_FILES }}" >> "$GITHUB_OUTPUT"
+      
+      - name: Set outputs
+        run: |                        
+          echo "files_output=${{ env.FILES }}" >> $GITHUB_OUTPUT
+          echo "other_files_output=${{ env.OTHER_FILES }}" >> $GITHUB_OUTPUT
 
       - name: Format code with Black
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
@@ -88,16 +91,16 @@ jobs:
       
       - name: Use FILES and OTHER_FILES from format_code job
         run: |
-          FILES: "${{ needs.format_code.outputs.FILES }}""
-          OTHER_FILES: "${{ needs.format_code.outputs.OTHER_FILES }}"
-          echo "Using FILES: "$FILES"
-          echo "Using OTHER_FILES: $OTHER_FILES"
+          FILES="${{ needs.format_code.outputs.files_output }}"
+          OTHER_FILES="${{ needs.format_code.outputs.other_files_output }}"
+          echo "FILES=$FILES" >> $GITHUB_ENV
+          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Lint with flake8
-        if: ${{ env.FILES != '' }}
+        if: env.FILES != ''
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          flake8 ${{ env.FILES }}
+          flake8 $FILES
 
       - name: Test coverage
         id: coverage
