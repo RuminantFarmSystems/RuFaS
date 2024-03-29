@@ -47,8 +47,8 @@ jobs:
       
       - name: Set outputs
         run: |                        
-          echo "files_output=${{ env.FILES }}" >> $GITHUB_OUTPUT
-          echo "other_files_output=${{ env.OTHER_FILES }}" >> $GITHUB_OUTPUT
+          echo "files_output=${{ env.FILES }}" >> "$GITHUB_OUTPUT"
+          echo "other_files_output=${{ env.OTHER_FILES }}" >> "$GITHUB_OUTPUT"
 
       - name: Format code with Black
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
