@@ -112,7 +112,7 @@ def test_process_degradations(
         call(mock_first_crop, mock_conditions, mock_time),
         call(mock_second_crop, mock_conditions, mock_time),
     ]
-    expected_recalculate_percentage_call_count = 6
+    expected_recalculate_percentage_call_count = len(storage.stored) * 4
     expected_reset_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
 
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
@@ -122,9 +122,11 @@ def test_process_degradations(
     mock_first_crop.crude_protein_percent = percentage
     mock_first_crop.adf = percentage
     mock_first_crop.ndf = percentage
+    mock_first_crop.sugar = percentage
     mock_second_crop.crude_protein_percent = percentage
     mock_second_crop.adf = percentage
     mock_second_crop.ndf = percentage
+    mock_second_crop.sugar = percentage
 
 
 def test_give_feed(storage: Storage) -> None:

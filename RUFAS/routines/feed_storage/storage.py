@@ -50,11 +50,13 @@ class Storage:
     stored : List[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
     crude_protein_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust crude protein loss.
+        Fractional coefficient used to adjust crude protein after dry matter loss.
     adf_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust ADF loss.
+        Fractional coefficient used to adjust ADF after dry matter loss.
     ndf_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust NDF loss.
+        Fractional coefficient used to adjust NDF after dry matter loss.
+    sugar_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust sugar after dry matter loss.
 
     Methods
     -------
@@ -91,6 +93,7 @@ class Storage:
         self.crude_protein_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
+        self.sugar_loss_coefficient = 0.0
 
     @property
     def stored_mass(self) -> float:
@@ -164,6 +167,9 @@ class Storage:
             )
             crop.ndf = self.recalculate_nutrient_percentage(
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+            crop.sugar = self.recalculate_nutrient_percentage(
+                crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
