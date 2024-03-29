@@ -1877,6 +1877,18 @@
         "type": "string",
         "description": "Each index corresponds to the state/location with the FIPS code that has the same first two digits as that index. The value at that index is the corresponding region for that state/location."
       }
+    },
+    "parity_milk_adjustments": {
+      "type": "object",
+      "description": "Parity 2 and 3 milk yield adjustment assumptions for use in calculations",
+      "MY305_P2_adjustment": {
+        "type": "number",
+        "description": "The P2 milk adjustment value"
+      },
+		  "MY305_P3_adjustment": {
+        "type": "number",
+        "description": "The P3 milk adjustment value"
+      }
     }
   },
   "crop_schedule_properties": {
