@@ -69,7 +69,7 @@ class Storage:
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
-        Sets mass related attributes after loss of dry matter.
+        Resets mass related attributes after loss of dry matter.
     record_stored_crops(self, gaseous_dry_matter_loss: float)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
