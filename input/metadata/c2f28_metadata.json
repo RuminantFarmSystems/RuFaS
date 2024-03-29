@@ -73,7 +73,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/c2f10_weather.csv",
+      "path": "input/data/weather/c2f28_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
