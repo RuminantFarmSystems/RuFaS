@@ -89,6 +89,9 @@ jobs:
           pip install coverage mypy
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
+      - name: Debug Output FILES
+        run: echo "${{ needs.format_code.outputs.files_output }}"    
+
       - name: Use FILES and OTHER_FILES from format_code job
         run: |
           FILES="${{ needs.format_code.outputs.files_output }}"
