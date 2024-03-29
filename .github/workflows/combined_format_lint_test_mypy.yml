@@ -88,7 +88,7 @@ jobs:
       
       - name: Use FILES and OTHER_FILES from format_code job
         run: |
-          FILES: ${{ needs.format_code.outputs.FILES }}
+          FILES: "${{ needs.format_code.outputs.FILES }}""
           OTHER_FILES: "${{ needs.format_code.outputs.OTHER_FILES }}"
           echo "Using FILES: $FILES"
           echo "Using OTHER_FILES: $OTHER_FILES"
