@@ -233,7 +233,7 @@ class Storage:
         Returns
         -------
         float
-            The amount of dry matter lost to gas, specific to fermentation.
+            The amount of dry matter lost to gas, specific to fermentation in kg.
 
         Notes
         -----
