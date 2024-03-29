@@ -553,9 +553,7 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(  # noqa
-        self, animal, p_conc, feed, temp, num_animals_before_additions
-    ):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):  # noqa
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
