@@ -273,9 +273,8 @@ class Cow(HeiferIII):
         """
         if self.lactation_curve == "wood":
 
-            
             parity_key = self.parity_index
-            #this is a temporary fix for the negative parity_index issue 
+            # this is a temporary fix for the negative parity_index issue
             #'parity_key' should not be needed if self.parity_index is always an int between 0 and 2
             if parity_key < 0:
                 parity_key = 0
