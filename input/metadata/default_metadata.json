@@ -157,7 +157,7 @@
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
-      "path": "input/metadata/properties/defaultLAC.json",
+      "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
     }
