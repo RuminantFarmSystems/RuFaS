@@ -24,6 +24,12 @@ class Silage(Storage):
     """
     Class representing the Silage storage type, inheriting from Storage.
 
+    Attributes
+    ----------
+    sugar_loss_coefficient : float, default 1.0
+        Fractional coefficient used to adjust sugar after dry matter loss to fermentation. The dry matter lost during
+        fermentation is all sugars, which is why this coefficient is 1.0.
+
     Methods
     -------
     process_degradations(current_conditions: CurrentDayConditions, time: Time)
@@ -48,6 +54,7 @@ class Silage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.sugar_loss_coefficient = 1.0
 
     def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
@@ -83,14 +90,20 @@ class Silage(Storage):
             )
 
             crop.non_protein_nitrogen = self.recalculate_nutrient_percentage(
-                crop.non_protein_nitrogen, non_protein_nitrogen_loss_coefficient, effluent_dry_matter_loss, crop.dry_matter_mass
+                crop.non_protein_nitrogen,
+                non_protein_nitrogen_loss_coefficient,
+                effluent_dry_matter_loss,
+                crop.dry_matter_mass,
             )
 
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
-                crop.crude_protein_percent, crude_protein_effluent_coefficient, effluent_dry_matter_loss, crop.dry_matter_mass
+                crop.crude_protein_percent,
+                crude_protein_effluent_coefficient,
+                effluent_dry_matter_loss,
+                crop.dry_matter_mass,
             )
 
-            self.set_mass_attributes_after_loss(crop, effluent_dry_matter_loss, effluent_moisture_loss)
+            self.reset_mass_attributes_after_loss(crop, effluent_dry_matter_loss, effluent_moisture_loss)
         om.add_variable("effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
         om.add_variable("effluent_moisture_loss", total_effluent_moisture_loss, info_map)
         super().process_degradations(current_conditions, time)

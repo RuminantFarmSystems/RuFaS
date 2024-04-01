@@ -7,8 +7,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 """Temperature below which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
 ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 5.0
 
@@ -36,6 +34,8 @@ NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 15.0
 Dry matter percentage of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
 NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
 
+om = OutputManager()
+
 
 class Storage:
     """
@@ -50,11 +50,13 @@ class Storage:
     stored : List[HarvestedCrop]
         A list of HarvestedCrop objects representing the crops stored.
     crude_protein_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust crude protein loss.
+        Fractional coefficient used to adjust crude protein after dry matter loss.
     adf_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust ADF loss.
+        Fractional coefficient used to adjust ADF after dry matter loss.
     ndf_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust NDF loss.
+        Fractional coefficient used to adjust NDF after dry matter loss.
+    sugar_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust sugar after dry matter loss.
 
     Methods
     -------
@@ -66,8 +68,8 @@ class Storage:
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
-    set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
-        Sets mass related attributes after loss of dry matter.
+    reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
+        Resets mass related attributes after loss of dry matter and/or moisture.
     record_stored_crops(self)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
@@ -91,6 +93,7 @@ class Storage:
         self.crude_protein_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
+        self.sugar_loss_coefficient = 0.0
 
     @property
     def stored_mass(self) -> float:
@@ -170,8 +173,11 @@ class Storage:
             crop.ndf = self.recalculate_nutrient_percentage(
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
+            crop.sugar = self.recalculate_nutrient_percentage(
+                crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
 
-            self.set_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, 0.0)
+            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, 0.0)
         om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
@@ -189,7 +195,9 @@ class Storage:
         """
         pass
 
-    def set_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float) -> None:
+    def reset_mass_attributes_after_loss(
+        self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float
+    ) -> None:
         """
         Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after loss of both dry
         matter and moisture.
@@ -210,7 +218,7 @@ class Storage:
 
         """
         new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
-        crop.fresh_mass -= (dry_matter_loss + moisture_loss)
+        crop.fresh_mass -= dry_matter_loss + moisture_loss
         if crop.fresh_mass == 0.0:
             crop.dry_matter_percentage = 0.0
             return
@@ -294,7 +302,7 @@ class Storage:
         Returns
         -------
         float
-            The amount of dry matter lost to gas, specific to fermentation.
+            The amount of dry matter lost to gas, specific to fermentation in kg.
 
         Notes
         -----
@@ -308,14 +316,10 @@ class Storage:
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
         lower_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
         )
         upper_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
+            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
         )
         lower_dry_matter_limit = (
             ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
@@ -366,7 +370,7 @@ class Storage:
         initial_dry_matter: float,
     ) -> float:
         """
-        Recalculates the relative nutrient percentage after dry matter has been lost from a stored crop.
+        Calculates the updated relative nutrient percentage after dry matter has been lost from a stored crop.
 
         Parameters
         ----------
@@ -382,17 +386,39 @@ class Storage:
         Returns
         -------
         float
-            The nutrient concentration after loss.
+            The nutrient percentage after dry matter loss.
 
         Notes
         -----
-        The loss coefficient is upper-bounded to prevent a negative nutrient percentage from being calculated.
+        When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
+        composed of. In this case, the concentration of the nutrient within the dry matter changes which is why it must
+        be recalculated. If a negative nutrient percentage would be calculated after losing dry matter, the percentage
+        is calculated to be 0 and a warning is logged to the OuputManager. If a negative nutrient percentage would have
+        been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
+        is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
+        division by zero error.
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
-        bounded_loss_coefficient = min(initial_nutrient_percentage, loss_coefficient)
-        return (
-            (initial_nutrient_percentage - bounded_loss_coefficient)
-            * dry_matter_loss_fraction
-            / (1 - dry_matter_loss_fraction)
+        initial_nutrient_fraction = initial_nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+
+        if dry_matter_loss_fraction == 1.0:
+            return 0.0
+
+        fraction_of_nutrient_in_lost_dry_matter = loss_coefficient * dry_matter_loss_fraction
+        if initial_nutrient_fraction < fraction_of_nutrient_in_lost_dry_matter:
+            info_map = {"class": self.__class__.__name__, "function": self.recalculate_nutrient_percentage.__name__}
+            warning_title = (
+                f"Nutrient fraction {initial_nutrient_fraction} is less than nutrient fraction in dry matter loss "
+                + f"{fraction_of_nutrient_in_lost_dry_matter}"
+            )
+            warning_message = "Calculating updated percentage of nutrient in stored crop dry matter to be 0"
+            om.add_warning(warning_title, warning_message, info_map)
+            return 0.0
+
+        updated_nutrient_fraction = (initial_nutrient_fraction - fraction_of_nutrient_in_lost_dry_matter) / (
+            1 - dry_matter_loss_fraction
         )
+        updated_nutrient_percentage = updated_nutrient_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+        return updated_nutrient_percentage

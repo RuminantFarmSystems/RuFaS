@@ -108,8 +108,8 @@ def test_process_degradations(
     storage.stored = [mock_first_crop, mock_second_crop]
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
-    mock_set_mass = mocker.patch.object(storage, "set_mass_attributes_after_loss")
     mock_add_var = mocker.patch.object(om, "add_variable")
+    mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
 
     storage.process_degradations(mock_conditions, mock_time)
@@ -118,20 +118,21 @@ def test_process_degradations(
         call(mock_first_crop, mock_conditions, mock_time),
         call(mock_second_crop, mock_conditions, mock_time),
     ]
-    expected_recalculate_percentage_call_count = 6
-    expected_set_mass_calls = [call(mock_first_crop, loss, 0.0), call(mock_second_crop, loss, 0.0)]
-
+    expected_recalculate_percentage_call_count = len(storage.stored) * 4
+    expected_reset_mass_calls = [call(mock_first_crop, loss, 0.0), call(mock_second_crop, loss, 0.0)]
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
-    mock_set_mass.assert_has_calls(expected_set_mass_calls)
-    mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", expected_loss, expected_info_map)
+    mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
+    mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", loss * len(storage.stored), expected_info_map)
     mock_record.assert_called_once()
     mock_first_crop.crude_protein_percent = percentage
     mock_first_crop.adf = percentage
     mock_first_crop.ndf = percentage
+    mock_first_crop.sugar = percentage
     mock_second_crop.crude_protein_percent = percentage
     mock_second_crop.adf = percentage
     mock_second_crop.ndf = percentage
+    mock_second_crop.sugar = percentage
 
 
 def test_give_feed(storage: Storage) -> None:
@@ -151,7 +152,7 @@ def test_give_feed(storage: Storage) -> None:
         (0.0, 100.0, 1000.0, 10.0, 900.0, 11.11111),
     ],
 )
-def test_set_mass_attributes(
+def test_reset_mass_attributes(
     storage: Storage,
     harvested_crop: HarvestedCrop,
     dry_loss: float,
@@ -161,11 +162,11 @@ def test_set_mass_attributes(
     expected_fresh: float,
     expected_percentage: float,
 ) -> None:
-    """Test set_mass_attributes method of Storage class."""
+    """Test reset_mass_attributes method of Storage class."""
     harvested_crop.fresh_mass = fresh
     harvested_crop.dry_matter_percentage = percentage
 
-    storage.set_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
+    storage.reset_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
 
     assert harvested_crop.fresh_mass == expected_fresh
     assert pytest.approx(harvested_crop.dry_matter_percentage) == expected_percentage
@@ -272,26 +273,34 @@ def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: f
 
 
 @pytest.mark.parametrize(
-    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected",
+    "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected,warned",
     [
-        (8.0, 0.4, 20.0, 100.0, 1.9),
-        (4.0, 0.17, 21.0, 150.0, 0.623488),
-        (6.0, 0.0, 10.0, 100.0, 0.666667),
-        (0.5, 0.7, 100.0, 200.0, 0.0),
-        (3.4, 0.8, 0.0, 200.0, 0.0),
+        (8.0, 0.4, 20.0, 100.0, 0.0, True),
+        (4.0, 0.17, 21.0, 150.0, 1.88372, False),
+        (6.0, 0.0, 10.0, 100.0, 6.666667, False),
+        (0.5, 0.7, 100.0, 200.0, 0.0, True),
+        (3.4, 0.8, 0.0, 200.0, 3.4, False),
+        (5.8, 0.08, 100.0, 100.0, 0.0, False),
     ],
 )
 def test_recalculate_nutrient_percentage(
     storage: Storage,
+    mocker: MockerFixture,
     nutrients: float,
     loss_coefficient: float,
     dry_matter_loss: float,
     dry_matter: float,
     expected: float,
+    warned: bool,
 ) -> None:
     """
     Test the recalculate_nutrient_percentage method of the Storage class.
     """
+    mock_warn = mocker.patch.object(om, "add_warning")
     actual = storage.recalculate_nutrient_percentage(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
 
     assert pytest.approx(actual) == expected
+    if warned:
+        mock_warn.assert_called_once()
+    else:
+        mock_warn.assert_not_called()

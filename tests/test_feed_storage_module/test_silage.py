@@ -76,7 +76,7 @@ def test_process_degradations(
         silage, "calculate_non_protein_nitrogen_loss_coefficient", return_value=loss_coeff
     )
     mock_calc_nutrient_percentage = mocker.patch.object(silage, "recalculate_nutrient_percentage")
-    mock_set_mass = mocker.patch.object(silage, "set_mass_attributes_after_loss")
+    mock_reset_mass = mocker.patch.object(silage, "reset_mass_attributes_after_loss")
     mock_add_var = mocker.patch.object(om, "add_variable")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
 
@@ -90,10 +90,10 @@ def test_process_degradations(
     expected_protein_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_npn_loss_calls = [mocker.call(mock_first_crop, loss), mocker.call(mock_second_crop, loss)]
     expected_calc_nutrient_percentage_call_count = len(silage.stored) * 2
-    expected_set_mass_calls = [mocker.call(mock_first_crop, loss, loss), mocker.call(mock_second_crop, loss, loss)]
+    expected_reset_mass_calls = [mocker.call(mock_first_crop, loss, loss), mocker.call(mock_second_crop, loss, loss)]
     expected_add_var_calls = [
         mocker.call("effluent_dry_matter_loss", expected_loss, expected_info_map),
-        mocker.call("effluent_moisture_loss", expected_loss, expected_info_map)
+        mocker.call("effluent_moisture_loss", expected_loss, expected_info_map),
     ]
 
     mock_estimate_effluent.assert_has_calls(expected_estimate_calls)
@@ -102,7 +102,7 @@ def test_process_degradations(
     mock_protein_loss.assert_has_calls(expected_protein_loss_calls)
     mock_npn_loss.assert_has_calls(expected_npn_loss_calls)
     assert mock_calc_nutrient_percentage.call_count == expected_calc_nutrient_percentage_call_count
-    mock_set_mass.assert_has_calls(expected_set_mass_calls)
+    mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
     mock_add_var.assert_has_calls(expected_add_var_calls)
     mock_storage_process_degradations.assert_called_once_with(mock_conditions, mock_time)
     mock_first_crop.crude_protein_percent = percentage
@@ -124,7 +124,6 @@ def test_process_degradations(
 def test_estimate_maximum_effluent(
     silage: Silage,
     harvested_crop: HarvestedCrop,
-    mocker: MockerFixture,
     dry_matter: float,
     mass: float,
     expected: float,
