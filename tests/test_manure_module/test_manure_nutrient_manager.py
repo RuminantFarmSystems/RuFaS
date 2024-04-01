@@ -713,7 +713,8 @@ def test_remove_nutrients_more_than_available(
         available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
         patch_for_om_add_warning.assert_called_once_with(
             "Remove more nutrients than available",
-            f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available ({float(available_amount)})",
+            f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available "
+            f"({float(available_amount)})",
             {
                 "class": "ManureNutrientManager",
                 "function": "_remove_nutrients",
