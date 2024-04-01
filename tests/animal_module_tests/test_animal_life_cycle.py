@@ -1415,6 +1415,13 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     life_cycle_manager.heiferIII_num = 4
     life_cycle_manager.cow_num = 5
 
+
+    life_cycle_manager.sold_calves = [1]
+    life_cycle_manager.sold_heiferIIIs = [1]
+    life_cycle_manager.sold_heiferIIs = [1]
+    life_cycle_manager.sold_cows = [1]
+    life_cycle_manager.sold_and_died_cows = [1]
+
     life_cycle_manager.sold_calf_num = 6
     life_cycle_manager.sold_heiferIII_oversupply_num = 7
     life_cycle_manager.bought_heifer_num = 8
@@ -1478,6 +1485,12 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.bought_heifer_num == 0
     assert life_cycle_manager.sold_heiferII_num == 0
     assert life_cycle_manager.cow_herd_exit_num == 0
+
+    assert life_cycle_manager.sold_calves == []
+    assert life_cycle_manager.sold_heiferIIIs == []
+    assert life_cycle_manager.sold_heiferIIs == []
+    assert life_cycle_manager.sold_cows == []
+    assert life_cycle_manager.sold_and_died_cows == []
 
     assert life_cycle_manager.calf_percent == approx(0.0)
     assert life_cycle_manager.heiferI_percent == approx(0.0)
