@@ -1003,7 +1003,7 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
         "tai_method_h": {
           "type": "string",
@@ -1135,7 +1135,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
         "tai_method_h": {
           "type": "string",
@@ -1267,7 +1267,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "tai_method_h": {
           "type": "string",
@@ -1429,7 +1429,7 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
         "tai_method_h": {
           "type": "string",
