@@ -49,7 +49,7 @@
 					"estrus_detection_rate": 0.6,
 					"estrus_conception_rate": 0.4,
 					"tai_method_h": "md5CG2P",
-        			"synch_ed_method_h": "2P",
+					"synch_ed_method_h": "2P",
 					"repro_sub_properties": {
 						"conception_rate": 0.6,
 						"estrus_detection_rate": 0.7
