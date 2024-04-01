@@ -297,10 +297,15 @@
               "minimum": 0,
               "maximum": 1
             },
-            "repro_sub_protocol": {
+            "tai_method_h": {
               "type": "string",
-              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
-              "default": "5dCG2P"
+              "description": "Heifer Reproduction Program",
+              "pattern": "^(md5CG2P|md5CGP)$"
+            },
+            "synch_ed_method_h": {
+              "type": "string",
+              "description": "Heifer SynchED Program",
+              "pattern": "^(2P|CP)$"
             },
             "repro_sub_properties": {
               "type": "object",
