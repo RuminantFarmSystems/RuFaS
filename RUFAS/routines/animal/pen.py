@@ -330,10 +330,6 @@ class Pen:
         """
         return len(self.animals_in_pen) > 0
 
-    @property
-    def current_pen_ration(self):
-        pass
-
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements
