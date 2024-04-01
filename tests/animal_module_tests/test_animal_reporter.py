@@ -596,6 +596,42 @@ def test_report_305d_milk(mocker: MockerFixture) -> None:
     ]
 
 
+def test_report_daily_pen_average_body_weight(mocker: MockerFixture) -> None:
+    sim_day = 100
+    pen_list = [mocker.MagicMock(), mocker.MagicMock()]
+    for idx, pen in enumerate(pen_list):
+        pen.id = idx
+        pen.animal_combination.name = 'mock'
+        pen.average_body_weight = (idx + 1) * 100
+    # act
+    AnimalModuleReporter.report_daily_pen_average_body_weight(sim_day, pen_list)
+    # assert
+    assert om.variables_pool[
+        "AnimalModuleReporter.report_daily_pen_average_body_weight.average_body_weight_in_pen_0_mock"
+    ]["values"] == [100]
+    assert om.variables_pool[
+        "AnimalModuleReporter.report_daily_pen_average_body_weight.average_body_weight_in_pen_1_mock"
+    ]["values"] == [200]
+
+
+def test_report_daily_pen_average_growth(mocker: MockerFixture) -> None:
+    sim_day = 100
+    pen_list = [mocker.MagicMock(), mocker.MagicMock()]
+    for idx, pen in enumerate(pen_list):
+        pen.id = idx
+        pen.animal_combination.name = "mock"
+        pen.avg_growth = (idx + 1) * 100
+    # act
+    AnimalModuleReporter.report_daily_pen_average_growth(sim_day, pen_list)
+    # assert
+    assert om.variables_pool["AnimalModuleReporter.report_daily_pen_average_growth.average_growth_in_pen_0_mock"][
+        "values"
+    ] == [100]
+    assert om.variables_pool["AnimalModuleReporter.report_daily_pen_average_growth.average_growth_in_pen_1_mock"][
+        "values"
+    ] == [200]
+
+
 def test_report_daily_reports(mocker: MockerFixture) -> None:
     animal_manager = mocker.MagicMock()
     animal_manager.all_pens = [mocker.MagicMock(), mocker.MagicMock()]
