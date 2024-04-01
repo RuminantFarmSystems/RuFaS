@@ -458,11 +458,7 @@ def execute_simulations(
         output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
-
-        error_count, warning_count = output_manager.get_error_and_warning_counts()
-        output_manager.add_log(
-            "error and warning count", f"{error_count} error(s) and " f"{warning_count} warning(s) found.\n", info_map
-        )
+        output_manager.print_errors_warnings_logs_counts()
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
