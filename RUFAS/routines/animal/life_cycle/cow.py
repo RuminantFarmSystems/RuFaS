@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 import numpy as np
 
@@ -341,7 +341,7 @@ class Cow(HeiferIII):
         """
         return np.random.normal(mean, std)
 
-    def milking_update(self, sim_day, calving_interval):
+    def milking_update(self, sim_day: int, calving_interval: int) -> None:
         """
         Update milking status for lactating cows.
         start at calving, daily milk production estimated by breed and parity
@@ -402,14 +402,14 @@ class Cow(HeiferIII):
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
             self.fat_percent = self.get_user_defined_milk_fat_percent()
-            daily_fat_correct_milk_production = (
-                0.4 * estimated_daily_milk_produced + 0.15 * self.fat_percent * estimated_daily_milk_produced
-            )
+            # daily_fat_correct_milk_production = (
+            #     0.4 * estimated_daily_milk_produced + 0.15 * self.fat_percent * estimated_daily_milk_produced
+            # )
             self.milk_fat_kg = (self.fat_percent / 100) * self.estimated_daily_milk_produced
             self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
-            daily_fat_correct_milk_production = 0.0
+            # daily_fat_correct_milk_production = 0.0
             self.milk_fat_kg = 0.0
             self.milk_protein_kg = 0.0
 
@@ -419,12 +419,6 @@ class Cow(HeiferIII):
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
-
-        return (
-            self.estimated_daily_milk_produced,
-            self.fat_percent,
-            daily_fat_correct_milk_production,
-        )
 
     def get_user_defined_milk_fat_percent(self) -> float:
         """
@@ -659,7 +653,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day, calving_interval):  # noqa
+    def update(self, sim_day: int, calving_interval: int) -> Tuple(bool, bool):  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -734,11 +728,7 @@ class Cow(HeiferIII):
                 )
 
         # if self.milking:
-        (
-            estimated_daily_milk_produced,
-            fat_percent,
-            daily_fat_correct_milk_production,
-        ) = self.milking_update(sim_day, calving_interval)
+        self.milking_update(sim_day, calving_interval)
 
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
@@ -807,9 +797,6 @@ class Cow(HeiferIII):
         cull_stage = self.cull_update(sim_day)
 
         return (
-            estimated_daily_milk_produced,
-            fat_percent,
-            daily_fat_correct_milk_production,
             cull_stage,
             new_born,
         )
