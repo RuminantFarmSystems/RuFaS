@@ -1415,10 +1415,6 @@ class HeiferII(HeiferI):
         float
             The birth weight of the calf.
 
-        Notes
-        -----
-        
-
         """
         birth_weight = truncnorm.rvs(
             -const.STDI,
