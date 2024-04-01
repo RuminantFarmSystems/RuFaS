@@ -1255,15 +1255,6 @@ class AnimalManager:
             or self.simulation_day == 0
         )
 
-    def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
-        """
-        Returns
-        -------
-        dict
-            A dictionary which is the summary of the initial herd.
-        """
-        return self.life_cycle_manager.initial_herd_summary
-
     @classmethod
     def _calc_phosphorus_concentration(cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> float:
         """
