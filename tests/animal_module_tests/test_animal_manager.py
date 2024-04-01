@@ -1926,7 +1926,16 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
     animal_manager_with_mock_pens.calc_avg_growth()
 
     for pen in animal_manager_with_mock_pens.all_pens:
-        pen.calc_avg_growth.assert_called_once()
+        pen.calc_average_growth.assert_called_once()
+
+
+def test_calc_avg_body_weight(animal_manager_with_mock_pens: AnimalManager) -> None:
+    """Unit test for function calc_avg_growth in file routines/animal/animal_manager.py"""
+
+    animal_manager_with_mock_pens.calc_avg_body_weight()
+
+    for pen in animal_manager_with_mock_pens.all_pens:
+        pen.calc_average_body_weight.assert_called_once()
 
 
 def test_record_pen_history(mocker: MockerFixture) -> None:

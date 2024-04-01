@@ -391,13 +391,16 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
         ([], False, 0),
     ],
 )
-def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
+def test_calc_avg_growth(pen: Pen,
+                         pen_animals: List[MagicMock],
+                         pen_populated: bool,
+                         expected: float) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
     for animal in pen_animals:
         pen.animals_in_pen[animal.id] = animal
     # pen.animals_in_pen = pen_animals
     pen.populated = pen_populated
-    pen.calc_avg_growth()
+    pen.calc_average_growth()
 
     actual = pen.avg_growth
 
