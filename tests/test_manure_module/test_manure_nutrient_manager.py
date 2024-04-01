@@ -670,6 +670,18 @@ def test_remove_nutrients(
             ),
             "dry_matter",
         ),
+        (
+            "InvalidManureType",
+            None,
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            None,
+        ),
     ],
 )
 def test_remove_nutrients_more_than_available(
@@ -688,22 +700,26 @@ def test_remove_nutrients_more_than_available(
     """
     # Arrange
     manager = ManureNutrientManager()
-    manager.add_nutrients(initial_nutrients)
+    if initial_nutrients:
+        manager.add_nutrients(initial_nutrients)
     patch_for_om_add_warning = mocker.patch(
         "RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.om.add_warning"
     )
-    removed_amount = getattr(nutrients_to_remove, exceeding_nutrient_type)
-    available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
 
-    # Act
-    manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
-
-    # Assert
-    patch_for_om_add_warning.assert_called_once_with(
-        "Remove more nutrients than available",
-        f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available ({float(available_amount)})",
-        {
-            "class": "ManureNutrientManager",
-            "function": "_remove_nutrients",
-        },
-    )
+    # Act & Assert
+    if isinstance(manure_type, ManureType):
+        manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        removed_amount = getattr(nutrients_to_remove, exceeding_nutrient_type)
+        available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
+        patch_for_om_add_warning.assert_called_once_with(
+            "Remove more nutrients than available",
+            f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available ({float(available_amount)})",
+            {
+                "class": "ManureNutrientManager",
+                "function": "_remove_nutrients",
+            },
+        )
+    else:
+        with pytest.raises(ValueError) as exc_info:
+            manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        assert str(exc_info.value) == f"Invalid manure type: {manure_type}. Supported types are: {ManureType}"
