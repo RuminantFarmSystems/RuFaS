@@ -137,7 +137,7 @@ def test_give_feed(storage: Storage) -> None:
 
 
 def test_reset_mass_attributes_after_loss() -> None:
-    """Test set_mass_attributes_after_loss method of Storage class."""
+    """Test reset_mass_attributes_after_loss method of Storage class."""
     pass
 
 
