@@ -689,7 +689,7 @@ class Cow(HeiferIII):
         """
         if self.culled:
             # TODO: remove this part of the code if never should be used
-            print('CULLED HERE')
+            print("CULLED HERE")
             return None
 
         new_born = False
