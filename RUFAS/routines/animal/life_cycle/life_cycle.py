@@ -797,7 +797,7 @@ class LifeCycleManager:
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
-            _, _, _, culled, new_born = cow.update(sim_day, self.avg_CI)
+            culled, new_born = cow.update(sim_day, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
             if culled:
