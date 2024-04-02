@@ -20,7 +20,6 @@ from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
     PurchasedFeedEmissionsEstimator,
 )
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.feed.feed import Feed
 
 om = OutputManager()
 
