@@ -463,14 +463,8 @@ class OutputManager(object):
             return data_dict
 
         for key in data_dict:
-            if not isinstance(data_dict[key], dict):
-                continue
-
             sub_data_dict = data_dict[key]
-            if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
-                continue
-
-            if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+            if not self._can_add_detailed_values(sub_data_dict):
                 continue
 
             data_origins: List[List[Tuple[str, str]]] = []
@@ -494,6 +488,29 @@ class OutputManager(object):
             sub_data_dict["detailed_values"] = detailed_values
 
         return data_dict
+
+    def _can_add_detailed_values(self, sub_data_dict: Dict[str, Any]) -> bool:
+        """
+        Checks if the provided sub_data_dict is suitable for adding detailed values.
+
+        Parameters
+        ----------
+        sub_data_dict : Dict[str, Any]
+            The dictionary to check for suitability.
+
+        Returns
+        -------
+        bool
+            True if the sub_data_dict is suitable for adding detailed values, False otherwise.
+        """
+
+        if not isinstance(sub_data_dict, dict):
+            return False
+        if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+            return False
+        if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+            return False
+        return True
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
