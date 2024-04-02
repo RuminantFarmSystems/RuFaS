@@ -346,11 +346,11 @@ class LifeCycleManager:
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
 
-        self.sold_calves = []
-        self.sold_heiferIIIs = []
-        self.sold_heiferIIs = []
-        self.sold_cows = []
-        self.sold_and_died_cows = []
+        self.sold_calves_info: List[Dict[str, str | int | float]] = []
+        self.sold_heiferIIIs_info: List[Dict[str, str | int | float]] = []
+        self.sold_heiferIIs_info: List[Dict[str, str | int | float]] = []
+        self.sold_cows_info: List[Dict[str, str | int | float]] = []
+        self.sold_and_died_cows_info: List[Dict[str, str | int | float]] = []
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -580,7 +580,15 @@ class LifeCycleManager:
                     heiferII.days_born,
                 )
                 heiferII.sold_at_day = sim_day
-                self.sold_heiferIIs.append(heiferII)
+                #  TODO: SHOULD THIS BE sold_heiferII = heiferII.pop()? Like in heifer III?
+                self.sold_heiferIIs_info.append(
+                    {
+                        "animal_type": "heiferII",
+                        "sold_at_day": heiferII.sold_at_day,
+                        "body_weight": heiferII.body_weight,
+                        "cull_reason": "",
+                    }
+                )
                 removed_heiferIIs_idx.append(idx)
             elif is_heiferIII_stage:
                 self._convert_heiferII_to_heiferIII(heiferII, heiferIIIs)
@@ -742,7 +750,14 @@ class LifeCycleManager:
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = sim_day
-            self.sold_heiferIIIs.append(removed_heiferIII)
+            self.sold_heiferIIIs_info.append(
+                {
+                    "animal_type": "heiferIII",
+                    "sold_at_day": removed_heiferIII.sold_at_day,
+                    "body_weight": removed_heiferIII.body_weight,
+                    "cull_reason": '',
+                }
+            )
             self.sold_heiferIII_oversupply_num += 1
             self.heiferIII_num -= 1
 
@@ -832,7 +847,10 @@ class LifeCycleManager:
 
         """
         cow.sold_at_day = sim_day
-        self.sold_and_died_cows.append(cow)
+        self.sold_and_died_cows_info.append({'animal_type': 'cow',
+                                             'sold_at_day': cow.sold_at_day,
+                                             'body_weight': cow.body_weight,
+                                             'cull_reason': cow.cull_reason})
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
@@ -975,7 +993,14 @@ class LifeCycleManager:
             calves_born.append(new_calf)
         if new_calf.sold:
             new_calf.sold_at_day = sim_day
-            self.sold_calves.append(new_calf)
+            self.sold_calves_info.append(
+                {
+                    "animal_type": "calf",
+                    "sold_at_day": new_calf.sold_at_day,
+                    "body_weight": new_calf.body_weight,
+                    "cull_reason": '',
+                }
+            )
             self.sold_calf_num += 1
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
