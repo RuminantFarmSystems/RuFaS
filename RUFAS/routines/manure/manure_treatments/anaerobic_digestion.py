@@ -50,7 +50,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         return daily_output
 
     def _calc_anaerobic_digestion_daily_output(
-            self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
         """Returns the daily output from anaerobic digestion.
 
@@ -69,14 +69,13 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         average_temperature_celsius = self._get_current_day_average_temperature_celsius()
         heating_input_energy = (
-                self._calc_specific_input_energy(average_temperature_celsius, moisture_content)
-                * daily_final_manure_volume
-                * GeneralConstants.LITERS_TO_CUBIC_METERS
+            self._calc_specific_input_energy(average_temperature_celsius, moisture_content)
+            * daily_final_manure_volume
+            * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
         # MS.3.B.7R
         methane_generation_volume = GasEmissionsCalculator.methane_volume_via_Chen_equation(
-            manure_total_degradable_volatile_solids=
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
+            manure_total_degradable_volatile_solids=self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
             hydraulic_retention_time=self.config.hydraulic_retention_time,
         )
         biogas_energy_content = GasEmissionsCalculator.biogas_energy_content(methane_volume=methane_generation_volume)
@@ -86,19 +85,21 @@ class AnaerobicDigestion(BaseManureTreatment):
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
         new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
-        new_daily_output.liquid_manure_total_degradable_volatile_solids = \
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids - (
-                new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            )
-        new_daily_output.liquid_manure_total_non_degradable_volatile_solids = \
+        new_daily_output.liquid_manure_total_degradable_volatile_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+        )
+        new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
-        new_daily_output.liquid_manure_total_volatile_solids = \
-            new_daily_output.liquid_manure_total_degradable_volatile_solids + \
-            new_daily_output.liquid_manure_total_non_degradable_volatile_solids
-        new_daily_output.liquid_manure_total_solids = \
-            self._current_manure_treatment_daily_input.liquid_manure_total_solids - (
-                new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            )
+        )
+        new_daily_output.liquid_manure_total_volatile_solids = (
+            new_daily_output.liquid_manure_total_degradable_volatile_solids
+            + new_daily_output.liquid_manure_total_non_degradable_volatile_solids
+        )
+        new_daily_output.liquid_manure_total_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_solids
+            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+        )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
         new_daily_output.biogas_energy_content = biogas_energy_content
@@ -141,7 +142,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         average_manure_heat_capacity = (influent_heat_capacity + anaerobic_digestion_heat_capacity) / 2
         heating_input_energy = average_manure_heat_capacity * (
-                self.config.anaerobic_digestion_temperature_set_point - effluent_temperature
+            self.config.anaerobic_digestion_temperature_set_point - effluent_temperature
         )
         return heating_input_energy
 
@@ -171,7 +172,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         return 0.68298 + 0.025662 * average_temperature_celsius + 0.01306 * moisture_content * 100
 
     def _adjust_accumulated_output(
-            self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
         """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
         wanting to never empty the manure pit for AnaerobicDigestion"""
