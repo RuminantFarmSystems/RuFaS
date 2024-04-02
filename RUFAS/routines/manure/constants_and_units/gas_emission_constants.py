@@ -56,8 +56,22 @@ class GasEmissionConstants:
     mass of methane.
     """
 
-    METHANE_DENSITY: float = 0.657
-    """Methane density (kg/:math:`m^3`)."""
+    AD_METHANE_DENSITY: float = 0.629
+    """
+    Unit conversion factor for methane generated from anaerobic digestion at 1 abr of pressure and 37.5C
+    (kg/:math:`m^3`).
+    """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide based on a molar ratio of 1:3
+    (methane : carbon dioxide).
+    """
+
+    AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 2.86
+    """
+    The mass conversion factor from methane to methane and carbon dioxide in anaerobic digestion (kg CH4 / kg CO2)
+    """
 
     METHANE_POTENTIAL_Go: float = 240.0
     """Methane potential (mL/g). Default is set to 240.0."""
