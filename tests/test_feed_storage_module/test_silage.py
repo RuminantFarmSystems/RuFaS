@@ -139,13 +139,35 @@ def test_estimate_maximum_effluent(
 
 
 @pytest.mark.parametrize(
-    "dry_matter,max_effluent,days,expected",
+    "days,expected",
     [
-        (100.0, 25.0, 8, 0.0207),
-        (350.0, 40.0, 2, 0.002365714),
-        (30.0, 55.0, 12, 0.0),
-        (400.0, 12.0, 1, 0.0003105),
-        (100.0, 0.0, 4, 0.0),
+        (0, False),
+        (1, True),
+        (5, True),
+        (10, True),
+        (11, False),
+    ]
+)
+def test_effluent_loss_occurs(silage: Silage, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: bool) -> None:
+    """Test the effluent_loss_occurs method of the Silage class."""
+    mock_time = mocker.MagicMock(autospec=Time)
+    mock_days_stored = mocker.patch.object(harvested_crop, "days_stored", return_value=days)
+
+    actual = silage.determine_effluent_loss_occurs(harvested_crop, mock_time)
+
+    assert actual == expected
+    mock_days_stored.assert_called_once_with(mock_time)
+
+
+@pytest.mark.parametrize(
+    "dry_matter,max_effluent,effluent_occurs,days,expected",
+    [
+        (100.0, 25.0, True, 8, 0.0207),
+        (350.0, 40.0, True, 2, 0.002365714),
+        (30.0, 55.0, False, 12, 0.0),
+        (400.0, 12.0, True, 1, 0.0003105),
+        (100.0, 0.0, True, 4, 0.0),
+        (250.0, 45.0, False, 0, 0.0),
     ],
 )
 def test_calculate_dry_matter_loss_to_effluent(
@@ -154,6 +176,7 @@ def test_calculate_dry_matter_loss_to_effluent(
     harvested_crop: HarvestedCrop,
     dry_matter: float,
     max_effluent: float,
+    effluent_occurs: bool,
     days: int,
     expected: float,
 ) -> None:
@@ -161,6 +184,7 @@ def test_calculate_dry_matter_loss_to_effluent(
     Test the calculate_dry_matter_loss_to_effluent method of the Silage class.
     """
     mock_time = mocker.MagicMock(autospec=Time)
+    mock_effluent_loss = mocker.patch.object(silage, "determine_effluent_loss_occurs", return_value=effluent_occurs)
     mocker.patch(
         "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
         new_callable=mocker.PropertyMock,
@@ -170,7 +194,36 @@ def test_calculate_dry_matter_loss_to_effluent(
     actual = silage.calculate_dry_matter_loss_to_effluent(harvested_crop, max_effluent, mock_time)
 
     assert pytest.approx(actual) == expected
-    mock_days_stored.assert_called_once_with(mock_time)
+    mock_effluent_loss.assert_called_once_with(harvested_crop, mock_time)
+    assert mock_days_stored.call_count == (1 if effluent_occurs else 0)
+
+
+@pytest.mark.parametrize(
+    "max_effluent,effluent_loss,expected",
+    [
+        (25.0, True, 2.5),
+        (14.0, True, 1.4),
+        (15.0, False, 0.0),
+        (64.0, True, 6.4),
+        (44.0, False, 0.0),
+    ]
+)
+def test_calculate_moisture_loss_to_effluent(
+    silage: Silage,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    max_effluent: float,
+    effluent_loss: bool,
+    expected: float,
+) -> None:
+    """Test the calculate_mositure_loss_to_effluent method of the Silage class."""
+    mock_time = mocker.MagicMock(autospec=Time)
+    mock_effluent_loss = mocker.patch.object(silage, "determine_effluent_loss_occurs", return_value=effluent_loss)
+
+    actual = silage.calculate_moisture_loss_to_effluent(harvested_crop, max_effluent, mock_time)
+
+    assert pytest.approx(actual) == expected
+    mock_effluent_loss.assert_called_once_with(harvested_crop, mock_time)
 
 
 @pytest.mark.parametrize(

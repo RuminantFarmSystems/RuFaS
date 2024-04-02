@@ -36,8 +36,12 @@ class Silage(Storage):
         Handles the processing of mass and nutritive loss to effluence and fermentation.
     estimate_maximum_effluent(crop: HarvestedCrop)
         Estimates the maximum amount of effluent (water) that will flow out of an ensiled crop.
+    determine_effluent_loss_occurs(self, crop: HarvestedCrop, time: Time)
+        Determines if a crop loses mass to effluent.
     calculate_dry_matter_loss_to_effluent(crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time)
-        Calculates the amount of dry matter lost to effluent from an ensiled crop.
+        Calculates the amount of dry matter lost from an ensiled crop as water is squeezed out of it.
+    calculate_moisture_loss_to_effluent(crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time)
+        Calculates the amount of moisture lost from an ensiled crop as water is squeezed out of it.
     calculate_protein_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float)
         Calculates the loss coefficient of crude protein in the dry matter of an ensiled crop after effluent loss.
     calculate_non_protein_nitrogen_loss_coefficient(self, crop: HarvestedCrop, effluent_loss: float)
@@ -132,11 +136,37 @@ class Silage(Storage):
 
         return crop.stored_fresh_mass * max(0.0, initial_water_fraction - MOISTURE_FRACTION_THRESHOLD_FOR_EFFLUENT)
 
+    def determine_effluent_loss_occurs(self, crop: HarvestedCrop, time: Time) -> bool:
+        """
+        Determines if effluent loss occurs for crop at the specified time.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The crop which may be losing mass to effluent.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        Returns
+        -------
+        bool
+            True if the crop loses mass to effluent on the current day, otherwise false.
+
+        Notes
+        -----
+        Loss to effluent is zero beyond a specific number of days, and on the day that the crop is stored.
+
+        """
+        time_in_silo = crop.days_stored(time)
+        if 0 < time_in_silo <= EFFLUENT_LOSS_CONSTRAINER:
+            return True
+        return False
+
     def calculate_dry_matter_loss_to_effluent(
         self, crop: HarvestedCrop, estimated_maximum_effluent: float, time: Time
     ) -> float:
         """
-        Calculates the amount of dry matter lost from an ensiled crop to effluent.
+        Calculates the amount of dry matter lost from an ensiled crop as water is squeezed out of it.
 
         Parameters
         ----------
@@ -157,10 +187,10 @@ class Silage(Storage):
         Effluent loss is zero beyond a specific number of days.
 
         """
-        time_in_silo = crop.days_stored(time)
-        if time_in_silo > EFFLUENT_LOSS_CONSTRAINER:
+        if not self.determine_effluent_loss_occurs(crop, time):
             return 0.0
 
+        time_in_silo = crop.days_stored(time)
         return (0.1035 * estimated_maximum_effluent) * (0.1 * time_in_silo) / crop.dry_matter_mass
 
     def calculate_moisture_loss_to_effluent(
@@ -185,12 +215,11 @@ class Silage(Storage):
 
         Notes
         -----
-        Effluent loss is zero beyond a specific number of days. During the period of effluent loss, the same amount of
-        effluent will be lost every day.
+        Moisture loss to effluent is zero beyond a specific number of days. During the period of effluent loss, the same
+        amount of effluent will be lost every day.
 
         """
-        time_in_silo = crop.days_stored(time)
-        if time_in_silo > EFFLUENT_LOSS_CONSTRAINER:
+        if not self.determine_effluent_loss_occurs(crop, time):
             return 0.0
 
         return estimated_maximum_effluent / EFFLUENT_LOSS_CONSTRAINER
