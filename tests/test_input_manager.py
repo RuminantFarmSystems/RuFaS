@@ -19,12 +19,20 @@ def mock_input_manager() -> InputManager:
     return input_manager
 
 
-def test_input_manager_singleton(mocker: MockerFixture) -> None:
+def test_input_manager_singleton() -> None:
     """Unit test to ensure InputManager is a singleton"""
     im1 = InputManager()
     im2 = InputManager()
 
     assert im1 is im2
+
+    fake_pool = {"a": 1}
+    im1.pool = fake_pool
+    assert im2.pool is fake_pool
+
+    fake_metadata = {"b": 2}
+    im1.meta_data = fake_metadata
+    assert im2.meta_data is fake_metadata
 
 
 @pytest.fixture
