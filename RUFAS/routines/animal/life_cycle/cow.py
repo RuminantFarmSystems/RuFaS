@@ -32,11 +32,11 @@ im = InputManager()
 
 
 class MilkProductionHistory:
-    def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
-        self.simulation_day = sim_day
-        self.days_in_milk = days_in_milk
-        self.milk_production = milk_prod
-        self.days_born = days_born
+    def __init__(self, sim_day: int, days_in_milk: int, milk_prod: float, days_born: int) -> None:
+        self.simulation_day: int = sim_day
+        self.days_in_milk: int = days_in_milk
+        self.milk_production: float = milk_prod
+        self.days_born: int = days_born
 
 
 class Cow(HeiferIII):
@@ -297,9 +297,9 @@ class Cow(HeiferIII):
                 * (1 - math.exp((AnimalBase.config["c"] - self.days_in_milk) / AnimalBase.config["b"]) / 2)
                 * math.exp((0 - AnimalBase.config["d"]) * self.days_in_milk)
             )
-        return 0
+        return 0.0
 
-    def update_milk_production_history(self, sim_day):
+    def update_milk_production_history(self, sim_day: int) -> None:
         """
         Updates the animal's milk production history by appending a
         MilkProductionHistory object to the list.
@@ -310,7 +310,8 @@ class Cow(HeiferIII):
 
         Parameter
         ---------
-            sim_day: simulation day
+        sim_day : int
+            Day of simulation.
         """
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
             del self.milk_production_history[-1]
@@ -341,7 +342,7 @@ class Cow(HeiferIII):
         """
         return np.random.normal(mean, std)
 
-    def milking_update(self, sim_day: int, calving_interval: int) -> None:
+    def milking_update(self, sim_day: int, calving_interval: int | float) -> None:
         """
         Update milking status for lactating cows.
         start at calving, daily milk production estimated by breed and parity
@@ -370,7 +371,7 @@ class Cow(HeiferIII):
             self.lactose_milk = 0.0
             self.CP_milk = 0.0
             self.mPrt = 0.0
-            return 0, 0, 0
+            # return 0, 0, 0
 
         if self.milking:
             self.days_in_milk += 1
@@ -653,7 +654,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day: int, calving_interval: int) -> Tuple(bool, bool):  # noqa
+    def update(self, sim_day: int, calving_interval: int | float) -> Tuple[bool, bool] | None:  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -661,18 +662,11 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The simulation day.
-        calving_interval : int
-            The size of the calving interval in days.
+        calving_interval : int | float
+            The size of the calving interval in days, can be average current calving interval instead of input value.
 
         Returns
         -------
-        float
-            estimated daily milk production from the lactation curve.
-        float
-            fat_percent calculated with days in milk, for temporary use.
-        float
-            daily_fat_correct_milk_production calculated form estimated milk
-            production and fat percent, for temporary use.
         bool
             cull_stage which is True if a cow is culled, False if it stays in the herd.
         bool
@@ -685,6 +679,7 @@ class Cow(HeiferIII):
 
         """
         if self.culled:
+            print('CULLED HERE')
             return None
 
         new_born = False
