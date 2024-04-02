@@ -569,9 +569,7 @@ class Pen:
             return
         animal_ids = set(animal_ids)
         self.animals_in_pen = {
-            animal_id: animal
-            for animal_id, animal in self.animals_in_pen.items()
-            if animal_id not in animal_ids
+            animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
 
     def clear(self):
@@ -681,9 +679,7 @@ class Pen:
 
     @staticmethod
     def _update_animal_manure_excretion_data(
-        manure_excretions_output_data: dict[
-            str, dict[str, str | AnimalManureExcretions]
-        ],
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]],
         prefix: str,
         manure: AnimalManureExcretions,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
@@ -759,12 +755,8 @@ class Pen:
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
             )
-            self._update_animal_manure_excretion_data(
-                manure_excretions_output_data, prefix, manure, animal
-            )
-            self.manure = add_animal_manure_excretions(
-                self.manure, animal.manure_excretion
-            )
+            self._update_animal_manure_excretion_data(manure_excretions_output_data, prefix, manure, animal)
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
 
     def _set_animal_nutrient_values(
         self, animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
@@ -815,13 +807,9 @@ class Pen:
             animal.DNED_requirement = (
                 requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
             ) / animal.DMIest_requirement
-            animal.DMPD_requirement = (
-                requirements["MP_requirement"]
-            ) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
 
-            animal.calc_daily_walking_dist(
-                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-            )
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         if animal_type in [AnimalType.CALF]:
             if self.avg_calf_nutrient_rqmts:
@@ -906,9 +894,7 @@ class Pen:
 
         """
 
-        self._set_animal_nutrient_values(
-            animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
-        )
+        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
         self.animals_in_pen[animal.id] = animal
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 
