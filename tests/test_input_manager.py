@@ -14,6 +14,7 @@ from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Mod
 
 @pytest.fixture
 def mock_input_manager() -> InputManager:
+    InputManager.__instance = None
     input_manager = InputManager()
     return input_manager
 
@@ -60,6 +61,18 @@ def input_manager_original_method_states(
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
     }
+
+
+def test_metadata_setter_getter(mock_input_manager: InputManager) -> None:
+    test_data = {"foo": "bar", "integer": 1}
+    mock_input_manager.meta_data = test_data
+    assert mock_input_manager.meta_data == test_data
+
+
+def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
+    test_data = {"foo": "bar", "integer": 1}
+    mock_input_manager.pool = test_data
+    assert mock_input_manager.pool == test_data
 
 
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
