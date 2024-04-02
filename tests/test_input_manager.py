@@ -72,12 +72,14 @@ def input_manager_original_method_states(
 
 
 def test_metadata_setter_getter(mock_input_manager: InputManager) -> None:
+    """Unit test for metadata getter and setter methods"""
     test_data = {"foo": "bar", "integer": 1}
     mock_input_manager.meta_data = test_data
     assert mock_input_manager.meta_data == test_data
 
 
 def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
+    """Unit test for metadata getter and setter methods"""
     test_data = {"foo": "bar", "integer": 1}
     mock_input_manager.pool = test_data
     assert mock_input_manager.pool == test_data
