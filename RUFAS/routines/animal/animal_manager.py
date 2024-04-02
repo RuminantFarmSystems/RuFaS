@@ -573,63 +573,6 @@ class AnimalManager:
         return num_animals - max_animal_spaces
 
     @classmethod
-    def _create_default_pen(
-        cls,
-        pen_id: int,
-        animal_combination: AnimalCombination,
-        num_stalls: int,
-        max_stocking_density: float,
-    ) -> Pen:
-        """
-        Create a default Pen object with the given parameters.
-
-        Parameters
-        ----------
-        pen_id : int
-            The unique identifier for the pen.
-        animal_combination : AnimalCombination
-            The animal combination for the pen.
-        num_stalls : int
-            The number of stalls in the pen.
-        max_stocking_density : float
-            The maximum stocking density for the pen.
-
-        Returns
-        -------
-        Pen
-            A new Pen object with the specified parameters and default values for other attributes.
-
-        Examples
-        --------
-        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
-        animal_combination=AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
-        >>> pen.id
-        1
-        >>> pen.animal_combination
-        <AnimalCombination.CALF: 0>
-        >>> pen.num_stalls
-        10
-        >>> pen.max_stocking_density
-        1.5
-
-        """
-
-        return Pen(
-            pen_id=pen_id,
-            vertical_dist_to_milking_parlor=AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR,
-            horizontal_dist_to_milking_parlor=AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR,
-            number_of_stalls=num_stalls,
-            housing_type=AnimalModuleConstants.DEFAULT_HOUSING_TYPE,
-            bedding_type=AnimalModuleConstants.DEFAULT_BEDDING_TYPE,
-            pen_type=AnimalModuleConstants.DEFAULT_PEN_TYPE,
-            manure_handling=AnimalModuleConstants.DEFAULT_MANURE_HANDLER,
-            manure_separator=AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR,
-            manure_storage=AnimalModuleConstants.DEFAULT_MANURE_STORAGE,
-            animal_combination=animal_combination,
-            max_stocking_density=max_stocking_density,
-        )
-
-    @classmethod
     def _create_duplicate_pen(
         cls,
         pen_id: int,
