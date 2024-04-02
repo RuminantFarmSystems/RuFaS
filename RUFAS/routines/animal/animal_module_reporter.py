@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Sequence
 import numpy as np
 import sys
 
@@ -761,7 +761,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_sold_animal_information_sort_by_sell_day(
-        cls, sold_animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int
+        cls, sold_animals: Sequence[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int
     ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
@@ -877,24 +877,29 @@ class AnimalModuleReporter:
             The total number of days in the simulation
         """
         AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
-        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            life_cycle_manager.sold_calves,
-            "sold_calves",
-            total_days,
-        )
-        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            life_cycle_manager.sold_heiferIIs, "heiferII", total_days
-        )
-        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            life_cycle_manager.sold_heiferIIIs, "heiferIII", total_days
-        )
-        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            life_cycle_manager.sold_and_died_cows,
-            "sold_and_died_cows",
-            total_days,
-        )
-        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            life_cycle_manager.sold_cows,
-            "sold_cows",
-            total_days,
-        )
+        if life_cycle_manager.sold_calves:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                life_cycle_manager.sold_calves,
+                "sold_calves",
+                total_days,
+            )
+        if life_cycle_manager.sold_calves:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                life_cycle_manager.sold_heiferIIs, "heiferII", total_days
+            )
+        if life_cycle_manager.sold_heiferIIIs:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                life_cycle_manager.sold_heiferIIIs, "heiferIII", total_days
+            )
+        if life_cycle_manager.sold_and_died_cows:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                life_cycle_manager.sold_and_died_cows,
+                "sold_and_died_cows",
+                total_days,
+            )
+        if life_cycle_manager.sold_cows:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                life_cycle_manager.sold_cows,
+                "sold_cows",
+                total_days,
+            )
