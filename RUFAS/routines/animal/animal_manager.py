@@ -11,7 +11,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -452,153 +451,6 @@ class AnimalManager:
             for animal_id in animals_in_pen:
                 self.animal_to_pen_id_map[animal_id] = pen.id
 
-    def remove_animals_from_herd(self, animals_removed: List[AnimalBase]) -> None:
-        """
-        Deletes the IDs of animals from animal_to_pen_id_map dictionary when the animal
-        was removed from the herd; updates the relevant pen's stocking density.
-
-        Parameters
-        ----------
-        animals_removed : List[AnimalBase]
-            list of animal objects that are to be removed from the herd
-
-        """
-
-        for animal in animals_removed:
-            if animal.id in self.animal_to_pen_id_map:
-                pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
-                pen.remove_animals_by_ids([animal.id])
-                del self.animal_to_pen_id_map[animal.id]
-
-    def track_former_pen_population(self) -> List[int]:
-        """
-        Creates a list containing the original pen populations of a simulated
-        farm before any updates are made to pens. The original pens' information
-        would get lost as animals get added.
-
-        Returns
-        -------
-        a list of the populations of each pen on the farm prior to
-            any additions due to daily pen updates
-        """
-
-        pen_population_before_additions = [0] * len(self.all_pens)
-
-        for index, pen in enumerate(self.all_pens):
-            pen_population_before_additions[index] = len(pen.animals_in_pen)
-
-        return pen_population_before_additions
-
-    def calculate_pen_rations(self, prior_pen_populations: List[int]) -> None:
-        """
-        Adjusts the amount of each feed within a ration that is delivered to a pen
-            when the number of animals in the pen is changed
-
-        Parameters
-        ----------
-        prior_pen_populations : List[int]
-            list of the number of animals in each pen, since
-             pens are zero-indexed
-        """
-
-        for index, pen in enumerate(self.all_pens):
-            for key in pen.ration:
-                if key != "status" and key != "objective":
-                    pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
-
-    def daily_update_id_map(
-        self,
-        animals_added: List[AnimalBase],
-        animals_removed: List[AnimalBase],
-        calves_born: List[Calf],
-        feed: Feed,
-        current_temperature: float,
-    ) -> None:
-        """
-        Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
-        new animals are born or purchased and when animals leave the herd due to death or culling
-
-        Parameters
-        ----------
-        animals_added : List[AnimalBase]
-            list of animal objects that have been added to the herd
-        animals_removed : List[AnimalBase]
-            list of animal objects that have been removed from the herd
-        calves_born : List[Calf]
-            list of Calf objects that have been added to the herd
-        feed : Feed
-            an instance of the Feed class defined in feed.py
-        current_temperature : float
-            the temperature on the current day
-
-        """
-
-        all_animals_added = animals_added + calves_born
-
-        original_pen_populations = self.track_former_pen_population()
-
-        self.remove_animals_from_herd(animals_removed)
-
-        animal_type_mapping_dict = {
-            "Calf": {
-                "p_conc": self.p_conc["calf"],
-                "animal_list": self.calves,
-                "animal_group": AnimalCombination.CALF,
-            },
-            "HeiferI": {
-                "p_conc": self.p_conc["heiferI"],
-                "animal_list": self.heiferIs,
-                "animal_group": AnimalCombination.GROWING,
-            },
-            "HeiferII": {
-                "p_conc": self.p_conc["heiferII"],
-                "animal_list": self.heiferIIs,
-                "animal_group": AnimalCombination.GROWING,
-            },
-            "HeiferIII": {
-                "p_conc": self.p_conc["heiferIII"],
-                "animal_list": self.heiferIIIs,
-                "animal_group": AnimalCombination.CLOSE_UP,
-            },
-            "Lac_Cow": {
-                "p_conc": self.p_conc["cow"],
-                "animal_list": self.cows,
-                "animal_group": AnimalCombination.LAC_COW,
-            },
-            "Dry_Cow": {
-                "p_conc": self.p_conc["cow"],
-                "animal_list": self.cows,
-                "animal_group": AnimalCombination.CLOSE_UP,
-            },
-        }
-
-        for animal in all_animals_added:
-            animal_class = type(animal).__name__
-
-            if animal_class == "Cow":
-                if animal.milking:
-                    animal_class = "Lac_Cow"
-                else:
-                    animal_class = "Dry_Cow"
-
-            animal_p_conc = animal_type_mapping_dict.get(animal_class)["p_conc"]
-            animal_type_mapping_dict.get(animal_class)["animal_list"].append(animal)
-            group = animal_type_mapping_dict.get(animal_class)["animal_group"]
-
-            candidate_pens = self.pens_by_animal_combination[group]
-            pen_for_insert = min(candidate_pens, key=lambda p: p.current_stocking_density)
-
-            self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
-            self.all_pens[pen_for_insert.id].set_up_new_animal(
-                animal,
-                animal_p_conc,
-                feed,
-                current_temperature,
-                original_pen_populations[pen_for_insert.id],
-            )
-
-        self.calculate_pen_rations(original_pen_populations)
-
     @classmethod
     def _get_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
         """
@@ -719,63 +571,6 @@ class AnimalManager:
         for pen in pens:
             max_animal_spaces += cls._calc_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density)
         return num_animals - max_animal_spaces
-
-    @classmethod
-    def _create_default_pen(
-        cls,
-        pen_id: int,
-        animal_combination: AnimalCombination,
-        num_stalls: int,
-        max_stocking_density: float,
-    ) -> Pen:
-        """
-        Create a default Pen object with the given parameters.
-
-        Parameters
-        ----------
-        pen_id : int
-            The unique identifier for the pen.
-        animal_combination : AnimalCombination
-            The animal combination for the pen.
-        num_stalls : int
-            The number of stalls in the pen.
-        max_stocking_density : float
-            The maximum stocking density for the pen.
-
-        Returns
-        -------
-        Pen
-            A new Pen object with the specified parameters and default values for other attributes.
-
-        Examples
-        --------
-        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
-        animal_combination=AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
-        >>> pen.id
-        1
-        >>> pen.animal_combination
-        <AnimalCombination.CALF: 0>
-        >>> pen.num_stalls
-        10
-        >>> pen.max_stocking_density
-        1.5
-
-        """
-
-        return Pen(
-            pen_id=pen_id,
-            vertical_dist_to_milking_parlor=AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR,
-            horizontal_dist_to_milking_parlor=AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR,
-            number_of_stalls=num_stalls,
-            housing_type=AnimalModuleConstants.DEFAULT_HOUSING_TYPE,
-            bedding_type=AnimalModuleConstants.DEFAULT_BEDDING_TYPE,
-            pen_type=AnimalModuleConstants.DEFAULT_PEN_TYPE,
-            manure_handling=AnimalModuleConstants.DEFAULT_MANURE_HANDLER,
-            manure_separator=AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR,
-            manure_storage=AnimalModuleConstants.DEFAULT_MANURE_STORAGE,
-            animal_combination=animal_combination,
-            max_stocking_density=max_stocking_density,
-        )
 
     @classmethod
     def _create_duplicate_pen(
@@ -1254,15 +1049,6 @@ class AnimalManager:
             or self.formulation_interval == 1
             or self.simulation_day == 0
         )
-
-    def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
-        """
-        Returns
-        -------
-        dict
-            A dictionary which is the summary of the initial herd.
-        """
-        return self.life_cycle_manager.initial_herd_summary
 
     @classmethod
     def _calc_phosphorus_concentration(cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> float:
