@@ -78,7 +78,6 @@ class InputManager:
         self.__pool: Dict[str, Any] = {}
         self.__get_data_logs_pool: Dict[str, str] = {}
         self.elements_counter = ElementsCounter()
-        self.__original_data_exists: bool = False
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -88,8 +87,6 @@ class InputManager:
     @meta_data.setter
     def meta_data(self, incoming_metadata: Dict[str, Any]) -> None:
         """The setter method for __metadata"""
-        if self.__original_data_exists:
-            raise AttributeError("This instance of Input Manager is already populated.")
         self.__metadata = incoming_metadata
 
     @property
@@ -100,8 +97,6 @@ class InputManager:
     @pool.setter
     def pool(self, incoming_pool: Dict[str, Any]) -> None:
         """The setter method for __pool"""
-        if self.__original_data_exists:
-            raise AttributeError("This instance of Input Manager is already populated.")
         self.__pool = incoming_pool
 
     def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
@@ -124,7 +119,6 @@ class InputManager:
         self._load_metadata(metadata_path)
         self._load_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
-        self.__original_data_exists = True
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
