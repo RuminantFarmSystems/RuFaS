@@ -2529,7 +2529,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=mock_manure_treatment_config,
     )
     mock_manure_handler_daily_output = mocker.MagicMock()
-    mock_manure_handler_daily_output.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
+    mock_manure_handler_daily_output.liquid_manure_total_solids = 50.0
     mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = 35.0
     anaerobic_digestion._manure_handler_daily_output = mock_manure_handler_daily_output
 
@@ -2538,7 +2538,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output
 
     mock_manure_treatment_daily_input = mocker.MagicMock()
-    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = liquid_manure_total_volatile_solids = 35.0
+    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = 35.0
     mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids = (
         liquid_manure_total_degradable_volatile_solids
     ) = 31.5
@@ -2612,7 +2612,8 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_specific_input_energy.assert_called_once_with(average_temperature_celsius, moisture_content)
     patch_for_calc_methane_volume_via_Chen_equation.assert_called_once_with(
-        manure_total_degradable_volatile_solids=mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
+        manure_total_degradable_volatile_solids=
+        mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
         hydraulic_retention_time=hydraulic_retention_time,
     )
     patch_for_calc_biogas_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
