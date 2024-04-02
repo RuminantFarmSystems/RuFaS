@@ -75,8 +75,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         # MS.3.B.7R
         methane_generation_volume = GasEmissionsCalculator.methane_volume_via_Chen_equation(
-            manure_total_degradable_volatile_solids=
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
+            manure_total_degradable_volatile_solids=self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids,
             hydraulic_retention_time=self.config.hydraulic_retention_time,
         )
         biogas_energy_content = GasEmissionsCalculator.biogas_energy_content(methane_volume=methane_generation_volume)
