@@ -2105,44 +2105,6 @@ def test_print_errors_warnings_logs(
                 }
             },
         ),
-        # Test case to cover non-dict value within data_dict
-        (
-            {
-                "ModuleH.non_dict": "This is a test string",
-                "ModuleI.dict_value": {
-                    "info_maps": [{"data_origin": [["ClassY", "method_y"]], "units": "units_y"}],
-                    "values": [80],
-                },
-            },
-            True,  # detailed_values_flag
-            {
-                "ModuleH.non_dict": "This is a test string",
-                "ModuleI.dict_value": {
-                    "info_maps": [{"data_origin": [["ClassY", "method_y"]], "units": "units_y"}],
-                    "values": [80],
-                    "detailed_values": [
-                        [("[ClassY.method_y]->[ModuleI.dict_value]", 80)],
-                    ],
-                },
-            },
-        ),
-        # Test case for mismatched lengths of info_maps and values
-        (
-            {
-                "ModuleJ.mismatched_lengths": {
-                    "info_maps": [{"data_origin": [["ClassZ", "method_z"]], "units": "units_z"}],  # Single entry
-                    "values": [90, 100],  # Two entries
-                }
-            },
-            True,  # detailed_values_flag
-            {
-                "ModuleJ.mismatched_lengths": {
-                    "info_maps": [{"data_origin": [["ClassZ", "method_z"]], "units": "units_z"}],
-                    "values": [90, 100],
-                }
-            },
-        ),
-        # Test case for info_map without data_origin
         (
             {
                 "ModuleK.no_data_origin": {
@@ -2210,3 +2172,33 @@ def test_set_detailed_values_flag(new_flag_value: bool) -> None:
 
     # Clean up
     manager1.set_detailed_values_flag(False)
+
+
+@pytest.mark.parametrize(
+    "sub_data_dict, expected_result",
+    [
+        # Case 1: All conditions met
+        ({"info_maps": [{"data_origin": "source"}], "values": [1]}, True),
+        # Case 2: Not a dictionary
+        ("not_a_dict", False),
+        # Case 3: Missing 'info_maps' key
+        ({"values": [1]}, False),
+        # Case 4: Missing 'values' key
+        ({"info_maps": [{"data_origin": "source"}]}, False),
+        # Case 5: 'info_maps' and 'values' have different lengths
+        ({"info_maps": [{"data_origin": "source"}, {"data_origin": "source2"}], "values": [1]}, False),
+    ],
+)
+def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result: bool) -> None:
+    """
+    Unit test for the _can_add_detailed_values() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Act
+    result = output_manager._can_add_detailed_values(sub_data_dict)
+
+    # Assert
+    assert result == expected_result
