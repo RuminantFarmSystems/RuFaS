@@ -1415,7 +1415,6 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     life_cycle_manager.heiferIII_num = 4
     life_cycle_manager.cow_num = 5
 
-
     life_cycle_manager.sold_calves = [1]
     life_cycle_manager.sold_heiferIIIs = [1]
     life_cycle_manager.sold_heiferIIs = [1]
