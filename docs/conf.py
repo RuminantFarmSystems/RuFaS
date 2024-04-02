@@ -21,12 +21,12 @@ author = "RuFaS team"
 extensions = ["sphinx.ext.autodoc"]
 
 autodoc_default_options = {
-    'members': True,
-    'undoc-members': True,
-    'private-members': True,
-    'special-members': '__init__',
-    'static-members': True,
-    'member-order': 'bysource',
+    "members": True,
+    "undoc-members": True,
+    "private-members": True,
+    "special-members": "__init__",
+    "static-members": True,
+    "member-order": "bysource",
 }
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
