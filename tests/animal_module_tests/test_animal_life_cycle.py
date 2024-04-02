@@ -1407,7 +1407,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     assert actual_total_animal_num == current_total_animal_num
 
 
-def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
+def test_reset_daily_stats(life_cycle_manager: LifeCycleManager, mocker: MockerFixture) -> None:
     # Arrange
     life_cycle_manager.calf_num = 1
     life_cycle_manager.heiferI_num = 2
@@ -1415,12 +1415,11 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     life_cycle_manager.heiferIII_num = 4
     life_cycle_manager.cow_num = 5
 
-
-    life_cycle_manager.sold_calves = [1]
-    life_cycle_manager.sold_heiferIIIs = [1]
-    life_cycle_manager.sold_heiferIIs = [1]
-    life_cycle_manager.sold_cows = [1]
-    life_cycle_manager.sold_and_died_cows = [1]
+    life_cycle_manager.sold_calves = [mocker.MagicMock()]
+    life_cycle_manager.sold_heiferIIIs = [mocker.MagicMock()]
+    life_cycle_manager.sold_heiferIIs = [mocker.MagicMock()]
+    life_cycle_manager.sold_cows = [mocker.MagicMock()]
+    life_cycle_manager.sold_and_died_cows = [mocker.MagicMock()]
 
     life_cycle_manager.sold_calf_num = 6
     life_cycle_manager.sold_heiferIII_oversupply_num = 7
