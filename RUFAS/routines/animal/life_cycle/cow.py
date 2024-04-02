@@ -349,8 +349,13 @@ class Cow(HeiferIII):
 
         Parameters
         -------
-        sim_day : Any
-        calving_interval : Any
+        sim_day : int
+            The current simulation day
+        calving_interval : int or float
+            calving_interval is an int (user input calving interval) if the value of 
+            animal_config["use_input_calving_interval"] exists and is True;
+            otherwise, it is a float (average herd calving interval)
+            (logic in _set_avg_CI in of lifecycle.py)
 
         Returns
         -------
@@ -365,7 +370,7 @@ class Cow(HeiferIII):
         ------
         - The targeted lactation curve is set at the beginning of each lactation,
         and the variance can be added after adjusted by the nutrition submodel.
-        - TEMP: Currently, the variables for fat percent, FCM,
+        - Currently, the variables for fat percent, FCM,
         body weight during lactation, and dry matter intake
         are coded here with equations containing hard-coded parameters
         just to validate the simulation model. They indicate places for future adjustment
