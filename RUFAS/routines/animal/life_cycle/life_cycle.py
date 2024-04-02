@@ -583,7 +583,7 @@ class LifeCycleManager:
                 #  TODO: SHOULD THIS BE sold_heiferII = heiferII.pop()? Like in heifer III?
                 self.sold_heiferIIs_info.append(
                     {
-                        "animal_type": "heiferII",
+                        "animal_type": HeiferII.__name__,
                         "sold_at_day": heiferII.sold_at_day,
                         "body_weight": heiferII.body_weight,
                         "cull_reason": "",
@@ -752,10 +752,10 @@ class LifeCycleManager:
             removed_heiferIII.sold_at_day = sim_day
             self.sold_heiferIIIs_info.append(
                 {
-                    "animal_type": "heiferIII",
+                    "animal_type": HeiferIII.__name__,
                     "sold_at_day": removed_heiferIII.sold_at_day,
                     "body_weight": removed_heiferIII.body_weight,
-                    "cull_reason": '',
+                    "cull_reason": "",
                 }
             )
             self.sold_heiferIII_oversupply_num += 1
@@ -847,10 +847,10 @@ class LifeCycleManager:
 
         """
         cow.sold_at_day = sim_day
-        self.sold_and_died_cows_info.append({'animal_type': 'cow',
-                                             'sold_at_day': cow.sold_at_day,
-                                             'body_weight': cow.body_weight,
-                                             'cull_reason': cow.cull_reason})
+        self.sold_and_died_cows_info.append({"animal_type": Cow.__name__,
+                                             "sold_at_day": cow.sold_at_day,
+                                             "body_weight": cow.body_weight,
+                                             "cull_reason": cow.cull_reason})
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
@@ -995,10 +995,10 @@ class LifeCycleManager:
             new_calf.sold_at_day = sim_day
             self.sold_calves_info.append(
                 {
-                    "animal_type": "calf",
+                    "animal_type": Calf.__name__,
                     "sold_at_day": new_calf.sold_at_day,
                     "body_weight": new_calf.body_weight,
-                    "cull_reason": '',
+                    "cull_reason": "",
                 }
             )
             self.sold_calf_num += 1
