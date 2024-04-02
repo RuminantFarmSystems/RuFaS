@@ -76,9 +76,28 @@ class InputManager:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
-        self.__properties_used: Dict[str, Any] = {}
         self.__get_data_logs_pool: Dict[str, str] = {}
         self.elements_counter = ElementsCounter()
+
+    @property
+    def meta_data(self) -> Dict[str, Any]:
+        """The getter method for __metadata"""
+        return self.__metadata
+
+    @meta_data.setter
+    def meta_data(self, incoming_metadata: Dict[str, Any]) -> None:
+        """The setter method for __metadata"""
+        self.__metadata = incoming_metadata
+
+    @property
+    def pool(self) -> Dict[str, Any]:
+        """The getter method for __pool"""
+        return self.__pool
+
+    @pool.setter
+    def pool(self, incoming_pool: Dict[str, Any]) -> None:
+        """The setter method for __pool"""
+        self.__pool = incoming_pool
 
     def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
         """
@@ -168,7 +187,6 @@ class InputManager:
             if not os.path.exists(properties_path):
                 raise FileNotFoundError(f"Properties file not found at {properties_path}")
 
-            self.__properties_used = self.__metadata["files"]["properties"]
             del self.__metadata["files"]["properties"]
 
             self.__metadata["properties"] = self._load_data_from_json(properties_path)
