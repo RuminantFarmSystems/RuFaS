@@ -847,10 +847,14 @@ class LifeCycleManager:
 
         """
         cow.sold_at_day = sim_day
-        self.sold_and_died_cows_info.append({"animal_type": Cow.__name__,
-                                             "sold_at_day": cow.sold_at_day,
-                                             "body_weight": cow.body_weight,
-                                             "cull_reason": cow.cull_reason})
+        self.sold_and_died_cows_info.append(
+            {
+                "animal_type": Cow.__name__,
+                "sold_at_day": cow.sold_at_day,
+                "body_weight": cow.body_weight,
+                "cull_reason": cow.cull_reason,
+            }
+        )
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
