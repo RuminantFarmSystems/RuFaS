@@ -54,6 +54,8 @@ class HarvestedCrop:
     -------
     __post_init__():
         Validates the category and type relationship.
+    days_stored(time: Time)
+        Determines the number of days that this crop has been stored for.
 
     """
 
