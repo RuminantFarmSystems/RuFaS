@@ -346,6 +346,12 @@ class LifeCycleManager:
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
 
+        self.sold_calves = []
+        self.sold_heiferIIIs = []
+        self.sold_heiferIIs = []
+        self.sold_cows = []
+        self.sold_and_died_cows = []
+
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
         self.heiferII_percent = 0.0

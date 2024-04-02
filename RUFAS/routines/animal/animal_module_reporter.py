@@ -708,24 +708,24 @@ class AnimalModuleReporter:
             )
 
     @classmethod
-    def report_sold_animal_information(cls, animal_manager) -> None:
+    def report_sold_animal_information(cls, life_cycle_manager: LifeCycleManager) -> None:
         """
         Adds a dictionary of sold animal information to the output manager.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of Class AnimalManager.
+        life_cycle_manager : LifeCycleManager
+            Instance of Class LifeCycleManager.
 
         """
         sold_animals = (
-            animal_manager.life_cycle_manager.sold_calves
-            + animal_manager.life_cycle_manager.sold_heiferIIs
-            + animal_manager.life_cycle_manager.sold_heiferIIIs
+            life_cycle_manager.sold_calves
+            + life_cycle_manager.sold_heiferIIs
+            + life_cycle_manager.sold_heiferIIIs
             + list(
                 filter(
                     lambda cow: cow.cull_reason != animal_constants.DEATH_CULL,
-                    animal_manager.life_cycle_manager.sold_and_died_cows,
+                    life_cycle_manager.sold_and_died_cows,
                 )
             )
         )
@@ -858,13 +858,14 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
         AnimalModuleReporter.report_daily_pen_total(animal_manager.simulation_day, animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
+        AnimalModuleReporter.report_end_of_simulation(animal_manager.life_cycle_manager, animal_manager.simulation_day)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen, animal_manager.simulation_day)
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
     @classmethod
-    def report_end_of_simulation(cls, animal_manager, total_days: int) -> None:
+    def report_end_of_simulation(cls, life_cycle_manager: LifeCycleManager, total_days: int) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
 
@@ -875,25 +876,25 @@ class AnimalModuleReporter:
         total_days : int
             The total number of days in the simulation
         """
-        AnimalModuleReporter.report_sold_animal_information(animal_manager)
+        AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_calves,
+            life_cycle_manager.sold_calves,
             "sold_calves",
             total_days,
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_heiferIIs, "heiferII", total_days
+            life_cycle_manager.sold_heiferIIs, "heiferII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_heiferIIIs, "heiferIII", total_days
+            life_cycle_manager.sold_heiferIIIs, "heiferIII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_and_died_cows,
+            life_cycle_manager.sold_and_died_cows,
             "sold_and_died_cows",
             total_days,
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_cows,
+            life_cycle_manager.sold_cows,
             "sold_cows",
             total_days,
         )
