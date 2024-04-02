@@ -20,8 +20,6 @@ author = "RuFaS team"
 
 extensions = ["sphinx.ext.autodoc"]
 
-templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
@@ -30,6 +28,8 @@ autodoc_default_options = {
     'static-members': True,
     'member-order': 'bysource',
 }
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
