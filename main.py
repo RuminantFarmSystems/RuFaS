@@ -425,6 +425,7 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", f"Data is valid. Simulating {metadata_file['prefix']} scenario", info_map
             )
+            output_manager.set_detailed_values_flag(input_manager.get_data("config.detailed_values"))
             set_random_seed(input_manager)
             try:
                 initialize_herd(

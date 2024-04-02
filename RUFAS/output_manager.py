@@ -104,6 +104,7 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self._detailed_values_flag: bool = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -389,16 +390,17 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
-                data_dict = self._add_detailed_data_origin(data_dict)
+                data_dict = self._add_detailed_values(data_dict)
+                max_depth = 4
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=4),
+                        Utility.make_serializable(data_dict, max_depth=max_depth),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=4),
+                        Utility.make_serializable(data_dict, max_depth=max_depth),
                         json_file,
                         indent=2,
                     )
@@ -406,15 +408,15 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _add_detailed_data_origin(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _add_detailed_values(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Adds a `detailed_data_origins` list to each sub-dictionary that has information about data origins.
+        Adds a `detailed_values` list to each sub-dictionary to replace the original `values` list.
 
         Notes
         -----
         This method iterates over each key in the provided dictionary. For keys that correspond to
         dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
-        named `detailed_data_origins`. This list contains details about the data origin, including the class name,
+        named `detailed_values`. This list contains details about the data origin, including the class name,
         function name, and the key itself, paired with each corresponding value from the `values` list.
         The format used for detailing the origin is "[class_name.function_name]->[key]",
         where `class_name` and `function_name` are derived from the `data_origin`
@@ -430,7 +432,7 @@ class OutputManager(object):
         Returns
         -------
         Dict[str, Any]
-            The modified dictionary with a `detailed_data_origins` list added to each sub-dictionary that meets the
+            The modified dictionary with a `detailed_values` list added to each sub-dictionary that meets the
             criteria. This list provides detailed information on the origin of each value.
 
         Examples
@@ -445,9 +447,10 @@ class OutputManager(object):
         ...     }
         ... }
         >>> output_manager = OutputManager()
-        >>> modified_data_dict = output_manager._add_detailed_data_origin(example_data_dict)
+        >>> output_manager.set_detailed_values_flag(True)
+        >>> modified_data_dict = output_manager._add_detailed_values(example_data_dict)
         >>> assert modified_data_dict[
-        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_data_origins"
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_values"
         ... ] == [
         ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
         ...     193)],
@@ -455,6 +458,9 @@ class OutputManager(object):
         ...     194)]
         ... ]
         """
+
+        if not self._detailed_values_flag:
+            return data_dict
 
         for key in data_dict:
             if not isinstance(data_dict[key], dict):
@@ -476,16 +482,16 @@ class OutputManager(object):
             if len(data_origins) != len(sub_data_dict["values"]):
                 continue
 
-            detailed_data_origins: List[List[Tuple[str, Any]]] = []
+            detailed_values: List[List[Tuple[str, Any]]] = []
             for index, value in enumerate(sub_data_dict["values"]):
                 detailed_origin_for_value = []
                 for origin in data_origins[index]:
                     class_name, function_name = origin
                     origin_key = f"[{class_name}.{function_name}]->[{key}]"
                     detailed_origin_for_value.append((origin_key, value))
-                detailed_data_origins.append(detailed_origin_for_value)
+                detailed_values.append(detailed_origin_for_value)
 
-            sub_data_dict["detailed_values"] = detailed_data_origins
+            sub_data_dict["detailed_values"] = detailed_values
 
         return data_dict
 
@@ -588,11 +594,21 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def generate_file_name(self, base_name: str, extension: str) -> str:
+    def generate_file_name(self, base_name: str, extension: str, include_millis: bool = False) -> str:
         """
         Returns a file name using the given base_name and timestamp.
+
+        Parameters
+        ----------
+        base_name : str
+            The base name of the file.
+        extension : str
+            The extension of the file.
+        include_millis : bool
+            Flag to include milliseconds in the timestamp.
         """
-        timestamp: str = Utility.get_timestamp(include_millis=False)
+
+        timestamp: str = Utility.get_timestamp(include_millis=include_millis)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
@@ -896,11 +912,13 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-            file_path = os.path.join(
+            self._save_to_json(
+                filter_file,
                 save_path,
-                self.generate_file_name(f"saved_variables_{filter_file}", "json"),
+                filtered_pool,
+                filter_content,
             )
-            self.dict_to_file_json(filtered_pool, file_path)
+
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = os.path.join(
@@ -925,6 +943,42 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+
+    def _save_to_json(
+        self,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        filter_content: Dict[str, Union[str, int]],
+    ) -> None:
+        """
+        Saves the filtered pool to a JSON file.
+
+        Parameters
+        ----------
+        filter_file : str
+            The name of the filter file being processed.
+        save_path : Path
+            The directory path where the JSON file will be saved.
+        filtered_pool : Dict[str, pool_element_type]
+            The pool of filtered data to be saved.
+        filter_content : Dict[str, Union[str, int]]
+            Additional content from the filter that might influence the file naming.
+        """
+
+        if filter_file.endswith(".json") and "name" not in filter_content:
+            include_millis = True
+        else:
+            include_millis = False
+
+        if "name" in filter_content:
+            base_name = f"saved_variables_{filter_content['name']}"
+        else:
+            base_name = f"saved_variables_{filter_file}"
+
+        file_name = self.generate_file_name(base_name, "json", include_millis=include_millis)
+        file_path = os.path.join(save_path, file_name)
+        self.dict_to_file_json(filtered_pool, file_path)
 
     def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
@@ -1261,3 +1315,15 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+
+    def set_detailed_values_flag(self, flag: bool) -> None:
+        """
+        Sets the flag for adding detailed values to the output files.
+
+        Parameters
+        ----------
+        flag : bool
+            The flag to add detailed values to the output files.
+        """
+
+        self._detailed_values_flag = flag
