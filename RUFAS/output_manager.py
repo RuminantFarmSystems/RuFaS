@@ -120,6 +120,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self.time = None
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -819,7 +820,7 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator()
+        report_generator = ReportGenerator(self.time)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -912,7 +913,7 @@ class OutputManager(object):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    graph_generator = GraphGenerator(self.__metadata_prefix, self.time)
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
@@ -1261,3 +1262,15 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+
+    def set_time(self, time_obj) -> None:
+        """
+        Sets the time object for the output manager.
+
+        Parameters
+        ----------
+        time_obj : Time
+            The time object to be set.
+        """
+
+        self.time = time_obj
