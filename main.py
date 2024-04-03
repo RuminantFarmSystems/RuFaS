@@ -61,7 +61,6 @@ def main():
         )
         output_manager.dump_all_nondata_pools(
             cmd_arguments.output_dir,
-            cmd_arguments.exclude_info_maps,
             cmd_arguments.format_option,
         )
         output_manager.add_error(
@@ -137,7 +136,6 @@ def run_rufas(
     if load_pool:
         run_load_vars_pool(
             vars_file_path,
-            exclude_info_maps,
             format_option,
             produce_graphics,
             graphics_dir,
@@ -153,11 +151,10 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_files, exclude_info_maps, format_option, output_dir)
+        run_validation(metadata_files, format_option, output_dir)
     else:
         execute_simulations(
             metadata_files,
-            exclude_info_maps,
             produce_graphics,
             graphics_dir,
             format_option,
@@ -173,7 +170,6 @@ def run_rufas(
 
 def run_load_vars_pool(
     vars_file_path: Path,
-    exclude_info_maps: bool,
     format_option: str,
     produce_graphics: bool,
     graphics_dir: Path,
@@ -189,8 +185,6 @@ def run_load_vars_pool(
     ----------
     vars_file_path : Path
         The path to the json file to load into Output Manager variables pool for processing.
-    exclude_info_maps : bool
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
         Format for variable_names.txt output file.
     produce_graphics : bool
@@ -215,17 +209,15 @@ def run_load_vars_pool(
     output_manager.save_results(
         output_dir,
         filters_dir,
-        exclude_info_maps,
         produce_graphics,
         graphics_dir,
         csv_dir,
     )
-    output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+    output_manager.dump_all_nondata_pools(output_dir, format_option)
 
 
 def run_validation(
     metadata_files: List[Path],
-    exclude_info_maps: bool,
     format_option: str,
     output_dir: Path,
 ) -> None:
@@ -235,8 +227,6 @@ def run_validation(
     ----------
     metadata_files : List[MetadataPaths]
         The list of Paths to the metadata files the user entered with which to run the simulation.
-    exclude_info_maps : bool, optional
-        Flag for whether the user wants to include info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
     output_dir : Path
@@ -270,7 +260,7 @@ def run_validation(
                 f"Data not valid for {metadata_file['path']}.\n\n",
                 info_map,
             )
-        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+        output_manager.dump_all_nondata_pools(output_dir, format_option)
 
 
 def set_random_seed(input_manager: InputManager) -> None:
@@ -364,7 +354,6 @@ def initialize_herd(
 
 def execute_simulations(
     metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool,
     produce_graphics: bool,
     graphics_dir: Path,
     format_option: str,
@@ -383,8 +372,6 @@ def execute_simulations(
     metadata_files : List[MetadataPaths]
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
-    exclude_info_maps : bool
-        Flag for whether or not the user wants to include info_maps data in their results files.
     produce_graphics: bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path
@@ -437,7 +424,6 @@ def execute_simulations(
             except Exception as e:
                 output_manager.dump_all_nondata_pools(
                     path=output_dir,
-                    exclude_info_maps=exclude_info_maps,
                     format_option=format_option,
                 )
                 raise e
@@ -456,9 +442,9 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
+        output_manager.save_results(output_dir, filters_dir, produce_graphics, graphics_dir, csv_dir)
         input_manager.dump_get_data_logs(path=output_dir)
-        output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+        output_manager.dump_all_nondata_pools(output_dir, format_option)
         output_manager.print_errors_warnings_logs_counts()
 
 

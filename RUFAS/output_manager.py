@@ -791,7 +791,6 @@ class OutputManager(object):
         self,
         save_path: Path,
         filters_dir_path: Path,
-        exclude_info_maps: bool,
         produce_graphics: bool,
         graphics_dir: Path,
         csv_dir: Path,
@@ -811,9 +810,6 @@ class OutputManager(object):
         filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to include info_maps data in their results files.
-
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
 
@@ -829,7 +825,7 @@ class OutputManager(object):
         }
         self.add_log(
             "exclude_info_maps",
-            f"exclude_info_maps flag set to {exclude_info_maps}",
+            f"exclude_info_maps flag set to {self._exclude_info_maps_flag}",
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
@@ -862,7 +858,7 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self._filter_variables_pool(filter_content)
-                if exclude_info_maps:
+                if self._exclude_info_maps_flag:  # Still needed when reloading the pool from a file
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
@@ -978,7 +974,7 @@ class OutputManager(object):
         when save_results() is not working.""",
         version="MVP",
     )
-    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
+    def dump_variables(self, path: str) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -987,12 +983,9 @@ class OutputManager(object):
         path : str
             Path to the directory where the file will be saved.
 
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
         """
         pool = self.variables_pool
-        if exclude_info_maps:
+        if self._exclude_info_maps_flag:
             pool = self._exclude_info_maps(self.variables_pool)
 
         json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
@@ -1022,7 +1015,6 @@ class OutputManager(object):
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
         path: str,
-        exclude_info_maps: bool,
         format_option: str,
     ) -> None:
         """
@@ -1033,9 +1025,6 @@ class OutputManager(object):
         ----------
         path : str
             The path to the file to be dumped to.
-
-        exclude_info_maps : bool
-            Flag to denote whether info_map data should be dumped with variable names.
 
         format_option : {"block", "inline", "verbose", "basic"}
             The selection for the formatting option of the text written to the variables names text file.
@@ -1069,7 +1058,7 @@ class OutputManager(object):
         class_name.function_name.variable_name.info_maps: variable4_name
         """
 
-        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
+        var_list = [f"_{self._exclude_info_maps_flag=}, expect info_maps accordingly.{os.linesep}"]
         for name, variable_data in self.variables_pool.items():
             if "values" not in variable_data:
                 var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
@@ -1077,7 +1066,7 @@ class OutputManager(object):
 
             parsable_dicts = []
 
-            if not exclude_info_maps and "info_maps" in variable_data:
+            if not self._exclude_info_maps_flag and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
 
             is_variable_nested = isinstance(variable_data["values"][0], dict)
@@ -1109,13 +1098,20 @@ class OutputManager(object):
     def dump_all_nondata_pools(
         self,
         path: str,
-        exclude_info_maps: bool,
         format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
+
+        Parameters
+        ----------
+        path : str
+            The path to the directory where the files will be saved.
+        format_option : {"block", "inline", "verbose", "basic"}
+            The selection for the formatting option of the text written to the variables names text file.
         """
-        self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
+
+        self.dump_variable_names_and_contexts(path, format_option)
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
