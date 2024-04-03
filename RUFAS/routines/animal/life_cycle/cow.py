@@ -363,7 +363,7 @@ class Cow(HeiferIII):
             Estimated daily milk production from the lactation curve
         fat_percent : float
             Calculated with days in milk, for temporary use
-        daily_fat_correct_milk_production : Any | float
+        daily_fat_correct_milk_production : float
             Calculated from estimated milk production and fat percent, for temporary use
 
         Notes
