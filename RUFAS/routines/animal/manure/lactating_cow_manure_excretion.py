@@ -52,11 +52,7 @@ def methane_mitigation(
             - 0.337 * (starch_concentration - 21.1)
         )
     elif methane_mitigation_method == "Monensin":
-        methane_yield_reduction = (
-            6.36 
-            - 0.277 * methane_mitigation_additive_amount
-            - 0.182 * starch_concentration
-        ) 
+        methane_yield_reduction = 6.36 - 0.277 * methane_mitigation_additive_amount - 0.182 * starch_concentration
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
