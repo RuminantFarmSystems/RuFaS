@@ -364,7 +364,7 @@ class Cow(HeiferIII):
         fat_percent : float
             Calculated with days in milk, for temporary use
         daily_fat_correct_milk_production : float
-            Calculated from estimated milk production and fat percent, for temporary use
+            Calculated from estimated milk production and fat percent, for temporary use.
 
         Notes
         ------
