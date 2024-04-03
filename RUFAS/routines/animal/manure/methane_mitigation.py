@@ -79,11 +79,7 @@ class Monensin(MethaneMitigationMethod):
 
         """
         starch_concentration = nutrient_concentrations["starch"]
-        return(
-            6.36 
-            - 0.277 * additive_amount
-            - 0.182 * starch_concentration
-        ) 
+        return 6.36 - 0.277 * additive_amount - 0.182 * starch_concentration
 
 
 class EssentialOils(MethaneMitigationMethod):
