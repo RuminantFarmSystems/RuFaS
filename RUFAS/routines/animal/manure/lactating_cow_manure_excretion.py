@@ -44,7 +44,6 @@ def methane_mitigation(
     methane_yield_reduction = 0.0
 
     if methane_mitigation_method == "3-NOP":
-        print("3-NOP starch_concentration: ", starch_concentration)
         methane_yield_reduction = (
             -30.8
             - 0.226 * (methane_mitigation_additive_amount - 70.5)
@@ -53,7 +52,6 @@ def methane_mitigation(
             - 0.337 * (starch_concentration - 21.1)
         )
     elif methane_mitigation_method == "Monensin":
-        print("Monensin starch_concentration: ", starch_concentration)
         methane_yield_reduction = (
             6.36 
             - 0.277 * methane_mitigation_additive_amount
@@ -63,7 +61,6 @@ def methane_mitigation(
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
         methane_yield_reduction = 0.0
-    # print("methane_yield_reduction: ", methane_yield_reduction)
     return methane_yield_reduction
 
 
