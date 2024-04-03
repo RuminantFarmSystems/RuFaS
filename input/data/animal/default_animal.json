@@ -10,7 +10,7 @@
     "breed": "HO"
   },
   "herd_initialization": {
-    "initial_animal_num": 1000,
+    "initial_animal_num": 10000,
     "simulation_days": 5000
   },
   "animal_config": {
