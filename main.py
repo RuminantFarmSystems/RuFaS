@@ -129,7 +129,6 @@ def run_rufas(
     """
 
     output_manager = OutputManager()
-    output_manager.set_exclude_info_maps_flag(exclude_info_maps)
     output_manager.set_log_verbose(verbose)
     output_manager.print_credits()
     output_manager.create_directory(output_dir)
@@ -384,7 +383,7 @@ def execute_simulations(
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
     exclude_info_maps : bool
-        Flag for whether or not the user wants to include info_maps data in their results files.
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
     produce_graphics: bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path
