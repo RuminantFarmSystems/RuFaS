@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
@@ -151,7 +152,7 @@ def test_report_daily_animal_population(mocker: MockerFixture) -> None:
     assert om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"]["info_maps"] == [
         {
             "data_origin": [("AnimalManager", "daily_updates")],
-            "units": "animals",
+            "units": AcceptableUnits.ANIMALS,
         }
     ]
 
@@ -200,46 +201,46 @@ def test_report_milk(mocker: MockerFixture) -> None:
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": AcceptableUnits.DAYS,
+                "estimated_daily_milk_produced": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_protein": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_fat": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_lactose": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "lactating": AcceptableUnits.UNITLESS,
+                "parity": AcceptableUnits.UNITLESS,
+                "cow_id": AcceptableUnits.UNITLESS,
+                "pen_id": AcceptableUnits.UNITLESS,
+                "simulation_day": AcceptableUnits.SIMULATION_DAY,
             },
         },
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": AcceptableUnits.DAYS,
+                "estimated_daily_milk_produced": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_protein": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_fat": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_lactose": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "lactating": AcceptableUnits.UNITLESS,
+                "parity": AcceptableUnits.UNITLESS,
+                "cow_id": AcceptableUnits.UNITLESS,
+                "pen_id": AcceptableUnits.UNITLESS,
+                "simulation_day": AcceptableUnits.SIMULATION_DAY,
             },
         },
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": AcceptableUnits.DAYS,
+                "estimated_daily_milk_produced": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_protein": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_fat": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "milk_lactose": AcceptableUnits.KILOGRAMS_PER_DAY,
+                "lactating": AcceptableUnits.UNITLESS,
+                "parity": AcceptableUnits.UNITLESS,
+                "cow_id": AcceptableUnits.UNITLESS,
+                "pen_id": AcceptableUnits.UNITLESS,
+                "simulation_day": AcceptableUnits.SIMULATION_DAY,
             },
         },
     ]

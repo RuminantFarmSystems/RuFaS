@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, call, patch, PropertyMock
 from typing import List
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -182,14 +183,14 @@ def test_record_tillage(
 
     expected_clay_percent = 25.0
     expected_units = {
-        "tillage_depth": "mm",
-        "incorporation_fraction": "unitless",
-        "mixing_fraction": "unitless",
-        "implement": "unitless",
-        "year": "year",
-        "day": "day",
-        "field_size": "ha",
-        "average_clay_percent": "percentage",
+        "tillage_depth": AcceptableUnits.MILLIMETERS,
+        "incorporation_fraction": AcceptableUnits.UNITLESS,
+        "mixing_fraction": AcceptableUnits.UNITLESS,
+        "implement": AcceptableUnits.UNITLESS,
+        "year": AcceptableUnits.CALENDAR_YEAR,
+        "day": AcceptableUnits.ORDINAL_DAY,
+        "field_size": AcceptableUnits.HECTARE,
+        "average_clay_percent": AcceptableUnits.PERCENT,
     }
     expected_info_map = {
         "class": TillageApplication.__name__,

@@ -10,6 +10,7 @@ from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.output_manager import LogVerbosity, OutputManager
 
 
@@ -1937,8 +1938,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
                     ],
                     "values": [10, 20],
                 }
@@ -1946,8 +1947,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
                     ],
                     "values": [10, 20],
                     "detailed_data_origins": [
@@ -1964,9 +1965,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": "units_b",
+                            "units": AcceptableUnits.MILLIMETERS,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": AcceptableUnits.MILLIMETERS},
                     ],
                     "values": [30, 40],
                 }
@@ -1976,9 +1977,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": "units_b",
+                            "units": AcceptableUnits.MILLIMETERS,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": AcceptableUnits.MILLIMETERS},
                     ],
                     "values": [30, 40],
                     "detailed_data_origins": [
