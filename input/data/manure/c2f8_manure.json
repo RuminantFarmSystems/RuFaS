@@ -6,7 +6,7 @@
       "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_separator_after_digestion": "none",
-      "manure_treatment": "compost barn bedded pack"
+      "manure_treatment": "compost bedded pack barn"
     },
     {
       "scenario_id": 1,
@@ -178,7 +178,7 @@
       "potassium_removal_efficiency_for_treatment": 0.00,
       "storage_time_period": 180,
       "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "no cover"
     },
     {
       "manure_treatment_type": "anaerobic lagoon",

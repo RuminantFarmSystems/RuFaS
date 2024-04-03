@@ -20,7 +20,7 @@
         "scenario_id": 2,
         "bedding_type": "none",
         "manure_handler": "flush system",
-        "manure_separator": "screw press + settling pond",
+        "manure_separator": "screw press",
         "manure_separator_after_digestion": "none",
         "manure_treatment": "anaerobic lagoon"
       }
@@ -145,18 +145,8 @@
         "phosphorus_removal_efficiency_for_separator": 0.40,
         "potassium_removal_efficiency_for_separator": 0.15
       },
-      {
-        "manure_separator_type": "screw press",
-        "percent_dry_solids": 0.35,
-        "total_solids_removal_efficiency_for_separator": 0.25,
-        "volatile_solids_removal_efficiency_for_separator": 0.30,
-        "nitrogen_removal_efficiency_for_separator": 0.30,
-        "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
-        "phosphorus_removal_efficiency_for_separator": 0.20,
-        "potassium_removal_efficiency_for_separator": 0.23
-      },
     {
-      "manure_separator_type": "screw press + settling pond",
+      "manure_separator_type": "screw press",
       "percent_dry_solids": 0.35,
       "total_solids_removal_efficiency_for_separator": 0.38,
       "volatile_solids_removal_efficiency_for_separator": 0.48,
@@ -190,7 +180,7 @@
         "potassium_removal_efficiency_for_treatment": 0.00,
         "storage_time_period": 120,
         "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "no cover"
       },
       {
         "manure_treatment_type": "anaerobic lagoon",
