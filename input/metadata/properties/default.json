@@ -299,8 +299,7 @@
             },
             "repro_sub_protocol": {
               "type": "string",
-              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
-              "default": "5dCG2P"
+              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
             },
             "repro_sub_properties": {
               "type": "object",
@@ -998,17 +997,11 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1130,17 +1123,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1262,17 +1249,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1424,17 +1405,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
