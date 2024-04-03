@@ -192,11 +192,11 @@ class HeiferII(HeiferI):
         self.estrus_day = args["estrus_day"]
 
         # TAI variables
-        self.tai_method_h = args["tai_method_h"]
+        self.tai_method_h = args["repro_sub_protocol"]
         self.tai_program_start_day_h = args["tai_program_start_day_h"]
 
         # synch_ED variables
-        self.synch_ed_method_h = args["synch_ed_method_h"]
+        self.synch_ed_method_h = args["repro_sub_protocol"]
         self.synch_ed_program_start_day_h = args["synch_ed_program_start_day_h"]
         self.synch_ed_estrus_day = args["synch_ed_estrus_day"]
         self.synch_ed_stop_day = args["synch_ed_stop_day"]
