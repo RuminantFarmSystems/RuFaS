@@ -173,7 +173,6 @@ def test_lactating_cow_manure_calculations(  # noqa
             NDF_concentration,
             EE_concentration,
             starch_concentration,
-            CP_concentration,
             methane_mitigation_method,
             methane_mitigation_additive_amount,
         )
