@@ -351,7 +351,7 @@ class Cow(HeiferIII):
         -------
         sim_day : int
             The current simulation day
-        calving_interval : int or float
+        calving_interval : int | float
             calving_interval is an int (user input calving interval) if the
             value of animal_config["use_input_calving_interval"] exists
             and is True; otherwise, it is a float (average herd calving
