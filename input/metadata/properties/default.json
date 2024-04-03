@@ -299,7 +299,8 @@
             },
             "repro_sub_protocol": {
               "type": "string",
-              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+              "default": "5dCG2P"
             },
             "repro_sub_properties": {
               "type": "object",
