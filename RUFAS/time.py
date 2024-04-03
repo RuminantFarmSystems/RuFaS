@@ -1,3 +1,4 @@
+from RUFAS.units import AcceptableUnits
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -141,9 +142,10 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.day, dict(info_map, **{"units": "ordinal day"}))
-        om.add_variable("year", self.year, dict(info_map, **{"units": "year"}))
-        om.add_variable("calendar_year", self.calendar_year, dict(info_map, **{"units": "calendar year"}))
+        om.add_variable("day", self.day, dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY}))
+        om.add_variable("year", self.year, dict(info_map, **{"units": AcceptableUnits.SIMULATION_YEAR}))
+        om.add_variable("calendar_year", self.calendar_year,
+                        dict(info_map, **{"units": AcceptableUnits.CALENDAR_YEAR}))
 
     @property
     def is_last_day_of_simulation(self):
