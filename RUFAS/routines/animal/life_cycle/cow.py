@@ -51,6 +51,8 @@ class Cow(HeiferIII):
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -171,6 +173,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
@@ -206,6 +209,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
