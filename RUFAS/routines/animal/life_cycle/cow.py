@@ -355,7 +355,7 @@ class Cow(HeiferIII):
             calving_interval is an int (user input calving interval) if the
             value of animal_config["use_input_calving_interval"] exists
             and is True; otherwise, it is a float (average herd calving
-            interval) (logic in _set_avg_CI in of lifecycle.py)
+            interval), see logic in _set_avg_CI in lifecycle.py.
 
         Returns
         -------
