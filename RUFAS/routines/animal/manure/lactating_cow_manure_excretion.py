@@ -14,7 +14,6 @@ def methane_mitigation(
     NDF_concentration: float,
     EE_concentration: float,
     starch_concentration: float,
-    CP_concentration: float,
     methane_mitigation_method: str,
     methane_mitigation_additive_amount: float,
 ) -> float:
@@ -28,8 +27,6 @@ def methane_mitigation(
         Concentration of ether extract (EE) in the ration.
     starch_concentration : float
         Concentration of starch in the ration.
-    CP_concentration : float
-        Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str
         Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
         "EssentialOils", and "Seaweed".
@@ -45,8 +42,6 @@ def methane_mitigation(
     """
 
     methane_yield_reduction = 0.0
-    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
-    Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
 
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = (
@@ -57,12 +52,7 @@ def methane_mitigation(
             - 0.337 * (starch_concentration - 21.1)
         )
     elif methane_mitigation_method == "Monensin":
-        if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
-            methane_yield_reduction = (
-                0.30054 - 0.00377 * methane_mitigation_additive_amount - 1.57832 * CP_concentration / 100
-            ) * 100
-        else:
-            methane_yield_reduction = (0.03223 - 0.00410 * methane_mitigation_additive_amount) * 100
+        methane_yield_reduction = 6.36 - 0.277 * methane_mitigation_additive_amount - 0.182 * starch_concentration
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
@@ -245,7 +235,6 @@ def manure_calculations(
             NDF_concentration,
             EE_concentration,
             starch_concentration,
-            CP_concentration,
             methane_mitigation_method,
             methane_mitigation_additive_amount,
         )

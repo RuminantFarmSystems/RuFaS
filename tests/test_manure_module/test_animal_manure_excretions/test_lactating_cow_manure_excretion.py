@@ -15,22 +15,20 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
 
 
 @pytest.mark.parametrize(
-    "NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method,\
+    "NDF_concentration, EE_concentration, starch_concentration, methane_mitigation_method,\
           methane_mitigation_additive_amount, expected_reduction",
     [
-        (35.0, 5.0, 20.0, 15.0, "3-NOP", 70.0, -25.3169),
-        (40.0, 4.0, 25.0, 18.0, "Monensin", 24.0, -7.40),
-        (40.0, 4.0, 25.0, 14.0, "Monensin", 24.0, -6.617),
-        (45.0, 3.0, 30.0, 10.0, "Essential Oils", 80.0, 0.0),
-        (50.0, 2.0, 35.0, 8.0, "Seaweed", 90.0, 0.0),
-        (55.0, 1.0, 40.0, 6.0, "None", 70.0, 0.0),
+        (35.0, 5.0, 20.0, "3-NOP", 70.0, -25.3169),
+        (40.0, 4.0, 25.0, "Monensin", 20.0, -3.73),
+        (45.0, 3.0, 30.0, "Essential Oils", 80.0, 0.0),
+        (50.0, 2.0, 35.0, "Seaweed", 90.0, 0.0),
+        (55.0, 1.0, 40.0, "None", 70.0, 0.0),
     ],
 )
 def test_methane_mitigation(
     NDF_concentration,
     EE_concentration,
     starch_concentration,
-    CP_concentration,
     methane_mitigation_method,
     methane_mitigation_additive_amount,
     expected_reduction,
@@ -40,7 +38,6 @@ def test_methane_mitigation(
         NDF_concentration,
         EE_concentration,
         starch_concentration,
-        CP_concentration,
         methane_mitigation_method,
         methane_mitigation_additive_amount,
     )
@@ -176,7 +173,6 @@ def test_lactating_cow_manure_calculations(  # noqa
             NDF_concentration,
             EE_concentration,
             starch_concentration,
-            CP_concentration,
             methane_mitigation_method,
             methane_mitigation_additive_amount,
         )
