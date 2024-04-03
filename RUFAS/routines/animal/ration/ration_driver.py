@@ -1,6 +1,7 @@
 import collections
 from typing import Set, Dict, List, Tuple
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
@@ -94,22 +95,22 @@ class RationManager:
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
                 fail_summary_units = {
-                    "simulation_day": "simulation day",
-                    "reattempt number": "unitless",
-                    "constraints_failed_dict": "unitless",
-                    "ration_attempted": "unitless",
+                    "simulation_day": AcceptableUnits.SIMULATION_DAY,
+                    "reattempt number": AcceptableUnits.UNITLESS,
+                    "constraints_failed_dict": AcceptableUnits.UNITLESS,
+                    "ration_attempted": AcceptableUnits.UNITLESS,
                     "pen requirements": {
-                        "NEmaint_requirement": "Mcal",
-                        "NEa_requirement": "Mcal",
-                        "NEg_requirement": "Mcal",
-                        "NEpreg_requirement": "Mcal",
-                        "NEl_requirement": "Mcal",
-                        "MP_requirement": "g",
-                        "Ca_requirement": "g",
-                        "P_req": "g",
-                        "DMIest_requirement": "kg",
-                        "avg_BW": "kg",
-                        "avg_milk_production_reduction_pen": "kg",
+                        "NEmaint_requirement": AcceptableUnits.MEGACALORIES,
+                        "NEa_requirement": AcceptableUnits.MEGACALORIES,
+                        "NEg_requirement": AcceptableUnits.MEGACALORIES,
+                        "NEpreg_requirement": AcceptableUnits.MEGACALORIES,
+                        "NEl_requirement": AcceptableUnits.MEGACALORIES,
+                        "MP_requirement": AcceptableUnits.GRAMS,
+                        "Ca_requirement": AcceptableUnits.GRAMS,
+                        "P_req": AcceptableUnits.GRAMS,
+                        "DMIest_requirement": AcceptableUnits.KILOGRAMS,
+                        "avg_BW": AcceptableUnits.KILOGRAMS,
+                        "avg_milk_production_reduction_pen": AcceptableUnits.KILOGRAMS,
                     },
                 }
                 om.add_variable(
@@ -281,22 +282,22 @@ class RationManager:
                 solution.x, ration_optimizer.heifer_cons, ration_config
             )
         fail_summary_units = {
-            "simulation_day": "simulation day",
-            "reattempt number": "unitless",
-            "constraints_failed_dict": "unitless",
-            "ration_attempted": "unitless",
+            "simulation_day": AcceptableUnits.SIMULATION_DAY,
+            "reattempt number": AcceptableUnits.UNITLESS,
+            "constraints_failed_dict": AcceptableUnits.UNITLESS,
+            "ration_attempted": AcceptableUnits.UNITLESS,
             "pen requirements": {
-                "NEmaint_requirement": "Mcal",
-                "NEa_requirement": "Mcal",
-                "NEg_requirement": "Mcal",
-                "NEpreg_requirement": "Mcal",
-                "NEl_requirement": "Mcal",
-                "MP_requirement": "g",
-                "Ca_requirement": "g",
-                "P_req": "g",
-                "DMIest_requirement": "kg",
-                "avg_BW": "kg",
-                "avg_milk_production_reduction_pen": "kg",
+                "NEmaint_requirement": AcceptableUnits.MEGACALORIES,
+                "NEa_requirement": AcceptableUnits.MEGACALORIES,
+                "NEg_requirement": AcceptableUnits.MEGACALORIES,
+                "NEpreg_requirement": AcceptableUnits.MEGACALORIES,
+                "NEl_requirement": AcceptableUnits.MEGACALORIES,
+                "MP_requirement": AcceptableUnits.GRAMS,
+                "Ca_requirement": AcceptableUnits.GRAMS,
+                "P_req": AcceptableUnits.GRAMS,
+                "DMIest_requirement": AcceptableUnits.KILOGRAMS,
+                "avg_BW": AcceptableUnits.KILOGRAMS,
+                "avg_milk_production_reduction_pen": AcceptableUnits.KILOGRAMS,
             },
         }
         if failed_constraints is not None:
