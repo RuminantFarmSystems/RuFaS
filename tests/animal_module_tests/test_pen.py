@@ -123,6 +123,7 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
         "birth_weight": 200,
         "p_init": 1,
         "repro_program": "ED",
+        "repro_sub_protocol": "2P",
         "tai_method_h": "5dCG2P",
         "synch_ed_method_h": "2P",
         "calf_birth_weight": 200,
