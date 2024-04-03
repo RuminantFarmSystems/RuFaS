@@ -1357,6 +1357,7 @@ class OutputManager(object):
         """
 
         self._detailed_values_flag = flag
+
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
         Sets the exclude_info_maps flag to the given value.
