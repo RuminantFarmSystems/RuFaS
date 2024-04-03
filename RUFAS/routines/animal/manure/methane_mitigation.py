@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-
 
 class MethaneMitigationMethod(ABC):
     """A class representing a methane mitigation method. This is a base class and should be subclassed."""
