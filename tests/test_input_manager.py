@@ -417,9 +417,12 @@ def test_populate_pool_valid(
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
 
+    input_manager.pool = {}
+
 
 def test_populate_pool_invalid(
     mock_metadata: Dict[str, Dict[str, Any]],
+    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
@@ -491,6 +494,8 @@ def test_populate_pool_partial_invalid(
     assert "element2" not in input_manager.pool["file1"]
     assert "element3" in input_manager.pool["file2"]
     assert "element4" not in input_manager.pool["file2"]
+
+    input_manager.pool = {}
 
 
 def test_populate_pool_eager_termination(
