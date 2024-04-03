@@ -341,7 +341,7 @@ class Cow(HeiferIII):
         """
         return np.random.normal(mean, std)
 
-    def milking_update(self, sim_day, calving_interval):
+    def milking_update(self, sim_day: int, calving_interval: int | float):
         """
         Updates milking status for lactating cows, using breed and parity
         to estimate daily milk production from specific lactation curves
