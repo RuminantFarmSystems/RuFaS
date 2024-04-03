@@ -27,18 +27,8 @@ def mock_output_manager(mocker) -> OutputManager:
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     """Unit test for the function set_metadata_prefix in the file output_manager.py"""
-
-    # Assert before setting metadata_prefix
-    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == ""
-
-    # Act
     mock_output_manager.set_metadata_prefix("dummy_prefix")
-
-    # Assert after setting metadata_prefix
-    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == "dummy_prefix"
-
-    # Cleanup
-    mock_output_manager.set_metadata_prefix("")
+    assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
 
 
 @pytest.mark.parametrize(
@@ -47,18 +37,8 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 )
 def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
-
-    # Assert before setting log_verbose
-    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == LogVerbosity.CREDITS
-
-    # Act
     mock_output_manager.set_log_verbose(log_verbose)
-
-    # Assert after setting log_verbose
-    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == log_verbose
-
-    # Cleanup
-    mock_output_manager.set_log_verbose(LogVerbosity.CREDITS)
+    assert mock_output_manager._OutputManager__log_verbose == log_verbose
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
@@ -467,78 +447,37 @@ def test_add_variable(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag",
-    [
-        ("dummy_value", False),
-        (2, False),
-        (3.45, False),
-        (True, False),
-        ({"key": "value"}, False),
-        ([1, 2, 3], False),
-        ("dummy_value", True),
-        (2, True),
-        (3.45, True),
-        (True, True),
-        ({"key": "value"}, True),
-        ([1, 2, 3], True),
-    ],
+    "dummy_value",
+    ["dummy_value", 2, 3.45, True],
 )
-def test_add_to_pool(
-    mock_output_manager: OutputManager,
-    dummy_value: Any,
-    exclude_info_maps_flag: bool,
-) -> None:
+def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
-
-    # Arrange
     info_map = {
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
     }
     key = "dummy_key"
-    pool: Dict[str, Dict[str, Any]] = {}
-    assert not mock_output_manager._exclude_info_maps_flag
-    mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
-
-    # Act
+    pool = {}
     mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
-
-    # Assert
+    assert pool[key] == {
+        "info_maps": [{"context": "dummy_context"}],
+        "values": [dummy_value],
+    }
     assert pool[key]["values"][0] == dummy_value
-    if isinstance(dummy_value, (int, bool, float, str)):
-        assert pool[key]["values"][0] is dummy_value
-    else:
-        assert pool[key]["values"][0] == deepcopy(dummy_value)
+    assert pool[key]["values"][0] is dummy_value
 
-    if exclude_info_maps_flag:
-        assert pool[key]["info_maps"] == []
-    else:
-        assert pool[key]["info_maps"] == [{"context": "dummy_context"}]
-
-    # Arrange
-    info_map["more_context"] = "1234567890"
-
-    # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
-
-    # Assert
-    assert pool[key]["values"][1] == dummy_value
-    if isinstance(dummy_value, (int, bool, float, str)):
-        assert pool[key]["values"][1] is dummy_value
-    else:
-        assert pool[key]["values"][1] == deepcopy(dummy_value)
-
-    if exclude_info_maps_flag:
-        assert pool[key]["info_maps"] == []
-    else:
-        assert pool[key]["info_maps"] == [
+    info_map["more_context"] = 1234567890
+    mock_output_manager._add_to_pool(pool, key, {dummy_value}, info_map)
+    assert pool[key] == {
+        "info_maps": [
             {"context": "dummy_context"},
-            {"context": "dummy_context", "more_context": "1234567890"},
-        ]
-
-    # Cleanup
-    mock_output_manager._exclude_info_maps_flag = False
+            {"context": "dummy_context", "more_context": 1234567890},
+        ],
+        "values": [dummy_value, {dummy_value}],
+    }
+    assert pool[key]["values"][1] == deepcopy({dummy_value})
+    assert pool[key]["values"][1] is not {dummy_value}
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
@@ -2114,25 +2053,3 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
-
-
-@pytest.mark.parametrize("flag_value", [False, True])
-def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
-    """
-    Unit test for the set_exclude_info_maps_flag() method in OutputManager class
-    """
-
-    # Arrange
-    output_manager = OutputManager()
-
-    # Assert before
-    assert not output_manager._exclude_info_maps_flag
-
-    # Act
-    output_manager.set_exclude_info_maps_flag(flag_value)
-
-    # Assert after
-    assert output_manager._exclude_info_maps_flag == flag_value
-
-    # Cleanup
-    output_manager._exclude_info_maps_flag = False
