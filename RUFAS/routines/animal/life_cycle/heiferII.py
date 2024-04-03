@@ -114,6 +114,8 @@ class HeiferII(HeiferI):
         self._hormone_schedule = None
         self._TAI_conception_rate = 0.0
 
+        self.repro_sub_protocol = args["repro_sub_protocol"]
+
     def get_bw_change(self):
         """
         Calculates the body weight change for a heifer, depending on if she
@@ -221,6 +223,7 @@ class HeiferII(HeiferI):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,

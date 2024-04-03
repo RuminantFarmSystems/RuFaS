@@ -10,7 +10,7 @@
     "breed": "HO"
   },
   "herd_initialization": {
-    "initial_animal_num": 10000,
+    "initial_animal_num": 1000,
     "simulation_days": 5000
   },
   "animal_config": {
@@ -48,8 +48,7 @@
         "heifers": {
             "estrus_detection_rate": 0.9,
             "estrus_conception_rate": 0.6,
-            "tai_method_h": "5dCG2P",
-            "synch_ed_method_h": "2P",
+            "repro_sub_protocol": "5dCG2P",
             "repro_sub_properties": {
                 "conception_rate": 0.6,
                 "estrus_detection_rate": 0.9
