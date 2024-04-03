@@ -732,7 +732,11 @@ def test_calculate_NRC_energy_growth_requirements(
         (lazy_fixture("heifer_b"), 40, 0),
     ],
 )
-def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float) -> None:
+def test_calculate_NRC_energy_pregnancy_requirements(
+    animal_dict: dict,
+    calf_birth_weight: float,
+    expected: float,
+) -> None:
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(animal_dict["day_of_pregnancy"], calf_birth_weight)
     assert (result_NEpreg) == pytest.approx((expected), rel=1e-2)
