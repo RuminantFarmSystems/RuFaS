@@ -3361,6 +3361,7 @@ def mock_cow_args() -> Dict[str, Any]:
         "id": 1,
         "calf_birth_weight": 30,
         "repro_program": "ED",
+        "repro_sub_protocol": "2P",
         "presynch_method": "PreSynch",
         "tai_method_c": "OvSynch 56",
         "tai_method_h": "OvSynch 56",
