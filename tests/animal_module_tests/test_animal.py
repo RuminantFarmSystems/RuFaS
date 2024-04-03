@@ -2911,7 +2911,7 @@ def test_calc_milk_average() -> None:
         4: MagicMock(),
     }
     production = [1, 2, 3, 4, 5]
-    for i in range(len(production)) -> None:
+    for i in range(len(production)):
         animal_list = list(mockpen.animals_in_pen.values())
         animal_list[i].estimated_daily_milk_produced = production[i]
     result = RationManager.calc_milk_average(mockpen)
