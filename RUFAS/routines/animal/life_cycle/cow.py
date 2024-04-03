@@ -51,6 +51,8 @@ class Cow(HeiferIII):
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
