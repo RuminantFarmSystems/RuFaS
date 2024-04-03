@@ -110,7 +110,6 @@ class HeiferII(HeiferI):
         self.conception_rate = 0.0
         self.tai_program_start_day = 0
         self.synch_ed_program_start_day = 0
-        self.abortion_day = None
         self.p_gest_for_calf = 0
         self._hormone_schedule = None
         self._TAI_conception_rate = 0.0
@@ -1415,14 +1414,15 @@ class HeiferII(HeiferI):
         -------
         float
             The birth weight of the calf.
-        """
 
-        return truncnorm.rvs(
+        """
+        birth_weight = truncnorm.rvs(
             -const.STDI,
             const.STDI,
             AnimalBase.config[f"birth_weight_avg_{breed.lower()}"],
             AnimalBase.config[f"birth_weight_std_{breed.lower()}"],
         )
+        return float(birth_weight)
 
     def _initialize_pregnancy_parameters(self) -> None:
         """
