@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import astuple, fields
 from dataclasses import dataclass
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
@@ -190,135 +191,135 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     """
 
     pen_id: int = -1
-    pen_id_unit: str = "unitless"
+    pen_id_unit: str = AcceptableUnits.UNITLESS
 
     simulation_day: int = -1
-    simulation_day_unit: str = "simulation days"
+    simulation_day_unit: str = AcceptableUnits.SIMULATION_DAY
 
     liquid_manure_total_ammoniacal_nitrogen: float = 0.0
-    liquid_manure_total_ammoniacal_nitrogen_unit: str = "kg"
+    liquid_manure_total_ammoniacal_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_nitrogen: float = 0.0
-    liquid_manure_nitrogen_unit: str = "kg"
+    liquid_manure_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_total_solids: float = 0.0
-    liquid_manure_total_solids_unit: str = "kg"
+    liquid_manure_total_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_total_volatile_solids: float = 0.0
-    liquid_manure_total_volatile_solids_unit: str = "kg"
+    liquid_manure_total_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_total_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_degradable_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_total_non_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_non_degradable_volatile_solids_unit: str = "kg"
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_phosphorus: float = 0.0
-    liquid_manure_phosphorus_unit: str = "kg"
+    liquid_manure_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     liquid_manure_potassium: float = 0.0
-    liquid_manure_potassium_unit: str = "kg"
+    liquid_manure_potassium_unit: str = AcceptableUnits.KILOGRAMS
 
     daily_final_manure_volume: float = 0.0
-    daily_final_manure_volume_unit: str = "m^3"
+    daily_final_manure_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     # To satisfy the LiquidManurePortionProtocol
     liquid_manure_daily_volume: float = 0.0
-    liquid_manure_daily_volume_unit: str = "m^3"
+    liquid_manure_daily_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     storage_methane: float = 0.0
-    storage_methane_unit: str = "kg"
+    storage_methane_unit: str = AcceptableUnits.KILOGRAMS
 
     storage_ammonia: float = 0.0
-    storage_ammonia_unit: str = "kg"
+    storage_ammonia_unit: str = AcceptableUnits.KILOGRAMS
 
     storage_nitrous_oxide: float = 0.0
-    storage_nitrous_oxide_unit: str = "kg"
+    storage_nitrous_oxide_unit: str = AcceptableUnits.KILOGRAMS
 
     storage_nitrogen_leached: float = 0.0
-    storage_nitrogen_leached_unit: str = "kg"
+    storage_nitrogen_leached_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_total_solids: float = 0.0
-    sludge_manure_total_solids_unit: str = "kg"
+    sludge_manure_total_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_total_volatile_solids: float = 0.0
-    sludge_manure_total_volatile_solids_unit: str = "kg"
+    sludge_manure_total_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_nitrogen: float = 0.0
-    sludge_manure_nitrogen_unit: str = "kg"
+    sludge_manure_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_phosphorus: float = 0.0
-    sludge_manure_phosphorus_unit: str = "kg"
+    sludge_manure_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_potassium: float = 0.0
-    sludge_manure_potassium_unit: str = "kg"
+    sludge_manure_potassium_unit: str = AcceptableUnits.KILOGRAMS
 
     sludge_manure_daily_volume: float = 0.0
-    sludge_manure_daily_volume_unit: str = "m^3"
+    sludge_manure_daily_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     solid_manure_total_solids: float = 0.0
-    solid_manure_total_solids_unit: str = "kg"
+    solid_manure_total_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_total_volatile_solids: float = 0.0
-    solid_manure_total_volatile_solids_unit: str = "kg"
+    solid_manure_total_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_nitrogen: float = 0.0
-    solid_manure_nitrogen_unit: str = "kg"
+    solid_manure_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_inorganic_nitrogen: float = 0.0
-    solid_manure_inorganic_nitrogen_unit: str = "kg"
+    solid_manure_inorganic_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_organic_nitrogen: float = 0.0
-    solid_manure_organic_nitrogen_unit: str = "kg"
+    solid_manure_organic_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_total_ammoniacal_nitrogen: float = 0.0
-    solid_manure_total_ammoniacal_nitrogen_unit: str = "kg"
+    solid_manure_total_ammoniacal_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_phosphorus: float = 0.0
-    solid_manure_phosphorus_unit: str = "kg"
+    solid_manure_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
-    solid_manure_water_extractable_inorganic_phosphorus_unit: str = "kg"
+    solid_manure_water_extractable_inorganic_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_water_extractable_organic_phosphorus: float = 0.0
-    solid_manure_water_extractable_organic_phosphorus_unit: str = "kg"
+    solid_manure_water_extractable_organic_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_non_water_extractable_inorganic_phosphorus: float = 0.0
-    solid_manure_non_water_extractable_inorganic_phosphorus_unit: str = "kg"
+    solid_manure_non_water_extractable_inorganic_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_non_water_extractable_organic_phosphorus: float = 0.0
-    solid_manure_non_water_extractable_organic_phosphorus_unit: str = "kg"
+    solid_manure_non_water_extractable_organic_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_potassium: float = 0.0
-    solid_manure_potassium_unit: str = "kg"
+    solid_manure_potassium_unit: str = AcceptableUnits.KILOGRAMS
 
     solid_manure_daily_mass: float = 0.0
-    solid_manure_daily_mass_unit: str = "kg"
+    solid_manure_daily_mass_unit: str = AcceptableUnits.KILOGRAMS
 
     # different unit from docstring m^3 vs m^3/day?
     biogas: float = 0.0  # biogas production per day (m3/day)
-    biogas_unit: str = "m^3/day"
+    biogas_unit: str = AcceptableUnits.CUBIC_METERS_PER_DAY
 
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    biogas_energy_content_unit: str = "MJ/m^3"
+    biogas_energy_content_unit: str = AcceptableUnits.MEGAJOULES_PER_CUBIC_METER
 
     methane_generation_volume: float = 0.0
-    methane_generation_volume_unit: str = "m^3"
+    methane_generation_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     heating_input_energy: float = 0.0
-    heating_input_energy_unit: str = "MJ"
+    heating_input_energy_unit: str = AcceptableUnits.MEGAJOULES
 
     evaporated_water: float = 0.0
-    evaporated_water_unit: str = "m^3"
+    evaporated_water_unit: str = AcceptableUnits.CUBIC_METERS
 
     minimum_digester_volume: float = 0.0
-    minimum_digester_volume_unit: str = "m^3"
+    minimum_digester_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     top_cover_volume: float = 0.0
-    top_cover_volume_unit: str = "m^3"
+    top_cover_volume_unit: str = AcceptableUnits.CUBIC_METERS
 
     solid_manure_carbon_decomposition: float = 0.0
-    solid_manure_carbon_decomposition_unit: str = "kg"
+    solid_manure_carbon_decomposition_unit: str = AcceptableUnits.KILOGRAMS
 
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the final manure volume."""

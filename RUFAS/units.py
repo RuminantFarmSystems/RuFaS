@@ -44,3 +44,7 @@ class AcceptableUnits(Enum):
     METRIC_TONS: str = "metric tons"
     METERS: str = "m"
     MILLIMETERS_PER_HECTARE: str = "mm/ha"
+    MEGAJOULES: str = "MJ"
+    CUBIC_METERS: str = "m^3"
+    MEGAJOULES_PER_CUBIC_METER: str = "MJ/m^3"
+    CUBIC_METERS_PER_DAY: str = "m^3/day"
