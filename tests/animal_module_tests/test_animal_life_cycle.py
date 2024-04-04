@@ -1316,7 +1316,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
 
-def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     # Arrange
     sim_day = 1
     mock_cows = []
@@ -1334,9 +1334,11 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
         mock_cow = mocker.MagicMock()
         mock_cow.id = i
         is_culled = i % 2 == 0
+        mock_cow.culled = is_culled
         has_new_born = i % 3 == 0
-        mock_cow.update.return_value = (None, None, None, is_culled, has_new_born)
-        if is_culled:
+        mock_cow.has_new_born = has_new_born
+        # mock_cow.update.return_value = (has_new_born)
+        if mock_cow.culled:
             animals_removed.append(mock_cow)
             removed_cows_idx.append(i)
             num_cows_culled += 1
@@ -1373,15 +1375,15 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     )
 
     # Act
-    actual_total_animal_num = life_cycle_manager._cull_cows_and_record_stats(
+    actual_total_animal_num = life_cycle_manager._evaluate_and_update_cows(
         sim_day, mock_cows, calves_born, animals_removed, total_animal_num_start
     )
 
     # Assert
     for cow in mock_cows_original:
         cow.update.assert_called_once_with(sim_day, avg_CI)
-        _, _, _, is_culled, has_new_born = cow.update.return_value
-        if is_culled:
+        has_new_born = cow.update.return_value
+        if cow.culled:
             assert cow in animals_removed
             assert cow.id in removed_cows_idx
         else:
@@ -1391,7 +1393,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
             patch_for_handle_cow_calves.assert_any_call(cow, calving_age_avail_num, calf_to_preg_time_avail_num)
             patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
             patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
-        if has_new_born:
+        if cow.has_new_born:
             patch_for_handle_new_born.assert_any_call(sim_day, cow, calves_born)
 
     assert patch_for_cull_cow.call_count == num_cows_culled

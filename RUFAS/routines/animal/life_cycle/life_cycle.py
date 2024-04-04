@@ -299,7 +299,7 @@ class LifeCycleManager:
             sim_day, heiferIIIs, cows, total_animal_num
         )
 
-        total_animal_num = self._cull_cows_and_record_stats(
+        total_animal_num = self._evaluate_and_update_cows(
             sim_day, cows, calves_born, animals_removed, total_animal_num
         )
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
@@ -769,7 +769,7 @@ class LifeCycleManager:
             animals_added.append(replacement)
             self.bought_heifer_num += 1
 
-    def _cull_cows_and_record_stats(
+    def _evaluate_and_update_cows(
         self,
         sim_day: int,
         cows: List[Cow],
@@ -779,15 +779,22 @@ class LifeCycleManager:
     ) -> int:
         """Culls cows and records stats.
 
-        Args:
-            sim_day: The current simulation day.
-            cows: The list of cows.
-            calves_born: The list of calves born.
-            animals_removed: The list of animals removed from the herd.
-            total_animal_num: The current total number of animals in the herd.
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+        cows : List[Cow]
+            The list of cows.
+        calves_born : List[Calf]
+            The list of calves born.
+        animals_removed : List[Cow]
+            The list of animals removed from the herd.
+        total_animal_num : int
+            The current total number of animals in the herd.
 
-        Returns:
-            The newly updated total number of animals in the herd.
+        Returns
+        -------
+        int: The newly updated total number of animals in the herd.
 
         """
         calving_interval_avail_num = 0
@@ -797,10 +804,10 @@ class LifeCycleManager:
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
-            culled, new_born = cow.update(sim_day, self.avg_CI)
+            cow.update(sim_day, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
-            if culled:
+            if cow.culled:
                 self._cull_cow(cow, sim_day)
                 animals_removed.append(cow)
                 removed_cows_idx.append(index)
@@ -812,7 +819,7 @@ class LifeCycleManager:
                 calving_interval_avail_num = self._handle_cow_CI(cow, calving_interval_avail_num)
                 self._extract_repro_stats_from_cow(cow)
 
-            if new_born:
+            if cow.has_new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
@@ -971,6 +978,7 @@ class LifeCycleManager:
             new_calf.sold_at_day = sim_day
             self.sold_calves.append(new_calf)
             self.sold_calf_num += 1
+        cow.has_new_born = False
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
         """Calculates percentage of each animal class in the herd.
