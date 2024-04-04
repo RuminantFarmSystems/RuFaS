@@ -499,9 +499,9 @@ class Cow(HeiferIII):
         ME_intake : float
             Metabolizable energy intake per kg DMI (Mcal/kg).
         nutrient_amount : Dict[str, float]
-            Amount of nutrients in pen ration, calculated per animal, see Notes section for units.
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
         nutrient_conc : Dict[str, float]
-            Concentration of nutrients in pen ration, calculated per animal, percentages.
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Notes
         -----

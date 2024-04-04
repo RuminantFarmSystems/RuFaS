@@ -111,9 +111,9 @@ def manure_calculations(
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
     nutrient_amount : Dict[str, float]
-        Amount of nutrients in pen ration, calculated per animal.
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
     nutrient_conc : Dict[str, float]
-        Concentration of nutrients in pen ration, calculated per animal.
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -123,6 +123,19 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
