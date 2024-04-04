@@ -117,7 +117,7 @@ class HeiferI(Calf):
         Parameters
         ----------
         DMI : float
-            The Dry Matter Intake (kg)
+            The Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000

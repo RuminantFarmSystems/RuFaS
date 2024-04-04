@@ -468,9 +468,9 @@ class Cow(HeiferIII):
         methane_mitigation_method: str
             Methane mitigation method used.
         methane_mitigation_additive_amount: float
-            Amount of methane mitigation additive, mg/kg dry matter intake (DMI).
+            Amount of methane mitigation additive per kg dry matter intake (DMI) (mg/kg).
         ME_intake : float
-            Metabolizable energy intake, Mcal/kg DM
+            Metabolizable energy intake per kg DMI (Mcal/kg).
         nutrient_amount : Dict[str, float]
             Amount of nutrients in pen ration, calculated per animal.
         nutrient_conc : Dict[str, float]
