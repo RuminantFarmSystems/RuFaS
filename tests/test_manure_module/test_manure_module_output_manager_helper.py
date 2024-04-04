@@ -6,7 +6,6 @@ from typing import Dict
 import pytest
 from pytest_mock import MockFixture
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
     ManureModuleOutputManagerHelper,
 )
