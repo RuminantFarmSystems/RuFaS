@@ -1730,7 +1730,7 @@ class AnimalRequirements:
                 dry_matter_intake_estimate -= adjustment_factor
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
@@ -1812,7 +1812,7 @@ class AnimalRequirements:
             )
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 

@@ -118,9 +118,23 @@ class HeiferIII(HeiferII):
         methane_model : str
             Methane model used for methane emission calculations, including Boadi, IPCC.
         nutrient_amount : Dict[str, float]
-            Amount of nutrients in pen ration, calculated per animal.
+            Amount of nutrients in pen ration, calculated per animal, see Notes  section for units.
         nutrient_conc : Dict[str, float]
-            Concentration of nutrients in pen ration, calculated per animal.
+            Concentration of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 

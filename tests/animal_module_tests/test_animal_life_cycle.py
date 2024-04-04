@@ -1649,7 +1649,7 @@ def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
         (300, 300, 100, 700, 273.6),
         (300, 500, 100, 700, 1.368),
         (520, 500, 100, 700, 13.68),
-        (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE),
+        (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE),
     ],
 )
 def test_heiferI_get_non_preg_bw_change(

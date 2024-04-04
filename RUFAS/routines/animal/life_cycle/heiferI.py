@@ -96,9 +96,23 @@ class HeiferI(Calf):
         methane_model : str
             Methane model used for methane emission calculations, including Boadi, IPCC.
         nutrient_amount : Dict[str, float]
-            Amount of nutrients in pen ration, calculated per animal.
+            Amount of nutrients in pen ration, calculated per animal, see Notes section for units.
         nutrient_conc : Dict[str, float]
-            Concentration of nutrients in pen ration, calculated per animal.
+            Concentration of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
         self.p_excrt, self.manure_excretion = manure_calculations(
@@ -161,7 +175,7 @@ class HeiferI(Calf):
             divisor = 1
         return max(
             (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
-            AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
+            AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
         )
 
     def update(self, sim_day: int) -> bool:
@@ -180,7 +194,7 @@ class HeiferI(Calf):
         Returns
         -------
         bool
-            The second stage of heifer -- breeding stage starts.
+            True if should be moved to second stage of heifer -- breeding stage starts.
         """
 
         self.update_body_weight_history(sim_day)

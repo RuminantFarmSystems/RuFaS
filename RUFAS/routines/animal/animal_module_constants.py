@@ -81,7 +81,7 @@ class AnimalModuleConstants:
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
 
-    MINIMUM_DMI_PERCENTAGE: float = 0.01
+    MINIMUM_DAILY_DMI_RATIO: float = 0.01
     """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
 
     MINIMUM_PHOSPHORUS: float = 0.0
@@ -93,5 +93,5 @@ class AnimalModuleConstants:
     MILK_REDUCTION_KG: float = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
 
-    MINIMUM_HEIFER_BW_CHANGE: float = 0.5
+    MINIMUM_HEIFER_DAILY_GROWTH_RATE: float = 0.5
     """Minimum daily growth for heifers, kg."""
