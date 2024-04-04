@@ -97,6 +97,11 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+    methane_mitigation_method: str
+        The name of the methane mitigation feed additives. The accepted names are
+            '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
+    methane_mitigation_additive_amount: float 
+        The dosage of the feed additive, mg/kg DMI. 
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
