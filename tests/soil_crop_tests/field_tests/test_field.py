@@ -634,11 +634,11 @@ def test_plant_crop(
             {
                 "suffix": "field='name_2'",
                 "units": {
-                    "crop": "unitless",
-                    "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "year", "day": "day"},
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "crop": AcceptableUnits.UNITLESS,
+                    "heat_scheduled_harvest": AcceptableUnits.UNITLESS,
+                    "date": {"year": AcceptableUnits.CALENDAR_YEAR, "day": AcceptableUnits.ORDINAL_DAY},
+                    "field_size": AcceptableUnits.HECTARE,
+                    "average_clay_percent": AcceptableUnits.PERCENT,
                 },
             },
             {
@@ -659,11 +659,11 @@ def test_plant_crop(
             {
                 "suffix": "field='name_3'",
                 "units": {
-                    "crop": "unitless",
-                    "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "year", "day": "day"},
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "crop": AcceptableUnits.UNITLESS,
+                    "heat_scheduled_harvest": AcceptableUnits.UNITLESS,
+                    "date": {"year": AcceptableUnits.CALENDAR_YEAR, "day": AcceptableUnits.ORDINAL_DAY},
+                    "field_size": AcceptableUnits.HECTARE,
+                    "average_clay_percent": AcceptableUnits.PERCENT,
                 },
             },
             {

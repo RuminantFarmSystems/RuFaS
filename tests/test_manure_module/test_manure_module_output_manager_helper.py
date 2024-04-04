@@ -6,6 +6,7 @@ from typing import Dict
 import pytest
 from pytest_mock import MockFixture
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
     ManureModuleOutputManagerHelper,
 )
@@ -43,20 +44,20 @@ class MockDataclass:
             (10, "value"),
             None,
             [
-                ("field1", 10, {"info_map1": "value1", "units": "kg"}),
-                ("field2", "value", {"info_map1": "value1", "units": "unitless"}),
+                ("field1", 10, {"info_map1": "value1", "units": AcceptableUnits.KILOGRAMS}),
+                ("field2", "value", {"info_map1": "value1", "units": AcceptableUnits.UNITLESS}),
             ],
         ),
-        ((10, "value"), ["field2"], [("field1", 10, {"info_map1": "value1", "units": "kg"})]),
+        ((10, "value"), ["field2"], [("field1", 10, {"info_map1": "value1", "units": AcceptableUnits.KILOGRAMS})]),
         (
             (5, "other_value"),
             None,
             [
-                ("field1", 5, {"info_map1": "value1", "units": "kg"}),
-                ("field2", "other_value", {"info_map1": "value1", "units": "unitless"}),
+                ("field1", 5, {"info_map1": "value1", "units": AcceptableUnits.KILOGRAMS}),
+                ("field2", "other_value", {"info_map1": "value1", "units": AcceptableUnits.UNITLESS}),
             ],
         ),
-        ((5, "other_value"), ["field2"], [("field1", 5, {"info_map1": "value1", "units": "kg"})]),
+        ((5, "other_value"), ["field2"], [("field1", 5, {"info_map1": "value1", "units": AcceptableUnits.KILOGRAMS})]),
     ],
 )
 def test_add_dataclass_object(
