@@ -3,6 +3,7 @@
 import time as timer
 from enum import Enum
 from typing import Optional
+from RUFAS.units import MeasurementUnits
 from RUFAS import routines
 from RUFAS.weather import Weather
 from RUFAS.time import Time
@@ -70,7 +71,11 @@ class SimulationEngine:
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
         ]
-        available_feeds_units = {"category": "unitless", "type": "unitless", "amount": "kg"}
+        available_feeds_units = {
+            "category": MeasurementUnits.UNITLESS,
+            "type": MeasurementUnits.UNITLESS,
+            "amount": MeasurementUnits.KILOGRAMS,
+        }
         om.add_variable(
             "available_feeds_on_final_day",
             available_feeds_on_final_day,
@@ -85,7 +90,7 @@ class SimulationEngine:
         om.add_variable(
             "day_counter_final_value",
             self.day_counter,
-            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": "days"},
+            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": MeasurementUnits.DAYS},
         )
 
     def _run_simulation_main_loop(self) -> None:
