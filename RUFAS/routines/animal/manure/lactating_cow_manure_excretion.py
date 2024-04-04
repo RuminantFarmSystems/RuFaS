@@ -100,8 +100,8 @@ def manure_calculations(
     methane_mitigation_method: str
         The name of the methane mitigation feed additives. The accepted names are
             '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
-    methane_mitigation_additive_amount: float 
-        The dosage of the feed additive, mg/kg DMI. 
+    methane_mitigation_additive_amount: float
+        The dosage of the feed additive, mg/kg DMI.
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
