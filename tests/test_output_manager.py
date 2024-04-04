@@ -434,7 +434,7 @@ def test_add_variable(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
-    info_map = {}
+    info_map = {"units": AcceptableUnits.ANIMALS}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
 
@@ -457,12 +457,13 @@ def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> No
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
+        "units": AcceptableUnits.ANIMALS,
     }
     key = "dummy_key"
     pool = {}
     mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
     assert pool[key] == {
-        "info_maps": [{"context": "dummy_context"}],
+        "info_maps": [{"context": "dummy_context", "units": AcceptableUnits.ANIMALS}],
         "values": [dummy_value],
     }
     assert pool[key]["values"][0] == dummy_value
@@ -472,8 +473,8 @@ def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> No
     mock_output_manager._add_to_pool(pool, key, {dummy_value}, info_map)
     assert pool[key] == {
         "info_maps": [
-            {"context": "dummy_context"},
-            {"context": "dummy_context", "more_context": 1234567890},
+            {"context": "dummy_context", "units": AcceptableUnits.ANIMALS},
+            {"context": "dummy_context", "more_context": 1234567890, "units": AcceptableUnits.ANIMALS},
         ],
         "values": [dummy_value, {dummy_value}],
     }
@@ -491,10 +492,11 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
+        "units": AcceptableUnits.ANIMALS,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
-        "info_maps": [{"context": "dummy_context"}],
+        "info_maps": [{"context": "dummy_context", "units": AcceptableUnits.ANIMALS}],
         "values": ["dummy_value"],
     }
 
@@ -533,7 +535,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    info_map = {"class": "dummy_class", "function": "dummy_func", "units": AcceptableUnits.ANIMALS}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
     om.add_warning("dummy_name", "dummy_msg", info_map)
