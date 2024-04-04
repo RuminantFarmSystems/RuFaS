@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any, Tuple
+from typing import Dict, Any
 
 import numpy as np
 
@@ -124,6 +124,7 @@ class Cow(HeiferIII):
         self.cull_reason = None
         self.repro_program = args["repro_program"]
         self.first_ai = False
+        self.has_new_born = False
         self.fat_percent = 0.0
 
         # TAI params
@@ -663,7 +664,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day: int, calving_interval: int | float) -> Tuple[bool, bool] | None:  # noqa
+    def update(self, sim_day: int, calving_interval: int | float) -> bool:  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -674,25 +675,17 @@ class Cow(HeiferIII):
         calving_interval : int | float
             The size of the calving interval in days, can be average current calving interval instead of input value.
 
-        Returns
-        -------
-        bool
-            cull_stage which is True if a cow is culled, False if it stays in the herd.
-        bool
-            new_born status which is True if a calf is born.
-
         Raises
         ------
         ValueError
             If reproduction program not in list of current reproduction programs.
 
         """
-        if self.culled:
-            # TODO: remove this part of the code if never should be used
-            print("CULLED HERE")
-            return None
+        # if self.culled:
+        #     # TODO: remove this part of the code if never should be used
+        #     print("CULLED HERE")
+        #     return None
 
-        new_born = False
         self.days_born += 1
 
         if self.days_in_preg > 0 and self.days_in_preg == self.gestation_length:
@@ -711,7 +704,7 @@ class Cow(HeiferIII):
             self.log_event(self.days_born, sim_day, f"{const.NUM_CALVES_BORN_NOTE}: {self.calves}")
             self.health_cull_update()
             self.death_update()
-            new_born = True
+            self.has_new_born = True
             self.set_parity_index()
             self.set_lactation_curve_params()
 
@@ -799,12 +792,7 @@ class Cow(HeiferIII):
 
         self._check_do_not_breed_flag(sim_day)
 
-        cull_stage = self.cull_update(sim_day)
-
-        return (
-            cull_stage,
-            new_born,
-        )
+        self.cull_update(sim_day)
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
         if self.should_decrease_conception_rate_in_rebreeding():
