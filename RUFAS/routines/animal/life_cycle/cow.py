@@ -664,7 +664,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day: int, calving_interval: int | float) -> bool:  # noqa
+    def update(self, sim_day: int, calving_interval: int | float):  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -2059,30 +2059,22 @@ class Cow(HeiferIII):
         return AnimalBase.config["decrease_conception_rate_by_parity"]
 
     # Cull methods
-    def cull_update(self, sim_day: int) -> bool:
+    def cull_update(self, sim_day: int) -> None:
         """
         Update culling time and cull reasons for cow to leave the herd
-        The reasons are reproduction failure, low production, and health issues
-        Returns
-        -------
-        bool
-            True if culled, False if not culled
+        The reasons are reproduction failure, low production, and health issues.
         """
         if self.do_not_breed and self.estimated_daily_milk_produced < AnimalBase.config["cull_milk_production"]:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
             self.cull_reason = const.LOW_PROD_CULL
-            return True
         if self.days_born == self.future_cull_date:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, self.cull_reason)
-            return True
         if self.days_born == self.future_death_date:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.DEATH_CULL)
             self.cull_reason = const.DEATH_CULL
-            return True
-        return False
 
     def death_update(self) -> None:
         if self.calves >= 4:
