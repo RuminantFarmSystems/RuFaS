@@ -27,14 +27,14 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
     ],
 )
 def test_methane_mitigation(
-    NDF_concentration,
-    EE_concentration,
-    starch_concentration,
-    CP_concentration,
-    methane_mitigation_method,
-    methane_mitigation_additive_amount,
-    expected_reduction,
-):
+    NDF_concentration: float,
+    EE_concentration: float,
+    starch_concentration: float,
+    CP_concentration: float,
+    methane_mitigation_method: str,
+    methane_mitigation_additive_amount: float,
+    expected_reduction: float,
+) -> None:
     # Act
     actual_reduction = methane_mitigation(
         NDF_concentration,
@@ -64,8 +64,6 @@ def test_lactating_cow_manure_calculations(  # noqa
 ) -> None:
     """Unit test for the manure_calculations function in lactating_cow_manure_excretion.py."""
     # Arrange
-    mock_ration_formulation = mocker.MagicMock()
-    mock_feed = mocker.MagicMock()
     body_weight = 600.0
     days_in_milk = 150
     milk_protein = 3.5
@@ -184,23 +182,18 @@ def test_lactating_cow_manure_calculations(  # noqa
     methane_emission = methane_yield_original * (1 + methane_yield_reduction / 100) * dry_matter_intake
 
     # Patching
-    patch_for_ration_report = mocker.patch(
-        "RUFAS.routines.animal.manure.lactating_cow_manure_excretion.RationReporter.report_ration"
-    )
-    patch_for_ration_report.return_value = (
-        {"dm": dry_matter_intake, "ash": ASH_diet_content},
-        {
-            "ash": ASH_concentration,
-            "dm": dry_matter_concentration,
-            "ADF": ADF_concentration,
-            "CP": CP_concentration,
-            "lignin": lignin_concentration,
-            "NDF": NDF_concentration,
-            "potassium": potassium_concentration,
-            "EE": EE_concentration,
-            "starch": starch_concentration,
-        },
-    )
+    mock_nutrient_amounts = {"dm": dry_matter_intake, "ash": ASH_diet_content}
+    mock_nutrient_concentrations = {
+        "ash": ASH_concentration,
+        "dm": dry_matter_concentration,
+        "ADF": ADF_concentration,
+        "CP": CP_concentration,
+        "lignin": lignin_concentration,
+        "NDF": NDF_concentration,
+        "potassium": potassium_concentration,
+        "EE": EE_concentration,
+        "starch": starch_concentration,
+    }
 
     patch_for_calculate_phosphorus_excretion_values = mocker.patch(
         "RUFAS.routines.animal.manure.lactating_cow_manure_excretion.calculate_phosphorus_excretion_values"
@@ -217,8 +210,6 @@ def test_lactating_cow_manure_calculations(  # noqa
     actual_total_phosphorus_excreted: float
     manure_excretion_values: AnimalManureExcretions
     actual_total_phosphorus_excreted, manure_excretion_values = manure_calculations(
-        ration_formulation=mock_ration_formulation,
-        feed=mock_feed,
         body_weight=body_weight,
         days_in_milk=days_in_milk,
         milk_protein=milk_protein,
@@ -230,10 +221,11 @@ def test_lactating_cow_manure_calculations(  # noqa
         methane_mitigation_additive_amount=methane_mitigation_additive_amount,
         milk_fat=milk_fat,
         metabolizable_energy_intake=metabolizable_energy_intake,
+        nutrient_amount=mock_nutrient_amounts,
+        nutrient_conc=mock_nutrient_concentrations,
     )
 
     # Assert
-    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=daily_milk_production,
         total_manure_excreted=total_manure_excreted,
