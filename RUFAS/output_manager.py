@@ -182,14 +182,14 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
 
-    def _validate_units(self, units: Union[Dict[str, Any], MeasurementUnits, str]):
+    def _validate_units(self, units: Dict[str, Any] | str):
         """
         Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
         valid MeasurementUnits values (including nested dictionaries).
 
         Parameters
         ----------
-        units : Union[Dict[str, Any], str]
+        units : Dict[str, Any] | str
             Either a string that can be converted to an MeasurementUnits, or a dictionary mapping string keys to either
             MeasurementUnits values or further dictionaries.
 

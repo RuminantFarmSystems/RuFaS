@@ -1601,21 +1601,21 @@ class AnimalManager:
             len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
-        om.add_variable("num_calves", len(self.calves), dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
-        om.add_variable("num_heiferIs", len(self.heiferIs), dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
-        om.add_variable("num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
-        om.add_variable("num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+        om.add_variable("num_calves", len(self.calves), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIs", len(self.heiferIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in self.cows if cow.is_lactating]),
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.COWS}),
         )
         om.add_variable(
             "num_dry_cows",
             len([cow for cow in self.cows if not cow.is_lactating]),
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.COWS}),
         )
-        om.add_variable("num_cows", len(self.cows), dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+        om.add_variable("num_cows", len(self.cows), dict(info_map, **{"units": MeasurementUnits.COWS}))
         om.add_variable(
             "num_cow_parity_1",
             self.life_cycle_manager.num_cow_for_parity["1"],
