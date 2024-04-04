@@ -519,7 +519,7 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
     mock_heiferII_cull_stage.days_born = 100
     life_cycle_manager.sold_heiferII_num = 0
     life_cycle_manager.avg_heifer_culling_age = 0.0
-    life_cycle_manager.sold_heiferIIs = []
+    life_cycle_manager.sold_heiferIIs_info = []
 
     mock_heiferII_third_stage = mocker.MagicMock(autospec=HeiferII)
     mock_heiferII_third_stage.update.return_value = [
@@ -541,7 +541,7 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
     total_animal_num = 0
     preg_heifer_num = 0
 
-    mock_heiferIIs: List[HeiferIII] = [
+    mock_heiferIIs: List[HeiferII] = [
         mock_heiferII_cull_stage,
         mock_heiferII_third_stage,
         mock_heiferII_pregnant_stage,
@@ -551,7 +551,7 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
     # Before
     assert life_cycle_manager.sold_heiferII_num == 0
     assert life_cycle_manager.avg_heifer_culling_age == approx(0.0)
-    assert len(life_cycle_manager.sold_heiferIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIs_info) == 0
 
     # Act
     result = life_cycle_manager._evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
@@ -562,8 +562,16 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
     # After
     assert life_cycle_manager.sold_heiferII_num == 1
     assert life_cycle_manager.avg_heifer_culling_age == approx(100.0)
-    assert len(life_cycle_manager.sold_heiferIIs) == 1
-    assert life_cycle_manager.sold_heiferIIs[0] == mock_heiferII_cull_stage
+    assert len(life_cycle_manager.sold_heiferIIs_info) == 1
+    assert life_cycle_manager.sold_heiferIIs_info[0] == {
+        "id": mock_heiferII_cull_stage.id,
+        "animal_type": HeiferII.__name__,
+        "sold_at_day": mock_heiferII_cull_stage.sold_at_day,
+        "body_weight": mock_heiferII_cull_stage.body_weight,
+        "cull_reason": "NA",
+        "days_in_milk": "NA",
+        "parity": "NA"
+        }
     mock_heiferII_cull_stage.update.assert_called_once_with(sim_day)
 
     patch_convert_heiferII_to_heiferIII.assert_called_once_with(mock_heiferII_third_stage, mock_heiferIIIs)
@@ -692,11 +700,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
         mock_heiferIIIs.append(mock_heiferIII)
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_removed = []
-    life_cycle_manager.sold_heiferIIIs = []
+    life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
-    assert len(life_cycle_manager.sold_heiferIIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
@@ -705,7 +713,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     # Assert after
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
-    assert len(life_cycle_manager.sold_heiferIIIs) == 2
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 2
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 2
     assert len(animals_removed) == 2
     # ---------------------------------------------------------------
@@ -720,11 +728,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
         mock_heiferIIIs.append(mock_heiferIII)
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_removed = []
-    life_cycle_manager.sold_heiferIIIs = []
+    life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
-    assert len(life_cycle_manager.sold_heiferIIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
@@ -733,7 +741,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     # Assert after
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
-    assert len(life_cycle_manager.sold_heiferIIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert len(animals_removed) == 0
     # ---------------------------------------------------------------
@@ -744,11 +752,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     mock_heiferIIIs: List[HeiferIII] = []
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 104
     animals_removed = []
-    life_cycle_manager.sold_heiferIIIs = []
+    life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
-    assert len(life_cycle_manager.sold_heiferIIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
@@ -757,7 +765,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     # Assert after
     assert len(mock_heiferIIIs) == 0
     assert len(mock_cows) == 104
-    assert len(life_cycle_manager.sold_heiferIIIs) == 0
+    assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert len(animals_removed) == 0
 
@@ -862,7 +870,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     # Arrange
     mock_cow: Cow = mocker.MagicMock(autospec=Cow)
     mock_cow.cull_reason = LOW_PROD_CULL
-    life_cycle_manager.sold_and_died_cows = []
+    life_cycle_manager.sold_and_died_cows_info = []
     life_cycle_manager.cull_reason_stats_range = collections.defaultdict(int)
     life_cycle_manager._reset_cull_reason_stats()
 
@@ -875,7 +883,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     life_cycle_manager.avg_cow_culling_age = 0
 
     # Assert before
-    assert len(life_cycle_manager.sold_and_died_cows) == 0
+    assert len(life_cycle_manager.sold_and_died_cows_info) == 0
     assert len(life_cycle_manager.cull_reason_stats_range) == 0
     assert life_cycle_manager.cull_reason_stats[LOW_PROD_CULL] == 0
     assert len(life_cycle_manager.parity_culling_stats_range) == 0
@@ -884,7 +892,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     life_cycle_manager._cull_cow(mock_cow)
 
     # Assert
-    assert len(life_cycle_manager.sold_and_died_cows) == 1
+    assert len(life_cycle_manager.sold_and_died_cows_info) == 1
     assert len(life_cycle_manager.cull_reason_stats_range) == 1
     assert LOW_PROD_CULL in life_cycle_manager.cull_reason_stats_range
     assert life_cycle_manager.cull_reason_stats_range[LOW_PROD_CULL] == 1
@@ -1093,7 +1101,7 @@ def test_handle_new_born(
     # Arrange
     sim_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
-    life_cycle_manager.sold_calves = []
+    life_cycle_manager.sold_calves_info = []
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
@@ -1137,8 +1145,8 @@ def test_handle_new_born(
         assert calves_born[0] == mock_calf
     if is_calf_sold:
         assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
-        assert len(life_cycle_manager.sold_calves) == 1
-        assert life_cycle_manager.sold_calves[0] == mock_calf
+        assert len(life_cycle_manager.sold_calves_info) == 1
+        assert life_cycle_manager.sold_calves_info[0] == mock_calf
         assert mock_calf.sold_at_day == sim_day
 
 
@@ -1415,12 +1423,6 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager, mocker: MockerF
     life_cycle_manager.heiferIII_num = 4
     life_cycle_manager.cow_num = 5
 
-    life_cycle_manager.sold_calves = [mocker.MagicMock()]
-    life_cycle_manager.sold_heiferIIIs = [mocker.MagicMock()]
-    life_cycle_manager.sold_heiferIIs = [mocker.MagicMock()]
-    life_cycle_manager.sold_cows = [mocker.MagicMock()]
-    life_cycle_manager.sold_and_died_cows = [mocker.MagicMock()]
-
     life_cycle_manager.sold_calf_num = 6
     life_cycle_manager.sold_heiferIII_oversupply_num = 7
     life_cycle_manager.bought_heifer_num = 8
@@ -1485,11 +1487,11 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager, mocker: MockerF
     assert life_cycle_manager.sold_heiferII_num == 0
     assert life_cycle_manager.cow_herd_exit_num == 0
 
-    assert life_cycle_manager.sold_calves == []
-    assert life_cycle_manager.sold_heiferIIIs == []
-    assert life_cycle_manager.sold_heiferIIs == []
-    assert life_cycle_manager.sold_cows == []
-    assert life_cycle_manager.sold_and_died_cows == []
+    assert life_cycle_manager.sold_calves_info == []
+    assert life_cycle_manager.sold_heiferIIIs_info == []
+    assert life_cycle_manager.sold_heiferIIs_info == []
+    assert life_cycle_manager.sold_cows_info == []
+    assert life_cycle_manager.sold_and_died_cows_info == []
 
     assert life_cycle_manager.calf_percent == approx(0.0)
     assert life_cycle_manager.heiferI_percent == approx(0.0)
