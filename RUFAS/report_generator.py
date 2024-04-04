@@ -139,12 +139,13 @@ class ReportGenerator:
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, time=None) -> None:
         """
         Initializes the ReportGenerator.
         """
 
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
+        self.time = time
 
     def clear_reports(self) -> None:
         """
