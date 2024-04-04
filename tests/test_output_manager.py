@@ -426,10 +426,13 @@ def test_add_log(
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
-@pytest.mark.parametrize("info_map, exception, exception_message", [
-    ({"units": MeasurementUnits.ANIMALS}, None, None),
-    ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
-])
+@pytest.mark.parametrize(
+    "info_map, exception, exception_message",
+    [
+        ({"units": MeasurementUnits.ANIMALS}, None, None),
+        ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
+    ],
+)
 def test_add_variable(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -459,28 +462,45 @@ def test_add_variable(
     mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
 
 
-@pytest.mark.parametrize("units, expected_exception, expected_message", [
-    (MeasurementUnits.ANIMALS, None, None),
-    ({
-        "first": MeasurementUnits.ANIMALS,
-        "second": MeasurementUnits.COWS,
-        "nested": {"third": MeasurementUnits.DAYS}
-    }, None, None),
-    ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
-    ({
-        "first": MeasurementUnits.ANIMALS,
-        "invalid": "not_a_unit",
-    }, ValueError, "'not_a_unit' is not a valid MeasurementUnits value"),
-    ({
-        "first": {"nested_invalid": "definitely_not_a_unit"},
-        "second": MeasurementUnits.COWS,
-    }, ValueError, "'definitely_not_a_unit' is not a valid MeasurementUnits value"),
-])
-def test_validate_units(mock_output_manager: OutputManager,
-                        output_manager_original_method_states: Dict[str, Callable],
-                        units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
-                        expected_exception: ValueError,
-                        expected_message: str):
+@pytest.mark.parametrize(
+    "units, expected_exception, expected_message",
+    [
+        (MeasurementUnits.ANIMALS, None, None),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "second": MeasurementUnits.COWS,
+                "nested": {"third": MeasurementUnits.DAYS},
+            },
+            None,
+            None,
+        ),
+        ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "invalid": "not_a_unit",
+            },
+            ValueError,
+            "'not_a_unit' is not a valid MeasurementUnits value",
+        ),
+        (
+            {
+                "first": {"nested_invalid": "definitely_not_a_unit"},
+                "second": MeasurementUnits.COWS,
+            },
+            ValueError,
+            "'definitely_not_a_unit' is not a valid MeasurementUnits value",
+        ),
+    ],
+)
+def test_validate_units(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
+    expected_exception: ValueError,
+    expected_message: str,
+):
     """Test for function _validate_units in file output_manager.py"""
     if expected_exception:
         with pytest.raises(expected_exception) as e:

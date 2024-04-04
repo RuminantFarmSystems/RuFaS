@@ -1683,8 +1683,9 @@ class AnimalManager:
             else 0
         )
         om.add_variable(
-            "heiferII_ED_conception_rate", ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE})
+            "heiferII_ED_conception_rate",
+            ed_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
         om.add_variable(
@@ -1703,8 +1704,9 @@ class AnimalManager:
             else 0
         )
         om.add_variable(
-            "heiferII_TAI_conception_rate", tai_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE})
+            "heiferII_TAI_conception_rate",
+            tai_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
         om.add_variable(
@@ -1737,8 +1739,11 @@ class AnimalManager:
             "class": self.__class__.__name__,
             "function": self._record_cows_conception_rate.__name__,
         }
-        om.add_variable("cow_total_num_ai_performed", Cow.stats["num_ai_performed"],
-                        dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}))
+        om.add_variable(
+            "cow_total_num_ai_performed",
+            Cow.stats["num_ai_performed"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
         om.add_variable(
             "cow_total_num_successful_conceptions",
             Cow.stats["num_successful_conceptions"],
