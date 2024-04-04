@@ -589,7 +589,7 @@ class LifeCycleManager:
                         "body_weight": heiferII.body_weight,
                         "cull_reason": "NA",
                         "days_in_milk": "NA",
-                        "parity": "NA"
+                        "parity": "NA",
                     }
                 )
                 removed_heiferIIs_idx.append(idx)
@@ -761,7 +761,7 @@ class LifeCycleManager:
                     "body_weight": removed_heiferIII.body_weight,
                     "cull_reason": "NA",
                     "days_in_milk": "NA",
-                    "parity": "NA"
+                    "parity": "NA",
                 }
             )
             self.sold_heiferIII_oversupply_num += 1
@@ -861,21 +861,23 @@ class LifeCycleManager:
                 "body_weight": cow.body_weight,
                 "cull_reason": cow.cull_reason,
                 "days_in_milk": cow.days_in_milk,
-                "parity": cow.calves
+                "parity": cow.calves,
             }
         )
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
-            self.sold_cows_info.append({
-                "id": cow.id,
-                "animal_type": Cow.__name__,
-                "sold_at_day": cow.sold_at_day,
-                "body_weight": cow.body_weight,
-                "cull_reason": cow.cull_reason,
-                "days_in_milk": cow.days_in_milk,
-                "parity": cow.calves
-            })
+            self.sold_cows_info.append(
+                {
+                    "id": cow.id,
+                    "animal_type": Cow.__name__,
+                    "sold_at_day": cow.sold_at_day,
+                    "body_weight": cow.body_weight,
+                    "cull_reason": cow.cull_reason,
+                    "days_in_milk": cow.days_in_milk,
+                    "parity": cow.calves,
+                }
+            )
             self.sold_cow_num += 1
 
         parity = cow.calves if cow.calves <= 3 else "4+"
@@ -1022,7 +1024,7 @@ class LifeCycleManager:
                     "body_weight": new_calf.body_weight,
                     "cull_reason": "NA",
                     "days_in_milk": "NA",
-                    "parity": "NA"
+                    "parity": "NA",
                 }
             )
             self.sold_calf_num += 1

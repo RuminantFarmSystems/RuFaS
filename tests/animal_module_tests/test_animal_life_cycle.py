@@ -570,8 +570,8 @@ def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(
         "body_weight": mock_heiferII_cull_stage.body_weight,
         "cull_reason": "NA",
         "days_in_milk": "NA",
-        "parity": "NA"
-        }
+        "parity": "NA",
+    }
     mock_heiferII_cull_stage.update.assert_called_once_with(sim_day)
 
     patch_convert_heiferII_to_heiferIII.assert_called_once_with(mock_heiferII_third_stage, mock_heiferIIIs)
