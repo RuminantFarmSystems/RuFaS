@@ -1,29 +1,24 @@
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a calf with information from the ration formulation.
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
     body_weight : float
         Body weight of the current animal, kg.
     fecal_phosphorus : float
@@ -32,6 +27,10 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+    nutrient_amount : Dict[str, float]
+        Amount of nutrients in pen ration, calculated per animal.
+    nutrient_conc : Dict[str, float]
+        Concentration of nutrients in pen ration, calculated per animal.
 
     Returns
     -------
@@ -42,7 +41,8 @@ def manure_calculations(
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
 
