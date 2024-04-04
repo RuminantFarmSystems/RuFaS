@@ -454,44 +454,6 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_pen_manure(cls, pen: Pen) -> None:
-        """
-        Adds pen manure data to output manager.
-
-        Parameters
-        ----------
-        pen : Pen
-            Current pen.
-        """
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_pen_manure.__name__,
-            "data_origin": [("Pen", "calc_manure")],
-            "pen_id": pen.id,
-            "pen_animal_combination": pen.animal_combination._name_,
-            "units": {
-                "urea": MeasurementUnits.GRAMS_PER_LITER,
-                "urine": MeasurementUnits.KILOGRAMS,
-                "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
-                "urine_nitrogen": MeasurementUnits.KILOGRAMS,
-                "manure_nitrogen": MeasurementUnits.KILOGRAMS,
-                "manure_mass": MeasurementUnits.KILOGRAMS,
-                "total_solids": MeasurementUnits.KILOGRAMS,
-                "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-                "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-                "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-                "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-                "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-                "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-                "phosphorus": MeasurementUnits.GRAMS,
-                "phosphorus_fraction": MeasurementUnits.UNITLESS,
-                "potassium": MeasurementUnits.GRAMS,
-                "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY,
-            },
-        }
-        om.add_variable("pen_manure_data", pen.manure, info_map)
-
-    @classmethod
     def report_pen_manure_properties(cls, pen: Pen, simulation_day: int) -> None:
         """
         Adds pen manure properties to output manager.

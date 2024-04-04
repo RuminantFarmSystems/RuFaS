@@ -388,17 +388,6 @@ def test_report_animal_module_manure() -> None:
         ]
 
 
-def test_report_pen_manure(mocker: MockerFixture) -> None:
-    dummy_pen = mocker.MagicMock()
-    dummy_pen.id = 1
-    dummy_pen.animal_combination._name_ = "dummy_name"
-    dummy_pen.manure = {"dummy_dict": 100}
-
-    AnimalModuleReporter.report_pen_manure(dummy_pen)
-
-    assert om.variables_pool["AnimalModuleReporter.report_pen_manure.pen_manure_data"]["values"] == [dummy_pen.manure]
-
-
 def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
     life_cycle_manager = mocker.MagicMock()
     keydict = {
