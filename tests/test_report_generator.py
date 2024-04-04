@@ -96,14 +96,14 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
         ({"a": [8, 4, 2], "b": [2, 1, 1]}, "division", {"a": [1.0], "b": [2.0]}),
         # Tests with standard deviation aggregator
         (
-            {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
-            "SD",
-            {"a": [6.041522986797286], "b": [2.692582403567252]},
+                {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
+                "SD",
+                {"a": [6.041522986797286], "b": [2.692582403567252]},
         ),
         (
-            {"a": [10, 12, 23, 23, 23], "b": [17, 15, 22, 20, 20]},
-            "SD",
-            {"a": [5.912698199637793], "b": [2.481934729198171]},
+                {"a": [10, 12, 23, 23, 23], "b": [17, 15, 22, 20, 20]},
+                "SD",
+                {"a": [5.912698199637793], "b": [2.481934729198171]},
         ),
         # Test with empty data
         ({"a": [], "b": []}, "sum", {"a": [0], "b": [0]}),
@@ -112,7 +112,8 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: Dict[str, List[float]], aggregator_key: str, expected: List[float]
+        report_data: Dict[str, List[float]], aggregator_key: str, expected: Dict[str, List[float]],
+        mocker: MockerFixture
 ) -> None:
     """
     Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
@@ -120,7 +121,8 @@ def test_apply_vertical_aggregation(
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act
     result = report_generator._apply_vertical_aggregation(report_data, aggregator)
@@ -138,58 +140,59 @@ def test_apply_vertical_aggregation(
         # Tests with subtraction aggregation
         ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "subtraction", [-2, -2], None),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
-            ["a", "b"],
-            "subtraction",
-            [-3, -3, -3],
-            None,
+                {"a": [1, 2, 3], "b": [4, 5, 6]},
+                ["a", "b"],
+                "subtraction",
+                [-3, -3, -3],
+                None,
         ),
         # Tests with product aggregation
         ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "product", [3, 8], None),
         ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "product", [4, 10, 18], None),
         # Tests with division aggregation
         (
-            {"a": [1, 2], "b": [3, 4]},
-            ["a", "b"],
-            "division",
-            [0.3333333333333333, 0.5],
-            None,
+                {"a": [1, 2], "b": [3, 4]},
+                ["a", "b"],
+                "division",
+                [0.3333333333333333, 0.5],
+                None,
         ),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
-            ["a", "b"],
-            "division",
-            [0.25, 0.4, 0.5],
-            None,
+                {"a": [1, 2, 3], "b": [4, 5, 6]},
+                ["a", "b"],
+                "division",
+                [0.25, 0.4, 0.5],
+                None,
         ),
         # Tests with average aggregation
         ({"a": [1, 3], "b": [2, 4]}, ["a", "b"], "average", [1.5, 3.5], None),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
-            ["a", "b"],
-            "average",
-            [2.5, 3.5, 4.5],
-            None,
+                {"a": [1, 2, 3], "b": [4, 5, 6]},
+                ["a", "b"],
+                "average",
+                [2.5, 3.5, 4.5],
+                None,
         ),
         # Tests with standard deviation aggregation
         ({"a": [10, 10], "b": [20, 20]}, ["a", "b"], "SD", [5.0, 5.0], None),
         (
-            {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
-            ["a", "b"],
-            "SD",
-            [3.5, 1.5, 0.5, 1.5],
-            None,
+                {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
+                ["a", "b"],
+                "SD",
+                [3.5, 1.5, 0.5, 1.5],
+                None,
         ),
         # Tests with inconsistent lengths
         ({"a": [1, 2, 3], "b": [3, 4]}, ["a", "b"], "sum", None, ValueError),
     ],
 )
 def test_apply_horizontal_aggregation(
-    report_data: Dict[str, List[float]],
-    loop_list: List[str],
-    aggregator_key: str,
-    expected: List[float],
-    expected_exception: Type[Exception],
+        report_data: Dict[str, List[float]],
+        loop_list: List[str],
+        aggregator_key: str,
+        expected: List[float],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for _apply_horizontal_aggregation() static method in report_generator.py file.
@@ -197,7 +200,8 @@ def test_apply_horizontal_aggregation(
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act and assert
     if expected_exception:
@@ -213,43 +217,44 @@ def test_apply_horizontal_aggregation(
     [
         # Case with selected variables and slice parameters
         (
-            {
-                "var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7], "name": "value"},
-            None,
+                {
+                    "var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+                    "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
+                },
+                {"variables": ["a"], "slice_start": 0, "slice_end": 2},
+                {"a": [1, 3, 5, 7], "name": "value"},
+                None,
         ),
         # Case without selected variables but required
         (
-            {"var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
-            {},
-            None,
-            KeyError,
+                {"var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
+                {},
+                None,
+                KeyError,
         ),
         # Case with constants addition
         (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"name": "value", "var1": [1, 2, 3, 4]},
-            None,
+                {"var1": {"values": [1, 2, 3, 4]}},
+                {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
+                {"name": "value", "var1": [1, 2, 3, 4]},
+                None,
         ),
     ],
 )
 def test_prepare_report_data_with_constants(
-    filtered_pool: Dict[str, Dict[str, List[Any]]],
-    filter_content: Dict[str, Any],
-    expected_result: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
-    mocker: MockerFixture,
-):
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filter_content: Dict[str, Any],
+        expected_result: Dict[str, List[Any]],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
+) -> None:
     """
     Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     mocker.patch(
         "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
         side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
@@ -274,20 +279,20 @@ def test_prepare_report_data_with_constants(
     [
         # Valid case with a valid constant
         (
-            {"existing_data": [1, 2, 3]},
-            {"constants": {"Constant1": 10}},
-            {
-                "existing_data": [1, 2, 3],
-                "Constant1": [10, 10, 10],
-            },
-            None,
+                {"existing_data": [1, 2, 3]},
+                {"constants": {"Constant1": 10}},
+                {
+                    "existing_data": [1, 2, 3],
+                    "Constant1": [10, 10, 10],
+                },
+                None,
         ),
         # Valid case with existing data of different lengths
         (
-            {"col1": [1, 2, 3], "col2": [4, 5, 6, 7]},
-            {"constants": {"Constant1": 10}},
-            {"col1": [1, 2, 3], "col2": [4, 5, 6, 7], "Constant1": [10, 10, 10, 10]},
-            None,
+                {"col1": [1, 2, 3], "col2": [4, 5, 6, 7]},
+                {"constants": {"Constant1": 10}},
+                {"col1": [1, 2, 3], "col2": [4, 5, 6, 7], "Constant1": [10, 10, 10, 10]},
+                None,
         ),
         # Valid case with no constants
         ({"existing_data": [1, 2, 3]}, {}, {"existing_data": [1, 2, 3]}, None),
@@ -296,17 +301,19 @@ def test_prepare_report_data_with_constants(
     ],
 )
 def test_add_constants_to_report_data(
-    report_data: Dict[str, List[Any]],
-    filter_content: Dict[str, Any],
-    expected_report_data: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
+        report_data: Dict[str, List[Any]],
+        filter_content: Dict[str, Any],
+        expected_report_data: Dict[str, List[Any]],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _add_constants_to_report_data static method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act and assert
     if expected_exception:
@@ -337,16 +344,18 @@ def test_add_constants_to_report_data(
     ],
 )
 def test_validate_constants(
-    report_data: Dict[str, List[Any]],
-    constant_config: Dict[str, Any],
-    expected_exception: Type[Exception],
+        report_data: Dict[str, List[Any]],
+        constant_config: Dict[str, Any],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _validate_constants static method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act and assert
     if expected_exception:
@@ -361,112 +370,113 @@ def test_validate_constants(
     [
         # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
-            {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
-            {
-                "name": "Report",
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "average",
-                "horizontal_order": ["var1", "var2"],
-                "horizontal_first": True,
-            },
-            {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_ver_agg": [6.0]},
-            None,
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
+                {
+                    "name": "Report",
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "average",
+                    "horizontal_order": ["var1", "var2"],
+                    "horizontal_first": True,
+                },
+                {"var1": [1, 2], "var2": [3, 4]},
+                {"hor_ver_agg": [6.0]},
+                None,
         ),
         # Case with valid horizontal and vertical aggregations, with horizontal_first = False
         (
-            {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
-            {
-                "name": "Report",
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "average",
-                "horizontal_order": ["var1", "var2"],
-                "horizontal_first": False,
-            },
-            {"var1": [1, 2], "var2": [3, 4]},
-            {"ver_hor_agg": [3.5]},
-            None,
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
+                {
+                    "name": "Report",
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "average",
+                    "horizontal_order": ["var1", "var2"],
+                    "horizontal_first": False,
+                },
+                {"var1": [1, 2], "var2": [3, 4]},
+                {"ver_hor_agg": [3.5]},
+                None,
         ),
         # Case with no aggregation specified
         (
-            {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
-            {"name": "Report"},
-            {"var1": [1, 2], "var2": [3, 4]},
-            {"var1": [1, 2], "var2": [3, 4]},
-            None,
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
+                {"name": "Report"},
+                {"var1": [1, 2], "var2": [3, 4]},
+                {"var1": [1, 2], "var2": [3, 4]},
+                None,
         ),
         # Case where report_data is empty after preparing with constants
         (
-            {"var1": {"values": []}},
-            {"name": "Report", "horizontal_aggregation": "sum"},
-            {},
-            None,
-            ValueError,
+                {"var1": {"values": []}},
+                {"name": "Report", "horizontal_aggregation": "sum"},
+                {},
+                None,
+                ValueError,
         ),
         # Case with only horizontal aggregation specified
         (
-            {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
-            {
-                "name": "Report",
-                "horizontal_aggregation": "sum",
-                "horizontal_order": ["var1", "var2"],
-            },
-            {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_agg": [5, 7]},
-            None,
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
+                {
+                    "name": "Report",
+                    "horizontal_aggregation": "sum",
+                    "horizontal_order": ["var1", "var2"],
+                },
+                {"var1": [1, 2], "var2": [3, 4]},
+                {"hor_agg": [5, 7]},
+                None,
         ),
         # Case with only vertical aggregation specified
         (
-            {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
-            {"name": "Report", "vertical_aggregation": "average"},
-            {"var1": [1, 3], "var2": [2, 4]},
-            {"ver_agg": [3.5]},
-            None,
+                {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
+                {"name": "Report", "vertical_aggregation": "average"},
+                {"var1": [1, 3], "var2": [2, 4]},
+                {"ver_agg": [3.5]},
+                None,
         ),
         # Case with unsupported vertical aggregation type
         (
-            {"var1": {"values": [1, 2]}},
-            {"name": "Report", "vertical_aggregation": "unsupported"},
-            {"var1": [1, 2]},
-            None,
-            ValueError,
+                {"var1": {"values": [1, 2]}},
+                {"name": "Report", "vertical_aggregation": "unsupported"},
+                {"var1": [1, 2]},
+                None,
+                ValueError,
         ),
         # Case with unsupported horizontal aggregation type
         (
-            {"var1": {"values": [1, 2]}},
-            {"name": "Report2", "horizontal_aggregation": "unsupported"},
-            {"var1": [1, 2]},
-            None,
-            ValueError,
+                {"var1": {"values": [1, 2]}},
+                {"name": "Report2", "horizontal_aggregation": "unsupported"},
+                {"var1": [1, 2]},
+                None,
+                ValueError,
         ),
         # Case with only horizontal aggregation specified
         (
-            {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
-            {
-                "name": "Report5",
-                "horizontal_aggregation": "sum",
-                "horizontal_order": ["var1", "var2"],
-            },
-            {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_agg": [5, 7]},
-            None,
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
+                {
+                    "name": "Report5",
+                    "horizontal_aggregation": "sum",
+                    "horizontal_order": ["var1", "var2"],
+                },
+                {"var1": [1, 2], "var2": [3, 4]},
+                {"hor_agg": [5, 7]},
+                None,
         ),
     ],
 )
 def test_perform_aggregations(
-    filtered_pool: Dict[str, Dict[str, List[Any]]],
-    filter_content: Dict[str, Any],
-    mock_prep_data: Dict[str, List[Any]],
-    expected_result: List[Any],
-    expected_exception: Type[Exception],
-    mocker: MockerFixture,
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filter_content: Dict[str, Any],
+        mock_prep_data: Dict[str, List[Any]],
+        expected_result: List[Any],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _perform_aggregations() method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     mocker.patch.object(
         report_generator,
         "_prepare_report_data_with_constants",
@@ -493,10 +503,10 @@ def test_perform_aggregations(
     [
         # Test with valid horizontal and vertical keys
         (
-            {"horizontal_aggregation": "sum", "vertical_aggregation": "average"},
-            "sum",
-            "average",
-            None,
+                {"horizontal_aggregation": "sum", "vertical_aggregation": "average"},
+                "sum",
+                "average",
+                None,
         ),
         # Test with valid horizontal key and no vertical key
         ({"horizontal_aggregation": "product"}, "product", None, None),
@@ -504,50 +514,52 @@ def test_perform_aggregations(
         ({"vertical_aggregation": "division"}, None, "division", None),
         # Test with unsupported horizontal key
         (
-            {
-                "horizontal_aggregation": "unsupported_key",
-                "vertical_aggregation": "sum",
-            },
-            None,
-            None,
-            ValueError,
+                {
+                    "horizontal_aggregation": "unsupported_key",
+                    "vertical_aggregation": "sum",
+                },
+                None,
+                None,
+                ValueError,
         ),
         # Test with unsupported vertical key
         (
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "unsupported_key",
-            },
-            None,
-            None,
-            ValueError,
+                {
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "unsupported_key",
+                },
+                None,
+                None,
+                ValueError,
         ),
         # Test with both keys unsupported
         (
-            {
-                "horizontal_aggregation": "unsupported_h",
-                "vertical_aggregation": "unsupported_v",
-            },
-            None,
-            None,
-            ValueError,
+                {
+                    "horizontal_aggregation": "unsupported_h",
+                    "vertical_aggregation": "unsupported_v",
+                },
+                None,
+                None,
+                ValueError,
         ),
         # Test with empty filter content
         ({}, None, None, None),
     ],
 )
 def test_extract_and_check_aggregation_keys(
-    filter_content: Dict[str, Any],
-    expected_horizontal: str | None,
-    expected_vertical: str | None,
-    expected_exception: Type[Exception],
-):
+        filter_content: Dict[str, Any],
+        expected_horizontal: str | None,
+        expected_vertical: str | None,
+        expected_exception: Type[Exception],
+        mocker: MockerFixture,
+) -> None:
     """
     Unit test for _extract_and_check_aggregation_keys() method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act and assert
     if expected_exception:
@@ -567,51 +579,53 @@ def test_extract_and_check_aggregation_keys(
     [
         # Test case with both horizontal and vertical aggregation, horizontal first
         (
-            [1, 2, 3],
-            [4, 5, 6],
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": True,
-            },
-            {"hor_ver_agg": [sum([1, 2, 3])]},
+                [1, 2, 3],
+                [4, 5, 6],
+                {
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "sum",
+                    "horizontal_first": True,
+                },
+                {"hor_ver_agg": [sum([1, 2, 3])]},
         ),
         # Test case with both horizontal and vertical aggregation, vertical first
         (
-            [1, 2, 3],
-            {"a": [4, 5, 6], "b": [7, 8, 9]},
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": False,
-            },
-            {"ver_hor_agg": [a + b for a, b in zip([4, 5, 6], [7, 8, 9])]},
+                [1, 2, 3],
+                {"a": [4, 5, 6], "b": [7, 8, 9]},
+                {
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "sum",
+                    "horizontal_first": False,
+                },
+                {"ver_hor_agg": [a + b for a, b in zip([4, 5, 6], [7, 8, 9])]},
         ),
         # Test case with only horizontal aggregation
         ([1, 2, 3], None, {"horizontal_aggregation": "sum"}, {"hor_agg": [1, 2, 3]}),
         # Test case with only vertical aggregation
         (
-            None,
-            {"some_key": [4, 5, 6]},
-            {"vertical_aggregation": "sum"},
-            {"ver_agg": [4, 5, 6]},
+                None,
+                {"some_key": [4, 5, 6]},
+                {"vertical_aggregation": "sum"},
+                {"ver_agg": [4, 5, 6]},
         ),
         # Test case with no aggregation
         (None, None, {}, None),
     ],
 )
 def test_combine_aggregate_report_data(
-    horizontally_aggregated: List[int | float] | None,
-    vertically_aggregated: List[int | float] | None,
-    filter_content: Dict[str, Any],
-    expected: Dict[str, List[int | float]] | None,
+        horizontally_aggregated: List[int | float] | None,
+        vertically_aggregated: List[int | float] | None,
+        filter_content: Dict[str, Any],
+        expected: Dict[str, List[int | float]] | None,
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for _combine_aggregate_report_data() method in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Act
     result = report_generator._combine_aggregate_report_data(
@@ -629,17 +643,17 @@ def test_combine_aggregate_report_data(
         (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
         # One reference is missing
         (
-            ["ref1", "ref2"],
-            {"ref1": {}},
-            KeyError,
-            "Missing referenced reports matching the following pattern(s): ref2",
+                ["ref1", "ref2"],
+                {"ref1": {}},
+                KeyError,
+                "Missing referenced reports matching the following pattern(s): ref2",
         ),
         # Multiple references are missing
         (
-            ["ref1", "ref2", "ref3"],
-            {"ref1": {}},
-            KeyError,
-            "Missing referenced reports matching the following pattern(s): ref2, ref3",
+                ["ref1", "ref2", "ref3"],
+                {"ref1": {}},
+                KeyError,
+                "Missing referenced reports matching the following pattern(s): ref2, ref3",
         ),
         # Reports dictionary is empty
         (["ref1"], {}, KeyError, "Missing referenced reports matching the following pattern(s): ref1"),
@@ -649,21 +663,21 @@ def test_combine_aggregate_report_data(
         (["ref\\d"], {"ref2": {}, "ref3": {}}, None, None),
         # Regex match none
         (
-            ["ref\\d+"],
-            {"report1": {}, "report2": {}},
-            KeyError,
-            r"Missing referenced reports matching the following pattern(s): ref\\d+",
+                ["ref\\d+"],
+                {"report1": {}, "report2": {}},
+                KeyError,
+                r"Missing referenced reports matching the following pattern(s): ref\\d+",
         ),
         # Complex regex pattern
         (["ref[1-3]", "report\\d{2}"], {"ref1": {}, "ref2": {}, "report01": {}}, None, None),
     ],
 )
 def test_check_for_missing_references(
-    mocker: MockerFixture,
-    references: List[str],
-    reports: Dict[str, Dict[str, Any]],
-    expected_exception: Optional[Type[Exception]],
-    expected_message: Optional[str],
+        mocker: MockerFixture,
+        references: List[str],
+        reports: Dict[str, Dict[str, Any]],
+        expected_exception: Optional[Type[Exception]],
+        expected_message: Optional[str],
 ) -> None:
     """
     Unit test for _check_for_missing_references static method in report_generator.py file.
@@ -671,7 +685,8 @@ def test_check_for_missing_references(
 
     # Arrange
     mocker.patch("RUFAS.report_generator.ReportGenerator.__init__", return_value=None)
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     report_generator.reports = reports
 
     if expected_exception:
@@ -702,7 +717,7 @@ def test_check_for_missing_references(
     ],
 )
 def test_get_reports_by_regex(
-    regex_patterns: List[str], expected_matched_reports: Dict[str, Dict[str, List[Any]]]
+        regex_patterns: List[str], expected_matched_reports: Dict[str, Dict[str, List[Any]]], mocker: MockerFixture
 ) -> None:
     """
     Unit test for _get_reports_by_regex() method in report_generator.py file.
@@ -714,7 +729,8 @@ def test_get_reports_by_regex(
         "report2": {"data": []},
         "special_report-1": {"data": []},
     }
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     report_generator.reports = reports
 
     # Act
@@ -738,11 +754,11 @@ def test_get_reports_by_regex(
     ],
 )
 def test_ensure_unique_report_name_with_timestamp(
-    mocker: MockerFixture,
-    report_name: str,
-    reports: Dict[str, Dict[str, Any]],
-    expected_name: str,
-    timestamp_return_value: str,
+        mocker: MockerFixture,
+        report_name: str,
+        reports: Dict[str, Dict[str, Any]],
+        expected_name: str,
+        timestamp_return_value: str,
 ) -> None:
     """
     Unit test for _ensure_unique_report_name_with_timestamp method in report_generator.py file.
@@ -750,7 +766,8 @@ def test_ensure_unique_report_name_with_timestamp(
 
     # Arrange
     mocker.patch("RUFAS.report_generator.ReportGenerator.__init__", return_value=None)
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     report_generator.reports = reports
     mocker.patch("RUFAS.util.Utility.get_timestamp", return_value=timestamp_return_value)
 
@@ -767,126 +784,126 @@ def test_ensure_unique_report_name_with_timestamp(
     [
         # Standard report generation
         (
-            {"name": "standard_report", "filters": ["some_filter"]},
-            {"some_filter": [1, 2, 3]},
-            {},
-            None,
-            None,
-            {"standard_report_some_filter": {"values": [1, 2, 3]}},
-            ["Start generating individual report: standard_report"],
+                {"name": "standard_report", "filters": ["some_filter"]},
+                {"some_filter": [1, 2, 3]},
+                {},
+                None,
+                None,
+                {"standard_report_some_filter": {"values": [1, 2, 3]}},
+                ["Start generating individual report: standard_report"],
         ),
         # Report with name as an empty string
         (
-            {"name": "", "filters": ["some_filter"]},
-            {"some_filter": [1, 2, 3]},
-            {},
-            None,
-            None,
-            {"some_filter": {"values": [1, 2, 3]}},
-            ["Start generating individual report: "],
+                {"name": "", "filters": ["some_filter"]},
+                {"some_filter": [1, 2, 3]},
+                {},
+                None,
+                None,
+                {"some_filter": {"values": [1, 2, 3]}},
+                ["Start generating individual report: "],
         ),
         # Report with cross-references
         (
-            {"name": "report_with_references", "filters": ["some_filter"], "cross_references": ["ref1"]},
-            {"some_filter": [1, 2, 3]},
-            {"ref1": {"values": [4, 5, 6]}},
-            None,
-            None,
-            {
-                "ref1": {"values": [4, 5, 6]},
-                "report_with_references_some_filter": {"values": [1, 2, 3]},
-                "report_with_references_ref1": {"values": [4, 5, 6]},
-            },
-            ["Start generating individual report: report_with_references"],
+                {"name": "report_with_references", "filters": ["some_filter"], "cross_references": ["ref1"]},
+                {"some_filter": [1, 2, 3]},
+                {"ref1": {"values": [4, 5, 6]}},
+                None,
+                None,
+                {
+                    "ref1": {"values": [4, 5, 6]},
+                    "report_with_references_some_filter": {"values": [1, 2, 3]},
+                    "report_with_references_ref1": {"values": [4, 5, 6]},
+                },
+                ["Start generating individual report: report_with_references"],
         ),
         # Report generation with missing cross-references
         (
-            {"name": "error_report", "cross_references": ["missing_ref"]},
-            {},
-            {"ref": {"values": [1, 2, 3]}},
-            KeyError,
-            None,
-            None,
-            [
-                "Start generating individual report: error_report",
-                "Error generating the individual report (error_report) => KeyError: ",
-            ],
+                {"name": "error_report", "cross_references": ["missing_ref"]},
+                {},
+                {"ref": {"values": [1, 2, 3]}},
+                KeyError,
+                None,
+                None,
+                [
+                    "Start generating individual report: error_report",
+                    "Error generating the individual report (error_report) => KeyError: ",
+                ],
         ),
         # Report generation with error in _perform_aggregations
         (
-            {"name": "error_report", "filters": ["some_filter"]},
-            {"some_data_key": [1, 2, 3]},
-            {},
-            None,
-            ValueError,
-            None,
-            [
-                "Start generating individual report: error_report",
-                "Error generating the individual report (error_report) => ValueError: ",
-            ],
+                {"name": "error_report", "filters": ["some_filter"]},
+                {"some_data_key": [1, 2, 3]},
+                {},
+                None,
+                ValueError,
+                None,
+                [
+                    "Start generating individual report: error_report",
+                    "Error generating the individual report (error_report) => ValueError: ",
+                ],
         ),
         # Report with graph_details, without enable_graph_and_report - tests graph_data
         # creation and filtering reports by exclusion
         (
-            {
-                "name": "graph_report",
-                "filters": ["graph_filter"],
-                "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
-            },
-            {"graph_filter": [7, 8, 9]},
-            {},
-            None,
-            None,
-            {},
-            ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
+                {
+                    "name": "graph_report",
+                    "filters": ["graph_filter"],
+                    "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
+                },
+                {"graph_filter": [7, 8, 9]},
+                {},
+                None,
+                None,
+                {},
+                ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
         ),
         # Report with both graph_details and enable_graph_and_report set - tests enabling both graph and report data
         (
-            {
-                "name": "full_feature_report",
-                "filters": ["full_feature_filter"],
-                "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
-                "graph_and_report": True,
-            },
-            {"full_feature_filter": [10, 11, 12]},
-            {},
-            None,
-            None,
-            {"full_feature_report_full_feature_filter": {"values": [10, 11, 12]}},
-            [
-                "Start generating individual report: full_feature_report",
-                "Prepared graph data for report: full_feature_report",
-            ],
+                {
+                    "name": "full_feature_report",
+                    "filters": ["full_feature_filter"],
+                    "graph_details": {"type": "plot", "metadata_prefix": "dummy_prefix", "graphics_dir": "dummy_dir"},
+                    "graph_and_report": True,
+                },
+                {"full_feature_filter": [10, 11, 12]},
+                {},
+                None,
+                None,
+                {"full_feature_report_full_feature_filter": {"values": [10, 11, 12]}},
+                [
+                    "Start generating individual report: full_feature_report",
+                    "Prepared graph data for report: full_feature_report",
+                ],
         ),
         # Report with enable_graph_and_report set but without graph_details
         # tests warning log for missing graph_details
         (
-            {
-                "name": "graph_report_missing_details",
-                "filters": ["missing_graph_filter"],
-                "graph_and_report": True,
-            },
-            {"missing_graph_filter": [13, 14, 15]},
-            {},
-            None,
-            None,
-            {"graph_report_missing_details_missing_graph_filter": {"values": [13, 14, 15]}},
-            [
-                "Start generating individual report: graph_report_missing_details",
-                "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
-            ],
+                {
+                    "name": "graph_report_missing_details",
+                    "filters": ["missing_graph_filter"],
+                    "graph_and_report": True,
+                },
+                {"missing_graph_filter": [13, 14, 15]},
+                {},
+                None,
+                None,
+                {"graph_report_missing_details_missing_graph_filter": {"values": [13, 14, 15]}},
+                [
+                    "Start generating individual report: graph_report_missing_details",
+                    "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
+                ],
         ),
     ],
 )
 def test_generate_report(
-    filter_content: Dict[str, Any],
-    filtered_pool: Dict[str, Any],
-    reports: Dict[str, Dict[str, List[Any]]],
-    reference_exception: Optional[Type[BaseException]],
-    perform_aggregations_exception: Optional[Type[BaseException]],
-    expected_report_columns: Dict[str, List[Any]],
-    expected_log_messages: List[str],
-    mocker: MockerFixture,
+        filter_content: Dict[str, Any],
+        filtered_pool: Dict[str, Any],
+        reports: Dict[str, Dict[str, List[Any]]],
+        reference_exception: Optional[Type[BaseException]],
+        perform_aggregations_exception: Optional[Type[BaseException]],
+        expected_report_columns: Dict[str, List[Any]],
+        expected_log_messages: List[str],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the generate_report method in the ReportGenerator class.
@@ -894,7 +911,8 @@ def test_generate_report(
 
     # Arrange
     mocker.patch("RUFAS.report_generator.ReportGenerator.__init__", return_value=None)
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     report_generator.reports = reports
     mocker.patch.object(report_generator, "_ensure_unique_report_name_with_timestamp", side_effect=lambda name: name)
     mocker.patch.object(
@@ -922,7 +940,7 @@ def test_generate_report(
             report_generator,
             "_perform_aggregations",
             return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
-            | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
+                         | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
         )
 
     # Act
@@ -940,7 +958,10 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     """
     Unit test for the _prepare_report_data_to_be_graphed method in the ReportGenerator class.
     """
-    report_generator = ReportGenerator()
+
+    # Arrange
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     individual_report_name = "test_report"
     graph_data = {"some_data_key": [1, 2, 3]}
     filter_content = {
@@ -982,28 +1003,30 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     }, "Graph event log did not match expected output"
 
 
-def test_report_generator_init() -> None:
+def test_report_generator_init(mocker: MockerFixture) -> None:
     """
     Unit test for the __init__ method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    expected_reports = {}
+    expected_reports: Dict[str, Dict[str, List[Any]]] = {}
+    mock_time = mocker.MagicMock()
 
     # Act
-    report_generator = ReportGenerator()
+    report_generator = ReportGenerator(time=mock_time)
 
     # Assert
     assert report_generator.reports == expected_reports
 
 
-def test_clear_reports() -> None:
+def test_clear_reports(mocker: MockerFixture) -> None:
     """
     Unit test for the clear_reports method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    report_generator = ReportGenerator()
+    mock_time = mocker.MagicMock()
+    report_generator = ReportGenerator(time=mock_time)
     report_generator.reports = {"report1": {}, "report2": {}}
 
     # Act
