@@ -1389,6 +1389,7 @@ def test_save_results(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mock_output_manager.time = MagicMock()
 
     # Act
     mock_output_manager.save_results(
@@ -2053,3 +2054,19 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+def test_set_time(mocker: MockerFixture) -> None:
+    """
+    Unit test for the set_time() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    time_obj = mocker.MagicMock()
+
+    # Act
+    output_manager.set_time(time_obj)
+
+    # Assert
+    assert output_manager.time == time_obj
