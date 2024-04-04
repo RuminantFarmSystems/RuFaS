@@ -2,7 +2,9 @@
     "available_fertilizer_mixes": [
         {
             "name": "32_0_0",
-
+            "N": 0.32,
+            "P": 0,
+            "K": 0
         }
     ],
     "mix_names": ["32_0_0"],
