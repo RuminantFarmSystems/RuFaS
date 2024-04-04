@@ -1547,8 +1547,9 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth: float = (1.2
-                           + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+        P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
+            average_daily_gain / 0.96
+        )
         if day_of_pregnancy is None:
             P_preg: float = 0.0
         elif day_of_pregnancy > 190:
@@ -1877,6 +1878,9 @@ class AnimalRequirements:
                 "class": self.__class__.__name__,
                 "function": self.energy_activity_rqmts.__name__,
             }
-            om.add_error("Unavailable nutrient standard.",
-                         f"The nutrient standard '{nutrient_standard}' does not exist.", info_map)
+            om.add_error(
+                "Unavailable nutrient standard.",
+                f"The nutrient standard '{nutrient_standard}' does not exist.",
+                info_map,
+            )
             raise
