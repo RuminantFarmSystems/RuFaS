@@ -89,8 +89,9 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_daily_animal_population.__name__,
             "data_origin": [("AnimalManager", "daily_updates")],
         }
-        om.add_variable("sim_day", animal_manager.simulation_day,
-                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
+        om.add_variable(
+            "sim_day", animal_manager.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+        )
         om.add_variable(
             "num_animals",
             len(animal_manager.calves)
@@ -100,14 +101,16 @@ class AnimalModuleReporter:
             + len(animal_manager.cows),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
-        om.add_variable("num_calves", len(animal_manager.calves),
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("num_heiferIs", len(animal_manager.heiferIs),
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("num_heiferIIs", len(animal_manager.heiferIIs),
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("num_heiferIIIs", len(animal_manager.heiferIIIs),
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_calves", len(animal_manager.calves), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable(
+            "num_heiferIs", len(animal_manager.heiferIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "num_heiferIIs", len(animal_manager.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "num_heiferIIIs", len(animal_manager.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in animal_manager.cows if cow.is_lactating]),
@@ -118,8 +121,9 @@ class AnimalModuleReporter:
             len([cow for cow in animal_manager.cows if not cow.is_lactating]),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
-        om.add_variable("num_cows_total", len(animal_manager.cows),
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable(
+            "num_cows_total", len(animal_manager.cows), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
 
     @classmethod
     def report_milk(cls, pen: Pen, simulation_day: int) -> None:
@@ -520,48 +524,63 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
-            "bought_heifer_num", life_cycle_manager.bought_heifer_num,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+            "bought_heifer_num",
+            life_cycle_manager.bought_heifer_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
-            "sold_heiferII_num", life_cycle_manager.sold_heiferII_num,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+            "sold_heiferII_num",
+            life_cycle_manager.sold_heiferII_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
-            "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
-        )
-        om.add_variable("sold_cow_num", life_cycle_manager.sold_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable(
-            "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h,
-            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
+            "cow_herd_exit_num",
+            life_cycle_manager.cow_herd_exit_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
-            "GnRH_injection_num", life_cycle_manager.GnRH_injection_num,
-            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
+            "sold_cow_num", life_cycle_manager.sold_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
         om.add_variable(
-            "PGF_injection_num", life_cycle_manager.PGF_injection_num,
-            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
+            "GnRH_injection_num_h",
+            life_cycle_manager.GnRH_injection_num_h,
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS}),
         )
         om.add_variable(
-            "PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h,
-            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
+            "GnRH_injection_num",
+            life_cycle_manager.GnRH_injection_num,
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS}),
         )
-        om.add_variable("ai_num", life_cycle_manager.ai_num,
-                        dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}))
-        om.add_variable("preg_check_num", life_cycle_manager.preg_check_num,
-                        dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}))
         om.add_variable(
-            "preg_check_num_h", life_cycle_manager.preg_check_num_h,
-            dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS})
+            "PGF_injection_num",
+            life_cycle_manager.PGF_injection_num,
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS}),
         )
-        om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
-            "daily_milk_production", life_cycle_manager.daily_milk_production,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
+            "PGF_injection_num_h",
+            life_cycle_manager.PGF_injection_num_h,
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS}),
+        )
+        om.add_variable(
+            "ai_num", life_cycle_manager.ai_num, dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS})
+        )
+        om.add_variable(
+            "preg_check_num",
+            life_cycle_manager.preg_check_num,
+            dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}),
+        )
+        om.add_variable(
+            "preg_check_num_h",
+            life_cycle_manager.preg_check_num_h,
+            dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}),
+        )
+        om.add_variable(
+            "sold_calf_num", life_cycle_manager.sold_calf_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "daily_milk_production",
+            life_cycle_manager.daily_milk_production,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
         om.add_variable(
             "dry_cows_daily_milk_production",
@@ -569,18 +588,24 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
         om.add_variable(
-            "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent,
-            dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )
-        om.add_variable("herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg,
-                        dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}))
-        om.add_variable(
-            "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
+            "herd_milk_fat_percent",
+            life_cycle_manager.herd_milk_fat_percent,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         om.add_variable(
-            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
+            "herd_milk_fat_kg",
+            life_cycle_manager.herd_milk_fat_kg,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "dry_cows_milk_fat_kg",
+            life_cycle_manager.dry_cows_milk_fat_kg,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "herd_milk_protein_kg",
+            life_cycle_manager.herd_milk_protein_kg,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
         om.add_variable(
             "herd_milk_protein_percent",
@@ -592,29 +617,39 @@ class AnimalModuleReporter:
             life_cycle_manager.dry_cows_milk_protein_kg,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
-        om.add_variable("open_cow_num", life_cycle_manager.open_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num,
-                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable("avg_days_in_milk", life_cycle_manager.avg_days_in_milk,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
-        om.add_variable("avg_days_in_preg", life_cycle_manager.avg_days_in_preg,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable(
-            "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+            "open_cow_num", life_cycle_manager.open_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
-        om.add_variable("avg_parity_num", life_cycle_manager.avg_parity_num,
-                        dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
         om.add_variable(
-            "avg_calving_interval", life_cycle_manager.avg_calving_interval,
-            dict(info_map, **{"units": MeasurementUnits.DAYS})
+            "vwp_cow_num", life_cycle_manager.vwp_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "preg_cow_num", life_cycle_manager.preg_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "milking_cow_num", life_cycle_manager.milking_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "dry_cow_num", life_cycle_manager.dry_cow_num, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+        )
+        om.add_variable(
+            "avg_days_in_milk", life_cycle_manager.avg_days_in_milk, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_days_in_preg", life_cycle_manager.avg_days_in_preg, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_cow_body_weight",
+            life_cycle_manager.avg_cow_body_weight,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "avg_parity_num", life_cycle_manager.avg_parity_num, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+        )
+        om.add_variable(
+            "avg_calving_interval",
+            life_cycle_manager.avg_calving_interval,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
             "avg_breeding_to_preg_time",
@@ -627,8 +662,9 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
-            "avg_cow_culling_age", life_cycle_manager.avg_cow_culling_age,
-            dict(info_map, **{"units": MeasurementUnits.DAYS})
+            "avg_cow_culling_age",
+            life_cycle_manager.avg_cow_culling_age,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
             "avg_mature_body_weight",
@@ -644,19 +680,23 @@ class AnimalModuleReporter:
         om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
-            "num_cow_for_parity_greater_than_3", parity_greater_than_3,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+            "num_cow_for_parity_greater_than_3",
+            parity_greater_than_3,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         calving_to_preg_time_1 = life_cycle_manager.avg_calving_to_preg_time["1"]
         calving_to_preg_time_2 = life_cycle_manager.avg_calving_to_preg_time["2"]
         calving_to_preg_time_3 = life_cycle_manager.avg_calving_to_preg_time["3"]
         calving_to_preg_time_greater_than_3 = life_cycle_manager.avg_calving_to_preg_time["greater_than_3"]
-        om.add_variable("calving_to_preg_time_1", calving_to_preg_time_1,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
-        om.add_variable("calving_to_preg_time_2", calving_to_preg_time_2,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
-        om.add_variable("calving_to_preg_time_3", calving_to_preg_time_3,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
+        om.add_variable(
+            "calving_to_preg_time_1", calving_to_preg_time_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "calving_to_preg_time_2", calving_to_preg_time_2, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "calving_to_preg_time_3", calving_to_preg_time_3, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
         om.add_variable(
             "calving_to_preg_time_greater_than_3",
             calving_to_preg_time_greater_than_3,
@@ -666,12 +706,15 @@ class AnimalModuleReporter:
         avg_age_for_calving_2 = life_cycle_manager.avg_age_for_calving["2"]
         avg_age_for_calving_3 = life_cycle_manager.avg_age_for_calving["3"]
         avg_age_for_calving_greater_than_3 = life_cycle_manager.avg_age_for_calving["greater_than_3"]
-        om.add_variable("avg_age_for_calving_1", avg_age_for_calving_1,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
-        om.add_variable("avg_age_for_calving_2", avg_age_for_calving_2,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
-        om.add_variable("avg_age_for_calving_3", avg_age_for_calving_3,
-                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
+        om.add_variable(
+            "avg_age_for_calving_1", avg_age_for_calving_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_age_for_calving_2", avg_age_for_calving_2, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_age_for_calving_3", avg_age_for_calving_3, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
         om.add_variable(
             "avg_age_for_calving_greater_than_3",
             avg_age_for_calving_greater_than_3,
@@ -697,11 +740,7 @@ class AnimalModuleReporter:
     def report_daily_pen_total(cls, simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_pen_total.__name__
-        info_map = {
-            "class": classname,
-            "function": funcname,
-            "units": MeasurementUnits.ANIMALS
-        }
+        info_map = {"class": classname, "function": funcname, "units": MeasurementUnits.ANIMALS}
         for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
@@ -741,19 +780,22 @@ class AnimalModuleReporter:
         }
         for animal in sold_animals:
             om.add_variable("animal_id", animal.id, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
-            om.add_variable("animal_type", animal.__class__.__name__,
-                            dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+            om.add_variable(
+                "animal_type", animal.__class__.__name__, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            )
             om.add_variable("body_weight", animal.body_weight, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
 
             if hasattr(animal, "sold_at_day"):
-                om.add_variable("sold_day", animal.sold_at_day,
-                                dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
+                om.add_variable(
+                    "sold_day", animal.sold_at_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+                )
             else:
                 om.add_variable("sold_day", "NA", dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
 
             if hasattr(animal, "cull_reason"):
-                om.add_variable("cull_reason", animal.cull_reason,
-                                dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+                om.add_variable(
+                    "cull_reason", animal.cull_reason, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+                )
             else:
                 om.add_variable("cull_reason", "NA", dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
 
@@ -804,24 +846,30 @@ class AnimalModuleReporter:
                 daily_sell[animal.sold_at_day] = [animal]
 
         om.add_variable(
-            f"{report_name}_first_sell_event", sold_at_day_min,
-            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+            f"{report_name}_first_sell_event",
+            sold_at_day_min,
+            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
         om.add_variable(
-            f"{report_name}_last_sell_event", sold_at_day_max,
-            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+            f"{report_name}_last_sell_event",
+            sold_at_day_max,
+            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
         for day in range(1, total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal.body_weight for sold_animal in daily_sell[day])
-                om.add_variable(f"{report_name}_sold_count", sold_count,
-                                dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-                om.add_variable(f"{report_name}_sold_weight", sold_weight,
-                                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
+                om.add_variable(
+                    f"{report_name}_sold_count", sold_count, dict(info_map, **{"units": MeasurementUnits.ANIMALS})
+                )
+                om.add_variable(
+                    f"{report_name}_sold_weight", sold_weight, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+                )
             else:
                 om.add_variable(f"{report_name}_sold_count", 0, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-                om.add_variable(f"{report_name}_sold_weight", 0, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
+                om.add_variable(
+                    f"{report_name}_sold_weight", 0, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+                )
 
     @classmethod
     def report_305d_milk(cls, animal_manager) -> None:

@@ -144,8 +144,9 @@ class Time:
         }
         om.add_variable("day", self.day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable("year", self.year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR}))
-        om.add_variable("calendar_year", self.calendar_year,
-                        dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR}))
+        om.add_variable(
+            "calendar_year", self.calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
+        )
 
     @property
     def is_last_day_of_simulation(self):
