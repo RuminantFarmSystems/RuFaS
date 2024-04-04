@@ -67,7 +67,7 @@ def test_data_padder() -> None:
         full_variable_to_add="full_variable",
         thing_to_add=0,
         simulation_day=100,
-        info_map={"class": "dummyclass", "function": "dummyfunction"},
+        info_map={"class": "dummyclass", "function": "dummyfunction", "units": AcceptableUnits.ANIMALS},
     )
 
     # Assert
