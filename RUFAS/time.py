@@ -183,6 +183,6 @@ class Time:
         return str(
             {
                 "simulation_day": self.simulation_day,
-                "simulation_year_day": "Year: {} Day: {}".format(self.year, self.day),
+                "simulation_year_day": "Year: {}, Day: {}".format(self.year, self.day),
             }
         )
