@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Union, Tuple
 import pandas as pd
 from deprecated.sphinx import deprecated
 
+from RUFAS.units import AcceptableUnits
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.util import Utility
@@ -173,8 +174,39 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
+        units = info_map.get("units")
+        if units is None:
+            raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
+        self._validate_units(units)
+
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+    def _validate_units(self, units: Union[Dict[str, Any], AcceptableUnits, str]):
+        """
+        Recursively validates that units is either a valid AcceptableUnits value or a dictionary with
+        valid AcceptableUnits values (including nested dictionaries).
+
+        Parameters
+        ----------
+        units : Union[Dict[str, Any], str]
+            Either a string that can be converted to an AcceptableUnits, or a dictionary mapping string keys to either
+            AcceptableUnits values or further dictionaries.
+
+        Raises
+        ------
+        ValueError
+            If any unit or nested unit is not a valid AcceptableUnits value.
+
+        """
+        if isinstance(units, dict):
+            for key, unit in units.items():
+                self._validate_units(unit)
+        else:
+            try:
+                AcceptableUnits(units)
+            except ValueError:
+                raise ValueError(f"'{units}' is not a valid AcceptableUnits value")
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
