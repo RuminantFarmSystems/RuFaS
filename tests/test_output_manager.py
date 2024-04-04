@@ -426,25 +426,70 @@ def test_add_log(
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
+@pytest.mark.parametrize("info_map, exception, exception_message", [
+    ({"units": MeasurementUnits.ANIMALS}, None, None),
+    ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
+])
 def test_add_variable(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    info_map: Dict[str, Any],
+    exception: KeyError | None,
+    exception_message: str,
 ) -> None:
     """Unit test for function add_variable in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
-    info_map = {"units": MeasurementUnits.ANIMALS}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._validate_units = MagicMock()
 
-    mock_output_manager.add_variable(name, value, info_map)
-
-    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
-    mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
+    if exception:
+        with pytest.raises(exception) as e:
+            mock_output_manager.add_variable(name, value, info_map)
+        assert exception_message in str(e.value)
+    else:
+        mock_output_manager.add_variable(name, value, info_map)
+        mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+        mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
 
     mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
     mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
+    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+
+
+@pytest.mark.parametrize("units, expected_exception, expected_message", [
+    (MeasurementUnits.ANIMALS, None, None),
+    ({
+        "first": MeasurementUnits.ANIMALS,
+        "second": MeasurementUnits.COWS,
+        "nested": {"third": MeasurementUnits.DAYS}
+    }, None, None),
+    ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+    ({
+        "first": MeasurementUnits.ANIMALS,
+        "invalid": "not_a_unit",
+    }, ValueError, "'not_a_unit' is not a valid MeasurementUnits value"),
+    ({
+        "first": {"nested_invalid": "definitely_not_a_unit"},
+        "second": MeasurementUnits.COWS,
+    }, ValueError, "'definitely_not_a_unit' is not a valid MeasurementUnits value"),
+])
+def test_validate_units(mock_output_manager: OutputManager,
+                        output_manager_original_method_states: Dict[str, Callable],
+                        units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
+                        expected_exception: ValueError,
+                        expected_message: str):
+    """Test for function _validate_units in file output_manager.py"""
+    if expected_exception:
+        with pytest.raises(expected_exception) as e:
+            mock_output_manager._validate_units(units)
+        assert expected_message in str(e.value)
+    else:
+        mock_output_manager._validate_units(units)
+
+    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
 
 
 @pytest.mark.parametrize(
@@ -583,6 +628,7 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
+        "_validate_units": mock_output_manager._validate_units,
     }
 
 
