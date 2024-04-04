@@ -447,44 +447,6 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_pen_manure(cls, pen: Pen) -> None:
-        """
-        Adds pen manure data to output manager.
-
-        Parameters
-        ----------
-        pen : Pen
-            Current pen.
-        """
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_pen_manure.__name__,
-            "data_origin": [("Pen", "calc_manure")],
-            "pen_id": pen.id,
-            "pen_animal_combination": pen.animal_combination._name_,
-            "units": {
-                "urea": "g/L",
-                "urine": "kg",
-                "total_ammoniacal_nitrogen_concentration": "g/L",
-                "urine_nitrogen": "kg",
-                "manure_nitrogen": "kg",
-                "manure_mass": "kg",
-                "total_solids": "kg",
-                "degradable_volatile_solids": "kg",
-                "non_degradable_volatile_solids": "kg",
-                "inorganic_phosphorus_fraction": "unitless",
-                "organic_phosphorus_fraction": "unitless",
-                "non_water_inorganic_phosphorus_fraction": "unitless",
-                "non_water_organic_phosphorus_fraction": "unitless",
-                "phosphorus": "g",
-                "phosphorus_fraction": "unitless",
-                "potassium": "g",
-                "enteric_methane_g": "g/day",
-            },
-        }
-        om.add_variable("pen_manure_data", pen.manure, info_map)
-
-    @classmethod
     def report_pen_manure_properties(cls, pen: Pen, simulation_day: int) -> None:
         """
         Adds pen manure properties to output manager.
