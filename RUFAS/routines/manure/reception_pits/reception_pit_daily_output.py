@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
@@ -78,44 +78,44 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     """
 
     pen_id: int = -1
-    pen_id_unit: str = AcceptableUnits.UNITLESS
+    pen_id_unit: str = MeasurementUnits.UNITLESS
 
     simulation_day: int = -1
-    simulation_day_unit: str = AcceptableUnits.SIMULATION_DAY
+    simulation_day_unit: str = MeasurementUnits.SIMULATION_DAY
 
     manure_urea: float = 0.0
-    manure_urea_unit: str = AcceptableUnits.GRAMS_PER_LITER
+    manure_urea_unit: str = MeasurementUnits.GRAMS_PER_LITER
 
     liquid_manure_total_ammoniacal_nitrogen: float = 0.0
-    liquid_manure_total_ammoniacal_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_total_ammoniacal_nitrogen_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_nitrogen: float = 0.0
-    liquid_manure_nitrogen_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_nitrogen_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_total_solids: float = 0.0
-    liquid_manure_total_solids_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_total_solids_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_total_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_degradable_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_total_degradable_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_total_non_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_non_degradable_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_total_volatile_solids: float = 0.0
-    liquid_manure_total_volatile_solids_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_total_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_phosphorus: float = 0.0
-    liquid_manure_phosphorus_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_phosphorus_unit: str = MeasurementUnits.KILOGRAMS
 
     liquid_manure_potassium: float = 0.0
-    liquid_manure_potassium_unit: str = AcceptableUnits.KILOGRAMS
+    liquid_manure_potassium_unit: str = MeasurementUnits.KILOGRAMS
 
     total_daily_manure_volume: float = 0.0
-    total_daily_manure_volume_unit: str = AcceptableUnits.CUBIC_METERS
+    total_daily_manure_volume_unit: str = MeasurementUnits.CUBIC_METERS
 
     # To satisfy the LiquidManurePortionProtocol
     liquid_manure_daily_volume: float = field(init=False)
-    liquid_manure_daily_volume_unit: str = AcceptableUnits.CUBIC_METERS
+    liquid_manure_daily_volume_unit: str = MeasurementUnits.CUBIC_METERS
 
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the total daily manure volume."""

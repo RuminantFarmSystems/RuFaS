@@ -2,7 +2,7 @@ from typing import Dict, List, Any
 import numpy as np
 import sys
 
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -90,7 +90,7 @@ class AnimalModuleReporter:
             "data_origin": [("AnimalManager", "daily_updates")],
         }
         om.add_variable("sim_day", animal_manager.simulation_day,
-                        dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY}))
+                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
             "num_animals",
             len(animal_manager.calves)
@@ -98,28 +98,28 @@ class AnimalModuleReporter:
             + len(animal_manager.heiferIIs)
             + len(animal_manager.heiferIIIs)
             + len(animal_manager.cows),
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable("num_calves", len(animal_manager.calves),
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_heiferIs", len(animal_manager.heiferIs),
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_heiferIIs", len(animal_manager.heiferIIs),
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_heiferIIIs", len(animal_manager.heiferIIIs),
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in animal_manager.cows if cow.is_lactating]),
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_dry_cows",
             len([cow for cow in animal_manager.cows if not cow.is_lactating]),
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable("num_cows_total", len(animal_manager.cows),
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
 
     @classmethod
     def report_milk(cls, pen: Pen, simulation_day: int) -> None:
@@ -135,16 +135,16 @@ class AnimalModuleReporter:
 
         """
         units = {
-            "days_in_milk": AcceptableUnits.DAYS,
-            "estimated_daily_milk_produced": AcceptableUnits.KILOGRAMS_PER_DAY,
-            "milk_protein": AcceptableUnits.KILOGRAMS_PER_DAY,
-            "milk_fat": AcceptableUnits.KILOGRAMS_PER_DAY,
-            "milk_lactose": AcceptableUnits.KILOGRAMS_PER_DAY,
-            "lactating": AcceptableUnits.UNITLESS,
-            "parity": AcceptableUnits.UNITLESS,
-            "cow_id": AcceptableUnits.UNITLESS,
-            "pen_id": AcceptableUnits.UNITLESS,
-            "simulation_day": AcceptableUnits.SIMULATION_DAY,
+            "days_in_milk": MeasurementUnits.DAYS,
+            "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "lactating": MeasurementUnits.UNITLESS,
+            "parity": MeasurementUnits.UNITLESS,
+            "cow_id": MeasurementUnits.UNITLESS,
+            "pen_id": MeasurementUnits.UNITLESS,
+            "simulation_day": MeasurementUnits.SIMULATION_DAY,
         }
 
         info_map = {
@@ -205,15 +205,15 @@ class AnimalModuleReporter:
                 "simulation_day": simulation_day,
             }
             nutrient_amount_units = {
-                "dm": AcceptableUnits.KILOGRAMS_PER_ANIMAL,
-                "CP": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "ADF": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "NDF": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "lignin": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "ash": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "phosphorus": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "potassium": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                "N": AcceptableUnits.PERCENT_OF_DRY_MATTER,
+                "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "CP": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "ADF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "NDF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "lignin": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "ash": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "N": MeasurementUnits.PERCENT_OF_DRY_MATTER,
             }
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_ration_interval_data.__name__
@@ -239,20 +239,20 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
                 pen.MEdiet,
-                dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}),
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             avg_nutrient_rqmts_units = {
-                "NEmaint_requirement": AcceptableUnits.MEGACALORIES,
-                "NEa_requirement": AcceptableUnits.MEGACALORIES,
-                "NEg_requirement": AcceptableUnits.MEGACALORIES,
-                "NEpreg_requirement": AcceptableUnits.MEGACALORIES,
-                "NEl_requirement": AcceptableUnits.MEGACALORIES,
-                "MP_requirement": AcceptableUnits.GRAMS,
-                "Ca_requirement": AcceptableUnits.GRAMS,
-                "P_req": AcceptableUnits.GRAMS,
-                "DMIest_requirement": AcceptableUnits.KILOGRAMS,
-                "avg_BW": AcceptableUnits.KILOGRAMS,
-                "avg_milk_production_reduction_pen": AcceptableUnits.KILOGRAMS_PER_ANIMAL,
+                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+                "NEa_requirement": MeasurementUnits.MEGACALORIES,
+                "NEg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEl_requirement": MeasurementUnits.MEGACALORIES,
+                "MP_requirement": MeasurementUnits.GRAMS,
+                "Ca_requirement": MeasurementUnits.GRAMS,
+                "P_req": MeasurementUnits.GRAMS,
+                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+                "avg_BW": MeasurementUnits.KILOGRAMS,
+                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             }
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
@@ -266,7 +266,7 @@ class AnimalModuleReporter:
                 pen.avg_nutrient_rqmts,
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
-            ration_per_animal_units = {key: AcceptableUnits.KILOGRAMS for key in ration_per_animal.keys()}
+            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_animal.keys()}
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.ration_per_animal_for_pen_0_CALF",
                 f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -281,16 +281,16 @@ class AnimalModuleReporter:
             )
             if pen.animal_combination != AnimalCombination.CALF:
                 ration_supply_report_units = {
-                    "ME": AcceptableUnits.MEGACALORIES_PER_KILOGRAM,
-                    "DE": AcceptableUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_maintenance_and_activity": AcceptableUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_lactation": AcceptableUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_growth": AcceptableUnits.MEGACALORIES_PER_KILOGRAM,
-                    "calcium": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                    "phosphorus": AcceptableUnits.PERCENT_OF_DRY_MATTER,
-                    "fat": AcceptableUnits.GRAMS,
-                    "fat_percentage": AcceptableUnits.PERCENT,
-                    "forage_NDF": AcceptableUnits.PERCENT,
+                    "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                    "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                    "fat": MeasurementUnits.GRAMS,
+                    "fat_percentage": MeasurementUnits.PERCENT,
+                    "forage_NDF": MeasurementUnits.PERCENT,
                 }
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
@@ -345,7 +345,7 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_daily_feed_emissions(
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
-            ration_total_units = {key: AcceptableUnits.KILOGRAMS for key in ration_total.keys()}
+            ration_total_units = {key: MeasurementUnits.KILOGRAMS for key in ration_total.keys()}
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_daily_ration.__name__
             AnimalModuleReporter.data_padder(
@@ -404,7 +404,7 @@ class AnimalModuleReporter:
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
             daily_feed_emissions,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
 
     @classmethod
@@ -422,23 +422,23 @@ class AnimalModuleReporter:
 
         """
         manure_value_units = {
-            "urea": AcceptableUnits.GRAMS_PER_LITER,
-            "urine": AcceptableUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": AcceptableUnits.GRAMS_PER_LITER,
-            "urine_nitrogen": AcceptableUnits.KILOGRAMS,
-            "manure_nitrogen": AcceptableUnits.KILOGRAMS,
-            "manure_mass": AcceptableUnits.KILOGRAMS,
-            "total_solids": AcceptableUnits.KILOGRAMS,
-            "degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-            "non_degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-            "inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "non_water_inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "non_water_organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "phosphorus": AcceptableUnits.GRAMS,
-            "phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "potassium": AcceptableUnits.GRAMS,
-            "enteric_methane_g": AcceptableUnits.GRAMS_PER_DAY,
+            "urea": MeasurementUnits.GRAMS_PER_LITER,
+            "urine": MeasurementUnits.KILOGRAMS,
+            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "urine_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_mass": MeasurementUnits.KILOGRAMS,
+            "total_solids": MeasurementUnits.KILOGRAMS,
+            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "phosphorus": MeasurementUnits.GRAMS,
+            "phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "potassium": MeasurementUnits.GRAMS,
+            "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY,
         }
         for output_data_dict in manure_excretions_output_data.values():
             for manure_property, manure_value in output_data_dict["manure"].items():
@@ -470,23 +470,23 @@ class AnimalModuleReporter:
             "pen_id": pen.id,
             "pen_animal_combination": pen.animal_combination._name_,
             "units": {
-                "urea": AcceptableUnits.GRAMS_PER_LITER,
-                "urine": AcceptableUnits.KILOGRAMS,
-                "total_ammoniacal_nitrogen_concentration": AcceptableUnits.GRAMS_PER_LITER,
-                "urine_nitrogen": AcceptableUnits.KILOGRAMS,
-                "manure_nitrogen": AcceptableUnits.KILOGRAMS,
-                "manure_mass": AcceptableUnits.KILOGRAMS,
-                "total_solids": AcceptableUnits.KILOGRAMS,
-                "degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-                "non_degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-                "inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-                "organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-                "non_water_inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-                "non_water_organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-                "phosphorus": AcceptableUnits.GRAMS,
-                "phosphorus_fraction": AcceptableUnits.UNITLESS,
-                "potassium": AcceptableUnits.GRAMS,
-                "enteric_methane_g": AcceptableUnits.GRAMS_PER_DAY,
+                "urea": MeasurementUnits.GRAMS_PER_LITER,
+                "urine": MeasurementUnits.KILOGRAMS,
+                "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+                "urine_nitrogen": MeasurementUnits.KILOGRAMS,
+                "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+                "manure_mass": MeasurementUnits.KILOGRAMS,
+                "total_solids": MeasurementUnits.KILOGRAMS,
+                "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+                "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+                "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+                "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+                "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+                "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+                "phosphorus": MeasurementUnits.GRAMS,
+                "phosphorus_fraction": MeasurementUnits.UNITLESS,
+                "potassium": MeasurementUnits.GRAMS,
+                "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY,
             },
         }
         om.add_variable("pen_manure_data", pen.manure, info_map)
@@ -507,23 +507,23 @@ class AnimalModuleReporter:
             "data_origin": [("Pen", "calc_total_manure")],
         }
         manure_value_units = {
-            "urea": AcceptableUnits.GRAMS_PER_LITER,
-            "urine": AcceptableUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": AcceptableUnits.GRAMS_PER_LITER,
-            "urine_nitrogen": AcceptableUnits.KILOGRAMS,
-            "manure_nitrogen": AcceptableUnits.KILOGRAMS,
-            "manure_mass": AcceptableUnits.KILOGRAMS,
-            "total_solids": AcceptableUnits.KILOGRAMS,
-            "degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-            "non_degradable_volatile_solids": AcceptableUnits.KILOGRAMS,
-            "inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "non_water_inorganic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "non_water_organic_phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "phosphorus": AcceptableUnits.GRAMS,
-            "phosphorus_fraction": AcceptableUnits.UNITLESS,
-            "potassium": AcceptableUnits.GRAMS,
-            "enteric_methane_g": AcceptableUnits.GRAMS_PER_DAY,
+            "urea": MeasurementUnits.GRAMS_PER_LITER,
+            "urine": MeasurementUnits.KILOGRAMS,
+            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "urine_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_mass": MeasurementUnits.KILOGRAMS,
+            "total_solids": MeasurementUnits.KILOGRAMS,
+            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "phosphorus": MeasurementUnits.GRAMS,
+            "phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "potassium": MeasurementUnits.GRAMS,
+            "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY,
         }
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_pen_manure_properties.__name__
@@ -555,175 +555,175 @@ class AnimalModuleReporter:
         om.add_variable(
             "sold_heiferIII_oversupply_num",
             life_cycle_manager.sold_heiferIII_oversupply_num,
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "bought_heifer_num", life_cycle_manager.bought_heifer_num,
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS})
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
         om.add_variable(
             "sold_heiferII_num", life_cycle_manager.sold_heiferII_num,
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS})
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
         om.add_variable(
             "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num,
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS})
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
         om.add_variable("sold_cow_num", life_cycle_manager.sold_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h,
-            dict(info_map, **{"units": AcceptableUnits.INJECTIONS})
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
         )
         om.add_variable(
             "GnRH_injection_num", life_cycle_manager.GnRH_injection_num,
-            dict(info_map, **{"units": AcceptableUnits.INJECTIONS})
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
         )
         om.add_variable(
             "PGF_injection_num", life_cycle_manager.PGF_injection_num,
-            dict(info_map, **{"units": AcceptableUnits.INJECTIONS})
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
         )
         om.add_variable(
             "PGF_injection_num_h", life_cycle_manager.PGF_injection_num_h,
-            dict(info_map, **{"units": AcceptableUnits.INJECTIONS})
+            dict(info_map, **{"units": MeasurementUnits.INJECTIONS})
         )
         om.add_variable("ai_num", life_cycle_manager.ai_num,
-                        dict(info_map, **{"units": AcceptableUnits.ARTIFICIAL_INSEMINATIONS}))
+                        dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}))
         om.add_variable("preg_check_num", life_cycle_manager.preg_check_num,
-                        dict(info_map, **{"units": AcceptableUnits.PREGNANCY_CHECKS}))
+                        dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}))
         om.add_variable(
             "preg_check_num_h", life_cycle_manager.preg_check_num_h,
-            dict(info_map, **{"units": AcceptableUnits.PREGNANCY_CHECKS})
+            dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS})
         )
         om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "daily_milk_production", life_cycle_manager.daily_milk_production,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY})
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
         )
         om.add_variable(
             "dry_cows_daily_milk_production",
             life_cycle_manager.dry_cows_daily_milk_production,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
         om.add_variable(
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent,
-            dict(info_map, **{"units": AcceptableUnits.UNITLESS})
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         om.add_variable("herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg,
-                        dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY}))
+                        dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}))
         om.add_variable(
             "dry_cows_milk_fat_kg", life_cycle_manager.dry_cows_milk_fat_kg,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY})
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
         )
         om.add_variable(
             "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY})
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY})
         )
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
-            dict(info_map, **{"units": AcceptableUnits.UNITLESS}),
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         om.add_variable(
             "dry_cows_milk_protein_kg",
             life_cycle_manager.dry_cows_milk_protein_kg,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS_PER_DAY}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("milking_cow_num", life_cycle_manager.milking_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("dry_cow_num", life_cycle_manager.dry_cow_num,
-                        dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("avg_days_in_milk", life_cycle_manager.avg_days_in_milk,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable("avg_days_in_preg", life_cycle_manager.avg_days_in_preg,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable(
             "avg_cow_body_weight", life_cycle_manager.avg_cow_body_weight,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS})
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
         )
         om.add_variable("avg_parity_num", life_cycle_manager.avg_parity_num,
-                        dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+                        dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
         om.add_variable(
             "avg_calving_interval", life_cycle_manager.avg_calving_interval,
-            dict(info_map, **{"units": AcceptableUnits.DAYS})
+            dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
             "avg_breeding_to_preg_time",
             life_cycle_manager.avg_breeding_to_preg_time,
-            dict(info_map, **{"units": AcceptableUnits.DAYS}),
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
             "avg_heifer_culling_age",
             life_cycle_manager.avg_heifer_culling_age,
-            dict(info_map, **{"units": AcceptableUnits.DAYS}),
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
             "avg_cow_culling_age", life_cycle_manager.avg_cow_culling_age,
-            dict(info_map, **{"units": AcceptableUnits.DAYS})
+            dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
             "avg_mature_body_weight",
             life_cycle_manager.avg_mature_body_weight,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
-        om.add_variable("sim_day", sim_day, dict(info_map, **{"units": AcceptableUnits.DAYS}))
+        om.add_variable("sim_day", sim_day, dict(info_map, **{"units": MeasurementUnits.DAYS}))
         parity_1 = life_cycle_manager.num_cow_for_parity["1"]
         parity_2 = life_cycle_manager.num_cow_for_parity["2"]
         parity_3 = life_cycle_manager.num_cow_for_parity["3"]
         parity_greater_than_3 = life_cycle_manager.num_cow_for_parity["greater_than_3"]
-        om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
-        om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
-        om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_cow_for_parity_greater_than_3", parity_greater_than_3,
-            dict(info_map, **{"units": AcceptableUnits.ANIMALS})
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS})
         )
         calving_to_preg_time_1 = life_cycle_manager.avg_calving_to_preg_time["1"]
         calving_to_preg_time_2 = life_cycle_manager.avg_calving_to_preg_time["2"]
         calving_to_preg_time_3 = life_cycle_manager.avg_calving_to_preg_time["3"]
         calving_to_preg_time_greater_than_3 = life_cycle_manager.avg_calving_to_preg_time["greater_than_3"]
         om.add_variable("calving_to_preg_time_1", calving_to_preg_time_1,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable("calving_to_preg_time_2", calving_to_preg_time_2,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable("calving_to_preg_time_3", calving_to_preg_time_3,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable(
             "calving_to_preg_time_greater_than_3",
             calving_to_preg_time_greater_than_3,
-            dict(info_map, **{"units": AcceptableUnits.DAYS}),
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         avg_age_for_calving_1 = life_cycle_manager.avg_age_for_calving["1"]
         avg_age_for_calving_2 = life_cycle_manager.avg_age_for_calving["2"]
         avg_age_for_calving_3 = life_cycle_manager.avg_age_for_calving["3"]
         avg_age_for_calving_greater_than_3 = life_cycle_manager.avg_age_for_calving["greater_than_3"]
         om.add_variable("avg_age_for_calving_1", avg_age_for_calving_1,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable("avg_age_for_calving_2", avg_age_for_calving_2,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable("avg_age_for_calving_3", avg_age_for_calving_3,
-                        dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                        dict(info_map, **{"units": MeasurementUnits.DAYS}))
         om.add_variable(
             "avg_age_for_calving_greater_than_3",
             avg_age_for_calving_greater_than_3,
-            dict(info_map, **{"units": AcceptableUnits.DAYS}),
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         cull_reason_stats_units = {
-            animal_constants.DEATH_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.LOW_PROD_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.LAMENESS_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.INJURY_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.MASTITIS_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.DISEASE_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.UDDER_CULL: AcceptableUnits.UNITLESS,
-            animal_constants.UNKNOWN_CULL: AcceptableUnits.UNITLESS,
+            animal_constants.DEATH_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.LOW_PROD_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.LAMENESS_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.INJURY_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.MASTITIS_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.DISEASE_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.UDDER_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.UNKNOWN_CULL: MeasurementUnits.UNITLESS,
         }
         om.add_variable(
             "cull_reason_stats",
@@ -738,7 +738,7 @@ class AnimalModuleReporter:
         info_map = {
             "class": classname,
             "function": funcname,
-            "units": AcceptableUnits.ANIMALS
+            "units": MeasurementUnits.ANIMALS
         }
         for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
@@ -778,32 +778,32 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_sold_animal_information.__name__,
         }
         for animal in sold_animals:
-            om.add_variable("animal_id", animal.id, dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+            om.add_variable("animal_id", animal.id, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
             om.add_variable("animal_type", animal.__class__.__name__,
-                            dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
-            om.add_variable("body_weight", animal.body_weight, dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}))
+                            dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+            om.add_variable("body_weight", animal.body_weight, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
 
             if hasattr(animal, "sold_at_day"):
                 om.add_variable("sold_day", animal.sold_at_day,
-                                dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY}))
+                                dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
             else:
-                om.add_variable("sold_day", "NA", dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY}))
+                om.add_variable("sold_day", "NA", dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
 
             if hasattr(animal, "cull_reason"):
                 om.add_variable("cull_reason", animal.cull_reason,
-                                dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+                                dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
             else:
-                om.add_variable("cull_reason", "NA", dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+                om.add_variable("cull_reason", "NA", dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
 
             if hasattr(animal, "days_in_milk"):
-                om.add_variable("days_in_milk", animal.days_in_milk, dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                om.add_variable("days_in_milk", animal.days_in_milk, dict(info_map, **{"units": MeasurementUnits.DAYS}))
             else:
-                om.add_variable("days_in_milk", "NA", dict(info_map, **{"units": AcceptableUnits.DAYS}))
+                om.add_variable("days_in_milk", "NA", dict(info_map, **{"units": MeasurementUnits.DAYS}))
 
             if hasattr(animal, "calves"):
-                om.add_variable("parity", animal.calves, dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+                om.add_variable("parity", animal.calves, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
             else:
-                om.add_variable("parity", "NA", dict(info_map, **{"units": AcceptableUnits.UNITLESS}))
+                om.add_variable("parity", "NA", dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
 
     @classmethod
     def report_sold_animal_information_sort_by_sell_day(
@@ -843,23 +843,23 @@ class AnimalModuleReporter:
 
         om.add_variable(
             f"{report_name}_first_sell_event", sold_at_day_min,
-            dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY})
+            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
         om.add_variable(
             f"{report_name}_last_sell_event", sold_at_day_max,
-            dict(info_map, **{"units": AcceptableUnits.SIMULATION_DAY})
+            dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
         for day in range(1, total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal.body_weight for sold_animal in daily_sell[day])
                 om.add_variable(f"{report_name}_sold_count", sold_count,
-                                dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
+                                dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
                 om.add_variable(f"{report_name}_sold_weight", sold_weight,
-                                dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}))
+                                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
             else:
-                om.add_variable(f"{report_name}_sold_count", 0, dict(info_map, **{"units": AcceptableUnits.ANIMALS}))
-                om.add_variable(f"{report_name}_sold_weight", 0, dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}))
+                om.add_variable(f"{report_name}_sold_count", 0, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+                om.add_variable(f"{report_name}_sold_weight", 0, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}))
 
     @classmethod
     def report_305d_milk(cls, animal_manager) -> None:
@@ -886,7 +886,7 @@ class AnimalModuleReporter:
         om.add_variable(
             "milk_production_305days_herd_mean",
             milk_production_305days_herd_mean,
-            dict(info_map, **{"units": AcceptableUnits.KILOGRAMS}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
 
     @classmethod

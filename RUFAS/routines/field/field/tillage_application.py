@@ -1,6 +1,6 @@
 from typing import Optional
 
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.EEE.enums import TillageImplement
@@ -316,14 +316,14 @@ class TillageApplication:
 
         """
         units = {
-            "tillage_depth": AcceptableUnits.MILLIMETERS,
-            "incorporation_fraction": AcceptableUnits.UNITLESS,
-            "mixing_fraction": AcceptableUnits.UNITLESS,
-            "implement": AcceptableUnits.UNITLESS,
-            "year": AcceptableUnits.CALENDAR_YEAR,
-            "day": AcceptableUnits.ORDINAL_DAY,
-            "field_size": AcceptableUnits.HECTARE,
-            "average_clay_percent": AcceptableUnits.PERCENT,
+            "tillage_depth": MeasurementUnits.MILLIMETERS,
+            "incorporation_fraction": MeasurementUnits.UNITLESS,
+            "mixing_fraction": MeasurementUnits.UNITLESS,
+            "implement": MeasurementUnits.UNITLESS,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,

@@ -1,7 +1,8 @@
-from enum import Enum
+from enum import Enum, unique
 
 
-class AcceptableUnits(Enum):
+@unique
+class MeasurementUnits(Enum):
     """
     A list of acceptable units used within the RuFaS model.
 
@@ -32,13 +33,13 @@ class AcceptableUnits(Enum):
     KILOGRAMS_PER_DAY: str = "kg/day"
     KILOGRAMS_PER_HECTARE: str = "kg/ha"
     MEGACALORIES: str = "Mcal"
-    MEGACALORIES_PER_KILOGRAM: str = "MCcal"
+    MEGACALORIES_PER_KILOGRAM: str = "Mcal/kg"
     MEGAJOULES: str = "MJ"
     MEGAJOULES_PER_CUBIC_METER: str = "MJ/m^3"
     MEGAJOULES_PER_SQUARE_METER: str = "MJ/m^2"
     METERS: str = "m"
     METRIC_TONS: str = "metric tons"
-    MILLIMETERS: str = "millimeters"
+    MILLIMETERS: str = "mm"
     MILLIMETERS_PER_HECTARE: str = "mm/ha"
     ORDINAL_DAY: str = "ordinal day"
     PERCENT: str = "percent"

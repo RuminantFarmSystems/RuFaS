@@ -10,7 +10,7 @@ from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import LogVerbosity, OutputManager
 
 
@@ -434,7 +434,7 @@ def test_add_variable(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
-    info_map = {"units": AcceptableUnits.ANIMALS}
+    info_map = {"units": MeasurementUnits.ANIMALS}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
 
@@ -457,13 +457,13 @@ def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> No
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
-        "units": AcceptableUnits.ANIMALS,
+        "units": MeasurementUnits.ANIMALS,
     }
     key = "dummy_key"
     pool = {}
     mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
     assert pool[key] == {
-        "info_maps": [{"context": "dummy_context", "units": AcceptableUnits.ANIMALS}],
+        "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS}],
         "values": [dummy_value],
     }
     assert pool[key]["values"][0] == dummy_value
@@ -473,8 +473,8 @@ def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> No
     mock_output_manager._add_to_pool(pool, key, {dummy_value}, info_map)
     assert pool[key] == {
         "info_maps": [
-            {"context": "dummy_context", "units": AcceptableUnits.ANIMALS},
-            {"context": "dummy_context", "more_context": 1234567890, "units": AcceptableUnits.ANIMALS},
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS},
+            {"context": "dummy_context", "more_context": 1234567890, "units": MeasurementUnits.ANIMALS},
         ],
         "values": [dummy_value, {dummy_value}],
     }
@@ -492,11 +492,11 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
-        "units": AcceptableUnits.ANIMALS,
+        "units": MeasurementUnits.ANIMALS,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
-        "info_maps": [{"context": "dummy_context", "units": AcceptableUnits.ANIMALS}],
+        "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS}],
         "values": ["dummy_value"],
     }
 
@@ -535,7 +535,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {"class": "dummy_class", "function": "dummy_func", "units": AcceptableUnits.ANIMALS}
+    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
     om.add_warning("dummy_name", "dummy_msg", info_map)
@@ -1940,8 +1940,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS},
                     ],
                     "values": [10, 20],
                 }
@@ -1949,8 +1949,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": AcceptableUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS},
                     ],
                     "values": [10, 20],
                     "detailed_data_origins": [
@@ -1967,9 +1967,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": AcceptableUnits.MILLIMETERS,
+                            "units": MeasurementUnits.MILLIMETERS,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": AcceptableUnits.MILLIMETERS},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS},
                     ],
                     "values": [30, 40],
                 }
@@ -1979,9 +1979,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": AcceptableUnits.MILLIMETERS,
+                            "units": MeasurementUnits.MILLIMETERS,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": AcceptableUnits.MILLIMETERS},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS},
                     ],
                     "values": [30, 40],
                     "detailed_data_origins": [

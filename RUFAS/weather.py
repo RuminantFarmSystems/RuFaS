@@ -1,6 +1,6 @@
 import numpy as np
 
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
@@ -136,7 +136,7 @@ class Weather:
             "prefix": "Weather",
         }
         om.add_variable("average_annual_temperature", self.__mean_annual_temperature,
-                        dict(info_map, **{"units": AcceptableUnits.DEGREES_CELSIUS}))
+                        dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}))
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -195,20 +195,20 @@ class Weather:
         }
         current_weather = self.get_current_day_conditions(time)
         om.add_variable("precipitation", current_weather.precipitation,
-                        dict(info_map, **{"units": AcceptableUnits.MILLIMETERS}))
-        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": AcceptableUnits.MILLIMETERS}))
-        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": AcceptableUnits.MILLIMETERS}))
-        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": AcceptableUnits.HOURS}))
+                        dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS}))
         om.add_variable("maximum_temperature", current_weather.max_air_temperature,
-                        dict(info_map, **{"units": AcceptableUnits.DEGREES_CELSIUS}))
+                        dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}))
         om.add_variable("minimum_temperature", current_weather.min_air_temperature,
-                        dict(info_map, **{"units": AcceptableUnits.DEGREES_CELSIUS}))
+                        dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}))
         om.add_variable("average_temperature", current_weather.mean_air_temperature,
-                        dict(info_map, **{"units": AcceptableUnits.DEGREES_CELSIUS}))
+                        dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}))
         om.add_variable("radiation", current_weather.incoming_light,
-                        dict(info_map, **{"units": AcceptableUnits.MEGAJOULES_PER_SQUARE_METER}))
+                        dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}))
         om.add_variable("irrigation", current_weather.irrigation,
-                        dict(info_map, **{"units": AcceptableUnits.MILLIMETERS}))
+                        dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
 
     @staticmethod
     def _calculate_average_annual_temperature(

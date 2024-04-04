@@ -1,5 +1,5 @@
 import math
-from RUFAS.units import AcceptableUnits
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
@@ -476,16 +476,16 @@ class Field:
 
         """
         units = {
-            "mass": AcceptableUnits.KILOGRAMS,
-            "nitrogen": AcceptableUnits.KILOGRAMS,
-            "phosphorus": AcceptableUnits.KILOGRAMS,
-            "potassium": AcceptableUnits.KILOGRAMS,
-            "application_depth": AcceptableUnits.MILLIMETERS,
-            "surface_remainder_fraction": AcceptableUnits.UNITLESS,
-            "year": AcceptableUnits.CALENDAR_YEAR,
-            "day": AcceptableUnits.ORDINAL_DAY,
-            "field_size": AcceptableUnits.HECTARE,
-            "average_clay_percent": AcceptableUnits.PERCENT,
+            "mass": MeasurementUnits.KILOGRAMS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -706,18 +706,18 @@ class Field:
 
         """
         units = {
-            "dry_matter_mass": AcceptableUnits.DRY_KILOGRAMS,
-            "dry_matter_fraction": AcceptableUnits.FRACTION,
-            "field_coverage": AcceptableUnits.UNITLESS,
-            "application_depth": AcceptableUnits.MILLIMETERS,
-            "surface_remainder_fraction": AcceptableUnits.UNITLESS,
-            "nitrogen": AcceptableUnits.KILOGRAMS,
-            "phosphorus": AcceptableUnits.KILOGRAMS,
-            "potassium": AcceptableUnits.KILOGRAMS,
-            "day": AcceptableUnits.ORDINAL_DAY,
-            "year": AcceptableUnits.CALENDAR_YEAR,
-            "field_size": AcceptableUnits.HECTARE,
-            "average_clay_percent": AcceptableUnits.PERCENT,
+            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+            "dry_matter_fraction": MeasurementUnits.FRACTION,
+            "field_coverage": MeasurementUnits.UNITLESS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1076,11 +1076,11 @@ class Field:
 
         """
         units = {
-            "crop": AcceptableUnits.UNITLESS,
-            "heat_scheduled_harvest": AcceptableUnits.UNITLESS,
-            "date": {"year": AcceptableUnits.CALENDAR_YEAR, "day": AcceptableUnits.ORDINAL_DAY},
-            "field_size": AcceptableUnits.HECTARE,
-            "average_clay_percent": AcceptableUnits.PERCENT,
+            "crop": MeasurementUnits.UNITLESS,
+            "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
+            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1522,7 +1522,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": AcceptableUnits.MILLIMETERS,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("manure_water", manure_water, info_map)
 
@@ -1785,7 +1785,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": year, "day": day},
             "field_size": self.field_data.field_size,
-            "units": AcceptableUnits.MILLIMETERS,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("field_watering", watering_amount, info_map)
 
