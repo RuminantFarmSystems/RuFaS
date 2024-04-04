@@ -516,17 +516,17 @@ def test_report_sold_animal_information(
         else:
             setattr(mock_animal, attr, none_str)
 
-    animal_manager = mocker.MagicMock()
-    animal_manager.life_cycle_manager.sold_calves = [mock_animal] if animal_type == "Calf" else []
-    animal_manager.life_cycle_manager.sold_heiferIIs = [mock_animal] if animal_type == "HeiferII" else []
-    animal_manager.life_cycle_manager.sold_heiferIIIs = [mock_animal] if animal_type == "HeiferIII" else []
-    animal_manager.life_cycle_manager.sold_and_died_cows = [mock_animal] if animal_type == "Cow" else []
+    life_cycle_manager = mocker.MagicMock()
+    life_cycle_manager.sold_calves_info = [mock_animal] if animal_type == "Calf" else []
+    life_cycle_manager.sold_heiferIIs_info = [mock_animal] if animal_type == "HeiferII" else []
+    life_cycle_manager.sold_heiferIIIs_info = [mock_animal] if animal_type == "HeiferIII" else []
+    life_cycle_manager.sold_and_died_cows_info = [mock_animal] if animal_type == "Cow" else []
 
     patch_for_add_variable = mocker.patch("RUFAS.routines.animal" ".animal_module_reporter.om.add_variable")
     assert patch_for_add_variable.call_count == 0
 
     # Act
-    AnimalModuleReporter.report_sold_animal_information(animal_manager)
+    AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
 
     # Assert
     if cull_reason == animal_constants.DEATH_CULL:
