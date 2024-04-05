@@ -545,7 +545,7 @@ class FieldDataReporter:
                 om.add_variable(
                     "soil_overall_carbon_fraction",
                     layer.soil_overall_carbon_fraction,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+                    dict(info_map, **{"units": MeasurementUnits.FRACTION}),
                 )
                 om.add_variable(
                     "total_soil_carbon_amount",
