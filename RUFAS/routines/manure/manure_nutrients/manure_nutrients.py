@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from typing import Dict
 
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
@@ -12,32 +13,32 @@ class ManureNutrients:
 
     manure_type: ManureType
     """Type of manure."""
-    manure_type_unit: str = "unitless"
+    manure_type_unit: MeasurementUnits = MeasurementUnits.UNITLESS
     """Unit for manure_type"""
 
     nitrogen: float = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
-    nitrogen_unit: str = "kg"
+    nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for nitrogen"""
 
     phosphorus: float = 0.0
     """Amount of accumulated manure phosphorus derived from the manure module, kg."""
-    phosphorus_unit: str = "kg"
+    phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for phosphorus"""
 
     potassium: float = 0.0
     """Amount of accumulated manure potassium derived from the manure module, kg."""
-    potassium_unit: str = "kg"
+    potassium_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for potassium"""
 
     dry_matter: float = 0.0
     """Amount of accumulated dry matter derived from the manure module, kg."""
-    dry_matter_unit: str = "kg"
+    dry_matter_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for dry_matter"""
 
     total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
-    total_manure_mass_unit: str = "kg"
+    total_manure_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for total_manure_mass"""
 
     def __post_init__(self) -> None:
@@ -63,7 +64,7 @@ class ManureNutrients:
                     raise ValueError(f"Field {field.name} must be non-negative.")
 
     @property
-    def units_dict(self) -> Dict[str, str]:
+    def units_dict(self) -> Dict[MeasurementUnits, MeasurementUnits]:
         """
         Creates a dictionary of unit labels for each property in the ManureNutrients class.
 
@@ -73,7 +74,7 @@ class ManureNutrients:
 
         Returns
         -------
-        Dict[str, str]
+        Dict[MeasurementUnits, MeasurementUnits]
             A dictionary where keys are the names of attributes representing the units of nutrients and properties,
             and values are the respective units of measurement.
         """
