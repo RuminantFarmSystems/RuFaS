@@ -1125,7 +1125,7 @@ def test_handle_new_born(
         "body_weight": mock_calf.body_weight,
         "cull_reason": "NA",
         "days_in_milk": "NA",
-        "parity": "NA"
+        "parity": "NA",
     }
     patch_for_mock_calf = mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=mock_calf)
     calves_born: List[Calf] = []
