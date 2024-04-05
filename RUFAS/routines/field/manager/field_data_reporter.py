@@ -750,7 +750,7 @@ class FieldDataReporter:
                 om.add_variable(
                     "optimal_nitrogen_fraction",
                     crop.data.optimal_nitrogen_fraction,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+                    dict(info_map, **{"units": MeasurementUnits.FRACTION}),
                 )
                 om.add_variable(
                     "potential_phosphorus_uptake",
