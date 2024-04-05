@@ -10,7 +10,7 @@
       },
       {
         "scenario_id": 1,
-        "bedding_type": "Manure_solids",
+        "bedding_type": "manure solids",
         "manure_handler": "alley scraper",
         "manure_separator": "none",
         "manure_separator_after_digestion": "none",
@@ -170,7 +170,7 @@
         "potassium_removal_efficiency_for_treatment": 0.00,
         "storage_time_period": 180,
         "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "no cover"
       },
       {
         "manure_treatment_type": "anaerobic lagoon",

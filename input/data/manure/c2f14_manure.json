@@ -2,7 +2,7 @@
     "manure_management_scenarios": [
       {
         "scenario_id": 0,
-        "bedding_type": "Sawdust",
+        "bedding_type": "sawdust",
         "manure_handler": "manual scraping",
         "manure_separator": "none",
         "manure_separator_after_digestion": "none",
@@ -14,7 +14,7 @@
         "manure_handler": "harrowing",
         "manure_separator": "none",
         "manure_separator_after_digestion": "none",
-        "manure_treatment": "open lot"
+        "manure_treatment": "open lots"
       },
       {
         "scenario_id": 2,
@@ -212,7 +212,7 @@
         "potassium_removal_efficiency_for_treatment": 0.00,
         "storage_time_period": 120,
         "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "no cover"
       },
       {
         "manure_treatment_type": "anaerobic lagoon",
