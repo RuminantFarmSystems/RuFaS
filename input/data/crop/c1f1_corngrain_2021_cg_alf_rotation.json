@@ -5,7 +5,7 @@
             "planting_years": [2014],
             "pattern_repeat": 1,
             "planting_skip": 7,
-            "harvesting_skip": 3,
+            "harvesting_skip": 4,
             "planting_days": [110],
             "harvest_years": [2014, 2014, 2014, 2015, 2015, 2015, 2015, 2016, 2016, 2016, 2016, 2017, 2017, 2017, 2017],
             "harvest_days": [170, 210, 280, 154, 200, 230, 280, 154, 200, 230, 280, 154, 200, 230, 280],

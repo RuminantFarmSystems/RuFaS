@@ -5,7 +5,7 @@
             "planting_years": [2018],
             "pattern_repeat": 1,
             "planting_skip": 7,
-            "harvesting_skip": 3,
+            "harvesting_skip": 4,
             "planting_days": [110],
             "harvest_years": [2018, 2018, 2018, 2019, 2019, 2019, 2019, 2020, 2020, 2020, 2020, 2021, 2021, 2021, 2021],
             "harvest_days": [170, 210, 280, 154, 200, 230, 280, 154, 200, 230, 280, 154, 200, 230, 280],
@@ -18,7 +18,7 @@
 {
             "crop_species": "corn_silage",
             "planting_years": [2014, 2015, 2016, 2017],
-            "pattern_repeat": 0,
+            "pattern_repeat": 1,
             "planting_skip": 4,
             "harvesting_skip": 4,
             "planting_days": [121],
