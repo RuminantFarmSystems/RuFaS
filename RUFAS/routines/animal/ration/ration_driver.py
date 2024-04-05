@@ -1,6 +1,7 @@
 import collections
 from typing import Set, Dict, List, Tuple
 
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
@@ -94,22 +95,22 @@ class RationManager:
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
                 fail_summary_units = {
-                    "simulation_day": "simulation day",
-                    "reattempt number": "unitless",
-                    "constraints_failed_dict": "unitless",
-                    "ration_attempted": "unitless",
+                    "simulation_day": MeasurementUnits.SIMULATION_DAY,
+                    "reattempt number": MeasurementUnits.UNITLESS,
+                    "constraints_failed_dict": MeasurementUnits.UNITLESS,
+                    "ration_attempted": MeasurementUnits.UNITLESS,
                     "pen requirements": {
-                        "NEmaint_requirement": "Mcal",
-                        "NEa_requirement": "Mcal",
-                        "NEg_requirement": "Mcal",
-                        "NEpreg_requirement": "Mcal",
-                        "NEl_requirement": "Mcal",
-                        "MP_requirement": "g",
-                        "Ca_requirement": "g",
-                        "P_req": "g",
-                        "DMIest_requirement": "kg",
-                        "avg_BW": "kg",
-                        "avg_milk_production_reduction_pen": "kg",
+                        "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+                        "NEa_requirement": MeasurementUnits.MEGACALORIES,
+                        "NEg_requirement": MeasurementUnits.MEGACALORIES,
+                        "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+                        "NEl_requirement": MeasurementUnits.MEGACALORIES,
+                        "MP_requirement": MeasurementUnits.GRAMS,
+                        "Ca_requirement": MeasurementUnits.GRAMS,
+                        "P_req": MeasurementUnits.GRAMS,
+                        "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+                        "avg_BW": MeasurementUnits.KILOGRAMS,
+                        "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
                     },
                 }
                 om.add_variable(
@@ -281,22 +282,22 @@ class RationManager:
                 solution.x, ration_optimizer.heifer_cons, ration_config
             )
         fail_summary_units = {
-            "simulation_day": "simulation day",
-            "reattempt number": "unitless",
-            "constraints_failed_dict": "unitless",
-            "ration_attempted": "unitless",
+            "simulation_day": MeasurementUnits.SIMULATION_DAY,
+            "reattempt number": MeasurementUnits.UNITLESS,
+            "constraints_failed_dict": MeasurementUnits.UNITLESS,
+            "ration_attempted": MeasurementUnits.UNITLESS,
             "pen requirements": {
-                "NEmaint_requirement": "Mcal",
-                "NEa_requirement": "Mcal",
-                "NEg_requirement": "Mcal",
-                "NEpreg_requirement": "Mcal",
-                "NEl_requirement": "Mcal",
-                "MP_requirement": "g",
-                "Ca_requirement": "g",
-                "P_req": "g",
-                "DMIest_requirement": "kg",
-                "avg_BW": "kg",
-                "avg_milk_production_reduction_pen": "kg",
+                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+                "NEa_requirement": MeasurementUnits.MEGACALORIES,
+                "NEg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEl_requirement": MeasurementUnits.MEGACALORIES,
+                "MP_requirement": MeasurementUnits.GRAMS,
+                "Ca_requirement": MeasurementUnits.GRAMS,
+                "P_req": MeasurementUnits.GRAMS,
+                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+                "avg_BW": MeasurementUnits.KILOGRAMS,
+                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
             },
         }
         if failed_constraints is not None:
