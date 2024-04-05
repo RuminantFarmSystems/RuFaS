@@ -1019,7 +1019,7 @@ class LifeCycleManager:
             self.sold_calves_info.append(
                 {
                     "id": new_calf.id,
-                    "animal_type": Calf.__name__,
+                    "animal_type": "Calf",
                     "sold_at_day": new_calf.sold_at_day,
                     "body_weight": new_calf.body_weight,
                     "cull_reason": "NA",

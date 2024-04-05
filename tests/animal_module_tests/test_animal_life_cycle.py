@@ -1118,8 +1118,17 @@ def test_handle_new_born(
     mock_calf.culled = is_calf_culled
     mock_calf.sold = is_calf_sold
     mock_calf.sold_at_day = 0
+    calf_info_dict = {
+        "id": mock_calf.id,
+        "animal_type": "Calf",
+        "sold_at_day": 1,
+        "body_weight": mock_calf.body_weight,
+        "cull_reason": "NA",
+        "days_in_milk": "NA",
+        "parity": "NA"
+    }
     patch_for_mock_calf = mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=mock_calf)
-    calves_born = []
+    calves_born: List[Calf] = []
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", {"breed": "HO"})
 
     # Act
@@ -1146,7 +1155,7 @@ def test_handle_new_born(
     if is_calf_sold:
         assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
         assert len(life_cycle_manager.sold_calves_info) == 1
-        assert life_cycle_manager.sold_calves_info[0] == mock_calf
+        assert life_cycle_manager.sold_calves_info[0] == calf_info_dict
         assert mock_calf.sold_at_day == sim_day
 
 
