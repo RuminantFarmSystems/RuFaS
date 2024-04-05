@@ -804,7 +804,7 @@ class LifeCycleManager:
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
-            cow.update(sim_day, self.avg_CI)
+            new_born = cow.update(sim_day, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
             if cow.culled:
@@ -819,7 +819,7 @@ class LifeCycleManager:
                 calving_interval_avail_num = self._handle_cow_CI(cow, calving_interval_avail_num)
                 self._extract_repro_stats_from_cow(cow)
 
-            if cow.has_new_born:
+            if new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
@@ -978,7 +978,6 @@ class LifeCycleManager:
             new_calf.sold_at_day = sim_day
             self.sold_calves.append(new_calf)
             self.sold_calf_num += 1
-        cow.has_new_born = False
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
         """Calculates percentage of each animal class in the herd.
