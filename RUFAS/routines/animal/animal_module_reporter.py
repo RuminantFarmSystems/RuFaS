@@ -610,7 +610,7 @@ class AnimalModuleReporter:
         om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
-            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+            dict(info_map, **{"units": MeasurementUnits.PERCENT}),
         )
         om.add_variable(
             "dry_cows_milk_protein_kg",
