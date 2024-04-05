@@ -74,10 +74,10 @@ class InputManager:
     def __init__(self) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
-        self.__metadata: Dict[str, Any] = {}
-        self.__pool: Dict[str, Any] = {}
-        self.__get_data_logs_pool: Dict[str, str] = {}
-        self.elements_counter = ElementsCounter()
+            self.__metadata: Dict[str, Any] = {}
+            self.__pool: Dict[str, Any] = {}
+            self.__get_data_logs_pool: Dict[str, str] = {}
+            self.elements_counter = ElementsCounter()
 
     @property
     def meta_data(self) -> Dict[str, Any]:
