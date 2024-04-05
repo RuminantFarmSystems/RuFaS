@@ -1336,8 +1336,7 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
         is_culled = i % 2 == 0
         mock_cow.culled = is_culled
         has_new_born = i % 3 == 0
-        mock_cow.has_new_born = has_new_born
-        # mock_cow.update.return_value = (has_new_born)
+        mock_cow.update.return_value = (has_new_born)
         if mock_cow.culled:
             animals_removed.append(mock_cow)
             removed_cows_idx.append(i)
@@ -1393,7 +1392,7 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
             patch_for_handle_cow_calves.assert_any_call(cow, calving_age_avail_num, calf_to_preg_time_avail_num)
             patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
             patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
-        if cow.has_new_born:
+        if has_new_born:
             patch_for_handle_new_born.assert_any_call(sim_day, cow, calves_born)
 
     assert patch_for_cull_cow.call_count == num_cows_culled

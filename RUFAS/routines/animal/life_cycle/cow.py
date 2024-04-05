@@ -124,7 +124,6 @@ class Cow(HeiferIII):
         self.cull_reason = None
         self.repro_program = args["repro_program"]
         self.first_ai = False
-        self.has_new_born = False
         self.fat_percent = 0.0
 
         # TAI params
@@ -664,7 +663,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day: int, calving_interval: int | float):  # noqa
+    def update(self, sim_day: int, calving_interval: int | float) -> bool:  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -674,6 +673,11 @@ class Cow(HeiferIII):
             The simulation day.
         calving_interval : int | float
             The size of the calving interval in days, can be average current calving interval instead of input value.
+
+        Returns
+        -------
+        bool
+            new_born status which is True if a calf is born.
 
         Raises
         ------
@@ -686,6 +690,7 @@ class Cow(HeiferIII):
         #     print("CULLED HERE")
         #     return None
 
+        new_born = False
         self.days_born += 1
 
         if self.days_in_preg > 0 and self.days_in_preg == self.gestation_length:
@@ -704,7 +709,7 @@ class Cow(HeiferIII):
             self.log_event(self.days_born, sim_day, f"{const.NUM_CALVES_BORN_NOTE}: {self.calves}")
             self.health_cull_update()
             self.death_update()
-            self.has_new_born = True
+            new_born = True
             self.set_parity_index()
             self.set_lactation_curve_params()
 
@@ -793,6 +798,8 @@ class Cow(HeiferIII):
         self._check_do_not_breed_flag(sim_day)
 
         self.cull_update(sim_day)
+
+        return new_born
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
         if self.should_decrease_conception_rate_in_rebreeding():
