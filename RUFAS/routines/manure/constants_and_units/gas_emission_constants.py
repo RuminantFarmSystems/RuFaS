@@ -70,7 +70,7 @@ class GasEmissionConstants:
 
     AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 2.86
     """
-    The mass conversion factor from methane to methane and carbon dioxide in anaerobic digestion (kg CH4 / kg CO2)
+    The mass conversion factor from methane to methane and carbon dioxide in anaerobic digestion (kg CH4 / kg CO2).
     """
 
     METHANE_POTENTIAL_Go: float = 240.0
