@@ -1,12 +1,11 @@
 import math
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
@@ -61,8 +60,6 @@ def methane_mitigation(
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     days_in_milk: int,
     milk_protein: float,
@@ -74,6 +71,8 @@ def manure_calculations(
     methane_mitigation_additive_amount: float,
     milk_fat: float,
     metabolizable_energy_intake: float,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a cow with information from the ration formulation.
 
@@ -106,6 +105,10 @@ def manure_calculations(
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -115,8 +118,22 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     ASH_diet_content = nutrient_amounts["ash"]
     ASH_concentration = nutrient_concentrations["ash"]
