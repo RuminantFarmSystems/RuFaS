@@ -49,14 +49,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
-    MONENSIN_CP_LOWER_BOUND: float = 15
-    """The lower bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when
-    calculating the mitigation effects of monensin."""
-
-    MONENSIN_CP_UPPER_BOUND: float = 19
-    """The upper bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when
-    calculating the mitigation effects of monensin."""
-
     URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND: float = 2
     """The lower bound of the urine urea nitrogen concentration."""
 
