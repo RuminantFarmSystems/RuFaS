@@ -500,7 +500,7 @@ def test_validate_units(
     units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
     expected_exception: ValueError,
     expected_message: str,
-):
+) -> None:
     """Test for function _validate_units in file output_manager.py"""
     if expected_exception:
         with pytest.raises(expected_exception) as e:
