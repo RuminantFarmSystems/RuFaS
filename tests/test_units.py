@@ -11,7 +11,6 @@ def test_units_member_values() -> None:
     assert MeasurementUnits.CALENDAR_YEAR.value == "calendar year"
     assert MeasurementUnits.CONCEPTIONS.value == "conceptions"
     assert MeasurementUnits.CONCEPTIONS_PER_SERVICE.value == "conceptions per service"
-    assert MeasurementUnits.COWS.value == "cows"
     assert MeasurementUnits.CUBIC_METERS.value == "m^3"
     assert MeasurementUnits.CUBIC_METERS_PER_DAY.value == "m^3/day"
     assert MeasurementUnits.DAYS.value == "days"

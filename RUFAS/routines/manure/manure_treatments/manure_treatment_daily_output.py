@@ -18,308 +18,308 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     ---------
     pen_id: int
         ID of the pen that this output is associated with.
-    pen_id_unit: MeasurementUnits
+    pen_id_unit: str
         Unit for pen_id.
     simulation_day: int
         Number of days into the simulation.
-    simulation_day_unit: MeasurementUnits
+    simulation_day_unit: str
         Unit for simulation_day.
     liquid_manure_total_ammoniacal_nitrogen: float
         Total ammoniacal nitrogen, kg.
-    liquid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits
+    liquid_manure_total_ammoniacal_nitrogen_unit: str
         Unit for liquid_manure_total_ammoniacal_nitrogen.
     liquid_manure_nitrogen: float
         Amount of nitrogen in manure, kg.
-    liquid_manure_nitrogen_unit: MeasurementUnits
+    liquid_manure_nitrogen_unit: str
         Unit for liquid_manure_nitrogen.
     liquid_manure_total_solids: float
         Total amount of solids from the manure and the bedding, kg.
-    liquid_manure_total_solids_unit: MeasurementUnits
+    liquid_manure_total_solids_unit: str
         Unit for liquid_manure_total_solids.
     liquid_manure_total_volatile_solids: float
         Total amount of volatile solids, kg.
-    liquid_manure_total_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_volatile_solids_unit: str
         Unit for liquid_manure_total_volatile_solids.
     liquid_manure_total_degradable_volatile_solids: float
         Amount of degradable volatile solids, kg.
-    liquid_manure_total_degradable_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_degradable_volatile_solids_unit: str
         Unit for liquid_manure_total_degradable_volatile_solids
     liquid_manure_total_non_degradable_volatile_solids: float
         Amount of non-degradable volatile solids, kg.
-    liquid_manure_total_non_degradable_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_non_degradable_volatile_solids_unit: str
         Unit for liquid_manure_total_non_degradable_volatile_solids
     liquid_manure_phosphorus: float
         Amount of phosphorus excreted in manure, kg.
-    liquid_manure_phosphorus_unit: MeasurementUnits
+    liquid_manure_phosphorus_unit: str
         Unit for liquid_manure_phosphorus.
     liquid_manure_potassium: float
         Amount of potassium in manure, kg.
-    liquid_manure_potassium_unit: MeasurementUnits
+    liquid_manure_potassium_unit: str
         Unit for liquid_manure_potassium.
     daily_final_manure_volume: float
         Final manure volume after treatment, m^3.
-    daily_final_manure_volume_unit: MeasurementUnits
+    daily_final_manure_volume_unit: str
         Unit for daily_final_manure_volume.
     liquid_manure_daily_volume: float
         Daily volume of manure, m^3.
-    liquid_manure_daily_volume_unit: MeasurementUnits
+    liquid_manure_daily_volume_unit: str
         Unit for liquid_manure_daily_volume.
     storage_methane: float
         Amount of methane produced by the manure treatment process, kg.
-    storage_methane_unit: MeasurementUnits
+    storage_methane_unit: str
         Unit for storage_methane.
     storage_ammonia: float
         Amount of ammonia produced by the manure treatment process, kg.
-    storage_ammonia_unit: MeasurementUnits
+    storage_ammonia_unit: str
         Unit for storage_ammonia.
     storage_nitrous_oxide: float
         Amount of nitrous oxide produced by the manure treatment process, kg.
-    storage_nitrous_oxide_unit: MeasurementUnits
+    storage_nitrous_oxide_unit: str
         Unit for storage_nitrous_oxide.
     storage_nitrogen_leached: float
         Amount of nitrogen lost through leaching during the manure treatment process, kg.
-    storage_nitrogen_leached_unit: MeasurementUnits
+    storage_nitrogen_leached_unit: str
         Unit for storage_nitrogen_leached.
     sludge_manure_total_solids: float
         Total amount of solids in the sludge manure, kg.
-    sludge_manure_total_solids_unit: MeasurementUnits
+    sludge_manure_total_solids_unit: str
         Unit for sludge_manure_total_solids.
     sludge_manure_total_volatile_solids: float
         Total amount of volatile solids in the sludge manure, kg.
-    sludge_manure_total_volatile_solids_unit: MeasurementUnits
+    sludge_manure_total_volatile_solids_unit: str
         Unit for sludge_manure_total_volatile_solids.
     sludge_manure_nitrogen: float
         Amount of nitrogen in the sludge manure, kg.
-    sludge_manure_nitrogen_unit: MeasurementUnits
+    sludge_manure_nitrogen_unit: str
         Unit for sludge_manure_nitrogen.
     sludge_manure_phosphorus: float
         Amount of phosphorus in the sludge manure, kg.
-    sludge_manure_phosphorus_unit: MeasurementUnits
+    sludge_manure_phosphorus_unit: str
         Unit for sludge_manure_phosphorus.
     sludge_manure_potassium: float
         Amount of potassium in the sludge manure, kg.
-    sludge_manure_potassium_unit: MeasurementUnits
+    sludge_manure_potassium_unit: str
         Unit for sludge_manure_potassium.
     sludge_manure_daily_volume: float
         Daily volume of sludge manure, m^3.
-    sludge_manure_daily_volume_unit: MeasurementUnits
+    sludge_manure_daily_volume_unit: str
         Unit for sludge_manure_daily_volume.
     solid_manure_total_solids: float
         Total amount of solids in the solid manure, kg.
-    solid_manure_total_solids_unit: MeasurementUnits
+    solid_manure_total_solids_unit: str
         Unit for solid_manure_total_solids.
     solid_manure_total_volatile_solids: float
         Total amount of volatile solids in the solid manure, kg.
-    solid_manure_total_volatile_solids_unit: MeasurementUnits
+    solid_manure_total_volatile_solids_unit: str
         Unit for solid_manure_total_volatile_solids.
     solid_manure_nitrogen: float
         Amount of nitrogen in the solid manure, kg.
-    solid_manure_nitrogen_unit: MeasurementUnits
+    solid_manure_nitrogen_unit: str
         Unit for solid_manure_nitrogen.
     solid_manure_inorganic_nitrogen: float
         Amount of inorganic nitrogen in the solid manure, kg.
-    solid_manure_inorganic_nitrogen_unit: MeasurementUnits
+    solid_manure_inorganic_nitrogen_unit: str
         Unit for solid_manure_inorganic_nitrogen.
     solid_manure_organic_nitrogen: float
         Amount of organic nitrogen in the solid manure, kg.
-    solid_manure_organic_nitrogen_unit: MeasurementUnits
+    solid_manure_organic_nitrogen_unit: str
         Unit for solid_manure_organic_nitrogen.
     solid_manure_total_ammoniacal_nitrogen_ammonium: float
         Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
-    solid_manure_total_ammoniacal_nitrogen_ammonium_unit: MeasurementUnits
+    solid_manure_total_ammoniacal_nitrogen_ammonium_unit: str
         Unit for solid_manure_total_ammoniacal_nitrogen_ammonium.
     solid_manure_phosphorus: float
         Amount of phosphorus in the solid manure, kg.
-    solid_manure_phosphorus_unit: MeasurementUnits
+    solid_manure_phosphorus_unit: str
         Unit for solid_manure_phosphorus.
     solid_manure_water_extractable_inorganic_phosphorus: float
         Amount of water-extractable inorganic phosphorus in the solid manure, kg.
-    solid_manure_water_extractable_inorganic_phosphorus_unit: MeasurementUnits
+    solid_manure_water_extractable_inorganic_phosphorus_unit: str
         Unit for solid_manure_water_extractable_inorganic_phosphorus.
     solid_manure_water_extractable_organic_phosphorus: float
         Amount of water-extractable organic phosphorus in the solid manure, kg.
-    solid_manure_water_extractable_organic_phosphorus_unit: MeasurementUnits
+    solid_manure_water_extractable_organic_phosphorus_unit: str
         Unit for solid_manure_water_extractable_organic_phosphorus.
     solid_manure_non_water_extractable_inorganic_phosphorus: float
         Amount of non-water-extractable inorganic phosphorus in the solid manure, kg.
-    solid_manure_non_water_extractable_inorganic_phosphorus_unit: MeasurementUnits
+    solid_manure_non_water_extractable_inorganic_phosphorus_unit: str
         Unit for solid_manure_non_water_extractable_inorganic_phosphorus.
     solid_manure_non_water_extractable_organic_phosphorus: float
         Amount of non-water-extractable organic phosphorus in the solid manure, kg.
-    solid_manure_non_water_extractable_organic_phosphorus_unit: MeasurementUnits
+    solid_manure_non_water_extractable_organic_phosphorus_unit: str
         Unit for solid_manure_non_water_extractable_organic_phosphorus.
     solid_manure_potassium: float
         Amount of potassium in the solid manure, kg.
-    solid_manure_potassium_unit: MeasurementUnits
+    solid_manure_potassium_unit: str
         Unit for solid_manure_potassium.
     solid_manure_daily_mass: float
         Daily mass of solid manure, kg.
-    solid_manure_daily_mass_unit: MeasurementUnits
+    solid_manure_daily_mass_unit: str
         Unit for solid_manure_daily_mass.
     biogas: float
         Amount of biogas produced, m^3.
-    biogas_unit: MeasurementUnits
+    biogas_unit: str
         Unit for biogas.
     biogas_energy_content: float
         Energy content of biogas, MJ/m^3.
-    biogas_energy_content_unit: MeasurementUnits
+    biogas_energy_content_unit: str
         Unit for biogas_energy_content.
     methane_generation_volume: float
         Amount of methane generated, m^3.
-    methane_generation_volume_unit: MeasurementUnits
+    methane_generation_volume_unit: str
         Unit for methane_generation_volume.
     heating_input_energy: float
         Amount of energy input to the heating system, MJ.
-    heating_input_energy_unit: MeasurementUnits
+    heating_input_energy_unit: str
         Unit for heating_input_energy.
     evaporated_water: float
         Amount of water evaporated, m^3.
-    evaporated_water_unit: MeasurementUnits
+    evaporated_water_unit: str
         Unit for evaporated_water.
     minimum_digester_volume: float
         Minimum digester volume, m^3.
-    minimum_digester_volume_unit: MeasurementUnits
+    minimum_digester_volume_unit: str
         Unit for minimum_digester_volume.
     top_cover_volume: float
         Volume of the top cover, m^3.
-    top_cover_volume_unit: MeasurementUnits
+    top_cover_volume_unit: str
         Unit for top_cover_volume.
     solid_manure_carbon_decomposition: float
         Carbon decomposition, kg.
-    solid_manure_carbon_decomposition_unit: MeasurementUnits
+    solid_manure_carbon_decomposition_unit: str
         Unit for solid_manure_carbon_decomposition.
     """
 
     pen_id: int = -1
-    pen_id_unit: MeasurementUnits = MeasurementUnits.UNITLESS
+    pen_id_unit: str = MeasurementUnits.UNITLESS.value
 
     simulation_day: int = -1
-    simulation_day_unit: MeasurementUnits = MeasurementUnits.SIMULATION_DAY
+    simulation_day_unit: str = MeasurementUnits.SIMULATION_DAY.value
 
     liquid_manure_total_ammoniacal_nitrogen: float = 0.0
-    liquid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_total_ammoniacal_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_nitrogen: float = 0.0
-    liquid_manure_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_total_solids: float = 0.0
-    liquid_manure_total_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_total_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_total_volatile_solids: float = 0.0
-    liquid_manure_total_volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_total_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_total_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_degradable_volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_total_degradable_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_total_non_degradable_volatile_solids: float = 0.0
-    liquid_manure_total_non_degradable_volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_total_non_degradable_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_phosphorus: float = 0.0
-    liquid_manure_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     liquid_manure_potassium: float = 0.0
-    liquid_manure_potassium_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    liquid_manure_potassium_unit: str = MeasurementUnits.KILOGRAMS.value
 
     daily_final_manure_volume: float = 0.0
-    daily_final_manure_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    daily_final_manure_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     # To satisfy the LiquidManurePortionProtocol
     liquid_manure_daily_volume: float = 0.0
-    liquid_manure_daily_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    liquid_manure_daily_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     storage_methane: float = 0.0
-    storage_methane_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    storage_methane_unit: str = MeasurementUnits.KILOGRAMS.value
 
     storage_ammonia: float = 0.0
-    storage_ammonia_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    storage_ammonia_unit: str = MeasurementUnits.KILOGRAMS.value
 
     storage_nitrous_oxide: float = 0.0
-    storage_nitrous_oxide_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    storage_nitrous_oxide_unit: str = MeasurementUnits.KILOGRAMS.value
 
     storage_nitrogen_leached: float = 0.0
-    storage_nitrogen_leached_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    storage_nitrogen_leached_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_total_solids: float = 0.0
-    sludge_manure_total_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    sludge_manure_total_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_total_volatile_solids: float = 0.0
-    sludge_manure_total_volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    sludge_manure_total_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_nitrogen: float = 0.0
-    sludge_manure_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    sludge_manure_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_phosphorus: float = 0.0
-    sludge_manure_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    sludge_manure_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_potassium: float = 0.0
-    sludge_manure_potassium_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    sludge_manure_potassium_unit: str = MeasurementUnits.KILOGRAMS.value
 
     sludge_manure_daily_volume: float = 0.0
-    sludge_manure_daily_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    sludge_manure_daily_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     solid_manure_total_solids: float = 0.0
-    solid_manure_total_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_total_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_total_volatile_solids: float = 0.0
-    solid_manure_total_volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_total_volatile_solids_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_nitrogen: float = 0.0
-    solid_manure_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_inorganic_nitrogen: float = 0.0
-    solid_manure_inorganic_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_inorganic_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_organic_nitrogen: float = 0.0
-    solid_manure_organic_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_organic_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_total_ammoniacal_nitrogen: float = 0.0
-    solid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_total_ammoniacal_nitrogen_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_phosphorus: float = 0.0
-    solid_manure_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
-    solid_manure_water_extractable_inorganic_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_water_extractable_inorganic_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_water_extractable_organic_phosphorus: float = 0.0
-    solid_manure_water_extractable_organic_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_water_extractable_organic_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_non_water_extractable_inorganic_phosphorus: float = 0.0
-    solid_manure_non_water_extractable_inorganic_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_non_water_extractable_inorganic_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_non_water_extractable_organic_phosphorus: float = 0.0
-    solid_manure_non_water_extractable_organic_phosphorus_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_non_water_extractable_organic_phosphorus_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_potassium: float = 0.0
-    solid_manure_potassium_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_potassium_unit: str = MeasurementUnits.KILOGRAMS.value
 
     solid_manure_daily_mass: float = 0.0
-    solid_manure_daily_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_daily_mass_unit: str = MeasurementUnits.KILOGRAMS.value
 
     # different unit from docMeasurementUnitsing m^3 vs m^3/day?
     biogas: float = 0.0  # biogas production per day (m3/day)
-    biogas_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS_PER_DAY
+    biogas_unit: str = MeasurementUnits.CUBIC_METERS_PER_DAY.value
 
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER
+    biogas_energy_content_unit: str = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER.value
 
     methane_generation_volume: float = 0.0
-    methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    methane_generation_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     heating_input_energy: float = 0.0
-    heating_input_energy_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
+    heating_input_energy_unit: str = MeasurementUnits.MEGAJOULES.value
 
     evaporated_water: float = 0.0
-    evaporated_water_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    evaporated_water_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     minimum_digester_volume: float = 0.0
-    minimum_digester_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    minimum_digester_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     top_cover_volume: float = 0.0
-    top_cover_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    top_cover_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
 
     solid_manure_carbon_decomposition: float = 0.0
-    solid_manure_carbon_decomposition_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    solid_manure_carbon_decomposition_unit: str = MeasurementUnits.KILOGRAMS.value
 
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the final manure volume."""
