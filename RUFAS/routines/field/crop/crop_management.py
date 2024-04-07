@@ -1,5 +1,6 @@
 from math import exp
 from typing import Optional
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.field.crop.crop_data import (
@@ -300,19 +301,19 @@ class CropManagement:
 
         """
         units = {
-            "crop": "unitless",
-            "wet_yield": "wet kg/ha",
-            "dry_yield": "dry kg/ha",
-            "nitrogen": "kg/ha",
-            "phosphorus": "kg/ha",
-            "yield_residue": "dry kg/ha",
-            "harvest_index": "unitless",
+            "crop": MeasurementUnits.UNITLESS.value,
+            "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
+            "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
+            "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
+            "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
+            "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
+            "harvest_index": MeasurementUnits.UNITLESS.value,
             "planting_date": {
-                "year": "year",
-                "day": "day",
+                "year": MeasurementUnits.CALENDAR_YEAR.value,
+                "day": MeasurementUnits.ORDINAL_DAY.value,
             },
-            "harvest_date": {"year": "year", "day": "day"},
-            "field_size": "ha",
+            "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
+            "field_size": MeasurementUnits.HECTARE.value,
         }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
