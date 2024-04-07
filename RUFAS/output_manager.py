@@ -182,7 +182,7 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
 
-    def _validate_units(self, units: Dict[str, Any] | str):
+    def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
         Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
         valid MeasurementUnits values (including nested dictionaries).

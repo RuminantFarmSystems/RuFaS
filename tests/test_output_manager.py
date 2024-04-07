@@ -280,7 +280,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     with raises(KeyError):
         om._generate_key("name", {"class": "test"})
 
-    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    info_map: dict[str, str | bool] = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_class.dummy_func.key_name"
 
@@ -449,7 +449,7 @@ def test_add_variable(
     mock_output_manager._validate_units = MagicMock()
 
     if exception:
-        with pytest.raises(exception) as e:
+        with pytest.raises(KeyError) as e:
             mock_output_manager.add_variable(name, value, info_map)
         assert exception_message in str(e.value)
     else:
