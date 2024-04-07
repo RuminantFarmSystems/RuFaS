@@ -84,12 +84,14 @@ class FieldDataReporter:
                 dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
             )
             om.add_variable(
-                "snow_content", field.soil.data.snow_content,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+                "snow_content",
+                field.soil.data.snow_content,
+                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
             )
             om.add_variable(
-                "snow_melt", field.soil.data.snow_melt_amount,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+                "snow_melt",
+                field.soil.data.snow_melt_amount,
+                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
             )
             om.add_variable(
                 "current_day_snow_temperature",
@@ -356,8 +358,9 @@ class FieldDataReporter:
                 info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
 
                 om.add_variable(
-                    "temperature", layer.temperature,
-                    dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value})
+                    "temperature",
+                    layer.temperature,
+                    dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
                 )
                 om.add_variable(
                     "percolated_water",
@@ -365,8 +368,9 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
                 )
                 om.add_variable(
-                    "water_content", layer.water_content,
-                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+                    "water_content",
+                    layer.water_content,
+                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
                 )
                 om.add_variable(
                     "water_factor", layer.water_factor, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
@@ -661,8 +665,9 @@ class FieldDataReporter:
                     "root_depth", crop.data.root_depth, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
                 )
                 om.add_variable(
-                    "biomass", crop.data.biomass,
-                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE.value})
+                    "biomass",
+                    crop.data.biomass,
+                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE.value}),
                 )
                 om.add_variable(
                     "usable_light",
@@ -680,8 +685,9 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE.value}),
                 )
                 om.add_variable(
-                    "growth_factor", crop.data.growth_factor,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "growth_factor",
+                    crop.data.growth_factor,
+                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
                     "above_ground_biomass",
@@ -694,19 +700,20 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE.value}),
                 )
                 om.add_variable(
-                    "water_uptake", crop.data.water_uptake,
-                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+                    "water_uptake",
+                    crop.data.water_uptake,
+                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
                 )
                 om.add_variable(
-                    "water_stress", crop.data.water_stress,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "water_stress", crop.data.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
                 )
                 om.add_variable(
                     "temp_stress", crop.data.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
                 )
                 om.add_variable(
-                    "nitrogen_stress", crop.data.nitrogen_stress,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "nitrogen_stress",
+                    crop.data.nitrogen_stress,
+                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
                     "phosphorus_stress",
@@ -719,8 +726,9 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
-                    "heat_fraction", crop.data.heat_fraction,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "heat_fraction",
+                    crop.data.heat_fraction,
+                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
                     "is_growing", crop.data.is_growing, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
@@ -729,15 +737,17 @@ class FieldDataReporter:
                     "is_dormant", crop.data.is_dormant, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
                 )
                 om.add_variable(
-                    "leaf_area_index", crop.data.leaf_area_index,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "leaf_area_index",
+                    crop.data.leaf_area_index,
+                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
                     "canopy_height", crop.data.canopy_height, dict(info_map, **{"units": MeasurementUnits.METERS})
                 )
                 om.add_variable(
-                    "leaf_area_added", crop.data.leaf_area_added,
-                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+                    "leaf_area_added",
+                    crop.data.leaf_area_added,
+                    dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
                 )
                 om.add_variable(
                     "optimal_leaf_area_change",
@@ -805,8 +815,9 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
                 )
                 om.add_variable(
-                    "canopy_water", crop.data.canopy_water,
-                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+                    "canopy_water",
+                    crop.data.canopy_water,
+                    dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
                 )
                 om.add_variable(
                     "cut_biomass",

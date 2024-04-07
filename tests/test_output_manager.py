@@ -557,7 +557,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
-        "units": MeasurementUnits.ANIMALS.value
+        "units": MeasurementUnits.ANIMALS.value,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
