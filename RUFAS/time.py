@@ -142,10 +142,10 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
-        om.add_variable("year", self.year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR}))
+        om.add_variable("day", self.day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value}))
+        om.add_variable("year", self.year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR.value}))
         om.add_variable(
-            "calendar_year", self.calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
+            "calendar_year", self.calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR.value})
         )
 
     @property
