@@ -1153,11 +1153,6 @@ def test_daily_pen_p_update():
     pass
 
 
-def test_set_up_new_animal():
-    """Unit test for function set_up_new_animal in file routines/animal/pen.py"""
-    pass
-
-
 def test_clear():
     """Unit test for function clear in file routines/animal/pen.py"""
     pass
