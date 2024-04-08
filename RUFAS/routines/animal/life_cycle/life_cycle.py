@@ -346,12 +346,6 @@ class LifeCycleManager:
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
 
-        # self.sold_calves_info: List[Dict[str, str | int | float]] = []
-        # self.sold_heiferIIIs_info: List[Dict[str, str | int | float]] = []
-        # self.sold_heiferIIs_info: List[Dict[str, str | int | float]] = []
-        # self.sold_cows_info: List[Dict[str, str | int | float]] = []
-        # self.sold_and_died_cows_info: List[Dict[str, str | int | float]] = []
-
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
         self.heiferII_percent = 0.0
@@ -580,7 +574,6 @@ class LifeCycleManager:
                     heiferII.days_born,
                 )
                 heiferII.sold_at_day = sim_day
-                #  TODO: SHOULD THIS BE sold_heiferII = heiferII.pop()? Like in heifer III?
                 self.sold_heiferIIs_info.append(
                     {
                         "id": heiferII.id,
