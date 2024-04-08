@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
@@ -66,7 +67,7 @@ def test_data_padder() -> None:
         full_variable_to_add="full_variable",
         thing_to_add=0,
         simulation_day=100,
-        info_map={"class": "dummyclass", "function": "dummyfunction"},
+        info_map={"class": "dummyclass", "function": "dummyfunction", "units": MeasurementUnits.ANIMALS.value},
     )
 
     # Assert
@@ -151,7 +152,7 @@ def test_report_daily_animal_population(mocker: MockerFixture) -> None:
     assert om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"]["info_maps"] == [
         {
             "data_origin": [("AnimalManager", "daily_updates")],
-            "units": "animals",
+            "units": MeasurementUnits.ANIMALS.value,
         }
     ]
 
@@ -200,46 +201,46 @@ def test_report_milk(mocker: MockerFixture) -> None:
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": MeasurementUnits.DAYS.value,
+                "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "lactating": MeasurementUnits.UNITLESS.value,
+                "parity": MeasurementUnits.UNITLESS.value,
+                "cow_id": MeasurementUnits.UNITLESS.value,
+                "pen_id": MeasurementUnits.UNITLESS.value,
+                "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
             },
         },
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": MeasurementUnits.DAYS.value,
+                "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "lactating": MeasurementUnits.UNITLESS.value,
+                "parity": MeasurementUnits.UNITLESS.value,
+                "cow_id": MeasurementUnits.UNITLESS.value,
+                "pen_id": MeasurementUnits.UNITLESS.value,
+                "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
             },
         },
         {
             "data_origin": [("Cow", "milking_update")],
             "units": {
-                "days_in_milk": "days",
-                "estimated_daily_milk_produced": "kg/day",
-                "milk_protein": "kg/day",
-                "milk_fat": "kg/day",
-                "milk_lactose": "kg/day",
-                "lactating": "unitless",
-                "parity": "unitless",
-                "cow_id": "unitless",
-                "pen_id": "unitless",
-                "simulation_day": "simulation day",
+                "days_in_milk": MeasurementUnits.DAYS.value,
+                "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY.value,
+                "lactating": MeasurementUnits.UNITLESS.value,
+                "parity": MeasurementUnits.UNITLESS.value,
+                "cow_id": MeasurementUnits.UNITLESS.value,
+                "pen_id": MeasurementUnits.UNITLESS.value,
+                "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
             },
         },
     ]
