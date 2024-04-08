@@ -19,19 +19,27 @@ def mock_input_manager() -> InputManager:
     return input_manager
 
 
-def test_input_manager_singleton(mocker: MockerFixture) -> None:
+def test_input_manager_singleton() -> None:
     """Unit test to ensure InputManager is a singleton"""
     im1 = InputManager()
     im2 = InputManager()
 
     assert im1 is im2
 
+    fake_pool = {"a": 1}
+    im1.pool = fake_pool
+    assert im2.pool is fake_pool
+
+    fake_metadata = {"b": 2}
+    im1.meta_data = fake_metadata
+    assert im2.meta_data is fake_metadata
+
 
 @pytest.fixture
 def input_manager_original_method_states(
     mock_input_manager: InputManager,
 ) -> Dict[str, Callable]:
-    """Fixture to store original methods of OutputManager"""
+    """Fixture to store original methods of InputManager"""
     return {
         "start_data_processing": mock_input_manager.start_data_processing,
         "_load_metadata": mock_input_manager._load_metadata,
@@ -64,12 +72,14 @@ def input_manager_original_method_states(
 
 
 def test_metadata_setter_getter(mock_input_manager: InputManager) -> None:
+    """Unit test for metadata getter and setter methods"""
     test_data = {"foo": "bar", "integer": 1}
     mock_input_manager.meta_data = test_data
     assert mock_input_manager.meta_data == test_data
 
 
 def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
+    """Unit test for metadata getter and setter methods"""
     test_data = {"foo": "bar", "integer": 1}
     mock_input_manager.pool = test_data
     assert mock_input_manager.pool == test_data
@@ -404,12 +414,15 @@ def test_populate_pool_valid(
 
     # Assert
     assert result
-    assert "file1" in getattr(input_manager, "_InputManager__pool")
-    assert "file2" in getattr(input_manager, "_InputManager__pool")
+    assert "file1" in input_manager.pool
+    assert "file2" in input_manager.pool
+
+    input_manager.pool = {}
 
 
 def test_populate_pool_invalid(
     mock_metadata: Dict[str, Dict[str, Any]],
+    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
@@ -441,8 +454,8 @@ def test_populate_pool_invalid(
 
     # Assert
     assert not result
-    assert "file1" not in getattr(input_manager, "_InputManager__pool")
-    assert "file2" not in getattr(input_manager, "_InputManager__pool")
+    assert "file1" not in input_manager.pool
+    assert "file2" not in input_manager.pool
 
 
 def test_populate_pool_partial_invalid(
@@ -475,12 +488,14 @@ def test_populate_pool_partial_invalid(
 
     # Assert
     assert result
-    assert "file1" in getattr(input_manager, "_InputManager__pool")
-    assert "file2" in getattr(input_manager, "_InputManager__pool")
-    assert "element1" in getattr(input_manager, "_InputManager__pool")["file1"]
-    assert "element2" not in getattr(input_manager, "_InputManager__pool")["file1"]
-    assert "element3" in getattr(input_manager, "_InputManager__pool")["file2"]
-    assert "element4" not in getattr(input_manager, "_InputManager__pool")["file2"]
+    assert "file1" in input_manager.pool
+    assert "file2" in input_manager.pool
+    assert "element1" in input_manager.pool["file1"]
+    assert "element2" not in input_manager.pool["file1"]
+    assert "element3" in input_manager.pool["file2"]
+    assert "element4" not in input_manager.pool["file2"]
+
+    input_manager.pool = {}
 
 
 def test_populate_pool_eager_termination(
@@ -514,8 +529,8 @@ def test_populate_pool_eager_termination(
 
     # Assert
     assert result is False
-    assert "file1" not in getattr(input_manager, "_InputManager__pool")
-    assert "file2" not in getattr(input_manager, "_InputManager__pool")
+    assert "file1" not in input_manager.pool
+    assert "file2" not in input_manager.pool
 
 
 def test_populate_pool_raises_keyerror(
@@ -523,7 +538,7 @@ def test_populate_pool_raises_keyerror(
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for invalid data file type for function _populate_pool in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {
+    mock_input_manager.meta_data = {
         "files": {
             "dummy_file_key": {
                 "type": "invalid_data_type",
@@ -1698,7 +1713,7 @@ def test_get_metadata_with_valid_key(
 ) -> None:
     """Unit test for get_metadata function in file input_manager.py with a valid metadata_path key"""
 
-    mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
+    mock_input_manager.meta_data = mock_pool_for_get_metadata
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager.get_metadata(dummy_metadata_path)
@@ -2039,7 +2054,7 @@ def test_add_variable_to_pool_valid(
     assert result
     assert patch_for_add_warning.call_count == expected_add_warning_count
     assert patch_for_add_error.call_count == 0
-    assert variable_name in getattr(input_manager, "_InputManager__pool")
+    assert variable_name in input_manager.pool
     assert input_manager.get_data(variable_name) == data
 
 
@@ -2173,7 +2188,7 @@ def test_add_variable_to_pool_invalid(
     if starting_im_pool:
         assert starting_im_pool[variable_name] == input_manager.get_data(variable_name)
     else:
-        assert variable_name not in getattr(input_manager, "_InputManager__pool")
+        assert variable_name not in input_manager.pool
 
 
 @pytest.mark.parametrize(
@@ -2305,7 +2320,7 @@ def test_add_variable_to_pool_eager_termination(
     if starting_im_pool:
         assert starting_im_pool[variable_name] == input_manager.get_data(variable_name)
     else:
-        assert variable_name not in getattr(input_manager, "_InputManager__pool")
+        assert variable_name not in input_manager.pool
 
 
 @pytest.mark.parametrize(

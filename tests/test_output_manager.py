@@ -11,6 +11,7 @@ from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 def test_get_prefix() -> None:
@@ -299,7 +300,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     with raises(KeyError):
         om._generate_key("name", {"class": "test"})
 
-    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    info_map: dict[str, str | bool] = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_class.dummy_func.key_name"
 
@@ -445,25 +446,90 @@ def test_add_log(
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
+@pytest.mark.parametrize(
+    "info_map, exception, exception_message",
+    [
+        ({"units": MeasurementUnits.ANIMALS.value}, None, None),
+        ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
+    ],
+)
 def test_add_variable(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    info_map: Dict[str, Any],
+    exception: KeyError | None,
+    exception_message: str,
 ) -> None:
     """Unit test for function add_variable in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
-    info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._validate_units = MagicMock()
 
-    mock_output_manager.add_variable(name, value, info_map)
-
-    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
-    mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
+    if exception:
+        with pytest.raises(KeyError) as e:
+            mock_output_manager.add_variable(name, value, info_map)
+        assert exception_message in str(e.value)
+    else:
+        mock_output_manager.add_variable(name, value, info_map)
+        mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+        mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
 
     mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
     mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
+    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+
+
+@pytest.mark.parametrize(
+    "units, expected_exception, expected_message",
+    [
+        (MeasurementUnits.ANIMALS, None, None),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS.value,
+                "second": MeasurementUnits.ANIMALS.value,
+                "nested": {"third": MeasurementUnits.DAYS.value},
+            },
+            None,
+            None,
+        ),
+        ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS.value,
+                "invalid": "not_a_unit",
+            },
+            ValueError,
+            "'not_a_unit' is not a valid MeasurementUnits value",
+        ),
+        (
+            {
+                "first": {"nested_invalid": "definitely_not_a_unit"},
+                "second": MeasurementUnits.ANIMALS.value,
+            },
+            ValueError,
+            "'definitely_not_a_unit' is not a valid MeasurementUnits value",
+        ),
+    ],
+)
+def test_validate_units(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
+    expected_exception: ValueError,
+    expected_message: str,
+) -> None:
+    """Test for function _validate_units in file output_manager.py"""
+    if expected_exception:
+        with pytest.raises(expected_exception) as e:
+            mock_output_manager._validate_units(units)
+        assert expected_message in str(e.value)
+    else:
+        mock_output_manager._validate_units(units)
+
+    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
 
 
 @pytest.mark.parametrize(
@@ -495,6 +561,7 @@ def test_add_to_pool(
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
     }
     key = "dummy_key"
     pool: Dict[str, Dict[str, Any]] = {}
@@ -514,7 +581,9 @@ def test_add_to_pool(
     if exclude_info_maps_flag:
         assert pool[key]["info_maps"] == []
     else:
-        assert pool[key]["info_maps"] == [{"context": "dummy_context"}]
+        assert pool[key]["info_maps"] == [
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+        ]
 
     # Arrange
     info_map["more_context"] = "1234567890"
@@ -533,8 +602,8 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context"},
-            {"context": "dummy_context", "more_context": "1234567890"},
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
         ]
 
     # Cleanup
@@ -551,10 +620,11 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
-        "info_maps": [{"context": "dummy_context"}],
+        "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
         "values": ["dummy_value"],
     }
 
@@ -593,7 +663,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS.value}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
     om.add_warning("dummy_name", "dummy_msg", info_map)
@@ -641,6 +711,7 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
+        "_validate_units": mock_output_manager._validate_units,
     }
 
 
@@ -1998,8 +2069,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS.value},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS.value},
                     ],
                     "values": [10, 20],
                 }
@@ -2007,8 +2078,8 @@ def test_print_errors_warnings_logs(
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
-                        {"data_origin": [["SourceClassA", "method_a"]], "units": "units_a"},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS.value},
+                        {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS.value},
                     ],
                     "values": [10, 20],
                     "detailed_data_origins": [
@@ -2025,9 +2096,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": "units_b",
+                            "units": MeasurementUnits.MILLIMETERS.value,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                     ],
                     "values": [30, 40],
                 }
@@ -2037,9 +2108,9 @@ def test_print_errors_warnings_logs(
                     "info_maps": [
                         {
                             "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": "units_b",
+                            "units": MeasurementUnits.MILLIMETERS.value,
                         },
-                        {"data_origin": [["SourceClassB", "method_b"]], "units": "units_b"},
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                     ],
                     "values": [30, 40],
                     "detailed_data_origins": [
