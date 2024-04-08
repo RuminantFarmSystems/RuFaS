@@ -713,7 +713,7 @@
         "type": "string",
         "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
         "default": "None",
-        "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        "pattern": "^(None|3-NOP|Monensin|Essential Oils|Seaweed)$"
       },
       "methane_mitigation_additive_amount": {
         "type": "number",

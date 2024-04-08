@@ -6,7 +6,6 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
@@ -40,6 +39,10 @@ def manure_calculations(
         Methane model used for methane emission calculations, including Mills, IPCC.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -49,11 +52,23 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
     # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
     # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
     # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
