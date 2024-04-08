@@ -804,7 +804,9 @@ class Pen:
             animal.Ca_requirement = requirements["Ca_requirement"]
             animal.P_requirement = requirements["P_requirement"]
             animal.DMIest_requirement = requirements["DMIest_requirement"]
-            animal.DNED_requirement = (requirements["NEmaint_requirement"] + requirements["NEl_requirement"]) / animal.DMIest_requirement
+            animal.DNED_requirement = (
+                requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
+            ) / animal.DMIest_requirement
             animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
 
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
