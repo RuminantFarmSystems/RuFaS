@@ -796,12 +796,22 @@ class AnimalModuleReporter:
         }
         for animal in sold_animals:
             om.add_variable("animal_id", animal["id"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}))
-            om.add_variable("animal_type", animal["animal_type"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}))
-            om.add_variable("body_weight", animal["body_weight"], dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value}))
-            om.add_variable("sold_day", animal["sold_at_day"], dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value}))
+            om.add_variable(
+                "animal_type", animal["animal_type"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+            )
+            om.add_variable(
+                "body_weight", animal["body_weight"], dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value})
+            )
+            om.add_variable(
+                "sold_day", animal["sold_at_day"], dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value})
+            )
 
-            om.add_variable("cull_reason", animal["cull_reason"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}))
-            om.add_variable("days_in_milk", animal["days_in_milk"], dict(info_map, **{"units": MeasurementUnits.DAYS.value}))
+            om.add_variable(
+                "cull_reason", animal["cull_reason"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+            )
+            om.add_variable(
+                "days_in_milk", animal["days_in_milk"], dict(info_map, **{"units": MeasurementUnits.DAYS.value})
+            )
             om.add_variable("parity", animal["parity"], dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}))
 
     @classmethod
@@ -854,8 +864,14 @@ class AnimalModuleReporter:
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal["body_weight"] for sold_animal in daily_sell[day])
-                om.add_variable(f"{report_name}_sold_count", sold_count, dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}))
-                om.add_variable(f"{report_name}_sold_weight", sold_weight, dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value}))
+                om.add_variable(
+                    f"{report_name}_sold_count", sold_count, dict(info_map, **{"units": MeasurementUnits.ANIMALS.value})
+                )
+                om.add_variable(
+                    f"{report_name}_sold_weight",
+                    sold_weight,
+                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value}),
+                )
             else:
                 om.add_variable(
                     f"{report_name}_sold_count", 0, dict(info_map, **{"units": MeasurementUnits.ANIMALS.value})
