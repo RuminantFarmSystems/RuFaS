@@ -243,9 +243,9 @@ class HeiferII(HeiferI):
 
     def set_nutrient_rqmts(
         self,
-        temp,
+        temperature: float,
         animal_grouping_scenario,
-        nutrient_conc: dict = {},
+        nutrient_conc: Dict[str, float] = {},
         metabolizable_energy: float = 15.625,
         previous_DMI: float = 10.0,
     ):
@@ -271,7 +271,7 @@ class HeiferII(HeiferI):
             day_of_pregnancy=self.days_in_preg,
             animal_type=animal_grouping_scenario.get_animal_type(self),
             body_condition_score_5=3,
-            previous_temperature=temp,
+            previous_temperature=temperature,
             average_daily_gain_heifer=self.daily_growth,
             NDF_conc=NDF_conc,
             TDN_conc=TDN_conc,
@@ -287,12 +287,34 @@ class HeiferII(HeiferI):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, methane_model, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]):
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
