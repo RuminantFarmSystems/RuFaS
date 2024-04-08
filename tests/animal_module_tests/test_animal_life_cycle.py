@@ -1336,7 +1336,7 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
         is_culled = i % 2 == 0
         mock_cow.culled = is_culled
         has_new_born = i % 3 == 0
-        mock_cow.update.return_value = (has_new_born)
+        mock_cow.update.return_value = has_new_born
         if mock_cow.culled:
             animals_removed.append(mock_cow)
             removed_cows_idx.append(i)
