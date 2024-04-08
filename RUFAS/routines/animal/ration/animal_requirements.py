@@ -18,7 +18,7 @@ class AnimalRequirements:
     be used in the ration formulation.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes a requirements object with default values of specific
         requirements at 0.
@@ -1331,16 +1331,16 @@ class AnimalRequirements:
             8th edition."
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
-        NPscurf = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
-        CPMFP = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
-        NPMFP = CPMFP * 0.73
-        NPGrowth = frame_weight_gain * 0.11 * 0.86
-        NPGest = gravid_uterine_weight_gain * 125
-        NPMilk = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
-        TargetEffMP = 0.69
+        NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
+        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
+        NPMFP: float = CPMFP * 0.73
+        NPGrowth: float = frame_weight_gain * 0.11 * 0.86
+        NPGest: float = gravid_uterine_weight_gain * 125
+        NPMilk: float = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
+        TargetEffMP: float = 0.69
         if lactating:
-            metabolizable_protein_requirement = (
+            metabolizable_protein_requirement: float = (
                 ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
             )
         else:
@@ -1356,7 +1356,7 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         animal_type: AnimalType,
         average_daily_gain: float,
-        milk_production,
+        milk_production: float,
     ) -> float:
         """Calculates total Calcium requirement according to NRC (2001).
 
@@ -1428,7 +1428,7 @@ class AnimalRequirements:
             Ca_lact = 1.22 * milk_production
             # [A.Cow.C.5]
             # Total calcium requirement (g)
-            calcium_requirement = Ca_maint + Ca_growth + Ca_preg + Ca_lact
+            calcium_requirement: float = Ca_maint + Ca_growth + Ca_preg + Ca_lact
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
@@ -1489,21 +1489,21 @@ class AnimalRequirements:
             8th edition."
             National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
         """
-        Ca_Maint = 0.90 * dry_matter_intake_estimate
+        Ca_Maint: float = 0.90 * dry_matter_intake_estimate
         if parity <= 2:
-            Ca_Growth = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
+            Ca_Growth: float = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
         else:
             Ca_Growth = 0.0
         if day_of_pregnancy is None:
-            Ca_Preg = 0.0
+            Ca_Preg: float = 0.0
         else:
             Ca_Preg = 0.02456 * math.exp(
                 (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
             ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)) * (
                 body_weight / 715
             )
-        Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
-        calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
+        Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
+        calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
     def calculate_NRC_phosphorus_requirements(
@@ -1547,9 +1547,11 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+        P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
+            average_daily_gain / 0.96
+        )
         if day_of_pregnancy is None:
-            P_preg = 0.0
+            P_preg: float = 0.0
         elif day_of_pregnancy > 190:
             P_preg = 0.02743 * math.exp(
                 (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
@@ -1557,19 +1559,16 @@ class AnimalRequirements:
         else:
             P_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
-            P_maint = 1 * dry_matter_intake_estimate + 0.002 * body_weight
-        else:
-            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
-        if animal_type in [AnimalType.LAC_COW]:
-            P_lact = 0.9 * milk_production
-        if animal_type in [AnimalType.LAC_COW]:
-            phosphorus_requirement = P_growth + P_preg + P_lact + P_maint
+            P_maint: float = 1 * dry_matter_intake_estimate + 0.002 * body_weight
+            P_lact: float = 0.9 * milk_production
+            phosphorus_requirement: float = P_growth + P_preg + P_lact + P_maint
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
             AnimalType.HEIFER_III,
             AnimalType.DRY_COW,
         ]:
+            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
             phosphorus_requirement = P_growth + P_preg + P_maint
         return phosphorus_requirement
 
@@ -1627,7 +1626,7 @@ class AnimalRequirements:
 
         """
         if animal_type in [AnimalType.LAC_COW]:
-            P_Maint = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
+            P_Maint: float = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
@@ -1638,20 +1637,20 @@ class AnimalRequirements:
         else:
             P_Maint = 0.0
         if parity <= 2:
-            P_Growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
+            P_Growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
             P_Growth = 0.0
         if day_of_pregnancy is None:
-            P_Preg = 0.0
+            P_Preg: float = 0.0
         else:
             P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
                 (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
             )
         if milk_true_protein is None or milk_production is None:
-            P_Lact = 0.0
+            P_Lact: float = 0.0
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
-        phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
+        phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     def calculate_NRC_DMI(
@@ -1712,7 +1711,7 @@ class AnimalRequirements:
 
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
+            dry_matter_intake_estimate: float = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
                 1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
             )
         elif animal_type in [AnimalType.DRY_COW]:
@@ -1730,7 +1729,7 @@ class AnimalRequirements:
                 dry_matter_intake_estimate -= adjustment_factor
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
@@ -1812,11 +1811,11 @@ class AnimalRequirements:
             )
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
-    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float | None) -> float:
+    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy
         requirements for animals. This is separate because it must be calculated after
@@ -1851,25 +1850,37 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
-        if AnimalBase.config["nutrient_standard"] == "NRC":
+        nutrient_standard = AnimalBase.config["nutrient_standard"]
+        if nutrient_standard == "NRC":
             # Activity requirements
             # ---------------------
             # [A.Cow.A.4]-[A.Heifer.A.5]
             # Net energy for activity requirement caused by grazing system (Mcal)
             if housing == "Grazing":
-                net_energy_activity1 = 0.0012 * body_weight
+                net_energy_activity1: float = 0.0012 * body_weight
             else:
                 net_energy_activity1 = 0.0
             # [A.Cow.A.6]-[A.Heifer.A.7]
             # Total net energy for activity requirement (Mcal)
-            net_energy_activity = distance * 0.00045 * body_weight + net_energy_activity1
+            net_energy_activity: float = distance * 0.00045 * body_weight + net_energy_activity1
             return net_energy_activity
-        elif AnimalBase.config["nutrient_standard"] == "NASEM":
+        elif nutrient_standard == "NASEM":
             if housing == "Barn":
                 net_energy_activity = distance * 0.00035 * body_weight
             elif housing == "Grazing":
-                nonpasturekgDMI = 1
+                nonpasturekgDMI: float = 1.0
                 net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
             else:
                 net_energy_activity = 0.0
             return net_energy_activity
+        else:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.energy_activity_rqmts.__name__,
+            }
+            om.add_error(
+                "Unavailable nutrient standard.",
+                f"The nutrient standard '{nutrient_standard}' does not exist.",
+                info_map,
+            )
+            raise

@@ -1,5 +1,6 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
+from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
@@ -428,19 +429,19 @@ def test_record_yield(
     crop_manager.data.yield_phosphorus = phosphorus
 
     expected_units = {
-        "crop": "unitless",
-        "wet_yield": "wet kg/ha",
-        "dry_yield": "dry kg/ha",
-        "nitrogen": "kg/ha",
-        "phosphorus": "kg/ha",
-        "yield_residue": "dry kg/ha",
-        "harvest_index": "unitless",
+        "crop": MeasurementUnits.UNITLESS.value,
+        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
+        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
+        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
+        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
+        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
+        "harvest_index": MeasurementUnits.UNITLESS.value,
         "planting_date": {
-            "year": "year",
-            "day": "day",
+            "year": MeasurementUnits.CALENDAR_YEAR.value,
+            "day": MeasurementUnits.ORDINAL_DAY.value,
         },
-        "harvest_date": {"year": "year", "day": "day"},
-        "field_size": "ha",
+        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
+        "field_size": MeasurementUnits.HECTARE.value,
     }
 
     expected_info_map = {

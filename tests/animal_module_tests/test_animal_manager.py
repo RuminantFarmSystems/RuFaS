@@ -20,7 +20,6 @@ from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
     PurchasedFeedEmissionsEstimator,
 )
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.feed.feed import Feed
 
 om = OutputManager()
 
@@ -1746,86 +1745,6 @@ def setup_dummy_animal_manager_with_pens(
     }
 
 
-@pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_remove_animals_from_herd(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
-    """Unit test for function remove_animals_from_herd in file routines/animal/animal_manager.py"""
-
-    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)[
-        "animal_manager_object"
-    ]
-    animals_removed = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)["animals_removed_list"]
-
-    dummy_animal_manager.remove_animals_from_herd(animals_removed)
-
-    assert dummy_animal_manager.animal_to_pen_id_map == info_dict["animal_to_pen_id_map_after_removals"]
-    for idx, pen_dict in enumerate(info_dict["pen_data"].values()):
-        assert dummy_animal_manager.all_pens[idx].current_stocking_density == pen_dict["post_removal_stocking_density"]
-        assert set(dummy_animal_manager.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
-
-
-@pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_track_former_pen_population(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
-    """Unit test for function track_former_pen_population in file routines/animal/animal_manager.py"""
-
-    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, False)[
-        "animal_manager_object"
-    ]
-
-    former_population_dictionary = dummy_animal_manager.track_former_pen_population()
-
-    assert former_population_dictionary == info_dict["tracked_pen_population_list"]
-
-
-@pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_calculate_pen_rations(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
-    """Unit test for function calculate_pen_rations in file routines/animal/animal_manager.py"""
-
-    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, False)[
-        "animal_manager_object"
-    ]
-
-    dummy_animal_manager.calculate_pen_rations(info_dict["former_pen_populations"])
-
-    for idx, pen in enumerate(dummy_animal_manager.all_pens):
-        assert pen.ration == info_dict["updated_pen_rations"][idx]
-
-
-@pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager, mocker: MockerFixture):
-    """Unit test for function daily_update_id_map in file routines/animal/animal_manager.py"""
-
-    mocker.patch("RUFAS.routines.feed.Feed.__init__", return_value=None)
-
-    calf_addition_list = []
-    animal_addition_list = []
-
-    dummy_feed = Feed(data=mocker.MagicMock())
-
-    dummy_object_and_removals = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)
-    dummy_animal_manager = dummy_object_and_removals["animal_manager_object"]
-    dummy_removal_list = dummy_object_and_removals["animals_removed_list"]
-
-    for animal_id, animal_type in info_dict["new_cow_dict"].items():
-        new_cow = setup_dummy_animal(animal_id, animal_type)
-        animal_addition_list.append(new_cow)
-
-    for calf_id, calf_type in info_dict["new_calf_dict"].items():
-        new_calf = setup_dummy_animal(calf_id, calf_type)
-        calf_addition_list.append(new_calf)
-
-    with patch("RUFAS.routines.animal.pen.Pen.set_up_new_animal") as set_up_new_animal:
-        dummy_animal_manager.daily_update_id_map(
-            animal_addition_list,
-            dummy_removal_list,
-            calf_addition_list,
-            dummy_feed,
-            20.0,
-        )
-        assert set_up_new_animal.call_count == len(info_dict["new_calf_dict"]) + len(info_dict["new_cow_dict"])
-
-    assert dummy_animal_manager.animal_to_pen_id_map == info_dict["animal_to_pen_id_map_after_daily_update"]
-
-
 def test_get_dry_cows() -> None:
     """Unit test for function _get_dry_cows in file routines/animal/animal_manager.py"""
     mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
@@ -2697,7 +2616,6 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
 
     for mock_pen in mock_all_pens:
         mock_pen.calc_total_manure.assert_called_once_with(
-            mock_feed,
             mock_methane_model,
             mock_methane_mitigation_method,
             mock_methane_mitigation_additive_amount,
@@ -2730,7 +2648,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     pen = mocker.MagicMock()
     pen.calc_total_manure = mocker.MagicMock()
 
-    feed = mocker.MagicMock()
     manure_excretions_output_data = mocker.MagicMock()
 
     animal_manager = mocker.MagicMock()
@@ -2740,12 +2657,11 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     animal_manager.methane_mitigation_additive_amount = mocker.MagicMock()
 
     # act
-    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, feed, manure_excretions_output_data)
+    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, manure_excretions_output_data)
 
     # assert
     animal_manager._determine_classes_in_pen.assert_called_once_with(pen)
     pen.calc_total_manure.assert_called_once_with(
-        feed,
         animal_manager.methane_model,
         animal_manager.methane_mitigation_method,
         animal_manager.methane_mitigation_additive_amount,
