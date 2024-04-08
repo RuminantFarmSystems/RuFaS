@@ -420,7 +420,8 @@ class Pen:
         manure: Dict[float, int]
             A dictionary that contains the the accumulated manure excretion values for all animals
         curr_manure: AnimalManureExcretions
-            A dictionary that contains the manure excretion values used to update the manure and animal dictionaries in the AnimalManureExcretions class definition.
+            A dictionary that contains the manure excretion values used to update the manure and animal dictionaries in
+            the AnimalManureExcretions class definition.
         animal_dict: Dict[float, int]
             A dictionary that contains the manure excretion values for specific animals in the pen
 
@@ -803,9 +804,7 @@ class Pen:
             animal.Ca_requirement = requirements["Ca_requirement"]
             animal.P_requirement = requirements["P_requirement"]
             animal.DMIest_requirement = requirements["DMIest_requirement"]
-            animal.DNED_requirement = (
-                requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
-            ) / animal.DMIest_requirement
+            animal.DNED_requirement = (requirements["NEmaint_requirement"] + requirements["NEl_requirement"]) / animal.DMIest_requirement
             animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
 
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
