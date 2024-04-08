@@ -41,7 +41,7 @@ jobs:
             tr "\n" " ")" >> "$GITHUB_ENV"
           echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
             tr " " "\n" |
-            grep -E "\.txt$|\.json$|\.csv$"  |
+            grep -E "^(?!.*\.py$).*"  |
             tr "\n" " ")" >> "$GITHUB_ENV"
       
       - name: Check for Unauthorized Changes
