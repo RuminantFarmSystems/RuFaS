@@ -95,7 +95,22 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-
+      
+      - name: Fetch latest commit SHA
+        id: fetch-latest-sha
+        run: |
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Branch name: $BRANCH_NAME"
+          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
+          echo "Latest SHA: $LATEST_SHA"
+          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+          echo "::set-output name=sha::$LATEST_SHA"
+      
+      - name: Checkout the latest commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.fetch-latest-sha.outputs.sha }}
+      
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
