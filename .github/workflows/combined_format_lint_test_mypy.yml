@@ -72,7 +72,7 @@ jobs:
           black ${{ env.FILES }}
 
       - name: Commit and push formatting changes
-        if: ${{ steps.get_files.outputs.files != '' && github.ref != 'refs/heads/main' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
