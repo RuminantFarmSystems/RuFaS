@@ -299,9 +299,7 @@ class LifeCycleManager:
             sim_day, heiferIIIs, cows, total_animal_num
         )
 
-        total_animal_num = self._evaluate_and_update_cows(
-            sim_day, cows, calves_born, animals_removed, total_animal_num
-        )
+        total_animal_num = self._evaluate_and_update_cows(sim_day, cows, calves_born, animals_removed, total_animal_num)
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
