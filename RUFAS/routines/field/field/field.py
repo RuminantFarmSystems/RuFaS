@@ -1426,10 +1426,13 @@ class Field:
             weighted_average_transpiration,
         )
 
+        pre_sublimation_snow_content = self.soil.data.snow_content
         self.soil.snow.sublimate(soil_evaporation_and_sublimation_amount)
-        soil_evaporation_and_sublimation_amount -= self.soil.data.water_sublimated
         remaining_evapotranspirative_demand -= self.soil.data.water_sublimated
-        self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
+        max_soil_evaporation = self._determine_maximum_soil_evaporation(
+            soil_evaporation_and_sublimation_amount, pre_sublimation_snow_content
+        )
+        self.soil.evaporation.evaporate(max_soil_evaporation)
         remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
 
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
@@ -1724,6 +1727,33 @@ class Field:
             max_soil_evaporation_sublimation, adjusted_soil_evaporation_sublimation
         )
         return actual_soil_evaporation_sublimation
+
+    @staticmethod
+    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+        """
+        Calculates the maximum amount of evaporation from soil in a given day.
+
+        Parameters
+        ----------
+        soil_evaporation_adj : float
+            Maximum soil evaporation adjusted for plant water use on a given day (mm).
+        snow_water_content : float
+            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm).
+
+        Returns
+        -------
+        float
+            Maximum soil water evaporation on a given day (mm).
+
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.3.1
+
+        """
+        if soil_evaporation_adj < snow_water_content:
+            return 0  # 2:2.3.10
+        else:
+            return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
     def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
