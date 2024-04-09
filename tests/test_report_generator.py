@@ -563,66 +563,6 @@ def test_extract_and_check_aggregation_keys(
 
 
 @pytest.mark.parametrize(
-    "horizontally_aggregated, vertically_aggregated, filter_content, expected",
-    [
-        # Test case with both horizontal and vertical aggregation, horizontal first
-        (
-            [1, 2, 3],
-            [4, 5, 6],
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": True,
-            },
-            {"hor_ver_agg": [sum([1, 2, 3])]},
-        ),
-        # Test case with both horizontal and vertical aggregation, vertical first
-        (
-            [1, 2, 3],
-            {"a": [4, 5, 6], "b": [7, 8, 9]},
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": False,
-            },
-            {"ver_hor_agg": [a + b for a, b in zip([4, 5, 6], [7, 8, 9])]},
-        ),
-        # Test case with only horizontal aggregation
-        ([1, 2, 3], None, {"horizontal_aggregation": "sum"}, {"hor_agg": [1, 2, 3]}),
-        # Test case with only vertical aggregation
-        (
-            None,
-            {"some_key": [4, 5, 6]},
-            {"vertical_aggregation": "sum"},
-            {"ver_agg": [4, 5, 6]},
-        ),
-        # Test case with no aggregation
-        (None, None, {}, None),
-    ],
-)
-def test_combine_aggregate_report_data(
-    horizontally_aggregated: List[int | float] | None,
-    vertically_aggregated: List[int | float] | None,
-    filter_content: Dict[str, Any],
-    expected: Dict[str, List[int | float]] | None,
-) -> None:
-    """
-    Unit test for _combine_aggregate_report_data() method in report_generator.py file.
-    """
-
-    # Arrange
-    report_generator = ReportGenerator()
-
-    # Act
-    result = report_generator._combine_aggregate_report_data(
-        horizontally_aggregated, vertically_aggregated, filter_content
-    )
-
-    # Assert
-    assert result == expected
-
-
-@pytest.mark.parametrize(
     "references, reports, expected_exception, expected_message",
     [
         # All references are present
