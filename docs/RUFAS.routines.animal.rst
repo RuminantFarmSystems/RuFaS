@@ -10,7 +10,6 @@ Subpackages
    RUFAS.routines.animal.life_cycle
    RUFAS.routines.animal.manure
    RUFAS.routines.animal.ration
-   RUFAS.routines.animal.types
 
 Submodules
 ----------
