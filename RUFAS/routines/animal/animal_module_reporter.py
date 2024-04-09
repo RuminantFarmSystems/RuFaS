@@ -230,7 +230,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
                 {},
                 simulation_day,
-                info_map,
+                dict(info_map, **{"units": nutrient_amount_units}),
             )
             om.add_variable(
                 f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
@@ -242,7 +242,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
                 0,
                 simulation_day,
-                info_map,
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
@@ -267,7 +267,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
                 {},
                 simulation_day,
-                info_map,
+                dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
             om.add_variable(
                 f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
@@ -280,7 +280,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
                 {},
                 simulation_day,
-                info_map,
+                dict(info_map, **{"units": ration_per_animal_units}),
             )
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -311,7 +311,7 @@ class AnimalModuleReporter:
                     f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
                     {},
                     simulation_day,
-                    info_map,
+                    dict(info_map, **{"units": ration_supply_report_units}),
                 )
                 om.add_variable(
                     f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -361,7 +361,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 {},
                 animal_manager.simulation_day,
-                info_map,
+                dict(info_map, **{"units": ration_total_units}),
             )
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -407,7 +407,7 @@ class AnimalModuleReporter:
             f"{classname}.{funcname}.pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
             {},
             animal_manager.simulation_day,
-            info_map,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
         )
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
@@ -500,7 +500,9 @@ class AnimalModuleReporter:
         for manure_property, manure_value in pen.manure.items():
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
-            AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0, simulation_day, info_map)
+            AnimalModuleReporter.data_padder(
+                reference_variable, variable_to_add, 0, simulation_day, dict(info_map, **{"units": manure_value_units})
+            )
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
