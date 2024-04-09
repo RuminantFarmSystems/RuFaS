@@ -2161,18 +2161,19 @@ def test_execute_daily_processes(
 
 
 @pytest.mark.parametrize(
-    "field_size,rainfall,manure_water,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
+    "field_size,rainfall,manure_water,snow_content,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
     "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing",
     [
-        (1.9, 4.66, 3.2, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
-        (2.3, 5.6, 1.1, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
-        (2.3, 5.6, 0.0, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
+        (1.9, 4.66, 3.2, 0.0, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
+        (2.3, 5.6, 1.1, 3.3, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
+        (2.3, 5.6, 0.0, 8.5, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
     ],
 )
 def test_cycle_water(
     field_size: float,
     rainfall: float,
     manure_water: float,
+    snow_content: float,
     runoff: float,
     high_water_table: bool,
     residue: float,
@@ -2196,6 +2197,7 @@ def test_cycle_water(
             accumulated_runoff=runoff,
             water_evaporated=3.5,
             water_sublimated=1.0,
+            snow_content=snow_content,
         )
         soil_data.plant_surface_residue = surface_residue
         soil = Soil(soil_data)
@@ -2247,6 +2249,7 @@ def test_cycle_water(
         incorp._evaporate_from_crop_canopies = MagicMock(return_value=30.5)
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=40.0)
         incorp._determine_soil_evaporation_and_sublimation_adjusted = MagicMock(return_value=10.5)
+        incorp._determine_maximum_soil_evaporation = MagicMock(return_value=5.0)
         incorp._get_manure_water = MagicMock(return_value=manure_water)
 
         crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
@@ -2285,13 +2288,13 @@ def test_cycle_water(
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0,
             surface_residue,
-            0,
+            snow_content,
             expected_remaining_demand,
             expected_average_transpiration,
         )
         incorp.soil.snow.sublimate.assert_called_once_with(10.5)
-        expected_soil_evaporation_after_sublimation = 10.5 - 1.0
-        incorp.soil.evaporation.evaporate.assert_called_once_with(expected_soil_evaporation_after_sublimation)
+        incorp._determine_maximum_soil_evaporation.assert_called_once_with(10.5, snow_content)
+        incorp.soil.evaporation.evaporate.assert_called_once_with(5.0)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
             crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
@@ -2577,6 +2580,18 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(
             mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
 
         assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "soil_evaporation_adj,snow_water_content",
+    [(1.3, 3.2), (0, 0), (1.3, 0.4), (1.8954, 0)],
+)
+def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
+    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
+    if snow_water_content > soil_evaporation_adj:
+        assert 0 == observe
+    else:
+        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 @pytest.mark.parametrize(
