@@ -946,23 +946,6 @@ class LayerData:
         return max(0.0, self.saturation_content - self.water_content)
 
     @property
-    def percent_organic_matter_proportion(self) -> float:
-        """
-        Calculates the percent organic matter content of this soil layer.
-
-        Returns
-        -------
-        float
-            Percent organic matter content of this soil layer (uniteless).
-
-        References
-        ----------
-        SWAT 4:1.1.4
-
-        """
-        return 1.72 * self.percent_organic_carbon_content
-
-    @property
     def water_factor(self) -> float:
         """
         Calculates relative water saturation.
