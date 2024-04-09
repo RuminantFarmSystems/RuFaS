@@ -407,7 +407,7 @@ class ReportGenerator:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
             if horizontal_first:
-                loop_list = filter_content.get("horizontal_order", aggregate_report.keys())
+                loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
                 horizontally_aggregated = self._apply_horizontal_aggregation(
                     report_data, loop_list, horizontal_aggregator
                 )
@@ -421,7 +421,7 @@ class ReportGenerator:
 
         elif horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
-            loop_list = filter_content.get("horizontal_order", aggregate_report.keys())
+            loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
             horizontally_aggregated = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
@@ -597,7 +597,7 @@ class ReportGenerator:
 
         try:
             self._add_constants_to_report_data(report_data, filter_content)
-        except ValueError:
+        except ValueError:  # NOT COVERED
             raise
 
         return report_data
