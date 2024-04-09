@@ -1,30 +1,25 @@
-from typing import Tuple
+from typing import Tuple, Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import (
     calculate_phosphorus_excretion_values,
 )
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
     body_weight : float
         Body weight of the current animal, kg.
     fecal_phosphorus : float
@@ -33,6 +28,10 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including Boadi, IPCC.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -42,9 +41,23 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
     # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
     potassium_concentration = nutrient_concentrations["potassium"]

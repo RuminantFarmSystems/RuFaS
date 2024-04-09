@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-
 
 class MethaneMitigationMethod(ABC):
     """A class representing a methane mitigation method. This is a base class and should be subclassed."""
@@ -78,13 +76,8 @@ class Monensin(MethaneMitigationMethod):
             The reduction in methane yield.
 
         """
-        CP_concentration = nutrient_concentrations["CP"]
-        Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
-        Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
-        if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
-            return (0.30054 - 0.00377 * additive_amount - 1.57832 * CP_concentration / 100) * 100
-        else:
-            return (0.03223 - 0.00410 * additive_amount) * 100
+        starch_concentration = nutrient_concentrations["starch"]
+        return 6.36 - 0.277 * additive_amount - 0.182 * starch_concentration
 
 
 class EssentialOils(MethaneMitigationMethod):
