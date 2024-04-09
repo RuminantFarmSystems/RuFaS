@@ -330,10 +330,6 @@ class Pen:
         """
         return len(self.animals_in_pen) > 0
 
-    @property
-    def current_pen_ration(self):
-        pass
-
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements
@@ -553,119 +549,6 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    # fmt: off
-    def set_up_new_animal(  # noqa
-        self, animal, p_conc, feed, temp, num_animals_before_additions
-    ):
-        # fmt: on
-        """
-        Sets the necessary attributes for @animal to be a replacement in this
-        pen.
-
-        Args:
-            animal: the replacement animal which needs to have necessary values
-                for later computations
-            p_conc: P concentration of @animal's class, used to calculate the
-                P in @animal. -1 for this value indicates that @animal is a
-                calf and that its p_animal attribute has already been calculated
-            feed: instance of the Feed class defined in feed.py
-            temp: temperature on the current day
-            num_animals_before_additions: the number of animals in this pen
-                before any new animals were added for the day
-        """
-        if num_animals_before_additions == 0:
-            # for the case that there are no animals currently in this pen.
-            # Avoids a division by 0 error in below calculations
-            # TODO is there a better way? GitHub Issue #1213
-            num_animals_before_additions = 1
-
-        # TODO: Question - is this necessary or can we assume that any newly
-        #   added animals will match the existing animal combination? GitHub Issue #1213
-        class_name = type(animal).__name__
-        self.classes_in_pen.add(class_name)
-
-        if class_name == "Cow":
-            requirements = req.calc_rqmts(
-                body_weight=animal.body_weight,
-                mature_body_weight=animal.mature_body_weight,
-                day_of_pregnancy=animal.days_in_preg,
-                animal_type="cow",
-                parity=animal.calves,
-                calving_interval=animal.CI,
-                milk_true_protein=animal.mPrt,
-                milk_fat=animal.fat_percent,
-                milk_lactose=animal.lactose_milk,
-                milk_production=animal.estimated_daily_milk_produced,
-                days_in_milk=animal.days_in_milk,
-                lactating=animal.milking,
-            )
-            animal.NEmaint_requirement = requirements["NEmaint_requirement"]
-            animal.NEg_requirement = requirements["NEg_requirement"]
-            animal.NEpreg_requirement = requirements["NEpreg_requirement"]
-            animal.NEl_requirement = requirements["NEl_requirement"]
-            animal.MP_requirement = requirements["MP_requirement"]
-            animal.Ca_requirement = requirements["Ca_requirement"]
-            animal.P_requirement = requirements["P_requirement"]
-            animal.DMIest_requirement = requirements["DMIest_requirement"]
-            animal.DNED_requirement = (
-                requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
-            ) / animal.DMIest_requirement
-            animal.DMPD_requirement = (
-                requirements["MP_requirement"]
-            ) / animal.DMIest_requirement
-
-        animal.dry_matter_intake = self.dry_matter_intake
-
-        for key in self.ration:
-            if key == "status":
-                animal.ration_formulation[key] = self.ration[key]
-
-            else:  # feeds and price
-                animal.ration_formulation[key] = (
-                    self.ration[key] / num_animals_before_additions
-                )
-
-        # set animal's manure to be the average manure of all other
-        # animals in pen
-        for key in self.manure.keys():
-            if len(self.animals_in_pen) > 0:
-                animal.manure_excretion[key] = self.manure[key] / (
-                    len(self.animals_in_pen)
-                )
-
-        # since the manure attribute is a total from all animals in the pen,
-        # we need to add the current animal's values to the total values for
-        # each manure key
-        for key in self.manure:
-            self.manure[key] += animal.manure_excretion[key]
-
-        # set animal's nutrient requirements to be the average requirements of
-        # all other animals in pen
-        if class_name == "Calf":
-            animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
-        else:
-            animal.nutrient_rqmts = self.avg_nutrient_rqmts
-
-        if animal.nutrient_rqmts == {} and class_name == "Calf":
-            animal.calc_nutrient_rqmts(feed, temp)
-        elif animal.nutrient_rqmts == {} and not class_name == "Calf":
-            animal.set_nutrient_rqmts()
-
-        # set animal's DVD and DHD if it is a cow
-        if class_name == "Cow":
-            animal.calc_daily_walking_dist(
-                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-            )
-
-        # set this animal's p_animal to be the average P concentration of other
-        # animals in its class times its body weight
-        if not p_conc == -1:
-            animal.p_animal = animal.body_weight * p_conc
-
-        animal.p_intake = self.avg_p_intake
-
-        self.animals_in_pen[animal.id] = animal
-
     def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
         """
         Removes animals from the pen by their ids.
@@ -686,9 +569,7 @@ class Pen:
             return
         animal_ids = set(animal_ids)
         self.animals_in_pen = {
-            animal_id: animal
-            for animal_id, animal in self.animals_in_pen.items()
-            if animal_id not in animal_ids
+            animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
 
     def clear(self):
@@ -755,7 +636,6 @@ class Pen:
     def _calc_animal_manure_excretion(
         self,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -786,21 +666,22 @@ class Pen:
         is_lactating_cow = is_cow and animal.is_lactating
         if is_cow:
             animal.calc_manure_excretion(
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
                 self.MEdiet,
+                nutrient_amount=self.ration_nutrient_amount,
+                nutrient_conc=self.ration_nutrient_conc,
             )
         else:
-            animal.calc_manure_excretion(feed, methane_model)
+            animal.calc_manure_excretion(
+                methane_model, nutrient_amount=self.ration_nutrient_amount, nutrient_conc=self.ration_nutrient_conc
+            )
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
     @staticmethod
     def _update_animal_manure_excretion_data(
-        manure_excretions_output_data: dict[
-            str, dict[str, str | AnimalManureExcretions]
-        ],
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]],
         prefix: str,
         manure: AnimalManureExcretions,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
@@ -833,7 +714,6 @@ class Pen:
 
     def calc_total_manure(
         self,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -871,17 +751,12 @@ class Pen:
         for animal in list(self.animals_in_pen.values()):
             prefix, manure = self._calc_animal_manure_excretion(
                 animal,
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
             )
-            self._update_animal_manure_excretion_data(
-                manure_excretions_output_data, prefix, manure, animal
-            )
-            self.manure = add_animal_manure_excretions(
-                self.manure, animal.manure_excretion
-            )
+            self._update_animal_manure_excretion_data(manure_excretions_output_data, prefix, manure, animal)
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
 
     def _set_animal_nutrient_values(
         self, animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
@@ -932,13 +807,9 @@ class Pen:
             animal.DNED_requirement = (
                 requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
             ) / animal.DMIest_requirement
-            animal.DMPD_requirement = (
-                requirements["MP_requirement"]
-            ) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
 
-            animal.calc_daily_walking_dist(
-                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-            )
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         if animal_type in [AnimalType.CALF]:
             if self.avg_calf_nutrient_rqmts:
@@ -1023,9 +894,7 @@ class Pen:
 
         """
 
-        self._set_animal_nutrient_values(
-            animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
-        )
+        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
         self.animals_in_pen[animal.id] = animal
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 

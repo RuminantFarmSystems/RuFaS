@@ -1,3 +1,4 @@
+from RUFAS.units import MeasurementUnits
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from RUFAS.output_manager import OutputManager
@@ -205,13 +206,13 @@ class Feed:
                 "storage_type": storage,
             }
             nutrient_dict_units = {
-                "carbon": "kg",
-                "nitrogen": "kg",
-                "phosphorus": "kg",
-                "dry_matter": "kg",
-                "crude_protein": "kg",
-                "carbon_loss": "kg",
-                "crude_protein_loss": "kg",
+                "carbon": MeasurementUnits.KILOGRAMS.value,
+                "nitrogen": MeasurementUnits.KILOGRAMS.value,
+                "phosphorus": MeasurementUnits.KILOGRAMS.value,
+                "dry_matter": MeasurementUnits.KILOGRAMS.value,
+                "crude_protein": MeasurementUnits.KILOGRAMS.value,
+                "carbon_loss": MeasurementUnits.KILOGRAMS.value,
+                "crude_protein_loss": MeasurementUnits.KILOGRAMS.value,
             }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
