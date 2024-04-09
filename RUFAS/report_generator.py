@@ -400,78 +400,42 @@ class ReportGenerator:
         if not horizontal_agg_key and not vertical_agg_key:
             return report_data
 
-        horizontally_aggregated = None
-        vertically_aggregated = None
-
-        if horizontal_agg_key:
-            horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
-            loop_list = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list, horizontal_aggregator)
-
-        if vertical_agg_key:
-            vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
-
-        aggregate_report = self._combine_aggregate_report_data(
-            horizontally_aggregated, vertically_aggregated, filter_content
-        )
-
-        return aggregate_report
-
-    def _combine_aggregate_report_data(
-        self,
-        horizontally_aggregated: List[float] | None,
-        vertically_aggregated: Dict[str, List[float]] | None,
-        filter_content: Dict[str, Any],
-    ) -> Dict[str, List[float]] | None:
-        """
-        Combines horizontally and vertically aggregated data based on specified aggregation criteria
-        from filter_content.
-
-        Parameters
-        ----------
-        horizontally_aggregated : List[float] | None
-            The horizontally aggregated data.
-        vertically_aggregated : List[float] | None
-            The vertically aggregated data.
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        Dict[str, List[float]] | None
-            If no aggregation is specified, returns None.
-            If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
-                that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
-                in the filter content.
-            If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
-            If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
-        """
-
-        horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        vertical_agg_key = filter_content.get("vertical_aggregation")
+        horizontal_first = filter_content.get("horizontal_first", True)
+        aggregate_report = report_data
 
         if horizontal_agg_key and vertical_agg_key:
-            horizontal_first = filter_content.get("horizontal_first", True)
-            aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key if horizontal_first else horizontal_agg_key]
+            horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
+            vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
             if horizontal_first:
-                return {"hor_ver_agg": [aggregator(horizontally_aggregated)]}
+                loop_list = filter_content.get("horizontal_order", aggregate_report.keys())
+                horizontally_aggregated = self._apply_horizontal_aggregation(
+                    report_data, loop_list, horizontal_aggregator
+                )
+                aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
             else:
+                vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
                 ver_hor_aggregated = []
                 for elements in zip(*vertically_aggregated.values()):
-                    ver_hor_aggregated.append(aggregator(list(elements)))
-                return {"ver_hor_agg": ver_hor_aggregated}
+                    ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
+                aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
 
-        if horizontal_agg_key:
-            return {"hor_agg": horizontally_aggregated}
+        elif horizontal_agg_key:
+            horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
+            loop_list = filter_content.get("horizontal_order", aggregate_report.keys())
+            horizontally_aggregated = self._apply_horizontal_aggregation(
+                aggregate_report, loop_list, horizontal_aggregator
+            )
+            aggregate_report = {"hor_agg": horizontally_aggregated}
 
-        if vertical_agg_key:
+        elif vertical_agg_key:
+            vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
+            vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             if filter_content.get("variables") is not None or len(vertically_aggregated) > 1:
-                return {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+                aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
             elif len(vertically_aggregated) == 1:
-                return {"ver_agg": list(vertically_aggregated.values())[0]}
+                aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
-        return None
+        return aggregate_report
 
     def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
         """
