@@ -1317,11 +1317,12 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
 
 
 def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for _evaluate_and_update_cows in life_cycle.py"""
     # Arrange
     sim_day = 1
     mock_cows = []
     num_cows = 10
-    calves_born = []
+    calves_born: List[Calf] = []
     animals_removed = []
     removed_cows_idx = []
     total_animal_num_start = 0

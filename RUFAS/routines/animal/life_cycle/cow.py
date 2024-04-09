@@ -312,6 +312,7 @@ class Cow(HeiferIII):
         ---------
         sim_day : int
             Day of simulation.
+
         """
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
             del self.milk_production_history[-1]
@@ -536,6 +537,7 @@ class Cow(HeiferIII):
     def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}) -> None:
         """
         Calculates this Cow's nutrient requirements.
+
         """
         if nutrient_conc and nutrient_conc["dm"] != 0.0:
             NDF_conc = nutrient_conc["NDF"] / 100
@@ -577,10 +579,12 @@ class Cow(HeiferIII):
     def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
+
         Parameters
         ----------
         DMI : float
-            The Dry Matter Intake (kg)
+            The Dry Matter Intake (kg).
+
         """
         # amount of P required for endogenous losses (g) (A.1EF.E.1)
         self.p_maint_feces = 0.001 * DMI * 1000
@@ -627,12 +631,14 @@ class Cow(HeiferIII):
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
+
         Parameters
         ----------
-        vertical_dist_to_parlor : flaot
+        vertical_dist_to_parlor : float
             Vertical distance to milking parlor, km.
         horizontal_dist_to_parlor : float
             Horizontal distance to milking parlor, km.
+
         """
         # multiplied by 2 for return trip
         self.DVD = 2 * vertical_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
@@ -640,7 +646,6 @@ class Cow(HeiferIII):
 
     def get_bw_change(self, CI: int | float) -> float:  # noqa
         """
-        Life cycle pseudocode @[A.1A.C.56/57/58]
         Calculates the body weight change for a cow.
 
         Parameters
@@ -652,6 +657,10 @@ class Cow(HeiferIII):
         Returns
         -------
             The daily body weight change for a cow.
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.56/57/58]
 
         """
         # on the calving day
@@ -2111,8 +2120,9 @@ class Cow(HeiferIII):
     # Cull methods
     def cull_update(self, sim_day: int) -> None:
         """
-        Update culling time and cull reasons for cow to leave the herd
-        The reasons are reproduction failure, low production, and health issues.
+        Update culling time and cull reasons for cow to leave the herd.
+
+        The reasons for culling are reproduction failure, low production, and health issues.
         """
         if self.do_not_breed and self.estimated_daily_milk_produced < AnimalBase.config["cull_milk_production"]:
             self.culled = True

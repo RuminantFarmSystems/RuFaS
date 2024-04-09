@@ -775,7 +775,8 @@ class LifeCycleManager:
         animals_removed: List[Cow],
         total_animal_num: int,
     ) -> int:
-        """Culls cows and records stats.
+        """
+        Culls cows and records stats.
 
         Parameters
         ----------
