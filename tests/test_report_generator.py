@@ -570,6 +570,82 @@ def test_perform_aggregations(
 
 
 @pytest.mark.parametrize(
+    "aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content, expected_result",
+    [
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6]},
+            "sum",
+            "average",
+            {"horizontal_first": True, "horizontal_order": ["var1", "var2"]},
+            {"hor_ver_agg": [7.0]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6]},
+            "average",
+            "sum",
+            {"horizontal_first": False},
+            {"ver_hor_agg": [10.5]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
+            "product",
+            "subtraction",
+            {"horizontal_first": True},
+            {"hor_ver_agg": [-214]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
+            "subtraction",
+            "product",
+            {"horizontal_first": False},
+            {"ver_hor_agg": [-618]},
+        ),
+    ],
+)
+def test_handle_horizontal_and_vertical_aggregations(
+    aggregate_report: Dict[str, List[Any]],
+    horizontal_agg_key: str,
+    vertical_agg_key: str,
+    filter_content: Dict[str, Any],
+    expected_result: Dict[str, List[Any]],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for _handle_horizontal_and_vertical_aggregations() method in report_generator.py file.
+    """
+
+    # Arrange
+    report_generator = ReportGenerator()
+
+    def mock_apply_horizontal_aggregation(
+        data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
+    ) -> List[Any]:
+        """Mock function for _apply_horizontal_aggregation() method in report_generator.py file."""
+
+        return [aggregator([data[key][i] for key in loop_list]) for i in range(len(data[loop_list[0]]))]
+
+    def mock_apply_vertical_aggregation(
+        data: Dict[str, List[Any]], aggregator: Callable[[List[Any]], Any]
+    ) -> Dict[str, List[Any]]:
+        """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
+
+        return {key: [aggregator(values)] for key, values in data.items()}
+
+    mocker.patch.object(
+        report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
+    )
+    mocker.patch.object(report_generator, "_apply_vertical_aggregation", side_effect=mock_apply_vertical_aggregation)
+
+    # Act
+    result = report_generator._handle_horizontal_and_vertical_aggregations(
+        aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
+    )
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
     "filter_content, expected_horizontal, expected_vertical, expected_exception",
     [
         # Test with valid horizontal and vertical keys
