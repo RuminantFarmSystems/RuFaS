@@ -1458,6 +1458,7 @@ def test_save_results(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mock_output_manager.time = MagicMock()
 
     # Act
     mock_output_manager.save_results(
