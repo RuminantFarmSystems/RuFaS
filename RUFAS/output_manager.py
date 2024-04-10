@@ -389,6 +389,21 @@ class OutputManager(object):
         return f"{caller_class}.{caller_function}"
 
     def _write_disclaimer(self, file_pointer: TextIO) -> None:
+        """
+        Writes the predefined disclaimer message to a given file.
+
+        Parameters
+        ----------
+        file_pointer: TextIO
+            A file-like object (supporting the `.write()` method) that points to the file where the disclaimer should
+            be written.
+
+        Example
+        -------
+        >>>
+        ... with open('output.txt', 'w') as f:
+        ...    self._write_disclaimer(f)
+        """
         file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
     def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
