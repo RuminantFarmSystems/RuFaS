@@ -88,14 +88,12 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+            f"{DISCLAIMER_MESSAGE}" f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1.0, True, "test"]}},
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+            f"{DISCLAIMER_MESSAGE}" f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
             True,
         ),
         (
@@ -105,14 +103,12 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+            f"{DISCLAIMER_MESSAGE}" f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1, 2, 3]}},
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            f"{DISCLAIMER_MESSAGE}" f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
             True,
         ),
         (
@@ -122,8 +118,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+            f"{DISCLAIMER_MESSAGE}" f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
             True,
         ),
         (
@@ -175,7 +170,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                 "simple_key2": {"values": [4, 5, 6]},
             },
             f"{DISCLAIMER_MESSAGE}"
-            f"simple_key1,simple_key2{os.linesep}" f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+            f"simple_key1,simple_key2{os.linesep}"
+            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
             True,
         ),
         (
@@ -220,8 +216,8 @@ def test_dict_to_file_csv(
 
     if should_write:
         open_mock.assert_any_call("test", "w", encoding="utf-8", errors="strict", newline="")
-        open_mock.assert_any_call('test', 'r')
-        open_mock.assert_any_call('test', 'w', newline='')
+        open_mock.assert_any_call("test", "r")
+        open_mock.assert_any_call("test", "w", newline="")
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls[:-1])
 

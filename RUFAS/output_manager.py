@@ -617,7 +617,7 @@ class OutputManager(object):
             csv_lines = list(csv_reader)
             csv_lines.insert(0, [DISCLAIMER_MESSAGE])
 
-        with open(path, "w", newline='') as csv_file:
+        with open(path, "w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerows(csv_lines)
 
