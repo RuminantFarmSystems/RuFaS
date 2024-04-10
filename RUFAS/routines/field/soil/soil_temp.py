@@ -283,36 +283,6 @@ class SoilTemp:
         return max(plant_factor, snow_factor)
 
     @staticmethod
-    def _determine_weighted_average_temperature(
-        first_layer_temp: float,
-        first_layer_thickness: float,
-        second_layer_temp: float,
-        second_layer_thickness: float,
-    ) -> float:
-        """This method determines a weighted average temperature of two soil layers based on their thicknesses.
-
-        Parameters
-        ----------
-        first_layer_temp : float
-            Temperature of the first layer (degrees C)
-        first_layer_thickness : float
-            Thickness of the first layer (mm)
-        second_layer_temp : float
-            Temperature of the second layer (degrees C)
-        second_layer_thickness : float
-            Thickness of the second layer (mm)
-
-        Returns
-        -------
-        float
-            The weighted average temperature of the two soil layers passed (degrees C)
-
-        """
-        weighted_top_temp = first_layer_temp * first_layer_thickness
-        weighted_bottom_temp = second_layer_temp * second_layer_thickness
-        return (weighted_top_temp + weighted_bottom_temp) / (first_layer_thickness + second_layer_thickness)
-
-    @staticmethod
     def _determine_soil_surface_temp(
         cover_weighting_factor: float,
         previous_top_soil_layer_temp: float,
