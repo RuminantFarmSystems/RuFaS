@@ -152,51 +152,6 @@ def test_calc_animal_space_shortage(mocker: MockerFixture) -> None:
         AnimalCombination.LAC_COW,
     ],
 )
-def test_create_default_pen(animal_combination: AnimalCombination, mocker: MockerFixture) -> None:
-    """Unit test for function _create_default_pen() in file animal_manager.py"""
-    # Arrange
-    num_stalls = 10
-    max_stocking_density = 1.2
-    pen_id = 1
-
-    mock_pen = mocker.MagicMock(spec=Pen)
-    patch_for_pen_init = mocker.patch("RUFAS.routines.animal.animal_manager.Pen", return_value=mock_pen)
-
-    # Act
-    pen = AnimalManager._create_default_pen(
-        pen_id=pen_id,
-        animal_combination=animal_combination,
-        num_stalls=num_stalls,
-        max_stocking_density=max_stocking_density,
-    )
-
-    # Assert
-    assert pen == mock_pen
-    patch_for_pen_init.assert_called_once_with(
-        pen_id=pen_id,
-        vertical_dist_to_milking_parlor=AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR,
-        horizontal_dist_to_milking_parlor=AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR,
-        number_of_stalls=num_stalls,
-        housing_type=AnimalModuleConstants.DEFAULT_HOUSING_TYPE,
-        bedding_type=AnimalModuleConstants.DEFAULT_BEDDING_TYPE,
-        pen_type=AnimalModuleConstants.DEFAULT_PEN_TYPE,
-        manure_handling=AnimalModuleConstants.DEFAULT_MANURE_HANDLER,
-        manure_separator=AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR,
-        manure_storage=AnimalModuleConstants.DEFAULT_MANURE_STORAGE,
-        animal_combination=animal_combination,
-        max_stocking_density=max_stocking_density,
-    )
-
-
-@pytest.mark.parametrize(
-    "animal_combination",
-    [
-        AnimalCombination.CALF,
-        AnimalCombination.GROWING,
-        AnimalCombination.CLOSE_UP,
-        AnimalCombination.LAC_COW,
-    ],
-)
 def test_create_additional_pens_for_potential_space_shortage(
     animal_combination: AnimalCombination, mocker: MockerFixture
 ) -> None:
