@@ -172,9 +172,15 @@ class GraphGenerator:
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
             filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
             self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
-            legend = graph_details.get("legend")
-            if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+
+            if not graph_details.get("legend"):
+                if graph_details.get("omit_legend_prefix", False):
+                    if selected_variables := graph_details.get("variables"):
+                        graph_details["legend"] = selected_variables
+                    else:
+                        graph_details["legend"] = list(key.split(".")[-1] for key in prepared_data.keys())
+                else:
+                    graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
@@ -203,7 +209,8 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
+        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables",
+                                                                                                "omit_legend_prefix"]
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
