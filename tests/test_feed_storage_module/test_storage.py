@@ -96,6 +96,11 @@ def test_process_degradations(
     """
     Test the process_degradations method of the Storage class.
     """
+    expected_info_map = {
+        "class": storage.__class__.__name__,
+        "function": storage.process_degradations.__name__,
+        "units": "kg",
+    }
     mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
     mock_time = mocker.MagicMock(autospec=Time)
     mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
@@ -103,6 +108,7 @@ def test_process_degradations(
     storage.stored = [mock_first_crop, mock_second_crop]
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
+    mock_add_var = mocker.patch.object(om, "add_variable")
     mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
 
@@ -118,7 +124,8 @@ def test_process_degradations(
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
     mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
-    mock_record.assert_called_once_with(expected_loss)
+    mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", loss * len(storage.stored), expected_info_map)
+    mock_record.assert_called_once()
     mock_first_crop.crude_protein_percent = percentage
     mock_first_crop.adf = percentage
     mock_first_crop.ndf = percentage
@@ -136,14 +143,83 @@ def test_give_feed(storage: Storage) -> None:
     pass
 
 
-def test_reset_mass_attributes_after_loss() -> None:
-    """Test reset_mass_attributes_after_loss method of Storage class."""
-    pass
+@pytest.mark.parametrize(
+    "loss,fresh,percentage,expected_fresh,expected_percentage",
+    [
+        (50.0, 1000.0, 15.0, 950.0, 10.526316),
+        (200.0, 500.0, 50.0, 300.0, 16.666667),
+        (150.0, 150.0, 100.0, 0.0, 0.0),
+        (0.0, 200.0, 10.0, 200.0, 10.0),
+    ],
+)
+def test_reset_mass_attributes(
+    storage: Storage,
+    harvested_crop: HarvestedCrop,
+    loss: float,
+    fresh: float,
+    percentage: float,
+    expected_fresh: float,
+    expected_percentage: float,
+) -> None:
+    """Test reset_mass_attributes method of Storage class."""
+    harvested_crop.fresh_mass = fresh
+    harvested_crop.dry_matter_percentage = percentage
+
+    storage.reset_mass_attributes_after_loss(harvested_crop, loss)
+
+    assert harvested_crop.fresh_mass == expected_fresh
+    assert pytest.approx(harvested_crop.dry_matter_percentage) == expected_percentage
 
 
-def test_record_stored_crops() -> None:
+def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
     """Test record_stored_crops method of Storage class."""
-    pass
+    mock_stored_mass = mocker.patch(
+        "RUFAS.routines.feed_storage.storage.Storage.stored_mass", new_callable=mocker.PropertyMock
+    )
+    mock_total_amount = mocker.patch.object(storage, "_get_total_nutritive_amount")
+    mock_add_var = mocker.patch.object(om, "add_variable")
+    expected_get_total_amount_call_count = 9
+    expected_add_var_call_count = 11
+
+    storage.record_stored_crops()
+
+    mock_stored_mass.assert_called_once()
+    assert mock_total_amount.call_count == expected_get_total_amount_call_count
+    assert mock_add_var.call_count == expected_add_var_call_count
+
+
+@pytest.mark.parametrize(
+    "nutrient,dry_mass,percentages,expected",
+    [
+        ("crude_protein_percent", 100, [10.0, 20.0, 30.0], 60.0),
+        ("adf", 45.0, [3.0, 0.0, 5.3], 3.735),
+        ("ndf", 60.0, [0.0, 0.0, 0.0], 0.0),
+    ],
+)
+def test_get_total_nutritive_amount(
+    storage: Storage,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    nutrient: str,
+    dry_mass: float,
+    percentages: list[float],
+    expected: float,
+) -> None:
+    """Test _get_total_nutritive_amount in Storage class."""
+    storage.stored = [harvested_crop] * len(percentages)
+    mock_dry_matter_mass = mocker.patch(
+        "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
+        new_callable=mocker.PropertyMock,
+        return_value=dry_mass,
+    )
+    mock_getattr = mocker.patch("RUFAS.routines.feed_storage.storage.getattr", side_effect=percentages)
+    expected_getattr_calls = [call(crop, nutrient) for crop in storage.stored]
+
+    actual = storage._get_total_nutritive_amount(nutrient)
+
+    assert pytest.approx(actual) == expected
+    assert mock_dry_matter_mass.call_count == len(percentages)
+    mock_getattr.assert_has_calls(expected_getattr_calls)
 
 
 @pytest.mark.parametrize(
