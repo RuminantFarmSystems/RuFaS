@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import csv
 import json
 import os
 import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple
+from typing import Any, Dict, List, Union, Tuple, TextIO
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -15,6 +16,8 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.util import Utility
+
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 class LogVerbosity(Enum):
@@ -384,6 +387,24 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
+    def _write_disclaimer(self, file_pointer: TextIO) -> None:
+        """
+        Writes the predefined disclaimer message to a given file.
+
+        Parameters
+        ----------
+        file_pointer: TextIO
+            A file-like object (supporting the `.write()` method) that points to the file where the disclaimer should
+            be written.
+
+        Example
+        -------
+        >>>
+        ... with open('output.txt', 'w') as f:
+        ...    self._write_disclaimer(f)
+        """
+        file_pointer.write(DISCLAIMER_MESSAGE + "\n")
+
     def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
@@ -421,6 +442,7 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
+                self._write_disclaimer(json_file)
                 data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
@@ -587,8 +609,16 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
-
         df.to_csv(path, index=False)
+
+        with open(path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            csv_lines = list(csv_reader)
+            csv_lines.insert(0, [DISCLAIMER_MESSAGE])
+
+        with open(path, "w", newline="") as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerows(csv_lines)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
@@ -615,6 +645,7 @@ class OutputManager(object):
         self.add_log("save_txt_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as var_names_file:
+                self._write_disclaimer(var_names_file)
                 var_names_file.writelines(data_list)
                 self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
@@ -1147,6 +1178,25 @@ class OutputManager(object):
         self.errors_pool = {}
         self.logs_pool = {}
 
+    def _remove_disclaimer_from_input_file(self, file_path: Path) -> str:
+        """
+        Read the input data file, remove the disclaimer message is it is present on the first line.
+
+        Parameters
+        ----------
+        file_path : Path
+            The path to the file to be loaded to the variables pool.
+
+        Returns
+        -------
+            The input file content joined into a string
+        """
+        with open(file_path, 'r') as read_file:
+            lines = read_file.readlines()
+            if lines[0].strip('\n') == DISCLAIMER_MESSAGE:
+                lines = lines[1:]
+        return "".join(lines)
+
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
 
@@ -1169,13 +1219,13 @@ class OutputManager(object):
         }
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
-            with open(file_path) as file:
-                self.variables_pool = json.load(file)
-                self.add_log(
-                    "load_data_successful",
-                    f"Successfully loaded data from {str(file_path)}.",
-                    info_map,
-                )
+            file_lines = self._remove_disclaimer_from_input_file(file_path)
+            self.variables_pool = json.loads(file_lines)
+            self.add_log(
+                "load_data_successful",
+                f"Successfully loaded data from {str(file_path)}.",
+                info_map,
+            )
         except FileNotFoundError:
             self.add_error(
                 "File not found",
@@ -1285,6 +1335,13 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def print_disclaimer(self) -> None:
+        """
+        Prints out the disclaimer message when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
 
     def print_errors_warnings_logs_counts(self) -> None:
         """
