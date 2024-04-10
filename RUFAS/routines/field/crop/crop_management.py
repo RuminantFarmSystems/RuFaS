@@ -124,20 +124,6 @@ class CropManagement:
                 self.data.water_deficiency,
             )
 
-    def dry_down(self) -> None:
-        """
-        Adjusts crop biomass for water loss during the dry-down process.
-
-        Notes
-        -----
-        This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
-        based on species-specific water content, simulating the natural dry-down process.
-
-        """
-        # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
-        #   The dry down method is not currently used
-        self.data.above_ground_biomass -= self.data.above_ground_biomass * self.data.dry_down_fraction
-
     def cut_crop(self, collected_fraction: float = 0) -> None:
         """
         Performs a cut operation on the crop and, optionally, collects yield.
@@ -426,33 +412,6 @@ class CropManagement:
             )
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
-
-    # ---- Harvest Scheduling ----
-
-    def check_harvest_schedule(self, current_day, current_year):
-        """checks if the crop should be harvested today and sets the corresponding is_harvest_day attribute.
-
-        If the heat unit scheduling is used for this crop (`use_heat_scheduling = True`), then the current heat
-        fraction is used to decide if the crop should be harvested today. Otherwise, we simply check if the current
-        day is the day on which the harvest is scheduled.
-
-        References
-        ----------
-        SWAT 5:1.1.1 (Heat Unit Scheduling)
-
-        Parameters
-        ----------
-        current_day : int
-            the current (julian) day
-        current_year : int
-            the current year
-        """
-        if self.data.use_heat_scheduling:
-            self.data.is_harvest_day = self.data.heat_fraction >= self.data.harvest_heat_fraction
-        else:
-            is_harvest_year = current_day == self.data.next_harvest_day
-            is_harvest_day = current_year == self.data.next_harvest_year
-            self.data.is_harvest_day = is_harvest_year & is_harvest_day
 
     # ---- Helper Methods ----
     @staticmethod

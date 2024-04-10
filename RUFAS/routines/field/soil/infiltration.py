@@ -42,6 +42,10 @@ class Infiltration:
         layer than there is capacity in said layer. This works fine as long as water is allowed to percolate out of the
         surface layer after this.
 
+        The methodology in SWAT automatically adjusts the Second Moisture Condition Parameter. This behavior was removed
+        from RuFaS after consulting with SMEs who determined it was inappropriate to change user input in this way. See
+        PR #772 for more discussion.
+
         """
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
             self.data.second_moisture_condition_parameter
@@ -309,38 +313,6 @@ class Infiltration:
         return max_retention_parameter * (1 - exp(-0.000862 * retention_parameter))
 
     @staticmethod
-    def _determine_second_moisture_condition_adjusted(
-        average_fraction_slope: float,
-        second_moisture_condition: float,
-        third_moisture_condition: float,
-    ) -> float:
-        """
-        Determine the curve for moisture condition 2 (average moisture conditions) adjusted for slope.
-
-        Parameters
-        ----------
-        average_fraction_slope : float
-            Average slope fraction of the subbasin (unitless).
-        second_moisture_condition : float
-            Moisture condition 2 curve for (default) 5% slope (unitless).
-        third_moisture_condition : float
-            Moisture condition 3 curve for (default) 5% slope (unitless).
-
-        Returns
-        -------
-        float
-            Moisture condition 2 curve adjusted for the actual slope of the soil (unitless).
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 2:1.1.12
-
-        """
-        first_factor = (third_moisture_condition - second_moisture_condition) / 3
-        second_factor = 1 - (2 * exp(-13.86 * average_fraction_slope))
-        return (first_factor * second_factor) + second_moisture_condition
-
-    @staticmethod
     def _determine_accumulated_runoff(rainfall: float, retention_parameter: float) -> float:
         """
         Calculate accumulated runoff or rainfall excess.
@@ -371,69 +343,3 @@ class Infiltration:
             return ((rainfall - (0.2 * retention_parameter)) ** 2) / (rainfall + (0.8 * retention_parameter))
         else:
             return 0
-
-    @staticmethod
-    def _determine_updated_retention_parameter(
-        previous_retention_parameter: float,
-        potential_evapotranspiration: float,
-        max_retention_parameter: float,
-        rainfall: float,
-        runoff: float,
-        weighting_coefficient: float,
-    ) -> float:
-        """
-        Update the retention parameter based on the previous day's retention parameter and the current day's conditions.
-
-        Parameters
-        ----------
-        previous_retention_parameter : float
-            Retention parameter from the previous day (mm).
-        potential_evapotranspiration : float
-            Potential evapotranspiration for the current day (mm per day).
-        max_retention_parameter : float
-            Maximum retention parameter for the current day (mm).
-        rainfall : float
-            Rainfall depth of the current day (mm).
-        runoff : float
-            Surface runoff of the current day (mm).
-        weighting_coefficient : float
-            Weighting coefficient used to calculate the retention coefficient for daily curve number calculations
-            dependent on plant evapotranspiration (unitless).
-
-        Returns
-        -------
-        float
-            Retention parameter for the current day (mm).
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 2:1.1.9
-
-        """
-        retention_parameter = previous_retention_parameter - rainfall + runoff
-        retention_parameter += potential_evapotranspiration * exp(
-            (((-1) * weighting_coefficient) * previous_retention_parameter) / max_retention_parameter
-        )
-        return retention_parameter
-
-    @staticmethod
-    def _determine_moisture_condition_parameter(retention_parameter: float) -> float:
-        """
-        Determine the curve number on a given day adjusted for moisture content.
-
-        Parameters
-        ----------
-        retention_parameter : float
-            Retention parameter calculated for moisture content on a given day (unitless).
-
-        Returns
-        -------
-        float
-            The curve number for a given day adjusted for moisture content (unitless).
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 2:1.1.11
-
-        """
-        return 25400 / (retention_parameter + 254)
