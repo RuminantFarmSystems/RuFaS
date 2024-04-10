@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import _io
 import csv
 import json
 import os
@@ -1179,6 +1178,25 @@ class OutputManager(object):
         self.errors_pool = {}
         self.logs_pool = {}
 
+    def _remove_disclaimer_from_input_file(self, file_path: Path) -> str:
+        """
+        Read the input data file, remove the disclaimer message is it is present on the first line.
+
+        Parameters
+        ----------
+        file_path : Path
+            The path to the file to be loaded to the variables pool.
+
+        Returns
+        -------
+            The input file content joined into a string
+        """
+        with open(file_path, 'r') as read_file:
+            lines = read_file.readlines()
+            if lines[0].strip('\n') == DISCLAIMER_MESSAGE:
+                lines = lines[1:]
+        return "".join(lines)
+
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
 
@@ -1201,13 +1219,13 @@ class OutputManager(object):
         }
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
-            with open(file_path) as file:
-                self.variables_pool = json.load(file)
-                self.add_log(
-                    "load_data_successful",
-                    f"Successfully loaded data from {str(file_path)}.",
-                    info_map,
-                )
+            file_lines = self._remove_disclaimer_from_input_file(file_path)
+            self.variables_pool = json.loads(file_lines)
+            self.add_log(
+                "load_data_successful",
+                f"Successfully loaded data from {str(file_path)}.",
+                info_map,
+            )
         except FileNotFoundError:
             self.add_error(
                 "File not found",

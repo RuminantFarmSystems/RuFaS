@@ -5,7 +5,6 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
-import mock
 import pytest
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
@@ -1749,6 +1748,9 @@ def test_route_logs(
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager._route_logs = output_manager_original_method_states["_route_logs"]
 
+
+def test_remove_disclaimer_from_input_file() -> None:
+    pass
 
 def test_load_variables_pool_from_file_valid_path(
     mock_output_manager: OutputManager,
