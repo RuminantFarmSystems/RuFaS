@@ -1751,16 +1751,20 @@ def test_route_logs(
 
 def test_remove_disclaimer_from_input_file() -> None:
     output_manager = OutputManager()
-    dummy_input = f"{DISCLAIMER_MESSAGE}\n"\
-                  "{\n"\
-                  "    \"vars\": {\n"\
-                  "        \"var1\": {\"values\": [1, 2, 3], \"info_map\": {\"imvar1\": 1, \"imvar2\": 2}},\n"\
-                  "        \"var2\": {\"values\": {\"a\": 1, \"b\": 2}, \"info_map\": {}}\n"\
-                  "    }\n"\
-                  "}"
-    expected = "{\n    \"vars\": {\n        \"var1\": {\"values\": [1, 2, 3], \"info_map\": {\"imvar1\": 1, " \
-                         "\"imvar2\": 2}},\n        \"var2\": {\"values\": {\"a\": 1, \"b\": 2}, " \
-                         "\"info_map\": {}}\n    }\n}"
+    dummy_input = (
+        f"{DISCLAIMER_MESSAGE}\n"
+        "{\n"
+        '    "vars": {\n'
+        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
+        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
+        "    }\n"
+        "}"
+    )
+    expected = (
+        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
+        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
+        '"info_map": {}}\n    }\n}'
+    )
     with patch("builtins.open", mock_open(read_data=dummy_input)):
         actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
     assert actual == expected
@@ -1768,15 +1772,19 @@ def test_remove_disclaimer_from_input_file() -> None:
 
 def test_remove_disclaimer_from_input_file_no_disclaimer() -> None:
     output_manager = OutputManager()
-    dummy_input = "{\n"\
-                  "    \"vars\": {\n"\
-                  "        \"var1\": {\"values\": [1, 2, 3], \"info_map\": {\"imvar1\": 1, \"imvar2\": 2}},\n"\
-                  "        \"var2\": {\"values\": {\"a\": 1, \"b\": 2}, \"info_map\": {}}\n"\
-                  "    }\n"\
-                  "}"
-    expected = "{\n    \"vars\": {\n        \"var1\": {\"values\": [1, 2, 3], \"info_map\": {\"imvar1\": 1, " \
-                         "\"imvar2\": 2}},\n        \"var2\": {\"values\": {\"a\": 1, \"b\": 2}, " \
-                         "\"info_map\": {}}\n    }\n}"
+    dummy_input = (
+        "{\n"
+        '    "vars": {\n'
+        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
+        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
+        "    }\n"
+        "}"
+    )
+    expected = (
+        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
+        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
+        '"info_map": {}}\n    }\n}'
+    )
     with patch("builtins.open", mock_open(read_data=dummy_input)):
         actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
     assert actual == expected
