@@ -99,11 +99,18 @@ class Time:
 
     def end_year(self) -> bool:
         """
-        Returns a bool signifying the end of a year.
+        Determines if the current day is the last day of the year in the simulation.
+
         Returns
         -------
         bool
-            True if it is the end of a year, False otherwise
+            True if the current day is the last day of the year, False otherwise.
+
+        Notes
+        -----
+        This method compares the current day with the number of days in the current year.
+        As soon as the current day is greater than the number of days in the year,
+        the day is reset to 1 and the year is incremented by 1.
         """
 
         return self.day > len(self.years[self.year - 1])
@@ -171,18 +178,9 @@ class Time:
         return actual_date
 
     def __str__(self) -> str:
-        """
-        Return a string representation of the current time.
-
-        Returns
-        -------
-        str
-            A string representation of a Time object.
-        """
-
         return str(
             {
                 "simulation_day": self.simulation_day,
-                "simulation_year_day": "Year: {}, Day: {}".format(self.year, self.day),
+                "simulation_year_day": f"Year: {self.year}, Day: {self.day}",
             }
         )

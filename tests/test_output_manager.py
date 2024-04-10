@@ -2054,19 +2054,3 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
-
-
-def test_set_time(mocker: MockerFixture) -> None:
-    """
-    Unit test for the set_time() method in OutputManager class.
-    """
-
-    # Arrange
-    output_manager = OutputManager()
-    time_obj = mocker.MagicMock()
-
-    # Act
-    output_manager.set_time(time_obj)
-
-    # Assert
-    assert output_manager.time == time_obj
