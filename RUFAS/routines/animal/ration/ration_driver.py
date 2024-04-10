@@ -412,7 +412,7 @@ class RationReporter:
     @classmethod
     def report_ration(  # noqa
         cls, ration: Dict[str, float],
-        available_feeds: AvailableFeedsTypedDict
+        available_feeds: Dict[str, Dict[str, float]]
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         # fmt: on
         """
@@ -426,7 +426,7 @@ class RationReporter:
         ration : Dict
             Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
-            available feeds dictionary from the Feed class object.
+            Available feeds dictionary from the Feed class object.
 
 
         Returns
@@ -1167,9 +1167,7 @@ class AvailableFeeds:
         # calf limit
         self.calf_limit: List[float] = []
         # key = feed_id, val = index of that feed_id in self.feed_id list
-        self._feed_id_to_list_idx_dict: Dict = {}
-        # key = feed_id, val = index of that feed_id in self.feed_id list
-        self._feed_id_to_list_idx_dict: Dict = {}
+        self._feed_id_to_list_idx_dict: Dict[int, int] = {}
 
     def feed_nutrients(self, feed) -> None:
         """
@@ -1219,14 +1217,15 @@ class AvailableFeeds:
         Returns a subset of data from all the available feeds based on the
         given set of feed ids.
 
-        Args
-        ----
-        feed_ids: a set of feed ids
+        Parameters
+        ----------
+        feed_ids : Set[int]
+            A set of feed ids.
 
         Returns
         -------
-        A dictionary that contains a subset of data from all the available feeds based on the
-        given set of feed ids
+        Dict
+            A dictionary that contains a subset of data from all the available feeds based on the given set of feed ids.
 
         Raises
         ------

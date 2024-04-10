@@ -246,7 +246,7 @@ class AvailableFeedsTypedDict(TypedDict):
     calcium: List[float]
     phosphorus: List[float]
     NDF: List[float]
-    feed_type: List[str]  # TODO CHANGE THIS
+    feed_type: List[str]
     is_wetforage: List[bool]
     Kd: List[float]
     N_A: List[float]

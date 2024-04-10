@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from typing import Any, Dict
+from typing import Any, Dict, List
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
@@ -21,6 +21,8 @@ from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
 import RUFAS.routines.animal.clustering_pen_grouping
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
+from RUFAS.routines.animal.ration.ration_config import RationConfig
 
 from RUFAS.output_manager import OutputManager
 
@@ -640,8 +642,8 @@ def decision_vector_sum_zero() -> np.ndarray:
 
 
 @pytest.fixture
-def mock_available_feeds() -> dict:
-    available_feeds = dict()
+def mock_available_feeds() -> AvailableFeedsTypedDict:
+    available_feeds: AvailableFeedsTypedDict = dict()
     available_feeds["feed_key"] = ["1", "2", "3", "4", "5", "6"]
     available_feeds["feed_id"] = [1, 2, 3, 4, 5, 6]
     available_feeds["price"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -652,14 +654,14 @@ def mock_available_feeds() -> dict:
     available_feeds["calcium"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["phosphorus"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["NDF"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["type"] = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
+    available_feeds["feed_type"] = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
     available_feeds["is_wetforage"] = [True, True, True, False, False, False]
     available_feeds["Kd"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["N_A"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["N_B"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["CP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["dRUP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["lactating_cow_limit"] = ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0],)
+    available_feeds["lactating_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["dry_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
     return available_feeds
@@ -732,7 +734,7 @@ def test_calculate_NRC_energy_growth_requirements(
         (lazy_fixture("heifer_b"), 40, 0),
     ],
 )
-def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float):
+def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float) -> None:
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(animal_dict["day_of_pregnancy"], calf_birth_weight)
     assert (result_NEpreg) == pytest.approx((expected), rel=1e-2)
@@ -1941,13 +1943,13 @@ def test_calc_intake():
         ),
     ],
 )
-def test_triple_values_in_list(input, expected) -> None:
+def test_triple_values_in_list(input: List[int], expected: List[str]) -> None:
     """Unit test for function triple_values_in_list in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     assert ration_optimizer.triple_values_in_list(input) == expected
 
 
-def test_init_ration_optimizer():
+def test_init_ration_optimizer() -> None:
     """Unit test for function __init__ in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
 
@@ -1956,7 +1958,7 @@ def test_init_ration_optimizer():
     assert ration_optimizer.constraint_functions == []
 
 
-def test_set_constraints():
+def test_set_constraints() -> None:
     """Unit test for function set_constraints in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     arguments = MagicMock()
@@ -1989,7 +1991,7 @@ def test_set_constraints():
     ]
 
 
-def test_get_ration_vals():
+def test_get_ration_vals() -> None:
     """Unit test for function get_ration_vals in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     decision_vector = [1.0, 2.0, 3.0, 4.0, 5.0]
@@ -2048,7 +2050,7 @@ def test_total_energy(ration_config, decision_vec, expected) -> None:
         (lazy_fixture("mock_ration_config_alternate_lowTDN"), -15),
     ],
 )
-def test_total_energy_no_dry_matter_intake(ration_config, expected) -> None:
+def test_total_energy_no_dry_matter_intake(ration_config: RationConfig, expected) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     decision_vector = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -2113,7 +2115,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-        ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0],),
+        [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         True,
         DMIest__requirement=10.0,
     )
@@ -2674,7 +2676,6 @@ def test_ration_optimizer_optimize_with_prev_ration(
 def test_ration_optimizer_optimize_value_error(
     mocker: MockerFixture,
     mock_ration_config: MagicMock,
-    mock_available_feeds: dict,
     ration_optimizer: RationOptimizer,
 ) -> None:
     """Unit test for value error in function optimize in file routines/animal/ration/ration_optimizer.py"""
@@ -2687,7 +2688,7 @@ def test_ration_optimizer_optimize_value_error(
         ration_optimizer.optimize(animal_combination, mock_ration_config)
 
 
-def test_calc_rqmts():
+def test_calc_rqmts() -> None:
     """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
     test_requirements = AnimalRequirements()
     test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(return_value=(1, 2, 3))
@@ -2707,7 +2708,6 @@ def test_calc_rqmts():
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
     AnimalBase.config["nutrient_standard"] = "NRC"
-    test_requirements.AnimalBase = AnimalBase
     actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     expected = {
         "NEmaint_requirement": 1,
@@ -3334,7 +3334,7 @@ def test_feed_nutrients() -> None:
         "calcium",
         "phosphorus",
         "NDF",
-        "type",
+        "feed_type",
         "Kd",
         "N_A",
         "N_B",
@@ -3530,7 +3530,7 @@ def test_get_feed_data_from_feed_ids() -> None:
     available_feeds.lactating_cow_limit = [100, 100, 100, 100]
     available_feeds.phosphorus = [19.3, 0, 0.75, 0.45]
     available_feeds.price = [0.1, 0.05, 0.82, 0.44]
-    available_feeds.type = ["Mineral", "Mineral", "Milk", "Starter"]
+    available_feeds.feed_type = ["Mineral", "Mineral", "Milk", "Starter"]
 
     # Assert before
     assert len(available_feeds._feed_id_to_list_idx_dict) == 0
@@ -3565,7 +3565,7 @@ def test_get_feed_data_from_feed_ids() -> None:
         "lactating_cow_limit": [100, 100],
         "phosphorus": [0.75, 0.45],
         "price": [0.82, 0.44],
-        "type": ["Milk", "Starter"],
+        "feed_type": ["Milk", "Starter"],
     }
     assert pen_specific_feed_data == expected_pen_specific_feed_data
 
