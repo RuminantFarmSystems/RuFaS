@@ -1,6 +1,7 @@
 import json
 import os
 from copy import deepcopy
+from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
@@ -2140,3 +2141,11 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+def test_write_disclaimer() -> None:
+    output_manager = OutputManager()
+
+    with StringIO() as fake_file:
+        output_manager._write_disclaimer(fake_file)
+        assert fake_file.getvalue() == DISCLAIMER_MESSAGE + "\n"
