@@ -78,6 +78,13 @@ class OutputManager(object):
     the first instance is created, future calls to the constructor method
     returns the first instance. Also, the initializer method only works once.
 
+    Class Attributes
+    ----------------
+    pool_element_type : Dict[str, List[Any]]
+        Type alias for the pool elements
+    JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
+        Maximum depth for recursive serialization in JSON output files (default: 4)
+
     Attributes
     ----------
     variables_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
@@ -88,10 +95,13 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
+    _detailed_values_flag : bool
+        Flag to include detailed values in the json output files
     """
 
     __instance = None
     pool_element_type = Dict[str, List[Any]]
+    JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
@@ -423,16 +433,15 @@ class OutputManager(object):
         try:
             with open(path, "w") as json_file:
                 data_dict = self._add_detailed_values(data_dict)
-                max_depth = 4
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=max_depth),
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=max_depth),
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         indent=2,
                     )
