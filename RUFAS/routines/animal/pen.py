@@ -568,9 +568,7 @@ class Pen:
         if not animal_ids:
             return
         animal_ids = set(animal_ids)
-        self.animals_in_pen = {
-            animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
-        }
+        self.animals_in_pen = {animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids}
 
     def clear(self):
         """
