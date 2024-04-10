@@ -76,12 +76,13 @@ class Calf(AnimalBase):
 
         self.birth_weight = args["birth_weight"]
         self.body_weight = args["birth_weight"]
-        self.mature_body_weight = truncnorm.rvs(
+        mature_body_weight = truncnorm.rvs(
             -const.STDI,
             const.STDI,
             AnimalBase.config["mature_body_weight_avg"],
             AnimalBase.config["mature_body_weight_std"],
         )
+        self.mature_body_weight = float(mature_body_weight)
         self.wean_weight = 0
         self.p_animal = args["p_init"]
 
