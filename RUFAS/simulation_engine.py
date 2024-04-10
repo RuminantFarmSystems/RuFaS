@@ -166,7 +166,7 @@ class SimulationEngine:
         """
 
         weather_data = im.get_data("weather")
-        om.set_time(self.time)
+        om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 

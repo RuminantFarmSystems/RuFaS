@@ -1262,15 +1262,3 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
-
-    def set_time(self, time_obj) -> None:
-        """
-        Sets the time object for the output manager.
-
-        Parameters
-        ----------
-        time_obj : Time
-            The time object to be set.
-        """
-
-        self.time = time_obj
