@@ -1191,9 +1191,9 @@ class OutputManager(object):
         -------
             The input file content joined into a string
         """
-        with open(file_path, 'r') as read_file:
+        with open(file_path, "r") as read_file:
             lines = read_file.readlines()
-            if lines[0].strip('\n') == DISCLAIMER_MESSAGE:
+            if lines[0].strip("\n") == DISCLAIMER_MESSAGE:
                 lines = lines[1:]
         return "".join(lines)
 

@@ -1781,6 +1781,7 @@ def test_remove_disclaimer_from_input_file_no_disclaimer() -> None:
         actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
     assert actual == expected
 
+
 def test_load_variables_pool_from_file_valid_path(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
