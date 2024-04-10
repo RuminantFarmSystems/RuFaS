@@ -175,7 +175,7 @@ class GraphGenerator:
             legend = graph_details.get("legend")
             if not legend:
                 if graph_details.get("omit_legend_prefix", False):
-                    graph_details["legend"] = list(key.split('.')[-1] for key in prepared_data.keys())
+                    graph_details["legend"] = list(key.split(".")[-1] for key in prepared_data.keys())
                 else:
                     graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
