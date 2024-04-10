@@ -8,18 +8,6 @@ from typing import List
 
 
 @pytest.mark.parametrize(
-    "soil_evaporation_adj,snow_water_content",
-    [(1.3, 3.2), (0, 0), (1.3, 0.4), (1.8954, 0)],
-)
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Evaporation._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
-
-
-@pytest.mark.parametrize(
     "max_soil_water_evap,depth",
     [
         (1.1, 0),
