@@ -18,3 +18,4 @@ salib
 tqdm
 mypy
 black
+coverage
