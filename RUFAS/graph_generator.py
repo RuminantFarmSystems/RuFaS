@@ -174,7 +174,10 @@ class GraphGenerator:
             self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
             legend = graph_details.get("legend")
             if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+                if graph_details.get("omit_legend_prefix", False):
+                    graph_details["legend"] = list(key.split(".")[-1] for key in prepared_data.keys())
+                else:
+                    graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
