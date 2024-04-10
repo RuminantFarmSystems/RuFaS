@@ -6,20 +6,29 @@ from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrifi
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-@pytest.mark.parametrize("nitrates,denitrification_rate,temp_factor,percent_carbon", [
-    (78, 1.4, 0.88, 60),
-    (104.55, 0.33, 0.233, 44.55),
-    (22.12, 0.0, 0.5561, 71.223),
-    (204.445, 3.0, 0.781, 22.334),
-    (0.0, 2.55, 0.1554, 39.112)
-])
-def test_calculate_denitrification_amount(nitrates: float, denitrification_rate: float, temp_factor: float,
-                                          percent_carbon: float) -> None:
+@pytest.mark.parametrize(
+    "nitrates,denitrification_rate,temp_factor,percent_carbon",
+    [
+        (78, 1.4, 0.88, 60),
+        (104.55, 0.33, 0.233, 44.55),
+        (22.12, 0.0, 0.5561, 71.223),
+        (204.445, 3.0, 0.781, 22.334),
+        (0.0, 2.55, 0.1554, 39.112),
+    ],
+)
+def test_calculate_denitrification_amount(
+    nitrates: float,
+    denitrification_rate: float,
+    temp_factor: float,
+    percent_carbon: float,
+) -> None:
     """Tests that the amount of nitrified nitrates is calculated correctly."""
-    actual = Denitrification._calculate_denitrification_amount(nitrates, denitrification_rate, temp_factor,
-                                                               percent_carbon)
-    expected_denitrification_factor = max(min(1 - exp(-1 * denitrification_rate * temp_factor * percent_carbon), 1.0),
-                                          0.0)
+    actual = Denitrification._calculate_denitrification_amount(
+        nitrates, denitrification_rate, temp_factor, percent_carbon
+    )
+    expected_denitrification_factor = max(
+        min(1 - exp(-1 * denitrification_rate * temp_factor * percent_carbon), 1.0), 0.0
+    )
     expected = nitrates * expected_denitrification_factor
     assert actual == expected
 
@@ -36,9 +45,11 @@ def test_denitrify() -> None:
     `nutrient_cycling_water_factor`, and above for the second.
 
     """
-    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
-                        nutrient_cycling_water_factor=PropertyMock(return_value=0.91),
-                        nutrient_cycling_temp_factor=PropertyMock(return_value=0.89)):
+    with patch.multiple(
+        "RUFAS.routines.field.soil.layer_data.LayerData",
+        nutrient_cycling_water_factor=PropertyMock(return_value=0.91),
+        nutrient_cycling_temp_factor=PropertyMock(return_value=0.89),
+    ):
         data = SoilData(field_size=1.8)
         incorp = Denitrification(data)
         incorp.data.set_vectorized_layer_attribute("nitrate_content", [35] * 4)

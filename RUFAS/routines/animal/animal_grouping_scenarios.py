@@ -17,20 +17,26 @@ class AnimalGroupingScenario(Enum):
 
 
     """
+
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
+    # GitHub Issue #1205
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
         AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
         AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
     CALF__GROWING_AND_CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
-        AnimalCombination.GROWING_AND_CLOSE_UP: [AnimalType.HEIFER_I, AnimalType.HEIFER_II,
-                                                 AnimalType.HEIFER_III, AnimalType.DRY_COW],
-        AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
+        AnimalCombination.GROWING_AND_CLOSE_UP: [
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+        ],
+        AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
     def __init__(self, value: Dict[AnimalCombination, List[str]]):
@@ -141,11 +147,12 @@ class AnimalGroupingScenario(Enum):
         """
 
         cow_subtype_by_scenario = {
-            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
-            else AnimalType.DRY_COW,
-
-            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
-            else AnimalType.DRY_COW,
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: (
+                AnimalType.LAC_COW if cow.is_lactating else AnimalType.DRY_COW
+            ),
         }
         return cow_subtype_by_scenario[self]
 
@@ -170,8 +177,10 @@ class AnimalGroupingScenario(Enum):
             HeiferI: self._get_heiferI_type,
             HeiferII: self._get_heiferII_type,
             HeiferIII: self._get_heiferIII_type,
-            Cow: self._get_cow_type
-        }[type(animal)](animal)  # type: ignore
+            Cow: self._get_cow_type,
+        }[type(animal)](
+            animal
+        )  # type: ignore
 
     def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalCombination:
         """

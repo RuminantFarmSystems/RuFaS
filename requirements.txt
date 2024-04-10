@@ -16,3 +16,6 @@ juliandate
 freezegun
 salib
 tqdm
+mypy
+black
+coverage

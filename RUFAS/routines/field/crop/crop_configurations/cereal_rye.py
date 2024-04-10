@@ -2,10 +2,8 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
@@ -13,7 +11,7 @@ class CerealRye(CropData):
     """
     Crop data class with default values for cereal rye.
     """
-    species: str = "cereal_rye"
+
     name: str = "default cereal_rye"
     plant_code: str = "RYE"
     scientific_name: str = "Secale cereale"
@@ -80,7 +78,8 @@ class CerealRyeGrain(CerealRye):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
-    species: str = "cereal_rye_grain"
+
+    species: CropSpecies = CropSpecies.CEREAL_RYE_GRAIN
     name: str = "cereal_rye grain"
 
     storage_type: StorageType = StorageType.DRY
@@ -135,7 +134,8 @@ class CerealRyeSilage(CerealRye):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
-    species: str = "cereal_rye_silage"
+
+    species: CropSpecies = CropSpecies.CEREAL_RYE_SILAGE
     name: str = "cereal_rye silage"
 
     storage_type: StorageType = StorageType.BUNKER
@@ -194,7 +194,8 @@ class CerealRyeBaleage(CerealRyeSilage):
     Cereal rye baleage has the same harvest parameters as cereal rye silage.
 
     """
-    species: str = "cereal_rye_baleage"
+
+    species: CropSpecies = CropSpecies.CEREAL_RYE_BALEAGE
     name: str = "cereal_rye baleage"
 
     storage_type: StorageType = StorageType.BALEAGE
@@ -235,7 +236,8 @@ class CerealRyeHay(CropData):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
-    species: str = "cereal_rye_hay"
+
+    species: CropSpecies = CropSpecies.CEREAL_RYE_HAY
     name: str = "cereal_rye hay"
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED

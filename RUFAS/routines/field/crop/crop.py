@@ -79,9 +79,14 @@ class Crop:
         self.crop_management = CropManagement(self.data)
         self.dormancy = Dormancy(self.data)
 
-    def grow_crop(self, soil_data: SoilData, incoming_light: float,
-                  mean_air_temperature: float, min_air_temperature: float,
-                  max_air_temperature: float) -> None:
+    def grow_crop(
+        self,
+        soil_data: SoilData,
+        incoming_light: float,
+        mean_air_temperature: float,
+        min_air_temperature: float,
+        max_air_temperature: float,
+    ) -> None:
         """
         Main function for growing the crop on a daily basis.
 

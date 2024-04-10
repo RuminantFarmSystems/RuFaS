@@ -4,24 +4,29 @@ from math import exp
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the section 'Percolation' (2:3.2) in SWAT
-"""
-
 
 class Percolation:
+    """
+    This class is based on the 'Percolation' section (2:3.2) in SWAT, designed to manage and simulate soil percolation
+    processes. It either accepts an existing SoilData object to work with or creates a new one based on the provided
+    field size.
+
+    Parameters
+    ----------
+    soil_data : Optional[SoilData]
+        The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
+        provided.
+    field_size : Optional[float], default=None
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData instance being used by the Percolation model.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track percolation, creates new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
@@ -40,6 +45,7 @@ class Percolation:
         References
         ----------
         SWAT sections 2:3.1 and 2
+
         """
         if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
@@ -58,10 +64,12 @@ class Percolation:
             else:
                 layer_below = self.data.vadose_zone_layer
 
-            can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
-                                                                   layer_below.field_capacity_content,
-                                                                   layer_below.saturation_content,
-                                                                   has_seasonal_high_water_table)
+            can_percolate = self._determine_if_percolation_allowed(
+                layer_below.water_content,
+                layer_below.field_capacity_content,
+                layer_below.saturation_content,
+                has_seasonal_high_water_table,
+            )
             if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
@@ -106,8 +114,11 @@ class Percolation:
 
     # --- Static methods ---
     @staticmethod
-    def _determine_percolation_travel_time(saturation: float, field_capacity_content: float,
-                                           saturated_hydraulic_conductivity: float) -> float:
+    def _determine_percolation_travel_time(
+        saturation: float,
+        field_capacity_content: float,
+        saturated_hydraulic_conductivity: float,
+    ) -> float:
         """
         Calculate the travel time for percolation.
 
@@ -128,14 +139,16 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.4
+
         """
         if saturated_hydraulic_conductivity <= 0:
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
         return (saturation - field_capacity_content) / saturated_hydraulic_conductivity
 
     @staticmethod
-    def _determine_percolation_to_next_layer(drainable_volume_water: float, time_step: float,
-                                             travel_time: float) -> float:
+    def _determine_percolation_to_next_layer(
+        drainable_volume_water: float, time_step: float, travel_time: float
+    ) -> float:
         """
         Calculate the amount of water that percolates to the soil layer below it on a given day.
 
@@ -156,13 +169,17 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.3
+
         """
         return drainable_volume_water * (1 - exp((-1 * time_step) / travel_time))
 
     @staticmethod
-    def _determine_if_percolation_allowed(soil_water_content: float, field_capacity_content: float,
-                                          saturated_capacity_content: float,
-                                          is_seasonal_high_water_table: bool) -> bool:
+    def _determine_if_percolation_allowed(
+        soil_water_content: float,
+        field_capacity_content: float,
+        saturated_capacity_content: float,
+        is_seasonal_high_water_table: bool,
+    ) -> bool:
         """
         Determine if a layer of soil has enough available capacity to accept more water via percolation.
 
@@ -185,11 +202,13 @@ class Percolation:
         References
         ----------
         SWAT Paragraph in between equations 2:3.2.3, 4
+
         """
         if not is_seasonal_high_water_table:
             return True
-        elif soil_water_content <= \
-                (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content))):
+        elif soil_water_content <= (
+            field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content))
+        ):
             return False
         else:
             return True
@@ -217,15 +236,19 @@ class Percolation:
         References
         ----------
         SWAT Section 2:3.2
+
         """
         if upper_layer.excess_water_available <= 0:
             return 0
         else:
             percolation_time = Percolation._determine_percolation_travel_time(
-                upper_layer.saturation_content, upper_layer.field_capacity_content,
-                upper_layer.saturated_hydraulic_conductivity)
+                upper_layer.saturation_content,
+                upper_layer.field_capacity_content,
+                upper_layer.saturated_hydraulic_conductivity,
+            )
             amount_to_percolate = Percolation._determine_percolation_to_next_layer(
-                upper_layer.excess_water_available, time_step, percolation_time)
+                upper_layer.excess_water_available, time_step, percolation_time
+            )
 
             #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:

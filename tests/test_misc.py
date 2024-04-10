@@ -47,7 +47,7 @@ def test_general_constants() -> None:
     assert constants.GRAMS_TO_KG == approx(0.001)
     assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
     assert constants.KG_TO_CUBIC_METERS == approx(0.001)
-    assert constants.DAYS_PER_YEAR == 365
+    assert constants.YEAR_LENGTH == 365
     assert constants.SECONDS_PER_DAY == 86400
     assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
     assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
@@ -98,19 +98,19 @@ class DummyNestedClass:
         (DummyNestedClass(42), 0, 2, {"value": {"value": 42}}),
         ({"a": {"b": DummyClass(42)}}, 0, 3, {"a": {"b": {"value": 42}}}),
         (
-                [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
-                0,
-                2,
-                [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+            0,
+            2,
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
         ),
     ],
 )
 def test_make_serializable_recursive(
-        input_obj: object,
-        depth: int,
-        max_depth: int,
-        expected_output: object,
-        mocker: MockerFixture,
+    input_obj: object,
+    depth: int,
+    max_depth: int,
+    expected_output: object,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function _make_serializable() in file util.py"""
     # Arrange

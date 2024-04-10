@@ -1,12 +1,19 @@
 from typing import Dict
+
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 
 
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
-    METHANE_EMISSION_COEFFICIENT: float = 24
-    """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
+    HOUR_TO_DAY_CONVERSION_FACTOR = 24
+    """
+    The conversion factor from hours to days.
+    """
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
@@ -19,10 +26,10 @@ class GasEmissionConstants:
     Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
     methane emission (unitless)."""
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 43.33
-    """Natural log of the Arrhenius constant (unitless)."""
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    """Natural log of the Arrhenius constant (g :math:`CH_4`/kg manure VS/h)."""
 
-    ACTIVATION_ENERGY: float = 112700.0
+    ACTIVATION_ENERGY: float = 81_000.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
@@ -49,8 +56,22 @@ class GasEmissionConstants:
     mass of methane.
     """
 
-    METHANE_DENSITY: float = 0.657
-    """Methane density (kg/:math:`m^3`)."""
+    AD_METHANE_DENSITY: float = 0.629
+    """
+    Unit conversion factor for methane generated from anaerobic digestion at 1 abr of pressure and 37.5C
+    (kg/:math:`m^3`).
+    """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide based on a molar ratio of 1:3
+    (methane : carbon dioxide).
+    """
+
+    AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 2.86
+    """
+    The mass conversion factor from methane to methane and carbon dioxide in anaerobic digestion (kg CH4 / kg CO2).
+    """
 
     METHANE_POTENTIAL_Go: float = 240.0
     """Methane potential (mL/g). Default is set to 240.0."""
@@ -127,7 +148,7 @@ class GasEmissionConstants:
     in the anaerobic digestion process increases.
     """
 
-    DEFAULT_HOUSING_SPECIFIC_CONSTANT: float = 260.0  # s/m
+    HOUSING_HSC = 260.0  # s/m
     """
     Default housing specific constant (s/m). This constant may be used in calculations
     related to the housing conditions for animals. Default is set to 260.0 s/m.
@@ -158,13 +179,13 @@ class GasEmissionConstants:
     SLURRY_MANURE_HSC: float = 19.0
     """Housing specific constant for slurry manure (s/m)."""
 
-    LIQUID_MANURE_HSC: float = 4.1
-    """Housing specific constant for liquid manure (s/m)."""
+    STORAGE_HSC = 4.1
+    """Housing specific constant for manure storage (s/m)."""
 
-    SOLID_MANURE_THRESHOLD: float = 8.0
+    SOLID_MANURE_THRESHOLD = 0.08
     """Dry matter threshold for classifying solid and semi-solid manure (unitless)."""
 
-    SLURRY_MANURE_THRESHOLD: float = 5.0
+    SLURRY_MANURE_THRESHOLD = 0.05
     """Dry matter threshold for classifying slurry manure (unitless)."""
 
     DEFAULT_STORAGE_AREA_PER_ANIMAL: float = 1.0
@@ -245,17 +266,37 @@ class GasEmissionConstants:
     FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.5,
         CompostingType.PASSIVE_WINDROW: 0.45,
-        CompostingType.INTENSIVE_WINDROW: 0.5
+        CompostingType.INTENSIVE_WINDROW: 0.5,
     }
 
     FRACTION_NITROGEN_LOST_TO_LEACHING: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
 
     FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
         CompostingType.STATIC_PILE: 0.06,
         CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
+        CompostingType.INTENSIVE_WINDROW: 0.06,
     }
+
+    NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (Dict)[ManureTreatmentType, Dict[str, float]] = {
+        ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0,
+        },
+        ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0,
+        },
+        ManureTreatmentType.ANAEROBIC_LAGOON: {
+            ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.NO_COVER.value: 0.0,
+        },
+        ManureTreatmentType.ANAEROBIC_DIGESTION: {ManureCoverEnum.NOT_APPLICABLE.value: 0.0006},
+    }
+    """
+    Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage
+    systems.
+    """

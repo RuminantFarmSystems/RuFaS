@@ -6,13 +6,10 @@ from math import exp
 
 
 # ---- helper function tests ----
-@pytest.mark.parametrize("rad,ext,lai", [
-    (1, 1, 1),
-    (0, 0, 0),
-    (1, 0, 1),
-    (.2, -.38, 0.75),
-    (.2, .38, 0.75)
-])
+@pytest.mark.parametrize(
+    "rad,ext,lai",
+    [(1, 1, 1), (0, 0, 0), (1, 0, 1), (0.2, -0.38, 0.75), (0.2, 0.38, 0.75)],
+)
 def test_calc_intercepted_radiation(rad, ext, lai):
     """ensure that intercepted radiation is correctly calculated by calc_intercepted_radiation()"""
     h_photo = 0.5 * rad * (1 - exp(-ext * lai))
@@ -20,81 +17,95 @@ def test_calc_intercepted_radiation(rad, ext, lai):
     assert result == h_photo
 
 
-@pytest.mark.parametrize("rad,eff,expected", [
-    (0, 0, 0),
-    (1, 0, 0),
-    (0, 1, 0),
-    (0, 0, 0),
-    (1, 1, 1),
-    (1000, 0.33, 330),  # arbitrary
-    (1961.67, 0.217, 1961.67 * 0.217),
-    (18.5, 22.19, 18.5 * 22.19)  # rad < eff
-])
+@pytest.mark.parametrize(
+    "rad,eff,expected",
+    [
+        (0, 0, 0),
+        (1, 0, 0),
+        (0, 1, 0),
+        (0, 0, 0),
+        (1, 1, 1),
+        (1000, 0.33, 330),  # arbitrary
+        (1961.67, 0.217, 1961.67 * 0.217),
+        (18.5, 22.19, 18.5 * 22.19),  # rad < eff
+    ],
+)
 def test_calc_max_accumulation(rad, eff, expected):
     """test that maximum biomass accumulation is properly calculated with calc_max_accumulation()"""
     assert BiomassAllocation._determine_max_accumulation(rad, eff) == expected
 
 
-@pytest.mark.parametrize("factor,max_growth", [
-    (1, 0),
-    (0, 1),
-    (1, 1),
-    (0.8, 103.84),
-    (1.2, 103.84),
-    (1.2, 873.2)
-])
+@pytest.mark.parametrize(
+    "factor,max_growth",
+    [(1, 0), (0, 1), (1, 1), (0.8, 103.84), (1.2, 103.84), (1.2, 873.2)],
+)
 def test_calc_biomass_accumulation(factor, max_growth):
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
     assert BiomassAllocation._determine_accumulated_biomass(factor, max_growth) == max_growth * factor
 
 
-@pytest.mark.parametrize("frac,bmass", [
-    (1, 0),
-    (0, 1),
-    (0, 0),
-    (1, 1),
-    (1.00, 836.2),  # arbitrary: frac = 1
-    (0.46, 836.2),  # arbitrary: frac < 1
-    (1.27, 836.2),  # arbitrary: frac > 1
-    (-1, 836.2),  # arbitrary: frac < 0
-    (0.59, 529.33),  # arbitrary 2
-])
+@pytest.mark.parametrize(
+    "frac,bmass",
+    [
+        (1, 0),
+        (0, 1),
+        (0, 0),
+        (1, 1),
+        (1.00, 836.2),  # arbitrary: frac = 1
+        (0.46, 836.2),  # arbitrary: frac < 1
+        (1.27, 836.2),  # arbitrary: frac > 1
+        (-1, 836.2),  # arbitrary: frac < 0
+        (0.59, 529.33),  # arbitrary 2
+    ],
+)
 def test_calc_above_ground_biomass(frac, bmass):
     """ensure that above ground biomass is correctly calculated"""
     expect = bmass * (1 - frac)
     assert BiomassAllocation._determine_above_ground_biomass(frac, bmass) == expect
 
 
-@pytest.mark.parametrize("frac,bmass", [
-    (1, 0),
-    (0, 1),
-    (0, 0),
-    (1, 1),
-    (1.00, 836.2),  # arbitrary: frac = 1
-    (0.46, 836.2),  # arbitrary: frac < 1
-    (1.27, 836.2),  # arbitrary: frac > 1
-    (-1, 836.2),  # arbitrary: frac < 0
-    (0.59, 529.33),  # arbitrary 2
-])
+@pytest.mark.parametrize(
+    "frac,bmass",
+    [
+        (1, 0),
+        (0, 1),
+        (0, 0),
+        (1, 1),
+        (1.00, 836.2),  # arbitrary: frac = 1
+        (0.46, 836.2),  # arbitrary: frac < 1
+        (1.27, 836.2),  # arbitrary: frac > 1
+        (-1, 836.2),  # arbitrary: frac < 0
+        (0.59, 529.33),  # arbitrary 2
+    ],
+)
 def test_calc_below_ground_biomass(frac, bmass):
     """ensure that below ground biomass is correctly calculated"""
     assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
 
 
 # ---- member function tests ----
-@pytest.mark.parametrize("light,ext,conv,gfact,rfrac", [
-    (1000, 0.7, 20, 1, 1/3),  # start
-    (1000, 0.7, 20, 1, 0.66),  # increased root proportion
-    (1000, 0.7, 20, 0.83, 0.33),  # restricted growth
-    (1000, 0.7, 16.3, 1, 0.33),  # reduced energy conversion
-    (1000, 0.8, 20, 1, 0.33),  # greater light extinction
-    (824.6, 0.7, 20, 1, 0.33),  # lower incoming light
-    (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
-])
+@pytest.mark.parametrize(
+    "light,ext,conv,gfact,rfrac",
+    [
+        (1000, 0.7, 20, 1, 1 / 3),  # start
+        (1000, 0.7, 20, 1, 0.66),  # increased root proportion
+        (1000, 0.7, 20, 0.83, 0.33),  # restricted growth
+        (1000, 0.7, 16.3, 1, 0.33),  # reduced energy conversion
+        (1000, 0.8, 20, 1, 0.33),  # greater light extinction
+        (824.6, 0.7, 20, 1, 0.33),  # lower incoming light
+        (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
+    ],
+)
 def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     """integration check to check that biomass gets allocated correctly"""
-    data = CropData(light_extinction=ext, leaf_area_index=1.87, light_use_efficiency=conv, growth_factor=gfact,
-                    root_fraction=rfrac, biomass=89.0)
+    data = CropData(
+        light_extinction=ext,
+        leaf_area_index=1.87,
+        light_use_efficiency=conv,
+        growth_factor=gfact,
+        root_fraction=rfrac,
+        biomass=89.0,
+    )
     bioal = BiomassAllocation(data)
     bioal.allocate_biomass(light)
 

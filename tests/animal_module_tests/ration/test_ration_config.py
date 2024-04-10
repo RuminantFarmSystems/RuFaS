@@ -48,34 +48,103 @@ def test_default_initialization():
 
 
 @pytest.mark.parametrize(
-    'price, NEmaint, NEa, NEpreg, NEl, NEg,'
-    'MP_req, C_req, P_req, TDN, DE, EE,'
-    'is_fat, BW, calcium, phosphorus, NDF, type_input,'
-    'is_wetforage, Kd, N_A, N_B, CP, dRUP,'
-    'limit, lactating, DMIest',
+    "price, NEmaint, NEa, NEpreg, NEl, NEg,"
+    "MP_req, C_req, P_req, TDN, DE, EE,"
+    "is_fat, BW, calcium, phosphorus, NDF, type_input,"
+    "is_wetforage, Kd, N_A, N_B, CP, dRUP,"
+    "limit, lactating, DMIest",
     [
         # Default values
-        ([], 0, 0, 0, 0, 0,
-         0, 0, 0, [], [], [],
-         [], 0, [], [], [], [],
-         [], [], [], [], [], [],
-         [], False, None),
-
+        (
+            [],
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            [],
+            [],
+            [],
+            [],
+            0,
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            False,
+            None,
+        ),
         # Custom values
-        ([1, 2], 3, 4, 5, 6, 7,
-         8, 9, 10, [11, 12], [13, 14], [15, 16],
-         [True, False], 17, [18, 19], [20, 21], [22, 23], [24, 25],
-         [True, False], [26, 27], [28, 29], [30, 31], [32, 33], [34, 35],
-         [36, 37], True, 38),
+        (
+            [1, 2],
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            [11, 12],
+            [13, 14],
+            [15, 16],
+            [True, False],
+            17,
+            [18, 19],
+            [20, 21],
+            [22, 23],
+            [24, 25],
+            [True, False],
+            [26, 27],
+            [28, 29],
+            [30, 31],
+            [32, 33],
+            [34, 35],
+            [36, 37],
+            True,
+            38,
+        ),
     ],
 )
-def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, NEpreg: float, NEl: float, NEg: float,
-                               MP_req: float, C_req: float, P_req: float, TDN: list[float], DE: list[float],
-                               EE: list[float], is_fat: list[bool], BW: float, calcium: list[float],
-                               phosphorus: list[float], NDF: list[float], type_input: list[str],
-                               is_wetforage: list[bool], Kd: list[float], N_A: list[float], N_B: list[float],
-                               CP: list[float], dRUP: list[float], limit: list[float], lactating: bool, DMIest: float) \
-        -> None:
+def test_custom_initialization(
+    price: list[float],
+    NEmaint: float,
+    NEa: float,
+    NEpreg: float,
+    NEl: float,
+    NEg: float,
+    MP_req: float,
+    C_req: float,
+    P_req: float,
+    TDN: list[float],
+    DE: list[float],
+    EE: list[float],
+    is_fat: list[bool],
+    BW: float,
+    calcium: list[float],
+    phosphorus: list[float],
+    NDF: list[float],
+    type_input: list[str],
+    is_wetforage: list[bool],
+    Kd: list[float],
+    N_A: list[float],
+    N_B: list[float],
+    CP: list[float],
+    dRUP: list[float],
+    limit: list[float],
+    lactating: bool,
+    DMIest: float,
+) -> None:
     """
     Test the initialization of the RationConfig class with custom values.
 

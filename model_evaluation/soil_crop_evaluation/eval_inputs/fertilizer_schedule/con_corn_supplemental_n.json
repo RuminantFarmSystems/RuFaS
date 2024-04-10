@@ -1,0 +1,20 @@
+{
+    "available_fertilizer_mixes": [
+        {
+            "name": "100-0-0",
+            "N": 1.0,
+            "P": 0.0,
+            "K": 0.0
+        }
+    ],
+    "mix_names": ["100-0-0"],
+    "years": [1980],
+    "days": [183],
+    "nitrogen_masses": [98.0],
+    "phosphorus_masses": [0.0],
+    "potassium_masses": [0.0],
+    "application_depths": [0.0],
+    "surface_remainder_fractions": [1.0],
+    "pattern_repeat": 24,
+    "pattern_skip": 0
+}

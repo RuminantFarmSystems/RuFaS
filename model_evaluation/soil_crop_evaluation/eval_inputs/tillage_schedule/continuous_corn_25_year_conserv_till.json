@@ -1,0 +1,9 @@
+{
+    "years": [1980],
+    "days": [123],
+    "incorporation_fractions": [0.50],
+    "mixing_fractions": [0.55],
+    "tillage_depths": [150],
+    "pattern_repeat": 24,
+    "pattern_skip": 0
+}

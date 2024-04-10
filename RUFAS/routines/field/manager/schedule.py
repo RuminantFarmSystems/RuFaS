@@ -1,32 +1,41 @@
 from typing import List, Any
 from copy import copy
 
-"""
-This module contains `Schedule`, which acts as the base class for all the different schedule objects that are utilized
-by the Crop and Soil module.
-"""
-
 
 class Schedule:
+    """
+    Base class for scheduling events in the Crop and Soil module, provides a generic structure for creating and
+    managing schedules for various agricultural and environmental processes.
+
+    Parameters
+    ----------
+    name : str
+        The name of the schedule, serving as a unique identifier.
+    years : List[int]
+        The years in which scheduled events are to occur.
+    days : List[int]
+        The Julian days corresponding to each event within the specified years.
+    pattern_skip : int, optional, default 0.0
+        The number of years to skip between repetitions of the schedule.
+    pattern_repeat : int, optional, default 0.0
+        The number of times the schedule pattern is repeated.
+
+    Attributes
+    ----------
+    name : str
+        Name of the schedule, uniquely identifying it within the simulation.
+    years : List[int]
+        List of years during which the scheduled events will occur.
+    days : List[int]
+        Elongated list of days to ensure a day value for each specified year, aligning with the `years` attribute.
+    pattern_skip : int
+        Specifies the interval of years between each cycle of the schedule.
+    pattern_repeat : int
+        Indicates how many times the schedule cycle is to be repeated.
+
+    """
 
     def __init__(self, name: str, years: List[int], days: List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
-        """
-        Creates a base Schedule object which specific types of Scheduling classes will inherit from.
-
-        Parameters
-        ----------
-        name : str
-            Reference to the name of this schedule that will be used to distinguish this schedule from others.
-        years : List[int]
-            Year(s) in which this event will occur.
-        days : List[int]
-            Julian day(s) in which this event will occur.
-        pattern_skip : int, default=0
-            Number of years to skip between cycles.
-        pattern_repeat : int, default=0
-            Number of times the specified pattern of this schedule should be repeated.
-
-        """
         self.name = name
         self.years = years
 
@@ -43,7 +52,6 @@ class Schedule:
         ------
         ValueError
             If the skip is < 0.
-        ValueError
             If the repeat is < 0.
 
         """

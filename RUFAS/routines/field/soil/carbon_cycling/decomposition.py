@@ -8,37 +8,46 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 #   but the meaning (and validity) of the terms is extremely unclear from either source. The
 #   documentation cannot be adequately completed without a better understanding of these methods.
 class Decomposition:
+    """
+    This class is responsible for calculating the factors related carbon decomposition rate.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        An instance of SoilData containing soil properties and carbon pool information. A new instance is created if not
+        provided.
+    field_size : float, optional, default None
+        The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData instance being used by this module. Contains information about the soil's properties, carbon pools,
+        and other relevant data for simulating decomposition.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track the decomposition of carbon in the soil profile, creates
-            new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def decompose(self) -> None:
         """
         Determines decomposition effect for each layer and temperature effect.
 
-        Returns
-        -------
-        None
         """
         for layer in self.data.soil_layers:
             layer.decomposition_moisture_effect = self._calc_moisture_factor(layer.water_factor)
             layer.decomposition_temperature_effect = self._calc_temp_factor(layer.temperature)
 
     @staticmethod
-    def _calc_temp_factor(layer_temp, x_inflection: float = 15.4, y_inflection: float = 11.75,
-                          point_distance: float = 29.7, inflection_slope=0.03,
-                          normalizer=20.80546) -> float:
+    def _calc_temp_factor(
+        layer_temp,
+        x_inflection: float = 15.4,
+        y_inflection: float = 11.75,
+        point_distance: float = 29.7,
+        inflection_slope=0.03,
+        normalizer=20.80546,
+    ) -> float:
         """
         Calculate the temperature factor for each layer.
 
@@ -58,16 +67,24 @@ class Decomposition:
         -----
         This temperature factor is lower-bounded at 0.0 because if negative, it may result in a negative amount
         of decomposition, which in this context would be considered a bug.
+
         """
         # S.6.A.4
-        temp_factor = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                layer_temp - x_inflection))) / normalizer
+        temp_factor = (
+            y_inflection
+            + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (layer_temp - x_inflection))
+        ) / normalizer
         return max(0.0, temp_factor)
 
     @staticmethod
-    def _calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float = 1.7,
-                              c_term: float = -0.007, first_exponent=6.648115,
-                              second_exponent=3.22) -> float:
+    def _calc_moisture_factor(
+        water_factor,
+        a_term: float = 0.55,
+        b_term: float = 1.7,
+        c_term: float = -0.007,
+        first_exponent=6.648115,
+        second_exponent=3.22,
+    ) -> float:
         """
         Calculate the moisture factor for carbon decomposition for the layer.
 
@@ -77,11 +94,21 @@ class Decomposition:
         ----------
         water_factor : float
             Relative water saturation (%).
+        a_term : float, default 0.55
+            Coarse in defac row 3, column N
+        b_term : float, default 1.7
+            Coarse in defac row 4, column N
+        c_term : float, default -0.007
+            Coarse in defac row 5, column
+        first_exponent : float, default 6.648115
+            First exponent in defac spreadsheet
+        second_exponent : float, default 3.22
+            Second exponent in defac spreadsheet
 
         Returns
         -------
         float
-            Moisture effect (unitless).
+            Moisture factor (unitless).
 
         Notes
         -----
@@ -91,6 +118,7 @@ class Decomposition:
 
         The moisture effect is lower-bounded at 0 because if negative, it will lead to a negative decomposition factor,
         which is not meaningful.
+
         """
         # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)

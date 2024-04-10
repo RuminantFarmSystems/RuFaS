@@ -11,6 +11,7 @@ Details:
             value should be expressed as 1 divided the non-reverse direction value.
         4. The non-reverse conversion direction value should be greater than one.
 """
+
 # Area
 HECTARES_TO_SQUARE_MILLIMETERS = 10_000_000_000
 SQUARE_MILLIMETERS_TO_HECTARES = 1 / HECTARES_TO_SQUARE_MILLIMETERS

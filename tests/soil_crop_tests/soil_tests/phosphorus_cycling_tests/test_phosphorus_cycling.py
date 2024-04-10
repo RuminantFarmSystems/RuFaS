@@ -2,17 +2,23 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import (
+    PhosphorusCycling,
+)
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
-from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import (
+    PhosphorusMineralization,
+)
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
+    SolublePhosphorus,
+)
 
 
-@pytest.mark.parametrize("rainfall,runoff,field_size,mean_air_temperature", [
-    (1, 2, 3, 4),
-    (1.3, 0.2, 9.24, 7.7)
-])
+@pytest.mark.parametrize(
+    "rainfall,runoff,field_size,mean_air_temperature",
+    [(1, 2, 3, 4), (1.3, 0.2, 9.24, 7.7)],
+)
 def test_phosphorus_cycling(rainfall: float, runoff: float, field_size: float, mean_air_temperature: float) -> None:
     """Tests that the main routine were executed correctly"""
     manure = MagicMock(Manure)

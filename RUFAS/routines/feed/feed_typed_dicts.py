@@ -28,7 +28,6 @@ class PurchasedFeedTypedDict(TypedDict):
 
     feed_database: str
     feeds_table: str
-    feed_quality_table: str
     nutrient_table: str
 
     calf_feeds: List[int]

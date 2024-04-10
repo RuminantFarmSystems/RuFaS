@@ -1,0 +1,9 @@
+{
+    "start_date": "1980:1",
+    "end_date": "2004:365",
+    "random_seed": 0,
+    "set_seed": false,
+    "simulate_animals": false,
+    "nutrient_standard": "NASEM",
+    "FIPS_county_code": 55021
+}

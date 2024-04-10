@@ -3,31 +3,34 @@ from math import exp
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module handles the nitrification and volatilization operations for the ammonium pool, based on SWAT section 3:1.3.
-"""
-
 
 class NitrificationVolatilization:
+    """
+    Manages the nitrification and volatilization operations for the ammonium pool, in accordance with SWAT section
+    3:1.3.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module for tracking the nitrification and volatilization of ammonium in the
+        soil. If not provided, a new SoilData object will be instantiated.
+    field_size : float, optional
+        The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.
+
+    Attributes
+    ----------
+    data : SoilData
+        Holds the SoilData object for tracking nitrification and volatilization processes.
+
+    Notes
+    -----
+    The provision of a field size is crucial when a pre-configured SoilData object is not available, as it enables the
+    initialization of a SoilData object. This allows for the simulation of nitrification and volatilization processes
+    specific to the given field size.
+
+    """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or creates one if one is not
-            provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track the nitrification and volatilization of ammonium, creates
-            new one if one is not provided.
-        field_size : float, optional
-            Size of the field (ha)
-
-        Notes
-        -----
-        The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
-        SoilData object is not provided.
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def do_daily_nitrification_and_volatilization(self) -> None:
@@ -57,20 +60,30 @@ class NitrificationVolatilization:
 
             nitrification_regulator = self._calculate_nitrification_regulator(temp_factor, water_factor)
             volatilization_regulator = self._calculate_volatilization_regulator(
-                temp_factor, depth_factor, layer.ammonium_volatilization_cation_exchange_factor)
+                temp_factor,
+                depth_factor,
+                layer.ammonium_volatilization_cation_exchange_factor,
+            )
 
             nitrification_loss_fraction = self._calculate_ammonium_loss_fraction(nitrification_regulator)
             volatilization_loss_fraction = self._calculate_ammonium_loss_fraction(volatilization_regulator)
 
-            total_ammonium_lost = self._calculate_total_ammonium_lost(layer.ammonium_content, nitrification_regulator,
-                                                                      volatilization_regulator)
+            total_ammonium_lost = self._calculate_total_ammonium_lost(
+                layer.ammonium_content,
+                nitrification_regulator,
+                volatilization_regulator,
+            )
 
-            nitrified_ammonium = self._calculate_ammonium_lost_to_process(total_ammonium_lost,
-                                                                          nitrification_loss_fraction,
-                                                                          volatilization_loss_fraction)
-            volatilized_ammonium = self._calculate_ammonium_lost_to_process(total_ammonium_lost,
-                                                                            volatilization_loss_fraction,
-                                                                            nitrification_loss_fraction)
+            nitrified_ammonium = self._calculate_ammonium_lost_to_process(
+                total_ammonium_lost,
+                nitrification_loss_fraction,
+                volatilization_loss_fraction,
+            )
+            volatilized_ammonium = self._calculate_ammonium_lost_to_process(
+                total_ammonium_lost,
+                volatilization_loss_fraction,
+                nitrification_loss_fraction,
+            )
 
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
@@ -79,18 +92,21 @@ class NitrificationVolatilization:
 
     # --- Static methods ---
     @staticmethod
-    def _calculate_nitrification_volatilization_temp_factor(temperature: float) -> float:
-        """Calculates the nitrification/volatilization temperature factor.
+    def _calculate_nitrification_volatilization_temp_factor(
+        temperature: float,
+    ) -> float:
+        """
+        Calculates the nitrification/volatilization temperature factor.
 
         Parameters
         ----------
         temperature : float
-            Current temperature of the soil layer (degrees C)
+            Current temperature of the soil layer (degrees C).
 
         Returns
         -------
         float
-            The nitrification/volatilization temperature factor of the current layer of soil (unitless)
+            The nitrification/volatilization temperature factor of the current layer of soil (unitless).
 
         Notes
         -----
@@ -105,24 +121,25 @@ class NitrificationVolatilization:
         return min(1.0, 0.41 * ((temperature - 5) / 10))
 
     @staticmethod
-    def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
-                                                   field_capacity: float) -> float:
+    def _calculate_nitrification_soil_water_factor(
+        water_content: float, wilting_point: float, field_capacity: float
+    ) -> float:
         """
         Calculates the soil water factor for nitrification.
 
         Parameters
         ----------
         water_content : float
-            Water present in this soil layer (mm)
+            Water present in this soil layer (mm).
         wilting_point : float
-            Amount of water in this soil layer when at wilting point (mm)
+            Amount of water in this soil layer when at wilting point (mm).
         field_capacity : float
-            Amount of water in this soil layer when at field capacity (mm)
+            Amount of water in this soil layer when at field capacity (mm).
 
         Returns
         -------
         float
-            The nitrification soil water factor (unitless)
+            The nitrification soil water factor (unitless).
 
         Notes
         -----
@@ -142,17 +159,18 @@ class NitrificationVolatilization:
 
     @staticmethod
     def _calculate_volatilization_depth_factor(depth: float) -> float:
-        """Calculates the depth factor for use in determining volatilization.
+        """
+        Calculates the depth factor for use in determining volatilization.
 
         Parameters
         ----------
         depth : float
-            The depth of the center of this soil layer (mm)
+            The depth of the center of this soil layer (mm).
 
         Returns
         -------
         float
-            The volatilization depth factor (unitless)
+            The volatilization depth factor (unitless).
 
         References
         ----------
@@ -164,19 +182,20 @@ class NitrificationVolatilization:
 
     @staticmethod
     def _calculate_nitrification_regulator(temp_factor: float, water_factor: float) -> float:
-        """Calculates the nitrification regulator for this layer of soil.
+        """
+        Calculates the nitrification regulator for this layer of soil.
 
         Parameters
         ----------
         temp_factor : float
-            The nitrification/volatilization temperature factor of the current layer of soil (unitless)
+            The nitrification/volatilization temperature factor of the current layer of soil (unitless).
         water_factor : float
-            The nitrification soil water factor of the current soil layer (unitless)
+            The nitrification soil water factor of the current soil layer (unitless).
 
         Returns
         -------
         float
-            The nitrification regulator for this layer of soil (unitless)
+            The nitrification regulator for this layer of soil (unitless).
 
         References
         ----------
@@ -186,23 +205,25 @@ class NitrificationVolatilization:
         return temp_factor * water_factor
 
     @staticmethod
-    def _calculate_volatilization_regulator(temp_factor: float, depth_factor: float,
-                                            cation_exchange_factor: float) -> float:
-        """Calculates the volatilization regulator for this layer of soil.
+    def _calculate_volatilization_regulator(
+        temp_factor: float, depth_factor: float, cation_exchange_factor: float
+    ) -> float:
+        """
+        Calculates the volatilization regulator for this layer of soil.
 
         Parameters
         ----------
         temp_factor : float
-            The nitrification/volatilization temperature factor of the current layer of soil (unitless)
+            The nitrification/volatilization temperature factor of the current layer of soil (unitless).
         depth_factor : float
-            The volatilization depth factor (unitless)
+            The volatilization depth factor (unitless).
         cation_exchange_factor : float
-            The volatilization cation exchange factor (unitless)
+            The volatilization cation exchange factor (unitless).
 
         Returns
         -------
         float
-            The volatilization regulator for this layer of soil (unitless)
+            The volatilization regulator for this layer of soil (unitless).
 
         References
         ----------
@@ -212,23 +233,27 @@ class NitrificationVolatilization:
         return temp_factor * depth_factor * cation_exchange_factor
 
     @staticmethod
-    def _calculate_total_ammonium_lost(ammonium_content: float, nitrification_regulator: float,
-                                       volatilization_regulator: float) -> float:
-        """Calculates the amount of ammonium lost to nitrification and volatilization.
+    def _calculate_total_ammonium_lost(
+        ammonium_content: float,
+        nitrification_regulator: float,
+        volatilization_regulator: float,
+    ) -> float:
+        """
+        Calculates the amount of ammonium lost to nitrification and volatilization.
 
         Parameters
         ----------
         ammonium_content : float
-            The ammonium content of this soil layer (kg / ha)
+            The ammonium content of this soil layer (kg / ha).
         nitrification_regulator : float
-            The nitrification regulator for this layer of soil (unitless)
+            The nitrification regulator for this layer of soil (unitless).
         volatilization_regulator : float
-            The volatilization regulator for this layer of soil (unitless)
+            The volatilization regulator for this layer of soil (unitless).
 
         Returns
         -------
         float
-            The amount of ammonium lost to nitrification and volatilization (kg / ha)
+            The amount of ammonium lost to nitrification and volatilization (kg / ha).
 
         References
         ----------
@@ -240,17 +265,18 @@ class NitrificationVolatilization:
 
     @staticmethod
     def _calculate_ammonium_loss_fraction(regulator: float) -> float:
-        """Calculates the fraction of lost ammonium that is lost to the specified process.
+        """
+        Calculates the fraction of lost ammonium that is lost to the specified process.
 
         Parameters
         ----------
         regulator : float
-            The regulator for the process that ammonium is being lost to (unitless)
+            The regulator for the process that ammonium is being lost to (unitless).
 
         Returns
         -------
         float
-            Fraction of lost ammonium that is lost due to the given process (unitless)
+            Fraction of lost ammonium that is lost due to the given process (unitless).
 
         References
         ----------
@@ -264,23 +290,27 @@ class NitrificationVolatilization:
         return 1 - exp(-1 * regulator)
 
     @staticmethod
-    def _calculate_ammonium_lost_to_process(total_lost_ammonium: float, actual_loss_fraction: float,
-                                            other_loss_fraction: float) -> float:
-        """Calculates the amount of ammonium lost to the specified process.
+    def _calculate_ammonium_lost_to_process(
+        total_lost_ammonium: float,
+        actual_loss_fraction: float,
+        other_loss_fraction: float,
+    ) -> float:
+        """
+        Calculates the amount of ammonium lost to the specified process.
 
         Parameters
         ----------
         total_lost_ammonium : float
-            The total ammonium content lost to nitrification and volatilization (kg / ha)
+            The total ammonium content lost to nitrification and volatilization (kg / ha).
         actual_loss_fraction : float
-            The loss fraction for the specified process that ammonium is being lost to (unitless)
+            The loss fraction for the specified process that ammonium is being lost to (unitless).
         other_loss_fraction : float
-            The loss fraction for the other process that ammonium is lost to (unitless)
+            The loss fraction for the other process that ammonium is lost to (unitless).
 
         Returns
         -------
         float
-            The amount of ammonium that is lost to the specified process (kg / ha)
+            The amount of ammonium that is lost to the specified process (kg / ha).
 
         References
         ----------

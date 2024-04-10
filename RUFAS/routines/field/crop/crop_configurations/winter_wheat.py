@@ -2,10 +2,8 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
@@ -13,7 +11,7 @@ class WinterWheat(CropData):
     """
     Crop data class with default values for winter wheat.
     """
-    species: str = "winter_wheat"
+
     name: str = "default winter_wheat"
     plant_code: str = "WWHT"
     scientific_name: str = "Triticum aestivum"
@@ -80,7 +78,8 @@ class WinterWheatGrain(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "winter_wheat_grain"
+
+    species: CropSpecies = CropSpecies.WINTER_WHEAT_GRAIN
     name: str = "winter_wheat grain"
 
     storage_type: StorageType = StorageType.DRY
@@ -135,7 +134,8 @@ class WinterWheatSilage(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "winter_wheat_silage"
+
+    species: CropSpecies = CropSpecies.WINTER_WHEAT_SILAGE
     name: str = "winter_wheat silage"
 
     storage_type: StorageType = StorageType.BUNKER
@@ -194,7 +194,8 @@ class WinterWheatBaleage(WinterWheatSilage):
     Winter Wheat baleage currently has the same harvest and quality properties as Winter Wheat silage.
 
     """
-    species: str = "winter_wheat_baleage"
+
+    species: CropSpecies = CropSpecies.WINTER_WHEAT_BALEAGE
     name: str = "winter_wheat baleage"
 
     storage_type: StorageType = StorageType.BALEAGE
@@ -235,7 +236,8 @@ class WinterWheatHay(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "winter_wheat_hay"
+
+    species: CropSpecies = CropSpecies.WINTER_WHEAT_HAY
     name: str = "winter_wheat hay"
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED

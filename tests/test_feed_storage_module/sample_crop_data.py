@@ -1,29 +1,16 @@
 from typing import Dict
-from RUFAS.time import Time
-from RUFAS.config import Config
 
+from mock.mock import MagicMock
+
+from RUFAS.time import Time
+
+mock_time = MagicMock(auto_spec=Time)
+mock_time.year = 1
+mock_time.day = 1
 
 sample_crop_data: Dict[str, float] = {
-    "harvest_time": Time(
-        Config(
-            {
-                "start_date": "1:1",
-                "end_date": "1:10",
-                "set_seed": False,
-                "random_seed": 42,
-            }
-        )
-    ),
-    "storage_time": Time(
-        Config(
-            {
-                "start_date": "1:1",
-                "end_date": "1:10",
-                "set_seed": False,
-                "random_seed": 42,
-            }
-        )
-    ),
+    "harvest_time": mock_time,
+    "storage_time": mock_time,
     "fresh_mass": 100.0,
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,
@@ -38,26 +25,8 @@ sample_crop_data: Dict[str, float] = {
 }
 
 sample_crop_data_no_mass: Dict[str, float] = {
-    "harvest_time": Time(
-        Config(
-            {
-                "start_date": "1:1",
-                "end_date": "1:10",
-                "set_seed": False,
-                "random_seed": 42,
-            }
-        )
-    ),
-    "storage_time": Time(
-        Config(
-            {
-                "start_date": "1:1",
-                "end_date": "1:10",
-                "set_seed": False,
-                "random_seed": 42,
-            }
-        )
-    ),
+    "harvest_time": mock_time,
+    "storage_time": mock_time,
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,
     "crude_protein_percent": 10.0,

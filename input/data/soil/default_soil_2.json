@@ -31,9 +31,7 @@
             "ammonium_volatilization_cation_exchange_factor": 0.45,
             "denitrification_rate_coefficient": 0.01,
             "denitrification_threshold_water_content": 1.3,
-            "residue_fresh_organic_mineralization_rate": 0.05,
-            "denitrification_rate": 0.1,
-            "active_N_percent": 0.02
+            "residue_fresh_organic_mineralization_rate": 0.05
         },
         {
             "bottom_depth": 1041.4,
@@ -57,9 +55,7 @@
             "ammonium_volatilization_cation_exchange_factor": 0.45,
             "denitrification_rate_coefficient": 0.01,
             "denitrification_threshold_water_content": 1.3,
-            "residue_fresh_organic_mineralization_rate": 0.05,
-            "denitrification_rate": 0.1,
-            "active_N_percent": 0.02
+            "residue_fresh_organic_mineralization_rate": 0.05
         },
         {
             "bottom_depth": 1168.4,
@@ -83,9 +79,7 @@
             "ammonium_volatilization_cation_exchange_factor": 0.45,
             "denitrification_rate_coefficient": 0.01,
             "denitrification_threshold_water_content": 1.3,
-            "residue_fresh_organic_mineralization_rate": 0.05,
-            "denitrification_rate": 0.1,
-            "active_N_percent": 0.02
+            "residue_fresh_organic_mineralization_rate": 0.05
         },
         {
             "bottom_depth": 2006.6,
@@ -109,9 +103,7 @@
             "ammonium_volatilization_cation_exchange_factor": 0.45,
             "denitrification_rate_coefficient": 0.01,
             "denitrification_threshold_water_content": 1.3,
-            "residue_fresh_organic_mineralization_rate": 0.05,
-            "denitrification_rate": 0.1,
-            "active_N_percent": 0.02
+            "residue_fresh_organic_mineralization_rate": 0.05
         }
     ]
 }

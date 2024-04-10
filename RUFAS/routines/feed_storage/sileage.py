@@ -29,9 +29,7 @@ class Sileage(Storage):
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(
-        self, dry_matter: float, time_in_silo: int
-    ) -> float:
+    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
         """
         Calculates the dry matter loss to gas, specific to Sileage.
 

@@ -18,7 +18,11 @@ class GeneralConstants:
 
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
+        PERCENTAGE_TO_FRACTION: The conversion factor from a percentage to a fraction.
+        FRACTION_TO_PERCENTAGE: The conversion factor from a fraction to a percentage.
+
     """
+
     # Length-related
     MM_TO_M = 0.001
 
@@ -32,7 +36,8 @@ class GeneralConstants:
     KG_TO_CUBIC_METERS = 0.001
 
     # Time-related
-    DAYS_PER_YEAR = 365
+    YEAR_LENGTH = 365
+    LEAP_YEAR_LENGTH = 366
     SECONDS_PER_DAY = 86400
 
     # Density-related
@@ -45,3 +50,7 @@ class GeneralConstants:
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
+
+    # Fractions and Percentages
+    PERCENTAGE_TO_FRACTION = 0.01
+    FRACTION_TO_PERCENTAGE = 100.0

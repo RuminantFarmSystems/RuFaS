@@ -78,7 +78,7 @@ class ReproStateManager:
         if not keep_existing or self._states == {ReproStateEnum.NONE}:
             self._states.clear()
         if state in self._states:
-            raise ValueError(f'Attempting to re-enter the same state: {state}')
+            raise ValueError(f"Attempting to re-enter the same state: {state}")
         self._states.add(state)
 
     def exit(self, state: ReproStateEnum) -> None:
@@ -103,7 +103,7 @@ class ReproStateManager:
         if state is ReproStateEnum.NONE or self._states == {ReproStateEnum.NONE}:
             return
         if state not in self._states:
-            raise ValueError(f'Attempting to exit a state that is not entered: {state}')
+            raise ValueError(f"Attempting to exit a state that is not entered: {state}")
         self._states.remove(state)
         if not self._states:
             self._states = {ReproStateEnum.NONE}
@@ -171,4 +171,4 @@ class ReproStateManager:
             A string representation of the current reproductive states.
         """
 
-        return ', '.join([state.value for state in self._states])
+        return ", ".join([state.value for state in self._states])

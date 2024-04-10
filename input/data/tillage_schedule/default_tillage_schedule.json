@@ -179,6 +179,7 @@
     0.3,
     0.3
   ],
+  "implements": ["disk-harrow"],
   "pattern_repeat": 0,
   "pattern_skip": 0
 }

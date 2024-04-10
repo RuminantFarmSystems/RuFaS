@@ -25,14 +25,17 @@ class AnimalEvents:
         Args:
                 events_str: string representation of events
         """
-        split_by_date = list(filter(lambda x: x != '', list(
-            map(lambda x: x.strip(), events_str.lower().split('days born ')))))
+        split_by_date = list(
+            filter(
+                lambda x: x != "",
+                list(map(lambda x: x.strip(), events_str.lower().split("days born "))),
+            )
+        )
 
         for day in split_by_date:
-            split = day.split(': ')
+            split = day.split(": ")
             date = int(split[0])
-            events = list(
-                filter(lambda x: (x != '[' and x != ']' and x != ', '), split[1].split('\'')))
+            events = list(filter(lambda x: (x != "[" and x != "]" and x != ", "), split[1].split("'")))
             for event in events:
                 self.add_event(date, 0, event)
 
@@ -52,12 +55,14 @@ class AnimalEvents:
                 self.events[animal_age] = [description]
             else:
                 self.events[animal_age] = [
-                    'simulation_day=' + str(simulation_day), description]
+                    "simulation_day=" + str(simulation_day),
+                    description,
+                ]
 
     def __str__(self) -> str:
-        res_str = ''
+        res_str = ""
         for key, value in sorted(self.events.items()):
-            res_str += '\tdays born {}: {} \n'.format(key, value)
+            res_str += "\tdays born {}: {} \n".format(key, value)
 
         return res_str
 

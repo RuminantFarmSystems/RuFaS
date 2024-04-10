@@ -1,0 +1,15 @@
+{
+  "soil_specification": "soil",
+  "crop_specification": "crop",
+  "fertilizer_management_specification": "fertilizer_schedule",
+  "manure_management_specification": "manure_schedule",
+  "tillage_management_specification": "tillage_schedule",
+  "field_size": 1.0,
+  "absolute_latitude": 43.338,
+  "longitude": -89.3804,
+  "minimum_daylength": 9.0,
+  "seasonal_high_water_table": false,
+  "watering_amount_in_liters": 0.0,
+  "watering_interval": 0,
+  "supplement_manure_nutrient_deficiencies": false
+}
