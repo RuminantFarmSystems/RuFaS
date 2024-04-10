@@ -65,17 +65,13 @@ jobs:
             echo "No unauthorized changes detected."
           fi
       
-      - name: Format code with Black
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
-        run: |
-          black ${{ env.FILES }}
-
-      - name: Commit and push formatting changes
+      - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A
