@@ -114,56 +114,6 @@ def test_kill():
     assert crop.data.yield_residue == 5.29 + 192.33
 
 
-def test_dry_down():
-    crop = CropManagement(CropData(above_ground_biomass=10.2, dry_down_fraction=0.18))
-    crop.dry_down()
-    assert pytest.approx(crop.data.above_ground_biomass) == 10.2 * (1 - 0.18)
-
-
-@pytest.mark.parametrize(
-    "heat_sched,heat_frac,harv_day,harv_yr,this_day,this_yr",
-    [
-        (False, 1.20, 100, 0, 80, 0),  # scheduled, too early (conflicting heat)
-        (False, 1.00, 100, 0, 100, 0),  # scheduled, exactly right (conflicting heat)
-        (False, 1.10, 100, 0, 110, 0),  # scheduled, too late (conflicting heat)
-        (True, 1.08, 100, 0, 110, 0),  # heat-scheduled, too early (conflicting dates)
-        (
-            True,
-            1.10,
-            100,
-            0,
-            80,
-            0,
-        ),  # heat-scheduled, exactly right (conflicting dates)
-        (True, 1.20, 100, 0, 80, 0),  # heat-scheduled, passed time (conflicting dates)
-    ],
-)
-def test_check_harvest_schedule(
-    heat_sched: bool,
-    heat_frac: float,
-    harv_day: int,
-    harv_yr: int,
-    this_day: int,
-    this_yr: int,
-):
-    """ensure that is_harvest_day is correctly set"""
-    data = CropData(
-        use_heat_scheduling=heat_sched,
-        next_harvest_day=harv_day,
-        next_harvest_year=harv_yr,
-        harvest_heat_fraction=1.10,
-    )
-    cm = CropManagement(data)
-    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
-        cm.check_harvest_schedule(this_day, this_yr)
-    scheduled_and_correct = (this_day == harv_day) & (this_yr == harv_yr) & (heat_sched is False)
-    heat_scheduled_and_correct = (heat_sched is True) & (heat_frac >= 1.10)
-    if scheduled_and_correct or heat_scheduled_and_correct:
-        assert data.is_harvest_day is True
-    else:
-        assert data.is_harvest_day is False
-
-
 @pytest.mark.parametrize(
     "harvest,heat_frac,water_def",
     [

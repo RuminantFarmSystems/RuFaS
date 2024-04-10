@@ -524,6 +524,7 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
+        heiferI_vals.update(repro_sub_protocol=HeiferII.get_user_defined_repro_sub_protocol())
         if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
             heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
             heiferI_vals.update(synch_ed_method_h="")
