@@ -18,7 +18,7 @@ from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.util import Utility
 
-DISCLAIMER_MESSAGE = "Under construction, use the results with caution"
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 class LogVerbosity(Enum):
@@ -1317,6 +1317,13 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def print_disclaimer(self) -> None:
+        """
+        Prints out the disclaimer message when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
 
     def print_errors_warnings_logs_counts(self) -> None:
         """

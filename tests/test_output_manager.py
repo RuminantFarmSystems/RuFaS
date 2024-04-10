@@ -15,7 +15,7 @@ from pytest_mock.plugin import MockerFixture
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import LogVerbosity, OutputManager
 
-DISCLAIMER_MESSAGE = "Under construction, use the results with caution"
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 def test_get_prefix() -> None:
@@ -634,6 +634,7 @@ def output_manager_original_method_states(
     """Fixture to store original methods of OutputManager"""
     return {
         "_add_to_pool": mock_output_manager._add_to_pool,
+        "_write_disclaimer": mock_output_manager._write_disclaimer,
         "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
         "dict_to_file_json": mock_output_manager.dict_to_file_json,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
@@ -663,6 +664,7 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
+        "print_disclaimer": mock_output_manager.print_disclaimer,
         "_validate_units": mock_output_manager._validate_units,
     }
 
@@ -1988,6 +1990,29 @@ def test_print_credits(
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
     mock_output_manager.print_credits()
+
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+
+@pytest.mark.parametrize(
+    "log_verbose, expected_output",
+    [
+        (LogVerbosity.NONE, ""),
+        (LogVerbosity.CREDITS, f"{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.ERRORS, f"{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.WARNINGS, f"{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.LOGS, f"{DISCLAIMER_MESSAGE}\n"),
+    ],
+)
+def test_print_disclaimer(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
+) -> None:
+    """
+    Unit test for the print_disclaimer() method in OutputManager class.
+    """
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_disclaimer()
 
     captured = capfd.readouterr()
     assert captured.out == expected_output
