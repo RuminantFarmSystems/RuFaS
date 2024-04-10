@@ -3,18 +3,19 @@
 import time as timer
 from enum import Enum
 from typing import Optional
-from RUFAS.units import MeasurementUnits
+
 from RUFAS import routines
-from RUFAS.weather import Weather
-from RUFAS.time import Time
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, ManureManager
-from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, ManureManager
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 om = OutputManager()
 im = InputManager()
@@ -89,9 +90,16 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
         om.add_variable(
-            "day_counter_final_value",
+            "simulation_day_final_value",
             str(self.time),
-            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": MeasurementUnits.DAYS},
+            {
+                "class": self.__class__.__name__,
+                "function": self.simulate.__name__,
+                "units": {
+                    "simulation_day": MeasurementUnits.UNITLESS.value,
+                    "simulation_year_day": MeasurementUnits.UNITLESS.value,
+                },
+            },
         )
 
     def _run_simulation_main_loop(self) -> None:
