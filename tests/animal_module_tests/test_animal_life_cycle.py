@@ -346,12 +346,14 @@ def test_convert_heiferI_to_heiferII(
         }
     )
     repro_program_update_call = mocker.call(repro_program=heifer_repro_method)
+    repro_sub_protocol_update_call = mocker.call(repro_sub_protocol=dummy_repro_sub_protocol)
     tai_method_update_call = mocker.call(tai_method_h=tai_method_h_value)
     synch_ed_method_update_call = mocker.call(synch_ed_method_h=synch_ed_method_h_value)
 
     expected_mock_calls = [
         basic_update_call,
         repro_program_update_call,
+        repro_sub_protocol_update_call,
         tai_method_update_call,
         synch_ed_method_update_call,
     ]
