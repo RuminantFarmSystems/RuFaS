@@ -4,6 +4,7 @@ from typing import Tuple
 
 import math
 
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
@@ -310,14 +311,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         new_accumulated_liquid_manure_total_solids = max(
             self._accumulated_output.liquid_manure_total_solids
-            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (methane_loss * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
             0.0,
         )
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
 
         new_accumulated_liquid_manure_total_volatile_solids = max(
             self._accumulated_output.liquid_manure_total_volatile_solids
-            - (methane_loss * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (methane_loss * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
             0.0,
         )
         self._accumulated_output.liquid_manure_total_volatile_solids = (
@@ -328,7 +329,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             self._accumulated_output.liquid_manure_total_degradable_volatile_solids
             - (
                 methane_emission_from_degradable_volatile_solids
-                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
             0.0,
         )
@@ -340,7 +341,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
             - (
                 methane_emission_from_non_degradable_volatile_solids
-                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
             0.0,
         )
