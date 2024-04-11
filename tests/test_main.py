@@ -1044,7 +1044,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     assert actual_args == "test_args"
 
 
-def test_case_insensitive_argument_action():
+def test_case_insensitive_argument_action() -> None:
     parser = argparse.ArgumentParser()
     parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
 
