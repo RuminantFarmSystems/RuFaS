@@ -2334,8 +2334,6 @@ def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result:
 
     # Assert
     assert result == expected_result
-# =======
-#     assert result == expected
 
 
 @pytest.mark.parametrize("flag_value", [False, True])
