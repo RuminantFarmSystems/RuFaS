@@ -96,7 +96,7 @@ class OutputManager(object):
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
     _include_detailed_values : bool
-        Flag to include detailed values in the json output files
+        Set to True to include detailed values in the json output files after the simulation
     """
 
     __instance = None
@@ -515,8 +515,7 @@ class OutputManager(object):
         if not self._include_detailed_values:
             return data_dict
 
-        for key in data_dict:
-            sub_data_dict = data_dict[key]
+        for key, sub_data_dict in data_dict.items():
             if not self._can_add_detailed_values(sub_data_dict):
                 continue
 
@@ -544,17 +543,22 @@ class OutputManager(object):
 
     def _can_add_detailed_values(self, sub_data_dict: Dict[str, Any]) -> bool:
         """
-        Checks if the provided sub_data_dict is suitable for adding detailed values.
+        Checks if the provided sub_data_dict has the necessary structure and data to add detailed values.
+
+        The sub_data_dict should meet the following requirements:
+        - It must be a dictionary.
+        - It must contain the keys "info_maps" and "values".
+        - The length of the "info_maps" list and the "values" list must be equal.
 
         Parameters
         ----------
         sub_data_dict : Dict[str, Any]
-            The dictionary to check for suitability.
+            The dictionary to check for compatibility with adding detailed values.
 
         Returns
         -------
         bool
-            True if the sub_data_dict is suitable for adding detailed values, False otherwise.
+            True if the sub_data_dict meets the requirements for adding detailed values, False otherwise.
         """
 
         if not isinstance(sub_data_dict, dict):
