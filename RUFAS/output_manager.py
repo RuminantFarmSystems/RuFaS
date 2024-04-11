@@ -669,18 +669,7 @@ class OutputManager(object):
             raise e
 
     def generate_file_name(self, base_name: str, extension: str, include_millis: bool = False) -> str:
-        """
-        Returns a file name using the given base_name and timestamp.
-
-        Parameters
-        ----------
-        base_name : str
-            The base name of the file.
-        extension : str
-            The extension of the file.
-        include_millis : bool
-            Flag to include milliseconds in the timestamp.
-        """
+        """Returns a file name using the given base_name and timestamp."""
 
         timestamp: str = Utility.get_timestamp(include_millis=include_millis)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
@@ -1040,17 +1029,14 @@ class OutputManager(object):
             Additional content from the filter that might influence the file naming.
         """
 
-        if filter_file.endswith(".json") and "name" not in filter_content:
-            include_millis = True
-        else:
-            include_millis = False
+        include_milliseconds = filter_file.endswith(".json") and "name" not in filter_content
 
         if "name" in filter_content:
             base_name = f"saved_variables_{filter_content['name']}"
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json", include_millis=include_millis)
+        file_name = self.generate_file_name(base_name, "json", include_millis=include_milliseconds)
         file_path = os.path.join(save_path, file_name)
         self.dict_to_file_json(filtered_pool, file_path)
 
@@ -1391,16 +1377,10 @@ class OutputManager(object):
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
 
     def set_include_detailed_values(self, flag: bool) -> None:
-        """
-        Sets the flag for adding detailed values to the output files.
-
-        Parameters
-        ----------
-        flag : bool
-            The flag to add detailed values to the output files.
-        """
+        """Sets the flag for adding detailed values to the output files."""
 
         self._include_detailed_values = flag
+
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
         Sets the exclude_info_maps flag to the given value.
