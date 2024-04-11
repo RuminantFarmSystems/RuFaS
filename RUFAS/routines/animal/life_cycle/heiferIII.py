@@ -25,6 +25,8 @@ class HeiferIII(HeiferII):
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
