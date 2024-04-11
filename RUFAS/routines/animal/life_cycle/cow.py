@@ -42,11 +42,13 @@ class MilkProductionHistory:
 class Cow(HeiferIII):
     stats = collections.defaultdict(int)
 
-    def __init__(self, args):
+    def __init__(self, args: dict[str, Any]):
         """
-        Description:
-            initialize the cow from heifer
-        Input:
+        Initialize a cow from a heifer.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
             args.id: id of the animal
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
@@ -91,6 +93,12 @@ class Cow(HeiferIII):
             args.parity: parity of the cow
             args.calving_interval: cow's most recent calving interval
             args.lactation_curve: lactation curve model choice
+
+        Notes
+        -----
+        When a cow is initialized, it is checked to see whether it is already pregnant. If it is, it is immediately
+        entered in the `PREGNANT` repro state.
+
         """
         super().__init__(args)
 
@@ -137,6 +145,8 @@ class Cow(HeiferIII):
 
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
+        if self.is_pregnant:
+            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
 
         self.wood_l = 0
         self.wood_m = 0
