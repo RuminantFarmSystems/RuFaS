@@ -29,7 +29,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: Dict[str, Any],
-        units: Dict[str, str] | MeasurementUnits | str
+        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str
     ) -> None:
         """
         Pads a variable in OutputManager for entries that it "missed" relative to another variable.
@@ -57,6 +57,9 @@ class AnimalModuleReporter:
             The day of the simulation.
         info_map: Dict[str, Any]
             The info_map to use when padding.
+        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str
+            Units for the variable being added, in the format provided in the main call to add_variable,
+            (e.g. the one following the call of data_padder).
 
         """
         if simulation_day > 0 and reference_variable in om.variables_pool:
@@ -347,8 +350,8 @@ class AnimalModuleReporter:
             del ration_per_animal["status"]
             del ration_per_animal["objective"]
             ration_total = {}
-            ration_total["dry_matter_intake_total"] = 0
-            ration_total["byproducts_total"] = 0
+            ration_total["dry_matter_intake_total"] = 0.0
+            ration_total["byproducts_total"] = 0.0
             for key in ration_per_animal.keys():
                 if key != "status" and key != "objective":
                     ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
@@ -508,7 +511,10 @@ class AnimalModuleReporter:
         for manure_property, manure_value in pen.manure.items():
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
-            AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0, simulation_day, info_map, manure_value_units)
+            AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0,
+                                             simulation_day,
+                                             info_map,
+                                             manure_value_units)
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
