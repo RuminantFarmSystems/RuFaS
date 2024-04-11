@@ -29,7 +29,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: Dict[str, Any],
-        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str
+        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str,
     ) -> None:
         """
         Pads a variable in OutputManager for entries that it "missed" relative to another variable.
@@ -508,10 +508,9 @@ class AnimalModuleReporter:
         for manure_property, manure_value in pen.manure.items():
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
-            AnimalModuleReporter.data_padder(reference_variable, variable_to_add, 0,
-                                             simulation_day,
-                                             info_map,
-                                             manure_value_units)
+            AnimalModuleReporter.data_padder(
+                reference_variable, variable_to_add, 0, simulation_day, info_map, manure_value_units
+            )
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
