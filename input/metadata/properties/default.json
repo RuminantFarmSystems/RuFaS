@@ -1930,7 +1930,7 @@
       "properties": {  
         "type": "number",
         "minimum": 0,
-        "default": 306
+        "default": 300
       }
     },
     "corn_silage_tillage_emissions": {
