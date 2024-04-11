@@ -235,7 +235,7 @@ class AnimalModuleReporter:
                 {},
                 simulation_day,
                 info_map,
-                nutrient_amount_units
+                nutrient_amount_units,
             )
             om.add_variable(
                 f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
@@ -248,7 +248,7 @@ class AnimalModuleReporter:
                 0,
                 simulation_day,
                 info_map,
-                MeasurementUnits.KILOGRAMS
+                MeasurementUnits.KILOGRAMS,
             )
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
@@ -288,7 +288,7 @@ class AnimalModuleReporter:
                 {},
                 simulation_day,
                 info_map,
-                ration_per_animal_units
+                ration_per_animal_units,
             )
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -309,10 +309,7 @@ class AnimalModuleReporter:
                     "forage_NDF": MeasurementUnits.PERCENT.value,
                 }
                 ration_supply_report = RationReporter.report_ration_supply(
-                    pen.ration_per_animal,
-                    feed.available_feeds,
-                    ration_report,
-                    pen.avg_nutrient_rqmts["avg_BW"]
+                    pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
                 )
                 AnimalModuleReporter.data_padder(
                     f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
@@ -320,7 +317,7 @@ class AnimalModuleReporter:
                     {},
                     simulation_day,
                     info_map,
-                    ration_supply_report_units
+                    ration_supply_report_units,
                 )
                 om.add_variable(
                     f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -371,7 +368,7 @@ class AnimalModuleReporter:
                 {},
                 animal_manager.simulation_day,
                 info_map,
-                ration_total_units
+                ration_total_units,
             )
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -774,12 +771,9 @@ class AnimalModuleReporter:
         for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
-            AnimalModuleReporter.data_padder(reference_variable,
-                                             variable_to_add,
-                                             0,
-                                             simulation_day,
-                                             info_map,
-                                             MeasurementUnits.ANIMALS.value)
+            AnimalModuleReporter.data_padder(
+                reference_variable, variable_to_add, 0, simulation_day, info_map, MeasurementUnits.ANIMALS.value
+            )
             om.add_variable(
                 f"number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}",
                 len(pen.animals_in_pen),
