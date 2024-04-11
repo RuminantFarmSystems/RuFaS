@@ -29,7 +29,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: Dict[str, Any],
-        units: Dict[str, str] | MeasurementUnits
+        units: Dict[str, str] | MeasurementUnits | str
     ) -> None:
         """
         Pads a variable in OutputManager for entries that it "missed" relative to another variable.
