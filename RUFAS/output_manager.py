@@ -95,7 +95,7 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
-    _detailed_values_flag : bool
+    _include_detailed_values : bool
         Flag to include detailed values in the json output files
     """
 
@@ -115,7 +115,7 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self._detailed_values_flag: bool = False
+            self._include_detailed_values: bool = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -488,7 +488,7 @@ class OutputManager(object):
         ...     }
         ... }
         >>> output_manager = OutputManager()
-        >>> output_manager.set_detailed_values_flag(True)
+        >>> output_manager.set_include_detailed_values(True)
         >>> modified_data_dict = output_manager._add_detailed_values(example_data_dict)
         >>> assert modified_data_dict[
         ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_values"
@@ -500,7 +500,7 @@ class OutputManager(object):
         ... ]
         """
 
-        if not self._detailed_values_flag:
+        if not self._include_detailed_values:
             return data_dict
 
         for key in data_dict:
@@ -1374,7 +1374,7 @@ class OutputManager(object):
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
 
-    def set_detailed_values_flag(self, flag: bool) -> None:
+    def set_include_detailed_values(self, flag: bool) -> None:
         """
         Sets the flag for adding detailed values to the output files.
 
@@ -1384,4 +1384,4 @@ class OutputManager(object):
             The flag to add detailed values to the output files.
         """
 
-        self._detailed_values_flag = flag
+        self._include_detailed_values = flag

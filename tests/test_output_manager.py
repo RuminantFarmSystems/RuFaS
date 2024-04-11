@@ -2222,25 +2222,25 @@ def test_add_detailed_values(
         False,
     ],
 )
-def test_set_detailed_values_flag(new_flag_value: bool) -> None:
+def test_set_detailed_values(new_flag_value: bool) -> None:
     """
-    Unit test for the set_detailed_values_flag() method in OutputManager class.
+    Unit test for the set_include_detailed_values() method in OutputManager class.
     """
 
     # Arrange
     manager1 = OutputManager()
 
     # Assert initial value
-    assert not manager1._detailed_values_flag
+    assert not manager1._include_detailed_values
 
     # Act
-    manager1.set_detailed_values_flag(new_flag_value)
+    manager1.set_include_detailed_values(new_flag_value)
 
     # Assert
-    assert manager1._detailed_values_flag == new_flag_value
+    assert manager1._include_detailed_values == new_flag_value
 
     # Clean up
-    manager1.set_detailed_values_flag(False)
+    manager1.set_include_detailed_values(False)
 
 
 @pytest.mark.parametrize(
