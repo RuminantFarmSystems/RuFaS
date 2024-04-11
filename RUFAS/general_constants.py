@@ -18,6 +18,9 @@ class GeneralConstants:
 
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
+        PERCENTAGE_TO_FRACTION: The conversion factor from a percentage to a fraction.
+        FRACTION_TO_PERCENTAGE: The conversion factor from a fraction to a percentage.
+
     """
 
     # Length-related
@@ -47,3 +50,7 @@ class GeneralConstants:
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
+
+    # Fractions and Percentages
+    PERCENTAGE_TO_FRACTION = 0.01
+    FRACTION_TO_PERCENTAGE = 100.0
