@@ -22,7 +22,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 
 
-"""This constants define the minimum and maximum integers that can be used to seed Numpy's `random` package."""
+"""These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
 NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
