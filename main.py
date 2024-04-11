@@ -19,6 +19,12 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.units import MeasurementUnits
+
+
+"""This constants define the minimum and maximum integers that can be used to seed Numpy's `random` package."""
+NUMPY_RANDOM_SEED_LOWER_BOUND = 0
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 
 def main():
@@ -290,15 +296,19 @@ def set_random_seed(input_manager: InputManager) -> None:
     """
     set_seed = input_manager.get_data("config.set_seed")
 
+    om = OutputManager()
+    info_map = {"class": "No caller class", "function": set_random_seed.__name__}
+
     if set_seed:
         seed = input_manager.get_data("config.random_seed")
-        om = OutputManager()
-        info_map = {"class": "No caller class", "function": set_random_seed.__name__}
         log_name = "Randomization seed set."
         log_message = f"Randomization libraries being seeded with {seed}."
         om.add_log(log_name, log_message, info_map)
     else:
-        seed = None
+        seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
+        info_map["units"] = MeasurementUnits.UNITLESS
+        om.add_variable("generated_random_seed", seed, info_map)
+        om.add_log("Generated random seed", f"Seeding random libaries with generated seed: {seed}", info_map)
 
     random.seed(seed)
     numpy.random.seed(seed)
