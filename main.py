@@ -10,7 +10,7 @@ import argparse
 import random
 import traceback
 from pathlib import Path
-from typing import List
+from typing import List, Any
 
 import numpy
 
@@ -27,7 +27,7 @@ NUMPY_RANDOM_SEED_LOWER_BOUND = 0
 NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 
-def main():
+def main() -> None:
     cmd_arguments = parse_gnu_args()
     if cmd_arguments.load_pool:
         load_pool = True
@@ -297,7 +297,7 @@ def set_random_seed(input_manager: InputManager) -> None:
     set_seed = input_manager.get_data("config.set_seed")
 
     om = OutputManager()
-    info_map = {"class": "No caller class", "function": set_random_seed.__name__}
+    info_map: dict[str, Any] = {"class": "No caller class", "function": set_random_seed.__name__}
 
     if set_seed:
         seed = input_manager.get_data("config.random_seed")
