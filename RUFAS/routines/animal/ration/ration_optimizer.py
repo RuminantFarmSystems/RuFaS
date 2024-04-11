@@ -668,9 +668,16 @@ class RationOptimizer:
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(decision_vector)
         if DMI != 0:
-            return (
+            return float((
                 sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI
-            ) - 25
+            ) - 25)
+        else:
+            info_map = {
+                "class": "RationOptimizer",
+                "function": RationOptimizer.NDF_constraint_lower.__name__,
+                }
+            om.add_error('DMI of 0', 'Dry matter intake during ration formulation is currently 0.', info_map)
+            raise
 
     @staticmethod
     def NDF_constraint_upper(
@@ -698,6 +705,8 @@ class RationOptimizer:
             return float((
                 -(sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI) + 45
             ))
+        else:
+            raise
 
     @staticmethod
     def forage_NDF_constraint(
