@@ -10,7 +10,7 @@ import argparse
 import random
 import traceback
 from pathlib import Path
-from typing import List, Any
+from typing import List
 
 import numpy
 
@@ -298,7 +298,7 @@ def set_random_seed(input_manager: InputManager) -> None:
     set_seed = input_manager.get_data("config.set_seed")
 
     om = OutputManager()
-    info_map: dict[str, Any] = {"class": "No caller class", "function": set_random_seed.__name__}
+    info_map: dict[str, str | MeasurementUnits] = {"class": "No caller class", "function": set_random_seed.__name__}
 
     if set_seed:
         seed = input_manager.get_data("config.random_seed")
