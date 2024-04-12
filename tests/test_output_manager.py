@@ -1733,9 +1733,7 @@ def test_save_to_json(
     base_name = (
         f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
     )
-    patch_for_generate_file_name.assert_called_once_with(
-        base_name, "json", include_millis=filter_file.endswith(".json") and "name" not in filter_content
-    )
+    patch_for_generate_file_name.assert_called_once_with(base_name, "json")
     patch_for_dict_to_file_json.assert_called_once_with(filtered_pool, os.path.join(save_path, expected_filename))
 
 
