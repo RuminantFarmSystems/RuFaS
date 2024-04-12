@@ -62,6 +62,8 @@ class HeiferII(HeiferI):
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -110,10 +112,11 @@ class HeiferII(HeiferI):
         self.conception_rate = 0.0
         self.tai_program_start_day = 0
         self.synch_ed_program_start_day = 0
-        self.abortion_day = None
         self.p_gest_for_calf = 0
         self._hormone_schedule = None
         self._TAI_conception_rate = 0.0
+
+        self.repro_sub_protocol = args["repro_sub_protocol"]
 
     def get_bw_change(self):
         """
@@ -191,11 +194,11 @@ class HeiferII(HeiferI):
         self.estrus_day = args["estrus_day"]
 
         # TAI variables
-        self.tai_method_h = args["tai_method_h"]
+        self.tai_method_h = args["repro_sub_protocol"]
         self.tai_program_start_day_h = args["tai_program_start_day_h"]
 
         # synch_ED variables
-        self.synch_ed_method_h = args["synch_ed_method_h"]
+        self.synch_ed_method_h = args["repro_sub_protocol"]
         self.synch_ed_program_start_day_h = args["synch_ed_program_start_day_h"]
         self.synch_ed_estrus_day = args["synch_ed_estrus_day"]
         self.synch_ed_stop_day = args["synch_ed_stop_day"]
@@ -222,6 +225,7 @@ class HeiferII(HeiferI):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
@@ -1436,14 +1440,15 @@ class HeiferII(HeiferI):
         -------
         float
             The birth weight of the calf.
-        """
 
-        return truncnorm.rvs(
+        """
+        birth_weight = truncnorm.rvs(
             -const.STDI,
             const.STDI,
             AnimalBase.config[f"birth_weight_avg_{breed.lower()}"],
             AnimalBase.config[f"birth_weight_std_{breed.lower()}"],
         )
+        return float(birth_weight)
 
     def _initialize_pregnancy_parameters(self) -> None:
         """
