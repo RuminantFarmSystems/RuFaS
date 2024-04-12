@@ -29,7 +29,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: Dict[str, Any],
-        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str,
+        units: Dict[str, str] | str,
     ) -> None:
         """
         Pads a variable in OutputManager for entries that it "missed" relative to another variable.
@@ -57,7 +57,7 @@ class AnimalModuleReporter:
             The day of the simulation.
         info_map: Dict[str, Any]
             The info_map to use when padding.
-        units: Dict[str, str | MeasurementUnits] | MeasurementUnits | str
+        units: Dict[str, str] | str
             Units for the variable being added, in the format provided in the main call to add_variable,
             (e.g. the one following the call of data_padder).
 
@@ -248,12 +248,12 @@ class AnimalModuleReporter:
                 0,
                 simulation_day,
                 info_map,
-                MeasurementUnits.KILOGRAMS,
+                MeasurementUnits.KILOGRAMS.value,
             )
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
                 pen.MEdiet,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value}),
             )
             avg_nutrient_rqmts_units = {
                 "NEmaint_requirement": MeasurementUnits.MEGACALORIES.value,
@@ -281,7 +281,7 @@ class AnimalModuleReporter:
                 pen.avg_nutrient_rqmts,
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
-            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_animal.keys()}
+            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS.value for key in ration_per_animal.keys()}
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.ration_per_animal_for_pen_0_CALF",
                 f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
