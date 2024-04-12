@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List
 
 
 class RationConfig:
@@ -221,12 +222,12 @@ class RationConfig:
         self.MPbact = None
         self.RUP_diet = None
         self.dP_list = []
-        self.TDNact_list = []
+        self.TDNact_list: List[float] = []
         self.dCa_list = []
         self.is_conc_list = []
         self.RDP_list = []
-        self.RUP_list = []
-        self.TDNact_diet = None
+        self.RUP_list: List[float] = []
+        self.TDNact_diet: float = None
         self.RDP_diet = None
         self.MPbact = None
         self.MP_supply = None
