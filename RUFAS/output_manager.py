@@ -1029,14 +1029,12 @@ class OutputManager(object):
             Additional content from the filter that might influence the file naming.
         """
 
-        include_milliseconds = filter_file.endswith(".json") and "name" not in filter_content
-
         if "name" in filter_content:
             base_name = f"saved_variables_{filter_content['name']}"
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json", include_millis=include_milliseconds)
+        file_name = self.generate_file_name(base_name, "json")
         file_path = os.path.join(save_path, file_name)
         self.dict_to_file_json(filtered_pool, file_path)
 
