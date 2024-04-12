@@ -33,7 +33,7 @@ def cow_args() -> dict[str, Any]:
         (True, True),
         (True, False),
         (False, True),
-    ]
+    ],
 )
 def test_init_cow(mocker: MockFixture, cow_args: dict[str, Any], pregnant: bool, in_milk: bool) -> None:
     """
