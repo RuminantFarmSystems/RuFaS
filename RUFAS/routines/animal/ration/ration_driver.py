@@ -30,10 +30,9 @@ class RationManager:
     """
 
     @classmethod
-    def formulate_ration(cls,
-                         pen: PenTypedDict,
-                         available_feeds: AvailableFeedsTypedDict,
-                         animal_grouping_scenario) -> Tuple[Dict[str, float], Dict[str, float]]:
+    def formulate_ration(
+        cls, pen: PenTypedDict, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
+    ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -182,9 +181,7 @@ class RationManager:
 
     @classmethod
     def make_ration_from_solution(
-        cls,
-        available_feeds: AvailableFeedsTypedDict,
-        solution: scipy.optimize.OptimizeResult
+        cls, available_feeds: AvailableFeedsTypedDict, solution: scipy.optimize.OptimizeResult
     ) -> Dict[str, float | str]:
         """
         Generates ration dictionary from scipy result
@@ -244,10 +241,11 @@ class RationManager:
 
     @classmethod
     def get_user_defined_ration(  # noqa
-        cls, req: animal_requirements.AnimalRequirements,
+        cls,
+        req: animal_requirements.AnimalRequirements,
         pen: PenTypedDict,
         available_feeds: AvailableFeedsTypedDict,
-        animal_grouping_scenario
+        animal_grouping_scenario,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in

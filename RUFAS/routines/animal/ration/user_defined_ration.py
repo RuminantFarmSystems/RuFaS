@@ -59,9 +59,9 @@ class UserDefinedRationManager(object):
         return ration_percents
 
     @staticmethod
-    def make_ration_from_user_values(ration_percents: Dict[str, float],
-                                     available_feeds: AvailableFeedsTypedDict,
-                                     req: AnimalRequirements) -> Dict[str, float | str]:
+    def make_ration_from_user_values(
+        ration_percents: Dict[str, float], available_feeds: AvailableFeedsTypedDict, req: AnimalRequirements
+    ) -> Dict[str, float | str]:
         """
         Generate ration dict from user ration percents input,
         scaled to their estimated dry matter intake (DMI)
