@@ -713,7 +713,7 @@
         "type": "string",
         "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
         "default": "None",
-        "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        "pattern": "^(None|3-NOP|Monensin|Essential Oils|Seaweed)$"
       },
       "methane_mitigation_additive_amount": {
         "type": "number",
@@ -998,17 +998,11 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP|5dCG2P)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1130,17 +1124,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP|5dCG2P)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1264,15 +1252,9 @@
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP|5dCG2P)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1426,15 +1408,9 @@
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP|5dCG2P)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP|5dCG2P)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1954,7 +1930,7 @@
       "properties": {  
         "type": "number",
         "minimum": 0,
-        "default": 306
+        "default": 300
       }
     },
     "corn_silage_tillage_emissions": {

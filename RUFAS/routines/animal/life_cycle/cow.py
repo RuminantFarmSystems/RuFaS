@@ -51,6 +51,8 @@ class Cow(HeiferIII):
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -171,6 +173,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
@@ -206,6 +209,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
@@ -341,22 +345,49 @@ class Cow(HeiferIII):
         """
         return np.random.normal(mean, std)
 
-    def milking_update(self, sim_day, calving_interval):
+    def milking_update(self, sim_day: int, calving_interval: int | float):
         """
-        Update milking status for lactating cows.
-        start at calving, daily milk production estimated by breed and parity
-        specific lactation curves.
-        TEMP: fat percent, FCM, body weight during lactation, and dry matter
-        intake are coded here with equations with hard-coded parameters just
-        for valid the simulation model indication of the place for future
-        adjustment with ration formulation and economics calculation.
+        Updates milking status for lactating cows, using breed and parity
+        to estimate daily milk production from specific lactation curves
+        (following Wood's curve model).
 
-        Returns:
-            estimated_daily_milk_produced: estimated daily milk production
-                from the lactation curve
-            fat_percent: calculated with days in milk, for temporary use
-            daily_fat_correct_milk_production: calculated form estimated
-                milk production and fat percent, for temporary use
+        Parameters
+        -------
+        sim_day : int
+            The current simulation day.
+        calving_interval : int | float
+            calving_interval is an int (user input calving interval) if the
+            value of animal_config["use_input_calving_interval"] exists
+            and is True; otherwise, it is a float (average herd calving
+            interval). See logic in _set_avg_CI in lifecycle.py.
+
+        Returns
+        -------
+        estimated_daily_milk_produced : float
+            Estimated daily milk production from the lactation curve.
+        fat_percent : float
+            Calculated with days in milk, for temporary use.
+        daily_fat_correct_milk_production : float
+            Calculated from estimated milk production and fat percent, for temporary use.
+
+        Notes
+        ------
+        - The targeted lactation curve is set at the beginning of each lactation,
+        and the variance can be added after adjusted by the nutrition submodel.
+        - Currently, the variables for fat percent, FCM,
+        body weight during lactation, and dry matter intake
+        are coded here with equations containing hard-coded parameters
+        just to validate the simulation model. They indicate places for future adjustment
+        in regards to ration formulation and economics calculation.
+
+        References
+        ------
+        [1] [A.1A.C.33]-[A.1A.C.34]
+        [2] M. Li, G.J.M. Rosa, K.F. Reed, V.E. Cabrera,
+        Investigating the effect of temporal, geographic, and management
+        factors on US Holstein lactation curve parameters,
+        Journal of Dairy Science, Volume 105, Issue 9, 2022,
+        Pages 7525-7538, ISSN 0022-0302.
         """
         if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
             self.milking = False
@@ -452,18 +483,43 @@ class Cow(HeiferIII):
 
     def calc_manure_excretion(
         self,
-        methane_model,
-        methane_mitigation_method,
-        methane_mitigation_additive_amount,
-        ME_intake,
-        nutrient_amount,
-        nutrient_conc,
-    ):
+        methane_model: str,
+        methane_mitigation_method: str,
+        methane_mitigation_additive_amount: float,
+        ME_intake: float,
+        nutrient_amount: Dict[str, float],
+        nutrient_conc: Dict[str, float],
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
-        Args:
-            methane_model: methane model used for methane emission calculations
-            ME_intake: metabolizable energy intake, Mcal/kg DM
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        methane_mitigation_method: str
+            Methane mitigation method used.
+        methane_mitigation_additive_amount: float
+            Amount of methane mitigation additive per kg dry matter intake (DMI) (mg/kg).
+        ME_intake : float
+            Metabolizable energy intake per kg DMI (Mcal/kg).
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 

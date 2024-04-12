@@ -40,12 +40,12 @@ class HeiferI(Calf):
 
     def set_nutrient_rqmts(
         self,
-        temp,
+        temperature: float,
         animal_grouping_scenario,
-        nutrient_conc: dict = {},
+        nutrient_conc: Dict[str, float] = {},
         metabolizable_energy: float = 15.625,
         previous_DMI: float = 10.0,
-    ):
+    ) -> None:
         """
         Calculates this heiferI's nutrient requirements.
         """
@@ -68,7 +68,7 @@ class HeiferI(Calf):
             day_of_pregnancy=None,
             animal_type=animal_grouping_scenario.get_animal_type(self),
             body_condition_score_5=3,
-            previous_temperature=temp,
+            previous_temperature=temperature,
             average_daily_gain_heifer=self.daily_growth,
             NDF_conc=NDF_conc,
             TDN_conc=TDN_conc,
@@ -85,12 +85,34 @@ class HeiferI(Calf):
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
-    def calc_manure_excretion(self, methane_model, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]):
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-                methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
         self.p_excrt, self.manure_excretion = manure_calculations(
@@ -102,12 +124,14 @@ class HeiferI(Calf):
             nutrient_conc=nutrient_conc,
         )
 
-    def phosphorus_rqmts(self, DMI):
+    def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
 
-        Args:
-            DMI: the Dry Matter Intake (kg)
+        Parameters
+        ----------
+        DMI : float
+            The Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000
@@ -129,7 +153,7 @@ class HeiferI(Calf):
         # requirement of P from the ration (g) (A.1B-D.E.7)
         self.p_req = p_absorb / 0.664
 
-    def get_non_preg_bw_change(self):
+    def get_non_preg_bw_change(self) -> float:
         """
         Calculates the body weight change for a heifer that is not pregnant.
         If the days_born of the animal is equal to 400,
@@ -143,7 +167,7 @@ class HeiferI(Calf):
 
         Returns
         -------
-        int
+        float
             The daily body weight change for a heifer that is not pregnant.
         """
         divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
@@ -151,21 +175,26 @@ class HeiferI(Calf):
             divisor = 1
         return max(
             (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor,
-            AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE,
+            AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
         )
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls heifer's grow with average daily gain based on non-preg ADG based on NRC.
         Here is the place to change growth rate with heifer feeding methods later
-        when we have heifer nutrition from the ration furmulation module.
+        when we have heifer nutrition from the ration formulation module.
         Once reach the breeding start day,
-        this heifer would be move to next stage, the heiferII stage
+        this heifer would be move to next stage, the heiferII stage.
+
+        Parameters
+        ----------
+        sim_day : int
+            Day of simulation.
 
         Returns
         -------
-
-        the second stage of heifer -- breeding stage starts
+        bool
+            True if should be moved to second stage of heifer -- breeding stage starts.
         """
 
         self.update_body_weight_history(sim_day)

@@ -13,7 +13,6 @@ def methane_mitigation(
     NDF_concentration: float,
     EE_concentration: float,
     starch_concentration: float,
-    CP_concentration: float,
     methane_mitigation_method: str,
     methane_mitigation_additive_amount: float,
 ) -> float:
@@ -27,8 +26,6 @@ def methane_mitigation(
         Concentration of ether extract (EE) in the ration.
     starch_concentration : float
         Concentration of starch in the ration.
-    CP_concentration : float
-        Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str
         Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
         "EssentialOils", and "Seaweed".
@@ -44,8 +41,6 @@ def methane_mitigation(
     """
 
     methane_yield_reduction = 0.0
-    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
-    Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
 
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = (
@@ -56,12 +51,7 @@ def methane_mitigation(
             - 0.337 * (starch_concentration - 21.1)
         )
     elif methane_mitigation_method == "Monensin":
-        if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
-            methane_yield_reduction = (
-                0.30054 - 0.00377 * methane_mitigation_additive_amount - 1.57832 * CP_concentration / 100
-            ) * 100
-        else:
-            methane_yield_reduction = (0.03223 - 0.00410 * methane_mitigation_additive_amount) * 100
+        methane_yield_reduction = 6.36 - 0.277 * methane_mitigation_additive_amount - 0.182 * starch_concentration
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
@@ -106,10 +96,19 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+    methane_mitigation_method: str
+        The name of the methane mitigation feed additives. The accepted names are
+            '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
+    methane_mitigation_additive_amount: float
+        The dosage of the feed additive, mg/kg DMI.
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -119,8 +118,20 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
-    # nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
     nutrient_amounts = nutrient_amount
     nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
@@ -246,7 +257,6 @@ def manure_calculations(
             NDF_concentration,
             EE_concentration,
             starch_concentration,
-            CP_concentration,
             methane_mitigation_method,
             methane_mitigation_additive_amount,
         )

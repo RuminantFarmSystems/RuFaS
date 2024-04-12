@@ -76,12 +76,13 @@ class Calf(AnimalBase):
 
         self.birth_weight = args["birth_weight"]
         self.body_weight = args["birth_weight"]
-        self.mature_body_weight = truncnorm.rvs(
+        mature_body_weight = truncnorm.rvs(
             -const.STDI,
             const.STDI,
             AnimalBase.config["mature_body_weight_avg"],
             AnimalBase.config["mature_body_weight_std"],
         )
+        self.mature_body_weight = float(mature_body_weight)
         self.wean_weight = 0
         self.p_animal = args["p_init"]
 
@@ -147,11 +148,29 @@ class Calf(AnimalBase):
         Parameters
         ----------
         methane_model : str
-            methane model used for methane emission calculations
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
         None
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
 
         """
         p_urine, p_feces_excrt = self.calc_base_manure()

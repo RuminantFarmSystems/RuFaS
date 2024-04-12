@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Union, Tuple
 import pandas as pd
 from deprecated.sphinx import deprecated
 
+from RUFAS.units import MeasurementUnits
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.util import Utility
@@ -104,8 +105,6 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self._exclude_info_maps_flag = False
-
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -136,27 +135,15 @@ class OutputManager(object):
         value: Any,
         info_map: Dict[str, Any],
     ) -> None:
-        """
-        Adds value and info map at key in the given pool.
-
-        Parameters
-        ----------
-        pool : Dict[str, Dict[str, List[Dict[str, Any]]]
-            The pool to add the value and info_map to.
-        key : str
-            The key to add the value and info_map at.
-        value : Any
-            The value to be added to the pool.
-        info_map : Dict[str, Any]
-            The info map to be added to the pool.
-        """
-
+        """Adds value and info map at key in the given pool."""
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        if not self._exclude_info_maps_flag:
-            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
-            pool[key]["info_maps"].append(reduced_info_map)
+        # reduced_info_map is identical to info_map without the class key and
+        # the function key; as they are already stored in element key and
+        # having them increases the final file size.
+        reduced_info_map = {k: info_map[k] for k in info_map.keys() - {"class", "function"}}
+        pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
             pool[key]["values"].append(value)
@@ -187,8 +174,39 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
+        units = info_map.get("units")
+        if units is None:
+            raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
+        self._validate_units(units)
+
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+    def _validate_units(self, units: Dict[str, Any] | str) -> None:
+        """
+        Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
+        valid MeasurementUnits values (including nested dictionaries).
+
+        Parameters
+        ----------
+        units : Dict[str, Any] | str
+            Either a string that can be converted to an MeasurementUnits, or a dictionary mapping string keys to either
+            MeasurementUnits values or further dictionaries.
+
+        Raises
+        ------
+        ValueError
+            If any unit or nested unit is not a valid MeasurementUnits value.
+
+        """
+        if isinstance(units, dict):
+            for key, unit in units.items():
+                self._validate_units(unit)
+        else:
+            try:
+                MeasurementUnits(units)
+            except ValueError:
+                raise ValueError(f"'{units}' is not a valid MeasurementUnits value")
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -1077,10 +1095,10 @@ class OutputManager(object):
 
             parsable_dicts = []
 
-            if not exclude_info_maps and "info_maps" in variable_data:
+            if not exclude_info_maps:
                 parsable_dicts.append("info_maps")
 
-            is_variable_nested = isinstance(variable_data["values"][0], dict)
+            is_variable_nested = isinstance(variable_data["values"][0], Dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
@@ -1275,15 +1293,3 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
-
-    def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
-        """
-        Sets the exclude_info_maps flag to the given value.
-
-        Parameters
-        ----------
-        exclude_info_maps : bool
-            The value to set the exclude_info_maps flag to.
-        """
-
-        self._exclude_info_maps_flag = exclude_info_maps
