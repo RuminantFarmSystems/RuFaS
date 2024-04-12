@@ -37,7 +37,7 @@ class ReproStateManager:
         Check if the current state is in the empty state (NONE).
     """
 
-    def __init__(self, initial_states: set[ReproStateEnum] | None = None):
+    def __init__(self, initial_states: set[ReproStateEnum] | None = None) -> None:
         """
         Initialize the ReproStateManager with the given initial states.
 
