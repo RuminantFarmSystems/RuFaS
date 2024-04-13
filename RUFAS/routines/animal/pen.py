@@ -84,9 +84,6 @@ class Pen:
     animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
 
-    classes_in_pen : set
-        The set (no repeats) of all the classes to which the animals in the pen belong.
-
     populated : bool
         True iff there is at least 1 animal in the pen, and false otherwise.
 
@@ -231,7 +228,7 @@ class Pen:
         # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
         self.populated = False
 
-        # self.classes_in_pen = set()
+        # self. = set()
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -401,16 +398,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    # def update_classes_in_pen(self) -> None:
-    #     """
-    #     Updates the classes contained within the pen
-    #     """
-    #     self.classes_in_pen = set()
-    #     for animal in list(self.animals_in_pen.values()):
-    #         life_cycle_stage = type(animal).__name__
-    #         self.classes_in_pen.add(life_cycle_stage)
-
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -427,7 +414,6 @@ class Pen:
         self.update_pen_populated()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        # self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -539,14 +525,14 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if AnimalType.DRY_COW or AnimalType.LAC_COW in list(self.animal_grouping_scenario.values()):
+        if AnimalType.DRY_COW or AnimalType.LAC_COW in list(self.animal_grouping_scenario.values()):  # CHECK
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-        # if "Cow" in self.classes_in_pen:
-        #     for animal in list(self.animals_in_pen.values()):
-        #         if type(animal).__name__ == "Cow":
-        #             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+        if self.animal_combination == 2 or self.animal_combination == 3 or self.animal_combination == 4:  # CHECK
+            for animal in list(self.animals_in_pen.values()):
+                if type(animal).__name__ == "Cow":
+                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
         """
