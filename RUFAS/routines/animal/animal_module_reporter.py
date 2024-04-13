@@ -222,6 +222,12 @@ class AnimalModuleReporter:
                 "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
                 "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
                 "N": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "as_fed": MeasurementUnits.PERCENT.value,
+                "EE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "starch": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "TDN": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "DE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
             }
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_ration_interval_data.__name__
@@ -299,6 +305,9 @@ class AnimalModuleReporter:
                     "fat": MeasurementUnits.GRAMS.value,
                     "fat_percentage": MeasurementUnits.PERCENT.value,
                     "forage_NDF": MeasurementUnits.PERCENT.value,
+                    "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                    "metabolizable_protein": MeasurementUnits.GRAMS.value,
+
                 }
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
