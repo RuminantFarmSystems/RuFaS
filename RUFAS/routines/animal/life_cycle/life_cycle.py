@@ -641,7 +641,7 @@ class LifeCycleManager:
             heiferII: The heiferII to extract the stats from.
 
         """
-        # self.CIDR_count += heiferII.CIDR_count  # TODO: add CIDR count to heiferII GitHub Issue #1217
+        self.CIDR_count += heiferII.CIDR_count
         self.GnRH_injection_num_h += heiferII.GnRH_injections
         self.PGF_injection_num_h += heiferII.PGF_injections
         self.preg_check_num_h += heiferII.preg_diagnoses

@@ -103,6 +103,7 @@ class HeiferII(HeiferI):
         self.GnRH_injections = 0
         self.PGF_injections = 0
         self.CIDR_injections = 0
+        self.CIDR_count = self.CIDR_injections
         self.semen_num = 0
         self.AI_times = 0
         self.preg_diagnoses = 0
