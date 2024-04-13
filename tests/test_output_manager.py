@@ -263,9 +263,9 @@ def test_get_units_substr(
                 }
             },
             f"simple_key.key1_random1,simple_key.key2_random2{os.linesep}"
-            f"1,\"[1, 1]\"{os.linesep}"
-            f"2,\"[2, 2]\"{os.linesep}"
-            f"3,\"[3, 3]\"{os.linesep}",
+            f'1,"[1, 1]"{os.linesep}'
+            f'2,"[2, 2]"{os.linesep}'
+            f'3,"[3, 3]"{os.linesep}',
             True,
         ),
         (

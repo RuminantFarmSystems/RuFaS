@@ -307,7 +307,6 @@ class AnimalModuleReporter:
                     "forage_NDF": MeasurementUnits.PERCENT.value,
                     "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
                     "metabolizable_protein": MeasurementUnits.GRAMS.value,
-
                 }
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
