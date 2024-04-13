@@ -41,6 +41,11 @@
       "maximum": 56045,
       "default": null,
       "description": "Unique 5-digit code that represents a specific U.S. county."
+    },
+    "include_detailed_values": {
+      "type": "bool",
+      "description": "Whether or not to add detailed_values property to the json output",
+      "default": false
     }
   },
   "animal_properties": {
