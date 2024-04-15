@@ -283,9 +283,10 @@ class ReportGenerator:
             "function": self._check_horizontal_first_property.__name__,
         }
 
-        if isinstance(filter_content["horizontal_first"], str) and filter_content[
-            "horizontal_first"
-        ].lower() in ["true", "false"]:
+        if isinstance(filter_content["horizontal_first"], str) and filter_content["horizontal_first"].lower() in [
+            "true",
+            "false",
+        ]:
             filter_content["horizontal_first"] = filter_content["horizontal_first"].lower() == "true"
 
             warning_event_log = {
