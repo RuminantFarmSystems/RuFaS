@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from scipy.optimize import minimize, OptimizeResult
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Any
 
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.ration.user_defined_ration import (
@@ -35,9 +35,9 @@ class RationOptimizer:
 
     def __init__(self) -> None:
         """initializes RationOptimizer object"""
-        self.cow_cons: List[Callable] = []
-        self.heifer_cons: List[Callable] = []
-        self.constraint_functions: List[Callable] = []
+        self.constraint_functions: List[Callable[[Any], float]] = []
+        self.cow_cons: List[Dict[str, Any]] = []
+        self.heifer_cons: List[Dict[str, Any]] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
@@ -58,12 +58,10 @@ class RationOptimizer:
         ]
 
         self.cow_cons = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
-        """ constraints for lactating cows """
 
         self.heifer_cons = [
             cons for cons in self.cow_cons if cons["fun"] not in [self.total_energy, self.NEl_constraint]
         ]
-        """constraints for animals that are not lactating cows """
 
     @staticmethod
     def triple_values_in_list(input_list: List[float]) -> List[float]:
