@@ -196,6 +196,8 @@ class ReportGenerator:
         event_logs.append(init_event_log)
 
         try:
+            self._check_horizontal_first_property(filter_content, event_logs, individual_report_name)
+
             report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
@@ -240,6 +242,65 @@ class ReportGenerator:
             event_logs.append(error_event_log)
 
         return event_logs
+
+    def _check_horizontal_first_property(
+        self,
+        filter_content: Dict[str, Any],
+        event_logs: List[Dict[str, str | Dict[str, str]]],
+        individual_report_name: str,
+    ) -> None:
+        """
+        Check if the 'horizontal_first' property (when present) in the report filter is a boolean and convert it to a
+        boolean if it is a string with the lowercased value 'true' or 'false'.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details such as 'name', 'filters',
+            'cross_references', and aggregation instructions.
+        event_logs : List[Dict[str, str | Dict[str, str]]]
+            A list of log events.
+        individual_report_name : str
+            The name of the report to be generated.
+
+        Raises
+        ------
+        ValueError
+            If the value of 'horizontal_first' in the report filter is not a boolean or a string with the lowercased
+            value 'true' or 'false'.
+        """
+
+        if "horizontal_first" not in filter_content:
+            return
+
+        horizontal_first = filter_content["horizontal_first"]
+
+        if isinstance(horizontal_first, bool):
+            return
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._check_horizontal_first_property.__name__,
+        }
+
+        if isinstance(filter_content["horizontal_first"], str) and filter_content[
+            "horizontal_first"
+        ].lower() in ["true", "false"]:
+            filter_content["horizontal_first"] = filter_content["horizontal_first"].lower() == "true"
+
+            warning_event_log = {
+                "warning": "report_generation_warning",
+                "message": f"Warning generating the individual report ({individual_report_name}): "
+                "The value of 'horizontal_first' in the report filter should be a boolean, not a string. "
+                "It has been converted to a boolean.",
+                "info_map": info_map,
+            }
+            event_logs.append(warning_event_log)
+        else:
+            raise ValueError(
+                f"The value of 'horizontal_first' in the report filter should be a boolean. "
+                f"Value provided: {filter_content['horizontal_first']}"
+            )
 
     def _prepare_report_data_to_be_graphed(
         self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
