@@ -1111,7 +1111,8 @@ def test_clear_reports() -> None:
 
 
 @pytest.mark.parametrize(
-    "filter_content, event_logs, individual_report_name, expected_filter_content, expected_event_logs, expected_exception",
+    "filter_content, event_logs, individual_report_name, "
+    "expected_filter_content, expected_event_logs, expected_exception",
     [
         (
             {"horizontal_first": True},
