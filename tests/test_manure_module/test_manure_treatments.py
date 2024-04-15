@@ -1887,9 +1887,13 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
         (101, 100, SlurryStorageOutdoor, "cover"),
     ],
 )
-def test_adjust_final_manure_volume(simulation_day: int, storage_time_period: int,
-                                    manure_treatment: Type[AnaerobicLagoon | SlurryStorageOutdoor], manure_cover: str,
-                                    mocker: MockFixture) -> None:
+def test_adjust_final_manure_volume(
+    simulation_day: int,
+    storage_time_period: int,
+    manure_treatment: Type[AnaerobicLagoon | SlurryStorageOutdoor],
+    manure_cover: str,
+    mocker: MockFixture,
+) -> None:
     """Unit test for _adjust_final_manure_volume() in anaerobic_lagoon.py."""
     # Arrange
     manure_treatment_config = mocker.MagicMock()
