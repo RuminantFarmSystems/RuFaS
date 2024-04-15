@@ -36,8 +36,8 @@ class RationOptimizer:
     def __init__(self) -> None:
         """initializes RationOptimizer object"""
         self.constraint_functions: List[Callable[[Any, Any], float]] = []
-        self.cow_cons: List[Dict[str, Any]] = []
-        self.heifer_cons: List[Dict[str, Any]] = []
+        self.cow_cons: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig]] | str] = []
+        self.heifer_cons: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig]] | str] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
@@ -1099,7 +1099,7 @@ class RationOptimizer:
     @staticmethod
     def is_constraint_violated(
         solution_x: npt.NDArray,
-        constraint: Dict[str, Callable[[Any, Any], float]],
+        constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
         ration_config: RationConfig
     ) -> bool:
         """
@@ -1131,7 +1131,7 @@ class RationOptimizer:
     @staticmethod
     def find_failed_constraints(
         solution_x: npt.NDArray,
-        constraints: List[dict[str, Callable[[Any, Any], float]]],
+        constraints: List[Dict[str, Callable[[Any, Any], float]]],
         ration_config: RationConfig
     ) -> List[Dict[str, Callable[[Any, Any], float]]]:
         """
