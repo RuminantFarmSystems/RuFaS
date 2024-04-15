@@ -586,10 +586,20 @@ class OutputManager(object):
         -------
         str
             The formatted units substring for the column title.
+
+        Examples
+        --------
+        >>> output_manager = OutputManager()
+        >>> output_manager._get_units_substr("temperature", "C")
+        '_(C)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
+        '_(m/s)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
+        '_(degrees)'
         """
 
         if not isinstance(units, dict):
-            return f"_{units}" if units else ""
+            return f"_({units})" if units else ""
 
         if subkey not in units:
             if subkey is not None:
@@ -603,7 +613,7 @@ class OutputManager(object):
                 )
             return ""
 
-        return f"_{units[subkey]}"
+        return f"_({units[subkey]})"
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary to a csv file.
