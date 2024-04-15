@@ -35,7 +35,7 @@ class RationOptimizer:
 
     def __init__(self) -> None:
         """initializes RationOptimizer object"""
-        self.constraint_functions: List[Callable[[Any], float]] = []
+        self.constraint_functions: List[Callable[[Any, Any], float]] = []
         self.cow_cons: List[Dict[str, Any]] = []
         self.heifer_cons: List[Dict[str, Any]] = []
 
@@ -64,7 +64,7 @@ class RationOptimizer:
         ]
 
     @staticmethod
-    def triple_values_in_list(input_list: List[float]) -> List[float]:
+    def triple_values_in_list(input_list: List[Any]) -> List[Any]:
         """
         Helper function that takes an input of a list and returns that list with
         each value occuring a total of 3 times consecutively. This method is
@@ -73,12 +73,12 @@ class RationOptimizer:
 
         Parameters
         ----------
-        list : list
+        input_list : List[Any]
             A list of values.
 
         Returns
         -------
-        List[float]
+        List[Any]
 
         """
         tripled_list = []
@@ -174,7 +174,7 @@ class RationOptimizer:
         ration_config.MEact_list = []
         for i in range(len(ration_config.DEact_list)):
             if ration_config.feed_type_list[i] == "Mineral":
-                ration_config.MEact_list.append(0)
+                ration_config.MEact_list.append(0.0)
             elif ration_config.is_fat_list[i] is True:
                 ration_config.MEact_list.append(ration_config.DE_list[i])
             elif ration_config.EE_list[i] >= 3:
@@ -314,11 +314,11 @@ class RationOptimizer:
         )
         # [A.Cow.E.6]-[A.Heifer.E.6]
         # Actual metabolizable energy of feed i, Mcal/kg
-        if not ration_config.MEact_list:
+        if hasattr(ration_config, "MEact_list"):
             ration_config.MEact_list = []
             for i in range(len(ration_config.DEact_list)):
                 if ration_config.feed_type_list[i] == "Mineral":
-                    ration_config.MEact_list.append(0)
+                    ration_config.MEact_list.append(0.0)
                 elif ration_config.is_fat_list[i] is True:
                     ration_config.MEact_list.append(ration_config.DE_list[i])
                 elif ration_config.EE_list[i] >= 3:
@@ -425,7 +425,7 @@ class RationOptimizer:
             # [A.Cow.E.9]-[A.Heifer.E.9]
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == "Mineral":
-                    ration_config.NEgact_list.append(0)
+                    ration_config.NEgact_list.append(0.0)
                 elif ration_config.is_fat_list[i] is True:
                     ration_config.NEgact_list.append(0.55 * ration_config.MEact_list[i])
                 else:
@@ -473,7 +473,7 @@ class RationOptimizer:
             elif ration_config.feed_type_list[i] == "Mineral":
                 ration_config.dCa_list.append(0.95)
             else:
-                ration_config.dCa_list.append(0)
+                ration_config.dCa_list.append(0.0)
         # [A.Cow.E.16]-[A.Heifer.E.16]
         return float(sum(
             np.multiply(
@@ -519,7 +519,7 @@ class RationOptimizer:
             elif ration_config.feed_type_list[i] == "Mineral":
                 ration_config.dP_list.append(0.80)
             else:
-                ration_config.dP_list.append(0)
+                ration_config.dP_list.append(0.0)
         return float(sum(
             np.multiply(
                 decision_vector,
@@ -673,7 +673,7 @@ class RationOptimizer:
             info_map = {
                 "class": "RationOptimizer",
                 "function": RationOptimizer.NDF_constraint_lower.__name__,
-                }
+            }
             om.add_error('DMI of 0', 'Dry matter intake during ration formulation is currently 0.', info_map)
             raise
 
@@ -736,7 +736,7 @@ class RationOptimizer:
                 ration_config.is_forage_list.append(0)
         DMI = sum(decision_vector)
         if DMI != 0:
-            return (
+            return (float(
                 sum(
                     np.multiply(
                         decision_vector,
@@ -746,7 +746,9 @@ class RationOptimizer:
                     )
                 )
                 / DMI
-            ) - 15
+            ) - 15)
+        else:
+            raise
 
     @staticmethod
     def fat_constraint(
@@ -771,7 +773,9 @@ class RationOptimizer:
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(decision_vector)
         if DMI != 0:
-            return -(sum(np.multiply(decision_vector, ration_config.EE_list)) / DMI) + 7
+            return float(-(sum(np.multiply(decision_vector, ration_config.EE_list)) / DMI) + 7)
+        else:
+            raise
 
     @staticmethod
     def DMI_constraint_lower(
@@ -849,7 +853,7 @@ class RationOptimizer:
 
     @staticmethod
     def make_user_bounds(
-        ration_percents: Dict, DMIest: float
+        ration_percents: Dict[str, float], DMIest: float
     ) -> List[Tuple[float, float]]:
         """
         Calculates user bounds for optimize function
@@ -860,7 +864,7 @@ class RationOptimizer:
             which requires the decision vector in this shape
         Parameters
         ----------
-        ration_percents: Dict
+        ration_percents: Dict[str, float]
             keys are feed IDs, values are percent of DMI
         DMIest: float
             average estimated DMI for pen
@@ -976,7 +980,7 @@ class RationOptimizer:
         available_feeds: AvailableFeedsTypedDict,
         animal_combination: AnimalCombination,
         previous_ration: Dict[str, float | str] | None = None
-    ) -> Tuple[OptimizeResult, Dict[str, float], RationConfig]:
+    ) -> Tuple[OptimizeResult | None, Dict[str, float] | None, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for the non-linear program and calls the optimization function.
@@ -1088,7 +1092,6 @@ class RationOptimizer:
         # retrieving MEact from diet
         if solution is None:
             ration_vals = None
-            ration_config = None
         else:
             ration_vals = self.get_ration_vals(solution.x, ration_config)
         return solution, ration_vals, ration_config
@@ -1096,7 +1099,7 @@ class RationOptimizer:
     @staticmethod
     def is_constraint_violated(
         solution_x: npt.NDArray,
-        constraint: dict[str, Callable],
+        constraint: Dict[str, Callable[[Any, Any], float]],
         ration_config: RationConfig
     ) -> bool:
         """
@@ -1128,9 +1131,9 @@ class RationOptimizer:
     @staticmethod
     def find_failed_constraints(
         solution_x: npt.NDArray,
-        constraints: List[dict[str, Callable]],
+        constraints: List[dict[str, Callable[[Any, Any], float]]],
         ration_config: RationConfig
-    ) -> List[Dict[str, Callable]]:
+    ) -> List[Dict[str, Callable[[Any, Any], float]]]:
         """
         Returns list of constraints that were not met during optmization step.
 

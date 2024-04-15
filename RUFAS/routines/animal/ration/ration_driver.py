@@ -200,7 +200,7 @@ class RationManager:
             Dictionary of formulated ration, with keys as feed IDs, values as kg fed per animal.
 
         """
-        ration: Dict[str, float] = {}
+        ration: Dict[str, float | str] = {}
         for feed_id in range(len(available_feeds["feed_id"])):
             i = feed_id * 3
             num = solution.x[i]

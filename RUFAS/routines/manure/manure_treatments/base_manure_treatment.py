@@ -88,7 +88,7 @@ class BaseManureTreatment(ABC):
         self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
         self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
         try:
-            self.storage_time_period = self.config.storage_time_period
+_conf            self.storage_time_period = self.config.storage_time_period
         except AttributeError:
             self.storage_time_period = None
         self._accumulated_output = ManureTreatmentDailyOutput()

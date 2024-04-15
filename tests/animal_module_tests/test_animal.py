@@ -479,7 +479,6 @@ def test_use_existing_requirements() -> None:
 def mock_ration_config() -> MagicMock:
     ration_config = MagicMock()
     ration_config.price_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.n = 6
     ration_config.NEmaint_requirement = 1.0
     ration_config.NEa_requirement = 2.0
     ration_config.NEpreg_requirement = 3.0
@@ -532,7 +531,6 @@ def mock_ration_config() -> MagicMock:
 def mock_random_ration_config() -> MagicMock:
     ration_config = MagicMock()
     ration_config.price_list = [2.615, 0.544, 3.847, 3.585, 2.881, 1.342]
-    ration_config.n = 6
     ration_config.NEmaint_requirement = 1.423
     ration_config.NEa_requirement = 3.849
     ration_config.NEpreg_requirement = 2.223
