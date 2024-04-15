@@ -479,9 +479,13 @@ class ReportGenerator:
         elif vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
             vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
-            if filter_content.get("variables") is not None or len(vertically_aggregated) > 1:
+
+            has_dict_variables = filter_content.get("variables") is not None
+            has_multiple_columns = len(vertically_aggregated) > 1
+
+            if has_dict_variables or has_multiple_columns:
                 aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
-            elif len(vertically_aggregated) == 1:
+            else:
                 aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return aggregate_report
