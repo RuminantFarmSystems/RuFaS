@@ -231,7 +231,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             Flushing water volume, m^3
 
         """
-        return self._manure_handler_daily_output.cleaning_water_volume
+        if self._manure_handler_daily_output:
+            return self._manure_handler_daily_output.cleaning_water_volume
+        else:
+            return 0.0
 
     @property
     def volume_needed(self):
