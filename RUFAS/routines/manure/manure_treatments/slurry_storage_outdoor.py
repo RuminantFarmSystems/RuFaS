@@ -4,6 +4,7 @@ from typing import Tuple
 
 import math
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -69,7 +70,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The minimum treatment volume, m^3.
 
         """
-        return self.wastewater_volume * self.storage_time_period
+        if isinstance(self.storage_time_period, int):
+            return self.wastewater_volume * self.storage_time_period
+        else:
+            return 0.0
 
     @property
     def total_pit_volume(self) -> float:
@@ -182,6 +186,26 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return self.freeboard_input * self.pit_surface_area
 
+    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
+        """
+        Adjust the final manure volume to account for the precipitation and the storage time period.
+
+        Parameters
+        ----------
+        current_day_final_manure_volume : float
+            The final manure volume for the current simulation day (:math:`m^3`).
+
+        Returns
+        -------
+        float
+            The adjusted final manure volume.
+
+        """
+        if self.config.manure_cover == ManureCoverEnum.NO_COVER.value:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
+
     def calc_methane_emission(
         self,
         accumulated_liquid_manure_total_volatile_solids: float,
@@ -269,6 +293,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
+        adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
+        daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
+
         self._adjust_accumulated_output(daily_output)
 
         # fmt: off
