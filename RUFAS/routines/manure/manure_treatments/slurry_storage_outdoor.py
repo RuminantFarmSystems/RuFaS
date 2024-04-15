@@ -251,7 +251,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         num_animals: int,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
-    ) -> Tuple[float, float]:
+    ) -> float:
         """Calculates the ammonia emission from the outdoor slurry storage treatment system.
 
         Parameters
@@ -267,9 +267,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         Returns
         -------
-        Tuple[float, float]
-            A tuple of the ammonia emission from the outdoor slurry storage in kg and the accumulated total ammoniacal
-            nitrogen in the treatment system after the ammonia emission is calculated, kg.
+        float
+            The ammonia emission from the outdoor slurry storage in kg.
 
         """
         ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
@@ -292,7 +291,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(daily_input)
+        if daily_input:
+            daily_output = self._initialize_daily_output_during_update(daily_input)
         adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
