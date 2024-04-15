@@ -137,9 +137,9 @@ def test_dict_to_csv_column_list(
             units = data["info_maps"][0].get("units")
             if isinstance(units, dict):
                 for subkey in units:
-                    assert f"_{units[subkey]}" in series.name
+                    assert f"_({units[subkey]})" in series.name
             elif units:
-                assert f"_{units}" in series.name
+                assert f"_({units})" in series.name
 
     # Cleanup
     output_manager.flush_pools()
@@ -148,12 +148,12 @@ def test_dict_to_csv_column_list(
 @pytest.mark.parametrize(
     "variable_name, units, subkey, expected_result, expected_error",
     [
-        ("temperature", "Celsius", None, "_Celsius", None),
-        ("position", {"x": "m", "y": "m"}, "x", "_m", None),
+        ("temperature", "Celsius", None, "_(Celsius)", None),
+        ("position", {"x": "m", "y": "m"}, "x", "_(m)", None),
         ("position", {"x": "m", "y": "m"}, "z", "", "units_key_error"),
         ("pressure", None, None, "", None),
         ("empty_units", "", None, "", None),
-        ("nested_units", {"value": "kg", "error": "kg"}, "value", "_kg", None),
+        ("nested_units", {"value": "kg", "error": "kg"}, "value", "_(kg)", None),
         ("nested_units", {"value": "kg", "error": "kg"}, "uncertainty", "", "units_key_error"),
     ],
 )
@@ -210,7 +210,7 @@ def test_get_units_substr(
                     "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
                 }
             },
-            f"var1_m{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            f"var1_(m){os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
             True,
         ),
         (
@@ -225,7 +225,7 @@ def test_get_units_substr(
                     "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
                 }
             },
-            f"var1_unitless{os.linesep}1{os.linesep}2{os.linesep}",
+            f"var1_(unitless){os.linesep}1{os.linesep}2{os.linesep}",
             True,
         ),
         (
@@ -235,7 +235,7 @@ def test_get_units_substr(
                     "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
                 }
             },
-            f"var1.v1_m,var1.v2_s{os.linesep}1,1{os.linesep}2,2{os.linesep}",
+            f"var1.v1_(m),var1.v2_(s){os.linesep}1,1{os.linesep}2,2{os.linesep}",
             True,
         ),
         (
@@ -262,7 +262,7 @@ def test_get_units_substr(
                     ],
                 }
             },
-            f"simple_key.key1_random1,simple_key.key2_random2{os.linesep}"
+            f"simple_key.key1_(random1),simple_key.key2_(random2){os.linesep}"
             f'1,"[1, 1]"{os.linesep}'
             f'2,"[2, 2]"{os.linesep}'
             f'3,"[3, 3]"{os.linesep}',
@@ -295,7 +295,7 @@ def test_get_units_substr(
                     ],
                 },
             },
-            f"simple_key1_random,simple_key2_random{os.linesep}"
+            f"simple_key1_(random),simple_key2_(random){os.linesep}"
             f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep},8{os.linesep},9{os.linesep}",
             True,
         ),
