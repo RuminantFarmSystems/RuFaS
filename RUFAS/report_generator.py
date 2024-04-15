@@ -629,7 +629,7 @@ class ReportGenerator:
 
         try:
             self._add_constants_to_report_data(report_data, filter_content)
-        except ValueError:  # NOT COVERED
+        except ValueError:
             raise
 
         return report_data
