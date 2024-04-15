@@ -452,7 +452,7 @@ class ReportGenerator:
             The aggregated report data.
         """
 
-        horizontal_first = filter_content.get("horizontal_first", True)
+        horizontal_first = filter_content.get("horizontal_first", False)
         horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
         vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
         if horizontal_first:
