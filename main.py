@@ -19,6 +19,7 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.task_manager import TaskManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -579,4 +580,7 @@ def parse_gnu_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    task_manager = TaskManager(workers=4)
+    metadata_paths = ["path/to/metadata1", "path/to/metadata2", "path/to/metadata3", "path/to/metadata4"]
+    task_manager.run_tasks(metadata_paths)
