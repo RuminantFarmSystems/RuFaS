@@ -841,12 +841,13 @@ class OutputManager(object):
             if selected_variables is None or not is_data_in_dict:
                 if use_filter_name:
                     results[f"{filter_name}_{counter}"] = {"values": sliced_data}
-                results[key] = {"values": sliced_data}
+                else:
+                    results[key] = {"values": sliced_data}
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
                         "Unpacking Pool Error",
-                        "Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
+                        f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
                         f"{is_data_in_dict=}, {selected_variables=}",
                         info_map,
                     )

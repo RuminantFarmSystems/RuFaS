@@ -13,6 +13,7 @@ from pytest_mock.plugin import MockerFixture
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
 
+from freezegun import freeze_time
 
 def test_get_prefix() -> None:
     """Unit test for function _get_prefix in file output_manager.py"""
@@ -1490,6 +1491,98 @@ def test_filter_variables_pool_exclude_regex_patterns(
 
     # Restore original method
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
+    mock_output_manager.variables_pool = {}
+
+
+@pytest.fixture
+def mock_variables_pool_complex() -> Dict[str, OutputManager.pool_element_type]:
+    dummy_variables_pool = {
+        "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+        "DummyClass1.dummy_fun1.dummy_var2": {"values": [{"a": "A", "b": 1.0, "c": True},
+                                                         {"a": "AA", "b": 2.0, "c": True}]},
+        "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
+        "DummyClass2.dummy_fun3.dummy_var4": {"values": "value4"}
+    }
+    return dummy_variables_pool
+
+def test_filter_variables_pool_complex(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mock_variables_pool_complex: Dict[str, str],
+) -> None:
+    """Test case for pattern pool with regex patterns and exclude keyword with
+    function filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = mock_variables_pool_complex
+
+    # use filter_name
+    filter_content = {"name": "test_case_1", "filters": ["^DummyClass1.*"],
+                      "filter_by_exclusion": False, "use_name": True,
+                      "variables": ["var2", "a"]}
+    expected_result = {
+        "test_case_1_0": {"values": ["value1", "value2", "value3"]},
+        "test_case_1_0.a": {"values": ["A", "AA", "AAA"]},
+    }
+
+    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
+
+    # unpacking pool error
+    filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False, "variables": "a"}
+    expected_result = {
+        'DummyClass1.dummy_fun1.dummy_var1': {
+            'values': ['value1', 'value2', 'value3']
+        }, 'a': {
+            'values': ['A', 'AA', 'AAA']
+        }
+    }
+    mock_output_manager.add_error = MagicMock()
+    with freeze_time('2023-12-12 13:34:42'):
+        actual = mock_output_manager.filter_variables_pool(filter_content)
+    mock_output_manager.add_error.assert_has_calls(
+        [call(
+            'Unpacking Pool Error',
+            "Unable to unpack key='DummyClass1.dummy_fun1.dummy_var2' in the data pool, "
+            "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+            {
+                'class': 'OutputManager',
+                'function': 'filter_variables_pool',
+                'filter_name': 'NO NAME FOUND',
+                'filter_by_exclusion': False,
+                'use_filter_name': False,
+                'timestamp': '12-Dec-2023_Tue_13-34-42.000000'
+            }),
+        call(
+            'Unpacking Pool Error',
+             "Unable to unpack key='DummyClass1.dummy_fun2.dummy_var3' in the data pool, "
+             "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+             {
+                 'class': 'OutputManager',
+                 'function': 'filter_variables_pool',
+                 'filter_name': 'NO NAME FOUND',
+                 'filter_by_exclusion': False,
+                 'use_filter_name': False,
+                 'timestamp': '12-Dec-2023_Tue_13-34-42.000000'
+             })]
+    )
+    assert actual == expected_result
+
+    # use_filter_name in dict data
+    filter_content = {"name": "test_case_3", "filters": ["^DummyClass1.*"],
+                      "filter_by_exclusion": False, "use_name": False,
+                      "variables": ["a", "b", "c"]}
+    expected_result = {
+        'DummyClass1.dummy_fun1.dummy_var1': {
+            'values': ['value1', 'value2', 'value3']
+        },
+        "a": {"values": ['A', 'AA', 'AAA']},
+        "b": {"values": [1.0, 2.0, 3.0]},
+        "c": {"values": [True, True, False]}
+    }
+
+    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
+
+    # Restore original method
+    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager.variables_pool = {}
 
 
