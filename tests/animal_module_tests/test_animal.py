@@ -4,6 +4,7 @@ from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
+from scipy.integrate import quad
 
 from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -1205,6 +1206,64 @@ def cow_fixture() -> AnimalBase:
     cowfixture = AnimalBase(initsetup)
     return cowfixture
 
+def test_set_lactation_curve_parameters(cow_fixture: AnimalBase): 
+    """Unit test for function set_lactation_curve_parameters in file routines/animal/life_cycle/animal_base.py"""
+    
+    # Act
+    cow_fixture.set_lactation_curve_parameters() 
+    AnimalBase.set_lactation_curve_parameters()
+    
+    #Assert 
+    AnimalBase.lactation_parameters[0] 
+
+def test_get_t_values(): 
+    """Unit test for function get_t_values in file routines/animal/life_cycle/animal_base.py"""
+
+    #Arrange 
+    expected_t_values_default = np.arange(1, 305, 1)
+    expected_t_values = np.arange(1, 30, 0.5)
+
+    #Act 
+    actual_t_values_default = AnimalBase.get_t_values()
+    actual_t_values = AnimalBase.get_t_values(1, 30, 0.5)
+    
+    #Assert 
+    assert actual_t_values_default == expected_t_values_default
+    assert actual_t_values == expected_t_values
+
+def test_get_y_values_wood_curve(): 
+    """Unit test for function get_y_values_wood_curve in file routines/animal/life_cycle/animal_base.py"""
+
+    #Arrange
+    expected_y_value = 2 * np.power(1, 3) * np.exp (-1 * 4 * 1)
+
+    #Act 
+    actual_y_value = AnimalBase.get_y_values_wood_curve(1, 2, 3, 4)
+
+    #Assert
+    assert actual_y_value == expected_y_value
+
+def test_calc_integral_wood_curve(): 
+    """Unit test for function calc_integral_wood_curve in file routines/animal/life_cycle/animal_base.py"""
+
+    #Arrange 
+    expected_calc_integral, _ = quad(AnimalBase.get_y_values_wood_curve, 1, 305, args=(1, 2, 3))
+
+    #Act 
+    actual_calc_integral = AnimalBase.calc_integral_wood_curve(1, 2, 3)
+    #Assert
+    assert actual_calc_integral == expected_calc_integral 
+
+def test_get_wood_parameters_305d(): 
+    """Unit test for function test_get_wood_parameteres in file routines/animal/life_cycle/animal_base.py when MY_305 is None"""
+
+    #Arrange 
+    
+
+    #Act 
+    actual_wood_parameters = AnimalBase.get_wood_parameters("1", "2016", "July", "New York", "2x/d")
+
+    #Assert 
 
 @pytest.mark.parametrize(
     "dP_reserves,p_intake,p_req,expected",
