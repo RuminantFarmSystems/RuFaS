@@ -981,7 +981,7 @@ class InputManager:
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
-            Boolean variable indicating whether the function is being called during initialization.
+            Boolean variable indicating whether the function is being called during initialization
 
         Returns
         -------
@@ -1039,7 +1039,6 @@ class InputManager:
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
-            Boolean variable indicating whether the function is being called during initialization.
 
         Returns
         -------
