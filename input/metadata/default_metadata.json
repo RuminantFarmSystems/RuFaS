@@ -21,6 +21,13 @@
       "type": "json",
       "properties": "animal_population_properties"
     },
+    "lactation": {
+      "title": "Lactation curve adjustment values",
+      "description": "Values for the adjustment of the three wood parameters based on farm specific data",
+      "path": "input/data/animal/LACTATION_CURVE_ADJUSTMENT_CONSTANTS.json",
+      "type": "json",
+      "properties": "lactation_properties"
+    },
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
