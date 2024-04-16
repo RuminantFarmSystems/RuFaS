@@ -1,13 +1,11 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Tuple
+from typing import Dict, List, Any, Callable, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
-
-from RUFAS.util import Utility
 
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
