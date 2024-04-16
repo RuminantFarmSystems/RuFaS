@@ -89,6 +89,15 @@ $$
 
 Where $d$ is the number of days the hay has been stored for, $i$ is the day since storage that dry matter loss is being calculated for, $l$ is the loss coefficient (unitless), $rain_i$ is the amount of rain on day $i$ (cm), $high_i$ is the high temperature on day $i$ ($C^\circ$), $low_i$ is the low temperature on day $i$ ($C^\circ$), b_{density} is the bale density ($kg / m^3$) (eqn. 1.2.5), and $b_{size}$ is the diameter of the hay bale ($m$).
 
+The loss coefficients for the different hay storages are defined in the table:
+| Hay Storage Type  | Loss Coefficient |
+|-------------------|------------------|
+|Protected Wrapped  |0.0000216         |
+|Protected Tarped   |0.0000108         |
+|Unprotected Outdoor|0.00006          |
+
+Table: 1.2.9
+
 ### 1.3 Silage and Baleage
 
 Both silage and baleage experience dry matter loss to fermentation.
@@ -109,4 +118,38 @@ $$
 
 Where $d$ is the number of days the crop has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, and $dryfrac_{i-1}$ is the fraction of the ensiled crop fresh mass that is dry matter on day $i-1$. When $i$ is 1, $dryfrac_{i-1}$ is the fraction of the ensiled crop's fresh mass that was dry matter when the crop was ensiled. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.15, 0.6]$ and the average temperature on day $i$ is in the range $[0, 40]$ ($C^\circ$).
 
+#### 1.3.1 Effluent Loss
 
+Ensiled crops lose both moisture and dry matter mass to effluent (but baled crops do not).
+
+If a crop is ensiled with a dry matter fraction of less than 0.3, it will lose dry matter and moisture to effluent.
+
+The cumulative amount of dry matter lost to effluent ($kg$) is calculated with the equation:
+
+$$
+DL_{effluent} = dryfrac_{effluent} \cdot M_{effluent} \cdot 0.1 \cdot max(10, d) \tag{1.3.1.1}
+$$
+
+Where $dryfrac_{effluent}$ is the fraction of dry matter in the effluent that is lost, $M_{effluent}$ is the estimated maximum effluent ($kg$), and $d$ is the number of days the crop has been ensiled for.
+
+The cumulative amount of moisture lost to effluent ($kg$) is calculated with the equation:
+
+$$
+ML_{effluent} = (1 - dryfrac_{effluent}) \cdot M_{effluent} \cdot 0.1 \cdot max(10, d) \tag{1.3.1.2}
+$$
+
+Where $dryfrac_{effluent}$ is the fraction of dry matter in the effluent that is lost, $M_{effluent}$ is the estimated maximum effluent ($kg$), and $d$ is the number of days the crop has been ensiled for.
+
+The fraction of dry matter in effluent is a constant:
+
+$$
+dryfrac_{effluent} = 0.1035 \tag{1.3.1.3}
+$$
+
+The estimated maximum effluent for an ensiled crop is calculated with the following equation:
+
+$$
+M_{effluent} = mass_{fresh} \cdot ((1 - dryfrac) - 0.7) \tag{1.3.1.4}
+$$
+
+Where $mass_{fresh}$ is the fresh mass of the crop when it is ensiled ($kg$) and $dryfrac$ is the fraction of the crop's fresh mass which is dry matter when it is ensiled.
