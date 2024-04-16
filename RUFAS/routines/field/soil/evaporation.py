@@ -75,36 +75,6 @@ class Evaporation:
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
 
-    # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
-    @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-        """
-        Calculates the maximum amount of evaporation from soil in a given day.
-
-        Parameters
-        ----------
-        soil_evaporation_adj : float
-            Maximum soil evaporation adjusted for plant water use on a given day (mm).
-        snow_water_content : float
-            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm).
-         TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-          (2:2.3.3) mean the same thing - issue #317
-
-        Returns
-        -------
-        float
-            Maximum soil water evaporation on a given day (mm).
-
-        References
-        ----------
-        SWAT Theoretical documentation 2:2.3.3.1
-
-        """
-        if soil_evaporation_adj < snow_water_content:
-            return 0  # 2:2.3.10
-        else:
-            return soil_evaporation_adj - snow_water_content  # 2:2.3.15
-
     @staticmethod
     def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
         """
