@@ -584,15 +584,30 @@ def test_bool_type_validator(
 
     # Arrange
     input_manager = InputManager()
+    var_path: list[str | int] = ["dummy_var_path"]
     variable_properties: Dict[str, Any] = {}
-    var_name = "dummy_var_name"
     dummy_properties_key = "dummy_variable_properties"
+    dummy_input_data = {"a": 1, "b": 2}
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    unused_bool_input = False
+    patch_extract = mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=input_data_value)
+    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    result = input_manager._bool_type_validator(variable_properties, var_name, input_data_value, dummy_properties_key)
+    result = input_manager._bool_type_validator(
+        var_path,
+        variable_properties,
+        dummy_input_data,
+        unused_bool_input,
+        dummy_properties_key,
+        dummy_counter,
+        unused_bool_input,
+    )
 
     # Assert
+    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
         patch_for_add_warning.assert_called_once()
     else:
@@ -2770,7 +2785,6 @@ def test_log_missing_data_runtime_key_error(
     input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
-
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
