@@ -388,7 +388,10 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
+            report_data = {
+                key: filtered_pool[key]["values"] for key in filtered_pool.keys()
+            }
+            self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise
 
@@ -573,70 +576,6 @@ class ReportGenerator:
             non_null_data_points = list(filter(lambda x: x is not None, data))
             aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
-
-    def _prepare_report_data_with_constants(
-        self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        filter_content: Dict[str, Any],
-    ) -> Dict[str, List[Any]]:
-        """
-        Processes and structures a filtered data pool for report generation.
-
-        Notes
-        -----
-        This method organizes data from a filtered pool based on selected variables and slicing parameters.
-        It caters to different data structures within the pool, ensuring data is formatted appropriately
-        for report inclusion.
-
-        Parameters
-        ----------
-        filtered_pool : Dict[str, pool_element_type]
-            The filtered data pool with each key mapping to its respective data element.
-
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        Dict[str, List[Any]]
-            Processed data suitable for report generation, keyed by selected variables.
-
-        Raises
-        ------
-        KeyError
-            If selected_variables is None and the data within the pool requires variable selection.
-        ValueError
-            If the name or value of any constant is not valid.
-        """
-        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
-        selected_variables = filter_content.get("variables")
-        slice_start = filter_content.get("slice_start", 0)
-        slice_end = filter_content.get("slice_end")
-        report_data: Dict[str, List[Any]] = {}
-
-        for key in filtered_pool.keys():
-            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
-                raise KeyError("Can't generate report, use 'variables' arg to select items from data")
-            if is_data_in_dict:
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
-                    filtered_pool[key]["values"][slice_start:slice_end]
-                )
-                filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
-                for filtered_key, filtered_value in filtered_data.items():
-                    if filtered_key in report_data:
-                        report_data[filtered_key].extend(filtered_value)
-                    else:
-                        report_data[filtered_key] = filtered_value
-            else:
-                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
-
-        try:
-            self._add_constants_to_report_data(report_data, filter_content)
-        except ValueError:
-            raise
-
-        return report_data
 
     def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
         """
