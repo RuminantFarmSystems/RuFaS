@@ -188,7 +188,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
-    prepared_data = {'var1': [1, 2, 3]}
+    prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     graph_generator._log_non_int_float_data = MagicMock(return_value=mock_log_pool)
     graph_details = {"type": "plot", "filters": ["var1", "var2"]}

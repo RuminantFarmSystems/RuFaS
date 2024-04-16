@@ -1257,10 +1257,7 @@ def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key2"]}
-    expected_result = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"}
-    }
+    expected_result = {"key1": {"values": "value1"}, "key2": {"values": "value2"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
@@ -1281,9 +1278,7 @@ def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key2"], "filter_by_exclusion": True}
-    expected_result = {
-        "key3": {"values": "value3"}
-    }
+    expected_result = {"key3": {"values": "value3"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
@@ -1304,9 +1299,7 @@ def test_filter_variables_pool_non_matching_pattern(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": False}
-    expected_result = {
-        "key1": {"values": "value1"}
-    }
+    expected_result = {"key1": {"values": "value1"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
@@ -1327,10 +1320,7 @@ def test_filter_variables_pool_exclude_non_matching_pattern(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": True}
-    expected_result = {
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"}
-    }
+    expected_result = {"key2": {"values": "value2"}, "key3": {"values": "value3"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
@@ -1347,9 +1337,7 @@ def test_filter_variables_pool_duplicate_patterns(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": False}
-    expected_result = {
-        "key1": {"values": "value1"}
-    }
+    expected_result = {"key1": {"values": "value1"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
@@ -1370,10 +1358,7 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
         "key3": {"values": "value3"},
     }
     filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": True}
-    expected_result = {
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"}
-    }
+    expected_result = {"key2": {"values": "value2"}, "key3": {"values": "value3"}}
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
