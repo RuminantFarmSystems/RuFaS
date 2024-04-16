@@ -113,7 +113,7 @@ Where $d$ is the number of days the alfalfa has been ensiled for, $i$ is the day
 The cumulative dry matter loss to fermentation for ensiled corn, grass, and small grain ($kg$) is calculated with the equation:
 
 $$
-L_{fermentation} = \sum_{i=1}^{d} 0.00864 - 0.0193(dryfrac_{i-1} - 0.15) \tag{1.3.1}
+L_{fermentation} = \sum_{i=1}^{d} 0.00864 - 0.0193(dryfrac_{i-1} - 0.15) \tag{1.3.2}
 $$
 
 Where $d$ is the number of days the crop has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, and $dryfrac_{i-1}$ is the fraction of the ensiled crop fresh mass that is dry matter on day $i-1$. When $i$ is 1, $dryfrac_{i-1}$ is the fraction of the ensiled crop's fresh mass that was dry matter when the crop was ensiled. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.15, 0.6]$ and the average temperature on day $i$ is in the range $[0, 40]$ ($C^\circ$).
