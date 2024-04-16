@@ -770,7 +770,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -795,27 +795,74 @@ class OutputManager(object):
         and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
         as inclusionary.
 
+        # TODO
+        This is a temp function to extend `_filter_variables_pool` functionality without creating merge conflicts.
+        It will be fixed by getting modified and removing `_filter_variables_pool` in issue 996.
+        This function is tested minimally, needs more comprehensive testing before replacing `_filter_variables_pool`.
+        `use_name` entry if present and true, uses filter name to populate the output, otherwise, uses the default key
         """
+        filter_name: str = filter_content.get("name", "NO NAME FOUND")
+        use_filter_name: bool = filter_content.get("use_name", False)
+        filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._filter_variables_pool.__name__,
+            "function": self.filter_variables_pool.__name__,
+            "filter_name": filter_name,
+            "filter_by_exclusion": filter_by_exclusion,
+            "use_filter_name": use_filter_name,
         }
-        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
-        filter_name = filter_content.get("filter_name", "NO_NAME")
+
         if filter_by_exclusion:
-            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
+            filter_excl_msg: str = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+            filter_excl_msg: str = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
         self.add_log("filtering_log", filter_excl_msg, info_map)
-        filtered_pool = Utility.filter_dictionary(
-            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
+
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
+            dict_to_filter=self.variables_pool,
+            filter_patterns=filter_content.get("filters", []),
+            filter_by_exclusion=filter_by_exclusion,
         )
         self.add_log(
             "num_filter_pattern_matches",
             f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
             info_map,
         )
-        return filtered_pool
+
+        selected_variables: List[str] = filter_content.get("variables")
+        slice_start: int = filter_content.get("slice_start", 0)
+        slice_end: int = filter_content.get("slice_end")
+
+        results: Dict[str, OutputManager.pool_element_type] = {}
+        counter: int = 0
+        for key in filtered_pool.keys():
+            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
+            is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
+            if selected_variables is None or not is_data_in_dict:
+                if use_filter_name:
+                    results[f"{filter_name}_{counter}"] = {"values": sliced_data}
+                else:
+                    results[key] = {"values": sliced_data}
+            elif is_data_in_dict:
+                if not isinstance(selected_variables, list):
+                    self.add_error(
+                        "Unpacking Pool Error",
+                        f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
+                        f"{is_data_in_dict=}, {selected_variables=}",
+                        info_map,
+                    )
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
+                filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
+                for filtered_key, filtered_value in filtered_data.items():
+                    if use_filter_name:
+                        combined_key = f"{filter_name}_{counter}.{filtered_key}"
+                    else:
+                        combined_key = filtered_key
+                    if combined_key in results:
+                        results[combined_key]["values"].extend(filtered_value)
+                    else:
+                        results[combined_key] = {"values": filtered_value}
+        return results
 
     def save_results(
         self,
@@ -891,7 +938,7 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content)
+                    filtered_pool = self.filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
