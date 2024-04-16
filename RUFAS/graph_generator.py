@@ -159,7 +159,6 @@ class GraphGenerator:
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             prepared_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
-            print(prepared_data.keys())
             log_pool = self._log_non_int_float_data(filtered_pool, graph_details)
             all_logs = log_pool + graph_filter_validation_logs
 
@@ -242,9 +241,9 @@ class GraphGenerator:
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
     ) -> List[Dict[str, str | Dict[str, str]]]:
-        """Extracts the values from the filtered_pool data and converts them a dictionary
-        that graph_generator can more readily handle and records logs, warnings, and errors for
-        Output Manager.
+        """
+        Identifies and logs entries in a filtered data pool that contain non-numeric data
+        which cannot be used for plotting in a graph.
 
         Parameters
         ----------
@@ -255,9 +254,8 @@ class GraphGenerator:
 
         Returns
         -------
-        Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]
-            A tuple containing the formatted data that can more readily be plotted by
-            graph_generator and the logs, warnings, and errors to be reported to OutputManager.
+        List[Dict[str, str | Dict[str, str]]]
+            A list of logs, warnings, and errors to be reported to OutputManager.
         """
         info_map = {
             "class": self.__class__.__name__,

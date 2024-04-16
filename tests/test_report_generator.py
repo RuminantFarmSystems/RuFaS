@@ -209,67 +209,6 @@ def test_apply_horizontal_aggregation(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, expected_result, expected_exception",
-    [
-        # Case with selected variables and slice parameters
-        (
-            {
-                "var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7], "name": "value"},
-            None,
-        ),
-        # Case without selected variables but required
-        (
-            {"var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
-            {},
-            None,
-            KeyError,
-        ),
-        # Case with constants addition
-        (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"name": "value", "var1": [1, 2, 3, 4]},
-            None,
-        ),
-    ],
-)
-def test_prepare_report_data_with_constants(
-    filtered_pool: Dict[str, Dict[str, List[Any]]],
-    filter_content: Dict[str, Any],
-    expected_result: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
-    mocker: MockerFixture,
-):
-    """
-    Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
-    """
-
-    # Arrange
-    report_generator = ReportGenerator()
-    mocker.patch(
-        "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
-        side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
-    )
-    mocker.patch.object(
-        report_generator,
-        "_add_constants_to_report_data",
-        side_effect=lambda report_data, _: report_data.update({"name": "value"}),
-    )
-
-    # Act and assert
-    if expected_exception:
-        with pytest.raises(expected_exception):
-            report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-    else:
-        result = report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-        assert result == expected_result
-
-
-@pytest.mark.parametrize(
     "report_data, filter_content, expected_report_data, expected_exception",
     [
         # Valid case with a valid constant
@@ -467,11 +406,6 @@ def test_perform_aggregations(
 
     # Arrange
     report_generator = ReportGenerator()
-    mocker.patch.object(
-        report_generator,
-        "_prepare_report_data_with_constants",
-        return_value=mock_prep_data,
-    )
     mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=[5, 7])
     mocker.patch.object(
         report_generator,

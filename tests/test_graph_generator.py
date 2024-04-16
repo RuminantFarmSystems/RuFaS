@@ -168,10 +168,9 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._customize_graph = MagicMock()
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
-    filtered_pool = {"var1": [1, 2, 3]}
+    filtered_pool = {"var1": {"values": [1, 2, 3]}}
     mock_log_pool = [{"error": "mock_error_message"}]
-    mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
-    graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
+    graph_generator._log_non_int_float_data = MagicMock(return_value=mock_log_pool)
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
@@ -188,17 +187,17 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._customize_graph = MagicMock()
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
-    filtered_pool = {"var1": [1, 2, 3]}
+    filtered_pool = {"var1": {"values": [1, 2, 3]}}
+    prepared_data = {'var1': [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
-    mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
-    graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
+    graph_generator._log_non_int_float_data = MagicMock(return_value=mock_log_pool)
     graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", filtered_pool, filtered_pool.keys())
+    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, prepared_data.keys())
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
 
@@ -262,139 +261,20 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
     "filtered_pool,graph_details,expected_util_convert_list_return,expected_util_filter_dict,expected_result",
     [
         (
-            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
-            {"variables": [], "title": "Test_1"},
-            None,
-            None,
-            (
-                {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
-                [
-                    {
-                        "log": "Successfully added Test_1 data to prepared_pool",
-                        "message": "Data for variable1 added.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                    {
-                        "log": "Successfully added Test_1 data to prepared_pool",
-                        "message": "Data for variable2 added.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                ],
-            ),
-        ),
-        (
-            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
-            {"variables": ["custom_var1", "custom_var2"], "title": "Test_2"},
-            None,
-            None,
-            (
-                {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
-                [
-                    {
-                        "log": "Successfully added Test_2 data to prepared_pool",
-                        "message": "Data for variable1 added.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                    {
-                        "log": "Successfully added Test_2 data to prepared_pool",
-                        "message": "Data for variable2 added.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                ],
-            ),
-        ),
-        (
-            {
-                "variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            {"variables": [], "title": "Test_3"},
-            None,
-            None,
-            (
-                {},
-                [
-                    {
-                        "error": "Can't plot Test_3 data set",
-                        "message": "No selected variables for variable1.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                    {
-                        "error": "Can't plot Test_3 data set",
-                        "message": "No selected variables for variable2.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    },
-                ],
-            ),
-        ),
-        (
-            {
-                "variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
-                "variable2": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
-            },
-            {"variables": ["a", "b"], "title": "Test_4"},
-            [
-                {"a": [1, 3], "b": [2, 4], "c": [25, 25]},
-                {"a": [5, 7], "b": [6, 8], "c": [25, 25]},
-            ],
-            [{"a": [1, 3], "b": [2, 4]}, {"a": [5, 7], "b": [6, 8]}],
-            ({"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]}, []),
-        ),
-        (
-            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
-            {"variables": ["c", "d"], "title": "Test_5"},
-            [{"a": [1, 3], "b": [2, 4]}],
-            [None],
-            (
-                {},
-                [
-                    {
-                        "error": "Can't plot Test_5 data set",
-                        "message": "No variables found in data provided.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    }
-                ],
-            ),
-        ),
-        (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]}},
             {"variables": ["a", "b"], "title": "Test_6"},
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
-            (
-                {"a": [1, 3], "b": [2, "ungraphable string"]},
-                [
-                    {
-                        "error": "Can't plot Test_6 data set",
-                        "message": "b key contains data that is non-numerical and can't be graphed.",
-                        "info_map": {
-                            "class": "GraphGenerator",
-                            "function": "_prepare_plot_data",
-                        },
-                    }
-                ],
-            ),
+            [
+                {
+                    "error": "Can't plot Test_6 data set",
+                    "message": "variable1 key contains data that is non-numerical and can't be graphed.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "_log_non_int_float_data",
+                    },
+                }
+            ],
         ),
     ],
 )
@@ -407,7 +287,7 @@ def test_prepare_plot_data_logic(
     graph_details: Dict[str, str | List[str]],
     expected_util_convert_list_return: Dict[str, List[int | float]],
     expected_util_filter_dict: Dict[str, List[int | float]],
-    expected_result: Dict[str, List[int | float]],
+    expected_result: List[int | float],
 ) -> None:
     # Arrange
     filtered_pool = filtered_pool
@@ -417,11 +297,10 @@ def test_prepare_plot_data_logic(
     mock_filter_dict.side_effect = expected_util_filter_dict
 
     # Act
-    prepared_pool, log_pool = mock_graph_generator._prepare_plot_data(filtered_pool, graph_details)
+    log_pool = mock_graph_generator._log_non_int_float_data(filtered_pool, graph_details)
 
     # Assert
-    assert prepared_pool == expected_result[0]
-    assert log_pool == expected_result[1]
+    assert log_pool == expected_result
 
 
 @pytest.mark.parametrize(
