@@ -158,9 +158,7 @@ class GraphGenerator:
             return all_logs
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
-            prepared_data: Dict[str, List[Any]] = {
-                key: filtered_pool[key]["values"] for key in filtered_pool.keys()
-            }
+            prepared_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
             print(prepared_data.keys())
             log_pool = self._log_non_int_float_data(filtered_pool, graph_details)
             all_logs = log_pool + graph_filter_validation_logs
@@ -272,8 +270,10 @@ class GraphGenerator:
             for key, value in filtered_pool.items()
             if not (
                 isinstance(value["values"], (int, float))
-                or (isinstance(value["values"], list) and
-                    all(isinstance(item, (int, float)) for item in value["values"]))
+                or (
+                    isinstance(value["values"], list)
+                    and all(isinstance(item, (int, float)) for item in value["values"])
+                )
             )
         ]
         for key in non_int_float_keys:
