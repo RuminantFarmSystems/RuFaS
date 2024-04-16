@@ -388,9 +388,7 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data = {
-                key: filtered_pool[key]["values"] for key in filtered_pool.keys()
-            }
+            report_data = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
             self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise

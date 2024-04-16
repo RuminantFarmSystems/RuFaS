@@ -794,7 +794,7 @@ class OutputManager(object):
         variable defined in this function, it will treat the rest of the filter list as exclusionary
         and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
         as inclusionary.
-        
+
         # TODO
         This is a temp function to extend `_filter_variables_pool` functionality without creating merge conflicts.
         It will be fixed by getting modified and removing `_filter_variables_pool` in issue 996.
@@ -821,7 +821,8 @@ class OutputManager(object):
         filtered_pool: Dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
             dict_to_filter=self.variables_pool,
             filter_patterns=filter_content.get("filters", []),
-            filter_by_exclusion=filter_by_exclusion)
+            filter_by_exclusion=filter_by_exclusion,
+        )
         self.add_log(
             "num_filter_pattern_matches",
             f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
@@ -839,12 +840,8 @@ class OutputManager(object):
             is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
                 if use_filter_name:
-                    results[f"{filter_name}_{counter}"] = {
-                        "values": sliced_data
-                    }
-                results[key] = {
-                        "values": sliced_data
-                    }
+                    results[f"{filter_name}_{counter}"] = {"values": sliced_data}
+                results[key] = {"values": sliced_data}
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -863,9 +860,7 @@ class OutputManager(object):
                     if combined_key in results:
                         results[combined_key]["values"].extend(filtered_value)
                     else:
-                        results[combined_key] = {
-                            "values": filtered_value
-                        }
+                        results[combined_key] = {"values": filtered_value}
         return results
 
     def save_results(
