@@ -633,19 +633,33 @@ def test_num_type_validator(
     dummy_variable_to_check: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function _num_type_validator in file input_manager.py"""
 
     # Arrange
     input_manager = InputManager()
-    dummy_var_name = "dummy_num"
+    dummy_var_path: list[str | int] = ["dummy_num"]
+    dummy_input_data = {"a": 1}
     dummy_properties_key = "dummy_variable_properties"
+    unused_bool_input = False
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    patch_extract = mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
 
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
         result = input_manager._num_type_validator(
-            dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
+            dummy_var_path,
+            dummy_variable_to_check,
+            dummy_input_data,
+            unused_bool_input,
+            dummy_properties_key,
+            dummy_counter,
+            unused_bool_input,
         )
 
+    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path)
+    patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
