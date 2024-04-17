@@ -786,20 +786,6 @@ class OutputManager(object):
         -------
         Dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
-
-        Notes
-        -----
-        The first item in the filter_patterns list will determine whether the patterns are treated as
-        exclusionary or inclusionary. If the first pattern matches the value of the exclude_keyword
-        variable defined in this function, it will treat the rest of the filter list as exclusionary
-        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
-        as inclusionary.
-
-        # TODO
-        This is a temp function to extend `_filter_variables_pool` functionality without creating merge conflicts.
-        It will be fixed by getting modified and removing `_filter_variables_pool` in issue 996.
-        This function is tested minimally, needs more comprehensive testing before replacing `_filter_variables_pool`.
-        `use_name` entry if present and true, uses filter name to populate the output, otherwise, uses the default key
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
