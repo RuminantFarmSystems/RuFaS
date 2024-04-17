@@ -388,7 +388,9 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
+            report_data: Dict[str, List[Any]] = {
+                key: filtered_pool[key]["values"] for key in filtered_pool.keys()
+            }
             if not all(report_data[key] for key in report_data.keys()):
                 raise ValueError
             self._add_constants_to_report_data(report_data, filter_content)
@@ -403,19 +405,19 @@ class ReportGenerator:
         if not horizontal_agg_key and not vertical_agg_key:
             return report_data
 
-        horizontally_aggregated = None
-        vertically_aggregated = None
+        horizontally_aggregated: List[float] | None = None
+        vertically_aggregated: Dict[str, List[float]] | None = None
 
         if horizontal_agg_key:
-            horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
-            loop_list = filter_content.get("horizontal_order", report_data.keys())
+            horizontal_aggregator: Callable[[List[float]], float] = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
+            loop_list: List[str] = filter_content.get("horizontal_order", report_data.keys())
             horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list, horizontal_aggregator)
 
         if vertical_agg_key:
-            vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
+            vertical_aggregator: Callable[[List[float]], float] = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
             vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
 
-        aggregate_report = self._combine_aggregate_report_data(
+        aggregate_report: Dict[str, List[float]] | None = self._combine_aggregate_report_data(
             horizontally_aggregated, vertically_aggregated, filter_content
         )
 
