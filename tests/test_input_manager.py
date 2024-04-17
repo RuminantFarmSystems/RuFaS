@@ -3928,12 +3928,8 @@ def test_array_type_validator(
         ("object", {"key": "value"}, True, True, False, False, False),
         # Complex data type: object, invalid
         ("object", "not a dict", False, False, False, False, False),
-        # Complex data type: object, invalid
-        ("object", "not a dict", False, False, False, False, False),
         # Complex data type: array, valid
         ("array", [1, 2, 3], True, True, False, False, False),
-        # Complex data type: array, invalid
-        ("array", "not a list", False, False, False, False, False),
         # Complex data type: array, invalid
         ("array", "not a list", False, False, False, False, False),
     ],
