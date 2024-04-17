@@ -388,9 +388,7 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data: Dict[str, List[Any]] = {
-                key: filtered_pool[key]["values"] for key in filtered_pool.keys()
-            }
+            report_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
             if not all(report_data[key] for key in report_data.keys()):
                 raise ValueError
             self._add_constants_to_report_data(report_data, filter_content)
