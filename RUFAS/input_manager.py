@@ -828,6 +828,17 @@ class InputManager:
         -------
         bool
             True if the input data is valid, False otherwise.
+
+        Raises
+        ------
+        KeyError
+            If the variable's properties does not specify a "type".
+
+        Notes
+        -----
+        Fixing invalid data will only be attempted if the data is of a "simpler" type (i.e. strings, bools, and
+        numbers).
+
         """
 
         if "type" not in variable_properties:
@@ -859,6 +870,11 @@ class InputManager:
             elements_counter,
             called_during_initialization,
         )
+
+        fixable_data_types = ["string", "number", "bool"]
+        if data_type not in fixable_data_types:
+            return is_valid
+
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True

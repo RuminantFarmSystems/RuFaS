@@ -3904,38 +3904,38 @@ def test_array_type_validator(
 
 
 @pytest.mark.parametrize(
-    "data_type, input_value, expected_result, validator_return, fixable",
+    "data_type, input_value, expected_result, validator_return, fixable, fix_attempted, simple_type",
     [
         # Primitive data type: valid string
-        ("string", "valid string", True, True, False),
+        ("string", "valid string", True, True, False, False, True),
         # Primitive data type: invalid string, fixable
-        ("string", "invalid string", True, False, True),
+        ("string", "invalid string", True, False, True, True, True),
         # Primitive data type: invalid string, not fixable
-        ("string", "invalid string", False, False, False),
+        ("string", "invalid string", False, False, False, True, True),
         # Primitive data type: valid number
-        ("number", 123, True, True, False),
+        ("number", 123, True, True, False, False, True),
         # Primitive data type: invalid number, fixable
-        ("number", "invalid number", True, False, True),
+        ("number", "invalid number", True, False, True, True, True),
         # Primitive data type: invalid number, not fixable
-        ("number", "invalid number", False, False, False),
+        ("number", "invalid number", False, False, False, True, True),
         # Primitive data type: valid bool
-        ("bool", True, True, True, False),
+        ("bool", True, True, True, False, False, True),
         # Primitive data type: invalid bool, fixable
-        ("bool", "invalid bool", True, False, True),
+        ("bool", "invalid bool", True, False, True, True, True),
         # Primitive data type: invalid bool, not fixable
-        ("bool", "invalid bool", False, False, False),
+        ("bool", "invalid bool", False, False, False, True, True),
         # Complex data type: object, valid
-        ("object", {"key": "value"}, True, True, False),
-        # Complex data type: object, invalid, fixable
-        ("object", "not a dict", True, False, True),
-        # Complex data type: object, invalid, not fixable
-        ("object", "not a dict", False, False, False),
+        ("object", {"key": "value"}, True, True, False, False, False),
+        # Complex data type: object, invalid
+        ("object", "not a dict", False, False, False, False, False),
+        # Complex data type: object, invalid
+        ("object", "not a dict", False, False, False, False, False),
         # Complex data type: array, valid
-        ("array", [1, 2, 3], True, True, False),
-        # Complex data type: array, invalid, fixable
-        ("array", "not a list", True, False, True),
-        # Complex data type: array, invalid, not fixable
-        ("array", "not a list", False, False, False),
+        ("array", [1, 2, 3], True, True, False, False, False),
+        # Complex data type: array, invalid
+        ("array", "not a list", False, False, False, False, False),
+        # Complex data type: array, invalid
+        ("array", "not a list", False, False, False, False, False),
     ],
 )
 def test_validate_input_by_type(
@@ -3945,6 +3945,8 @@ def test_validate_input_by_type(
     expected_result: bool,
     validator_return: bool,
     fixable: bool,
+    fix_attempted: bool,
+    simple_type: bool,
 ) -> None:
     """
     Unit test for the _validate_input_by_type method of the InputManager class.
@@ -3974,15 +3976,19 @@ def test_validate_input_by_type(
     assert result == expected_result
     validator_mock.assert_called_once()
 
-    if validator_return:
-        patch_for_fix_data.assert_not_called()
-        elements_counter.increment.assert_called_once_with(ElementState.VALID)
-    else:
+    if fix_attempted:
         patch_for_fix_data.assert_called_once()
-        if fixable:
-            elements_counter.increment.assert_called_once_with(ElementState.FIXED)
-        else:
-            elements_counter.increment.assert_called_once_with(ElementState.INVALID)
+    else:
+        patch_for_fix_data.assert_not_called()
+
+    if not simple_type:
+        elements_counter.increment.assert_not_called()
+    elif expected_result and not fix_attempted:
+        elements_counter.increment.assert_called_once_with(ElementState.VALID)
+    elif fixable:
+        elements_counter.increment.assert_called_once_with(ElementState.FIXED)
+    else:
+        elements_counter.increment.assert_called_once_with(ElementState.INVALID)
 
 
 def test_validate_input_by_type_key_error() -> None:
