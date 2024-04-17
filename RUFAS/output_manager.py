@@ -823,6 +823,7 @@ class OutputManager(object):
         filters_dir_path: Path,
         exclude_info_maps: bool,
         produce_graphics: bool,
+        json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
     ) -> None:
@@ -837,19 +838,16 @@ class OutputManager(object):
         ----------
         save_path : Path
             Path to the directory where the file will be saved.
-
         filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
-
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
-
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
-
+        json_dir : Path
+            The directory for saving JSONs.
         graphics_dir : Path
             The directory for saving graphics.
-
         csv_dir : Path
             The directory for saving csvs.
         """
@@ -910,6 +908,7 @@ class OutputManager(object):
                         filtered_pool,
                         produce_graphics,
                         filter_content,
+                        json_dir,
                         graphics_dir,
                         csv_dir,
                     )
@@ -928,6 +927,7 @@ class OutputManager(object):
         filtered_pool: Dict[str, pool_element_type],
         produce_graphics: bool,
         filter_content: Dict[str, str | int],
+        json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
     ) -> None:
@@ -940,8 +940,9 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            self.create_directory(json_dir)
             file_path = os.path.join(
-                save_path,
+                json_dir,
                 self.generate_file_name(f"saved_variables_{filter_file}", "json"),
             )
             self.dict_to_file_json(filtered_pool, file_path)
