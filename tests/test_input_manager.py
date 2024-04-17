@@ -53,7 +53,7 @@ def input_manager_original_method_states(
         "_log_missing_data": mock_input_manager._log_missing_data,
         "_validate_input_by_type": mock_input_manager._validate_input_by_type,
         "_array_type_validator": mock_input_manager._array_type_validator,
-        "_num_type_validator": mock_input_manager._num_type_validator,
+        "_number_type_validator": mock_input_manager._number_type_validator,
         "_string_type_validator": mock_input_manager._string_type_validator,
         "_bool_type_validator": mock_input_manager._bool_type_validator,
         "_fix_data": mock_input_manager._fix_data,
@@ -584,15 +584,30 @@ def test_bool_type_validator(
 
     # Arrange
     input_manager = InputManager()
+    var_path: list[str | int] = ["dummy_var_path"]
     variable_properties: Dict[str, Any] = {}
-    var_name = "dummy_var_name"
     dummy_properties_key = "dummy_variable_properties"
+    dummy_input_data = {"a": 1, "b": 2}
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    unused_bool_input = False
+    patch_extract = mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=input_data_value)
+    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    result = input_manager._bool_type_validator(variable_properties, var_name, input_data_value, dummy_properties_key)
+    result = input_manager._bool_type_validator(
+        var_path,
+        variable_properties,
+        dummy_input_data,
+        unused_bool_input,
+        dummy_properties_key,
+        dummy_counter,
+        unused_bool_input,
+    )
 
     # Assert
+    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
         patch_for_add_warning.assert_called_once()
     else:
@@ -613,24 +628,38 @@ def test_bool_type_validator(
         ("42", {"minimum": 4, "maximum": 32}, False, 1),
     ],
 )
-def test_num_type_validator(
+def test_number_type_validator(
     dummy_value: int,
     dummy_variable_to_check: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for function _num_type_validator in file input_manager.py"""
+    """Unit test for function _number_type_validator in file input_manager.py"""
 
     # Arrange
     input_manager = InputManager()
-    dummy_var_name = "dummy_num"
+    dummy_var_path: list[str | int] = ["dummy_num"]
+    dummy_input_data = {"a": 1}
     dummy_properties_key = "dummy_variable_properties"
+    unused_bool_input = False
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    patch_extract = mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
 
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
-        result = input_manager._num_type_validator(
-            dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
+        result = input_manager._number_type_validator(
+            dummy_var_path,
+            dummy_variable_to_check,
+            dummy_input_data,
+            unused_bool_input,
+            dummy_properties_key,
+            dummy_counter,
+            unused_bool_input,
         )
 
+    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path)
+    patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -659,16 +688,32 @@ def test_string_type_validator(
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
-    dummy_var_name = "dummy_var"
+    var_path: list[str | int] = ["dummy_var_path"]
     dummy_properties_key = "dummy_variable_properties"
+    dummy_input_data = {"a": 1, "b": 2}
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    unused_bool_input = False
+    patch_extract = mocker.patch.object(mock_input_manager, "_extract_value_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(
+        mock_input_manager, "_convert_variable_path_to_str", return_value="dummy_name"
+    )
+    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._string_type_validator(
-            dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
-        )
+    result = mock_input_manager._string_type_validator(
+        var_path,
+        dummy_variable_to_check,
+        dummy_input_data,
+        unused_bool_input,
+        dummy_properties_key,
+        dummy_counter,
+        unused_bool_input,
+    )
 
+    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -2770,7 +2815,6 @@ def test_log_missing_data_runtime_key_error(
     input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
-
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
@@ -3919,15 +3963,9 @@ def test_validate_input_by_type(
     mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="path.to.variable")
     patch_for_fix_data = mocker.patch.object(input_manager, "_fix_data", return_value=fixable)
 
-    if data_type in ["string", "number", "bool"]:
-        data_type = "num" if data_type == "number" else data_type
-        validator_mock = mocker.patch.object(
-            input_manager, f"_{data_type}_type_validator", return_value=validator_return
-        )
-    else:
-        validator_mock = mocker.patch.object(
-            input_manager, f"_{data_type}_type_validator", return_value=expected_result
-        )
+    validator_mock = mocker.patch.object(
+        input_manager, f"_{data_type}_type_validator", return_value=validator_return
+    )
 
     # Act
     result = input_manager._validate_input_by_type(
@@ -3938,14 +3976,15 @@ def test_validate_input_by_type(
     assert result == expected_result
     validator_mock.assert_called_once()
 
-    if data_type in ["string", "number", "bool"]:
-        if not validator_return and fixable:
-            patch_for_fix_data.assert_called_once()
-            elements_counter.increment.assert_called_with(ElementState.FIXED)
-        elif not validator_return and not fixable:
-            elements_counter.increment.assert_called_with(ElementState.INVALID)
-        elif validator_return:
-            elements_counter.increment.assert_called_with(ElementState.VALID)
+    if validator_return:
+        patch_for_fix_data.assert_not_called()
+        elements_counter.increment.assert_called_once_with(ElementState.VALID)
+    else:
+        patch_for_fix_data.assert_called_once()
+        if fixable:
+            elements_counter.increment.assert_called_once_with(ElementState.FIXED)
+        else:
+            elements_counter.increment.assert_called_once_with(ElementState.INVALID)
 
 
 def test_validate_input_by_type_key_error() -> None:
