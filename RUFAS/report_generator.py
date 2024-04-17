@@ -410,9 +410,9 @@ class ReportGenerator:
             horizontal_aggregator: Callable[[List[float]], float] | None = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
             loop_list: List[str] = filter_content.get("horizontal_order", report_data.keys())
             if horizontal_aggregator is not None:
-                horizontally_aggregated = self._apply_horizontal_aggregation(report_data,
-                                                                             loop_list,
-                                                                             horizontal_aggregator)
+                horizontally_aggregated = self._apply_horizontal_aggregation(
+                    report_data, loop_list, horizontal_aggregator
+                )
 
         if vertical_agg_key is not None:
             vertical_aggregator: Callable[[List[float]], float] | None = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
