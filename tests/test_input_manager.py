@@ -3963,9 +3963,7 @@ def test_validate_input_by_type(
     mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="path.to.variable")
     patch_for_fix_data = mocker.patch.object(input_manager, "_fix_data", return_value=fixable)
 
-    validator_mock = mocker.patch.object(
-        input_manager, f"_{data_type}_type_validator", return_value=validator_return
-    )
+    validator_mock = mocker.patch.object(input_manager, f"_{data_type}_type_validator", return_value=validator_return)
 
     # Act
     result = input_manager._validate_input_by_type(
