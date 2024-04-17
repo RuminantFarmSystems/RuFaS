@@ -599,7 +599,7 @@ class OutputManager(object):
         """
 
         if not isinstance(units, dict):
-            return f"_({units})" if units else ""
+            return f" ({units})" if units else ""
 
         if subkey not in units:
             if subkey is not None:
@@ -613,7 +613,7 @@ class OutputManager(object):
                 )
             return ""
 
-        return f"_({units[subkey]})"
+        return f" ({units[subkey]})"
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary to a csv file.
