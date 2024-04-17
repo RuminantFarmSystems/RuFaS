@@ -688,16 +688,32 @@ def test_string_type_validator(
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
-    dummy_var_name = "dummy_var"
+    var_path: list[str | int] = ["dummy_var_path"]
     dummy_properties_key = "dummy_variable_properties"
+    dummy_input_data = {"a": 1, "b": 2}
+    dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
+    unused_bool_input = False
+    patch_extract = mocker.patch.object(mock_input_manager, "_extract_value_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(
+        mock_input_manager, "_convert_variable_path_to_str", return_value="dummy_name"
+    )
+    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._string_type_validator(
-            dummy_variable_to_check, dummy_var_name, dummy_value, dummy_properties_key
-        )
+    result = mock_input_manager._string_type_validator(
+        var_path,
+        dummy_variable_to_check,
+        dummy_input_data,
+        unused_bool_input,
+        dummy_properties_key,
+        dummy_counter,
+        unused_bool_input,
+    )
 
+    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
