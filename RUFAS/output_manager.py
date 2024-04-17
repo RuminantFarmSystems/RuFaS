@@ -823,6 +823,7 @@ class OutputManager(object):
         filters_dir_path: Path,
         exclude_info_maps: bool,
         produce_graphics: bool,
+        reports_dir: Path,
         json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
@@ -844,6 +845,8 @@ class OutputManager(object):
             Flag for whether or not the user wants to include info_maps data in their results files.
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
+        reports_dir : Path
+            The directory for saving reports to.
         json_dir : Path
             The directory for saving JSONs.
         graphics_dir : Path
@@ -913,10 +916,11 @@ class OutputManager(object):
                         csv_dir,
                     )
             report_file_path = os.path.join(
-                save_path,
+                reports_dir,
                 self.generate_file_name(f"report_{filter_file}", "csv"),
             )
             if report_generator.reports:
+                self.create_directory(reports_dir)
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
 
