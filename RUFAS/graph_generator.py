@@ -1,7 +1,7 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable, Optional, Collection
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -111,7 +111,7 @@ class GraphGenerator:
         filter_file_name: str,
         graphics_dir: Path,
         produce_graphics: bool,
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+    ) -> List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
@@ -146,7 +146,7 @@ class GraphGenerator:
             "function": self.generate_graph.__name__,
         }
         if not produce_graphics:
-            all_logs = [
+            all_logs: List[Dict[str, Collection[str]]] = [
                 {
                     "error": f"Can't plot {graph_details.get('title')} data set",
                     "message": "'produce_graphics' set to False, no graphs will be produced.",
