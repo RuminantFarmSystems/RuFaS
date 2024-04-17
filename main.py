@@ -46,6 +46,8 @@ def main() -> None:
             vars_file_path=Path(cmd_arguments.load_pool),
             output_dir=Path(cmd_arguments.output_dir),
             filters_dir=Path(cmd_arguments.filters_dir),
+            reports_dir=Path(cmd_arguments.reports_dir),
+            json_dir=Path(cmd_arguments.json_dir),
             csv_dir=Path(cmd_arguments.csv_dir),
             init_herd=cmd_arguments.init_herd,
             save_animals=cmd_arguments.save_animals,
@@ -89,6 +91,8 @@ def run_rufas(
     vars_file_path: Path,
     output_dir: Path,
     filters_dir: Path,
+    reports_dir: Path,
+    json_dir: Path,
     csv_dir: Path,
     init_herd: bool,
     save_animals: bool,
@@ -122,6 +126,10 @@ def run_rufas(
         The directory for saving output.
     filters_dir : Path
         The directory for the files containing the keys for filtering.
+    reports_dir : Path
+        The directory for saving reports to.
+    json_dir : Path
+        The directory for the JSON output filter files to be saved in.
     csv_dir : Path
         The directory for the csv output files to be saved.
     init_herd: bool
@@ -150,6 +158,8 @@ def run_rufas(
             clear_output,
             output_dir,
             filters_dir,
+            reports_dir,
+            json_dir,
             csv_dir,
         )
         return
@@ -169,6 +179,8 @@ def run_rufas(
             format_option,
             output_dir,
             filters_dir,
+            reports_dir,
+            json_dir,
             csv_dir,
             init_herd,
             save_animals,
@@ -186,6 +198,8 @@ def run_load_vars_pool(
     clear_output: bool,
     output_dir: Path,
     filters_dir: Path,
+    reports_dir: Path,
+    json_dir: Path,
     csv_dir: Path,
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
@@ -209,6 +223,10 @@ def run_load_vars_pool(
         The directory for saving output.
     filters_dir : Path
         The directory for the files containing the keys for filtering.
+    reports_dir : Path
+        The directory for saving reports to.
+    json_dir : Path
+        The directory for the JSON filter file output to be saved.
     csv_dir : Path
         The directory for the csv output files to be saved.
     """
@@ -223,6 +241,8 @@ def run_load_vars_pool(
         filters_dir,
         exclude_info_maps,
         produce_graphics,
+        reports_dir,
+        json_dir,
         graphics_dir,
         csv_dir,
     )
@@ -380,6 +400,8 @@ def execute_simulations(
     format_option: str,
     output_dir: Path,
     filters_dir: Path,
+    reports_dir: Path,
+    json_dir: Path,
     csv_dir: Path,
     init_herd: bool,
     save_animals: bool,
@@ -405,6 +427,10 @@ def execute_simulations(
         The directory for saving output.
     filters_dir : Path
         The directory for the files containing the keys for filtering.
+    reports_dir : Path
+        The directory for the report filter outputs to be saved to.
+    json_dir : Path
+        The directory for the JSON output from filter files to be saved to.
     csv_dir : Path
         The directory for the csv output files to be saved.
     init_herd: bool
@@ -466,7 +492,9 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_results(output_dir, filters_dir, exclude_info_maps, produce_graphics, graphics_dir, csv_dir)
+        output_manager.save_results(
+            output_dir, filters_dir, exclude_info_maps, produce_graphics, reports_dir, json_dir, graphics_dir, csv_dir
+        )
         input_manager.dump_get_data_logs(path=output_dir)
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
         output_manager.print_errors_warnings_logs_counts()
@@ -542,6 +570,18 @@ def parse_gnu_args() -> argparse.Namespace:
         "--filters-dir",
         help="The directory for the files containing the keys for filtering",
         default="output/output_filters/",
+    )
+    parser.add_argument(
+        "-R",
+        "--reports-dir",
+        help="The directory for the reports to be saved",
+        default="output/reports/",
+    )
+    parser.add_argument(
+        "-J",
+        "--json-dir",
+        help="The directory for the JSON filter output files to be saved",
+        default="output/JSONs/",
     )
     parser.add_argument(
         "-C",
