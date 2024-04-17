@@ -840,7 +840,7 @@ class InputManager:
             "array": self._array_type_validator,
             "object": self._object_type_validator,
             "string": self._string_type_validator,
-            "number": self._num_type_validator,
+            "number": self._number_type_validator,
             "bool": self._bool_type_validator,
         }
 
@@ -1064,7 +1064,7 @@ class InputManager:
                 return False
         return is_whole_object_acceptable
 
-    def _num_type_validator(
+    def _number_type_validator(
         self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
@@ -1080,7 +1080,7 @@ class InputManager:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._num_type_validator.__name__,
+            "function": self._number_type_validator.__name__,
         }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
