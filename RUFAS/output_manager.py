@@ -794,7 +794,7 @@ class OutputManager(object):
         variable defined in this function, it will treat the rest of the filter list as exclusionary
         and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
         as inclusionary.
-        
+
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
