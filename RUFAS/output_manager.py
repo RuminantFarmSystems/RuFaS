@@ -806,11 +806,11 @@ class OutputManager(object):
             "filter_by_exclusion": filter_by_exclusion,
             "use_filter_name": use_filter_name,
         }
-
+        filter_excl_msg: str = ""
         if filter_by_exclusion:
-            filter_excl_msg: str = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
+            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_excl_msg: str = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
         self.add_log("filtering_log", filter_excl_msg, info_map)
 
         filtered_pool: Dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
@@ -824,9 +824,9 @@ class OutputManager(object):
             info_map,
         )
 
-        selected_variables: List[str] = filter_content.get("variables")
+        selected_variables: List[str] | None = filter_content.get("variables")
         slice_start: int = filter_content.get("slice_start", 0)
-        slice_end: int = filter_content.get("slice_end")
+        slice_end: int | None = filter_content.get("slice_end")
 
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0

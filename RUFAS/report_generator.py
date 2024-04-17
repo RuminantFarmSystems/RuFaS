@@ -155,7 +155,7 @@ class ReportGenerator:
         None
         """
 
-        self.reports: Dict[str, Dict[str, List[Any]]] = {}
+        self.reports = {}
 
     def generate_report(
         self,
@@ -354,7 +354,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, Any],
-    ) -> Dict[str, List[Any]]:
+    ) -> Dict[str, List[float]] | None:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
@@ -407,13 +407,17 @@ class ReportGenerator:
         vertically_aggregated: Dict[str, List[float]] | None = None
 
         if horizontal_agg_key:
-            horizontal_aggregator: Callable[[List[float]], float] = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
+            horizontal_aggregator: Callable[[List[float]], float] | None = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
             loop_list: List[str] = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list, horizontal_aggregator)
+            if horizontal_aggregator is not None:
+                horizontally_aggregated = self._apply_horizontal_aggregation(report_data,
+                                                                             loop_list,
+                                                                             horizontal_aggregator)
 
-        if vertical_agg_key:
-            vertical_aggregator: Callable[[List[float]], float] = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
+        if vertical_agg_key is not None:
+            vertical_aggregator: Callable[[List[float]], float] | None = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
+            if vertical_aggregator:
+                vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
 
         aggregate_report: Dict[str, List[float]] | None = self._combine_aggregate_report_data(
             horizontally_aggregated, vertically_aggregated, filter_content
