@@ -271,6 +271,7 @@ def run_validation(
                 info_map,
             )
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
+        input_manager.dump_metadata_properties(output_dir)
 
 
 def set_random_seed(input_manager: InputManager) -> None:
