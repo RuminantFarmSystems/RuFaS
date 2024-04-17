@@ -155,6 +155,7 @@ def test_dict_to_csv_column_list(
         ("empty_units", "", None, "", None),
         ("nested_units", {"value": "kg", "error": "kg"}, "value", " (kg)", None),
         ("nested_units", {"value": "kg", "error": "kg"}, "uncertainty", "", "units_key_error"),
+        ("coordinates", {"x": "m", "y": "m"}, None, "", "units_subkey_missing"),
     ],
 )
 def test_get_units_substr(
@@ -166,9 +167,14 @@ def test_get_units_substr(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the _get_units_substr() method in the file output_manager.py"""
+
     # Arrange
     output_manager = OutputManager()
     patch_for_add_error = mocker.patch.object(output_manager, "add_error")
+    info_map = {
+        "class": output_manager.__class__.__name__,
+        "function": "_get_units_substr",
+    }
 
     # Act
     result = output_manager._get_units_substr(variable_name, units, subkey)
@@ -176,15 +182,17 @@ def test_get_units_substr(
     # Assert
     assert result == expected_result
 
-    if expected_error:
-        expected_info_map = {
-            "class": output_manager.__class__.__name__,
-            "function": "_get_units_substr",
-        }
+    if expected_error == "units_key_error":
         patch_for_add_error.assert_called_once_with(
             "units_key_error",
             f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
-            info_map=expected_info_map,
+            info_map=info_map,
+        )
+    elif expected_error == "units_subkey_missing":
+        patch_for_add_error.assert_called_once_with(
+            "units_subkey_missing",
+            f"Subkey is required when units is a dictionary for variable '{variable_name}'.",
+            info_map=info_map,
         )
     else:
         patch_for_add_error.assert_not_called()
