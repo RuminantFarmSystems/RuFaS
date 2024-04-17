@@ -53,7 +53,7 @@ def input_manager_original_method_states(
         "_log_missing_data": mock_input_manager._log_missing_data,
         "_validate_input_by_type": mock_input_manager._validate_input_by_type,
         "_array_type_validator": mock_input_manager._array_type_validator,
-        "_num_type_validator": mock_input_manager._num_type_validator,
+        "_number_type_validator": mock_input_manager._number_type_validator,
         "_string_type_validator": mock_input_manager._string_type_validator,
         "_bool_type_validator": mock_input_manager._bool_type_validator,
         "_fix_data": mock_input_manager._fix_data,
@@ -628,14 +628,14 @@ def test_bool_type_validator(
         ("42", {"minimum": 4, "maximum": 32}, False, 1),
     ],
 )
-def test_num_type_validator(
+def test_number_type_validator(
     dummy_value: int,
     dummy_variable_to_check: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
-    """Unit test for function _num_type_validator in file input_manager.py"""
+    """Unit test for function _number_type_validator in file input_manager.py"""
 
     # Arrange
     input_manager = InputManager()
@@ -648,7 +648,7 @@ def test_num_type_validator(
     patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
 
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
-        result = input_manager._num_type_validator(
+        result = input_manager._number_type_validator(
             dummy_var_path,
             dummy_variable_to_check,
             dummy_input_data,
@@ -3963,15 +3963,9 @@ def test_validate_input_by_type(
     mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="path.to.variable")
     patch_for_fix_data = mocker.patch.object(input_manager, "_fix_data", return_value=fixable)
 
-    if data_type in ["string", "number", "bool"]:
-        data_type = "num" if data_type == "number" else data_type
-        validator_mock = mocker.patch.object(
-            input_manager, f"_{data_type}_type_validator", return_value=validator_return
-        )
-    else:
-        validator_mock = mocker.patch.object(
-            input_manager, f"_{data_type}_type_validator", return_value=expected_result
-        )
+    validator_mock = mocker.patch.object(
+        input_manager, f"_{data_type}_type_validator", return_value=validator_return
+    )
 
     # Act
     result = input_manager._validate_input_by_type(
@@ -3982,14 +3976,15 @@ def test_validate_input_by_type(
     assert result == expected_result
     validator_mock.assert_called_once()
 
-    if data_type in ["string", "number", "bool"]:
-        if not validator_return and fixable:
-            patch_for_fix_data.assert_called_once()
-            elements_counter.increment.assert_called_with(ElementState.FIXED)
-        elif not validator_return and not fixable:
-            elements_counter.increment.assert_called_with(ElementState.INVALID)
-        elif validator_return:
-            elements_counter.increment.assert_called_with(ElementState.VALID)
+    if validator_return:
+        patch_for_fix_data.assert_not_called()
+        elements_counter.increment.assert_called_once_with(ElementState.VALID)
+    else:
+        patch_for_fix_data.assert_called_once()
+        if fixable:
+            elements_counter.increment.assert_called_once_with(ElementState.FIXED)
+        else:
+            elements_counter.increment.assert_called_once_with(ElementState.INVALID)
 
 
 def test_validate_input_by_type_key_error() -> None:
