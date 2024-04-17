@@ -591,29 +591,42 @@ class OutputManager(object):
         --------
         >>> output_manager = OutputManager()
         >>> output_manager._get_units_substr("temperature", "C")
-        '_(C)'
+        ' (C)'
         >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
-        '_(m/s)'
+        ' (m/s)'
         >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
-        '_(degrees)'
+        ' (degrees)'
+        >>> output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
+        ''
         """
 
         if not isinstance(units, dict):
             return f" ({units})" if units else ""
 
-        if subkey not in units:
-            if subkey is not None:
-                self.add_error(
-                    "units_key_error",
-                    f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
-                    info_map={
-                        "class": self.__class__.__name__,
-                        "function": self._get_units_substr.__name__,
-                    },
-                )
+        if subkey is None:
+            self.add_error(
+                "units_subkey_missing",
+                f"Subkey is required when units is a dictionary for variable '{variable_name}'.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_units_substr.__name__,
+                },
+            )
             return ""
 
-        return f" ({units[subkey]})"
+        if subkey in units:
+            return f" ({units[subkey]})"
+
+        self.add_error(
+            "units_key_error",
+            f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._get_units_substr.__name__,
+            },
+        )
+
+        return ""
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary to a csv file.
