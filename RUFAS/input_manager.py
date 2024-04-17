@@ -836,8 +836,7 @@ class InputManager:
 
         Notes
         -----
-        Fixing invalid data will only be attempted if the data is of a "simpler" type (i.e. strings, bools, and
-        numbers).
+        Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
 
         """
 
