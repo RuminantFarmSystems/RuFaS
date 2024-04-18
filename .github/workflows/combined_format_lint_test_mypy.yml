@@ -220,7 +220,7 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           message: "Update coverage and mypy badges on README"
-          add: "README.md .github/badges/"
+          add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
 
