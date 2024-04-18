@@ -35,7 +35,7 @@ def main():
             verbose=LogVerbosity(cmd_arguments.verbose),
             clear_output=cmd_arguments.clear_output,
             exclude_info_maps=cmd_arguments.exclude_info_maps,
-            only_run_validation=cmd_arguments.only_run_validation,
+            audit_input_data=cmd_arguments.audit_input_data,
             graphics_dir=Path(cmd_arguments.graphics_dir),
             vars_file_path=Path(cmd_arguments.load_pool),
             output_dir=Path(cmd_arguments.output_dir),
@@ -78,7 +78,7 @@ def run_rufas(
     verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
-    only_run_validation: bool,
+    audit_input_data: bool,
     graphics_dir: Path,
     vars_file_path: Path,
     output_dir: Path,
@@ -106,8 +106,8 @@ def run_rufas(
         Clear output directory before running the simulation.
     exclude_info_maps : bool
         Exclude info_maps from the output.
-    only_run_validation : bool
-        Validate input data and don't run a simulation.
+    audit_input_data : bool
+        Validate input data and produce a CSV of the metadata properties used in validation, no simulation run.
     graphics_dir : Path
         The directory for saving graphics.
     vars_file_path : Path
@@ -152,7 +152,7 @@ def run_rufas(
         output_manager.clear_output_dir(vars_file_path, output_dir)
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
-    if only_run_validation:
+    if audit_input_data:
         run_validation(metadata_files, exclude_info_maps, format_option, output_dir)
     else:
         execute_simulations(
@@ -511,9 +511,9 @@ def parse_gnu_args() -> argparse.Namespace:
         action="store_true",
     )
     parser.add_argument(
-        "-o",
-        "--only-run-validation",
-        help="Only validate the data, don't run a simulation",
+        "-a",
+        "--audit-input-data",
+        help="Validates the input data and generates a CSV of the metadata properties, doesn't run a simulation",
         action="store_true",
     )
     parser.add_argument(
