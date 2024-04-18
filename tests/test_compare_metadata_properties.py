@@ -48,7 +48,8 @@ def test_compare_metadata_properties():
         (
             FileNotFoundError,
             "builtins.open",
-            "Error: The directory 'output' does not exist or diff_results_file1.json_vs_file2.json.txt cannot be accessed.",
+            "Error: The directory 'output' does not exist or diff_results_file1.json_vs_file2.json.txt "
+            "cannot be accessed.",
         ),
         (
             PermissionError,
