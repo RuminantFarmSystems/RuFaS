@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -208,7 +209,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        return current_day_final_manure_volume + self.precipitation_volume
+        if self.config.manure_cover == ManureCoverEnum.NO_COVER.value:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -227,7 +231,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             Flushing water volume, m^3
 
         """
-        return self._manure_handler_daily_output.cleaning_water_volume
+        if self._manure_handler_daily_output:
+            return self._manure_handler_daily_output.cleaning_water_volume
+        else:
+            return 0.0
 
     @property
     def volume_needed(self):
