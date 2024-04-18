@@ -98,6 +98,8 @@ The loss coefficients for the different hay storages are defined in the table:
 
 Table: 1.2.9
 
+$L_{additional}$ for protected indoor hay is 0.
+
 ### 1.3 Silage and Baleage
 
 Both silage and baleage experience dry matter loss to fermentation.
