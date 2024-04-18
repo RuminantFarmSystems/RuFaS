@@ -606,7 +606,8 @@ class OutputManager(object):
         if subkey is None:
             self.add_error(
                 "units_subkey_missing",
-                f"Variable {variable_name} has a dictionary for its 'units' property, but the 'values' associated with this variable are not dictionaries themselves.",
+                f"Variable {variable_name} has a dictionary for its 'units' property, "
+                f"but the 'values' associated with this variable are not dictionaries themselves.",
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self._get_units_substr.__name__,
