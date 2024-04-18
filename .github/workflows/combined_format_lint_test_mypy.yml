@@ -34,18 +34,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Print cache key
-        run: |
-          echo "Cache key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
-
-      - name: List cached files
-        run: |
-          if [ -d ~/.cache/pip ]; then
-            ls -alh ~/.cache/pip
-          else
-            echo "Cache directory does not exist. Cache is empty."
-          fi
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -140,18 +128,6 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
-      - name: Print cache key
-        run: |
-          echo "Cache key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
-
-      - name: List cached files
-        run: |
-          if [ -d ~/.cache/pip ]; then
-            ls -alh ~/.cache/pip
-          else
-            echo "Cache directory does not exist. Cache is empty."
-          fi
 
       - name: Install dependencies
         run: |
