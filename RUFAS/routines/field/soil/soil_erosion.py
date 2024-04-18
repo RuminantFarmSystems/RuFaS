@@ -139,8 +139,9 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.6
 
         """
-        return 0.2 + 0.3 * exp((-0.256) * sand_proportion_content * GeneralConstants.FRACTION_TO_PERCENTAGE
-                               * (1 - (silt_proportion_content)))
+        return 0.2 + 0.3 * exp((-0.256) * (sand_proportion_content if sand_proportion_content is not None else 0)
+                               * GeneralConstants.FRACTION_TO_PERCENTAGE
+                               * (1 - (silt_proportion_content if silt_proportion_content is not None else 0)))
 
     @staticmethod
     def _determine_clay_silt_ratio_factor(silt_proportion_content: float, clay_proportion_content: float) -> float:
@@ -171,7 +172,9 @@ class SoilErosion:
         """
         if silt_proportion_content == 0 and clay_proportion_content == 0:
             raise ValueError("Cannot have percent silt content and percent clay content both be 0")
-        return (silt_proportion_content / (clay_proportion_content + silt_proportion_content)) ** 0.3
+        return ((silt_proportion_content if silt_proportion_content is not None else 0)
+                / ((clay_proportion_content if clay_proportion_content is not None else 0)
+                   + (silt_proportion_content if silt_proportion_content is not None else 0))) ** 0.3
 
     @staticmethod
     def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
