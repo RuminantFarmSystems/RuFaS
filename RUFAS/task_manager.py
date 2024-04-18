@@ -2,13 +2,27 @@ from functools import partial
 from typing import Any, Dict, List, TypedDict
 import multiprocessing
 from pathlib import Path
+from enum import Enum
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 
 
-class MetadataPath(TypedDict):  # TODO: revisit docstring
+class TaskType(Enum):
+    """
+    Enum different types of task that TaskManager handles.
+    """
+
+    HERD_INITIALIZATION = "Herd Initialization"
+    SIMULATION_SIGNLE_RUN = "A single simulation run"
+    SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
+    SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
+    INPUT_DATA_VALIDATION = "Input data validation"
+    END_TO_END_TESTING = "Run e2e testing"
+
+
+class MetadataPath(TypedDict):  # TODO: revisit docstring; consider deprecating this altogether
     """
     Contains the path(s) to the metadata file(s) that will run when a user runs a simulation and the
     prefix(es) the user wants to use to designate the output files from this simulation.
@@ -51,11 +65,17 @@ class MetadataPath(TypedDict):  # TODO: revisit docstring
 
 
 class TaskManager:
-    def __init__(self, workers: int):
+    def __init__(self, workers: int = 1):
+        self.input_manager = InputManager()
+        self.input_manager.start_data_processing()
+        self.output_manager = OutputManager()
+        workers = self.input_manager.get_data("config.set_seed")
         self.pool = multiprocessing.Pool(workers, maxtasksperchild=1)
 
     @staticmethod
-    def task(metadata_path: MetadataPath, input_manager_pool: Dict[str, Any], input_manager_metadata: Dict[str, Any]) -> None:
+    def task(
+        metadata_path: MetadataPath, input_manager_pool: Dict[str, Any], input_manager_metadata: Dict[str, Any]
+    ) -> None:
         input_manager = InputManager()
 
         print(f"{metadata_path=}, {input_manager=}")
@@ -79,7 +99,7 @@ class TaskManager:
 
 if __name__ == "__main__":
     task_manager = TaskManager(workers=4)
-    metadata_paths : List[MetadataPath] = [
+    metadata_paths: List[MetadataPath] = [
         {"prefix": "1", "path": Path("input/metadata/default_metadata1.json")},
         {"prefix": "2", "path": Path("input/metadata/default_metadata2.json")},
         {"prefix": "3", "path": Path("input/metadata/default_metadata3.json")},
