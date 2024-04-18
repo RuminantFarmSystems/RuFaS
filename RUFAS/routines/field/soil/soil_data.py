@@ -752,5 +752,5 @@ class SoilData:
             Average clay percent of the soil (unitless).
 
         """
-        clay_percentages = self.get_vectorized_layer_attribute("percent_clay_content")
+        clay_percentages = self.get_vectorized_layer_attribute("clay_proportion_content")
         return sum(clay_percentages) / len(clay_percentages)
