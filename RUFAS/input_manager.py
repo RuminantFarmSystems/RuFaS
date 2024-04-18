@@ -2009,9 +2009,14 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def dump_metadata_properties(self, output_dir: Path):
+    def dump_metadata_properties(self, output_dir: Path) -> None:
         """
         Dumps metadata properties in CSV format.
+
+        Parameters
+        ----------
+        output_dir : Path
+            The path to the output directory where the metadata properties CSV will be saved.
         """
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
@@ -2031,7 +2036,7 @@ class InputManager:
         Parameters
         ----------
         data : Dict[str, Any]
-            The json file data to be parsed.
+            The metadata properties data to be parsed.
         prefix : str, optional
             The data record prefix, by default ''.
         sep : str, optional
