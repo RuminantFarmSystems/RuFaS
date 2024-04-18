@@ -49,9 +49,6 @@ echo "Mypy badge: $mypy_markdown_str"
 sed -i "s|\[\!\[Coverage\]\(.*\)\]|\[${coverage_markdown_str}\]|" ./README.md
 sed -i "s|\[\!\[Mypy\]\(.*\)\]|\[${mypy_markdown_str}\]|" ./README.md
 
-# Add or update the Pytest badge
-pytest_badge_url="https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg"
-#pytest_markdown_str="[![Pytest](${pytest_badge_url})](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)"
-pytest_markdown_str="[![Pytest, Flake8, Black]](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)"
-sed -i "s|\[\!\[Pytest, Flake8, Black\]\(.*\)\]|\[${pytest_markdown_str}\]|" ./README.md
-#sed -i "s|\[\!\[Pytest, Flake8, Black\]\]|\[${pytest_markdown_str}\]|" ./README.md
+combined_actions_badge_url="https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg"
+combined_actions_markdown_str="![Formatting and Testing](${combined_actions_badge_url})"
+sed -i "s|\[\!\[Formatting and Testing\(.*\)\]|\[${combined_actions_markdown_str}\]|" ./README.md
