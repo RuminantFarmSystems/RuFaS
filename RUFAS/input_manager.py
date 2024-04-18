@@ -2009,6 +2009,90 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
+    def dump_metadata_properties(self, output_dir: Path):
+        """
+        Dumps metadata properties in CSV format.
+        """
+        records = self._parse_metadata_properties(self.__metadata["properties"])
+        df = pd.DataFrame(records)
+        path_to_save = os.path.join(output_dir, om.generate_file_name(base_name=str(output_dir)
+                                                                      + "InputManager_metadata_properties",
+                                                                      extension="csv")
+                                    )
+        df.to_csv(path_to_save, index=False)
+
+    def _parse_metadata_properties(self, data: Dict[str, Any], prefix: str = '', sep: str = '_'
+                                   ) -> List[Dict[str, Any]]:
+        """
+        Recursively traverse through the metadata properties dictionary
+        to flatten it by creating a record for each entry.
+
+        Parameters
+        ----------
+        data : Dict[str, Any]
+            The json file data to be parsed.
+        prefix : str, optional
+            The data record prefix, by default ''.
+        sep : str, optional
+            The separator used between parts of the data entry names, by default '_'.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            A list of flattened data entries from the json file.
+        """
+        records = []
+        for key, value in data.items():
+            if isinstance(value, dict):
+                for nested_key, nested_value in value.items():
+                    if isinstance(nested_value, dict):
+                        if nested_value.get("type") in ["bool", "string", "number"]:
+                            name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
+                            record = self._create_record(nested_value, name)
+                            records.append(record)
+                        elif nested_value.get("type") == "array":
+                            records.extend(self._parse_metadata_properties(nested_value, prefix + sep + key + sep
+                                                                           + nested_key if prefix else key + sep
+                                                                           + nested_key, sep))
+                        elif nested_value.get("type") == "object":
+                            records.extend(self._parse_metadata_properties(nested_value, prefix + sep + key + sep
+                                                                           + nested_key if prefix else key + sep
+                                                                           + nested_key, sep))
+                    elif value.get("type") in ["bool", "string", "number"]:
+                        name = prefix + sep + key
+                        record = self._create_record(value, name)
+                        records.append(record)
+                        break
+                    elif value.get("type") == "object":
+                        self._parse_metadata_properties(value, prefix + sep + key, sep)
+
+        return records
+
+    def _create_record(self, data_entry: Dict[str, Any], name: str) -> Dict[str, Any]:
+        """Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.
+
+        Parameters
+        ----------
+        data_entry : Dict[str, Any]
+            The data entry from the json file to be converted into the record format.
+        name : str
+            The name to be used for the record.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary of the data entry converted to the record format.
+        """
+        return {
+            'name': name,
+            'type': data_entry.get('type', ''),
+            'description': data_entry.get('description', ''),
+            'pattern': data_entry.get('pattern', ''),
+            'default': data_entry.get('default', ''),
+            'maximum': data_entry.get('maximum', ''),
+            'minimum': data_entry.get('minimum', '')
+        }
+
 
 class ElementState(Enum):
     """
