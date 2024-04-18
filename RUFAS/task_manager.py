@@ -9,19 +9,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 
 
-class TaskType(Enum):
-    """
-    Enum different types of task that TaskManager handles.
-    """
-
-    HERD_INITIALIZATION = "Herd Initialization"
-    SIMULATION_SIGNLE_RUN = "A single simulation run"
-    SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
-    SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
-    INPUT_DATA_VALIDATION = "Input data validation"
-    END_TO_END_TESTING = "Run e2e testing"
-
-
 class MetadataPath(TypedDict):  # TODO: revisit docstring; consider deprecating this altogether
     """
     Contains the path(s) to the metadata file(s) that will run when a user runs a simulation and the
@@ -64,15 +51,58 @@ class MetadataPath(TypedDict):  # TODO: revisit docstring; consider deprecating 
     path: Path
 
 
+class TaskType(Enum):
+    """
+    Enum different types of task that TaskManager handles.
+    """
+
+    HERD_INITIALIZATION = "Herd Initialization"
+    SIMULATION_SIGNLE_RUN = "A single simulation run"
+    SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
+    SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
+    INPUT_DATA_VALIDATION = "Input data validation"
+    END_TO_END_TESTING = "Run e2e testing"
+
+    @staticmethod
+    def from_string(input_str: str) -> 'TaskType':
+        """
+        Converts a string to a corresponding TaskType enum member.
+
+        Parameters
+        ----------
+        input_str : str
+            The string representing a task type.
+
+        Returns
+        -------
+        TaskType
+            The corresponding TaskType enum member.
+
+        Raises
+        ------
+        ValueError
+            If the input string does not correspond to any TaskType enum member.
+        """
+        normalized_input = "_".join(input_str.strip().upper().split())
+        try:
+            return TaskType[normalized_input]
+        except KeyError:
+            raise ValueError(f"The string '{input_str}' is not a match with any acceptable TaskType.")
+
+
 class TaskManager:
-    def __init__(self, workers: int = 1):
+    def __init__(self):
         self.input_manager = InputManager()
         self.input_manager.start_data_processing(
             "input/metadata/task_manager_metadata.json"
         )  # TODO remove hardcoded value
         self.output_manager = OutputManager()
-        workers = self.input_manager.get_data("config.set_seed")
+        workers = self.input_manager.get_data("tasks.parallel_workers")
         self.pool = multiprocessing.Pool(workers, maxtasksperchild=1)
+        tasks = self.input_manager.get_data("tasks.tasks")
+        for task in tasks:
+            task_type = TaskType.from_string(task["task_type"])
+        print(tasks)
 
     @staticmethod
     def task(

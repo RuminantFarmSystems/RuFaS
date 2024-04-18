@@ -5,8 +5,20 @@
       "description": "How many parallel workers should Task Manager use",
       "default": 1,
       "minimum": 1
+    },
+    "tasks": {
+      "type": "array",
+      "description": "The list of things that Task Manager should do in an unordered manner",
+      "properties": {
+        "type": "object",
+        "task_type":{
+          "type":"string",
+          "pattern": "HERD_INITIALIZATION|SIMULATION_SIGNLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_VALIDATION|END_TO_END_TESTING"
+        }
+      }
     }
   },
+
   "config_properties": {
     "start_date": {
       "type": "string",

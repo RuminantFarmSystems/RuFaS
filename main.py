@@ -581,6 +581,6 @@ def parse_gnu_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     # main()
-    task_manager = TaskManager(workers=4)
+    task_manager = TaskManager()
     metadata_paths = ["path/to/metadata1", "path/to/metadata2", "path/to/metadata3", "path/to/metadata4"]
-    task_manager.run_tasks(metadata_paths)
+    # task_manager.run_tasks(metadata_paths)
