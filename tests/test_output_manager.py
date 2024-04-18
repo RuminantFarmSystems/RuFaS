@@ -191,7 +191,7 @@ def test_get_units_substr(
     elif expected_error == "units_subkey_missing":
         patch_for_add_error.assert_called_once_with(
             "units_subkey_missing",
-            f"Variable {variable_name} has the 'units' property as a dictionary, please specify a key.",
+            f"Variable {variable_name} has a dictionary for its 'units' property, but the 'values' associated with this variable are not dictionaries themselves.",
             info_map=info_map,
         )
     else:

@@ -522,7 +522,7 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",
                 manure_value,
-                dict(info_map, **{"units": manure_value_units}),
+                dict(info_map, **{"units": manure_value_units[manure_property]}),
             )
 
     @classmethod
