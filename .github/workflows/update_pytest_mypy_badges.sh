@@ -58,6 +58,8 @@ combined_actions_status=$(curl -s \
 combined_actions_badge_color="orange"
 combined_actions_status_label="failed"
 
+echo "Combined actions status: $combined_actions_status"
+
 if [ "$combined_actions_status" == "Success" ]; then
   combined_actions_badge_color="brightgreen"
   combined_actions_status_label="passed"
@@ -65,4 +67,8 @@ fi
 
 combined_actions_badge_url="https://img.shields.io/badge/Formatting%20and%20Testing-${combined_actions_status_label}-${combined_actions_badge_color}"
 combined_actions_markdown_str="![Formatting and Testing](${combined_actions_badge_url})"
+
+echo "Combined actions badge: $combined_actions_markdown_str"
+echo "Combined actions badge color: $combined_actions_badge_color"
+
 sed -i "s|^\[\!\[Formatting and Testing\(.*\)\]|\[${combined_actions_markdown_str}\]|" ./README.md
