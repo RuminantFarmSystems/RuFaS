@@ -174,7 +174,11 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The additional pit volume needed for precipitation, m^3.
 
         """
-        return self._get_current_day_rainfall() * self.pit_surface_area
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return (self._get_current_day_rainfall() * self._current_pen.num_animals
+                    * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL)
+        else:
+            return 0
 
     @property
     def freeboard_volume(self):
