@@ -543,8 +543,10 @@ class LayerData:
         )
 
         # SWAT eqn. 3:1.1.2
-        humic_organic_nitrogen_concentration = (10**4) * (self.organic_carbon_proportion_content / 14
-                                                          * GeneralConstants.FRACTION_TO_PERCENTAGE)
+        humic_organic_nitrogen_concentration = (10**4) * (
+            self.organic_carbon_proportion_content if self.organic_carbon_proportion_content is not None else 0 / 14
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
 
         initial_active_organic_nitrogen_concentration = (
             humic_organic_nitrogen_concentration * FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
@@ -592,7 +594,9 @@ class LayerData:
             self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        self.total_soil_carbon_amount = soil_mass_in_kg * (self.organic_carbon_proportion_content) / field_size
+        self.total_soil_carbon_amount = soil_mass_in_kg * (
+            self.organic_carbon_proportion_content if self.organic_carbon_proportion_content is not None else 0
+        ) / field_size
 
         if self.top_depth == 0:
             self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
@@ -705,10 +709,12 @@ class LayerData:
         is used in the SurPhos code (see pminrl.f, line 49).
 
         """
-        adjusted_clay_content = max(10**-8, clay_proportion_content * GeneralConstants.FRACTION_TO_PERCENTAGE)
+        adjusted_clay_content = max(10**-8, (clay_proportion_content if clay_proportion_content is not None else 0)
+                                    * GeneralConstants.FRACTION_TO_PERCENTAGE)
         first_term = -0.045 * log(adjusted_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
-        third_term = 0.035 * organic_carbon_proportion_content * GeneralConstants.FRACTION_TO_PERCENTAGE
+        third_term = 0.035 * (organic_carbon_proportion_content if organic_carbon_proportion_content is not None
+                              else 0) * GeneralConstants.FRACTION_TO_PERCENTAGE
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
