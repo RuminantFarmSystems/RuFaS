@@ -174,14 +174,6 @@ class CropData:
         Nitrogen stress for the day (unitless).
     phosphorus_stress : Optional[float]
         Phosphorus stress for the day (unitless).
-    simulate_water_stress : bool, default True
-        Whether water stress should effect crop growth.
-    simulate_temp_stress: bool, default True
-        Whether temperature stress should effect crop growth.
-    simulate_nitrogen_stress : bool, default True
-        Whether nitrogen stress should effect crop growth.
-    simulate_phosphorus_stress : bool, default True
-        Whether phosphorus stress should effect crop growth.
     maximum_temperature : float
         Maximum temperature for plant growth (Celsius).
     potential_heat_units : float
@@ -467,10 +459,6 @@ class CropData:
     temp_stress: Optional[float] = None
     nitrogen_stress: Optional[float] = None
     phosphorus_stress: Optional[float] = None
-    simulate_water_stress: bool = True
-    simulate_temp_stress: bool = True
-    simulate_nitrogen_stress: bool = True
-    simulate_phosphorus_stress: bool = True
 
     # ---- heat_units
     maximum_temperature: float = 38
