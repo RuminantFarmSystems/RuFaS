@@ -603,34 +603,41 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "set_seed,seed,expected_seed,get_data_call_count,add_log_call_count",
+    "set_seed,seed,generated_seed,expected_seed,get_data_call_count,randint_called,add_log_call_count,"
+    "add_var_call_count",
     [
-        (True, 1, 1, 2, 1),
-        (False, 1, None, 1, 0),
+        (True, 1, 0, 1, 2, False, 1, 0),
+        (False, 1, 0, 0, 1, True, 1, 1),
     ],
 )
 def test_set_random_seed(
     mocker: MockerFixture,
     set_seed: bool,
     seed: int,
+    generated_seed: int,
     expected_seed: int,
     get_data_call_count: int,
+    randint_called: bool,
     add_log_call_count: int,
+    add_var_call_count: int,
 ) -> None:
     """Tests that the randomization libraries used in simulations are correctly seeded."""
     mock_input_manager = mocker.MagicMock(autospec=InputManager)
     mock_input_manager.get_data.side_effect = [set_seed, seed]
     mock_output_manager = mocker.MagicMock(autospec=OutputManager)
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mock_random_randint = mocker.patch("random.randint", return_value=generated_seed)
     mock_random_seed = mocker.patch("random.seed")
     mock_numpy_random_seed = mocker.patch("numpy.random.seed")
 
     set_random_seed(mock_input_manager)
 
     mock_input_manager.get_data.call_count == get_data_call_count
+    assert mock_random_randint.call_count == (1 if randint_called else 0)
     mock_random_seed.assert_called_once_with(expected_seed)
     mock_numpy_random_seed.assert_called_once_with(expected_seed)
     assert mock_output_manager.add_log.call_count == add_log_call_count
+    assert mock_output_manager.add_variable.call_count == add_var_call_count
 
 
 @pytest.mark.parametrize(
@@ -1037,7 +1044,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     assert actual_args == "test_args"
 
 
-def test_case_insensitive_argument_action():
+def test_case_insensitive_argument_action() -> None:
     parser = argparse.ArgumentParser()
     parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
 
