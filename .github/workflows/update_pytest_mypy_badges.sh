@@ -52,9 +52,9 @@ sed -i "s|\[\!\[Mypy\]\(.*\)\]|\[${mypy_markdown_str}\]|" ./README.md
 # Add or update the Pytest badge
 pytest_badge_url="https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg"
 pytest_markdown_str="[![Pytest](${pytest_badge_url})](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)"
-sed -i "s|\[!\[Testing\].*\]|${pytest_markdown_str}|" ./README.md
+sed -i "s|\[\!\[Testing\]\(.*\)\]|\[${pytest_markdown_str}\]|" ./README.md
 
 # Add or update the Flake8-Black badge
 flake8_black_badge_url="https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg"
 flake8_black_markdown_str="[![Flake8-Black](${flake8_black_badge_url})](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)"
-sed -i "s|\[!\[Linting\].*\]|${flake8_black_markdown_str}|" ./README.md
+sed -i "s|\[\!\[Linting\]\(.*\)\]|\[${flake8_black_markdown_str}\]|" ./README.md
