@@ -2015,14 +2015,15 @@ class InputManager:
         """
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
-        path_to_save = os.path.join(output_dir, om.generate_file_name(base_name=str(output_dir)
-                                                                      + "InputManager_metadata_properties",
-                                                                      extension="csv")
-                                    )
+        path_to_save = os.path.join(
+            output_dir,
+            om.generate_file_name(base_name=str(output_dir) + "InputManager_metadata_properties", extension="csv"),
+        )
         df.to_csv(path_to_save, index=False)
 
-    def _parse_metadata_properties(self, data: Dict[str, Any], prefix: str = '', sep: str = '_'
-                                   ) -> List[Dict[str, Any]]:
+    def _parse_metadata_properties(
+        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
+    ) -> List[Dict[str, Any]]:
         """
         Recursively traverse through the metadata properties dictionary
         to flatten it by creating a record for each entry.
@@ -2051,13 +2052,21 @@ class InputManager:
                             record = self._create_record(nested_value, name)
                             records.append(record)
                         elif nested_value.get("type") == "array":
-                            records.extend(self._parse_metadata_properties(nested_value, prefix + sep + key + sep
-                                                                           + nested_key if prefix else key + sep
-                                                                           + nested_key, sep))
+                            records.extend(
+                                self._parse_metadata_properties(
+                                    nested_value,
+                                    prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key,
+                                    sep,
+                                )
+                            )
                         elif nested_value.get("type") == "object":
-                            records.extend(self._parse_metadata_properties(nested_value, prefix + sep + key + sep
-                                                                           + nested_key if prefix else key + sep
-                                                                           + nested_key, sep))
+                            records.extend(
+                                self._parse_metadata_properties(
+                                    nested_value,
+                                    prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key,
+                                    sep,
+                                )
+                            )
                     elif value.get("type") in ["bool", "string", "number"]:
                         name = prefix + sep + key
                         record = self._create_record(value, name)
@@ -2084,13 +2093,13 @@ class InputManager:
             A dictionary of the data entry converted to the record format.
         """
         return {
-            'name': name,
-            'type': data_entry.get('type', ''),
-            'description': data_entry.get('description', ''),
-            'pattern': data_entry.get('pattern', ''),
-            'default': data_entry.get('default', ''),
-            'maximum': data_entry.get('maximum', ''),
-            'minimum': data_entry.get('minimum', '')
+            "name": name,
+            "type": data_entry.get("type", ""),
+            "description": data_entry.get("description", ""),
+            "pattern": data_entry.get("pattern", ""),
+            "default": data_entry.get("default", ""),
+            "maximum": data_entry.get("maximum", ""),
+            "minimum": data_entry.get("minimum", ""),
         }
 
 
