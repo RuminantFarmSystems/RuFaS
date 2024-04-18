@@ -51,4 +51,4 @@ sed -i "s|\[\!\[Mypy\]\(.*\)\]|\[${mypy_markdown_str}\]|" ./README.md
 
 combined_actions_badge_url="https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg?label=Formatting%20and%20Testing"
 combined_actions_markdown_str="![Formatting and Testing](${combined_actions_badge_url})"
-sed -i "s|\[\!\[Formatting and Testing\(.*\)\]|\[${combined_actions_markdown_str}\]|" ./README.md
+sed -i "s|^\[\!\[Formatting and Testing\(.*\)\]|\[${combined_actions_markdown_str}\]|" ./README.md
