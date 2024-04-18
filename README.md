@@ -1,7 +1,7 @@
 [![Pytest](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Flake8-Black](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
-[![Mypy](https://img.shields.io/badge/mypy-4412%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/mypy_type_checker.yml)
+[![Mypy](https://img.shields.io/badge/mypy-4139%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/mypy_type_checker.yml)
 
 
 # Vision
