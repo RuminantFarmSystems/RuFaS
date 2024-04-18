@@ -12,6 +12,7 @@ This will produce a list of the differences in a .txt file saved in the output d
 "diff_results_file_name_1_vs_file_name_2.txt"
 
 """
+
 from deepdiff import DeepDiff
 from pprint import pformat
 
@@ -25,7 +26,7 @@ def load_json(file_path: str):
     Loads a json file.
     """
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             return json.load(file)
     except FileNotFoundError:
         print(f"Error: The file '{file_path}' does not exist or cannot be accessed.")
@@ -51,9 +52,9 @@ def compare_metadata_properties() -> None:
 
     formatted_diff = pformat(diff, indent=2)
 
-    file_name = 'diff_results_' + os.path.basename(str(args.file1)) + '_vs_' + os.path.basename(str(args.file2))
+    file_name = "diff_results_" + os.path.basename(str(args.file1)) + "_vs_" + os.path.basename(str(args.file2))
     try:
-        with open(f'output/{file_name}.txt', 'w') as file:
+        with open(f"output/{file_name}.txt", "w") as file:
             file.write(f"Comparing: '{str(args.file1)}' to '{str(args.file2)}'\n")
             file.write(formatted_diff)
     except FileNotFoundError:
