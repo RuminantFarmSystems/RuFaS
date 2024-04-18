@@ -94,7 +94,7 @@ The loss coefficients for the different hay storages are defined in the table:
 |-------------------|------------------|
 |Protected Wrapped  |0.0000216         |
 |Protected Tarped   |0.0000108         |
-|Unprotected Outdoor|0.00006          |
+|Unprotected Outdoor|0.00006           |
 
 Table: 1.2.9
 
@@ -107,18 +107,18 @@ Both silage and baleage experience dry matter loss to fermentation.
 The cumulative dry matter loss to fermentation for ensiled alfalfa ($kg$) is calculated with the equation:
 
 $$
-L_{fermentation} = \sum_{i=1}^{d} 0.0156 - 0.0364(dryfrac_{i-1} - 0.2) \tag{1.3.1}
+L_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot 0.0156 - 0.0364(dryfrac_{i-1} - 0.2) \tag{1.3.1}
 $$
 
-Where $d$ is the number of days the alfalfa has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, and $dryfrac_{i-1}$ is the fraction of ensiled alfalfa fresh mass that is dry matter on day $i-1$. When $i$ is 1, $dryfrac_{i-1}$ is the fraction of ensiled alfalfa's fresh mass that was dry matter when the crop was initially ensiled. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.2, 0.6]$ and the average temperature on day $i$ is in the range $[5, 45]$ ($C^\circ$).
+Where $d$ is the number of days the alfalfa has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, $drymass_{i-1}$ is the dry matter mass of ensiled alfalfa on day $i-1$, and $dryfrac_{i-1}$ is the fraction of ensiled alfalfa fresh mass that is dry matter on day $i-1$. When $i$ is 1, $drymass_{i-1}$ is the initial amount of ensiled alfalfa dry mass and $dryfrac_{i-1}$ is the initial dry matter fraction of the ensiled alfalfa. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.2, 0.6]$ and the average temperature on day $i$ is in the range $[5, 45]$ ($C^\circ$).
 
 The cumulative dry matter loss to fermentation for ensiled corn, grass, and small grain ($kg$) is calculated with the equation:
 
 $$
-L_{fermentation} = \sum_{i=1}^{d} 0.00864 - 0.0193(dryfrac_{i-1} - 0.15) \tag{1.3.2}
+L_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot 0.00864 - 0.0193(dryfrac_{i-1} - 0.15) \tag{1.3.2}
 $$
 
-Where $d$ is the number of days the crop has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, and $dryfrac_{i-1}$ is the fraction of the ensiled crop fresh mass that is dry matter on day $i-1$. When $i$ is 1, $dryfrac_{i-1}$ is the fraction of the ensiled crop's fresh mass that was dry matter when the crop was ensiled. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.15, 0.6]$ and the average temperature on day $i$ is in the range $[0, 40]$ ($C^\circ$).
+Where $d$ is the number of days the crop has been ensiled for, $i$ is the day since ensilement that dry matter loss is being calculated for, $drymass_{i-1}$ is the dry matter mass of ensiled crop on day $i-1$, and $dryfrac_{i-1}$ is the fraction of the ensiled crop fresh mass that is dry matter on day $i-1$. When $i$ is 1, $drymass_{i-1}$ is the initial amount of ensiled crop dry mass and $dryfrac_{i-1}$ is the initial dry matter fraction of the ensiled crop. This equation is only appropriate for use if $dryfrac_{i-1}$ is in the range $[0.15, 0.6]$ and the average temperature on day $i$ is in the range $[0, 40]$ ($C^\circ$).
 
 #### 1.3.1 Effluent Loss
 
