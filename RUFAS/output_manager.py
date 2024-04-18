@@ -1028,21 +1028,21 @@ class OutputManager(object):
         json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
         self.dict_to_file_json(pool, json_file_path)
 
-    def dump_logs(self, path: str) -> None:
+    def dump_logs(self, path: Path) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self.generate_file_name("logs", "json"))
         self.dict_to_file_json(self.logs_pool, file_path)
 
-    def dump_warnings(self, path: str) -> None:
+    def dump_warnings(self, path: Path) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self.generate_file_name("warnings", "json"))
         self.dict_to_file_json(self.warnings_pool, file_path)
 
-    def dump_errors(self, path: str) -> None:
+    def dump_errors(self, path: Path) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
@@ -1051,7 +1051,7 @@ class OutputManager(object):
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
-        path: str,
+        path: Path,
         exclude_info_maps: bool,
         format_option: str,
     ) -> None:
@@ -1138,7 +1138,7 @@ class OutputManager(object):
 
     def dump_all_nondata_pools(
         self,
-        path: str,
+        path: Path,
         exclude_info_maps: bool,
         format_option: str,
     ) -> None:
