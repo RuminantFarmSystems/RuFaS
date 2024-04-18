@@ -626,6 +626,7 @@
             "description": "Culling probability for mastitis",
             "properties": {
               "type": "number",
+              "description": "Culling probability for mastitis",
               "minimum": 0,
               "maximum": 1
             }
@@ -635,6 +636,7 @@
             "description": "Culling probability for udder reasons",
             "properties": {
               "type": "number",
+              "description": "Culling probability for udder reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -644,6 +646,7 @@
             "description": "Culling probability for feet and leg reasons",
             "properties": {
               "type": "number",
+              "description": "Culling probability for feet and leg reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -653,6 +656,7 @@
             "description": "Culling probability for unknown reasons",
             "properties": {
               "type": "number",
+              "description": "Culling probability for unknown reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -662,6 +666,7 @@
             "description": "Culling probability for disease",
             "properties": {
               "type": "number",
+              "description": "Culling probability for disease",
               "minimum": 0,
               "maximum": 1
             }
@@ -671,6 +676,7 @@
             "description": "Culling probability for injury",
             "properties": {
               "type": "number",
+              "description": "Culling probability for injury",
               "minimum": 0,
               "maximum": 1
             }
@@ -680,6 +686,7 @@
             "description": "Culling probability for death",
             "properties": {
               "type": "number",
+              "description": "Culling probability for death",
               "minimum": 0,
               "maximum": 1
             }
@@ -689,6 +696,7 @@
             "description": "Culling day count",
             "properties": {
               "type": "number",
+              "description": "Culling day count",
               "minimum": 0
             }
           }
@@ -1517,6 +1525,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Julian day of year to harvest",
             "minimum": 1,
             "maximum": 366
           }
@@ -1528,6 +1537,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Calendar year in which the harvesting occurs",
             "minimum": 1
           }
         },
@@ -1538,6 +1548,7 @@
           "default": ["harvest_kill"],
           "properties": {
             "type": "string",
+            "description": "Operation with which this crop will be harvested.",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
             "default": "harvest_kill"
           }
@@ -1554,6 +1565,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Julian day of year to plant",
             "minimum": 1,
             "maximum": 366
           }
@@ -1564,6 +1576,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Calendar years in which the planting occurs",
             "minimum": 1
           }
         },
@@ -1626,7 +1639,8 @@
       "description": "List of the mix names that will be used for the corresponding fertilizer application.",
       "default": [],
       "properties": {
-        "type": "string"
+        "type": "string",
+        "description": "Mix name that will be used for the corresponding fertilizer application."
       }
     },
     "years": {
@@ -1635,6 +1649,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Year in which fertilizer will be applied.",
         "minimum": 1
       }
     },
@@ -1644,6 +1659,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Day on which fertilizer will be applied.",
         "minimum": 1,
         "maximum": 366
       }
@@ -1654,6 +1670,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Minimum nitrogen mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1663,6 +1680,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Minimum phosphorus mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1672,6 +1690,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Minimum potassium mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1681,6 +1700,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Depth at which the fertilizer is injected into the soil.\nUnits: mm.",
         "minimum": 0.0
       }
     },
@@ -1690,6 +1710,7 @@
       "default": [],
       "properties": {
         "type": "number",
+        "description": "Fraction of fertilizer which remains on the soil surface when applied via injection.",
         "minimum": 0.0,
         "maximum": 1.0
       }
@@ -1714,7 +1735,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of years in which manure will be applied.",
+        "description": "Year in which manure will be applied.",
         "minimum": 1
       }
     },
@@ -1725,7 +1746,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "description": "List of days in which manure will be applied.",
+        "description": "Day in which manure will be applied.",
         "maximum": 366
       }
     },
@@ -1735,7 +1756,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg.",
+        "description": "Minimum nitrogen mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1745,7 +1766,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg.",
+        "description": "Minimum phosphorus mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1755,7 +1776,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg.",
+        "description": "Minimum potassium mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1765,7 +1786,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
+        "description": "Fraction of how much of the field is covered by the corresponding manure application.",
         "minimum": 0.01,
         "maximum": 1.0
       }
@@ -1776,7 +1797,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of depths at which the manure is injected into the soil.\nUnits: mm.",
+        "description": "Depth at which the manure is injected into the soil.\nUnits: mm.",
         "minimum": 0.0
       }
     },
@@ -1786,7 +1807,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
+        "description": "Fraction of manure which remains on the soil surface when applied via injection.",
         "minimum": 0.0,
         "maximum": 1.0
       }
@@ -1821,7 +1842,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of years in which tillage will occur.",
+        "description": "Year in which tillage will occur.",
         "minimum": 1
       }
     },
@@ -1832,7 +1853,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "description": "List of days on which tilling will occur.",
+        "description": "Day on which tilling will occur.",
         "maximum": 366
       }
     },
@@ -1842,7 +1863,7 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "List of depths that the corresponding tillage applications reach.\nUnits: mm.",
+        "description": "Depth that the corresponding tillage application reaches.\nUnits: mm.",
         "minimum": 0.1
       }
     },
@@ -1853,7 +1874,7 @@
       "properties": {
         "type": "number",
         "minimum": 0.0,
-        "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
+        "description": "Fraction of surface pools that get incorporated into the soil during application.",
         "maximum": 1.0
       }
     },
@@ -1864,7 +1885,7 @@
       "properties": {
         "type": "number",
         "minimum": 0.0,
-        "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
+        "description": "Fraction of soil layer pools that is available to mix into other soil layers.",
         "maximum": 1.0
       }
     },
@@ -1874,7 +1895,7 @@
       "default": [],
       "properties": {
         "type": "string",
-        "description": "List of tillage implements which will be used to execute the tillage operations.",
+        "description": "Tillage implement which will be used to execute the tillage operations.",
         "pattern": "^(subsoiler|moldboard-plow|coulter-chisel-plow|disk-harrow|cultivator|seedbed-conditioner)$"
       }
     },
@@ -3065,6 +3086,7 @@
       "description": "Calf Feeds (raised off farm - 24 hrs of age).",
       "properties": {
         "type": "number",
+        "description": "Calf Feed (raised off farm - 24 hrs of age).",
         "minimum": 1,
         "maximum": 300,
         "default": 155
@@ -3075,6 +3097,7 @@
       "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
       "properties": {
         "type": "number",
+        "description": "Growing Feed (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
         "minimum": 1,
         "maximum": 300
       }
@@ -3084,6 +3107,7 @@
       "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
       "properties": {
         "type": "number",
+        "description": "Close Up Feed (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
         "minimum": 1,
         "maximum": 300
       }
@@ -3093,6 +3117,7 @@
       "description": "Lactating Cow Feeds",
       "properties": {
         "type": "number",
+        "description": "Lactating Cow Feed",
         "minimum": 1,
         "maximum": 300
       }
@@ -3120,6 +3145,7 @@
       "description": "Farm-Grown Feeds",
       "properties": {
         "type": "number",
+        "description": "Farm-Grown Feed",
         "minimum": 1,
         "maximum": 300
       }
@@ -3290,7 +3316,7 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "description": "Unique integer identifier for feed used within the RuFaS model.",
         "minimum": 1
       }
     },
@@ -3335,7 +3361,7 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "description": "Unique integer identifier for a feed used within the RuFaS model.",
         "minimum": 1
       }
     },
@@ -3677,7 +3703,7 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "description": "Unique integer identifier for a feed used within the RuFaS model.",
         "minimum": 1
       }
     },
