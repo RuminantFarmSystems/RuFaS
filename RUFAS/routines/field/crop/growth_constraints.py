@@ -58,20 +58,37 @@ class GrowthConstraints:
             The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
         temperature : float
             The current air temperature in degrees Celsius.
+
+        Notes
+        -----
+        Each crop stressor is checked to determine whether or not it should effect crop growth. If it is not to effect
+        crop growth, then the stressor is set to 0.
+
         """
 
-        self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
-        #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
+        self.data.water_stress = (
+            0.0
+            if not self.data.simulate_water_stress
+            else GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
+        )
+        self.data.temp_stress = (
+            0.0
+            if not self.data.simulate_temp_stress
+            else GrowthConstraints._determine_temperature_stress(
+                temperature, self.data.minimum_temperature, self.data.optimal_temperature
+            )
+        )
+        self.data.nitrogen_stress = (
+            0.0
+            if not self.data.simulate_nitrogen_stress
+            else GrowthConstraints._determine_nutrient_stress(self.data.nitrogen, self.data.optimal_nitrogen)
+        )
+        self.data.phosphorus_stress = (
+            0.0
+            if not self.data.simulate_phosphorus_stress
+            else GrowthConstraints._determine_nutrient_stress(self.data.phosphorus, self.data.optimal_phosphorus)
+        )
 
-        self.data.temp_stress = GrowthConstraints._determine_temperature_stress(
-            temperature, self.data.minimum_temperature, self.data.optimal_temperature
-        )
-        self.data.nitrogen_stress = GrowthConstraints._determine_nutrient_stress(
-            self.data.nitrogen, self.data.optimal_nitrogen
-        )
-        self.data.phosphorus_stress = GrowthConstraints._determine_nutrient_stress(
-            self.data.phosphorus, self.data.optimal_phosphorus
-        )
         self.data.growth_factor = GrowthConstraints._determine_growth_factor(
             self.data.water_stress,
             self.data.temp_stress,
