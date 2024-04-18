@@ -1,3 +1,11 @@
 {
-    "parallel_workers": 4
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SIGNLE_RUN"
+    },
+    {
+      "task_type": "HERD_INITIALIZATION"
+    }
+  ]
 }
