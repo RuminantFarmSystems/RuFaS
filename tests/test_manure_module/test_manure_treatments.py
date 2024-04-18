@@ -1623,7 +1623,7 @@ def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
         (MagicMock(num_animals=100), 100, 1000.0 * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL),
         (None, None, 0),
         (MagicMock(num_animals=None), None, 0),
-    ]
+    ],
 )
 def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_animals, expected_volume):
     """Unit test for precipitation_volume() in slurry_storage_outdoor.py, with different pen and animal scenarios."""
@@ -1636,7 +1636,7 @@ def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_an
     rainfall = 10.0
     mocker.patch(
         "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._get_current_day_rainfall",
-        return_value=rainfall
+        return_value=rainfall,
     )
     slurry_storage_outdoor._current_pen = current_pen
 
