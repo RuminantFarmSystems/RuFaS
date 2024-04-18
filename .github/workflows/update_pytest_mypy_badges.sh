@@ -58,7 +58,7 @@ combined_actions_status=$(curl -s \
 combined_actions_badge_color="orange"
 combined_actions_status_label="failed"
 
-if [ "$combined_actions_status" == "success" ]; then
+if [ "$combined_actions_status" == "Success" ]; then
   combined_actions_badge_color="brightgreen"
   combined_actions_status_label="passed"
 fi
