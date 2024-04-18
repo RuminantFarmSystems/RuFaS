@@ -2,6 +2,7 @@ import dataclasses
 import math
 from typing import Type, Tuple
 
+from mock import MagicMock
 import pytest
 from mock.mock import PropertyMock, call
 from pytest import approx
@@ -1616,8 +1617,16 @@ def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
     assert patch_for_pit_slope.call_count == 2
 
 
-def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> None:
-    """Unit test for precipitation_volume() in slurry_storage_outdoor.py."""
+@pytest.mark.parametrize(
+    "current_pen, num_animals, expected_volume",
+    [
+        (MagicMock(num_animals=100), 100, 1000.0 * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL),
+        (None, None, 0),
+        (MagicMock(num_animals=None), None, 0),
+    ]
+)
+def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_animals, expected_volume):
+    """Unit test for precipitation_volume() in slurry_storage_outdoor.py, with different pen and animal scenarios."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
         weather=mocker.MagicMock(),
@@ -1625,26 +1634,20 @@ def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> Non
         manure_treatment_config=mocker.MagicMock(),
     )
     rainfall = 10.0
-    patch_for_get_current_day_rainfall = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor"
-        "._get_current_day_rainfall",
-        return_value=rainfall,
+    mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._get_current_day_rainfall",
+        return_value=rainfall
     )
-    pit_surface_area = 300.0
-    patch_for_pit_surface_area = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area",
-        new_callable=PropertyMock,
-        return_value=pit_surface_area,
-    )
-    expected_precipitation_volume = rainfall * pit_surface_area
+    slurry_storage_outdoor._current_pen = current_pen
+
+    if current_pen is not None:
+        current_pen.num_animals = num_animals
 
     # Act
     actual_precipitation_volume = slurry_storage_outdoor.precipitation_volume
 
     # Assert
-    assert actual_precipitation_volume == expected_precipitation_volume
-    patch_for_get_current_day_rainfall.assert_called_once()
-    patch_for_pit_surface_area.assert_called_once()
+    assert actual_precipitation_volume == expected_volume
 
 
 def test_slurry_storage_outdoor_freeboard_volume(mocker: MockFixture) -> None:
