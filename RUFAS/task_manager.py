@@ -67,7 +67,9 @@ class MetadataPath(TypedDict):  # TODO: revisit docstring; consider deprecating 
 class TaskManager:
     def __init__(self, workers: int = 1):
         self.input_manager = InputManager()
-        self.input_manager.start_data_processing()
+        self.input_manager.start_data_processing(
+            "input/metadata/task_manager_metadata.json"
+        )  # TODO remove hardcoded value
         self.output_manager = OutputManager()
         workers = self.input_manager.get_data("config.set_seed")
         self.pool = multiprocessing.Pool(workers, maxtasksperchild=1)

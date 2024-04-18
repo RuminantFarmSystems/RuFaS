@@ -1,5 +1,5 @@
 {
-  "task_properties": {
+  "tasks_properties": {
     "parallel_workers": {
       "type": "number",
       "description": "How many parallel workers should Task Manager use",
