@@ -1,0 +1,19 @@
+{
+  "files": {
+    "config": {
+      "title": "Task manager data",
+      "description": "Configuration file for general simulation parameters.",
+      "path": "input/data/tasks/sample_tasks.json",
+      "type": "json",
+      "properties": "task_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "path": "input/metadata/properties/task_properties.json",
+      "type": "json",
+      "properties": "NA"
+    }
+  },
+  "cross-validation": {}
+}
