@@ -35,7 +35,8 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Print cache key
-        run: echo "Cache key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        run: |
+          echo "Cache key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
 
       - name: List cached files
         run: ls -alh ~/.cache/pip
