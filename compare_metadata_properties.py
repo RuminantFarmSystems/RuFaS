@@ -65,4 +65,5 @@ def compare_metadata_properties() -> None:
         print(f"An unexpected OS error occurred: {e}")
 
 
-compare_metadata_properties()
+if __name__ == "__main__":
+    compare_metadata_properties()
