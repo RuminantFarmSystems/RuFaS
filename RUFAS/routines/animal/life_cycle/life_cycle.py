@@ -14,6 +14,7 @@ from RUFAS.routines.animal.animal_typed_dicts import (
     AnimalConfigTypedDict,
     HerdInfoTypedDict,
     InitialHerdSummaryTypedDict,
+    SoldAnimalTypedDict,
 )
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -72,11 +73,11 @@ class LifeCycleManager:
         self.initial_herd_summary: Optional[InitialHerdSummaryTypedDict] = None
         self.avg_CI = 0.0
 
-        self.sold_calves: List[Calf] = []
-        self.sold_heiferIIIs: List[HeiferIII] = []
-        self.sold_heiferIIs: List[HeiferII] = []
-        self.sold_cows: List[Cow] = []
-        self.sold_and_died_cows: List[Cow] = []
+        self.sold_calves_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_cows_info: List[SoldAnimalTypedDict] = []
+        self.sold_and_died_cows_info: List[SoldAnimalTypedDict] = []
 
         self.herd_num = 0
         self.calf_num = 0
@@ -575,7 +576,17 @@ class LifeCycleManager:
                     heiferII.days_born,
                 )
                 heiferII.sold_at_day = sim_day
-                self.sold_heiferIIs.append(heiferII)
+                self.sold_heiferIIs_info.append(
+                    {
+                        "id": heiferII.id,
+                        "animal_type": HeiferII.__name__,
+                        "sold_at_day": heiferII.sold_at_day,
+                        "body_weight": heiferII.body_weight,
+                        "cull_reason": "NA",
+                        "days_in_milk": "NA",
+                        "parity": "NA",
+                    }
+                )
                 removed_heiferIIs_idx.append(idx)
             elif is_heiferIII_stage:
                 self._convert_heiferII_to_heiferIII(heiferII, heiferIIIs)
@@ -737,7 +748,17 @@ class LifeCycleManager:
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = sim_day
-            self.sold_heiferIIIs.append(removed_heiferIII)
+            self.sold_heiferIIIs_info.append(
+                {
+                    "id": removed_heiferIII.id,
+                    "animal_type": HeiferIII.__name__,
+                    "sold_at_day": removed_heiferIII.sold_at_day,
+                    "body_weight": removed_heiferIII.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
             self.sold_heiferIII_oversupply_num += 1
             self.heiferIII_num -= 1
 
@@ -827,11 +848,31 @@ class LifeCycleManager:
 
         """
         cow.sold_at_day = sim_day
-        self.sold_and_died_cows.append(cow)
+        self.sold_and_died_cows_info.append(
+            {
+                "id": cow.id,
+                "animal_type": Cow.__name__,
+                "sold_at_day": cow.sold_at_day,
+                "body_weight": cow.body_weight,
+                "cull_reason": cow.cull_reason,
+                "days_in_milk": cow.days_in_milk,
+                "parity": cow.calves,
+            }
+        )
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
-            self.sold_cows.append(cow)
+            self.sold_cows_info.append(
+                {
+                    "id": cow.id,
+                    "animal_type": Cow.__name__,
+                    "sold_at_day": cow.sold_at_day,
+                    "body_weight": cow.body_weight,
+                    "cull_reason": cow.cull_reason,
+                    "days_in_milk": cow.days_in_milk,
+                    "parity": cow.calves,
+                }
+            )
             self.sold_cow_num += 1
 
         parity = cow.calves if cow.calves <= 3 else "4+"
@@ -970,7 +1011,17 @@ class LifeCycleManager:
             calves_born.append(new_calf)
         if new_calf.sold:
             new_calf.sold_at_day = sim_day
-            self.sold_calves.append(new_calf)
+            self.sold_calves_info.append(
+                {
+                    "id": new_calf.id,
+                    "animal_type": "Calf",
+                    "sold_at_day": new_calf.sold_at_day,
+                    "body_weight": new_calf.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
             self.sold_calf_num += 1
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
