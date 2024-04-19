@@ -309,23 +309,6 @@ def test_acceptable_percolation_amount(water_content: float, saturation_content:
         assert observe == expect
 
 
-@pytest.mark.parametrize("percent_organic_carbon_proportion", [0.98, 1.82, 2.49585])
-def test_percent_organic_matter_proportion(
-    percent_organic_carbon_proportion: float,
-) -> None:
-    """Test that percent_organic_matter_proportion() in LayerData correctly calculates the percent of organic matter
-    content in a layer of soil"""
-    layer = LayerData(
-        top_depth=0,
-        bottom_depth=30,
-        percent_organic_carbon_content=percent_organic_carbon_proportion,
-        field_size=1.98,
-    )
-    observe = layer.percent_organic_matter_proportion
-    expect = 1.72 * percent_organic_carbon_proportion
-    assert observe == expect
-
-
 @pytest.mark.parametrize(
     "added_phosphorus,initial_labile_phosphorus,field_size",
     [

@@ -346,12 +346,14 @@ def test_convert_heiferI_to_heiferII(
         }
     )
     repro_program_update_call = mocker.call(repro_program=heifer_repro_method)
+    repro_sub_protocol_update_call = mocker.call(repro_sub_protocol=dummy_repro_sub_protocol)
     tai_method_update_call = mocker.call(tai_method_h=tai_method_h_value)
     synch_ed_method_update_call = mocker.call(synch_ed_method_h=synch_ed_method_h_value)
 
     expected_mock_calls = [
         basic_update_call,
         repro_program_update_call,
+        repro_sub_protocol_update_call,
         tai_method_update_call,
         synch_ed_method_update_call,
     ]
@@ -1533,12 +1535,12 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
 def test_set_nutrient_rqmts(
     mocker: MockerFixture,
     temp: int,
-    nutrient_conc,
-    ndf,
-    tdn,
-    met_energy,
-    prev_DMI,
-    net_energy,
+    nutrient_conc: Dict[str, float],
+    ndf: float,
+    tdn: float,
+    met_energy: float,
+    prev_DMI: float,
+    net_energy: float,
 ) -> None:
     """Unit tests for the function set_nutrient_rqmts in file routines/animal/life_cycle/heiferI.py."""
     heiferI = mocker.MagicMock(autospec=HeiferI)
@@ -1600,21 +1602,24 @@ def test_heiferI_calc_manure_excretion(mocker: MockerFixture) -> None:
     heiferI.daily_growth = 1.0
     heiferI.days_born = 300
     heiferI.ration_formulation = mocker.MagicMock()
-    feed = mocker.MagicMock(autospec=Feed)
+    nutrient_amount = mocker.MagicMock()
+    nutrient_conc = mocker.MagicMock()
     mock_numI = (mocker.MagicMock(autospec=int), mocker.MagicMock(autospec=int))
     heiferI.calc_base_manure.return_value = mock_numI
-    man_calc = mocker.patch(
+    mocked_heifer_manure_excretion = mocker.patch(
         "RUFAS.routines.animal.life_cycle.heiferI.manure_calculations",
         return_value=(None, None),
     )
-    HeiferI.calc_manure_excretion(heiferI, feed, "methane_model")
-    man_calc.assert_called_with(
-        heiferI.ration_formulation,
-        feed,
+    HeiferI.calc_manure_excretion(
+        heiferI, "methane_model", nutrient_amount=nutrient_amount, nutrient_conc=nutrient_conc
+    )
+    mocked_heifer_manure_excretion.assert_called_with(
         heiferI.body_weight,
         mock_numI[1],
         mock_numI[0],
         "methane_model",
+        nutrient_amount=nutrient_amount,
+        nutrient_conc=nutrient_conc,
     )
     heiferI.calc_base_manure.assert_called()
 
@@ -1646,7 +1651,7 @@ def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
         (300, 300, 100, 700, 273.6),
         (300, 500, 100, 700, 1.368),
         (520, 500, 100, 700, 13.68),
-        (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_BW_CHANGE),
+        (100, 900, 600, 700, AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE),
     ],
 )
 def test_heiferI_get_non_preg_bw_change(
@@ -1946,12 +1951,20 @@ def test_calf_calc_manure_excretion(mocker: MockerFixture) -> None:
 
     calf = mocker.MagicMock(autospec=Calf)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=calf)
-    feed = mocker.MagicMock(autospec=Feed)
+    nutrient_amount = mocker.MagicMock()
+    nutrient_conc = mocker.MagicMock()
     one = 1.2
     two = 0.3
     calf.calc_base_manure.return_value = (one, two)
-    Calf.calc_manure_excretion(calf, feed, "methane_model")
+    mocked_calf_manure_excretion = mocker.patch(
+        "RUFAS.routines.animal.life_cycle.calf.manure_calculations", return_value=(1, 2)
+    )
+    calf.manure_calculations.return_value = (one, two)
+    Calf.calc_manure_excretion(calf, "methane_model", nutrient_amount, nutrient_conc)
     calf.calc_base_manure.assert_called()
+    mocked_calf_manure_excretion.assert_called_once_with(
+        calf.body_weight, 0.3, 1.2, "methane_model", nutrient_amount=nutrient_amount, nutrient_conc=nutrient_conc
+    )
 
 
 def test_calf_phosphorus_rqmts(mocker: MockerFixture) -> None:

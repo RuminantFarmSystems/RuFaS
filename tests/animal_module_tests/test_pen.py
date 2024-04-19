@@ -123,6 +123,7 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
         "birth_weight": 200,
         "p_init": 1,
         "repro_program": "ED",
+        "repro_sub_protocol": "2P",
         "tai_method_h": "5dCG2P",
         "synch_ed_method_h": "2P",
         "calf_birth_weight": 200,
@@ -400,11 +401,6 @@ def test_daily_p_update():
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
 
 
-def test_set_up_new_animal():
-    """Unit test for function set_up_new_animal in file routines/animal/pen.py"""
-    pass
-
-
 def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
     calves = {0: MagicMock()}
@@ -533,7 +529,6 @@ def test_calc_animal_manure_excretion(
     animal = mocker.MagicMock(spec=animal_class)
     animal.is_lactating = is_lactating
     animal.__class__.__name__ = animal_class.__name__
-    mock_feed = mocker.MagicMock(spec="Feed")
     mock_prefix = mocker.MagicMock()
     mock_default_manure = mocker.MagicMock()
     mocker.patch("RUFAS.routines.animal.pen.Pen.__init__", return_value=None)
@@ -544,6 +539,8 @@ def test_calc_animal_manure_excretion(
         return_value=(mock_prefix, mock_default_manure),
     )
     pen.MEdiet = mock_MEdiet = mocker.MagicMock()
+    pen.ration_nutrient_amount = mock_ration_nutrient_amount = mocker.MagicMock()
+    pen.ration_nutrient_conc = mock_ration_nutrient_conc = mocker.MagicMock()
     mock_methane_model = mocker.MagicMock()
     mock_methane_mitigation_method = mocker.MagicMock()
     mock_methane_mitigation_additive_amount = mocker.MagicMock()
@@ -551,7 +548,6 @@ def test_calc_animal_manure_excretion(
     # Act
     actual_prefix, actual_manure = pen._calc_animal_manure_excretion(
         animal,
-        mock_feed,
         mock_methane_model,
         mock_methane_mitigation_method,
         mock_methane_mitigation_additive_amount,
@@ -563,14 +559,19 @@ def test_calc_animal_manure_excretion(
     patch_for_get_prefix_and_default_manure_excretion.assert_called_once_with(animal, is_lactating)
     if animal_class.__name__ == "Cow":
         animal.calc_manure_excretion.assert_called_once_with(
-            mock_feed,
             mock_methane_model,
             mock_methane_mitigation_method,
             mock_methane_mitigation_additive_amount,
             mock_MEdiet,
+            nutrient_amount=mock_ration_nutrient_amount,
+            nutrient_conc=mock_ration_nutrient_conc,
         )
     else:
-        animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model)
+        animal.calc_manure_excretion.assert_called_once_with(
+            mock_methane_model,
+            nutrient_amount=mock_ration_nutrient_amount,
+            nutrient_conc=mock_ration_nutrient_conc,
+        )
 
 
 @pytest.mark.parametrize(
@@ -749,7 +750,6 @@ def test_calc_total_manure(
     for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
-    feed = MagicMock(spec="Feed")
     methane_model = mocker.MagicMock()
     methane_mitigation_method = mocker.MagicMock()
     methane_mitigation_additive_amount = mocker.MagicMock()
@@ -773,7 +773,6 @@ def test_calc_total_manure(
 
     # Act
     pen.calc_total_manure(
-        feed,
         methane_model,
         methane_mitigation_method,
         methane_mitigation_additive_amount,
@@ -787,7 +786,6 @@ def test_calc_total_manure(
                 [
                     mocker.call(
                         animal,
-                        feed,
                         methane_model,
                         methane_mitigation_method,
                         methane_mitigation_additive_amount,

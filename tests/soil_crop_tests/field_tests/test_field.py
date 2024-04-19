@@ -3,6 +3,7 @@ from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
@@ -608,11 +609,11 @@ def test_plant_crop(
             {
                 "suffix": "field='name_1'",
                 "units": {
-                    "crop": "unitless",
-                    "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "year", "day": "day"},
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "crop": MeasurementUnits.UNITLESS.value,
+                    "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
+                    "date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -633,11 +634,11 @@ def test_plant_crop(
             {
                 "suffix": "field='name_2'",
                 "units": {
-                    "crop": "unitless",
-                    "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "year", "day": "day"},
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "crop": MeasurementUnits.UNITLESS.value,
+                    "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
+                    "date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -658,11 +659,11 @@ def test_plant_crop(
             {
                 "suffix": "field='name_3'",
                 "units": {
-                    "crop": "unitless",
-                    "heat_scheduled_harvest": "unitless",
-                    "date": {"year": "year", "day": "day"},
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "crop": MeasurementUnits.UNITLESS.value,
+                    "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
+                    "date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -1377,16 +1378,16 @@ def test_record_fertilizer_application(
         clay.assert_called_once()
 
     expected_units = {
-        "mass": "kg",
-        "nitrogen": "kg",
-        "phosphorus": "kg",
-        "potassium": "kg",
-        "application_depth": "mm",
-        "surface_remainder_fraction": "unitless",
-        "year": "year",
-        "day": "day",
-        "field_size": "ha",
-        "average_clay_percent": "percentage",
+        "mass": MeasurementUnits.KILOGRAMS.value,
+        "nitrogen": MeasurementUnits.KILOGRAMS.value,
+        "phosphorus": MeasurementUnits.KILOGRAMS.value,
+        "potassium": MeasurementUnits.KILOGRAMS.value,
+        "application_depth": MeasurementUnits.MILLIMETERS.value,
+        "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
+        "year": MeasurementUnits.CALENDAR_YEAR.value,
+        "day": MeasurementUnits.ORDINAL_DAY.value,
+        "field_size": MeasurementUnits.HECTARE.value,
+        "average_clay_percent": MeasurementUnits.PERCENT.value,
     }
 
     expected_info_map = {"suffix": f"field='{field_name}'", "mix_name": mix_name, "units": expected_units}
@@ -1819,18 +1820,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_1'",
                 "units": {
-                    "dry_matter_mass": "dry kg",
-                    "dry_matter_fraction": "fraction",
-                    "field_coverage": "unitless",
-                    "application_depth": "mm",
-                    "surface_remainder_fraction": "unitless",
-                    "nitrogen": "kg",
-                    "phosphorus": "kg",
-                    "potassium": "kg",
-                    "day": "day",
-                    "year": "year",
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS.value,
+                    "dry_matter_fraction": MeasurementUnits.FRACTION.value,
+                    "field_coverage": MeasurementUnits.UNITLESS.value,
+                    "application_depth": MeasurementUnits.MILLIMETERS.value,
+                    "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
+                    "nitrogen": MeasurementUnits.KILOGRAMS.value,
+                    "phosphorus": MeasurementUnits.KILOGRAMS.value,
+                    "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -1864,18 +1865,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_2'",
                 "units": {
-                    "dry_matter_mass": "dry kg",
-                    "dry_matter_fraction": "fraction",
-                    "field_coverage": "unitless",
-                    "application_depth": "mm",
-                    "surface_remainder_fraction": "unitless",
-                    "nitrogen": "kg",
-                    "phosphorus": "kg",
-                    "potassium": "kg",
-                    "day": "day",
-                    "year": "year",
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS.value,
+                    "dry_matter_fraction": MeasurementUnits.FRACTION.value,
+                    "field_coverage": MeasurementUnits.UNITLESS.value,
+                    "application_depth": MeasurementUnits.MILLIMETERS.value,
+                    "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
+                    "nitrogen": MeasurementUnits.KILOGRAMS.value,
+                    "phosphorus": MeasurementUnits.KILOGRAMS.value,
+                    "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -1909,18 +1910,18 @@ def test_execute_manure_application_with_invalid_args(
             {
                 "suffix": "field='test_3'",
                 "units": {
-                    "dry_matter_mass": "dry kg",
-                    "dry_matter_fraction": "fraction",
-                    "field_coverage": "unitless",
-                    "application_depth": "mm",
-                    "surface_remainder_fraction": "unitless",
-                    "nitrogen": "kg",
-                    "phosphorus": "kg",
-                    "potassium": "kg",
-                    "day": "day",
-                    "year": "year",
-                    "field_size": "ha",
-                    "average_clay_percent": "percentage",
+                    "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS.value,
+                    "dry_matter_fraction": MeasurementUnits.FRACTION.value,
+                    "field_coverage": MeasurementUnits.UNITLESS.value,
+                    "application_depth": MeasurementUnits.MILLIMETERS.value,
+                    "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
+                    "nitrogen": MeasurementUnits.KILOGRAMS.value,
+                    "phosphorus": MeasurementUnits.KILOGRAMS.value,
+                    "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "field_size": MeasurementUnits.HECTARE.value,
+                    "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
             {
@@ -2160,18 +2161,19 @@ def test_execute_daily_processes(
 
 
 @pytest.mark.parametrize(
-    "field_size,rainfall,manure_water,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
+    "field_size,rainfall,manure_water,snow_content,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
     "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing",
     [
-        (1.9, 4.66, 3.2, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
-        (2.3, 5.6, 1.1, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
-        (2.3, 5.6, 0.0, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
+        (1.9, 4.66, 3.2, 0.0, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
+        (2.3, 5.6, 1.1, 3.3, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
+        (2.3, 5.6, 0.0, 8.5, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False),
     ],
 )
 def test_cycle_water(
     field_size: float,
     rainfall: float,
     manure_water: float,
+    snow_content: float,
     runoff: float,
     high_water_table: bool,
     residue: float,
@@ -2195,6 +2197,7 @@ def test_cycle_water(
             accumulated_runoff=runoff,
             water_evaporated=3.5,
             water_sublimated=1.0,
+            snow_content=snow_content,
         )
         soil_data.plant_surface_residue = surface_residue
         soil = Soil(soil_data)
@@ -2246,6 +2249,7 @@ def test_cycle_water(
         incorp._evaporate_from_crop_canopies = MagicMock(return_value=30.5)
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=40.0)
         incorp._determine_soil_evaporation_and_sublimation_adjusted = MagicMock(return_value=10.5)
+        incorp._determine_maximum_soil_evaporation = MagicMock(return_value=5.0)
         incorp._get_manure_water = MagicMock(return_value=manure_water)
 
         crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
@@ -2284,13 +2288,13 @@ def test_cycle_water(
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0,
             surface_residue,
-            0,
+            snow_content,
             expected_remaining_demand,
             expected_average_transpiration,
         )
         incorp.soil.snow.sublimate.assert_called_once_with(10.5)
-        expected_soil_evaporation_after_sublimation = 10.5 - 1.0
-        incorp.soil.evaporation.evaporate.assert_called_once_with(expected_soil_evaporation_after_sublimation)
+        incorp._determine_maximum_soil_evaporation.assert_called_once_with(10.5, snow_content)
+        incorp.soil.evaporation.evaporate.assert_called_once_with(5.0)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
             crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
@@ -2383,7 +2387,12 @@ def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name
         add_var.assert_called_once_with(
             "manure_water",
             water_amount,
-            {"class": "Field", "function": "_get_manure_water", "suffix": f"field='{field_name}'", "units": "mm"},
+            {
+                "class": "Field",
+                "function": "_get_manure_water",
+                "suffix": f"field='{field_name}'",
+                "units": MeasurementUnits.MILLIMETERS.value,
+            },
         )
 
     assert actual == water_amount
@@ -2574,6 +2583,18 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(
 
 
 @pytest.mark.parametrize(
+    "soil_evaporation_adj,snow_water_content",
+    [(1.3, 3.2), (0, 0), (1.3, 0.4), (1.8954, 0)],
+)
+def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
+    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
+    if snow_water_content > soil_evaporation_adj:
+        assert 0 == observe
+    else:
+        assert (soil_evaporation_adj - snow_water_content) == observe
+
+
+@pytest.mark.parametrize(
     "above_ground_biomass,residue,snow_water",
     [
         (400, 65, 0.3),
@@ -2758,7 +2779,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
                 "suffix": "field='name_1'",
                 "date": {"year": 1993, "day": 120},
                 "field_size": 100,
-                "units": "mm",
+                "units": MeasurementUnits.MILLIMETERS.value,
             },
             135.6,
         ),
@@ -2772,7 +2793,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
                 "suffix": "field='name_2'",
                 "date": {"year": 1996, "day": 3},
                 "field_size": 14.65,
-                "units": "mm",
+                "units": MeasurementUnits.MILLIMETERS.value,
             },
             1.2,
         ),
@@ -2786,7 +2807,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
                 "suffix": "field='name_2'",
                 "date": {"year": 2023, "day": 48},
                 "field_size": 14.65,
-                "units": "mm",
+                "units": MeasurementUnits.MILLIMETERS.value,
             },
             1.2,
         ),
