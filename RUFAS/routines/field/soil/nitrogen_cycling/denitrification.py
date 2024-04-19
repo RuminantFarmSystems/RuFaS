@@ -70,7 +70,7 @@ class Denitrification:
         nitrate_content: float,
         denitrification_rate_coefficient: float,
         temp_factor: float,
-        organic_carbon_proportion_content: float,
+        organic_carbon_fraction: float,
     ) -> float:
         """
         Calculates the amount of nitrate lost to denitrification.
@@ -83,8 +83,8 @@ class Denitrification:
             Rate coefficient that regulates denitrification in this layer of soil (unitless)
         temp_factor : float
             The nutrient cycling temperature factor of this soil layer (unitless)
-        organic_carbon_proportion_content : float
-            The proportion of this soil layer that is made up of organic carbon, in the range [0, 1.0] (unitless)
+        organic_carbon_fraction : float
+            The fraction of this soil layer that is made up of organic carbon, in the range [0, 1.0] (unitless)
 
         Returns
         -------
@@ -103,7 +103,7 @@ class Denitrification:
         is physically impossible to remove more nitrate than there is in the soil.
 
         """
-        exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * organic_carbon_proportion_content
+        exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * organic_carbon_fraction
                                * GeneralConstants.FRACTION_TO_PERCENTAGE)
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
