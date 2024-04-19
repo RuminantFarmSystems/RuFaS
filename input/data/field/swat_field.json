@@ -15,5 +15,5 @@
   "simulate_water_stress": true,
   "simulate_temp_stress": true,
   "simulate_nitrogen_stress": true,
-  "simualte_phosphorus_stress": true
+  "simulate_phosphorus_stress": true
 }
