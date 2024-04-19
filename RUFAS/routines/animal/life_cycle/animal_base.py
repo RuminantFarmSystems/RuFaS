@@ -56,7 +56,7 @@ class AnimalBase:
 
         if MY_305d == None:
             MY_305d = AnimalBase.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
-            y = AnimalBase.get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c)
+            #y = AnimalBase.get_y_values_wood_curve(t, parameter_a, parameter_b, parameter_c)
             return parameter_a, parameter_b, parameter_c, MY_305d
 
         else:
@@ -107,7 +107,7 @@ class AnimalBase:
             total_avg_305 = annual_MY_lbs * 305 / (365 * num_milking_cows * 2.205)
 
             # Extracting percentage distribution for each lactation group
-            percent_P1 = parity_percentages[0] * 100
+            #percent_P1 = parity_percentages[0] * 100
             percent_P2 = parity_percentages[1] * 100
             percent_P3 = parity_percentages[2] * 100
 
@@ -133,9 +133,9 @@ class AnimalBase:
         AnimalBase.lactation_parameters[3] = AnimalBase.get_wood_parameters(
             lactation_group="3", year=year, region=region, milking_frequency=milking_freq, MY_305d=P3_305
         )
-        print("Params 1: " + str(AnimalBase.lactation_parameters[1]))
+        ''' print("Params 1: " + str(AnimalBase.lactation_parameters[1]))
         print("Params 2: " + str(AnimalBase.lactation_parameters[2]))
-        print("Params 3: " + str(AnimalBase.lactation_parameters[3]))
+        print("Params 3: " + str(AnimalBase.lactation_parameters[3]))'''
 
         # assign final values to dictionary
         # AnimalBase.lactation_parameters = None
