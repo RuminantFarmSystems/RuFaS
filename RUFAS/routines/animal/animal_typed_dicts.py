@@ -233,3 +233,41 @@ class InitialHerdSummaryTypedDict(TypedDict):
     cow_avg_days_in_milk: float
     cow_avg_parity: float
     cow_avg_CI: float
+
+
+class AvailableFeedsTypedDict(TypedDict):
+    feed_id: List[int]
+    feed_key: List[str]
+    price: List[float]
+    TDN: List[float]
+    EE: List[float]
+    DE: List[float]
+    is_fat: List[bool]
+    calcium: List[float]
+    phosphorus: List[float]
+    NDF: List[float]
+    feed_type: List[str]
+    is_wetforage: List[bool]
+    Kd: List[float]
+    N_A: List[float]
+    N_B: List[float]
+    CP: List[float]
+    dRUP: List[float]
+    lactating_cow_limit: List[float]
+    dry_cow_limit: List[float]
+    heiferIII_limit: List[float]
+    heiferII_limit: List[float]
+    heiferI_limit: List[float]
+    cakf_limit: List[float]
+
+
+class FeedInfoTypedDict(TypedDict):
+    feed_type: str
+    is_fat: bool
+    calcium: float
+    EE: float
+    DE: float
+    DE_Base: float
+    de_key: float
+    phosphorus: float
+    NDF: float
