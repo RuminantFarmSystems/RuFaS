@@ -4863,22 +4863,22 @@
     },
     "simulate_water_stress": {
       "type": "bool",
-      "description": "Whether to water stress effects crops grown in this field.",
+      "description": "Whether water stress affects crops grown in this field.",
       "default": true
     },
     "simulate_temp_stress": {
       "type": "bool",
-      "description": "Whether to temperature stress effects crops grown in this field.",
+      "description": "Whether temperature stress affects crops grown in this field.",
       "default": true
     },
     "simulate_nitrogen_stress": {
       "type": "bool",
-      "description": "Whether to nitrogen stress effects crops grown in this field.",
+      "description": "Whether nitrogen stress affects crops grown in this field.",
       "default": true
     },
     "simulate_phosphorus_stress": {
       "type": "bool",
-      "description": "Whether to phosphrorus stress effects crops grown in this field.",
+      "description": "Whether phosphrorus stress affects crops grown in this field.",
       "default": true
     }
   },
