@@ -121,7 +121,7 @@ class FieldManager:
         simulate_water_stress = field_configuration_data.get("simulate_water_stress")
         simulate_temp_stress = field_configuration_data.get("simulate_temp_stress")
         simulate_nitrogen_stress = field_configuration_data.get("simulate_nitrogen_stress")
-        simualte_phosphorus_stress = field_configuration_data.get("simualte_phosphorus_stress")
+        simulate_phosphorus_stress = field_configuration_data.get("simulate_phosphorus_stress")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
         (
@@ -162,7 +162,7 @@ class FieldManager:
             simulate_water_stress=simulate_water_stress,
             simulate_temp_stress=simulate_temp_stress,
             simulate_nitrogen_stress=simulate_nitrogen_stress,
-            simulate_phosphorus_stress=simualte_phosphorus_stress,
+            simulate_phosphorus_stress=simulate_phosphorus_stress,
         )
 
         return Field(
