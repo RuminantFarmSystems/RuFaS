@@ -378,16 +378,18 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
 def test_report_animal_module_manure() -> None:
     test_output_dict = {
         "prefix": "dummy",
-        "manure": {"property1": 100, "property2": 200},
+        "manure": {"urea": 100, "urine": 200},
     }
     test_dict = {"example": test_output_dict}
 
     AnimalModuleReporter.report_animal_module_manure(test_dict)
 
-    for i in range(1, 2):
-        assert om.variables_pool[f"AnimalModuleReporter.report_animal_module_manure.dummy_property{i}"]["values"] == [
-            100 * i
-        ]
+    # for i in range(1, 2):
+    #     assert om.variables_pool[f"AnimalModuleReporter.report_animal_module_manure.dummy_property{i}"]["values"] == [
+    #         100 * i
+    #     ]
+    assert om.variables_pool["AnimalModuleReporter.report_animal_module_manure.dummy_urea"]["values"] == [100]
+    assert om.variables_pool["AnimalModuleReporter.report_animal_module_manure.dummy_urine"]["values"] == [200]
 
 
 def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
