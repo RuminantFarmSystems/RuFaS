@@ -10,7 +10,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 )
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import PenTypedDict, AvailableFeedsTypedDict
+from RUFAS.routines.animal.animal_typed_dicts import PenTypedDict, AvailableFeedsTypedDict, FeedInfoTypedDict
 
 import scipy
 
@@ -634,7 +634,7 @@ class RationReporter:
     @staticmethod
     def get_DE(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -668,7 +668,7 @@ class RationReporter:
     @staticmethod
     def get_ME(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -699,7 +699,7 @@ class RationReporter:
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
         elif feed_item_info["is_fat"] is True:
-            ME_item = (
+            ME_item = float(
                 feed_item_info["DE"]
                 if feed_item_info["DE"] != -1
                 else feed_item_info["DE_Base"]
@@ -713,7 +713,7 @@ class RationReporter:
     @staticmethod
     def get_NE_maintenance_and_activity(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -751,7 +751,7 @@ class RationReporter:
     @staticmethod
     def get_NE_lactation(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -798,7 +798,7 @@ class RationReporter:
     @staticmethod
     def get_NE_growth(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -838,7 +838,7 @@ class RationReporter:
     @staticmethod
     def get_calcium(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -876,7 +876,7 @@ class RationReporter:
     @staticmethod
     def get_phosphorus(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -913,7 +913,7 @@ class RationReporter:
     @staticmethod
     def get_fat(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -943,7 +943,7 @@ class RationReporter:
     @staticmethod
     def get_fat_percentage(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:
@@ -975,7 +975,7 @@ class RationReporter:
     @staticmethod
     def get_forage_NDF(
         kg_fed: float,
-        feed_item_info: Dict[str, str | int | float],
+        feed_item_info: FeedInfoTypedDict,
         ration_report: Dict[str, Dict[str, float]],
         body_weight: float
     ) -> float:

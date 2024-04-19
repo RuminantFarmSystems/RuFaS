@@ -259,3 +259,15 @@ class AvailableFeedsTypedDict(TypedDict):
     heiferII_limit: List[float]
     heiferI_limit: List[float]
     cakf_limit: List[float]
+
+
+class FeedInfoTypedDict(TypedDict):
+    feed_type: str
+    is_fat: bool
+    calcium: float
+    EE: float
+    DE: float
+    DE_Base: float
+    de_key: float
+    phosphorus: float
+    NDF: float
