@@ -1,6 +1,6 @@
 ---
-name: Report issue in USIR format
-about: Report issue with Urgency-Status-Intention-Request format
+name: Report issue in SIR format
+about: Report issue with Status-Intention-Request format
 title: ''
 labels: ''
 assignees: ''
@@ -8,18 +8,10 @@ assignees: ''
 ---
 
 
-<!-- This is a Git Issue Template following the Urgency-Status-Intention-Request (USIR) pattern.
+<!-- This is a Git Issue Template following the Status-Intention-Request (SIR) pattern.
      Please fill in as many details as you can.
 -->
 
-## Urgency Level
-<!-- Indicate the urgency level of this issue -->
-- [ ] Urgent: a critical feature or fix is needed
-- [ ] High: the issue significantly impacts the user experience
-- [ ] Medium: the issue affects functionality but has a workaround
-- [ ] Low: the issue doesn't have a significant immediate impact
-- [ ] Wishful: the issue should not be prioritized over any others
-- [ ] Unsure: the urgency level has not been or cannot be assessed at this time 
 
 ## Status
 <!-- Describe the current status of the problem or context.
