@@ -2102,7 +2102,14 @@ def test_execute_daily_processes(
         is_mature=PropertyMock(return_value=not crops_growing),
         is_dormant=PropertyMock(return_value=not crops_growing),
     ):
-        field_data = FieldData(field_size=field_size, current_residue=residue, simulate_water_stress=stressors, simulate_temp_stress=stressors, simulate_nitrogen_stress=stressors, simulate_phosphorus_stress=stressors)
+        field_data = FieldData(
+            field_size=field_size,
+            current_residue=residue,
+            simulate_water_stress=stressors,
+            simulate_temp_stress=stressors,
+            simulate_nitrogen_stress=stressors,
+            simulate_phosphorus_stress=stressors,
+        )
         incorp = Field(field_data=field_data, manure_manager=MagicMock(ManureManager))
         crop_1 = Crop()
         crop_1.data.max_transpiration = transpiration
