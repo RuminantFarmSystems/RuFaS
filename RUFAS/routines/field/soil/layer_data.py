@@ -593,9 +593,7 @@ class LayerData:
             self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        self.total_soil_carbon_amount = soil_mass_in_kg * (
-            self.organic_carbon_fraction
-        ) / field_size
+        self.total_soil_carbon_amount = soil_mass_in_kg * (self.organic_carbon_fraction) / field_size
 
         if self.top_depth == 0:
             self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
@@ -976,7 +974,7 @@ class LayerData:
         generate a reasonable value close to that.
 
         """
-        return (self.silt_fraction + self.clay_fraction)
+        return self.silt_fraction + self.clay_fraction
 
     @property
     def carbon_emissions(self) -> float:
