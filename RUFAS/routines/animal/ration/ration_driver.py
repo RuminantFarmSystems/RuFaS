@@ -1,5 +1,5 @@
 import collections
-from typing import Set, Dict, List, Tuple
+from typing import Set, Dict, List, Tuple, Literal
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
@@ -45,7 +45,8 @@ class RationManager:
         available_feeds : AvailableFeedsTypedDict
             An object of class AvailableFeeds.
         animal_grouping_scenario : AnimalGroupingScenario enum
-            A grouping scenario of animals used in the current simulation, specified in AnimalGroupingScenario enum and AnimalManager class.
+            A grouping scenario of animals used in the current simulation,
+            specified in AnimalGroupingScenario enum and AnimalManager class.
 
         Returns
         -------
@@ -80,7 +81,7 @@ class RationManager:
                 num_reattempts += 1
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
-                    solution.x, ration_optimizer.cow_cons, ration_config
+                    solution.x, ration_optimizer.cow_constraints, ration_config
                 )
                 if failed_constraints:
                     for constr in failed_constraints:
@@ -296,11 +297,11 @@ class RationManager:
         )
         if pen.animal_combination.name in ["LAC_COW"]:
             failed_constraints = ration_optimizer.find_failed_constraints(
-                solution.x, ration_optimizer.cow_cons, ration_config
+                solution.x, ration_optimizer.cow_constraints, ration_config
             )
         else:
             failed_constraints = ration_optimizer.find_failed_constraints(
-                solution.x, ration_optimizer.heifer_cons, ration_config
+                solution.x, ration_optimizer.heifer_constraints, ration_config
             )
         fail_summary_units = {
             "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
@@ -374,7 +375,7 @@ class RationManager:
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
-                    solution.x, ration_optimizer.cow_cons, ration_config
+                    solution.x, ration_optimizer.cow_constraints, ration_config
                 )
                 if failed_constraints:
                     for constr in failed_constraints:
@@ -659,7 +660,7 @@ class RationReporter:
             actual digestible energy of feed item, Mcal/kg.
 
         """
-        de_key: str = "DE_Base" if feed_item_info["DE"] == -1 else "DE"
+        de_key: Literal["DE_Base", "DE"] = "DE_Base" if feed_item_info["DE"] == -1 else "DE"
         DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(
             ration_report, body_weight
         )

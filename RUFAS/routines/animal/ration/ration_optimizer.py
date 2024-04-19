@@ -36,8 +36,8 @@ class RationOptimizer:
     def __init__(self) -> None:
         """initializes RationOptimizer object"""
         self.constraint_functions: List[Callable[[Any, Any], float]] = []
-        self.cow_cons: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig]] | str] = []
-        self.heifer_cons: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig]] | str] = []
+        self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+        self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
@@ -57,10 +57,11 @@ class RationOptimizer:
             self.DMI_constraint_lower,
         ]
 
-        self.cow_cons = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
+        self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for
+                                func in self.constraint_functions]
 
-        self.heifer_cons = [
-            cons for cons in self.cow_cons if cons["fun"] not in [self.total_energy, self.NEl_constraint]
+        self.heifer_constraints = [
+            cons for cons in self.cow_constraints if cons["fun"] not in [self.total_energy, self.NEl_constraint]
         ]
 
     @staticmethod
@@ -650,6 +651,7 @@ class RationOptimizer:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -670,12 +672,7 @@ class RationOptimizer:
                 sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI
             ) - 25)
         else:
-            info_map = {
-                "class": "RationOptimizer",
-                "function": RationOptimizer.NDF_constraint_lower.__name__,
-            }
-            om.add_error('DMI of 0', 'Dry matter intake during ration formulation is currently 0.', info_map)
-            raise
+            return -1.0
 
     @staticmethod
     def NDF_constraint_upper(
@@ -684,6 +681,7 @@ class RationOptimizer:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -704,7 +702,7 @@ class RationOptimizer:
                 -(sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI) + 45
             ))
         else:
-            raise
+            return -1.0
 
     @staticmethod
     def forage_NDF_constraint(
@@ -714,6 +712,7 @@ class RationOptimizer:
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
         forages constraint. This is a lower bound constraint on NDF percent across
         forages.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -748,7 +747,7 @@ class RationOptimizer:
                 / DMI
             ) - 15)
         else:
-            raise
+            return -1.0
 
     @staticmethod
     def fat_constraint(
@@ -757,6 +756,7 @@ class RationOptimizer:
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
         constraint. This is an upper bound constraint on over fat percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -775,7 +775,7 @@ class RationOptimizer:
         if DMI != 0:
             return float(-(sum(np.multiply(decision_vector, ration_config.EE_list)) / DMI) + 7)
         else:
-            raise
+            return -1.0
 
     @staticmethod
     def DMI_constraint_lower(
@@ -955,7 +955,7 @@ class RationOptimizer:
                 x0,
                 method="SLSQP",
                 bounds=bnds,
-                constraints=self.cow_cons,
+                constraints=self.cow_constraints,
                 args=arguments,
             )
         elif str(animal_combination) in [
@@ -968,7 +968,7 @@ class RationOptimizer:
                 x0,
                 method="SLSQP",
                 bounds=bnds,
-                constraints=self.heifer_cons,
+                constraints=self.heifer_constraints,
                 args=arguments,
             )
         else:

@@ -1,5 +1,4 @@
-from typing import List
-from typing import TypedDict
+from typing import List, Dict, TypedDict
 from typing_extensions import NotRequired
 
 
@@ -31,6 +30,7 @@ class PenTypedDict(TypedDict):
     manure_separator: str
     manure_storage: str
     max_stocking_density: float
+    ration: Dict[str, float | str]
 
 
 class AnimalBaseInitArgsTypedDict(TypedDict):
