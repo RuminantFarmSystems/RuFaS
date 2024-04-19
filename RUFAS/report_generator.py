@@ -196,8 +196,6 @@ class ReportGenerator:
         event_logs.append(init_event_log)
 
         try:
-            self._check_horizontal_first_property(filter_content, event_logs, individual_report_name)
-
             report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
@@ -243,65 +241,44 @@ class ReportGenerator:
 
         return event_logs
 
-    def _check_horizontal_first_property(
+    def _get_horizontal_first_value(
         self,
         filter_content: Dict[str, Any],
-        event_logs: List[Dict[str, str | Dict[str, str]]],
-        individual_report_name: str,
-    ) -> None:
+    ) -> bool:
         """
-        Check if the 'horizontal_first' property (when present) in the report filter is a boolean and convert it to a
-        boolean if it is a string with the lowercased value 'true' or 'false'.
+        Check if the 'horizontal_first' property (when present) in the report filter is a boolean.
+        If not, raise an error. Return the value of 'horizontal_first' or False as the default value.
 
         Parameters
         ----------
         filter_content : Dict[str, Any]
             A dictionary containing the configuration for the report, including details such as 'name', 'filters',
             'cross_references', and aggregation instructions.
-        event_logs : List[Dict[str, str | Dict[str, str]]]
-            A list of log events.
-        individual_report_name : str
-            The name of the report to be generated.
+
+        Returns
+        -------
+        bool
+            The value of 'horizontal_first' in the report filter, or False if it is not present.
 
         Raises
         ------
         ValueError
-            If the value of 'horizontal_first' in the report filter is not a boolean or a string with the lowercased
-            value 'true' or 'false'.
+            If the value of 'horizontal_first' in the report filter is not a boolean.
         """
 
         if "horizontal_first" not in filter_content:
-            return
+            return False
 
         horizontal_first = filter_content["horizontal_first"]
 
-        if isinstance(horizontal_first, bool):
-            return
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._check_horizontal_first_property.__name__,
-        }
-
-        if isinstance(filter_content["horizontal_first"], str) and filter_content["horizontal_first"].lower() in [
-            "true",
-            "false",
-        ]:
-            filter_content["horizontal_first"] = filter_content["horizontal_first"].lower() == "true"
-
-            warning_event_log = {
-                "warning": "report_generation_warning",
-                "message": f"Warning generating the individual report ({individual_report_name}): "
-                "The value of 'horizontal_first' in the report filter should be a boolean, not a string. "
-                "It has been converted to a boolean.",
-                "info_map": info_map,
-            }
-            event_logs.append(warning_event_log)
-        else:
+        if not isinstance(horizontal_first, bool):
             raise ValueError(
                 f"The value of 'horizontal_first' in the report filter should be a boolean. "
-                f"Value provided: {filter_content['horizontal_first']}"
+                f"Value provided: {repr(filter_content['horizontal_first'])} "
+                f"(type {type(filter_content['horizontal_first'])})"
             )
+
+        return horizontal_first
 
     def _prepare_report_data_to_be_graphed(
         self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
@@ -518,7 +495,7 @@ class ReportGenerator:
             The aggregated report data.
         """
 
-        horizontal_first = filter_content.get("horizontal_first", False)
+        horizontal_first = self._get_horizontal_first_value(filter_content)
         horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
         vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
         if horizontal_first:

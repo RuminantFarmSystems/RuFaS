@@ -1111,93 +1111,24 @@ def test_clear_reports() -> None:
 
 
 @pytest.mark.parametrize(
-    "filter_content, event_logs, individual_report_name, "
-    "expected_filter_content, expected_event_logs, expected_exception",
+    "filter_content, expected_result, expected_exception",
     [
-        (
-            {"horizontal_first": True},
-            [],
-            "Report 1",
-            {"horizontal_first": True},
-            [],
-            None,
-        ),
-        (
-            {"horizontal_first": False},
-            [],
-            "Report 2",
-            {"horizontal_first": False},
-            [],
-            None,
-        ),
-        (
-            {"horizontal_first": "true"},
-            [],
-            "Report 3",
-            {"horizontal_first": True},
-            [
-                {
-                    "warning": "report_generation_warning",
-                    "message": "Warning generating the individual report (Report 3): "
-                    "The value of 'horizontal_first' in the report filter should be a boolean, not a string. "
-                    "It has been converted to a boolean.",
-                    "info_map": {
-                        "class": "ReportGenerator",
-                        "function": "_check_horizontal_first_property",
-                    },
-                }
-            ],
-            None,
-        ),
-        (
-            {"horizontal_first": "false"},
-            [],
-            "Report 4",
-            {"horizontal_first": False},
-            [
-                {
-                    "warning": "report_generation_warning",
-                    "message": "Warning generating the individual report (Report 4): "
-                    "The value of 'horizontal_first' in the report filter should be a boolean, not a string. "
-                    "It has been converted to a boolean.",
-                    "info_map": {
-                        "class": "ReportGenerator",
-                        "function": "_check_horizontal_first_property",
-                    },
-                }
-            ],
-            None,
-        ),
-        (
-            {},
-            [],
-            "Report 5",
-            {},
-            [],
-            None,
-        ),
-        (
-            {"horizontal_first": "invalid"},
-            [],
-            "Report 6",
-            {},
-            [],
-            ValueError(
-                "The value of 'horizontal_first' in the report filter should be a boolean. Value provided: invalid"
-            ),
-        ),
+        ({"horizontal_first": True}, True, None),
+        ({"horizontal_first": False}, False, None),
+        ({}, False, None),
+        ({"horizontal_first": "true"}, None, ValueError),
+        ({"horizontal_first": "false"}, None, ValueError),
+        ({"horizontal_first": 1}, None, ValueError),
+        ({"horizontal_first": None}, None, ValueError),
     ],
 )
-def test_check_horizontal_first_property(
+def test_get_horizontal_first_value(
     filter_content: Dict[str, Any],
-    event_logs: List[Dict[str, Any]],
-    individual_report_name: str,
-    expected_filter_content: Dict[str, Any],
-    expected_event_logs: List[Dict[str, Any]],
+    expected_result: bool,
     expected_exception: Exception | None,
 ) -> None:
     """
-    Unit test for the _check_horizontal_first_property method of ReportGenerator class in report_generator.py file.
+    Unit test for the _get_horizontal_first_value method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
@@ -1205,10 +1136,13 @@ def test_check_horizontal_first_property(
 
     # Act & Assert
     if expected_exception:
-        with pytest.raises(type(expected_exception)) as exc_info:
-            report_generator._check_horizontal_first_property(filter_content, event_logs, individual_report_name)
-        assert str(exc_info.value) == str(expected_exception)
+        with pytest.raises(ValueError) as exc_info:
+            report_generator._get_horizontal_first_value(filter_content)
+        assert str(exc_info.value) == (
+            f"The value of 'horizontal_first' in the report filter should be a boolean. "
+            f"Value provided: {repr(filter_content['horizontal_first'])} "
+            f"(type {type(filter_content['horizontal_first'])})"
+        )
     else:
-        report_generator._check_horizontal_first_property(filter_content, event_logs, individual_report_name)
-        assert filter_content == expected_filter_content
-        assert event_logs == expected_event_logs
+        result = report_generator._get_horizontal_first_value(filter_content)
+        assert result == expected_result
