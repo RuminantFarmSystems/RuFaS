@@ -55,13 +55,13 @@ class FieldData:
     annual_irrigation_water_use_total : float, default=0.0
         Cumulative total of water used for irrigation in a year (mm).
     simulate_water_stress : bool, default True
-        Whether water stress should effect growth of all crops grown in the field.
+        Whether water stress should affect growth of all crops grown in the field.
     simulate_temp_stress : bool, default True
-        Whether temperature stress should effect growth of all crops grown in the field.
+        Whether temperature stress should affect growth of all crops grown in the field.
     simulate_nitrogen_stress : bool, default True
-        Whether nitrogen stress should effect growth of all crops grown in the field.
+        Whether nitrogen stress should affect growth of all crops grown in the field.
     simulate_phosphorus_stress : bool, default True
-        Whether phosphorus stress should effect growth of all crops grown in the field.
+        Whether phosphorus stress should affect growth of all crops grown in the field.
 
     Methods
     -------

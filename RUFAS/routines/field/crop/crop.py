@@ -107,13 +107,13 @@ class Crop:
         max_air_temperature : float
             Maximum air temperature for the day (°C).
         simulate_water_stress : bool
-            Whether water stress should effect growth of the crop grown.
+            Whether water stress should affect growth of the crop grown.
         simulate_temp_stress : bool
-            Whether temperature stress should effect growth of the crop grown.
+            Whether temperature stress should affect growth of the crop grown.
         simulate_nitrogen_stress : bool
-            Whether nitrogen stress should effect growth of the crop grown.
+            Whether nitrogen stress should affect growth of the crop grown.
         simulate_phosphorus_stress : bool
-            Whether phosphorus stress should effect growth of the crop grown.
+            Whether phosphorus stress should affect growth of the crop grown.
 
         Notes
         -----

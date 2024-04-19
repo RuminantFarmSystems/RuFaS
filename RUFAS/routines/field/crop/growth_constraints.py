@@ -67,17 +67,17 @@ class GrowthConstraints:
         temperature : float
             The current air temperature in degrees Celsius.
         simulate_water_stress : bool
-            Whether water stress should effect growth of all crops grown in the field.
+            Whether water stress should affect growth of all crops grown in the field.
         simulate_temp_stress : bool
-            Whether temperature stress should effect growth of all crops grown in the field.
+            Whether temperature stress should affect growth of all crops grown in the field.
         simulate_nitrogen_stress : bool
-            Whether nitrogen stress should effect growth of all crops grown in the field.
+            Whether nitrogen stress should affect growth of all crops grown in the field.
         simulate_phosphorus_stress : bool
-            Whether phosphorus stress should effect growth of all crops grown in the field.
+            Whether phosphorus stress should affect growth of all crops grown in the field.
 
         Notes
         -----
-        Each crop stressor is checked to determine whether or not it should effect crop growth. If it is not to effect
+        Each crop stressor is checked to determine whether or not it should affect crop growth. If it is not to affect
         crop growth, then the stressor is set to 0.
 
         """
