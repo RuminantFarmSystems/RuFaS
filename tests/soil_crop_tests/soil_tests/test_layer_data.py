@@ -126,7 +126,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
         # Check everything
         assert layer.water_content == expected_water_content
-        calc_psp.assert_called_once_with(layer.clay_proportion_content, 25, layer.organic_carbon_proportion_content)
+        calc_psp.assert_called_once_with(layer.clay_fraction, 25, layer.organic_carbon_fraction)
         assert determine_nutrient_density.call_count == 3
         assert layer.mean_phosphorus_sorption_parameter == 0.5
         assert layer.labile_inorganic_phosphorus_content == 22
@@ -165,7 +165,7 @@ def test_initialize_carbon_pools(
         top_depth=top_depth,
         bottom_depth=750.0,
         bulk_density=1.5,
-        organic_carbon_proportion_content=0.022,
+        organic_carbon_fraction=0.022,
     )
     assert actual.active_carbon_amount == pytest.approx(expected_active)
     assert actual.passive_carbon_amount == pytest.approx(expected_passive)

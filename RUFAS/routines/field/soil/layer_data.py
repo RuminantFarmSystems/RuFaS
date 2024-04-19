@@ -58,16 +58,16 @@ class LayerData:
         Temperature of soil layer on the previous day (degrees C).
     decomposition_temperature_effect : float, optional, default None
         Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).
-    organic_carbon_proportion_content : float, default 0.012
-        Organic carbon content expressed as proportion of soil in this layer (unitless).
-    clay_proportion_content : float, default 0.187
-        Clay content expressed as proportion of soil in this layer (unitless).
-    sand_proportion_content : float, default 0.145
-        Sand content expressed as proportion of soil in this layer (unitless).
-    silt_proportion_content : float, default 64.5
-        Silt content expressed as proportion of soil in this layer (unitless).
-    rock_proportion_content : float, default 0.01
-        Rock content expressed as proportion of soil in this layer (unitless).
+    organic_carbon_fraction : float, default 0.012
+        Organic carbon content expressed as fraction of soil in this layer (unitless).
+    clay_fraction : float, default 0.187
+        Clay content expressed as fraction of soil in this layer (unitless).
+    sand_fraction : float, default 0.145
+        Sand content expressed as fraction of soil in this layer (unitless).
+    silt_fraction : float, default 0.645
+        Silt content expressed as fraction of soil in this layer (unitless).
+    rock_fraction : float, default 0.01
+        Rock content expressed as fraction of soil in this layer (unitless).
     decomposition_moisture_effect : float, default 0.0
         Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
     plant_metabolic_active_carbon_usage : float, default 0.0
@@ -289,11 +289,11 @@ class LayerData:
     decomposition_temperature_effect: Optional[float] = None
 
     # --- Erosion
-    organic_carbon_proportion_content: float = 0.012
-    clay_proportion_content: float = 0.187
-    sand_proportion_content: float = 0.145
-    silt_proportion_content: float = 0.645
-    rock_proportion_content: float = 0.01
+    organic_carbon_fraction: float = 0.012
+    clay_fraction: float = 0.187
+    sand_fraction: float = 0.145
+    silt_fraction: float = 0.645
+    rock_fraction: float = 0.01
 
     # --- Decomposition
     decomposition_moisture_effect: float = 0.0
@@ -465,9 +465,9 @@ class LayerData:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
-            self.clay_proportion_content,
+            self.clay_fraction,
             self.initial_labile_inorganic_phosphorus_concentration,
-            self.organic_carbon_proportion_content,
+            self.organic_carbon_fraction,
         )
 
         initial_active_inorganic_phosphorus_concentration = self.initial_labile_inorganic_phosphorus_concentration * (
@@ -544,8 +544,7 @@ class LayerData:
 
         # SWAT eqn. 3:1.1.2
         humic_organic_nitrogen_concentration = (10**4) * (
-            self.organic_carbon_proportion_content if self.organic_carbon_proportion_content is not None else 0 / 14
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
+            self.organic_carbon_fraction / 14 * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
         initial_active_organic_nitrogen_concentration = (
@@ -595,7 +594,7 @@ class LayerData:
         )
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         self.total_soil_carbon_amount = soil_mass_in_kg * (
-            self.organic_carbon_proportion_content if self.organic_carbon_proportion_content is not None else 0
+            self.organic_carbon_fraction
         ) / field_size
 
         if self.top_depth == 0:
@@ -677,21 +676,21 @@ class LayerData:
 
     @staticmethod
     def calculate_phosphorus_sorption_parameter(
-        clay_proportion_content: float,
+        clay_fraction: float,
         labile_inorganic_phosphorus: float,
-        organic_carbon_proportion_content: float,
+        organic_carbon_fraction: float,
     ) -> float:
         """
         Calculates the phosphorus sorption coefficient based on the current soil conditions.
 
         Parameters
         ----------
-        clay_proportion_content : float
-            Proportion of this soil layer that is clay, expressed in range [0, 1.0] (unitless).
+        clay_fraction : float
+            Fraction of this soil layer that is clay, expressed in range [0, 1.0] (unitless).
         labile_inorganic_phosphorus : float
             Amount of labile inorganic phosphorus in this soil layer (mg / kg soil).
-        organic_carbon_proportion_content : float
-            Proportion of this soil layer that is organic carbon, expressed in range [0, 1.0] (unitless).
+        organic_carbon_fraction : float
+            Fraction of this soil layer that is organic carbon, expressed in range [0, 1.0] (unitless).
 
         Returns
         -------
@@ -709,12 +708,10 @@ class LayerData:
         is used in the SurPhos code (see pminrl.f, line 49).
 
         """
-        adjusted_clay_content = max(10**-8, (clay_proportion_content if clay_proportion_content is not None else 0)
-                                    * GeneralConstants.FRACTION_TO_PERCENTAGE)
+        adjusted_clay_content = max(10**-8, (clay_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE))
         first_term = -0.045 * log(adjusted_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
-        third_term = 0.035 * (organic_carbon_proportion_content if organic_carbon_proportion_content is not None
-                              else 0) * GeneralConstants.FRACTION_TO_PERCENTAGE
+        third_term = 0.035 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
@@ -979,7 +976,7 @@ class LayerData:
         generate a reasonable value close to that.
 
         """
-        return (self.silt_proportion_content + self.clay_proportion_content)
+        return (self.silt_fraction + self.clay_fraction)
 
     @property
     def carbon_emissions(self) -> float:
