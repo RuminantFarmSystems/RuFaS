@@ -47,34 +47,15 @@ assignees: ''
 
 
 
-
+### Target deadline
+<!-- By when should this issue be done -->
 
 <!-- Please provide any additional information below. -->
 
-#### Updates
-<!-- Keep this section updated with all the progress and communications regarding the issue. 
-
-- [ ] In progress (assigned to @username)
-- [ ] Fix proposed/pull request submitted
-- [ ] Postponed till a later date
-- [ ] Closed
-
--->
 
 
+### Additional Information
+
+<!-- Anything else you would like to share?-->
 
 
-
-#### Additional Information
-
-<!--
-
-- Anything else you would like to share?
-
--->
-
-
-
-
-
-<!-- End of USIR Git Issue Template -->
