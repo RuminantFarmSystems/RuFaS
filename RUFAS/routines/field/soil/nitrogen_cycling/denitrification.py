@@ -78,13 +78,13 @@ class Denitrification:
         Parameters
         ----------
         nitrate_content : float
-            The nitrate content of this soil layer (kg / ha)
+            The nitrate content of this soil layer (kg / ha).
         denitrification_rate_coefficient : float
-            Rate coefficient that regulates denitrification in this layer of soil (unitless)
+            Rate coefficient that regulates denitrification in this layer of soil (unitless).
         temp_factor : float
-            The nutrient cycling temperature factor of this soil layer (unitless)
+            The nutrient cycling temperature factor of this soil layer (unitless).
         organic_carbon_fraction : float
-            The fraction of this soil layer that is made up of organic carbon, in the range [0, 1.0] (unitless)
+            The fraction of this soil layer that is made up of organic carbon, in the range [0, 1.0] (unitless).
 
         Returns
         -------
