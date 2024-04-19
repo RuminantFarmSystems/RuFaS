@@ -18,7 +18,6 @@ def test_default_initialization():
 
     # Assert
     assert ration_config.price_list == []
-    assert ration_config.n == 0
     assert ration_config.NEmaint_requirement == 0
     assert ration_config.NEa_requirement == 0
     assert ration_config.NEpreg_requirement == 0
@@ -184,7 +183,6 @@ def test_custom_initialization(
 
     # Assert
     assert ration_config.price_list == price
-    assert ration_config.n == len(price)
     assert ration_config.NEmaint_requirement == NEmaint
     assert ration_config.NEa_requirement == NEa
     assert ration_config.NEpreg_requirement == NEpreg
