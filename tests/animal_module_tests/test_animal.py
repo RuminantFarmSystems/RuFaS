@@ -664,7 +664,7 @@ def mock_available_feeds() -> AvailableFeedsTypedDict:
         "heiferIII_limit": [],
         "heiferII_limit": [],
         "heiferI_limit": [],
-        "calf_limit": []
+        "calf_limit": [],
     }
 
     return available_feeds
@@ -2065,8 +2065,9 @@ def test_total_energy_no_dry_matter_intake(ration_config: RationConfig, expected
     assert actual == expected
 
 
-def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock,
-                              mock_available_feeds: AvailableFeedsTypedDict) -> None:
+def test_attempt_optimization(
+    mocker: MockerFixture, mock_ration_config: MagicMock, mock_available_feeds: AvailableFeedsTypedDict
+) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
     def mock_triple_values_in_list(x: Any) -> Any:
@@ -2173,8 +2174,9 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     ration_optimizer.get_ration_vals.assert_called_with(mock_optimize.return_value.x, mock_RationConfig.return_value)
 
 
-def test_attempt_optimization_raise_exception(mocker: MockerFixture, mock_available_feeds: AvailableFeedsTypedDict
-                                              ) -> None:
+def test_attempt_optimization_raise_exception(
+    mocker: MockerFixture, mock_available_feeds: AvailableFeedsTypedDict
+) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
     def mock_triple_values_in_list(x: Any) -> Any:
@@ -2272,8 +2274,9 @@ def test_NEmact_constraint(ration_config: RationConfig, expected: float, decisio
         (lazy_fixture("mock_ration_config"), 20.7717031),
     ],
 )
-def test_NEmact_constraint_noMEact_noNEm(ration_config: RationConfig, expected: float, decision_vector: np.ndarray
-                                         ) -> None:
+def test_NEmact_constraint_noMEact_noNEm(
+    ration_config: RationConfig, expected: float, decision_vector: np.ndarray
+) -> None:
     """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_config.MEact_list = []
     ration_config.NEm_act_list = []
@@ -2648,7 +2651,10 @@ def test_ration_optimizer_optimize(
 
 
 def test_ration_optimizer_optimize_with_prev_ration(
-    mocker: MockerFixture, mock_ration_config: MagicMock, ration_optimizer: RationOptimizer, mock_heifer_constraints: MagicMock
+    mocker: MockerFixture,
+    mock_ration_config: MagicMock,
+    ration_optimizer: RationOptimizer,
+    mock_heifer_constraints: MagicMock,
 ) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
     is_udr = False
