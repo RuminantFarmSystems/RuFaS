@@ -699,7 +699,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
         mock_heiferIII.id = i
         mock_heiferIIIs.append(mock_heiferIII)
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
-    animals_removed = []
+    animals_removed: List[Cow] = []
     life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
@@ -721,13 +721,13 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     # Case 2: len(heiferIIIs) + len(cows) <= herd_num * 1.03
     # Arrange
     life_cycle_manager.herd_num = 100
-    mock_heiferIIIs: List[HeiferIII] = []
+    mock_heiferIIIs_2: List[HeiferIII] = []
     for i in range(53):
         mock_heiferIII = mocker.MagicMock(autospec=HeiferIII)
         mock_heiferIII.id = i
-        mock_heiferIIIs.append(mock_heiferIII)
-    mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
-    animals_removed = []
+        mock_heiferIIIs_2.append(mock_heiferIII)
+    animals_removed_2: List[Cow] = []
+    mock_cows_2: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
@@ -736,22 +736,22 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs_2, mock_cows_2, animals_removed_2)
 
     # Assert after
-    assert len(mock_heiferIIIs) == 53
-    assert len(mock_cows) == 50
+    assert len(mock_heiferIIIs_2) == 53
+    assert len(mock_cows_2) == 50
     assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
-    assert len(animals_removed) == 0
+    assert len(animals_removed_2) == 0
     # ---------------------------------------------------------------
 
     # Case 3: len(heiferIIIs) == 0
     # Arrange
     life_cycle_manager.herd_num = 100
-    mock_heiferIIIs: List[HeiferIII] = []
-    mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 104
-    animals_removed = []
+    mock_heiferIIIs_3: List[HeiferIII] = []
+    mock_cows_3: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 104
+    animals_removed_3: List[Cow] = []
     life_cycle_manager.sold_heiferIIIs_info = []
     life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
@@ -760,14 +760,14 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs_3, mock_cows_3, animals_removed_3)
 
     # Assert after
-    assert len(mock_heiferIIIs) == 0
-    assert len(mock_cows) == 104
+    assert len(mock_heiferIIIs_3) == 0
+    assert len(mock_cows_3) == 104
     assert len(life_cycle_manager.sold_heiferIIIs_info) == 0
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
-    assert len(animals_removed) == 0
+    assert len(animals_removed_3) == 0
 
 
 def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
@@ -779,7 +779,7 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_m
     days_born = 30
     mock_heiferIIIs: List[HeiferIII] = [mocker.MagicMock(autospec=HeiferIII)] * 50
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
-    animals_added = []
+    animals_added: List[Cow] = []
     life_cycle_manager.bought_heifer_num = 0
     life_cycle_manager.herd_num = 100
 
@@ -808,8 +808,8 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_m
     # Arrange
     sim_day = 100
     days_born = 30
-    mock_heiferIIIs: List[HeiferIII] = [mocker.MagicMock(autospec=HeiferIII)] * 51
-    mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
+    mock_heiferIIIs_2: List[HeiferIII] = [mocker.MagicMock(autospec=HeiferIII)] * 51
+    mock_cows_2: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_added = []
     life_cycle_manager.bought_heifer_num = 0
     life_cycle_manager.herd_num = 100
@@ -825,12 +825,12 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_m
     assert life_cycle_manager.bought_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs, mock_cows, animals_added)
+    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs_2, mock_cows_2, animals_added)
 
     # Assert after
     assert life_cycle_manager.bought_heifer_num == 0
-    assert len(mock_heiferIIIs) == 51
-    assert len(mock_cows) == 50
+    assert len(mock_heiferIIIs_2) == 51
+    assert len(mock_cows_2) == 50
     assert len(animals_added) == 0
 
     # ---------------------------------------------------------------
@@ -839,8 +839,8 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_m
     # Arrange
     sim_day = 1
     days_born = 30
-    mock_heiferIIIs: List[HeiferIII] = [mocker.MagicMock(autospec=HeiferIII)] * 50
-    mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
+    mock_heiferIIIs_3: List[HeiferIII] = [mocker.MagicMock(autospec=HeiferIII)] * 50
+    mock_cows_3: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_added = []
     life_cycle_manager.bought_heifer_num = 0
     life_cycle_manager.herd_num = 100
@@ -856,12 +856,12 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_m
     assert life_cycle_manager.bought_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs, mock_cows, animals_added)
+    life_cycle_manager._check_if_replacement_heifers_needed(sim_day, mock_heiferIIIs_3, mock_cows_3, animals_added)
 
     # Assert after
     assert life_cycle_manager.bought_heifer_num == 0
-    assert len(mock_heiferIIIs) == 50
-    assert len(mock_cows) == 50
+    assert len(mock_heiferIIIs_3) == 50
+    assert len(mock_cows_3) == 50
     assert len(animals_added) == 0
 
 
@@ -1424,7 +1424,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     assert actual_total_animal_num == current_total_animal_num
 
 
-def test_reset_daily_stats(life_cycle_manager: LifeCycleManager, mocker: MockerFixture) -> None:
+def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     # Arrange
     life_cycle_manager.calf_num = 1
     life_cycle_manager.heiferI_num = 2

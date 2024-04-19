@@ -927,8 +927,6 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_daily_ration(animal_manager, available_feeds)
         AnimalModuleReporter.report_daily_pen_total(animal_manager.simulation_day, animal_manager.all_pens)
         AnimalModuleReporter.report_305d_milk(animal_manager)
-        # AnimalModuleReporter.report_end_of_simulation(animal_manager.life_cycle_manager,
-        # animal_manager.simulation_day)
         for pen in animal_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen, animal_manager.simulation_day)
             if pen.animal_combination.name == "LAC_COW":

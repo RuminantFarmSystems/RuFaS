@@ -14,6 +14,7 @@ from RUFAS.routines.animal.animal_typed_dicts import (
     AnimalConfigTypedDict,
     HerdInfoTypedDict,
     InitialHerdSummaryTypedDict,
+    SoldAnimalTypedDict,
 )
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -72,11 +73,11 @@ class LifeCycleManager:
         self.initial_herd_summary: Optional[InitialHerdSummaryTypedDict] = None
         self.avg_CI = 0.0
 
-        self.sold_calves_info: List[Dict[str, str | int | float]] = []
-        self.sold_heiferIIIs_info: List[Dict[str, str | int | float]] = []
-        self.sold_heiferIIs_info: List[Dict[str, str | int | float]] = []
-        self.sold_cows_info: List[Dict[str, str | int | float]] = []
-        self.sold_and_died_cows_info: List[Dict[str, str | int | float]] = []
+        self.sold_calves_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_cows_info: List[SoldAnimalTypedDict] = []
+        self.sold_and_died_cows_info: List[SoldAnimalTypedDict] = []
 
         self.herd_num = 0
         self.calf_num = 0
