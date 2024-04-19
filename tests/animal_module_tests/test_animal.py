@@ -1204,6 +1204,7 @@ def cow_fixture() -> AnimalBase:
     cowfixture = AnimalBase(initsetup)
     return cowfixture
 
+
 @pytest.mark.parametrize(
     "dP_reserves,p_intake,p_req,expected",
     [(0, 1, 0, 0), (-10, 10, 1, -3.7), (10, 10, 1, 0)],
