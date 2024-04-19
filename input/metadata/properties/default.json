@@ -4860,6 +4860,26 @@
       "type": "bool",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "default": false
+    },
+    "simulate_water_stress": {
+      "type": "bool",
+      "description": "Whether water stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_temp_stress": {
+      "type": "bool",
+      "description": "Whether temperature stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_nitrogen_stress": {
+      "type": "bool",
+      "description": "Whether nitrogen stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_phosphorus_stress": {
+      "type": "bool",
+      "description": "Whether phosphrorus stress affects crops grown in this field.",
+      "default": true
     }
   },
   "weather_properties": {
