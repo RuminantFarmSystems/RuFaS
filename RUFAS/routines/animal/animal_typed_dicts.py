@@ -258,7 +258,7 @@ class AvailableFeedsTypedDict(TypedDict):
     heiferIII_limit: List[float]
     heiferII_limit: List[float]
     heiferI_limit: List[float]
-    cakf_limit: List[float]
+    calf_limit: List[float]
 
 
 class FeedInfoTypedDict(TypedDict):

@@ -641,26 +641,31 @@ def decision_vector_sum_zero() -> np.ndarray:
 
 @pytest.fixture
 def mock_available_feeds() -> AvailableFeedsTypedDict:
-    available_feeds: AvailableFeedsTypedDict = dict()
-    available_feeds["feed_key"] = ["1", "2", "3", "4", "5", "6"]
-    available_feeds["feed_id"] = [1, 2, 3, 4, 5, 6]
-    available_feeds["price"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["TDN"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["DE"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["EE"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["is_fat"] = [True, True, True, False, False, False]
-    available_feeds["calcium"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["phosphorus"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["NDF"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["feed_type"] = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
-    available_feeds["is_wetforage"] = [True, True, True, False, False, False]
-    available_feeds["Kd"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["N_A"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["N_B"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["CP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["dRUP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["lactating_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["dry_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds: AvailableFeedsTypedDict = {
+        "feed_key": ["1", "2", "3", "4", "5", "6"],
+        "feed_id": [1, 2, 3, 4, 5, 6],
+        "price": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "TDN": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "DE": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "EE": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "is_fat": [True, True, True, False, False, False],
+        "calcium": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "phosphorus": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "NDF": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "feed_type": ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"],
+        "is_wetforage": [True, True, True, False, False, False],
+        "Kd": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "N_A": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "N_B": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "CP": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "dRUP": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "lactating_cow_limit": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "dry_cow_limit": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "heiferIII_limit": [],
+        "heiferII_limit": [],
+        "heiferI_limit": [],
+        "calf_limit": []
+    }
 
     return available_feeds
 
@@ -2055,15 +2060,16 @@ def test_total_energy(ration_config: RationConfig, decision_vec: np.ndarray, exp
 def test_total_energy_no_dry_matter_intake(ration_config: RationConfig, expected: float) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    decision_vector = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    decision_vector = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     actual = ration_optimizer.total_energy(decision_vector, ration_config)
     assert actual == expected
 
 
-def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock, mock_available_feeds: dict) -> None:
+def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock,
+                              mock_available_feeds: AvailableFeedsTypedDict) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
-    def mock_triple_values_in_list(x):
+    def mock_triple_values_in_list(x: Any) -> Any:
         return x
 
     mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
@@ -2167,10 +2173,11 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     ration_optimizer.get_ration_vals.assert_called_with(mock_optimize.return_value.x, mock_RationConfig.return_value)
 
 
-def test_attempt_optimization_raise_exception(mocker: MockerFixture, mock_available_feeds: dict) -> None:
+def test_attempt_optimization_raise_exception(mocker: MockerFixture, mock_available_feeds: AvailableFeedsTypedDict
+                                              ) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
-    def mock_triple_values_in_list(x) -> Any:
+    def mock_triple_values_in_list(x: Any) -> Any:
         return x
 
     mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
@@ -2598,7 +2605,6 @@ def ration_optimizer(mock_cow_constraints: MagicMock, mock_heifer_constraints: M
 def test_ration_optimizer_optimize(
     mocker: MockerFixture,
     mock_ration_config: MagicMock,
-    mock_available_feeds: dict,
     ration_optimizer: RationOptimizer,
     is_udr: bool,
     animal_combination: str,
@@ -3635,9 +3641,9 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     assert result == {"1": 0.1, "2": 0.2, "3": 0.3}
 
 
-def test_make_ration_from_user_values(mock_available_feeds: dict) -> None:
+def test_make_ration_from_user_values(mock_available_feeds: AvailableFeedsTypedDict) -> None:
     """Unit test for function make_ration_from_user_values in file routines/animal/ration/user_defined_ration.py"""
-    ration_percents = {"1": 50, "2": 50}
+    ration_percents = {"1": 50.0, "2": 50.0}
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     req.DMIest_requirement = 10
     actual = UserDefinedRationManager.make_ration_from_user_values(ration_percents, mock_available_feeds, req)
