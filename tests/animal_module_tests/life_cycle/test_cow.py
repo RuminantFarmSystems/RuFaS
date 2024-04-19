@@ -1,15 +1,64 @@
-from typing import Type
+from typing import Type, Any
 
 import pytest
 from pytest_mock import MockFixture
 
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
     CowReproProtocolEnum,
     ReproStateEnum,
 )
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
+
+
+@pytest.fixture
+def cow_args() -> dict[str, Any]:
+    """Fixture for mock Cow constructor arguments."""
+    return {
+        "calf_birth_weight": 40.0,
+        "repro_program": "dummy_program",
+        "presynch_method": "dummy_presynch",
+        "tai_method_c": "dummy_tai",
+        "resynch_method": "dummy_resynch",
+        "parity": 1,
+        "calving_interval": "dummy_interval",
+    }
+
+
+@pytest.mark.parametrize(
+    "pregnant,in_milk",
+    [
+        (True, True),
+        (True, False),
+        (False, True),
+    ],
+)
+def test_init_cow(mocker: MockFixture, cow_args: dict[str, Any], pregnant: bool, in_milk: bool) -> None:
+    """
+    Unit test for the method __init__() of the Cow class in cow.py.
+    """
+    if in_milk:
+        cow_args["days_in_milk"] = 10
+    super_constructor = mocker.patch.object(HeiferIII, "__init__")
+    is_pregnant = mocker.patch.object(Cow, "is_pregnant", new_callable=mocker.PropertyMock, return_value=pregnant)
+    set_breed_index = mocker.patch.object(Cow, "set_breed_index")
+    set_parity_index = mocker.patch.object(Cow, "set_parity_index")
+    set_lac_curve_params = mocker.patch.object(Cow, "set_lactation_curve_params")
+
+    cow = Cow(cow_args)
+
+    super_constructor.assert_called_once_with(cow_args)
+    is_pregnant.assert_called_once()
+    if pregnant:
+        cow._repro_state_manager.is_in(ReproStateEnum.PREGNANT)
+    else:
+        cow._repro_state_manager.is_in(ReproStateEnum.NONE)
+    set_breed_index.assert_called_once()
+    if in_milk:
+        set_parity_index.assert_called_once()
+        set_lac_curve_params.assert_called_once()
 
 
 def test_get_user_defined_milk_fat_percent(mocker: MockFixture) -> None:
