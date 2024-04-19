@@ -271,3 +271,13 @@ class FeedInfoTypedDict(TypedDict):
     de_key: float
     phosphorus: float
     NDF: float
+
+
+class SoldAnimalTypedDict(TypedDict):
+    id: int
+    animal_type: str
+    sold_at_day: int
+    body_weight: float
+    cull_reason: str | None
+    days_in_milk: int | str
+    parity: int | str
