@@ -753,7 +753,7 @@ class SoilData:
             Average clay percent of the soil (unitless).
 
         """
-        clay_percentages = self.get_vectorized_layer_attribute("clay_fraction") * (
-            GeneralConstants.FRACTION_TO_PERCENTAGE
-        )
+        clay_fractions = self.get_vectorized_layer_attribute("clay_fraction")
+        clay_percentages = [clay_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE for clay_fraction in clay_fractions]
+
         return sum(clay_percentages) / len(clay_percentages)
