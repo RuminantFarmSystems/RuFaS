@@ -514,24 +514,32 @@ def test_report_sold_animal_information(
         "days_in_milk": days_in_milk,
         "calves": calves,
     }
-    none_str = "none"
+    none_str = "NA"
     for attr, value in optional_attrs_dict.items():
         if value is not None:
             setattr(mock_animal, attr, value)
         else:
             setattr(mock_animal, attr, none_str)
-
-    animal_manager = mocker.MagicMock()
-    animal_manager.life_cycle_manager.sold_calves = [mock_animal] if animal_type == "Calf" else []
-    animal_manager.life_cycle_manager.sold_heiferIIs = [mock_animal] if animal_type == "HeiferII" else []
-    animal_manager.life_cycle_manager.sold_heiferIIIs = [mock_animal] if animal_type == "HeiferIII" else []
-    animal_manager.life_cycle_manager.sold_and_died_cows = [mock_animal] if animal_type == "Cow" else []
+    mock_animal_sell_report = {
+        "id": mock_animal.id,
+        "animal_type": mock_animal.__class__.__name__,
+        "sold_at_day": mock_animal.sold_at_day,
+        "body_weight": mock_animal.body_weight,
+        "cull_reason": mock_animal.cull_reason,
+        "days_in_milk": mock_animal.days_in_milk,
+        "parity": mock_animal.calves,
+    }
+    life_cycle_manager = mocker.MagicMock()
+    life_cycle_manager.sold_calves_info = [mock_animal_sell_report] if animal_type == "Calf" else []
+    life_cycle_manager.sold_heiferIIs_info = [mock_animal_sell_report] if animal_type == "HeiferII" else []
+    life_cycle_manager.sold_heiferIIIs_info = [mock_animal_sell_report] if animal_type == "HeiferIII" else []
+    life_cycle_manager.sold_and_died_cows_info = [mock_animal_sell_report] if animal_type == "Cow" else []
 
     patch_for_add_variable = mocker.patch("RUFAS.routines.animal" ".animal_module_reporter.om.add_variable")
     assert patch_for_add_variable.call_count == 0
 
     # Act
-    AnimalModuleReporter.report_sold_animal_information(animal_manager)
+    AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
 
     # Assert
     if cull_reason == animal_constants.DEATH_CULL:
