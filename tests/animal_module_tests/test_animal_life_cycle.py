@@ -469,7 +469,7 @@ def test_extract_repro_stats_from_heiferII(mocker: MockerFixture, life_cycle_man
 
     # After
     spy_extract_repro_stats.assert_called_once_with(mock_heiferII)
-    # assert life_cycle_manager.CIDR_count == mock_data['CIDR_count']
+    assert life_cycle_manager.CIDR_count == mock_data['CIDR_count']
     assert life_cycle_manager.GnRH_injection_num_h == mock_data["GnRH_injections"]
     assert life_cycle_manager.PGF_injection_num_h == mock_data["PGF_injections"]
     assert life_cycle_manager.preg_check_num_h == mock_data["preg_diagnoses"]
