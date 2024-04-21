@@ -117,8 +117,11 @@ def test_barn_area_from_pen_type(
     mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
     mock_pen.num_stalls = 1
-    animal_combinations = [AnimalCombination.LAC_COW,
-                           AnimalCombination.GROWING_AND_CLOSE_UP, AnimalCombination.CLOSE_UP]
+    animal_combinations = [
+        AnimalCombination.LAC_COW,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+        AnimalCombination.CLOSE_UP,
+    ]
 
     mock_pen.animal_combination = random.choice(animal_combinations) if has_cows else AnimalCombination.CALF
 

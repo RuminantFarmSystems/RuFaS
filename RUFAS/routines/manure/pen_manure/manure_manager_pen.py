@@ -152,6 +152,10 @@ class ManureManagerPen:
 
         barn_area = barn_area_by_pen_type[self.pen_type]
 
-        if self.animal_combination == AnimalCombination.LAC_COW or self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP or self.animal_combination == AnimalCombination.CLOSE_UP:
+        if (
+            self.animal_combination == AnimalCombination.LAC_COW
+            or self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP
+            or self.animal_combination == AnimalCombination.CLOSE_UP
+        ):
             return barn_area.has_cows * self.num_stalls
         return barn_area.no_cows * self.num_stalls
