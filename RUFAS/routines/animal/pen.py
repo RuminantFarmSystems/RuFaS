@@ -225,8 +225,6 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-        # TODO: To be removed. Use the property 'is_populated' instead. GitHub Issue #1207
-        self.populated = False
 
         # self. = set()
 
@@ -338,10 +336,6 @@ class Pen:
         """
         return len(self.animals_in_pen) > 0
 
-    @property
-    def current_pen_ration(self):
-        pass
-
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements
@@ -381,12 +375,6 @@ class Pen:
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
 
-    def update_pen_populated(self) -> None:
-        """
-        Updates whether the pen is populated
-        """
-        self.populated = len(self.animals_in_pen) != 0
-
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
@@ -411,7 +399,6 @@ class Pen:
         """
 
         self.add_new_animals(new_animals)
-        self.update_pen_populated()
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
 
@@ -512,7 +499,7 @@ class Pen:
         Calculates the average growth of the animals in the pen.
         """
 
-        if not self.populated:
+        if not self.is_populated:
             return
 
         total_growth = 0
@@ -694,9 +681,7 @@ class Pen:
             return
         animal_ids = set(animal_ids)
         self.animals_in_pen = {
-            animal_id: animal
-            for animal_id, animal in self.animals_in_pen.items()
-            if animal_id not in animal_ids
+            animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
 
     def clear(self):
@@ -707,7 +692,6 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = {}
-        self.populated = False
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):
@@ -764,7 +748,6 @@ class Pen:
     def _calc_animal_manure_excretion(
         self,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -795,21 +778,22 @@ class Pen:
         is_lactating_cow = is_cow and animal.is_lactating
         if is_cow:
             animal.calc_manure_excretion(
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
                 self.MEdiet,
+                nutrient_amount=self.ration_nutrient_amount,
+                nutrient_conc=self.ration_nutrient_conc,
             )
         else:
-            animal.calc_manure_excretion(feed, methane_model)
+            animal.calc_manure_excretion(
+                methane_model, nutrient_amount=self.ration_nutrient_amount, nutrient_conc=self.ration_nutrient_conc
+            )
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
     @staticmethod
     def _update_animal_manure_excretion_data(
-        manure_excretions_output_data: dict[
-            str, dict[str, str | AnimalManureExcretions]
-        ],
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]],
         prefix: str,
         manure: AnimalManureExcretions,
         animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
@@ -842,7 +826,6 @@ class Pen:
 
     def calc_total_manure(
         self,
-        feed,
         methane_model: str,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -880,17 +863,12 @@ class Pen:
         for animal in list(self.animals_in_pen.values()):
             prefix, manure = self._calc_animal_manure_excretion(
                 animal,
-                feed,
                 methane_model,
                 methane_mitigation_method,
                 methane_mitigation_additive_amount,
             )
-            self._update_animal_manure_excretion_data(
-                manure_excretions_output_data, prefix, manure, animal
-            )
-            self.manure = add_animal_manure_excretions(
-                self.manure, animal.manure_excretion
-            )
+            self._update_animal_manure_excretion_data(manure_excretions_output_data, prefix, manure, animal)
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
 
     def _set_animal_nutrient_values(
         self, animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
@@ -941,13 +919,9 @@ class Pen:
             animal.DNED_requirement = (
                 requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
             ) / animal.DMIest_requirement
-            animal.DMPD_requirement = (
-                requirements["MP_requirement"]
-            ) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
 
-            animal.calc_daily_walking_dist(
-                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-            )
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         if animal_type in [AnimalType.CALF]:
             if self.avg_calf_nutrient_rqmts:
@@ -1032,9 +1006,7 @@ class Pen:
 
         """
 
-        self._set_animal_nutrient_values(
-            animal, animal_grouping_scenario, feed, temp, phosphorus_concentration
-        )
+        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
         self.animals_in_pen[animal.id] = animal
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 

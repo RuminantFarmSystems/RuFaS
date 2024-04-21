@@ -36,7 +36,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
             manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
@@ -75,7 +75,9 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         # MS.3.B.7R
         methane_generation_volume = GasEmissionsCalculator.methane_volume_via_Chen_equation(
-            manure_total_volatile_solids=self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
+            manure_total_degradable_volatile_solids=(
+                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            ),
             hydraulic_retention_time=self.config.hydraulic_retention_time,
         )
         biogas_energy_content = GasEmissionsCalculator.biogas_energy_content(methane_volume=methane_generation_volume)
@@ -84,7 +86,22 @@ class AnaerobicDigestion(BaseManureTreatment):
         # MS.3.B.3
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
-        new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.METHANE_DENSITY
+        new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+        new_daily_output.liquid_manure_total_degradable_volatile_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+        )
+        new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+        )
+        new_daily_output.liquid_manure_total_volatile_solids = (
+            new_daily_output.liquid_manure_total_degradable_volatile_solids
+            + new_daily_output.liquid_manure_total_non_degradable_volatile_solids
+        )
+        new_daily_output.liquid_manure_total_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_solids
+            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+        )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
         new_daily_output.biogas_energy_content = biogas_energy_content
@@ -155,3 +172,10 @@ class AnaerobicDigestion(BaseManureTreatment):
         """
         # TODO: Name the constants if you can - Issue #1120
         return 0.68298 + 0.025662 * average_temperature_celsius + 0.01306 * moisture_content * 100
+
+    def _adjust_accumulated_output(
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+    ) -> ManureTreatmentDailyOutput:
+        """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
+        wanting to never empty the manure pit for AnaerobicDigestion"""
+        self._accumulated_output += manure_treatment_daily_output

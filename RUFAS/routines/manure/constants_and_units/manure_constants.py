@@ -72,5 +72,5 @@ class ManureConstants:
 
     LIQUID_MANURE_SOLIDS_FRACTION = 0.05
     """
-    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed
+    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """

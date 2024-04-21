@@ -6,13 +6,14 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union, Tuple
 
 import pandas as pd
 from deprecated.sphinx import deprecated
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -24,38 +25,44 @@ class LogVerbosity(Enum):
     ----------
     NONE : str
         Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    CREDITS : str
+        Selecting CREDITS will tell OutputManager to print out the credits.
     ERRORS : str
-        Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+        Selecting ERRORS will tell OutputManager to print out all credits and errors added during a simulation.
     WARNINGS : str
-        Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+        Selecting WARNINGS will tell OutputManager to print out the credits as well as warnings and errors added during
+        a simulation.
     LOGS : str
-        Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+        Selecting LOGS will tell OutputManager to print out the credits as well as logs, warnings, and errors added
+        during a simulation.
 
     Notes
     -----
-    NONE is the default setting.
+    CREDITS is the default setting.
 
     """
 
     NONE = "none"
+    CREDITS = "credits"
     ERRORS = "errors"
     WARNINGS = "warnings"
     LOGS = "logs"
 
     def __le__(self, other) -> bool:
-        if self == other:
-            return True
-        if self == LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
-            return True
-        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
-            return True
-        if self == LogVerbosity.LOGS:
-            return False
-        return False
+        order = {
+            LogVerbosity.NONE: 0,
+            LogVerbosity.CREDITS: 1,
+            LogVerbosity.ERRORS: 2,
+            LogVerbosity.WARNINGS: 3,
+            LogVerbosity.LOGS: 4,
+        }
 
-    def __str__(self) -> bool:
+        if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
+            return False
+
+        return order[self] <= order[other]
+
+    def __str__(self) -> str:
         if self.value == "none":
             return "NONE"
         return self.value[:-1].upper()
@@ -98,6 +105,7 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self._exclude_info_maps_flag = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -105,7 +113,7 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
-            self.__log_verbose: LogVerbosity = LogVerbosity("none")
+            self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -128,15 +136,26 @@ class OutputManager(object):
         value: Any,
         info_map: Dict[str, Any],
     ) -> None:
-        """Adds value and info map at key in the given pool."""
+        """
+        Adds value and info map at key in the given pool.
+        Parameters
+        ----------
+        pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+            The pool to add the value and info_map to.
+        key : str
+            The key to add the value and info_map at.
+        value : Any
+            The value to be added to the pool.
+        info_map : Dict[str, Any]
+            The info map to be added to the pool.
+        """
+
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        # reduced_info_map is identical to info_map without the class key and
-        # the function key; as they are already stored in element key and
-        # having them increases the final file size.
-        reduced_info_map = {k: info_map[k] for k in info_map.keys() - {"class", "function"}}
-        pool[key]["info_maps"].append(reduced_info_map)
+        if not self._exclude_info_maps_flag:
+            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+            pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
             pool[key]["values"].append(value)
@@ -167,8 +186,39 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
+        units = info_map.get("units")
+        if units is None:
+            raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
+        self._validate_units(units)
+
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+    def _validate_units(self, units: Dict[str, Any] | str) -> None:
+        """
+        Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
+        valid MeasurementUnits values (including nested dictionaries).
+
+        Parameters
+        ----------
+        units : Dict[str, Any] | str
+            Either a string that can be converted to an MeasurementUnits, or a dictionary mapping string keys to either
+            MeasurementUnits values or further dictionaries.
+
+        Raises
+        ------
+        ValueError
+            If any unit or nested unit is not a valid MeasurementUnits value.
+
+        """
+        if isinstance(units, dict):
+            for key, unit in units.items():
+                self._validate_units(unit)
+        else:
+            try:
+                MeasurementUnits(units)
+            except ValueError:
+                raise ValueError(f"'{units}' is not a valid MeasurementUnits value")
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -294,7 +344,7 @@ class OutputManager(object):
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.CREDITS) -> None:
         """Sets the __log_verbose attribute"""
         self.__log_verbose = log_verbose
 
@@ -315,10 +365,14 @@ class OutputManager(object):
             raise KeyError("'function' was not found in info_map")
 
         prefix = ""
-        if info_map.get("prefix") is not None:
-            prefix = info_map.get("prefix") + "."
+        prefix_value = info_map.get("prefix")
+        if isinstance(prefix_value, str):
+            prefix = prefix_value + "."
         elif not info_map.get("suppress_prefix", False):
-            prefix = self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            class_value = info_map.get("class")
+            function_value = info_map.get("function")
+            if isinstance(class_value, str) and isinstance(function_value, str):
+                prefix = self._get_prefix(class_value, function_value) + "."
 
         suffix = f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
 
@@ -379,21 +433,105 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
+                data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=3),
+                        Utility.make_serializable(data_dict, max_depth=4),
                         json_file,
                         indent=2,
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
             raise e
+
+    def _add_detailed_data_origin(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Adds a `detailed_data_origins` list to each sub-dictionary that has information about data origins.
+
+        Notes
+        -----
+        This method iterates over each key in the provided dictionary. For keys that correspond to
+        dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
+        named `detailed_data_origins`. This list contains details about the data origin, including the class name,
+        function name, and the key itself, paired with each corresponding value from the `values` list.
+        The format used for detailing the origin is "[class_name.function_name]->[key]",
+        where `class_name` and `function_name` are derived from the `data_origin`
+        entries within `info_maps`.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The input dictionary containing keys that may map to other dictionaries with `info_maps` and `values` keys.
+            `info_maps` should contain a list of dictionaries, each with a `data_origin` key indicating the source
+            of the data. `values` should contain a list of values corresponding to these origins.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The modified dictionary with a `detailed_data_origins` list added to each sub-dictionary that meets the
+            criteria. This list provides detailed information on the origin of each value.
+
+        Examples
+        --------
+        >>> example_data_dict = {
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals": {
+        ...         "info_maps": [
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"},
+        ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"}
+        ...         ],
+        ...         "values": [193, 194]
+        ...     }
+        ... }
+        >>> output_manager = OutputManager()
+        >>> modified_data_dict = output_manager._add_detailed_data_origin(example_data_dict)
+        >>> assert modified_data_dict[
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_data_origins"
+        ... ] == [
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     193)],
+        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
+        ...     194)]
+        ... ]
+        """
+
+        for key in data_dict:
+            if not isinstance(data_dict[key], dict):
+                continue
+
+            sub_data_dict = data_dict[key]
+            if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+                continue
+
+            if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+                continue
+
+            data_origins: List[List[Tuple[str, str]]] = []
+            for info_map in sub_data_dict["info_maps"]:
+                if "data_origin" not in info_map:
+                    break
+                data_origins.append(info_map["data_origin"])
+
+            if len(data_origins) != len(sub_data_dict["values"]):
+                continue
+
+            detailed_data_origins: List[List[Tuple[str, Any]]] = []
+            for index, value in enumerate(sub_data_dict["values"]):
+                detailed_origin_for_value = []
+                for origin in data_origins[index]:
+                    class_name, function_name = origin
+                    origin_key = f"[{class_name}.{function_name}]->[{key}]"
+                    detailed_origin_for_value.append((origin_key, value))
+                detailed_data_origins.append(detailed_origin_for_value)
+
+            sub_data_dict["detailed_data_origins"] = detailed_data_origins
+
+        return data_dict
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
@@ -411,24 +549,85 @@ class OutputManager(object):
             A list of (column_name, column_data) tuples.
 
         """
-        column_list = []
-        mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
-        for field in mandatory_fields:
-            data_list = data_dict[field]
-            if data_list and isinstance(data_list[0], dict):
-                csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
-                for nested_dictionary in data_list:
-                    for subkey, value in nested_dictionary.items():
-                        csv_column_lists[subkey].append(value)
 
-                for subkey in csv_column_lists.keys():
-                    column_title = f"{variable_name}.{subkey}"
-                    column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
-            else:
-                column_title = f"{variable_name}"
-                column_list.append(pd.Series(data_list, dtype=object, name=column_title))
+        column_list = []
+        units = data_dict["info_maps"][0]["units"] if data_dict.get("info_maps", []) else None
+        data_list = data_dict["values"]
+        if data_list and isinstance(data_list[0], dict):
+            csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+            for nested_dictionary in data_list:
+                for subkey, value in nested_dictionary.items():
+                    csv_column_lists[subkey].append(value)
+
+            for subkey in csv_column_lists.keys():
+                column_title = f"{variable_name}.{subkey}{self._get_units_substr(variable_name, units, subkey)}"
+                column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
+        else:
+            column_title = f"{variable_name}{self._get_units_substr(variable_name, units)}"
+            column_list.append(pd.Series(data_list, dtype=object, name=column_title))
 
         return column_list
+
+    def _get_units_substr(
+        self, variable_name: str, units: str | Dict[str, str] | None, subkey: str | None = None
+    ) -> str:
+        """Get the units substring for a column title.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable or group of variables associated with the units.
+        units : str | Dict[str, str] | None
+            The units associated with the data.
+        subkey : str | None, optional
+            The subkey to retrieve the units for, if units is a dictionary. Default is None.
+
+        Returns
+        -------
+        str
+            The formatted units substring for the column title.
+
+        Examples
+        --------
+        >>> output_manager = OutputManager()
+        >>> output_manager._get_units_substr("temperature", "C")
+        ' (C)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
+        ' (m/s)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
+        ' (degrees)'
+        >>> output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
+        ''
+        """
+
+        if not isinstance(units, dict):
+            return f" ({units})" if units else ""
+
+        if subkey is None:
+            self.add_error(
+                "units_subkey_missing",
+                f"Variable {variable_name} has a dictionary for its 'units' property, "
+                f"but the 'values' associated with this variable are not dictionaries themselves.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_units_substr.__name__,
+                },
+            )
+            return ""
+
+        if subkey in units:
+            return f" ({units[subkey]})"
+
+        self.add_error(
+            "units_key_error",
+            f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._get_units_substr.__name__,
+            },
+        )
+
+        return ""
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary to a csv file.
@@ -611,7 +810,10 @@ class OutputManager(object):
                         result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = [element for element in filter_file.read().splitlines() if element]
-                    result = [{"filters": list_of_elements}]
+                    filter_by_exclusion = list_of_elements[0] == "exclude"
+                    if filter_by_exclusion:
+                        list_of_elements.pop(0)
+                    result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
                 else:
                     raise Exception("Unsupported file format; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
@@ -629,9 +831,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(
-        self, filter_patterns: List[str], input_file_name: Optional[str]
-    ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -661,27 +861,22 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._filter_variables_pool.__name__,
         }
-        exclude_keyword_location = 0
-        exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
+        filter_name = filter_content.get("filter_name", "NO_NAME")
         if filter_by_exclusion:
-            filter_vars_msg = (
-                f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
-                f" position {exclude_keyword_location}. Performing filtering by exclusion."
-            )
+            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
-            filter_vars_msg = (
-                f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
-                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
-            )
-        filter_pattern_matches = Utility.filter_dictionary(self.variables_pool, filter_patterns, filter_by_exclusion)
-        self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = (
-            f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter pattern(s) in the {input_file_name} file."
+            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
+        self.add_log("filtering_log", filter_excl_msg, info_map)
+        filtered_pool = Utility.filter_dictionary(
+            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
         )
-        self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
-        return filter_pattern_matches
+        self.add_log(
+            "num_filter_pattern_matches",
+            f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
+            info_map,
+        )
+        return filtered_pool
 
     def save_results(
         self,
@@ -757,11 +952,16 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content["filters"], filter_file)
+                    filtered_pool = self._filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                    if filter_content.get("graph_details"):
+                        filter_content["graph_details"]["graphics_dir"] = graphics_dir
+                        filter_content["graph_details"]["produce_graphics"] = produce_graphics
+                        filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+                        self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:
@@ -819,10 +1019,7 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     log_pool = graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
+                        filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
                     self._route_logs(log_pool)
                 except Exception as e:
@@ -846,11 +1043,26 @@ class OutputManager(object):
         """
         for log in log_pool:
             if "error" in log:
-                self.add_error(log["error"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["error"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_error(log["error"], log["message"], log["info_map"])
             elif "log" in log:
-                self.add_log(log["log"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["log"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
-                self.add_warning(log["warning"], log["message"], log["info_map"])
+                if (
+                    isinstance(log["warning"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
@@ -956,10 +1168,10 @@ class OutputManager(object):
 
             parsable_dicts = []
 
-            if not exclude_info_maps:
+            if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
 
-            is_variable_nested = isinstance(variable_data["values"][0], Dict)
+            is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
@@ -1003,10 +1215,10 @@ class OutputManager(object):
         """
         Sets each pool to an empty dictionary.
         """
-        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
-        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.variables_pool = {}
+        self.warnings_pool = {}
+        self.errors_pool = {}
+        self.logs_pool = {}
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
@@ -1125,16 +1337,43 @@ class OutputManager(object):
         except Exception as e:
             self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)
 
-    def get_error_and_warning_counts(self) -> tuple[int, int]:
+    def _get_errors_warnings_logs_counts(self) -> tuple[int, int, int]:
         """
-        Get the total number of errors and warnings in the output manager's error and warning pools.
+        Get the total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
 
         Returns
         -------
-        tuple[int, int]
-            The total number of errors and warnings in the output manager's error and warning pools.
+        tuple[int, int, int]
+            The total number of errors, warnings, and logs in the output manager's errors, warnings, and logs pools.
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
         warnings_count = sum([len(value_dict["values"]) for value_dict in self.warnings_pool.values()])
-        return errors_count, warnings_count
+        logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
+        return errors_count, warnings_count, logs_count
+
+    def print_credits(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+
+    def print_errors_warnings_logs_counts(self) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
+            errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
+            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+
+    def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
+        """
+        Sets the exclude_info_maps flag to the given value.
+        Parameters
+        ----------
+        exclude_info_maps : bool
+            The value to set the exclude_info_maps flag to.
+        """
+
+        self._exclude_info_maps_flag = exclude_info_maps

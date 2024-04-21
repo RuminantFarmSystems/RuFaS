@@ -123,6 +123,7 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
         "birth_weight": 200,
         "p_init": 1,
         "repro_program": "ED",
+        "repro_sub_protocol": "2P",
         "tai_method_h": "5dCG2P",
         "synch_ed_method_h": "2P",
         "calf_birth_weight": 200,
@@ -176,20 +177,6 @@ def test_add_new_animals(
 
 
 @pytest.mark.parametrize(
-    "pen_to_test, expected_pen_populated",
-    [
-        (lazy_fixture("pen"), False),
-        (lazy_fixture("pen_with_animals"), True),
-    ],
-)
-def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool) -> None:
-    """Unit test for function update_pen_populated in file routines/animal/pen.py"""
-    pen_to_test.update_pen_populated()
-
-    assert pen_to_test.populated == expected_pen_populated
-
-
-@pytest.mark.parametrize(
     "pen_to_test, expected_stocking_density",
     [
         (lazy_fixture("pen"), 0),
@@ -223,14 +210,12 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
-    mocker.patch("RUFAS.routines.animal.pen.Pen.update_pen_populated")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_animal_combination")
     mocker.patch("RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist")
 
     pen.update_animals(MagicMock(), MagicMock())
 
     pen.add_new_animals.assert_called_once()
-    pen.update_pen_populated.assert_called_once()
     pen.update_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
 
@@ -379,22 +364,20 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
 
 
 @pytest.mark.parametrize(
-    "pen_animals, pen_populated, expected",
+    "pen_animals, expected",
     [
         (
             lazy_fixture("mock_calves_with_daily_growth"),
-            True,
             lazy_fixture("avg_calf_daily_growth_values"),
         ),
-        ([], False, 0),
+        ([], 0),
     ],
 )
-def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
+def test_calc_avg_growth(pen: Pen, pen_animals, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
     for animal in pen_animals:
         pen.animals_in_pen[animal.id] = animal
     # pen.animals_in_pen = pen_animals
-    pen.populated = pen_populated
     pen.calc_avg_growth()
 
     actual = pen.avg_growth
@@ -416,22 +399,17 @@ def test_daily_p_update():
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
 
 
-def test_set_up_new_animal():
-    """Unit test for function set_up_new_animal in file routines/animal/pen.py"""
-    pass
-
-
 def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
     calves = {0: MagicMock()}
     pen.animals_in_pen = calves
-    pen.populated = True
+    assert pen.is_populated is True
     pen.avg_p_animal = 1.0
 
     pen.clear()
 
     assert pen.animals_in_pen == {}
-    assert pen.populated is False
+    assert pen.is_populated is False
     assert pen.avg_p_animal == 0
 
 
@@ -549,7 +527,6 @@ def test_calc_animal_manure_excretion(
     animal = mocker.MagicMock(spec=animal_class)
     animal.is_lactating = is_lactating
     animal.__class__.__name__ = animal_class.__name__
-    mock_feed = mocker.MagicMock(spec="Feed")
     mock_prefix = mocker.MagicMock()
     mock_default_manure = mocker.MagicMock()
     mocker.patch("RUFAS.routines.animal.pen.Pen.__init__", return_value=None)
@@ -560,6 +537,8 @@ def test_calc_animal_manure_excretion(
         return_value=(mock_prefix, mock_default_manure),
     )
     pen.MEdiet = mock_MEdiet = mocker.MagicMock()
+    pen.ration_nutrient_amount = mock_ration_nutrient_amount = mocker.MagicMock()
+    pen.ration_nutrient_conc = mock_ration_nutrient_conc = mocker.MagicMock()
     mock_methane_model = mocker.MagicMock()
     mock_methane_mitigation_method = mocker.MagicMock()
     mock_methane_mitigation_additive_amount = mocker.MagicMock()
@@ -567,7 +546,6 @@ def test_calc_animal_manure_excretion(
     # Act
     actual_prefix, actual_manure = pen._calc_animal_manure_excretion(
         animal,
-        mock_feed,
         mock_methane_model,
         mock_methane_mitigation_method,
         mock_methane_mitigation_additive_amount,
@@ -579,14 +557,19 @@ def test_calc_animal_manure_excretion(
     patch_for_get_prefix_and_default_manure_excretion.assert_called_once_with(animal, is_lactating)
     if animal_class.__name__ == "Cow":
         animal.calc_manure_excretion.assert_called_once_with(
-            mock_feed,
             mock_methane_model,
             mock_methane_mitigation_method,
             mock_methane_mitigation_additive_amount,
             mock_MEdiet,
+            nutrient_amount=mock_ration_nutrient_amount,
+            nutrient_conc=mock_ration_nutrient_conc,
         )
     else:
-        animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model)
+        animal.calc_manure_excretion.assert_called_once_with(
+            mock_methane_model,
+            nutrient_amount=mock_ration_nutrient_amount,
+            nutrient_conc=mock_ration_nutrient_conc,
+        )
 
 
 @pytest.mark.parametrize(
@@ -765,7 +748,6 @@ def test_calc_total_manure(
     for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
-    feed = MagicMock(spec="Feed")
     methane_model = mocker.MagicMock()
     methane_mitigation_method = mocker.MagicMock()
     methane_mitigation_additive_amount = mocker.MagicMock()
@@ -789,7 +771,6 @@ def test_calc_total_manure(
 
     # Act
     pen.calc_total_manure(
-        feed,
         methane_model,
         methane_mitigation_method,
         methane_mitigation_additive_amount,
@@ -803,7 +784,6 @@ def test_calc_total_manure(
                 [
                     mocker.call(
                         animal,
-                        feed,
                         methane_model,
                         methane_mitigation_method,
                         methane_mitigation_additive_amount,

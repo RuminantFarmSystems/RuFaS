@@ -50,8 +50,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "liquid_manure_total_ammoniacal_nitrogen": 0.0,
                 "liquid_manure_nitrogen": 0.0,
                 "liquid_manure_total_solids": 0.0,
-                "manure_degradable_volatile_solids": 0.0,
-                "manure_non_degradable_volatile_solids": 0.0,
+                "liquid_manure_total_degradable_volatile_solids": 0.0,
+                "liquid_manure_total_non_degradable_volatile_solids": 0.0,
                 "liquid_manure_total_volatile_solids": 0.0,
                 "liquid_manure_phosphorus": 0.0,
                 "housing_methane": 0.0,
@@ -75,8 +75,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "liquid_manure_total_ammoniacal_nitrogen": 2.0,
                 "liquid_manure_nitrogen": 3.0,
                 "liquid_manure_total_solids": 4.0,
-                "manure_degradable_volatile_solids": 5.0,
-                "manure_non_degradable_volatile_solids": 6.0,
+                "liquid_manure_total_degradable_volatile_solids": 5.0,
+                "liquid_manure_total_non_degradable_volatile_solids": 6.0,
                 "liquid_manure_phosphorus": 7.0,
                 "liquid_manure_potassium": 8.0,
                 "housing_methane": 9.0,
@@ -96,8 +96,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "liquid_manure_total_ammoniacal_nitrogen": approx(2.0),
                 "liquid_manure_nitrogen": approx(3.0),
                 "liquid_manure_total_solids": approx(4.0),
-                "manure_degradable_volatile_solids": approx(5.0),
-                "manure_non_degradable_volatile_solids": approx(6.0),
+                "liquid_manure_total_degradable_volatile_solids": approx(5.0),
+                "liquid_manure_total_non_degradable_volatile_solids": approx(6.0),
                 "liquid_manure_total_volatile_solids": approx(5.0 + 6.0),
                 "liquid_manure_phosphorus": approx(7.0),
                 "liquid_manure_potassium": approx(8.0),
@@ -391,8 +391,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
-    assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(VSd)
-    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(VSnd)
+    assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
+    assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(VSnd)
     assert manure_handler_daily_output.liquid_manure_phosphorus == approx(P)
     assert manure_handler_daily_output.liquid_manure_potassium == approx(K)
     assert manure_handler_daily_output.housing_methane == approx(housing_methane_emission)
@@ -424,8 +424,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == approx(max(0.0, TAN))
     assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
-    assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(VSd)
-    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(VSnd)
+    assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
+    assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(VSnd)
     assert manure_handler_daily_output.liquid_manure_phosphorus == approx(P)
     assert manure_handler_daily_output.liquid_manure_potassium == approx(K)
     assert manure_handler_daily_output.housing_methane == approx(0.0)
@@ -473,8 +473,8 @@ def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None
     assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (approx(0.0))
     assert manure_handler_daily_output.liquid_manure_nitrogen == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(0.0)
-    assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(0.0)
-    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_phosphorus == approx(0.0)
     assert manure_handler_daily_output.liquid_manure_potassium == approx(0.0)
     assert manure_handler_daily_output.housing_methane == approx(0.0)
