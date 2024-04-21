@@ -590,7 +590,7 @@ class Pen:
         # TODO: Question - is this necessary or can we assume that any newly
         #   added animals will match the existing animal combination? GitHub Issue #1213
         class_name = type(animal).__name__
-        self.classes_in_pen.add(class_name)
+        # self.classes_in_pen.add(class_name)
 
         if class_name == "Cow":
             requirements = req.calc_rqmts(
