@@ -1452,8 +1452,8 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def collect_manure_excretions_output_data(self, pen: Pen, manure_excretions_output_data: Dict) -> None:
-        pen.classes_in_pen = self._determine_classes_in_pen(pen)
+    def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict) -> None:
+
         pen.calc_total_manure(
             self.methane_model,
             self.methane_mitigation_method,

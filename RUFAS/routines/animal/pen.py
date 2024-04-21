@@ -17,6 +17,7 @@ from RUFAS.routines.animal.manure.general_manure import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -83,8 +84,8 @@ class Pen:
     animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
 
-    classes_in_pen : set
-        The set (no repeats) of all the classes to which the animals in the pen belong.
+    populated : bool
+        True iff there is at least 1 animal in the pen, and false otherwise.
 
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
@@ -225,7 +226,7 @@ class Pen:
 
         self.animals_in_pen = {}
 
-        self.classes_in_pen = set()
+        # self. = set()
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -302,6 +303,11 @@ class Pen:
 
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
+
+        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
+        else:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
 
     @property
     def current_stocking_density(self) -> float:
@@ -380,16 +386,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    def update_classes_in_pen(self) -> None:
-        """
-        Updates the classes contained within the pen
-        """
-        self.classes_in_pen = set()
-        for animal in list(self.animals_in_pen.values()):
-            life_cycle_stage = type(animal).__name__
-            self.classes_in_pen.add(life_cycle_stage)
-
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -405,7 +401,6 @@ class Pen:
         self.add_new_animals(new_animals)
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -517,7 +512,11 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if "Cow" in self.classes_in_pen:
+        if AnimalType.DRY_COW or AnimalType.LAC_COW in list(self.animal_grouping_scenario.values()):  # CHECK
+            for animal in list(self.animals_in_pen.values()):
+                if type(animal).__name__ == "Cow":
+                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+        if self.animal_combination == 2 or self.animal_combination == 3 or self.animal_combination == 4:  # CHECK
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
@@ -548,6 +547,119 @@ class Pen:
             # TODO: Add warning if total_p_animal < 0 GitHub Issue #1212
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
+
+    # fmt: off
+    def set_up_new_animal(  # noqa
+        self, animal, p_conc, feed, temp, num_animals_before_additions
+    ):
+        # fmt: on
+        """
+        Sets the necessary attributes for @animal to be a replacement in this
+        pen.
+
+        Args:
+            animal: the replacement animal which needs to have necessary values
+                for later computations
+            p_conc: P concentration of @animal's class, used to calculate the
+                P in @animal. -1 for this value indicates that @animal is a
+                calf and that its p_animal attribute has already been calculated
+            feed: instance of the Feed class defined in feed.py
+            temp: temperature on the current day
+            num_animals_before_additions: the number of animals in this pen
+                before any new animals were added for the day
+        """
+        if num_animals_before_additions == 0:
+            # for the case that there are no animals currently in this pen.
+            # Avoids a division by 0 error in below calculations
+            # TODO is there a better way? GitHub Issue #1213
+            num_animals_before_additions = 1
+
+        # TODO: Question - is this necessary or can we assume that any newly
+        #   added animals will match the existing animal combination? GitHub Issue #1213
+        class_name = type(animal).__name__
+        # self.classes_in_pen.add(class_name)
+
+        if class_name == "Cow":
+            requirements = req.calc_rqmts(
+                body_weight=animal.body_weight,
+                mature_body_weight=animal.mature_body_weight,
+                day_of_pregnancy=animal.days_in_preg,
+                animal_type="cow",
+                parity=animal.calves,
+                calving_interval=animal.CI,
+                milk_true_protein=animal.mPrt,
+                milk_fat=animal.fat_percent,
+                milk_lactose=animal.lactose_milk,
+                milk_production=animal.estimated_daily_milk_produced,
+                days_in_milk=animal.days_in_milk,
+                lactating=animal.milking,
+            )
+            animal.NEmaint_requirement = requirements["NEmaint_requirement"]
+            animal.NEg_requirement = requirements["NEg_requirement"]
+            animal.NEpreg_requirement = requirements["NEpreg_requirement"]
+            animal.NEl_requirement = requirements["NEl_requirement"]
+            animal.MP_requirement = requirements["MP_requirement"]
+            animal.Ca_requirement = requirements["Ca_requirement"]
+            animal.P_requirement = requirements["P_requirement"]
+            animal.DMIest_requirement = requirements["DMIest_requirement"]
+            animal.DNED_requirement = (
+                requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
+            ) / animal.DMIest_requirement
+            animal.DMPD_requirement = (
+                requirements["MP_requirement"]
+            ) / animal.DMIest_requirement
+
+        animal.dry_matter_intake = self.dry_matter_intake
+
+        for key in self.ration:
+            if key == "status":
+                animal.ration_formulation[key] = self.ration[key]
+
+            else:  # feeds and price
+                animal.ration_formulation[key] = (
+                    self.ration[key] / num_animals_before_additions
+                )
+
+        # set animal's manure to be the average manure of all other
+        # animals in pen
+        for key in self.manure.keys():
+            if len(self.animals_in_pen) > 0:
+                animal.manure_excretion[key] = self.manure[key] / (
+                    len(self.animals_in_pen)
+                )
+
+        # since the manure attribute is a total from all animals in the pen,
+        # we need to add the current animal's values to the total values for
+        # each manure key
+        for key in self.manure:
+            self.manure[key] += animal.manure_excretion[key]
+
+        # set animal's nutrient requirements to be the average requirements of
+        # all other animals in pen
+        if class_name == "Calf":
+            animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
+        else:
+            animal.nutrient_rqmts = self.avg_nutrient_rqmts
+
+        if animal.nutrient_rqmts == {} and class_name == "Calf":
+            animal.calc_nutrient_rqmts(feed, temp)
+        elif animal.nutrient_rqmts == {} and not class_name == "Calf":
+            animal.set_nutrient_rqmts()
+
+        # set animal's DVD and DHD if it is a cow
+        if class_name == "Cow":
+            animal.calc_daily_walking_dist(
+                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
+            )
+
+        # set this animal's p_animal to be the average P concentration of other
+        # animals in its class times its body weight
+        if not p_conc == -1:
+            animal.p_animal = animal.body_weight * p_conc
+
+        animal.p_intake = self.avg_p_intake
+
+        self.animals_in_pen[animal.id] = animal
 
     def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
         """
