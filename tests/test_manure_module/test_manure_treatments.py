@@ -1884,9 +1884,11 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     [
         (1, 100, AnaerobicLagoon, "cover"),
         (100, 100, AnaerobicLagoon, "no cover"),
+        (100, 100, AnaerobicLagoon, "crust"),
         (101, 100, AnaerobicLagoon, "cover"),
         (1, 100, SlurryStorageOutdoor, "cover"),
         (100, 100, SlurryStorageOutdoor, "no cover"),
+        (100, 100, SlurryStorageOutdoor, "crust"),
         (101, 100, SlurryStorageOutdoor, "cover"),
     ],
 )
@@ -1928,7 +1930,7 @@ def test_adjust_final_manure_volume(
     actual_adjusted_final_manure_volume = treatment._adjust_final_manure_volume(current_day_final_manure_volume)
 
     # Assert
-    if manure_cover == "no cover":
+    if manure_cover == "no cover" or manure_cover == "crust":
         patch_for_precipitation_volume_property.assert_called_once()
     else:
         patch_for_precipitation_volume_property.assert_not_called()
@@ -1936,7 +1938,7 @@ def test_adjust_final_manure_volume(
         expected_adjusted_final_manure_volume = current_day_final_manure_volume + precipitation_volume
         assert actual_adjusted_final_manure_volume == expected_adjusted_final_manure_volume
     else:
-        if manure_cover == "no cover":
+        if manure_cover == "no cover" or manure_cover == "crust":
             patch_for_precipitation_volume_property.assert_called_once()
             assert actual_adjusted_final_manure_volume == current_day_final_manure_volume + precipitation_volume
         else:

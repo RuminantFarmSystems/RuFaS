@@ -208,7 +208,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        if self.config.manure_cover == ManureCoverEnum.NO_COVER.value:
+        if self.config.manure_cover in [ManureCoverEnum.NO_COVER.value, ManureCoverEnum.CRUST.value]:
             return current_day_final_manure_volume + self.precipitation_volume
         else:
             return current_day_final_manure_volume
