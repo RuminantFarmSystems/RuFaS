@@ -2,6 +2,7 @@ import dataclasses
 import math
 from typing import Type, Tuple
 
+from mock import MagicMock
 import pytest
 from mock.mock import PropertyMock, call
 from pytest import approx
@@ -1616,8 +1617,16 @@ def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
     assert patch_for_pit_slope.call_count == 2
 
 
-def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> None:
-    """Unit test for precipitation_volume() in slurry_storage_outdoor.py."""
+@pytest.mark.parametrize(
+    "current_pen, num_animals, expected_volume",
+    [
+        (MagicMock(num_animals=100), 100, 1000.0 * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL),
+        (None, None, 0),
+        (MagicMock(num_animals=None), None, 0),
+    ],
+)
+def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_animals, expected_volume):
+    """Unit test for precipitation_volume() in slurry_storage_outdoor.py, with different pen and animal scenarios."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
         weather=mocker.MagicMock(),
@@ -1625,26 +1634,20 @@ def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> Non
         manure_treatment_config=mocker.MagicMock(),
     )
     rainfall = 10.0
-    patch_for_get_current_day_rainfall = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor"
-        "._get_current_day_rainfall",
+    mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._get_current_day_rainfall",
         return_value=rainfall,
     )
-    pit_surface_area = 300.0
-    patch_for_pit_surface_area = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area",
-        new_callable=PropertyMock,
-        return_value=pit_surface_area,
-    )
-    expected_precipitation_volume = rainfall * pit_surface_area
+    slurry_storage_outdoor._current_pen = current_pen
+
+    if current_pen is not None:
+        current_pen.num_animals = num_animals
 
     # Act
     actual_precipitation_volume = slurry_storage_outdoor.precipitation_volume
 
     # Assert
-    assert actual_precipitation_volume == expected_precipitation_volume
-    patch_for_get_current_day_rainfall.assert_called_once()
-    patch_for_pit_surface_area.assert_called_once()
+    assert actual_precipitation_volume == expected_volume
 
 
 def test_slurry_storage_outdoor_freeboard_volume(mocker: MockFixture) -> None:
@@ -1877,49 +1880,70 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "simulation_day, storage_time_period",
+    "simulation_day, storage_time_period, manure_treatment, manure_cover",
     [
-        (1, 100),
-        (100, 100),
-        (101, 100),
+        (1, 100, AnaerobicLagoon, "cover"),
+        (100, 100, AnaerobicLagoon, "no cover"),
+        (100, 100, AnaerobicLagoon, "crust"),
+        (101, 100, AnaerobicLagoon, "cover"),
+        (1, 100, SlurryStorageOutdoor, "cover"),
+        (100, 100, SlurryStorageOutdoor, "no cover"),
+        (100, 100, SlurryStorageOutdoor, "crust"),
+        (101, 100, SlurryStorageOutdoor, "cover"),
     ],
 )
-def test_adjust_final_manure_volume(simulation_day: int, storage_time_period: int, mocker: MockFixture) -> None:
+def test_adjust_final_manure_volume(
+    simulation_day: int,
+    storage_time_period: int,
+    manure_treatment: Type[AnaerobicLagoon | SlurryStorageOutdoor],
+    manure_cover: str,
+    mocker: MockFixture,
+) -> None:
     """Unit test for _adjust_final_manure_volume() in anaerobic_lagoon.py."""
     # Arrange
-    anaerobic_lagoon = AnaerobicLagoon(
+    manure_treatment_config = mocker.MagicMock()
+    manure_treatment_config.__setattr__("manure_cover", manure_cover)
+    treatment = manure_treatment(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        manure_treatment_config=mocker.MagicMock(),
+        manure_treatment_config=manure_treatment_config,
     )
-    anaerobic_lagoon._sim_day = simulation_day
-    anaerobic_lagoon.storage_time_period = storage_time_period
+    treatment._sim_day = simulation_day
+    treatment.storage_time_period = storage_time_period
     current_day_final_manure_volume = 10.0
     precipitation_volume = 20.0
-    patch_for_precipitation_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.precipitation_volume",
-        new_callable=PropertyMock,
-        return_value=precipitation_volume,
-    )
-    flushing_volume = 30.0
-    patch_for_flushing_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.flushing_volume",
-        new_callable=PropertyMock,
-        return_value=flushing_volume,
-    )
+    if manure_treatment == AnaerobicLagoon:
+        patch_for_precipitation_volume_property = mocker.patch(
+            "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.precipitation_volume",
+            new_callable=PropertyMock,
+            return_value=precipitation_volume,
+        )
+    else:
+        patch_for_precipitation_volume_property = mocker.patch(
+            "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor."
+            "SlurryStorageOutdoor.precipitation_volume",
+            new_callable=PropertyMock,
+            return_value=precipitation_volume,
+        )
 
     # Act
-    actual_adjusted_final_manure_volume = anaerobic_lagoon._adjust_final_manure_volume(current_day_final_manure_volume)
+    actual_adjusted_final_manure_volume = treatment._adjust_final_manure_volume(current_day_final_manure_volume)
 
     # Assert
-    patch_for_precipitation_volume_property.assert_called_once()
+    if manure_cover == "no cover" or manure_cover == "crust":
+        patch_for_precipitation_volume_property.assert_called_once()
+    else:
+        patch_for_precipitation_volume_property.assert_not_called()
     if simulation_day % storage_time_period > 1:
-        patch_for_flushing_volume_property.assert_called_once()
-        expected_adjusted_final_manure_volume = current_day_final_manure_volume + precipitation_volume - flushing_volume
+        expected_adjusted_final_manure_volume = current_day_final_manure_volume + precipitation_volume
         assert actual_adjusted_final_manure_volume == expected_adjusted_final_manure_volume
     else:
-        patch_for_flushing_volume_property.assert_not_called()
-        assert actual_adjusted_final_manure_volume == current_day_final_manure_volume + precipitation_volume
+        if manure_cover == "no cover" or manure_cover == "crust":
+            patch_for_precipitation_volume_property.assert_called_once()
+            assert actual_adjusted_final_manure_volume == current_day_final_manure_volume + precipitation_volume
+        else:
+            patch_for_precipitation_volume_property.assert_not_called()
+            assert actual_adjusted_final_manure_volume == current_day_final_manure_volume
 
 
 def test_sludge_accumulation_volume_property(mocker: MockFixture) -> None:
