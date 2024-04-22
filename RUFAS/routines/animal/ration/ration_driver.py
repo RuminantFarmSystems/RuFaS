@@ -1,6 +1,5 @@
 import collections
-from typing import Set, Dict, List, Tuple, Literal, Callable, Any
-from numpy import ndarray as ndarray
+from typing import Set, Dict, List, Tuple, Literal, Any
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
@@ -168,7 +167,7 @@ class RationManager:
             f"failed_constraint_summary_for_pen_{pen.id}",
             fail_summary,
             dict(info_map, **{"units": fail_summary_units}),
-            )
+        )
 
     @staticmethod
     def calc_milk_average(pen: PenTypedDict) -> float:
