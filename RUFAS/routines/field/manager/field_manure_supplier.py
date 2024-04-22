@@ -4,14 +4,33 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.output_manager import OutputManager
 
 
+"""
+The Field Manure Supplier uses ratios of dry mass to wet mass, Nitrogen to dry mass, and Phosphorus to dry mass to
+project total amounts of manure applied. These ratios were derived from the ManureDB
+(http://manuredb.umn.edu/?a=Dairy&y=2024&y=2023&y=2022&y=2021&y=2020) for the year of 2023. The liquid ratios were
+calculated using the data collected for manure designated as "Slurry" and "Liquid", and the solid ratios for manure
+designated as "Solid".
+"""
+
+
 """Factor for converting dry matter mass of liquid manure to wet mass."""
-LIQUID_MANURE_DRY_MASS_TO_WET_MASS = 17.86
+LIQUID_MANURE_DRY_MASS_TO_WET_MASS = 21.739
 
 """Factor for converting nitrogen mass to dry matter mass of liquid manure."""
-NITROGEN_TO_LIQUID_MANURE_DRY_MASS = 22.4
+NITROGEN_TO_LIQUID_MANURE_DRY_MASS = 20.909
 
 """Factor for converting phosphorus mass to dry matter mass of liquid manure."""
-PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS = 56.0
+PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS = 51.111
+
+
+"""Factor for converting dry matter mass of solid manure to wet mass."""
+SOLID_MANURE_DRY_MASS_TO_WET_MASS = 2.469
+
+"""Factor for converting nitrogen mass to dry matter mass of solid manure."""
+NITROGEN_TO_SOLID_MANURE_DRY_MASS = 67.516
+
+"""Factor for converting phosphorus mass to dry matter mass of solid manure."""
+PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS = 135.033
 
 om = OutputManager()
 
@@ -58,9 +77,9 @@ class FieldManureSupplier:
                 "phosphorus": PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS,
             },
             ManureType.SOLID: {
-                "mass": LIQUID_MANURE_DRY_MASS_TO_WET_MASS,
-                "nitrogen": NITROGEN_TO_LIQUID_MANURE_DRY_MASS,
-                "phosphorus": PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS,
+                "mass": SOLID_MANURE_DRY_MASS_TO_WET_MASS,
+                "nitrogen": NITROGEN_TO_SOLID_MANURE_DRY_MASS,
+                "phosphorus": PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS,
             },
         }
 
