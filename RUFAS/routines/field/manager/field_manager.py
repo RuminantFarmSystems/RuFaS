@@ -119,15 +119,17 @@ class FieldManager:
         return FieldManureSupplier()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
+    def _setup_field(
+        field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
+    ) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager : ManureManager
-            Instance of the ManureManager class.
+        manure_supplier : ManureManager | FieldManureSupplier
+            Entity that will provide manure for field applications.
         feed_manager : FeedManager
             Instance of the FeedManager class which receives and manages harvested crops.
 
@@ -194,7 +196,7 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
-            manure_manager=manure_manager,
+            manure_supplier=manure_supplier,
             feed_manager=feed_manager,
         )
 
