@@ -14,7 +14,6 @@ This will produce a list of the differences in a .txt file saved in the output d
 """
 
 from deepdiff import DeepDiff
-from pprint import pformat
 
 import argparse
 import json
