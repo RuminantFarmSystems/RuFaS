@@ -19,9 +19,15 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.units import MeasurementUnits
 
 
-def main():
+"""These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
+NUMPY_RANDOM_SEED_LOWER_BOUND = 0
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+
+
+def main() -> None:
     cmd_arguments = parse_gnu_args()
     if cmd_arguments.load_pool:
         load_pool = True
@@ -129,6 +135,7 @@ def run_rufas(
     """
 
     output_manager = OutputManager()
+    output_manager.set_exclude_info_maps_flag(exclude_info_maps)
     output_manager.set_log_verbose(verbose)
     output_manager.print_credits()
     output_manager.create_directory(output_dir)
@@ -290,15 +297,19 @@ def set_random_seed(input_manager: InputManager) -> None:
     """
     set_seed = input_manager.get_data("config.set_seed")
 
+    om = OutputManager()
+    info_map: dict[str, str | MeasurementUnits] = {"class": "No caller class", "function": set_random_seed.__name__}
+
     if set_seed:
         seed = input_manager.get_data("config.random_seed")
-        om = OutputManager()
-        info_map = {"class": "No caller class", "function": set_random_seed.__name__}
         log_name = "Randomization seed set."
         log_message = f"Randomization libraries being seeded with {seed}."
         om.add_log(log_name, log_message, info_map)
     else:
-        seed = None
+        seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
+        info_map["units"] = MeasurementUnits.UNITLESS
+        om.add_variable("generated_random_seed", seed, info_map)
+        om.add_log("Generated random seed", f"Seeding random libaries with generated seed: {seed}", info_map)
 
     random.seed(seed)
     numpy.random.seed(seed)
@@ -383,7 +394,7 @@ def execute_simulations(
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
     exclude_info_maps : bool
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        Flag for whether or not the user wants to include info_maps data in their results files.
     produce_graphics: bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path

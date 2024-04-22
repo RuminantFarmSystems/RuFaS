@@ -443,31 +443,6 @@ class ResiduePartition:
         )
 
     @staticmethod
-    def _determine_plant_metabolic_to_soil_carbon_amount(
-        plant_metabolic_carbon_amount: float, tillage_fraction: float
-    ) -> float:
-        """
-        This method calculates the amount of metabolic carbon incorporated into soil during tillage (kg/ha).
-
-        Parameters
-        ----------
-        plant_metabolic_carbon_amount: float
-            Amount of metabolic carbon in plant (kg/ha).
-        tillage_fraction: float
-            Fraction of metabolic carbon incorporated into soil during tillage (unitless).
-        Returns
-        -------
-        float
-            The amount of metabolic carbon incorporated into soil during tillage (kg/ha).
-
-        References
-        ----------
-        pseudocode_soil S.6.B.I.6
-
-        """
-        return plant_metabolic_carbon_amount * tillage_fraction
-
-    @staticmethod
     def _determine_plant_structural_to_slow_or_active_rate(
         plant_residue_metabolic_fraction: float, structural_decomposition_factor=0.076
     ) -> float:
