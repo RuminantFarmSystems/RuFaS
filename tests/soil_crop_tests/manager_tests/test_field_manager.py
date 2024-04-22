@@ -24,6 +24,7 @@ from pytest_mock.plugin import MockerFixture
 from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -187,8 +188,8 @@ def test_annual_update_routine(fields: List[Field]):
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=animals)
-    add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    get_data = mocker.patch.object(im, "get_data", return_value=animals)
+    add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
     field_manager = FieldManager()
 
