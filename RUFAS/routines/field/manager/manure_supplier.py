@@ -27,6 +27,9 @@ class FieldManureSupplier:
 
     """
 
+    def __init__(self) -> None:
+        pass
+
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
         """
         Receives requests for amounts of nutrients to be contained in manure and formulates manure reponses to send out.
@@ -47,8 +50,6 @@ class FieldManureSupplier:
         selects the smallest mass and uses it to construct the amount of manure that is actually returned.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
-
         type_to_constants_map = {
             ManureType.LIQUID: {
                 "mass": LIQUID_MANURE_DRY_MASS_TO_WET_MASS,
