@@ -1,5 +1,4 @@
 from typing import List, NamedTuple
-from typing import Set
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
