@@ -201,7 +201,7 @@ jobs:
       - name: Update Badges
         run: |
           badge_url="https://img.shields.io/badge/Formatting%20and%20Testing-${{ steps.format_test_status.outputs.badge_status }}-${{ steps.format_test_status.outputs.badge_color }}"
-          badge_markdown_str="[![Formatting and Testing](${badge_url})](https://github.com/${{ github.repository }}/actions/workflows/combined_format_lint_test_mypy.yml)"
+          badge_markdown_str="[![Formatting and Testing](${badge_url})]"
           sed -i "s|\[\!\[Formatting and Testing\]\(.*\)\]|${badge_markdown_str}|" ./README.md
           
           chmod +x ./.github/workflows/update_pytest_mypy_badges.sh
