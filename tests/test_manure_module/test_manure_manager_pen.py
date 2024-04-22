@@ -1,5 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
+import random
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
@@ -18,7 +19,6 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     animals = expected_animals_in_pen = [mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)]
     mock_pen.animals_in_pen = {}
     Pen.add_new_animals(mock_pen, animals)
-    mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
     mock_pen.animal_combination = AnimalCombination.LAC_COW
 
     mock_pen.housing_type = expected_housing_type = "open air barn"
@@ -47,7 +47,6 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     assert pen.id == expected_pen_id
     assert list(pen.animals_in_pen.values()) == expected_animals_in_pen
     assert pen.num_animals == expected_num_animals
-    assert pen.classes_in_pen == expected_classes_in_pen
     assert pen.housing_type == expected_housing_type
     assert pen.pen_type == expected_pen_type
     assert pen.bedding_type == expected_bedding_type
@@ -118,7 +117,13 @@ def test_barn_area_from_pen_type(
     mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
     mock_pen.num_stalls = 1
-    mock_pen.classes_in_pen = {"Cow"} if has_cows else {"Calf"}
+    animal_combinations = [
+        AnimalCombination.LAC_COW,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+        AnimalCombination.CLOSE_UP,
+    ]
+
+    mock_pen.animal_combination = random.choice(animal_combinations) if has_cows else AnimalCombination.CALF
 
     # Act & Assert
     if raises_error:
