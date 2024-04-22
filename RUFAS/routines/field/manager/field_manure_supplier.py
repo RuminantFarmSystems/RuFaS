@@ -32,6 +32,21 @@ NITROGEN_TO_SOLID_MANURE_DRY_MASS = 67.516
 """Factor for converting phosphorus mass to dry matter mass of solid manure."""
 PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS = 135.033
 
+"""Maps the currently supported manure types to the constants associated with them."""
+TYPE_TO_CONSTANTS_MAP = {
+    ManureType.LIQUID: {
+        "mass": LIQUID_MANURE_DRY_MASS_TO_WET_MASS,
+        "nitrogen": NITROGEN_TO_LIQUID_MANURE_DRY_MASS,
+        "phosphorus": PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS,
+    },
+    ManureType.SOLID: {
+        "mass": SOLID_MANURE_DRY_MASS_TO_WET_MASS,
+        "nitrogen": NITROGEN_TO_SOLID_MANURE_DRY_MASS,
+        "phosphorus": PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS,
+    },
+}
+
+
 om = OutputManager()
 
 
@@ -70,20 +85,7 @@ class FieldManureSupplier:
         requested nutrient masses is 0, that nutrient is not considered when formulating the manure result.
 
         """
-        type_to_constants_map = {
-            ManureType.LIQUID: {
-                "mass": LIQUID_MANURE_DRY_MASS_TO_WET_MASS,
-                "nitrogen": NITROGEN_TO_LIQUID_MANURE_DRY_MASS,
-                "phosphorus": PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS,
-            },
-            ManureType.SOLID: {
-                "mass": SOLID_MANURE_DRY_MASS_TO_WET_MASS,
-                "nitrogen": NITROGEN_TO_SOLID_MANURE_DRY_MASS,
-                "phosphorus": PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS,
-            },
-        }
-
-        constants = type_to_constants_map[request.manure_type]
+        constants = TYPE_TO_CONSTANTS_MAP[request.manure_type]
 
         nitrogen_projected_mass = request.nitrogen * constants["nitrogen"]
         phosphorus_projected_mass = request.phosphorus * constants["phosphorus"]
