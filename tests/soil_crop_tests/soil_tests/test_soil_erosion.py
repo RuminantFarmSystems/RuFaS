@@ -2,6 +2,7 @@ import pytest
 from math import exp, log, atan, sin
 from unittest.mock import MagicMock, patch
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 
@@ -72,8 +73,9 @@ def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
 def test_determine_carbon_content_factor(carbon: float) -> None:
     """Tests _determine_carbon_content_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_carbon_content_factor(carbon)
-    expect_bottom_term = carbon + exp(3.72 - 2.95 * carbon)
-    expect = 1 - ((0.25 * carbon) / expect_bottom_term)
+    expect_bottom_term = carbon\
+        * GeneralConstants.FRACTION_TO_PERCENTAGE + exp(3.72 - 2.95 * carbon * GeneralConstants.FRACTION_TO_PERCENTAGE)
+    expect = 1 - ((0.25 * carbon * GeneralConstants.FRACTION_TO_PERCENTAGE) / expect_bottom_term)
     assert observe == expect
 
 

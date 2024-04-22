@@ -173,15 +173,15 @@ class SoilErosion:
         return (silt_fraction / ((clay_fraction) + (silt_fraction))) ** 0.3
 
     @staticmethod
-    def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
+    def _determine_carbon_content_factor(organic_carbon_fraction: float) -> float:
         """
-        Calculate a factor based on the percent of organic carbon content for use in calculating soil erodibility
+        Calculate a factor based on the fraction of organic carbon content for use in calculating soil erodibility
         factor.
 
         Parameters
         ----------
-        percent_organic_carbon : float
-            The percent of organic carbon content in the given layer of soil.
+        organic_carbon_fraction : float
+            The fraction of organic carbon content in the given layer of soil.
 
         Notes
         -------
@@ -199,7 +199,9 @@ class SoilErosion:
 
         """
         return 1 - (
-            (0.25 * percent_organic_carbon) / (percent_organic_carbon + exp(3.72 - (2.95 * percent_organic_carbon)))
+            (0.25 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)
+            / (organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+               + exp(3.72 - (2.95 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)))
         )
 
     @staticmethod
