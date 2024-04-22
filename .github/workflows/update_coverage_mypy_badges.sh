@@ -16,7 +16,7 @@ coverage_color=$(case $((coverage_percentage)) in
 echo "Coverage color: $coverage_color"
 
 # Build the URL for coverage badge
-coverage_markdown_str="![Coverage](https://img.shields.io/badge/coverage-${coverage_percentage}%25-${coverage_color})"
+coverage_markdown_str="![Coverage](https://img.shields.io/badge/Coverage-${coverage_percentage}%25-${coverage_color})"
 echo "Coverage badge: $coverage_markdown_str"
 
 # Get the mypy error count
@@ -41,7 +41,7 @@ echo "Mypy color: $mypy_color"
 
 # Build the URL for mypy badge
 mypy_message="${error_count}%20errors"
-mypy_badge_url="https://img.shields.io/badge/mypy-${mypy_message}-${mypy_color}"
+mypy_badge_url="https://img.shields.io/badge/Mypy-${mypy_message}-${mypy_color}"
 mypy_markdown_str="![Mypy](${mypy_badge_url})"
 echo "Mypy badge: $mypy_markdown_str"
 
