@@ -1,5 +1,5 @@
-import os
 import datetime
+import os
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Tuple
 
@@ -103,8 +103,9 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
-    def __init__(self, metadata_prefix: str = "") -> None:
+    def __init__(self, metadata_prefix: str = "", time=None) -> None:
         self.metadata_prefix = metadata_prefix
+        self.time = time
 
     def generate_graph(
         self,
