@@ -64,7 +64,7 @@
             "saturated_hydraulic_conductivity": 20,
             "initial_temperature": 13.38623,
             "bulk_density": 1.3,
-            "organic_carbon_fraction": 0.12,
+            "organic_carbon_fraction": 0.012,
             "clay_fraction": 0.20,
             "silt_fraction": 0.65,
             "sand_fraction": 0.15,
