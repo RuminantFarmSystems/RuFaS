@@ -146,11 +146,20 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def pit_surface_area(self) -> float:
         """Calculate the surface area of the pit.
 
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
+
         Returns:
             The surface area of the pit, m^2.
 
         """
-        return self.pit_width * self.pit_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return (
+                self._current_pen.num_animals
+                * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+            )
+        else:
+            return 0
 
     @property
     def pit_volume(self) -> float:
@@ -174,14 +183,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The additional pit volume needed for precipitation, m^3.
 
         """
-        if self._current_pen is not None and self._current_pen.num_animals is not None:
-            return (
-                self._get_current_day_rainfall()
-                * self._current_pen.num_animals
-                * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
-            )
-        else:
-            return 0
+        return self._get_current_day_rainfall() * self.pit_surface_area
 
     @property
     def freeboard_volume(self):
