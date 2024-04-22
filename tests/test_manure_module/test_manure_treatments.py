@@ -2529,13 +2529,24 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=mock_manure_treatment_config,
     )
     mock_manure_handler_daily_output = mocker.MagicMock()
-    mock_manure_handler_daily_output.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
-    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = liquid_manure_total_volatile_solids = 35.0
+    mock_manure_handler_daily_output.liquid_manure_total_solids = 50.0
+    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = 35.0
     anaerobic_digestion._manure_handler_daily_output = mock_manure_handler_daily_output
 
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output.daily_final_manure_volume = daily_final_manure_volume = 100.0
     mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output
+
+    mock_manure_treatment_daily_input = mocker.MagicMock()
+    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = 35.0
+    mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids = (
+        liquid_manure_total_degradable_volatile_solids
+    ) = 31.5
+    mock_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids = (
+        liquid_manure_total_non_degradable_volatile_solids
+    ) = 3.5
+    mock_manure_treatment_daily_input.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
+    anaerobic_digestion._current_manure_treatment_daily_input = mock_manure_treatment_daily_input
 
     moisture_content = 0.5
     patch_for_calc_moisture_content = mocker.patch.object(
@@ -2569,7 +2580,16 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         return_value=biogas_energy_content,
     )
 
-    expected_biogas = methane_generation_volume * GasEmissionConstants.METHANE_DENSITY
+    expected_biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+    expected_VSd = liquid_manure_total_degradable_volatile_solids - (
+        expected_biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    )
+    expected_VSnd = liquid_manure_total_non_degradable_volatile_solids
+    expected_total_VS = expected_VSd + expected_VSnd
+    expected_total_solids = liquid_manure_total_solids - (
+        expected_biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    )
+
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
@@ -2592,7 +2612,9 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_specific_input_energy.assert_called_once_with(average_temperature_celsius, moisture_content)
     patch_for_calc_methane_volume_via_Chen_equation.assert_called_once_with(
-        manure_total_volatile_solids=liquid_manure_total_volatile_solids,
+        manure_total_degradable_volatile_solids=(
+            mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+        ),
         hydraulic_retention_time=hydraulic_retention_time,
     )
     patch_for_calc_biogas_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
@@ -2604,6 +2626,14 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     assert actual_anaerobic_digestion_daily_output.minimum_digester_volume == approx(expected_minimum_digester_volume)
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
     assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(methane_generation_volume)
+    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_volatile_solids == approx(expected_total_VS)
+    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_degradable_volatile_solids == approx(
+        expected_VSd
+    )
+    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(
+        expected_VSnd
+    )
+    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_solids == approx(expected_total_solids)
 
 
 @pytest.mark.parametrize(
