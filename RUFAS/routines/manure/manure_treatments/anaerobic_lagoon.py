@@ -369,10 +369,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         if self._current_pen is not None and self._current_pen.num_animals is not None:
-            return (
-                self._current_pen.num_animals
-                * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
-            )
+            return self._current_pen.num_animals * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
         else:
             return 0.0
 
