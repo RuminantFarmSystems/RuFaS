@@ -2057,13 +2057,18 @@ class InputManager:
                             record = self._create_record(nested_value, name)
                             records.append(record)
                         elif nested_value.get("type") == "array":
-                            records.extend(
-                                self._parse_metadata_properties(
-                                    nested_value,
-                                    prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key,
-                                    sep,
+                            if nested_value["properties"]["type"] in ["bool", "string", "number"]:
+                                name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
+                                record = self._create_record(nested_value, name)
+                                records.append(record)
+                            else:
+                                records.extend(
+                                    self._parse_metadata_properties(
+                                        nested_value,
+                                        prefix + sep + key if prefix else key,
+                                        sep,
+                                    )
                                 )
-                            )
                         elif nested_value.get("type") == "object":
                             records.extend(
                                 self._parse_metadata_properties(
