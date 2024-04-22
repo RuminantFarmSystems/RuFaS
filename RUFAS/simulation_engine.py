@@ -66,7 +66,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.day_counter)
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.day_counter)
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -76,11 +76,12 @@ class SimulationEngine:
             "type": MeasurementUnits.UNITLESS.value,
             "amount": MeasurementUnits.KILOGRAMS.value,
         }
-        om.add_variable(
-            "available_feeds_on_final_day",
-            available_feeds_on_final_day,
-            dict(info_map, **{"units": available_feeds_units}),
-        )
+        for available_feed in available_feeds_on_final_day:
+            om.add_variable(
+                "available_feeds_on_final_day",
+                available_feed,
+                dict(info_map, **{"units": available_feeds_units}),
+            )
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
