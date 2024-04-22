@@ -174,22 +174,37 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: git checkout ${{ github.head_ref }}
 
-      - name: Set color and status for Flake8, Pytest badge
-        id: flake8_pytest_status
+      - name: Set color and status for Flake8 badge
+        id: flake8_status
         run: |
-          if [ ${{ steps.flake8.outcome }} == 'success' ] && [ ${{ steps.coverage.outcome }} == 'success' ]; then
-            echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
-            echo "badge_status=passed" >> $GITHUB_OUTPUT
+          if [ ${{ steps.flake8.outcome }} == 'success' ] ; then
+            echo "flake8_badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "flake8_badge_status=passed" >> $GITHUB_OUTPUT
           else
-            echo "badge_color=red" >> $GITHUB_OUTPUT
-            echo "badge_status=failed" >> $GITHUB_OUTPUT
+            echo "flake8_badge_color=red" >> $GITHUB_OUTPUT
+            echo "flake8_badge_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set color and status for Pytest badge
+        id: pytest_status
+        run: |
+          if [ ${{ steps.coverage.outcome }} == 'success' ]; then
+            echo "pytest_badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "pytest_badge_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "pytest_badge_color=red" >> $GITHUB_OUTPUT
+            echo "pytest_badge_status=failed" >> $GITHUB_OUTPUT
           fi
 
       - name: Update Badges
         run: |
-          badge_url="https://img.shields.io/badge/Flake8,%20Pytest-${{ steps.flake8_pytest_status.outputs.badge_status }}-${{ steps.flake8_pytest_status.outputs.badge_color }}"
-          badge_markdown_str="[![Flake8, Pytest](${badge_url})]"
-          sed -i "s|\[\!\[Flake8, Pytest\]\(.*\)\]|${badge_markdown_str}|" ./README.md
+          flake8_badge_url="https://img.shields.io/badge/Flake8-${{ steps.flake8_status.outputs.flake8_badge_status }}-${{ steps.flake8_status.outputs.flake8_badge_color }}"
+          flake8_badge_markdown_str="[![Flake8](${badge_url})]"
+          sed -i "s|\[\!\[Flake8\]\(.*\)\]|${flake8_badge_markdown_str}|" ./README.md
+          
+          pytest_badge_url="https://img.shields.io/badge/Pytest-${{ steps.pytest_status.outputs.pytest_badge_status }}-${{ steps.pytest_status.outputs.pytest_badge_color }}"
+          pytest_badge_markdown_str="[![Pytest](${pytest_badge_url})]"
+          sed -i "s|\[\!\[Pytest\]\(.*\)\]|${pytest_badge_markdown_str}|" ./README.md
           
           chmod +x ./.github/workflows/update_coverage_mypy_badges.sh
           ./.github/workflows/update_coverage_mypy_badges.sh
