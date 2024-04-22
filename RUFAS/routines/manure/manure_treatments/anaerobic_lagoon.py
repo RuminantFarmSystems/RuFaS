@@ -359,7 +359,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         Calculate and return the surface area of the lagoon in square meters (m^2).
 
-        The surface area is calculated as the product of the lagoon's width and length.
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
 
         Returns
         -------
@@ -367,7 +368,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             Lagoon surface area in square meters (:math:`m^2`).
 
         """
-        return self.lagoon_width * self.lagoon_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return (
+                self._current_pen.num_animals
+                * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+            )
+        else:
+            return 0.0
 
     def _calc_modeled_lagoon_volume(self) -> float:
         """
