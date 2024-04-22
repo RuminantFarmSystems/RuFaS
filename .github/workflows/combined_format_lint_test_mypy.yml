@@ -31,7 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Update All Badges to Unknown at the Start
+      - name: Update All Badges to Unknown Initially
         run: |
           flake8_badge_url="https://img.shields.io/badge/Flake8-unknown-lightgrey"
           flake8_badge_markdown_str="[![Flake8](${flake8_badge_url})]"
@@ -49,7 +49,7 @@ jobs:
           mypy_badge_markdown_str="[![Mypy](${mypy_badge_url})]"
           sed -i "s|\[\!\[Mypy\]\(.*\)\]|${mypy_badge_markdown_str}|" ./README.md
 
-      - name: Commit & Push Badge Updates
+      - name: Commit & Push Initial Badge Updates
         uses: EndBug/add-and-commit@v7
         with:
           message: "Set all badges to unknown at the start"
