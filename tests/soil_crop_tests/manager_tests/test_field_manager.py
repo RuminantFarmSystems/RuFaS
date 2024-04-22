@@ -10,6 +10,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.field.manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -178,6 +179,28 @@ def test_annual_update_routine(fields: List[Field]):
         for field in fields:
             assert field.perform_annual_reset.call_count == 1
         assert fm.output_gatherer.send_annual_variables.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "animals", [True, False]
+)
+def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
+    """Tests that the correct manure supplier is provided for setting up Fields."""
+    mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
+    get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=animals)
+    add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
+    field_manager = FieldManager()
+
+    actual = field_manager._get_manure_supplier(mock_manure_manager)
+
+    get_data.assert_called_once_with("config.simulate_animals")
+    if animals:
+        assert actual == mock_manure_manager
+        add_log.assert_not_called()
+    else:
+        assert isinstance(actual, FieldManureSupplier)
+        add_log.assert_called_once()
 
 
 @pytest.mark.parametrize(
