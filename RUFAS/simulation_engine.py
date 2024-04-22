@@ -134,10 +134,10 @@ class SimulationEngine:
             "function": self._advance_time.__name__,
             "print_day": print_day,
         }
+        self.time.advance()
         if print_day:
             simulating_day_log = f"simulating day: {self.time.simulation_day}"
             om.add_log("simulation_day", simulating_day_log, info_map)
-        self.time.advance()
         self.animal_manager.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:

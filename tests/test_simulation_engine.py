@@ -262,12 +262,12 @@ def test_run_pre_annual_routines(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "print_day, initial_simulation_day, time_str_return_value, expected_simulation_day",
     [
-        (True, 0, "Day 1", 1),
-        (False, 0, "Day 1", 1),
-        (True, 10, "Day 11", 11),
-        (False, 10, "Day 11", 11),
-        (True, 365, "Day 366", 366),
-        (False, 365, "Day 366", 366),
+        (True, 0, "1", 1),
+        (False, 0, "1", 1),
+        (True, 10, "11", 11),
+        (False, 10, "11", 11),
+        (True, 365, "366", 366),
+        (False, 365, "366", 366),
     ],
 )
 def test_advance_time(
@@ -285,7 +285,7 @@ def test_advance_time(
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
     mock_time = mocker.MagicMock()
-    mock_time.__str__ = mocker.MagicMock(return_value=time_str_return_value)
+    mock_time.simulation_day = initial_simulation_day + 1
     simulation_engine.time = mock_time
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.animal_manager.simulation_day = initial_simulation_day
