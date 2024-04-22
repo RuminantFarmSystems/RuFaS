@@ -76,8 +76,8 @@ class SolublePhosphorus:
                 self.data.soil_layers[0].layer_thickness,
             )
             self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
-            self.data.soil_phosphorus_runoff = phosphorus_runoff * field_size
-            self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
+            self.data.soil_phosphorus_runoff = phosphorus_runoff
+            self.data.annual_soil_phosphorus_runoff += phosphorus_runoff
 
         for layer_index in range(len(self.data.soil_layers)):
             current_layer = self.data.soil_layers[layer_index]
