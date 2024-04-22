@@ -119,8 +119,16 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
          
       - name: Lint with flake8
+        id: flake8
         run: |
           flake8 .
+        continue-on-error: true
+
+      - name: Test with pytest
+        id: pytest
+        run: |
+          pytest
+        continue-on-error: true
 
       - name: Test coverage
         id: coverage
@@ -174,7 +182,7 @@ jobs:
       - name: Determine Flake8 and Pytest Status
         id: flake8_pytest_status
         run: |
-          if [ ${{ job.status }} == 'success' ]; then
+          if [ ${{ steps.flake8.outcome }} == 'success' ] && [ ${{ steps.pytest.outcome }} == 'success' ]; then
             echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
             echo "badge_status=passed" >> $GITHUB_OUTPUT
           else
@@ -198,6 +206,18 @@ jobs:
           add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
+
+      - name: Check for Flake8 Errors
+        if: ${{ steps.flake8.outcome == 'failure' }}
+        run: |
+          echo "Flake8 encountered errors. Please fix the linting errors and re-run the workflow."
+          exit 1
+
+      - name: Check for Pytest Errors
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: |
+          echo "Pytest encountered errors. Please fix the test failures and re-run the workflow."
+          exit 1
 
       - name: Comment on Coverage and Mypy Errors
         env:
