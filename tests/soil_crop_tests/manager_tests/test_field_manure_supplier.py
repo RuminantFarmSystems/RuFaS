@@ -47,7 +47,7 @@ from RUFAS.routines.field.manager.field_manure_supplier import FieldManureSuppli
                 total_manure_mass=36666.366957,
                 dry_matter_fraction=0.046000276,
             ),
-        )
+        ),
     ],
 )
 def test_request_nutrients(nutrients: NutrientRequest, expected_result: NutrientRequestResults) -> None:
