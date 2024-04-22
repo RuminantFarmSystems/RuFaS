@@ -47,7 +47,8 @@ class FieldManureSupplier:
         Notes
         -----
         This method calculates the total mass of manure that would be applied for each of the requested nutrients, then
-        selects the smallest mass and uses it to construct the amount of manure that is actually returned.
+        selects the smallest mass and uses it to construct the amount of manure that is actually returned. If one of the
+        requested nutrient masses is 0, that nutrient is not considered when formulating the manure result.
 
         """
         type_to_constants_map = {
@@ -67,7 +68,13 @@ class FieldManureSupplier:
 
         nitrogen_projected_mass = request.nitrogen * constants["nitrogen"]
         phosphorus_projected_mass = request.phosphorus * constants["phosphorus"]
-        min_dry_mass = min(nitrogen_projected_mass, phosphorus_projected_mass)
+
+        if nitrogen_projected_mass != 0.0 and phosphorus_projected_mass != 0.0:
+            min_dry_mass = min(nitrogen_projected_mass, phosphorus_projected_mass)
+        elif nitrogen_projected_mass == 0.0:
+            min_dry_mass = phosphorus_projected_mass
+        else:
+            min_dry_mass = nitrogen_projected_mass
 
         nitrogen_mass = min_dry_mass / constants["nitrogen"]
         phosphorus_mass = min_dry_mass / constants["phosphorus"]
