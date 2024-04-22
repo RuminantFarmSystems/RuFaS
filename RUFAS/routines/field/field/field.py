@@ -16,7 +16,7 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
-from RUFAS.routines.field.manager.field_manure_supplier import FieldManureSupplier
+from ..manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
@@ -64,7 +64,7 @@ class Field:
     manure_events : List[ManureEvent], default=None
         Manure application interface.
     manure_supplier : ManureManager | FieldManureSupplier, default=None
-        ManureManager Object to be used during simulation
+        Object that will to be used during simulation to get manure for field applications.
 
     Attributes
     ----------
@@ -163,11 +163,11 @@ class Field:
         if manure_supplier is None:
             om.add_error(
                 "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no Manure Manager, failing to "
+                f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
                 f"initialize.",
                 info_map,
             )
-            raise ValueError("Manure manager cannot be None.")
+            raise ValueError("Manure supplier cannot be None.")
 
         self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
 

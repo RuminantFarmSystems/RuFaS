@@ -75,7 +75,7 @@ def test_init(
     """Tests that Field initialization fails when passed invalid parameters."""
     with patch.object(om, "add_error") as add_error:
         if should_fail:
-            with pytest.raises(ValueError, match="Manure manager cannot be None."):
+            with pytest.raises(ValueError, match="Manure supplier cannot be None."):
                 Field(manure_supplier=manure_manager, feed_manager=feed_manager)
         else:
             Field(manure_supplier=manure_manager, feed_manager=feed_manager)
