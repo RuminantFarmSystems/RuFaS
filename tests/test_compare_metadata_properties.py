@@ -32,16 +32,14 @@ def test_compare_metadata_properties():
         with patch(
             "argparse.ArgumentParser.parse_args", return_value=MagicMock(file1="file1.json", file2="file2.json")
         ):
-            with patch("compare_metadata_properties.load_json", side_effect=[{"key": "value1"}, {"key": "value2",
-                                                                                                 "key2": "value3"}]):
+            with patch(
+                "compare_metadata_properties.load_json",
+                side_effect=[{"key": "value1"}, {"key": "value2", "key2": "value3"}],
+            ):
                 with patch("deepdiff.DeepDiff") as mock_deepdiff:
                     mock_deepdiff.return_value = {
-                        "dictionary_item_added": {
-                            "root['key2']": "value3"
-                        },
-                        "values_changed": {
-                            "root['key']": {"new_value": "value2", "old_value": "value1"}
-                        }
+                        "dictionary_item_added": {"root['key2']": "value3"},
+                        "values_changed": {"root['key']": {"new_value": "value2", "old_value": "value1"}},
                     }
                     with patch("pprint.pformat", return_value="diff_output"):
                         with patch("builtins.open", mock_open()) as mock_file:
