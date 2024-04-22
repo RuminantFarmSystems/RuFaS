@@ -50,13 +50,24 @@ def compare_metadata_properties() -> None:
 
     diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
 
-    formatted_diff = pformat(diff, indent=2)
-
     file_name = "diff_results_" + os.path.basename(str(args.file1)) + "_vs_" + os.path.basename(str(args.file2))
     try:
         with open(f"output/{file_name}.txt", "w") as file:
-            file.write(f"Comparing: '{str(args.file1)}' to '{str(args.file2)}'\n")
-            file.write(formatted_diff)
+            file.write(f"Comparing changes going from '{args.file1}' to '{args.file2}'\n\n")
+
+            if 'dictionary_item_added' in diff:
+                file.write("Items added:\n")
+                for key, value in diff['dictionary_item_added'].items():
+                    file.write(f"{key}: {value}\n")
+                file.write("\n")
+
+            if 'values_changed' in diff:
+                file.write("Values changed:\n")
+                for key, details in diff['values_changed'].items():
+                    new_value = details['new_value']
+                    old_value = details['old_value']
+                    file.write(f"{key}: {{'new_value': {new_value}, 'old_value': {old_value}}}\n")
+                file.write("\n")
     except FileNotFoundError:
         print(f"Error: The directory 'output' does not exist or {file_name}.txt cannot be accessed.")
     except PermissionError:
