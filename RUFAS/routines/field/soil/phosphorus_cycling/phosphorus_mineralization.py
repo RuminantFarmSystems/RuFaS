@@ -58,9 +58,9 @@ class PhosphorusMineralization:
                 field_size,
             )
             current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-                layer.percent_clay_content,
+                layer.clay_fraction,
                 soil_phosphorus_content,
-                layer.percent_organic_carbon_content,
+                layer.organic_carbon_fraction,
             )
             layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
                 layer.mean_phosphorus_sorption_parameter,
