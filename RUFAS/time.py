@@ -181,9 +181,19 @@ class Time:
         return actual_date
 
     def __str__(self) -> str:
-        return str(
-            {
-                "simulation_day": self.simulation_day,
-                "simulation_year_day": f"Year: {self.year}, Day: {self.day}",
-            }
-        )
+        return f"Year: {self.year}, Day: {self.day}. Simulation Day: {self.simulation_day}"
+
+    def to_dict(self) -> dict[str, str | int]:
+        """
+        Returns a dictionary representation of the Time object.
+
+        Returns
+        -------
+        dict[str, str | int]
+            A dictionary representation of the Time object.
+        """
+
+        return {
+            "simulation_day": self.simulation_day,
+            "simulation_year_day": f"Year: {self.year}, Day: {self.day}",
+        }

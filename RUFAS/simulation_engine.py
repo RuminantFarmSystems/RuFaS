@@ -68,7 +68,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.time.simulation_day)
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time.simulation_day)
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -92,7 +92,7 @@ class SimulationEngine:
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
         om.add_variable(
             "simulation_day_final_value",
-            str(self.time),
+            self.time.to_dict(),
             {
                 "class": self.__class__.__name__,
                 "function": self.simulate.__name__,
@@ -135,7 +135,7 @@ class SimulationEngine:
             "print_day": print_day,
         }
         if print_day:
-            simulating_day_log = f"simulating day: {self.time}"
+            simulating_day_log = f"simulating day: {self.time.simulation_day}"
             om.add_log("simulation_day", simulating_day_log, info_map)
         self.time.advance()
         self.animal_manager.simulation_day += 1
