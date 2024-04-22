@@ -24,7 +24,7 @@ from main import (
 
 
 @pytest.mark.parametrize(
-    "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
+    "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, audit_input_data,"
     "graphics_dir, vars_file_path, init_herd, save_animals, save_animals_path,"
     "terminate_simulation_post_herd_generation",
     [
@@ -112,7 +112,7 @@ def test_main(
     verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
-    only_run_validation: bool,
+    audit_input_data: bool,
     graphics_dir: str,
     vars_file_path: str,
     init_herd: bool,
@@ -130,7 +130,7 @@ def test_main(
             verbose=verbose,
             clear_output=clear_output,
             exclude_info_maps=exclude_info_maps,
-            only_run_validation=only_run_validation,
+            audit_input_data=audit_input_data,
             graphics_dir=graphics_dir,
             load_pool=vars_file_path,
             output_dir=output_dir,
@@ -152,7 +152,7 @@ def test_main(
                 verbose=verbose,
                 clear_output=clear_output,
                 exclude_info_maps=exclude_info_maps,
-                only_run_validation=only_run_validation,
+                audit_input_data=audit_input_data,
                 graphics_dir=Path(graphics_dir),
                 vars_file_path=Path(vars_file_path),
                 output_dir=Path(output_dir),
@@ -200,7 +200,7 @@ def test_main_exception_handling(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, audit_input_data,"
     "graphics_dir, load_pool, vars_file_path, init_herd, save_animals, save_animals_dir, "
     "terminate_simulation_post_herd_generation",
     [
@@ -482,7 +482,7 @@ def test_run_rufas(
     verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
-    only_run_validation: bool,
+    audit_input_data: bool,
     graphics_dir: Path,
     load_pool: bool,
     vars_file_path: Path,
@@ -513,7 +513,7 @@ def test_run_rufas(
         verbose,
         clear_output,
         exclude_info_maps,
-        only_run_validation,
+        audit_input_data,
         graphics_dir,
         vars_file_path,
         output_dir,
@@ -539,7 +539,7 @@ def test_run_rufas(
             csv_dir,
         )
         return
-    elif only_run_validation:
+    elif audit_input_data:
         patch_run_validation.assert_called_once_with(
             metadata_file_list,
             exclude_info_maps,
@@ -983,9 +983,9 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             action="store_true",
         ),
         mocker.call(
-            "-o",
-            "--only-run-validation",
-            help="Only validate the data, don't run a simulation",
+            "-a",
+            "--audit-input-data",
+            help="Validates the input data and generates a CSV of the metadata properties, doesn't run a simulation",
             action="store_true",
         ),
         mocker.call(
