@@ -187,8 +187,23 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: git checkout ${{ github.head_ref }}
 
-      - name: Update Coverage and Mypy Badges
+      - name: Determine Format and Test Status
+        id: format_test_status
         run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "badge_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "badge_color=red" >> $GITHUB_OUTPUT
+            echo "badge_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Badges
+        run: |
+          badge_url="https://img.shields.io/badge/Formatting%20and%20Testing-${{ steps.format_test_status.outputs.badge_status }}-${{ steps.format_test_status.outputs.badge_color }}"
+          badge_markdown_str="[![Formatting and Testing](${badge_url})](https://github.com/${{ github.repository }}/actions/workflows/combined_format_lint_test_mypy.yml)"
+          sed -i "s|\[\!\[Formatting and Testing\]\(.*\)\]|${badge_markdown_str}|" ./README.md
+          
           chmod +x ./.github/workflows/update_pytest_mypy_badges.sh
           ./.github/workflows/update_pytest_mypy_badges.sh
 

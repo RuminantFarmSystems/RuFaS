@@ -48,27 +48,3 @@ echo "Mypy badge: $mypy_markdown_str"
 # Update the coverage and mypy badges in README.md using sed
 sed -i "s|\[\!\[Coverage\]\(.*\)\]|\[${coverage_markdown_str}\]|" ./README.md
 sed -i "s|\[\!\[Mypy\]\(.*\)\]|\[${mypy_markdown_str}\]|" ./README.md
-
-combined_actions_yaml_file="combined_format_lint_test_mypy.yml"
-combined_actions_status=$(curl -s \
-  -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/RuminantFarmSystems/MASM/actions/workflows/${combined_actions_yaml_file}/runs \
-  | jq -r '.workflow_runs[0].conclusion')
-
-combined_actions_badge_color="orange"
-combined_actions_status_label="failed"
-
-echo "Combined actions status: $combined_actions_status"
-
-if [ "$combined_actions_status" == "Success" ]; then
-  combined_actions_badge_color="brightgreen"
-  combined_actions_status_label="passed"
-fi
-
-combined_actions_badge_url="https://img.shields.io/badge/Formatting%20and%20Testing-${combined_actions_status_label}-${combined_actions_badge_color}"
-combined_actions_markdown_str="![Formatting and Testing](${combined_actions_badge_url})"
-
-echo "Combined actions badge: $combined_actions_markdown_str"
-echo "Combined actions badge color: $combined_actions_badge_color"
-
-sed -i "s|^\[\!\[Formatting and Testing\(.*\)\]|\[${combined_actions_markdown_str}\]|" ./README.md
