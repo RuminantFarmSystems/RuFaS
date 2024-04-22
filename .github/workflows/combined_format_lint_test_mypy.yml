@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   format_code:
     runs-on: ubuntu-latest
@@ -27,8 +31,8 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
-      - id: files
-        name: Set up dependency for getting changed files
+      - name: Set up dependency for getting changed files
+        id: files
         uses: jitterbit/get-changed-files@v1
       
       - name: Get all added or modified files
@@ -50,6 +54,7 @@ jobs:
           )
           unauthorized_changes=false
           
+          # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
             if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
               unauthorized_changes=true
@@ -67,9 +72,6 @@ jobs:
       
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
@@ -81,7 +83,8 @@ jobs:
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
       
   
-  lint_test_type_check_unauthorized_changes:
+  lint_test_type_check:
+    name: Lint, Test, Coverage, and Type Checking
     needs: format_code
     runs-on: ubuntu-latest
     steps:
@@ -94,9 +97,8 @@ jobs:
       - name: Fetch latest commit SHA
         id: fetch-latest-sha
         run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          echo "Branch name: $BRANCH_NAME"
-          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
+          echo "Branch name: ${{ env.BRANCH_NAME }}"
+          LATEST_SHA=$(git rev-parse origin/"${{ env.BRANCH_NAME }}")
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
           echo "::set-output name=sha::$LATEST_SHA"
@@ -117,8 +119,16 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
          
       - name: Lint with flake8
+        id: flake8
         run: |
           flake8 .
+        continue-on-error: true
+
+      - name: Test with pytest
+        id: pytest
+        run: |
+          pytest
+        continue-on-error: true
 
       - name: Test coverage
         id: coverage
@@ -169,27 +179,51 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: git checkout ${{ github.head_ref }}
 
-      - name: Update Coverage and Mypy Badges
+      - name: Determine Flake8 and Pytest Status
+        id: flake8_pytest_status
         run: |
-          chmod +x ./.github/workflows/update_badge.sh
-          chmod +x ./.github/workflows/update_mypy_badge.sh
-          ./.github/workflows/update_badge.sh
-          ./.github/workflows/update_mypy_badge.sh $(cat mypy_current_branch_error_count.txt)
+          if [ ${{ steps.flake8.outcome }} == 'success' ] && [ ${{ steps.pytest.outcome }} == 'success' ]; then
+            echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "badge_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "badge_color=red" >> $GITHUB_OUTPUT
+            echo "badge_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Badges
+        run: |
+          badge_url="https://img.shields.io/badge/Flake8,%20Pytest-${{ steps.flake8_pytest_status.outputs.badge_status }}-${{ steps.flake8_pytest_status.outputs.badge_color }}"
+          badge_markdown_str="[![Flake8, Pytest](${badge_url})]"
+          sed -i "s|\[\!\[Flake8, Pytest\]\(.*\)\]|${badge_markdown_str}|" ./README.md
+          
+          chmod +x ./.github/workflows/update_pytest_mypy_badges.sh
+          ./.github/workflows/update_pytest_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
         uses: EndBug/add-and-commit@v7
         with:
-          message: "Update coverage and mypy badges on README"
-          add: "README.md .github/badges/"
+          message: "Update badges on README"
+          add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
+
+      - name: Check for Flake8 Errors
+        if: ${{ steps.flake8.outcome == 'failure' }}
+        run: |
+          echo "Flake8 encountered errors. Please fix the linting errors and re-run the workflow."
+          exit 1
+
+      - name: Check for Pytest Errors
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: |
+          echo "Pytest encountered errors. Please fix the test failures and re-run the workflow."
+          exit 1
 
       - name: Comment on Coverage and Mypy Errors
         env:
           URL: ${{ github.event.pull_request.comments_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          MY_ERROR_COUNT=$(cat mypy_current_branch_error_count.txt)
+          MY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
           MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
@@ -198,12 +232,12 @@ jobs:
             MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
             DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
             if [ $DIFF -gt 0 ]; then
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF more errors on ${{ github.head_ref }} branch"
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
             elif [ $DIFF -lt 0 ]; then
               DIFF=$((DIFF * -1))
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: $DIFF fewer errors on ${{ github.head_ref }} branch"
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF fewer errors on ${{ github.head_ref }} branch"
             else
-              MYPY_ERRORS="$MYPY_ERRORS\nDifference: No difference in error counts"
+              MYPY_ERRORS="$MYPY_ERRORS\nNo difference in error counts"
             fi
             echo "$MYPY_ERRORS"
             COMMIT_MESSAGE="$PYTEST_COVERAGE\n\n$MYPY_ERRORS"
@@ -212,6 +246,6 @@ jobs:
               -X POST \
               $URL \
               -H "Content-Type: application/json" \
-              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
