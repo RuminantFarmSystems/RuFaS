@@ -1312,14 +1312,13 @@ def test_slurry_storage_outdoor_wastewater_volume(mocker: MockFixture) -> None:
     assert actual_wastewater_volume == 0.0
 
 
-@pytest.mark.parametrize("storage_time_period, expected_treatment_volume", [
-    (120, 100.0 * 120),
-    (None, 0.0),
-    (120.5, 0.0),
-    ("one hundred twenty", 0.0)
-])
-def test_slurry_storage_outdoor_treatment_volume(mocker: MockFixture, storage_time_period: Any,
-                                                 expected_treatment_volume: float) -> None:
+@pytest.mark.parametrize(
+    "storage_time_period, expected_treatment_volume",
+    [(120, 100.0 * 120), (None, 0.0), (120.5, 0.0), ("one hundred twenty", 0.0)],
+)
+def test_slurry_storage_outdoor_treatment_volume(
+    mocker: MockFixture, storage_time_period: Any, expected_treatment_volume: float
+) -> None:
     """Unit test for treatment_volume property in slurry_storage_outdoor.py."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
@@ -1555,8 +1554,9 @@ def test_slurry_storage_outdoor_pit_surface_area(mocker: MockFixture) -> None:
     )
 
     current_pen = mocker.MagicMock(num_animals=100)
-    mocker.patch.object(slurry_storage_outdoor, '_current_pen',
-                        new_callable=mocker.PropertyMock, return_value=current_pen)
+    mocker.patch.object(
+        slurry_storage_outdoor, "_current_pen", new_callable=mocker.PropertyMock, return_value=current_pen
+    )
 
     expected_area_per_animal = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
     expected_pit_surface_area = 100 * expected_area_per_animal
@@ -1966,10 +1966,9 @@ def test_sludge_accumulation_volume_property(mocker: MockFixture) -> None:
     assert actual_sludge_accumulation_volume == expected_sludge_accumulation_volume
 
 
-@pytest.mark.parametrize("daily_output, expected_flushing_volume", [
-    (MagicMock(cleaning_water_volume=10.0), 10.0),
-    (None, 0.0)
-])
+@pytest.mark.parametrize(
+    "daily_output, expected_flushing_volume", [(MagicMock(cleaning_water_volume=10.0), 10.0), (None, 0.0)]
+)
 def test_flushing_volume_property(mocker: MockFixture, daily_output, expected_flushing_volume: float) -> None:
     """Unit test for flushing_volume property in anaerobic_lagoon.py."""
     # Arrange
@@ -2249,8 +2248,7 @@ def test_anaerobic_lagoon_surface_area(mocker: MockFixture) -> None:
         manure_treatment_config=mocker.MagicMock(),
     )
     current_pen = mocker.MagicMock(num_animals=100)
-    mocker.patch.object(anaerobic_lagoon, '_current_pen',
-                        new_callable=mocker.PropertyMock, return_value=current_pen)
+    mocker.patch.object(anaerobic_lagoon, "_current_pen", new_callable=mocker.PropertyMock, return_value=current_pen)
 
     expected_area_per_animal = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
     expected_lagoon_surface_area = 100 * expected_area_per_animal
