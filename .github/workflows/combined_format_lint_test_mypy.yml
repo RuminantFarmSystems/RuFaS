@@ -199,7 +199,7 @@ jobs:
       - name: Update Badges
         run: |
           flake8_badge_url="https://img.shields.io/badge/Flake8-${{ steps.flake8_status.outputs.flake8_badge_status }}-${{ steps.flake8_status.outputs.flake8_badge_color }}"
-          flake8_badge_markdown_str="[![Flake8](${badge_url})]"
+          flake8_badge_markdown_str="[![Flake8](${flake8_badge_url})]"
           sed -i "s|\[\!\[Flake8\]\(.*\)\]|${flake8_badge_markdown_str}|" ./README.md
           
           pytest_badge_url="https://img.shields.io/badge/Pytest-${{ steps.pytest_status.outputs.pytest_badge_status }}-${{ steps.pytest_status.outputs.pytest_badge_color }}"
