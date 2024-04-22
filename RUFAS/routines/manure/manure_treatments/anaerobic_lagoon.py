@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -208,7 +209,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        return current_day_final_manure_volume + self.precipitation_volume
+        if self.config.manure_cover in [ManureCoverEnum.NO_COVER.value, ManureCoverEnum.CRUST.value]:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -227,7 +231,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             Flushing water volume, m^3
 
         """
-        return self._manure_handler_daily_output.cleaning_water_volume
+        if self._manure_handler_daily_output:
+            return self._manure_handler_daily_output.cleaning_water_volume
+        else:
+            return 0.0
 
     @property
     def volume_needed(self):
@@ -352,7 +359,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         Calculate and return the surface area of the lagoon in square meters (m^2).
 
-        The surface area is calculated as the product of the lagoon's width and length.
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
 
         Returns
         -------
@@ -360,7 +368,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             Lagoon surface area in square meters (:math:`m^2`).
 
         """
-        return self.lagoon_width * self.lagoon_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return (
+                self._current_pen.num_animals
+                * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+            )
+        else:
+            return 0.0
 
     def _calc_modeled_lagoon_volume(self) -> float:
         """
