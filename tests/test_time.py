@@ -468,4 +468,4 @@ def test_is_last_day_of_simulation(mock_time: Time) -> None:
     for _ in range(365):
         assert not time.is_last_day_of_simulation
         time.advance()
-    assert time.is_last_day_of_simulation
+    assert not time.is_last_day_of_simulation

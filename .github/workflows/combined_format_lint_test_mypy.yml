@@ -124,12 +124,6 @@ jobs:
           flake8 .
         continue-on-error: true
 
-      - name: Test with pytest
-        id: pytest
-        run: |
-          pytest
-        continue-on-error: true
-
       - name: Test coverage
         id: coverage
         run: |
@@ -138,6 +132,7 @@ jobs:
           coverage json --rcfile=.github/.coveragerc
           echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> $GITHUB_OUTPUT
           echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)"
+        continue-on-error: true
 
       - name: Run mypy on the current branch
         run: |
@@ -179,10 +174,10 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: git checkout ${{ github.head_ref }}
 
-      - name: Determine Flake8 and Pytest Status
+      - name: Set color and status for Flake8, Pytest badge
         id: flake8_pytest_status
         run: |
-          if [ ${{ steps.flake8.outcome }} == 'success' ] && [ ${{ steps.pytest.outcome }} == 'success' ]; then
+          if [ ${{ steps.flake8.outcome }} == 'success' ] && [ ${{ steps.coverage.outcome }} == 'success' ]; then
             echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
             echo "badge_status=passed" >> $GITHUB_OUTPUT
           else
@@ -214,7 +209,7 @@ jobs:
           exit 1
 
       - name: Check for Pytest Errors
-        if: ${{ steps.pytest.outcome == 'failure' }}
+        if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
           echo "Pytest encountered errors. Please fix the test failures and re-run the workflow."
           exit 1
