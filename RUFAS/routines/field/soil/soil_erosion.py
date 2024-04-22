@@ -169,7 +169,7 @@ class SoilErosion:
 
         """
         if silt_fraction == 0 and clay_fraction == 0:
-            raise ValueError("Cannot have percent silt content and percent clay content both be 0")
+            raise ValueError("Cannot have fractions of silt and clay in the soil both be 0")
         return (silt_fraction / ((clay_fraction) + (silt_fraction))) ** 0.3
 
     @staticmethod
