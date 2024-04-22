@@ -98,15 +98,15 @@ def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
         ],
         [],
@@ -148,15 +148,15 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
         ],
         [],
