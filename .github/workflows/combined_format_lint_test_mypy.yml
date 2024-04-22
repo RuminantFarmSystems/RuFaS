@@ -77,6 +77,8 @@ jobs:
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         run: |
+          python -m venv venv
+          source venv/bin/activate
           black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
