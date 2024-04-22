@@ -187,8 +187,8 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: git checkout ${{ github.head_ref }}
 
-      - name: Determine Format and Test Status
-        id: format_test_status
+      - name: Determine Flake8 and Pytest Status
+        id: flake8_pytest_status
         run: |
           if [ ${{ job.status }} == 'success' ]; then
             echo "badge_color=brightgreen" >> $GITHUB_OUTPUT
@@ -200,9 +200,9 @@ jobs:
 
       - name: Update Badges
         run: |
-          badge_url="https://img.shields.io/badge/Formatting%20and%20Testing-${{ steps.format_test_status.outputs.badge_status }}-${{ steps.format_test_status.outputs.badge_color }}"
-          badge_markdown_str="[![Formatting and Testing](${badge_url})]"
-          sed -i "s|\[\!\[Formatting and Testing\]\(.*\)\]|${badge_markdown_str}|" ./README.md
+          badge_url="https://img.shields.io/badge/Flake8,%20Pytest-${{ steps.flake8_pytest_status.outputs.badge_status }}-${{ steps.flake8_pytest_status.outputs.badge_color }}"
+          badge_markdown_str="[![Flake8, Pytest](${badge_url})]"
+          sed -i "s|\[\!\[Flake8, Pytest\]\(.*\)\]|${badge_markdown_str}|" ./README.md
           
           chmod +x ./.github/workflows/update_pytest_mypy_badges.sh
           ./.github/workflows/update_pytest_mypy_badges.sh
@@ -210,7 +210,7 @@ jobs:
       - name: Commit & Push Badge Updates
         uses: EndBug/add-and-commit@v7
         with:
-          message: "Update coverage and mypy badges on README"
+          message: "Update badges on README"
           add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
