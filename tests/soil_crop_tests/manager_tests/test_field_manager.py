@@ -182,9 +182,7 @@ def test_annual_update_routine(fields: List[Field]):
         assert fm.output_gatherer.send_annual_variables.call_count == 1
 
 
-@pytest.mark.parametrize(
-    "animals", [True, False]
-)
+@pytest.mark.parametrize("animals", [True, False])
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
