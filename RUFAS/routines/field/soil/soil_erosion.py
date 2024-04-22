@@ -226,7 +226,7 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.9
 
         """
-        not_sand_fraction = 1 - (sand_fraction)
+        not_sand_fraction = 1 - sand_fraction
         return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 * not_sand_fraction)))
 
     @staticmethod
