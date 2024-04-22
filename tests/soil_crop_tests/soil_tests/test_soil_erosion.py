@@ -203,7 +203,7 @@ def test_determine_topographic_factor(length: float, avg_slope: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "percent_rock",
+    "rock_fraction",
     [
         0,
         0.005,
@@ -213,10 +213,10 @@ def test_determine_topographic_factor(length: float, avg_slope: float) -> None:
         0.010495492330,
     ],
 )
-def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
+def test_determine_coarse_fragment_factor(rock_fraction: float) -> None:
     """Tests _determine_coarse_fragment_factor() in soil_erosion.py"""
-    observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
-    expect = exp((-0.053) * percent_rock * 100)
+    observe = SoilErosion._determine_coarse_fragment_factor(rock_fraction)
+    expect = exp((-0.053) * rock_fraction * 100)
     assert observe == expect
 
 

@@ -4703,7 +4703,7 @@
           "description": "Fraction of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.12
+          "default": 0.012
         },
         "clay_fraction": {
           "type": "number",
