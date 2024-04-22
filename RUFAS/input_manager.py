@@ -16,6 +16,11 @@ om = OutputManager()
 
 ADDRESS_TO_INPUTS = "files"
 
+"""
+Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
+"""
+FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
+
 
 class Modifiability(Enum):
     """
@@ -870,8 +875,7 @@ class InputManager:
             called_during_initialization,
         )
 
-        fixable_data_types = ["string", "number", "bool"]
-        if data_type not in fixable_data_types:
+        if data_type not in FIXABLE_INPUT_DATA_TYPES:
             return is_valid
 
         if is_valid:
