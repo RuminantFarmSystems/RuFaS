@@ -205,13 +205,13 @@ jobs:
       - name: Check for Flake8 Errors
         if: ${{ steps.flake8.outcome == 'failure' }}
         run: |
-          echo "Flake8 encountered errors. Please fix the linting errors and re-run the workflow."
+          echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
           exit 1
 
       - name: Check for Pytest Errors
         if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
-          echo "Pytest encountered errors. Please fix the test failures and re-run the workflow."
+          echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
           exit 1
 
       - name: Comment on Coverage and Mypy Errors
