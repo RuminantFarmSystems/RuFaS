@@ -1,7 +1,7 @@
-from manure.manure_nutrients.nutrient_request import NutrientRequest
-from manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from manure.manure_treatments.manure_types import ManureType
-from output_manager import OutputManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
 
 
 """Factor for converting dry matter mass of liquid manure to wet mass."""
@@ -63,7 +63,7 @@ class FieldManureSupplier:
             },
         }
 
-        constants = type_to_constants_map[NutrientRequest.manure_type]
+        constants = type_to_constants_map[request.manure_type]
 
         nitrogen_projected_mass = request.nitrogen * constants["nitrogen"]
         phosphorus_projected_mass = request.phosphorus * constants["phosphorus"]
