@@ -203,8 +203,8 @@ def test_daily_update_routine(runoff: float, field_size: float) -> None:
     if runoff > 0:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_called_once_with(runoff, field_size, 3.4, 1.4, 20)
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (3.4 - 0.9 - 1.2)
-        assert incorp.data.annual_soil_phosphorus_runoff == (0.9 * field_size)
-        assert incorp.data.soil_phosphorus_runoff == (0.9 * field_size)
+        assert incorp.data.annual_soil_phosphorus_runoff == 0.9
+        assert incorp.data.soil_phosphorus_runoff == 0.9
     else:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_not_called()
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.2
