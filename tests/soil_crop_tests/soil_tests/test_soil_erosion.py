@@ -10,18 +10,18 @@ from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 @pytest.mark.parametrize(
     "sand,silt",
     [
-        (15, 65),
+        (0.15, 0.65),
         (0, 0),
-        (17, 60),
-        (9, 80),
-        (12.339485, 61.1938549),
-        (23.4958769, 58.1093485),
+        (0.17, 0.60),
+        (0.09, 0.80),
+        (0.12339485, 0.611938549),
+        (0.234958769, 0.581093485),
     ],
 )
 def test_determine_coarse_sand_factor(sand: float, silt: float) -> None:
     """Tests _determine_coarse_sand_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_coarse_sand_factor(sand, silt)
-    expect_exp_term = exp((-0.256) * sand * (1 - (silt / 100)))
+    expect_exp_term = exp((-0.256) * sand * 100 * (1 - (silt)))
     expect = 0.2 + 0.3 * expect_exp_term
     assert observe == expect
 
@@ -80,22 +80,22 @@ def test_determine_carbon_content_factor(carbon: float) -> None:
 @pytest.mark.parametrize(
     "sand",
     [
-        15,
+        0.15,
         0,
-        23.5869348,
-        35.1938403,
-        76.193850,
-        80.10039458,
-        12.9498602,
-        8.1019843912,
-        4.1938402,
+        0.235869348,
+        0.351938403,
+        0.76193850,
+        0.8010039458,
+        0.129498602,
+        0.81019843912,
+        0.41938402,
     ],
 )
 def test_determine_high_sand_factor(sand: float) -> None:
     """Tests _determine_high_sand_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_high_sand_factor(sand)
-    top_term = 0.7 * (1 - (sand / 100))
-    first_bottom_term = 1 - (sand / 100)
+    top_term = 0.7 * (1 - (sand))
+    first_bottom_term = 1 - (sand)
     second_bottom_term = exp(-5.51 + 22.9 * first_bottom_term)
     expect = 1 - (top_term / (first_bottom_term + second_bottom_term))
     assert observe == expect
@@ -203,20 +203,20 @@ def test_determine_topographic_factor(length: float, avg_slope: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "percent_rock",
+    "rock_fraction",
     [
         0,
-        0.5,
-        0.02194,
-        0.019493,
-        0.0492184949,
-        0.10495492330,
+        0.005,
+        0.002194,
+        0.0019493,
+        0.00492184949,
+        0.010495492330,
     ],
 )
-def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
+def test_determine_coarse_fragment_factor(rock_fraction: float) -> None:
     """Tests _determine_coarse_fragment_factor() in soil_erosion.py"""
-    observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
-    expect = exp((-0.053) * percent_rock)
+    observe = SoilErosion._determine_coarse_fragment_factor(rock_fraction)
+    expect = exp((-0.053) * rock_fraction * 100)
     assert observe == expect
 
 
