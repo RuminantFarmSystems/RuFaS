@@ -200,8 +200,10 @@ class SoilErosion:
         """
         return 1 - (
             (0.25 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)
-            / (organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
-               + exp(3.72 - (2.95 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)))
+            / (
+                organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+                + exp(3.72 - (2.95 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE))
+            )
         )
 
     @staticmethod
