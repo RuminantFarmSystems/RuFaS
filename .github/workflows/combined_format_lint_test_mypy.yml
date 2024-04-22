@@ -12,7 +12,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  checkout_and_install:
+  format_code:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,14 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-  format_code:
-    needs: checkout_and_install
-    runs-on: ubuntu-latest
-    steps:
       - name: Set up dependency for getting changed files
         id: files
         uses: jitterbit/get-changed-files@v1
-      
+
       - name: Get all added or modified files
         id: get_files
         run: |
@@ -50,7 +46,7 @@ jobs:
             tr " " "\n" |
             grep -E "^(?!.*\.py$).*"  |
             tr "\n" " ")" >> "$GITHUB_ENV"
-      
+
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
@@ -73,12 +69,10 @@ jobs:
           else
             echo "No unauthorized changes detected."
           fi
-      
+
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
         run: |
-          python -m venv venv
-          source venv/bin/activate
           black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -88,12 +82,18 @@ jobs:
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
       
-  
+
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
-    needs: [checkout_and_install, format_code]
+    needs: format_code
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
       - name: Fetch latest commit SHA
         id: fetch-latest-sha
         run: |
@@ -102,12 +102,22 @@ jobs:
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
           echo "::set-output name=sha::$LATEST_SHA"
-      
+
       - name: Checkout the latest commit
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.fetch-latest-sha.outputs.sha }}
-      
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+
       - name: Lint with flake8
         id: flake8
         run: |
