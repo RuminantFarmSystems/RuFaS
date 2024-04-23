@@ -116,14 +116,14 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     produce_graphics = True
 
     with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
-        expected_output = {
+        expected_output = [{
             "error": "Error plotting Example Graph data set",
             "message": "Unforeseen error Test Exception when trying to graph data.",
             "info_map": {
                 "class": graph_generator.__class__.__name__,
                 "function": "generate_graph",
             },
-        }
+        }]
 
         result = graph_generator.generate_graph(
             filtered_pool=filtered_pool,
@@ -197,7 +197,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, prepared_data.keys())
+    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()))
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
 
@@ -268,7 +268,8 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             [
                 {
                     "error": "Can't plot Test_6 data set",
-                    "message": "variable1 key contains data that is non-numerical and can't be graphed.",
+                    "message": "variable1 key contains non-numerical data that are {<class 'dict'>} and "
+                               "can't be graphed.",
                     "info_map": {
                         "class": "GraphGenerator",
                         "function": "_log_non_numerical_data",
