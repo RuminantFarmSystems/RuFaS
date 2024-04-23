@@ -47,6 +47,10 @@ class TaskType(Enum):
         except KeyError:
             raise ValueError(f"The string '{input_str}' is not a match with any acceptable TaskType.")
 
+    def is_multi_run(self) -> bool:
+        """returns True if the task type requires multiple simulation runs; otherwise false"""
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
+
 
 class TaskManager:
     def __init__(self):
@@ -67,7 +71,7 @@ class TaskManager:
             pass
 
     def _parse_input_tasks(self) -> None:
-        tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")  # TODO imeplement
+        tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             self.parsed_task_args.append(input_task)
@@ -77,7 +81,7 @@ class TaskManager:
         input_manager = InputManager()
         if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
             TaskManager.bar1(args, const_var, input_manager)
-        elif args["task_type"] == TaskType.HERD_INITIALIZATION:
+        elif args["task_type"] == TaskType.SENSITIVITY_ANALYSIS:
             TaskManager.bar2(args, const_var, input_manager)
         else:
             print("error")
@@ -85,7 +89,9 @@ class TaskManager:
     @staticmethod
     def bar1(args: Dict[str, Any], const_var: int, input_manager: InputManager) -> None:  # TODO remove
         print(f"bar 1 {args['task_type']=}, {const_var=}, {input_manager=}")
+        print(args['task_type'].is_multi_run())
 
     @staticmethod
     def bar2(args: Dict[str, Any], const_var: int, input_manager: InputManager) -> None:  # TODO remove
         print(f"bar 2 {args['task_type']=}, {const_var=}, {input_manager=}")
+        print(args['task_type'].is_multi_run())

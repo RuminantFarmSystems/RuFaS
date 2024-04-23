@@ -13,9 +13,16 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SIGNLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_VALIDATION|END_TO_END_TESTING|POST_PROCESSING"
+          "pattern": "HERD_INITIALIZATION|SIMULATION_SIGNLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_VALIDATION|END_TO_END_TESTING|POST_PROCESSING",
+          "description": "What kind of task is this?"
         },
-        "variable name style": {
+        "metadata_file_path": {
+          "type": "string",
+          "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
+          "description": "The path to the metadata JSON files to load and use in the Input Manager of this task",
+          "default": "input/metadata/default_metadata.json"
+        },
+        "variable_name_style": {
           "type": "string",
           "pattern": "block|inline|verbose|basic",
           "description": "The formatting option for variable_names.txt file",
@@ -35,38 +42,38 @@
           "type": "bool",
           "description": "Choose this flag if you want to save the generated herd data into a JSON file.",
           "default": false
-        },        
-        "save animals directory": {
+        },
+        "save_animals_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The saving directory for animals if save_animals is set to true",
           "default": "output/"
-        },        
-        "output directory": {
+        },
+        "output_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The saving directory for output",
           "default": "output/"
         },
-        "filters directory": {
+        "filters_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The directory for the files containing the output filters",
           "default": "output/output_filters/"
         },
-        "CSV directory": {
+        "CSV_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The directory for the csv output files to be saved",
           "default": "output/CSVs/"
         },
-        "graphics directory": {
+        "graphics_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The saving directory for graphics",
           "default": "output/graphics/"
         },
-        "output pool path": {
+        "output_pool_path": {
           "type": "string",
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
           "description": "The path to a JSON files to load the Output Manager's pool from for post processing",

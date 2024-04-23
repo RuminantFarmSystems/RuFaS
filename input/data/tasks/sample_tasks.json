@@ -2,10 +2,11 @@
   "parallel_workers": 4,
   "tasks": [
     {
-      "task_type": "SIMULATION_SIGNLE_RUN"
+      "task_type": "SIMULATION_SIGNLE_RUN",
+      "output pool path":"input/data/animal/default_animal.json"
     },
     {
-      "task_type": "HERD_INITIALIZATION"
+      "task_type": "SENSITIVITY_ANALYSIS"
     }
   ]
 }
