@@ -51,7 +51,7 @@ def main() -> None:
             save_animals=cmd_arguments.save_animals,
             save_animals_dir=Path(cmd_arguments.save_animals_dir),
             terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
-            manage_pool_size=cmd_arguments.manage_pool_size
+            manage_pool_size=cmd_arguments.manage_pool_size,
         )
     except Exception as e:
         info_map = {
@@ -95,7 +95,7 @@ def run_rufas(
     save_animals: bool,
     save_animals_dir: Path,
     terminate_simulation_post_herd_generation: bool,
-    manage_pool_size: List[str]
+    manage_pool_size: List[str],
 ) -> None:
     """
     Main function to run RuFaS, with options.
@@ -583,10 +583,10 @@ def parse_gnu_args() -> argparse.Namespace:
         "-m",
         "--manage_pool_size",
         help="Select this flag if you only want to dynamically dump the OutputManager pool when its size gets too "
-             "large. User can specify the upper bound percent usage of the available memory and the absolute memory"
-             "usage of the OutputManager pool in bytes.",
+        "large. User can specify the upper bound percent usage of the available memory and the absolute memory"
+        "usage of the OutputManager pool in bytes.",
         nargs=2,
-        required=False
+        required=False,
     )
 
     return parser.parse_args()
