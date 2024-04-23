@@ -207,14 +207,14 @@ def test_get_units_substr(
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"DISCLAIMER,var1,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0,{os.linesep}\"{DISCLAIMER_MESSAGE}\",True,"
-            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",test,{os.linesep}",
+            f'DISCLAIMER,var1,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0,{os.linesep}"{DISCLAIMER_MESSAGE}",True,'
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",test,{os.linesep}',
             True,
         ),
         (
             {"var1": {"values": [1.0, True, "test"]}},
-            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0{os.linesep}\"{DISCLAIMER_MESSAGE}\",True{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\",test{os.linesep}",
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep}"{DISCLAIMER_MESSAGE}",True{os.linesep}'
+            f'"{DISCLAIMER_MESSAGE}",test{os.linesep}',
             True,
         ),
         (
@@ -224,14 +224,14 @@ def test_get_units_substr(
                     "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
                 }
             },
-            f"DISCLAIMER,var1,var1.v{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,2"
-            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,3{os.linesep}",
+            f'DISCLAIMER,var1,var1.v{os.linesep}"{DISCLAIMER_MESSAGE}",1,1{os.linesep}"{DISCLAIMER_MESSAGE}",2,2'
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",3,3{os.linesep}',
             True,
         ),
         (
             {"var1": {"values": [1, 2, 3]}},
-            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\",3{os.linesep}",
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep}"{DISCLAIMER_MESSAGE}",2{os.linesep}'
+            f'"{DISCLAIMER_MESSAGE}",3{os.linesep}',
             True,
         ),
         (
@@ -241,8 +241,8 @@ def test_get_units_substr(
                     "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
                 }
             },
-            f"DISCLAIMER,var1,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,value1{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\",,value2{os.linesep}",
+            f'DISCLAIMER,var1,var1.map1{os.linesep}"{DISCLAIMER_MESSAGE}",1,value1{os.linesep}'
+            f'"{DISCLAIMER_MESSAGE}",,value2{os.linesep}',
             True,
         ),
         (
@@ -252,8 +252,8 @@ def test_get_units_substr(
                     "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
                 }
             },
-            f"DISCLAIMER,var1.v1,var1.v2,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1,value1{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\",2,2,value2{os.linesep}",
+            f'DISCLAIMER,var1.v1,var1.v2,var1.map1{os.linesep}"{DISCLAIMER_MESSAGE}",1,1,value1{os.linesep}'
+            f'"{DISCLAIMER_MESSAGE}",2,2,value2{os.linesep}',
             True,
         ),
         (
@@ -281,11 +281,11 @@ def test_get_units_substr(
                 }
             },
             f"DISCLAIMER,simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
-            f"simple_key.subkey3,simple_key.subkey4{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f'simple_key.subkey3,simple_key.subkey4{os.linesep}"{DISCLAIMER_MESSAGE}",'
             f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\","
+            f'"{DISCLAIMER_MESSAGE}",'
             f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
-            f"\"{DISCLAIMER_MESSAGE}\","
+            f'"{DISCLAIMER_MESSAGE}",'
             f'3,"[3, 3]",,,,{os.linesep}',
             True,
         ),
@@ -294,8 +294,8 @@ def test_get_units_substr(
                 "simple_key1": {"values": [1, 2, 3]},
                 "simple_key2": {"values": [4, 5, 6]},
             },
-            f"DISCLAIMER,simple_key1,simple_key2{os.linesep}\"{DISCLAIMER_MESSAGE}\","
-            f"1,4{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,5{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,6{os.linesep}",
+            f'DISCLAIMER,simple_key1,simple_key2{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'1,4{os.linesep}"{DISCLAIMER_MESSAGE}",2,5{os.linesep}"{DISCLAIMER_MESSAGE}",3,6{os.linesep}',
             True,
         ),
         (
@@ -318,11 +318,11 @@ def test_get_units_substr(
                 },
             },
             f"DISCLAIMER,simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
-            f"simple_key2.subkey1{os.linesep}\"{DISCLAIMER_MESSAGE}\","
-            f"1,Farm,Field,4,Tractor{os.linesep}\"{DISCLAIMER_MESSAGE}\","
-            f"2,,,5,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
-            f"3,,,6,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
-            f",,,8,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f'simple_key2.subkey1{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'1,Farm,Field,4,Tractor{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'2,,,5,{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'3,,,6,{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f',,,8,{os.linesep}"{DISCLAIMER_MESSAGE}",'
             f",,,9,{os.linesep}",
             True,
         ),

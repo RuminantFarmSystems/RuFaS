@@ -682,7 +682,7 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
-        df.insert(loc=0, column='DISCLAIMER', value=DISCLAIMER_MESSAGE)
+        df.insert(loc=0, column="DISCLAIMER", value=DISCLAIMER_MESSAGE)
         print(df)
         df.to_csv(path, index=False)
 
