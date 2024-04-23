@@ -22,6 +22,11 @@
           "description": "The path to the metadata JSON files to load and use in the Input Manager of this task",
           "default": "input/metadata/default_metadata.json"
         },
+        "output_prefix": {
+          "type": "string",
+          "description": "Will be used to generate a name for each of the output files for this task.",
+          "default": "default_scenario"
+        },
         "variable_name_style": {
           "type": "string",
           "pattern": "block|inline|verbose|basic",
