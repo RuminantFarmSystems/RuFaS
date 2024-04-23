@@ -283,33 +283,36 @@ class RationManager:
             )
         fail_summary_units = {
             "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
-            "reattempt number": MeasurementUnits.UNITLESS.value,
+            "reattempt_number": MeasurementUnits.UNITLESS.value,
             "constraints_failed_dict": MeasurementUnits.UNITLESS.value,
             "ration_attempted": MeasurementUnits.UNITLESS.value,
-            "pen requirements": {
-                "NEmaint_requirement": MeasurementUnits.MEGACALORIES.value,
-                "NEa_requirement": MeasurementUnits.MEGACALORIES.value,
-                "NEg_requirement": MeasurementUnits.MEGACALORIES.value,
-                "NEpreg_requirement": MeasurementUnits.MEGACALORIES.value,
-                "NEl_requirement": MeasurementUnits.MEGACALORIES.value,
-                "MP_requirement": MeasurementUnits.GRAMS.value,
-                "Ca_requirement": MeasurementUnits.GRAMS.value,
-                "P_req": MeasurementUnits.GRAMS.value,
-                "DMIest_requirement": MeasurementUnits.KILOGRAMS.value,
-                "avg_BW": MeasurementUnits.KILOGRAMS.value,
-                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS.value,
-            },
+            "NEmaint_requirement": MeasurementUnits.MEGACALORIES.value,
+            "NEa_requirement": MeasurementUnits.MEGACALORIES.value,
+            "NEg_requirement": MeasurementUnits.MEGACALORIES.value,
+            "NEpreg_requirement": MeasurementUnits.MEGACALORIES.value,
+            "NEl_requirement": MeasurementUnits.MEGACALORIES.value,
+            "MP_requirement": MeasurementUnits.GRAMS.value,
+            "Ca_requirement": MeasurementUnits.GRAMS.value,
+            "P_req": MeasurementUnits.GRAMS.value,
+            "DMIest_requirement": MeasurementUnits.KILOGRAMS.value,
+            "avg_BW": MeasurementUnits.KILOGRAMS.value,
+            "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS.value,
         }
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
             animal_list = list(pen.animals_in_pen.values())
+            if not animal_list or not animal_list[0].body_weight_history:
+                simulation_day = -1
+            else:
+                simulation_day = animal_list[0].body_weight_history[-1].simulation_day
+
             fail_summary = {
-                "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
-                "reattempt number": num_reattempts,
+                "simulation_day": simulation_day,
+                "reattempt_number": num_reattempts,
                 "constraints_failed_dict": constraints_failed_list,
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
-                "pen requirements": pen.avg_nutrient_rqmts,
+                **pen.avg_nutrient_rqmts,
             }
             om.add_variable(
                 f"failed_constraint_summary_for_pen_{pen.id}",
