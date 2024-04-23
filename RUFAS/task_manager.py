@@ -67,12 +67,10 @@ class TaskManager:
             pass
 
     def _parse_input_tasks(self) -> None:
-        tasks_from_input: Dict[str, Any] = self.input_manager.get_data("tasks.tasks")  # TODO imeplement
+        tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")  # TODO imeplement
         for input_task in tasks_from_input:
-            parsed_task_arg = {
-                "task_type": TaskType.from_string(input_task["task_type"]),
-            }
-            self.parsed_task_args.append(parsed_task_arg)
+            input_task["task_type"] = TaskType.from_string(input_task["task_type"])
+            self.parsed_task_args.append(input_task)
 
     @staticmethod
     def task(args: Dict[str, Any], const_var: int) -> None:  # TODO imeplement
