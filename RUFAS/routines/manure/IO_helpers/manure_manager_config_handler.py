@@ -41,7 +41,7 @@ class ManureManagerConfigHandler:
             The manure manager config dictionary that contains all the manure manager config information.
 
         """
-        self.custom_bedding_configs = self._process_bedding_configs(manure_manager_config["bedding_configs"])
+        self.bedding_configs = self._process_bedding_configs(manure_manager_config["bedding_configs"])
         self.manure_handler_configs = self._process_manure_handler_configs(
             manure_manager_config["manure_handler_configs"]
         )
@@ -52,21 +52,28 @@ class ManureManagerConfigHandler:
             manure_manager_config["manure_treatment_configs"]
         )
 
-    def get_custom_bedding_config(self, bedding_type_name: str) -> Optional[BeddingConfig]:
-        """Returns the custom bedding config for the given bedding type name, or None if no custom config exists.
+    def get_bedding_config(self, bedding_name: str) -> BeddingConfig:
+        """Returns the bedding config for the given bedding type name.
 
         Parameters
         ----------
-        bedding_type_name : str
-            The name of the bedding type for which to get the custom config.
+        bedding_name : str
+            The name of the bedding configuration for which to get the config.
 
         Returns
         -------
-        Optional[BeddingConfig]
+        BeddingConfig
             The custom bedding config for the given bedding type name, or None if no custom config exists.
 
         """
-        return self.custom_bedding_configs.get(BeddingType.get_type(bedding_type_name), None)
+        try:
+            return self.bedding_configs[bedding_name]
+        except KeyError:
+            info_map = {"class": self.__class__.__name__, "function": self.get_bedding_config.__name__}
+            error_title = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'."
+            error_message = "Raising ValueError."
+            om.add_error(error_title, error_message, info_map)
+            raise KeyError(error_title)
 
     def get_manure_handler_config(self, manure_handler_type_name: str) -> ManureHandlerConfig:
         """Returns the manure handler config for the given manure handler type name.
@@ -140,28 +147,34 @@ class ManureManagerConfigHandler:
         return self.custom_manure_treatment_configs.get(ManureTreatmentType.get_type(manure_treatment_type_name), None)
 
     @classmethod
-    def _process_bedding_configs(cls, bedding_json_configs: List[Dict]) -> Dict[BeddingType, BeddingConfig]:
-        """Returns a dictionary of bedding config objects, with the key being the bedding type.
+    def _process_bedding_configs(cls, bedding_configs: List[Dict]) -> Dict[str, BeddingConfig]:
+        """
+        Creates a mapping of bedding configs to be used when setting up manure beddings.
 
         Parameters
         ----------
-        bedding_json_configs : List[Dict]
+        bedding_configs : List[Dict]
             A list of dictionaries containing the bedding config information.
 
         Returns
         -------
-        Dict[BeddingType, BeddingConfig]
+        Dict[str, BeddingConfig]
             A dictionary of bedding config objects, with the key being the bedding type.
 
         """
-        bedding_config_by_bedding_type: Dict[BeddingType, BeddingConfig] = {}
-        for json_bedding_config in bedding_json_configs:
-            bedding_type = BeddingType.get_type(json_bedding_config["bedding_type"])
-            del json_bedding_config["bedding_type"]
-            bedding_config_by_bedding_type[bedding_type] = BeddingConfig(
-                **json_bedding_config, bedding_type=bedding_type
-            )
-        return bedding_config_by_bedding_type
+        info_map = {"class": cls.__class__.__name__, "function": cls._process_bedding_configs.__name__}
+        available_bedding_configs: Dict[str, BeddingConfig] = {}
+        for config in bedding_configs:
+            bedding_name = config.pop("name")
+            if bedding_name in available_bedding_configs:
+                error_name = f"Bedding config '{bedding_name}' has multiple configurations."
+                error_message = "Raising ValueError."
+                om.add_error(error_name, error_message, info_map)
+                raise ValueError(f"Duplicate configurations for '{bedding_name}'.")
+            bedding_type = BeddingType(config["bedding_type"])
+            del config["bedding_type"]
+            available_bedding_configs[bedding_name] = BeddingConfig(**config, bedding_type=bedding_type)
+        return available_bedding_configs
 
     @classmethod
     def _process_manure_handler_configs(cls, manure_handler_configs: List[Dict]) -> Dict[str, ManureHandlerConfig]:
