@@ -626,6 +626,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         return_value=None,
     )
     manure_manager = ManureManager(
+        animal_manager=mock_animal_manager,
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
