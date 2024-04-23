@@ -4698,40 +4698,40 @@
           "maximum": 1.9,
           "default": 1.4
         },
-        "percent_organic_carbon_content": {
+        "organic_carbon_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
+          "description": "Fraction of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 1.2
+          "maximum": 1.0,
+          "default": 0.012
         },
-        "percent_clay_content": {
+        "clay_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
+          "description": "Fraction of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 22.5
+          "maximum": 1.0,
+          "default": 0.225
         },
-        "percent_silt_content": {
+        "silt_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
+          "description": "Fraction of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 62.5
+          "maximum": 1.0,
+          "default": 0.625
         },
-        "percent_sand_content": {
+        "sand_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
+          "description": "Fraction of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 12.5
+          "maximum": 1.0,
+          "default": 0.125
         },
-        "percent_rock_content": {
+        "rock_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
+          "description": "Fraction of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 1.3
+          "maximum": 1.0,
+          "default": 0.013
         },
         "initial_labile_inorganic_phosphorus_concentration": {
           "type": "number",
