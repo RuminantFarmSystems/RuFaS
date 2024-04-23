@@ -1737,7 +1737,8 @@ def test_anaerobic_lagoon_update_methane_emission(
 
     # Act
     actual_methane_emission, actual_methane_emission_from_VSd = anaerobic_lagoon._update_methane_emission(
-        mock_daily_output)
+        mock_daily_output
+    )
 
     # Assert
     # fmt: off
