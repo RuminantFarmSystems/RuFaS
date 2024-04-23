@@ -24,8 +24,9 @@ om = OutputManager()
 def test_process_bedding_configs(mocker: MockerFixture) -> None:
     """Unit test for the _process_bedding_configs() method in manure_manager_config_handler.py."""
     # Arrange
-    json_bedding_configs = [
+    bedding_configs = [
         {
+            "name": "sawdusty",
             "bedding_type": "sawdust",
             "bedding_mass_per_day": 1.97,
             "bedding_density": 250.0,
@@ -33,6 +34,7 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
             "bedding_cleaned_fraction": 1.0,
         },
         {
+            "name": "solids",
             "bedding_type": "manure solids",
             "bedding_mass_per_day": 2.50,
             "bedding_density": 400.0,
@@ -40,6 +42,7 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
             "bedding_cleaned_fraction": 1.0,
         },
         {
+            "name": "sand",
             "bedding_type": "sand",
             "bedding_mass_per_day": 25.0,
             "bedding_density": 1500.0,
@@ -48,11 +51,7 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
             "sand_removal_efficiency": 1.0,
         },
     ]
-
-    patch_for_bedding_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingType.get_type",
-        side_effect=[BeddingType.SAWDUST, BeddingType.MANURE_SOLIDS, BeddingType.SAND],
-    )
+    expected_bedding_config_keys = [config["name"] for config in bedding_configs]
 
     patch_for_bedding_config_init = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingConfig.__init__",
@@ -60,16 +59,9 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
     )
 
     # Act
-    actual_bedding_configs = ManureManagerConfigHandler._process_bedding_configs(json_bedding_configs)
+    actual_bedding_configs = ManureManagerConfigHandler._process_bedding_configs(bedding_configs)
 
     # Assert
-    assert len(actual_bedding_configs) == 3
-    assert patch_for_bedding_type_get_type.call_count == 3
-    assert patch_for_bedding_type_get_type.call_args_list == [
-        mocker.call("sawdust"),
-        mocker.call("manure solids"),
-        mocker.call("sand"),
-    ]
     assert patch_for_bedding_config_init.call_count == 3
     assert patch_for_bedding_config_init.call_args_list == [
         mocker.call(
@@ -95,9 +87,7 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
             bedding_type=BeddingType.SAND,
         ),
     ]
-    assert BeddingType.SAWDUST in actual_bedding_configs
-    assert BeddingType.MANURE_SOLIDS in actual_bedding_configs
-    assert BeddingType.SAND in actual_bedding_configs
+    assert list(actual_bedding_configs.keys()) == expected_bedding_config_keys
 
 
 def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
@@ -400,72 +390,50 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
     )
 
 
-def test_get_custom_bedding_config(mocker: MockerFixture) -> None:
-    """Unit test for _get_custom_bedding_config() in manure_manager_config_handler.py."""
-    # Case 1: Custom bedding config is provided
-
+def test_get_bedding_config(mocker: MockerFixture) -> None:
+    """Unit test for _get_bedding_config() in manure_manager_config_handler.py."""
     # Arrange
-    mock_bedding_type_name = "default"
-    mock_bedding_type = BeddingType.DEFAULT
-    patch_for_bedding_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingType.get_type",
-        return_value=mock_bedding_type,
-    )
+    mock_bedding_name = "default"
     mock_manure_manager_config = mocker.MagicMock()
     patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
         return_value=None,
     )
 
     manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
 
     mock_bedding_config = mocker.MagicMock()
-    mock_custom_bedding_configs = {mock_bedding_type: mock_bedding_config}
-    manure_manager_config_handler.custom_bedding_configs = mock_custom_bedding_configs
+    mock_bedding_configs = {mock_bedding_name: mock_bedding_config}
+    manure_manager_config_handler.bedding_configs = mock_bedding_configs
 
     # Act
-    actual_bedding_config = manure_manager_config_handler.get_custom_bedding_config(
-        bedding_type_name=mock_bedding_type_name
+    actual_bedding_config = manure_manager_config_handler.get_bedding_config(
+        bedding_name=mock_bedding_name
     )
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
         manure_manager_config=mock_manure_manager_config
     )
-    patch_for_bedding_type_get_type.assert_called_once_with(mock_bedding_type_name)
     assert actual_bedding_config == mock_bedding_config
 
-    # --------------------
 
-    # Case 2: There is no custom bedding config
-
-    mock_bedding_type_name = "default"
-    mock_bedding_type = BeddingType.DEFAULT
-    patch_for_bedding_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingType.get_type",
-        return_value=mock_bedding_type,
-    )
+def test_get_bedding_config_error(mocker: MockerFixture) -> None:
+    """Tests that error is properly raised in _get_bedding_config() when a config to get is not there."""
+    add_error = mocker.patch.object(om, "add_error")
     mock_manure_manager_config = mocker.MagicMock()
-    patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
+    mocker.patch(
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
         return_value=None,
     )
-
     manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
+    manure_manager_config_handler.bedding_configs = {}
+    expected_error_message = "Attempted to use a non-existent manure bedding configuration called 'not present'."
 
-    manure_manager_config_handler.custom_bedding_configs = {}
+    with pytest.raises(KeyError, match=expected_error_message):
+        manure_manager_config_handler.get_bedding_config("not present")
 
-    # Act
-    actual_bedding_config = manure_manager_config_handler.get_custom_bedding_config(
-        bedding_type_name=mock_bedding_type_name
-    )
-
-    # Assert
-    patch_for_manure_manager_config_handler_init.assert_called_once_with(
-        manure_manager_config=mock_manure_manager_config
-    )
-    patch_for_bedding_type_get_type.assert_called_once_with(mock_bedding_type_name)
-    assert actual_bedding_config is None
+    add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -590,10 +558,10 @@ def test_get_custom_manure_separator_config(mocker: MockerFixture) -> None:
 
     # --------------------
 
-    # Case 2: There is no custom bedding config
+    # Case 2: There is no custom separator config
 
     mock_manure_separator_type_name = "default"
-    mock_manure_separator_type = BeddingType.DEFAULT
+    mock_manure_separator_type = ManureSeparatorType.DEFAULT_SAND
     patch_for_manure_separator_type_get_type = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureSeparatorType.get_type",
         return_value=mock_manure_separator_type,
@@ -658,10 +626,10 @@ def test_get_custom_manure_treatment_config(mocker: MockerFixture) -> None:
 
     # --------------------
 
-    # Case 2: There is no custom bedding config
+    # Case 2: There is no custom treatment config
 
     mock_manure_treatment_type_name = "default"
-    mock_manure_treatment_type = BeddingType.DEFAULT
+    mock_manure_treatment_type = ManureTreatmentType.DEFAULT
     patch_for_manure_treatment_type_get_type = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureTreatmentType.get_type",
         return_value=mock_manure_treatment_type,
@@ -736,7 +704,7 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     patch_for_process_manure_handler_configs.assert_called_once_with(mock_manure_handler_json_configs)
     patch_for_process_manure_separator_configs.assert_called_once_with(mock_manure_separator_json_configs)
     patch_for_process_manure_treatment_configs.assert_called_once_with(mock_manure_treatment_json_configs)
-    assert manure_manager_config_handler.custom_bedding_configs == mock_custom_bedding_configs
+    assert manure_manager_config_handler.bedding_configs == mock_custom_bedding_configs
     assert manure_manager_config_handler.manure_handler_configs == mock_manure_handler_configs
     assert manure_manager_config_handler.custom_manure_separator_configs == mock_custom_manure_separator_configs
     assert manure_manager_config_handler.custom_manure_treatment_configs == mock_custom_manure_treatment_configs
