@@ -279,11 +279,28 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
                 }
             ],
         ),
+        (
+            {"variable1": {"values": "a"}},
+            {"title": "Test_6"},
+            ["ungraphable string"],
+            ["ungraphable string"],
+            [
+                {
+                    "error": "Can't plot Test_6 data set",
+                    "message": "variable1 key contains non-numerical data that are <class 'str'> and "
+                    "can't be graphed.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "_log_non_numerical_data",
+                    },
+                }
+            ],
+        ),
     ],
 )
 @patch("RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists")
 @patch("RUFAS.util.Utility.filter_dictionary")
-def test_prepare_plot_data_logic(
+def test_log_non_numerical_data(
     mock_filter_dict,
     mock_convert_list,
     filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
