@@ -2052,8 +2052,7 @@ class InputManager:
             if isinstance(value, dict):
                 for nested_key, nested_value in value.items():
                     if isinstance(nested_value, dict):
-                        is_primitive_type = self._check_property_type_primitive(nested_value)
-                        if is_primitive_type:
+                        if self._check_property_type_primitive(nested_value):
                             name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
                             nested_value["description"] = nested_value.get(
                                 "description",
@@ -2069,7 +2068,7 @@ class InputManager:
                                     sep,
                                 )
                             )
-                    elif value.get("type") in ["bool", "string", "number"]:
+                    elif self._check_property_type_primitive(value):
                         name = prefix + sep + key
                         record = self._create_record(value, name)
                         records.append(record)
@@ -2083,10 +2082,9 @@ class InputManager:
         if property.get("type") in ["bool", "string", "number"]:
             return True
         elif property.get("type") == "array":
-            if property["properties"]["type"] in ["bool", "string", "number"]:
+            if property.get("properties", {}).get("type") in ["bool", "string", "number"]:
                 return True
-        else:
-            return False
+        return False
 
     def _create_record(self, data_entry: Dict[str, Any], name: str) -> Dict[str, Any]:
         """Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.
