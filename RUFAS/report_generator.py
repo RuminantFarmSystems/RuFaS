@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Any, Callable
+from typing import Dict, List, Any, Callable, Collection
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
@@ -217,7 +217,7 @@ class ReportGenerator:
                 graph_event_log = self._prepare_report_data_to_be_graphed(
                     report_filter_data, filter_content, individual_report_name
                 )
-                event_logs.append(graph_event_log)
+                event_logs.extend(graph_event_log)
             elif not should_graph_report_data:
                 self.reports.update(report_filter_data)
                 report_filter_data = {}
@@ -282,7 +282,7 @@ class ReportGenerator:
 
     def _prepare_report_data_to_be_graphed(
         self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
-    ) -> Dict[str, str]:
+    ) -> List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]:
         """Prepare and send aggregated report data to Graph Generator to be graphed.
         Parameters
         ----------
