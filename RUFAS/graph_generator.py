@@ -178,11 +178,13 @@ class GraphGenerator:
             matplotlib.pyplot.close()
             return all_logs
         except Exception as e:
-            all_logs = [{
-                "error": f"Error plotting {graph_details.get('title')} data set",
-                "message": f"Unforeseen error {e} when trying to graph data.",
-                "info_map": info_map,
-            }]
+            all_logs = [
+                {
+                    "error": f"Error plotting {graph_details.get('title')} data set",
+                    "message": f"Unforeseen error {e} when trying to graph data.",
+                    "info_map": info_map,
+                }
+            ]
 
         return all_logs
 
@@ -264,14 +266,14 @@ class GraphGenerator:
         for key, value in filtered_pool.items():
             if isinstance(value["values"], list):
                 if non_numerical_data := [item for item in value["values"] if not isinstance(item, (int, float))]:
-                    non_numerical_data_types = set([
-                        type(non_numerical_item) for non_numerical_item in non_numerical_data
-                    ])
+                    non_numerical_data_types = set(
+                        [type(non_numerical_item) for non_numerical_item in non_numerical_data]
+                    )
                     log_pool.append(
                         {
                             "error": f"Can't plot {title} data set",
                             "message": f"{key} key contains non-numerical data that are {non_numerical_data_types} "
-                                       "and can't be graphed.",
+                            "and can't be graphed.",
                             "info_map": info_map,
                         }
                     )
@@ -280,7 +282,7 @@ class GraphGenerator:
                     {
                         "error": f"Can't plot {title} data set",
                         "message": f"{key} key contains non-numerical data that are {type(value['values'])} "
-                                   "and can't be graphed.",
+                        "and can't be graphed.",
                         "info_map": info_map,
                     }
                 )
