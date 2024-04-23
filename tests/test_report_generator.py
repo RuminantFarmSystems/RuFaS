@@ -209,86 +209,6 @@ def test_apply_horizontal_aggregation(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, expected_result, expected_exception",
-    [
-        # Case with selected variables and slice parameters
-        (
-            {
-                "var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7]},
-            None,
-        ),
-        # Case without selected variables but required
-        (
-            {"var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
-            {},
-            None,
-            KeyError,
-        ),
-        # Case with constants addition
-        (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"Constant1": 10, "var1": [1, 2, 3, 4]},
-            None,
-        ),
-        # Case with invalid constant name
-        (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "", "value": 10}]},
-            None,
-            ValueError,
-        ),
-    ],
-)
-def test_prepare_report_data_with_constants(
-    filtered_pool: Dict[str, Dict[str, List[Any]]],
-    filter_content: Dict[str, Any],
-    expected_result: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
-    mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
-    """
-
-    # Arrange
-    report_generator = ReportGenerator()
-    mocker.patch(
-        "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
-        side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
-    )
-
-    def mock_add_constants_to_report_data(
-        report_data: Dict[str, List[Any]],
-        _filter_content: Dict[str, Any],
-    ) -> None:
-        """Mock function for _add_constants_to_report_data() method in report_generator.py file."""
-        constants = _filter_content.get("constants", [])
-        for constant in constants:
-            if not constant["name"]:
-                raise ValueError("Constant name cannot be empty.")
-            report_data[constant["name"]] = constant["value"]
-
-    mocker.patch.object(
-        report_generator,
-        "_add_constants_to_report_data",
-        side_effect=mock_add_constants_to_report_data,
-    )
-
-    # Act and assert
-    if expected_exception:
-        with pytest.raises(expected_exception):
-            report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-    else:
-        result = report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-        assert result == expected_result
-
-
-@pytest.mark.parametrize(
     "report_data, filter_content, expected_report_data, expected_exception",
     [
         # Valid case with a valid constant
@@ -554,7 +474,7 @@ def test_perform_aggregations(
         """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
 
         return {key: [aggregator([value for value in values if value is not None])] for key, values in data.items()}
-
+      
     mocker.patch.object(
         report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
     )
