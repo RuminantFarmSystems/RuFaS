@@ -2052,28 +2052,16 @@ class InputManager:
             if isinstance(value, dict):
                 for nested_key, nested_value in value.items():
                     if isinstance(nested_value, dict):
-                        if nested_value.get("type") in ["bool", "string", "number"]:
+                        is_primitive_type = self._check_property_type_primitive(nested_value)
+                        if is_primitive_type:
                             name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
                             record = self._create_record(nested_value, name)
                             records.append(record)
-                        elif nested_value.get("type") == "array":
-                            if nested_value["properties"]["type"] in ["bool", "string", "number"]:
-                                name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
-                                record = self._create_record(nested_value, name)
-                                records.append(record)
-                            else:
-                                records.extend(
-                                    self._parse_metadata_properties(
-                                        nested_value,
-                                        prefix + sep + key if prefix else key,
-                                        sep,
-                                    )
-                                )
-                        elif nested_value.get("type") == "object":
+                        else:
                             records.extend(
                                 self._parse_metadata_properties(
                                     nested_value,
-                                    prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key,
+                                    prefix + sep + key if prefix else key + sep + nested_key,
                                     sep,
                                 )
                             )
@@ -2086,6 +2074,15 @@ class InputManager:
                         self._parse_metadata_properties(value, prefix + sep + key, sep)
 
         return records
+
+    def _check_property_type_primitive(self, property: dict) -> bool:
+        if property.get("type") in ["bool", "string", "number"]:
+            return True
+        elif property.get("type") == "array":
+            if property["properties"]["type"] in ["bool", "string", "number"]:
+                return True
+        else:
+            return False
 
     def _create_record(self, data_entry: Dict[str, Any], name: str) -> Dict[str, Any]:
         """Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.
@@ -2102,7 +2099,11 @@ class InputManager:
         Dict[str, Any]
             A dictionary of the data entry converted to the record format.
         """
+        properties_index = name.find('_properties') + len('_properties')
+        properties_group = name[:properties_index]
+        name = name[properties_index + 1:]
         return {
+            "properties_group": properties_group,
             "name": name,
             "type": data_entry.get("type", ""),
             "description": data_entry.get("description", ""),
