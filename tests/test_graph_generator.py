@@ -116,14 +116,16 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     produce_graphics = True
 
     with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
-        expected_output = [{
-            "error": "Error plotting Example Graph data set",
-            "message": "Unforeseen error Test Exception when trying to graph data.",
-            "info_map": {
-                "class": graph_generator.__class__.__name__,
-                "function": "generate_graph",
-            },
-        }]
+        expected_output = [
+            {
+                "error": "Error plotting Example Graph data set",
+                "message": "Unforeseen error Test Exception when trying to graph data.",
+                "info_map": {
+                    "class": graph_generator.__class__.__name__,
+                    "function": "generate_graph",
+                },
+            }
+        ]
 
         result = graph_generator.generate_graph(
             filtered_pool=filtered_pool,
@@ -269,7 +271,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
                 {
                     "error": "Can't plot Test_6 data set",
                     "message": "variable1 key contains non-numerical data that are {<class 'dict'>} and "
-                               "can't be graphed.",
+                    "can't be graphed.",
                     "info_map": {
                         "class": "GraphGenerator",
                         "function": "_log_non_numerical_data",
