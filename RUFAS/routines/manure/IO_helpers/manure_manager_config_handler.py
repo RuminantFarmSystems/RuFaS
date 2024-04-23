@@ -63,7 +63,7 @@ class ManureManagerConfigHandler:
         Returns
         -------
         BeddingConfig
-            The custom bedding config for the given bedding type name, or None if no custom config exists.
+            The bedding config associated with the given bedding name.
 
         """
         try:
@@ -159,7 +159,7 @@ class ManureManagerConfigHandler:
         Returns
         -------
         Dict[str, BeddingConfig]
-            A dictionary of bedding config objects, with the key being the bedding type.
+            A dictionary of bedding config objects, with the key being the bedding name.
 
         """
         info_map = {"class": cls.__class__.__name__, "function": cls._process_bedding_configs.__name__}
