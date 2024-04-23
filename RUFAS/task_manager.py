@@ -19,6 +19,7 @@ class TaskType(Enum):
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
     INPUT_DATA_VALIDATION = "Input data validation"
     END_TO_END_TESTING = "Run e2e testing"
+    POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
