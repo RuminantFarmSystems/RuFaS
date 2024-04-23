@@ -233,3 +233,13 @@ class InitialHerdSummaryTypedDict(TypedDict):
     cow_avg_days_in_milk: float
     cow_avg_parity: float
     cow_avg_CI: float
+
+
+class SoldAnimalTypedDict(TypedDict):
+    id: int
+    animal_type: str
+    sold_at_day: int
+    body_weight: float
+    cull_reason: str | None
+    days_in_milk: int | str
+    parity: int | str
