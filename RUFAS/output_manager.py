@@ -440,9 +440,9 @@ class OutputManager(object):
             "function": self.dict_to_file_json.__name__,
         }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
+        data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
         try:
             with open(path, "w") as json_file:
-                self._write_disclaimer(json_file)
                 data_dict = self._add_detailed_data_origin(data_dict)
                 if minify_output_file:
                     json.dump(
@@ -609,16 +609,9 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
+        df.insert(loc=0, column='DISCLAIMER', value=DISCLAIMER_MESSAGE)
+        print(df)
         df.to_csv(path, index=False)
-
-        with open(path, "r") as csv_file:
-            csv_reader = csv.reader(csv_file)
-            csv_lines = list(csv_reader)
-            csv_lines.insert(0, [DISCLAIMER_MESSAGE])
-
-        with open(path, "w", newline="") as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerows(csv_lines)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
@@ -1219,13 +1212,15 @@ class OutputManager(object):
         }
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
-            file_lines = self._remove_disclaimer_from_input_file(file_path)
-            self.variables_pool = json.loads(file_lines)
-            self.add_log(
-                "load_data_successful",
-                f"Successfully loaded data from {str(file_path)}.",
-                info_map,
-            )
+            with open(file_path) as file:
+                loaded_pool: OutputManager.pool_element_type = json.load(file)
+                loaded_pool.pop("DISCLAIMER", None)
+                self.variables_pool = loaded_pool
+                self.add_log(
+                    "load_data_successful",
+                    f"Successfully loaded data from {str(file_path)}.",
+                    info_map,
+                )
         except FileNotFoundError:
             self.add_error(
                 "File not found",
@@ -1335,12 +1330,6 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
-
-    def print_disclaimer(self) -> None:
-        """
-        Prints out the disclaimer message when LogVerbosity is set to any level except None.
-        """
-        if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
 
     def print_errors_warnings_logs_counts(self) -> None:
