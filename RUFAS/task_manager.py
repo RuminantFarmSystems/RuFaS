@@ -93,20 +93,26 @@ class TaskManager:
     @staticmethod
     def task_single(args: Dict[str, Any]) -> None:  # TODO imeplement
         input_manager = InputManager()
-        if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
-            TaskManager.bar1(args, 1, input_manager)
-        elif args["task_type"] == TaskType.SENSITIVITY_ANALYSIS:
-            TaskManager.bar2(args, 2, input_manager)
+        if args["task_type"] == TaskType.HERD_INITIALIZATION:
+            pass
+        elif args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
+            pass
+        elif args["task_type"] == TaskType.INPUT_DATA_VALIDATION:
+            pass
+        elif args["task_type"] == TaskType.END_TO_END_TESTING:
+            pass
+        elif args["task_type"] == TaskType.POST_PROCESSING:
+            pass
         else:
             print("error")
 
     @staticmethod
     def task_multi(args: Dict[str, Any], const_var: int) -> None:  # TODO imeplement
         input_manager = InputManager()
-        if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
-            TaskManager.bar1(args, const_var, input_manager)
+        if args["task_type"] == TaskType.SIMULATION_MULTI_RUN:
+            pass
         elif args["task_type"] == TaskType.SENSITIVITY_ANALYSIS:
-            TaskManager.bar2(args, const_var, input_manager)
+            pass
         else:
             print("error")
 
