@@ -4538,8 +4538,8 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|no cover|N/A)",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|crust|no cover|N/A)",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
