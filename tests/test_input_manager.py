@@ -3994,7 +3994,7 @@ def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
     with (
         patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
         patch("pandas.DataFrame.to_csv") as mock_to_csv,
-        patch("os.path.join", return_value=str(output_dir / "output.csv")) as mock_join,
+        patch("os.path.join", return_value="output.csv") as mock_join,
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
@@ -4004,10 +4004,8 @@ def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
 
         mock_parse.assert_called_once_with("test_properties")
         mock_join.assert_called_once_with(output_dir, "output.csv")
-        mock_to_csv.assert_called_once_with(str(output_dir / "output.csv"), index=False)
-        mock_generate_file_name.assert_called_once_with(
-            base_name=str(output_dir) + "InputManager_metadata_properties", extension="csv"
-        )
+        mock_to_csv.assert_called_once_with("output.csv", index=False)
+        mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
 
 @pytest.mark.parametrize(
