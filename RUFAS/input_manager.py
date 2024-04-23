@@ -2022,7 +2022,7 @@ class InputManager:
         df = pd.DataFrame(records)
         path_to_save = os.path.join(
             output_dir,
-            om.generate_file_name(base_name=str(output_dir) + "InputManager_metadata_properties", extension="csv"),
+            om.generate_file_name("InputManager_metadata_properties", extension="csv"),
         )
         df.to_csv(path_to_save, index=False)
 
