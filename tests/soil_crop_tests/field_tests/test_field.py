@@ -2077,11 +2077,11 @@ def test_record_nutrient_application_error(
 
 
 @pytest.mark.parametrize(
-    "field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp," "transpiration",
+    "field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,transpiration,stressors",
     [
-        (1.5, False, 34.5, 128, 22.5, 18.9, 25.6, 19.22, 5.2),
-        (2.4, True, 40.9, 150, 28, 24.55, 31.2, 17.9, 3.44),
-        (0.8, True, 12.22, 222, 18.7, 13.44, 23.44, 16.4, 1.33),
+        (1.5, False, 34.5, 128, 22.5, 18.9, 25.6, 19.22, 5.2, True),
+        (2.4, True, 40.9, 150, 28, 24.55, 31.2, 17.9, 3.44, False),
+        (0.8, True, 12.22, 222, 18.7, 13.44, 23.44, 16.4, 1.33, True),
     ],
 )
 def test_execute_daily_processes(
@@ -2094,6 +2094,7 @@ def test_execute_daily_processes(
     max_temp: float,
     annual_mean_temp: float,
     transpiration: float,
+    stressors: bool,
 ) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
     with patch.multiple(
@@ -2101,7 +2102,15 @@ def test_execute_daily_processes(
         is_mature=PropertyMock(return_value=not crops_growing),
         is_dormant=PropertyMock(return_value=not crops_growing),
     ):
-        field_data = FieldData(field_size=field_size, current_residue=residue)
+        field_data = FieldData(
+            field_size=field_size,
+            current_residue=residue,
+            simulate_water_stress=stressors,
+            simulate_temp_stress=stressors,
+            simulate_nitrogen_stress=stressors,
+            simulate_phosphorus_stress=stressors,
+        )
+
         incorp = Field(field_data=field_data, manure_supplier=MagicMock(ManureManager))
         crop_1 = Crop()
         crop_1.data.max_transpiration = transpiration
@@ -2131,6 +2140,7 @@ def test_execute_daily_processes(
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "year", 2023)
         setattr(mocked_time, "day", 178)
+
         incorp._execute_daily_processes(current_conditions, mocked_time)
 
         incorp.soil.snow.update_snow.assert_called_once_with(
@@ -2147,7 +2157,11 @@ def test_execute_daily_processes(
                 crop.root_development.develop_roots.assert_called_once()
                 crop.nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
                 crop.phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
-                crop.growth_constraints.constrain_growth.assert_called_once_with(transpiration, mean_temp)
+                crop.growth_constraints.constrain_growth.assert_called_once_with(
+                    transpiration,
+                    mean_temp,
+                    *[stressors] * 4,
+                )
                 crop.leaf_area_index.grow_canopy.assert_called_once()
                 crop.biomass_allocation.allocate_biomass.assert_called_once_with(light)
             else:

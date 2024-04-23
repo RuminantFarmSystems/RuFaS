@@ -1327,7 +1327,12 @@ class Field:
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
             crop.growth_constraints.constrain_growth(
-                crop.data.max_transpiration, current_conditions.mean_air_temperature
+                crop.data.max_transpiration,
+                current_conditions.mean_air_temperature,
+                self.field_data.simulate_water_stress,
+                self.field_data.simulate_temp_stress,
+                self.field_data.simulate_nitrogen_stress,
+                self.field_data.simulate_phosphorus_stress,
             )
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
