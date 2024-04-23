@@ -484,96 +484,22 @@ def parse_gnu_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="RuFaS: Whole dairy farm simulation")
     parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
     parser.add_argument(
-        "-f",
-        "--format-option",
-        choices=["block", "inline", "verbose", "basic"],
-        help="Select formatting option for variable_names.txt file",
-    )
-    parser.add_argument(
         "-g",
         "--no-graphics",
-        help="Prevent graphics from generating",
+        help="Prevents graphics from generating",
         action="store_true",
-    )
-    parser.add_argument(
-        "-G",
-        "--graphics_dir",
-        help="The saving directory for graphics",
-        default="output/graphics/",
     )
     parser.add_argument(
         "-v",
         "--verbose",
         choices=["errors", "warnings", "logs", "credits", "none"],
         default="credits",
-        help="Specify the log type to be printed",
+        help="Specifies the log type to be printed",
     )
     parser.add_argument(
         "-c",
         "--clear-output",
-        help="Clear output directory before running the simulation",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-i",
-        "--exclude_info_maps",
-        help="Exclude info_maps from the output",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-o",
-        "--only-run-validation",
-        help="Only validate the data, don't run a simulation",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-l",
-        "--load-pool",
-        help="Load the output manager's variables pool from provided path",
-        default="",
-    )
-    parser.add_argument(
-        "-O",
-        "--output-dir",
-        help="The saving directory for output",
-        default="output/",
-    )
-    parser.add_argument(
-        "-F",
-        "--filters-dir",
-        help="The directory for the files containing the keys for filtering",
-        default="output/output_filters/",
-    )
-    parser.add_argument(
-        "-C",
-        "--csv-dir",
-        help="The directory for the csv output files to be saved",
-        default="output/CSVs/",
-    )
-    parser.add_argument(
-        "-I",
-        "--init_herd",
-        help="Select this flag if you want to initialize the herd by generating a herd population through simulation.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-s",
-        "--save_animals",
-        help="If the '--init_herd' flag is selected, choose this flag if you want to save the generated herd data into"
-        " a JSON file.",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-S",
-        "--save_animals_dir",
-        help="If '--save_animals' flag is selected, use this flag to specify the directory to save the output animal "
-        "population JSON file.",
-        default="output/",
-    )
-    parser.add_argument(
-        "-t",
-        "--terminate_simulation_post_herd_generation",
-        help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
+        help="CAUTION! Clears output directory before running the simulation",
         action="store_true",
     )
     return parser.parse_args()
