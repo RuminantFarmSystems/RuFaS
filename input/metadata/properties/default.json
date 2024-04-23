@@ -627,7 +627,6 @@
             "description": "Culling probability for mastitis",
             "properties": {
               "type": "number",
-              "description": "Culling probability for mastitis",
               "minimum": 0,
               "maximum": 1
             }
@@ -637,7 +636,6 @@
             "description": "Culling probability for udder reasons",
             "properties": {
               "type": "number",
-              "description": "Culling probability for udder reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -647,7 +645,6 @@
             "description": "Culling probability for feet and leg reasons",
             "properties": {
               "type": "number",
-              "description": "Culling probability for feet and leg reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -657,7 +654,6 @@
             "description": "Culling probability for unknown reasons",
             "properties": {
               "type": "number",
-              "description": "Culling probability for unknown reasons",
               "minimum": 0,
               "maximum": 1
             }
@@ -667,7 +663,6 @@
             "description": "Culling probability for disease",
             "properties": {
               "type": "number",
-              "description": "Culling probability for disease",
               "minimum": 0,
               "maximum": 1
             }
@@ -677,7 +672,6 @@
             "description": "Culling probability for injury",
             "properties": {
               "type": "number",
-              "description": "Culling probability for injury",
               "minimum": 0,
               "maximum": 1
             }
@@ -687,7 +681,6 @@
             "description": "Culling probability for death",
             "properties": {
               "type": "number",
-              "description": "Culling probability for death",
               "minimum": 0,
               "maximum": 1
             }
@@ -697,7 +690,6 @@
             "description": "Culling day count",
             "properties": {
               "type": "number",
-              "description": "Culling day count",
               "minimum": 0
             }
           }
@@ -1538,7 +1530,6 @@
           "default": [],
           "properties": {
             "type": "number",
-            "description": "Calendar year in which the harvesting occurs",
             "minimum": 1
           }
         },
@@ -1549,7 +1540,6 @@
           "default": ["harvest_kill"],
           "properties": {
             "type": "string",
-            "description": "Operation with which this crop will be harvested.",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
             "default": "harvest_kill"
           }
@@ -1566,7 +1556,6 @@
           "default": [],
           "properties": {
             "type": "number",
-            "description": "Julian day of year to plant",
             "minimum": 1,
             "maximum": 366
           }
@@ -1577,7 +1566,6 @@
           "default": [],
           "properties": {
             "type": "number",
-            "description": "Calendar years in which the planting occurs",
             "minimum": 1
           }
         },
@@ -1640,8 +1628,7 @@
       "description": "List of the mix names that will be used for the corresponding fertilizer application.",
       "default": [],
       "properties": {
-        "type": "string",
-        "description": "Mix name that will be used for the corresponding fertilizer application."
+        "type": "string"
       }
     },
     "years": {
@@ -1650,7 +1637,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Year in which fertilizer will be applied.",
         "minimum": 1
       }
     },
@@ -1660,7 +1646,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Day on which fertilizer will be applied.",
         "minimum": 1,
         "maximum": 366
       }
@@ -1671,7 +1656,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum nitrogen mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1681,7 +1665,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum phosphorus mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1691,7 +1674,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum potassium mass that the corresponding fertilizer application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1701,7 +1683,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Depth at which the fertilizer is injected into the soil.\nUnits: mm.",
         "minimum": 0.0
       }
     },
@@ -1711,7 +1692,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Fraction of fertilizer which remains on the soil surface when applied via injection.",
         "minimum": 0.0,
         "maximum": 1.0
       }
@@ -1736,7 +1716,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Year in which manure will be applied.",
         "minimum": 1
       }
     },
@@ -1747,7 +1726,6 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "description": "Day in which manure will be applied.",
         "maximum": 366
       }
     },
@@ -1757,7 +1735,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum nitrogen mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1767,7 +1744,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum phosphorus mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1777,7 +1753,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Minimum potassium mass that the corresponding manure application should contain.\nUnits: kg.",
         "minimum": 0.0
       }
     },
@@ -1787,7 +1762,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Fraction of how much of the field is covered by the corresponding manure application.",
         "minimum": 0.01,
         "maximum": 1.0
       }
@@ -1798,7 +1772,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Depth at which the manure is injected into the soil.\nUnits: mm.",
         "minimum": 0.0
       }
     },
@@ -1808,7 +1781,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Fraction of manure which remains on the soil surface when applied via injection.",
         "minimum": 0.0,
         "maximum": 1.0
       }
@@ -1819,7 +1791,6 @@
       "default": [],
       "properties": {
         "type": "string",
-        "description": "The type of manure which will be requested for the application.",
         "pattern": "^(liquid|solid)$"
       }
     },
@@ -1843,7 +1814,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Year in which tillage will occur.",
         "minimum": 1
       }
     },
@@ -1854,7 +1824,6 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "description": "Day on which tilling will occur.",
         "maximum": 366
       }
     },
@@ -1864,7 +1833,6 @@
       "default": [],
       "properties": {
         "type": "number",
-        "description": "Depth that the corresponding tillage application reaches.\nUnits: mm.",
         "minimum": 0.1
       }
     },
@@ -1875,7 +1843,6 @@
       "properties": {
         "type": "number",
         "minimum": 0.0,
-        "description": "Fraction of surface pools that get incorporated into the soil during application.",
         "maximum": 1.0
       }
     },
@@ -1886,7 +1853,6 @@
       "properties": {
         "type": "number",
         "minimum": 0.0,
-        "description": "Fraction of soil layer pools that is available to mix into other soil layers.",
         "maximum": 1.0
       }
     },
@@ -1896,7 +1862,6 @@
       "default": [],
       "properties": {
         "type": "string",
-        "description": "Tillage implement which will be used to execute the tillage operations.",
         "pattern": "^(subsoiler|moldboard-plow|coulter-chisel-plow|disk-harrow|cultivator|seedbed-conditioner)$"
       }
     },
@@ -1961,7 +1926,6 @@
       "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
       "properties": {
         "type": "number",
-        "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
         "minimum": 0,
         "default": 500
       }
@@ -1971,7 +1935,6 @@
       "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
       "properties": {  
         "type": "number",
-        "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
         "minimum": 0,
         "default": 300
       }
@@ -1981,7 +1944,6 @@
       "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
       "properties": {
         "type": "number",
-        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
         "minimum": 0,
         "default": 400
       }
@@ -3087,7 +3049,6 @@
       "description": "Calf Feeds (raised off farm - 24 hrs of age).",
       "properties": {
         "type": "number",
-        "description": "Calf Feed (raised off farm - 24 hrs of age).",
         "minimum": 1,
         "maximum": 300,
         "default": 155
@@ -3098,7 +3059,6 @@
       "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
       "properties": {
         "type": "number",
-        "description": "Growing Feed (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
         "minimum": 1,
         "maximum": 300
       }
@@ -3108,7 +3068,6 @@
       "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
       "properties": {
         "type": "number",
-        "description": "Close Up Feed (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
         "minimum": 1,
         "maximum": 300
       }
@@ -3118,7 +3077,6 @@
       "description": "Lactating Cow Feeds",
       "properties": {
         "type": "number",
-        "description": "Lactating Cow Feed",
         "minimum": 1,
         "maximum": 300
       }
@@ -3130,7 +3088,6 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "description": "Purchased Feed",
           "minimum": 1,
           "maximum": 300
         },
@@ -3146,7 +3103,6 @@
       "description": "Farm-Grown Feeds",
       "properties": {
         "type": "number",
-        "description": "Farm-Grown Feed",
         "minimum": 1,
         "maximum": 300
       }
@@ -3317,7 +3273,6 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for feed used within the RuFaS model.",
         "minimum": 1
       }
     },
@@ -3325,7 +3280,6 @@
       "type": "array",
       "description": "A general common name for the feed as defined within RuFaS.",
       "properties": {
-        "description": "A general common name for the feed as defined within RuFaS.",
         "type": "string"
       }
     },
@@ -3333,7 +3287,6 @@
       "type": "array",
       "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
       "properties": {
-        "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
         "type": "string"
       }
     },
@@ -3342,7 +3295,6 @@
       "description": "The general type or category of the feed (group).",
       "properties": {
         "type": "string",
-        "description": "The general type or category of the feed (group).",
         "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
       }
     },
@@ -3351,7 +3303,6 @@
       "description": "The unit of measurement used for the feed.",
       "properties": {
         "type": "string",
-        "description": "The unit of measurement used for the feed.",
         "pattern": "(kg)"
       }
     }
@@ -3362,7 +3313,6 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for a feed used within the RuFaS model.",
         "minimum": 1
       }
     },
@@ -3371,7 +3321,6 @@
       "description": "The general type or category of the feed.",
       "properties": {
         "type": "string",
-        "description": "The general type or category of the feed.",
         "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No)$"
       }
     },
@@ -3380,7 +3329,6 @@
       "description": "Dry matter content of the feed (% DM).",
       "properties": {
         "type": "number",
-        "description": "Dry matter content of the feed (% DM).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3390,7 +3338,6 @@
       "description": "Crude protein content of the feed (% DM).",
       "properties": {
         "type": "number",
-        "description": "Crude protein content of the feed (% DM).",
         "minimum": 0,
         "maximum": 288 
       }
@@ -3400,7 +3347,6 @@
       "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "properties": {
         "type": "number",
-        "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
         "maximum": 12,
         "default": 0
@@ -3411,7 +3357,6 @@
       "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "properties": {
         "type": "number",
-        "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
         "maximum": 8,
         "default": 0
@@ -3422,7 +3367,6 @@
       "description": "Ether extract (% DM).",
       "properties": {
         "type": "number",
-        "description": "Ether extract (% DM).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3433,7 +3377,6 @@
       "description": "Neutral detergent fiber (% DM).",
       "properties": {
         "type": "number",
-        "description": "Neutral detergent fiber (% DM).",
         "minimum": 0,
         "maximum": 85,
         "default": 0
@@ -3444,7 +3387,6 @@
       "description": "Acid detergent fiber (% DM)",
       "properties": {
         "type": "number",
-        "description": "Acid detergent fiber (% DM)",
         "minimum": 0,
         "maximum": 66,
         "default": 0
@@ -3455,7 +3397,6 @@
       "description": "Acid detergent lignin (% DM).",
       "properties": {
         "type": "number",
-        "description": "Acid detergent lignin (% DM).",
         "minimum": 0,
         "maximum": 25,
         "default": 0
@@ -3466,7 +3407,6 @@
       "description": "Ash contents (% DM) ",
       "properties": {
         "type": "number",
-        "description": "Ash contents (% DM) ",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3477,7 +3417,6 @@
       "description": "Non fiber carbohydrates (% DM).",
       "properties": {
         "type": "number",
-        "description": "Non fiber carbohydrates (% DM).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3488,7 +3427,6 @@
       "description": "Processing adjustment factor.",
       "properties": {
         "type": "number",
-        "description": "Processing adjustment factor.",
         "minimum": 0.87,
         "maximum": 1.04,
         "default": 0
@@ -3499,7 +3437,6 @@
       "description": "Total digestible nutrients (% DM).",
       "properties": {
         "type": "number",
-        "description": "Total digestible nutrients (% DM).",
         "minimum": 0,
         "maximum": 184,
         "default": 0
@@ -3511,7 +3448,6 @@
       "description": "Nitrogen Fraction A (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction A (% CP).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3522,7 +3458,6 @@
       "description": "Nitrogen Fraction B (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction B (% CP).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3533,7 +3468,6 @@
       "description": "Nitrogen Fraction C (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction C (% CP).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3544,7 +3478,6 @@
       "description": "Feed degradation rate of B fraction (% h).",
       "properties": {
         "type": "number",
-        "description": "Feed degradation rate of B fraction (% h).",
         "minimum": 0,
         "maximum": 30,
         "default": 0
@@ -3555,7 +3488,6 @@
       "description": "Digested rumen undegradable protein (% of RUP).",
       "properties": {
         "type": "number",
-        "description": "Digested rumen undegradable protein (% of RUP).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3566,7 +3498,6 @@
       "description": "Calcium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Calcium (% DM).",
         "minimum": 0,
         "maximum": 72,
         "default": 0
@@ -3577,7 +3508,6 @@
       "description": "Phosphorus (% DM).",
       "properties": {
         "type": "number",
-        "description": "Phosphorus (% DM).",
         "minimum": 0,
         "maximum": 32,
         "default": 0
@@ -3588,7 +3518,6 @@
       "description": "Magnesium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Magnesium (% DM).",
         "minimum": 0,
         "maximum": 57,
         "default": 0
@@ -3599,7 +3528,6 @@
       "description": "Potassium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Potassium (% DM).",
         "minimum": 0,
         "maximum": 57,
         "default": 0
@@ -3610,7 +3538,6 @@
       "description": "Sodium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Sodium (% DM).",
         "minimum": 0,
         "maximum": 40,
         "default": 0
@@ -3621,7 +3548,6 @@
       "description": "Chlorine (% DM).",
       "properties": {
         "type": "number",
-        "description": "Chlorine (% DM).",
         "minimum": 0,
         "maximum": 67,
         "default": 0
@@ -3632,7 +3558,6 @@
       "description": "Sulphur (% DM).",
       "properties": {
         "type": "number",
-        "description": "Sulphur (% DM).",
         "minimum": 0,
         "maximum": 25,
         "default": 0
@@ -3643,7 +3568,6 @@
       "description": "Digestible energy (Mcal/kg).",
       "properties": {
         "type": "number",
-        "description": "Digestible energy (Mcal/kg).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3653,7 +3577,6 @@
       "type": "array",
       "description": "Identifier of fat type feed.",
       "properties": {
-        "description": "Identifier of fat type feed.",
         "type": "bool"
       }
     },
@@ -3661,7 +3584,6 @@
       "type": "array",
       "description": "Identifier of wet forage type feed.",
       "properties": {
-        "description": "Identifier of wet forage type feed.",
         "type": "bool"
       }
     },
@@ -3677,7 +3599,6 @@
       "description": "Starch (%)",
       "properties": {
         "type": "number",
-        "description": "Starch (%)",
         "minimum": 0,
         "maximum": 80,
         "default": 0
@@ -3704,7 +3625,6 @@
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
       "properties": {
         "type": "number",
-        "description": "Unique integer identifier for a feed used within the RuFaS model.",
         "minimum": 1
       }
     },
@@ -3712,7 +3632,6 @@
       "type": "array",
       "description": "Feed Name",
       "properties": {
-        "description": "Feed Name",
         "type": "string"
       }
     },
@@ -3721,7 +3640,6 @@
       "description": "Feed Category.",
       "properties": {
         "type": "string",
-        "description": "Feed Category.",
         "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
       }
     },
@@ -3730,7 +3648,6 @@
       "description": "The general type or category of the feed.",
       "properties":{
         "type": "string",
-        "description": "The general type or category of the feed.",
         "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
       }
     },
@@ -3739,7 +3656,6 @@
       "description": "Dry matter content of the feed (% DM).",
       "properties": {
         "type": "number",
-        "description": "Dry matter content of the feed (% DM).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3749,7 +3665,6 @@
       "description": "Ash contents (% DM) ",
       "properties": {
         "type": "number",
-        "description": "Ash contents (% DM) ",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3760,7 +3675,6 @@
       "description": "Crude protein content of the feed (% DM).",
       "properties": {
         "type": "number",
-        "description": "Crude protein content of the feed (% DM).",
         "minimum": 0,
         "maximum": 288 
       }
@@ -3770,7 +3684,6 @@
       "description": "Nitrogen Fraction A (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction A (% CP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3780,7 +3693,6 @@
       "description": "Nitrogen Fraction B (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction B (% CP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3790,7 +3702,6 @@
       "description": "Nitrogen Fraction C (% CP).",
       "properties": {
         "type": "number",
-        "description": "Nitrogen Fraction C (% CP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3800,7 +3711,6 @@
       "description": "Feed degradation rate of B fraction (% h).",
       "properties": {
         "type": "number",
-        "description": "Feed degradation rate of B fraction (% h).",
         "minimum": 0,
         "maximum": 30
       }
@@ -3810,7 +3720,6 @@
       "description": "Rumen undegradable protein (% CP).",
       "properties": {
         "type": "number",
-        "description": "Rumen undegradable protein (% CP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3820,7 +3729,6 @@
       "description": "Digested rumen undegradable protein (% of RUP).",
       "properties": {
         "type": "number",
-        "description": "Digested rumen undegradable protein (% of RUP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3830,7 +3738,6 @@
       "description": "Soluble protein (% CP).",
       "properties": {
         "type": "number",
-        "description": "Soluble protein (% CP).",
         "minimum": 0,
         "maximum": 100
       }
@@ -3840,7 +3747,6 @@
       "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "properties": {
         "type": "number",
-        "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
         "maximum": 8,
         "default": 0
@@ -3851,7 +3757,6 @@
       "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
       "properties": {
         "type": "number",
-        "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
         "maximum": 12,
         "default": 0
@@ -3862,7 +3767,6 @@
       "description": "Acid detergent fiber (% DM)",
       "properties": {
         "type": "number",
-        "description": "Acid detergent fiber (% DM)",
         "minimum": 0,
         "maximum": 66,
         "default": 0
@@ -3873,7 +3777,6 @@
       "description": "Neutral detergent fiber (% DM).",
       "properties": {
         "type": "number",
-        "description": "Neutral detergent fiber (% DM).",
         "minimum": 0,
         "maximum": 85,
         "default": 0
@@ -3884,7 +3787,6 @@
       "description": "In vitro 48-hour digestibility (% NDF).",
       "properties": {
         "type": "number",
-        "description": "In vitro 48-hour digestibility (% NDF).",
         "minimum": 0,
         "maximum": 89,
         "default": 0
@@ -3895,7 +3797,6 @@
       "description": "Acid detergent lignin (% DM).",
       "properties": {
         "type": "number",
-        "description": "Acid detergent lignin (% DM).",
         "minimum": 0,
         "maximum": 25,
         "default": 0
@@ -3906,7 +3807,6 @@
       "description": "Starch (%)",
       "properties": {
         "type": "number",
-        "description": "Starch (%)",
         "minimum": 0,
         "maximum": 80,
         "default": 0
@@ -3917,7 +3817,6 @@
       "description": "Water soluble carbohydrates (% DM).",
       "properties": {
         "type": "number",
-        "description": "Water soluble carbohydrates (% DM).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3928,7 +3827,6 @@
       "description": "Fatty acids (% DM).",
       "properties": {
         "type": "number",
-        "description": "Fatty acids (% DM).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3939,7 +3837,6 @@
       "description": "Ether extract (% DM).",
       "properties": {
         "type": "number",
-        "description": "Ether extract (% DM).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3950,7 +3847,6 @@
       "description": "Digestible energy standard (Mcal/kg).",
       "properties": {
         "type": "number",
-        "description": "Digestible energy standard (Mcal/kg).",
         "minimum": 0,
         "maximum": 100,
         "default": 0
@@ -3961,7 +3857,6 @@
       "description": "Calcium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Calcium (% DM).",
         "minimum": 0,
         "maximum": 72,
         "default": 0
@@ -3972,7 +3867,6 @@
       "description": "Phosphorus (% DM).",
       "properties": {
         "type": "number",
-        "description": "Phosphorus (% DM).",
         "minimum": 0,
         "maximum": 32,
         "default": 0
@@ -3983,7 +3877,6 @@
       "description": "Magnesium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Magnesium (% DM).",
         "minimum": 0,
         "maximum": 57,
         "default": 0
@@ -3994,7 +3887,6 @@
       "description": "Potassium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Potassium (% DM).",
         "minimum": 0,
         "maximum": 57,
         "default": 0
@@ -4005,7 +3897,6 @@
       "description": "Sodium (% DM).",
       "properties": {
         "type": "number",
-        "description": "Sodium (% DM).",
         "minimum": 0,
         "maximum": 40,
         "default": 0
@@ -4016,7 +3907,6 @@
       "description": "Chlorine (% DM).",
       "properties": {
         "type": "number",
-        "description": "Chlorine (% DM).",
         "minimum": 0,
         "maximum": 67,
         "default": 0
@@ -4027,7 +3917,6 @@
       "description": "Sulphur (% DM).",
       "properties": {
         "type": "number",
-        "description": "Sulphur (% DM).",
         "minimum": 0,
         "maximum": 25,
         "default": 0
@@ -4394,7 +4283,6 @@
       "type": "array",
       "description": "Identifier of fat type feed.",
       "properties": {
-        "description": "Identifier of fat type feed.",
         "type": "bool"
       }
     },
@@ -4409,7 +4297,6 @@
       "type": "array",
       "description": "",
       "properties": {
-        "description": "Identifier of wet forage type feed.",
         "type": "string"
       } 
     },
@@ -4431,7 +4318,6 @@
       "type": "array",
       "description": "Total digestible nutrients (% DM).",
       "properties": {
-        "description": "Total digestible nutrients (% DM).",
         "type": "number"
       }
     },
@@ -4994,7 +4880,6 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "description": "Julian day of the year.",
         "minimum": 0,
         "maximum": 366
       }
@@ -5004,7 +4889,6 @@
       "type":"array",
       "properties": {
         "type": "number",
-        "description": "Amount of precipitation (mm H2O).",
         "minimum": 0,
         "default": 0
       }
@@ -5013,7 +4897,6 @@
       "description": "The maximum air temperature of the day (°C).",
       "type": "array",
       "properties": {
-        "description": "The maximum air temperature of the day (°C).",
         "type": "number",
         "default": 21
       }
@@ -5022,7 +4905,6 @@
       "description": "The minimum air temperature of the day (°C).",
       "type": "array",
       "properties": {
-        "description": "The minimum air temperature of the day (°C).",
         "type": "number",
         "default": 0
       }
@@ -5031,7 +4913,6 @@
       "description": "The average air temperature of the day (°C).",
       "type": "array",
       "properties": {
-        "description": "The average air temperature of the day (°C).",
         "type": "number",
         "default": 0
       }
@@ -5040,7 +4921,6 @@
       "description": "The solar radiation of the day (MJ m^-2).",
       "type": "array",
       "properties": {
-        "description": "The solar radiation of the day (MJ m^-2).",
         "type": "number",
         "default": 0
       }
@@ -5060,7 +4940,6 @@
       "type": "array",
       "description": "Unique integer identifier for the data entry",
       "properties": {
-        "description": "Unique integer identifier for the data entry",
         "type": "number"
       }
     },
@@ -5076,7 +4955,6 @@
       "description": "The categorical size of the tractor",
       "properties": {
         "type": "string",
-        "description": "The categorical size of the tractor",
         "pattern": "(small|medium|large)",
         "default": "medium"
       }
@@ -5092,7 +4970,6 @@
       "description": "How deep in the soil the implement goes",
       "properties": {
         "type": "number",
-        "description": "How deep in the soil the implement goes",
         "minimum": 0,
         "maximum": 10,
         "default": 0
@@ -5102,7 +4979,6 @@
       "type": "array",
       "description": "The implement that is attached to the tractor",
       "properties": {
-        "description": "The implement that is attached to the tractor",
         "type": "string"
       }
     },
@@ -5110,7 +4986,6 @@
       "type": "array",
       "description": "Parameter A as described in the scientific references",
       "properties": {
-        "description": "Parameter A as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5119,7 +4994,6 @@
       "type": "array",
       "description": "Parameter B as described in the scientific references",
       "properties": {
-        "description": "Parameter B as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5128,7 +5002,6 @@
       "type": "array",
       "description": "Parameter C as described in the scientific references",
       "properties": {
-        "description": "Parameter C as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5137,7 +5010,6 @@
       "type": "array",
       "description": "The width of the implement in meters",
       "properties": {
-        "description": "The width of the implement in meters",
         "type": "number",
         "default": 0,
         "minimum": 0
@@ -5147,7 +5019,6 @@
       "type": "array",
       "description": "The mass of the implement in kg",
       "properties": {
-        "description": "The mass of the implement in kg",
         "type": "number",
         "default": 0,
         "minimum": 0
@@ -5157,7 +5028,6 @@
       "type": "array",
       "description": "Parameter E as described in the scientific references",
       "properties": {
-        "description": "Parameter E as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5166,7 +5036,6 @@
       "type": "array",
       "description": "Parameter F as described in the scientific references",
       "properties": {
-        "description": "Parameter F as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5175,7 +5044,6 @@
       "type": "array",
       "description": "Parameter G as described in the scientific references",
       "properties": {
-        "description": "Parameter G as described in the scientific references",
         "type": "number",
         "default": 0
       }
@@ -5184,7 +5052,6 @@
       "type": "array",
       "description": "true if depth is relevant for attachment operation, otherwise false",
       "properties": {
-        "description": "true if depth is relevant for attachment operation, otherwise false",
         "type": "bool"
       }
     },
@@ -5192,7 +5059,6 @@
       "type": "array",
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "properties": {
-        "description": "The maximum throughput of the implement (tons dm/hour)",
         "type": "number",
         "default": 0
       }
