@@ -69,7 +69,7 @@ class AnimalModuleReporter:
                 current_output_length = 0
             length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
             if length_difference > 1:
-                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1:]
+                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
                 for _ in range(0, length_difference - 1):
                     om.add_variable(
                         short_variable_to_add,
@@ -423,7 +423,10 @@ class AnimalModuleReporter:
             {variable: 0 for variable in daily_feed_emissions.keys()},
             animal_manager.simulation_day,
             info_map,
-            {key: MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value for key in daily_feed_emissions.keys()}
+            {
+                key: MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value
+                for key in daily_feed_emissions.keys()
+            },
         )
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
