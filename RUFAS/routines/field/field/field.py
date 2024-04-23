@@ -16,6 +16,7 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
+from ..manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
@@ -62,8 +63,8 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_manager : ManureManager, default=None
-        ManureManager Object to be used during simulation
+    manure_supplier : ManureManager | FieldManureSupplier, default=None
+        Object that will to be used during simulation to get manure for field applications.
 
     Attributes
     ----------
@@ -96,8 +97,8 @@ class Field:
         List of ManureApplication objects
     manure_events: List[ManureEvent]
         List of all manure applications that will be applied to this field
-    manure_manager: ManureManager
-        ManureManager instance from which manure is requested for application to the field.
+    manure_supplier: ManureManager | FieldManureSupplier
+        Manure supplier from which manure is requested for application to the field.
     feed_manager: FeedManager
         FeedManager instance which receives harvested crops.
 
@@ -118,7 +119,7 @@ class Field:
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_manager: Optional[ManureManager] = None,
+        manure_supplier: Optional[ManureManager | FieldManureSupplier] = None,
         feed_manager: Optional[FeedManager] = None,
     ):
         # field-wide attributes
@@ -159,16 +160,16 @@ class Field:
             "function": self.__init__.__name__,
         }
 
-        if manure_manager is None:
+        if manure_supplier is None:
             om.add_error(
                 "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no Manure Manager, failing to "
+                f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
                 f"initialize.",
                 info_map,
             )
-            raise ValueError("Manure manager cannot be None.")
+            raise ValueError("Manure supplier cannot be None.")
 
-        self.manure_manager: ManureManager = manure_manager
+        self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
 
         if feed_manager is None:
             om.add_error(
@@ -571,7 +572,7 @@ class Field:
             manure_type=requested_manure_type,
         )
 
-        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
+        manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -1326,7 +1327,12 @@ class Field:
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
             crop.growth_constraints.constrain_growth(
-                crop.data.max_transpiration, current_conditions.mean_air_temperature
+                crop.data.max_transpiration,
+                current_conditions.mean_air_temperature,
+                self.field_data.simulate_water_stress,
+                self.field_data.simulate_temp_stress,
+                self.field_data.simulate_nitrogen_stress,
+                self.field_data.simulate_phosphorus_stress,
             )
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
@@ -1426,10 +1432,13 @@ class Field:
             weighted_average_transpiration,
         )
 
+        pre_sublimation_snow_content = self.soil.data.snow_content
         self.soil.snow.sublimate(soil_evaporation_and_sublimation_amount)
-        soil_evaporation_and_sublimation_amount -= self.soil.data.water_sublimated
         remaining_evapotranspirative_demand -= self.soil.data.water_sublimated
-        self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
+        max_soil_evaporation = self._determine_maximum_soil_evaporation(
+            soil_evaporation_and_sublimation_amount, pre_sublimation_snow_content
+        )
+        self.soil.evaporation.evaporate(max_soil_evaporation)
         remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
 
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
@@ -1724,6 +1733,33 @@ class Field:
             max_soil_evaporation_sublimation, adjusted_soil_evaporation_sublimation
         )
         return actual_soil_evaporation_sublimation
+
+    @staticmethod
+    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+        """
+        Calculates the maximum amount of evaporation from soil in a given day.
+
+        Parameters
+        ----------
+        soil_evaporation_adj : float
+            Maximum soil evaporation adjusted for plant water use on a given day (mm).
+        snow_water_content : float
+            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm).
+
+        Returns
+        -------
+        float
+            Maximum soil water evaporation on a given day (mm).
+
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.3.1
+
+        """
+        if soil_evaporation_adj < snow_water_content:
+            return 0  # 2:2.3.10
+        else:
+            return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
     def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:

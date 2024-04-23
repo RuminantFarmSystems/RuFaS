@@ -42,15 +42,19 @@ class MilkProductionHistory:
 class Cow(HeiferIII):
     stats = collections.defaultdict(int)
 
-    def __init__(self, args):
+    def __init__(self, args: dict[str, Any]):
         """
-        Description:
-            initialize the cow from heifer
-        Input:
+        Initialize a cow from a heifer.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
             args.id: id of the animal
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -89,6 +93,12 @@ class Cow(HeiferIII):
             args.parity: parity of the cow
             args.calving_interval: cow's most recent calving interval
             args.lactation_curve: lactation curve model choice
+
+        Notes
+        -----
+        When a cow is initialized, it is checked to see whether it is already pregnant. If it is, it is immediately
+        entered in the `PREGNANT` repro state.
+
         """
         super().__init__(args)
 
@@ -135,6 +145,8 @@ class Cow(HeiferIII):
 
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
+        if self.is_pregnant:
+            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
 
         self.wood_l = 0
         self.wood_m = 0
@@ -171,6 +183,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
@@ -206,6 +219,7 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
+            "repro_sub_protocol": self.repro_sub_protocol,
             "tai_method_h": self.tai_method_h,
             "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,

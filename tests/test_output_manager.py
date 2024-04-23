@@ -4,14 +4,15 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
+import pandas as pd
 import pytest
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 def test_get_prefix() -> None:
@@ -28,8 +29,18 @@ def mock_output_manager(mocker) -> OutputManager:
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     """Unit test for the function set_metadata_prefix in the file output_manager.py"""
+
+    # Assert before setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == ""
+
+    # Act
     mock_output_manager.set_metadata_prefix("dummy_prefix")
-    assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
+
+    # Assert after setting metadata_prefix
+    assert getattr(mock_output_manager, "_OutputManager__metadata_prefix") == "dummy_prefix"
+
+    # Cleanup
+    mock_output_manager.set_metadata_prefix("")
 
 
 @pytest.mark.parametrize(
@@ -38,45 +49,154 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 )
 def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
+
+    # Assert before setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == LogVerbosity.CREDITS
+
+    # Act
     mock_output_manager.set_log_verbose(log_verbose)
-    assert mock_output_manager._OutputManager__log_verbose == log_verbose
+
+    # Assert after setting log_verbose
+    assert getattr(mock_output_manager, "_OutputManager__log_verbose") == log_verbose
+
+    # Cleanup
+    mock_output_manager.set_log_verbose(LogVerbosity.CREDITS)
 
 
-def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
+@pytest.mark.parametrize(
+    "variable_name, data, expected_result",
+    [
+        (
+            "temperature",
+            {"values": [25.0, 30.0, 35.0], "info_maps": [{"units": "Celsius"}]},
+            [pd.Series([25.0, 30.0, 35.0], name="temperature_Celsius", dtype=object)],
+        ),
+        (
+            "position",
+            {
+                "values": [
+                    {"x": 1.0, "y": 2.0},
+                    {"x": 3.0, "y": 4.0},
+                    {"x": 5.0, "y": 6.0},
+                ],
+                "info_maps": [{"units": {"x": "m", "y": "m"}}],
+            },
+            [
+                pd.Series([1.0, 3.0, 5.0], name="position.x_m", dtype=object),
+                pd.Series([2.0, 4.0, 6.0], name="position.y_m", dtype=object),
+            ],
+        ),
+        (
+            "measurements",
+            {
+                "values": [
+                    {"value": 10.5, "error": 0.1},
+                    {"value": 20.3, "error": 0.2},
+                    {"value": 15.7, "error": 0.15},
+                ],
+                "info_maps": [{"units": {"value": "kg", "error": "kg"}}],
+            },
+            [
+                pd.Series([10.5, 20.3, 15.7], name="measurements.value_kg", dtype=object),
+                pd.Series([0.1, 0.2, 0.15], name="measurements.error_kg", dtype=object),
+            ],
+        ),
+        (
+            "pressure",
+            {"values": [100.0, 200.0, 300.0]},
+            [pd.Series([100.0, 200.0, 300.0], name="pressure", dtype=object)],
+        ),
+        (
+            "empty_data",
+            {"values": [], "info_maps": []},
+            [pd.Series([], name="empty_data", dtype=object)],
+        ),
+    ],
+)
+def test_dict_to_csv_column_list(
+    variable_name: str,
+    data: Dict[str, List[Any]],
+    expected_result: List[pd.Series],
+) -> None:
     """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
-    data = {
-        "values": [1.0, True, "test", {"key": 1}],
+
+    # Arrange
+    output_manager = OutputManager()
+    expected_length = len(expected_result)
+
+    # Act
+    result = output_manager._dict_to_csv_column_list(variable_name, data)
+
+    # Assert
+    assert len(result) == expected_length
+
+    for i, series in enumerate(result):
+        assert series.equals(expected_result[i])
+
+        if i == 0 and data.get("info_maps", []):
+            units = data["info_maps"][0].get("units")
+            if isinstance(units, dict):
+                for subkey in units:
+                    assert f" ({units[subkey]})" in series.name
+            elif units:
+                assert f" ({units})" in series.name
+
+    # Cleanup
+    output_manager.flush_pools()
+
+
+@pytest.mark.parametrize(
+    "variable_name, units, subkey, expected_result, expected_error",
+    [
+        ("temperature", "Celsius", None, " (Celsius)", None),
+        ("position", {"x": "m", "y": "m"}, "x", " (m)", None),
+        ("position", {"x": "m", "y": "m"}, "z", "", "units_key_error"),
+        ("pressure", None, None, "", None),
+        ("empty_units", "", None, "", None),
+        ("nested_units", {"value": "kg", "error": "kg"}, "value", " (kg)", None),
+        ("nested_units", {"value": "kg", "error": "kg"}, "uncertainty", "", "units_key_error"),
+        ("coordinates", {"x": "m", "y": "m"}, None, "", "units_subkey_missing"),
+    ],
+)
+def test_get_units_substr(
+    variable_name: str,
+    units: str | Dict[str, str] | None,
+    subkey: str | None,
+    expected_result: str,
+    expected_error: str | None,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for the _get_units_substr() method in the file output_manager.py"""
+
+    # Arrange
+    output_manager = OutputManager()
+    patch_for_add_error = mocker.patch.object(output_manager, "add_error")
+    info_map = {
+        "class": output_manager.__class__.__name__,
+        "function": "_get_units_substr",
     }
-    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
-    v = result[0]
-    assert v.to_list() == data["values"]
 
-    data["info_maps"] = [{"map1": "value1", "map2": 1}, {"map1": "value2", "map2": 2}]
-    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
-    assert len(result) == 3
-    data_series = result[0]
-    map1_series = result[1]
-    map2_series = result[2]
-    assert data_series.name == "dummy_variable_name"
-    assert data_series.to_list() == data["values"]
-    assert map1_series.name == "dummy_variable_name.map1"
-    assert map1_series.to_list() == ["value1", "value2"]
-    assert map2_series.name == "dummy_variable_name.map2"
-    assert map2_series.to_list() == [1, 2]
+    # Act
+    result = output_manager._get_units_substr(variable_name, units, subkey)
 
+    # Assert
+    assert result == expected_result
 
-def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) -> None:
-    """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
-    data = {"values": [], "info_maps": []}
-    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
-
-    assert len(result) == 2
-    series = result[0]
-    assert series.name == "dummy_variable_name"
-    assert series.to_list() == []
-    series = result[1]
-    assert series.name == "dummy_variable_name"
-    assert series.to_list() == []
+    if expected_error == "units_key_error":
+        patch_for_add_error.assert_called_once_with(
+            "units_key_error",
+            f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
+            info_map=info_map,
+        )
+    elif expected_error == "units_subkey_missing":
+        patch_for_add_error.assert_called_once_with(
+            "units_subkey_missing",
+            f"Variable {variable_name} has a dictionary for its 'units' property, "
+            f"but the 'values' associated with this variable are not dictionaries themselves.",
+            info_map=info_map,
+        )
+    else:
+        patch_for_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -84,7 +204,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
             True,
         ),
         (
@@ -96,10 +216,10 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             {
                 "var1": {
                     "values": [1, 2, 3],
-                    "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
+                    "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
                 }
             },
-            f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+            f"var1 (m){os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
             True,
         ),
         (
@@ -110,21 +230,21 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
         (
             {
                 "var1": {
-                    "values": [1],
-                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+                    "values": [1, 2],
+                    "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
                 }
             },
-            f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+            f"var1 (unitless){os.linesep}1{os.linesep}2{os.linesep}",
             True,
         ),
         (
             {
                 "var1": {
                     "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
-                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+                    "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
                 }
             },
-            f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+            f"var1.v1 (m),var1.v2 (s){os.linesep}1,1{os.linesep}2,2{os.linesep}",
             True,
         ),
         (
@@ -137,25 +257,24 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     ],
                     "info_maps": [
                         {
-                            "subkey1": 1,
-                            "subkey2": "Hello",
-                            "subkey3": [1, 2, 3],
-                            "subkey4": {"nestedkey1": "World", "nestedkey2": [4, 5, 6]},
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
                         },
                         {
-                            "subkey1": 2,
-                            "subkey2": "Hi",
-                            "subkey3": [4, 5, 6],
-                            "subkey4": {"nestedkey1": "There", "nestedkey2": [7, 8, 9]},
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
                         },
                     ],
                 }
             },
-            f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
-            f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
-            f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
-            f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
-            f'3,"[3, 3]",,,,{os.linesep}',
+            f"simple_key.key1 (random unit 1),simple_key.key2 (random unit 2){os.linesep}"
+            f'1,"[1, 1]"{os.linesep}'
+            f'2,"[2, 2]"{os.linesep}'
+            f'3,"[3, 3]"{os.linesep}',
             True,
         ),
         (
@@ -170,24 +289,23 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             {
                 "simple_key1": {
                     "values": [1, 2, 3],
-                    "info_maps": [{"subkey1": "Farm", "subkey2": "Field"}],
+                    "info_maps": [
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                    ],
                 },
                 "simple_key2": {
                     "values": [4, 5, 6, 8, 9],
                     "info_maps": [
-                        {
-                            "subkey1": "Tractor",
-                        }
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
                     ],
                 },
             },
-            f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
-            f"simple_key2.subkey1{os.linesep}"
-            f"1,Farm,Field,4,Tractor{os.linesep}"
-            f"2,,,5,{os.linesep}"
-            f"3,,,6,{os.linesep}"
-            f",,,8,{os.linesep}"
-            f",,,9,{os.linesep}",
+            f"simple_key1 (random unit),simple_key2 (random unit){os.linesep}"
+            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep},8{os.linesep},9{os.linesep}",
             True,
         ),
         ({}, "", False),
@@ -513,11 +631,30 @@ def test_validate_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value",
-    ["dummy_value", 2, 3.45, True],
+    "dummy_value, exclude_info_maps_flag",
+    [
+        ("dummy_value", False),
+        (2, False),
+        (3.45, False),
+        (True, False),
+        ({"key": "value"}, False),
+        ([1, 2, 3], False),
+        ("dummy_value", True),
+        (2, True),
+        (3.45, True),
+        (True, True),
+        ({"key": "value"}, True),
+        ([1, 2, 3], True),
+    ],
 )
-def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> None:
+def test_add_to_pool(
+    mock_output_manager: OutputManager,
+    dummy_value: Any,
+    exclude_info_maps_flag: bool,
+) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
+
+    # Arrange
     info_map = {
         "class": "dummy_class",
         "function": "dummy_func",
@@ -525,26 +662,50 @@ def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> No
         "units": MeasurementUnits.ANIMALS.value,
     }
     key = "dummy_key"
-    pool = {}
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
-    assert pool[key] == {
-        "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
-        "values": [dummy_value],
-    }
-    assert pool[key]["values"][0] == dummy_value
-    assert pool[key]["values"][0] is dummy_value
+    pool: Dict[str, Dict[str, Any]] = {}
+    assert not mock_output_manager._exclude_info_maps_flag
+    mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
 
-    info_map["more_context"] = 1234567890
-    mock_output_manager._add_to_pool(pool, key, {dummy_value}, info_map)
-    assert pool[key] == {
-        "info_maps": [
+    # Act
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
+
+    # Assert
+    assert pool[key]["values"][0] == dummy_value
+    if isinstance(dummy_value, (int, bool, float, str)):
+        assert pool[key]["values"][0] is dummy_value
+    else:
+        assert pool[key]["values"][0] == deepcopy(dummy_value)
+
+    if exclude_info_maps_flag:
+        assert pool[key]["info_maps"] == []
+    else:
+        assert pool[key]["info_maps"] == [
             {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
-            {"context": "dummy_context", "more_context": 1234567890, "units": MeasurementUnits.ANIMALS.value},
-        ],
-        "values": [dummy_value, {dummy_value}],
-    }
-    assert pool[key]["values"][1] == deepcopy({dummy_value})
-    assert pool[key]["values"][1] is not {dummy_value}
+        ]
+
+    # Arrange
+    info_map["more_context"] = "1234567890"
+
+    # Act
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
+
+    # Assert
+    assert pool[key]["values"][1] == dummy_value
+    if isinstance(dummy_value, (int, bool, float, str)):
+        assert pool[key]["values"][1] is dummy_value
+    else:
+        assert pool[key]["values"][1] == deepcopy(dummy_value)
+
+    if exclude_info_maps_flag:
+        assert pool[key]["info_maps"] == []
+    else:
+        assert pool[key]["info_maps"] == [
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+        ]
+
+    # Cleanup
+    mock_output_manager._exclude_info_maps_flag = False
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
@@ -2122,3 +2283,25 @@ def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expecte
 
     # Assert
     assert result == expected
+
+
+@pytest.mark.parametrize("flag_value", [False, True])
+def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
+    """
+    Unit test for the set_exclude_info_maps_flag() method in OutputManager class
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Assert before
+    assert not output_manager._exclude_info_maps_flag
+
+    # Act
+    output_manager.set_exclude_info_maps_flag(flag_value)
+
+    # Assert after
+    assert output_manager._exclude_info_maps_flag == flag_value
+
+    # Cleanup
+    output_manager._exclude_info_maps_flag = False
