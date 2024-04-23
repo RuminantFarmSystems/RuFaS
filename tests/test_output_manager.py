@@ -1,6 +1,7 @@
 import json
 import os
 from copy import deepcopy
+from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
@@ -13,6 +14,8 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
+
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 def test_get_prefix() -> None:
@@ -204,12 +207,14 @@ def test_get_units_substr(
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+            f"DISCLAIMER,var1,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0,{os.linesep}\"{DISCLAIMER_MESSAGE}\",True,"
+            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",test,{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1.0, True, "test"]}},
-            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0{os.linesep}\"{DISCLAIMER_MESSAGE}\",True{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",test{os.linesep}",
             True,
         ),
         (
@@ -219,12 +224,14 @@ def test_get_units_substr(
                     "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
                 }
             },
-            f"var1 (m){os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            f"DISCLAIMER,var1,var1.v{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,2"
+            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,3{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1, 2, 3]}},
-            f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",3{os.linesep}",
             True,
         ),
         (
@@ -234,7 +241,8 @@ def test_get_units_substr(
                     "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
                 }
             },
-            f"var1 (unitless){os.linesep}1{os.linesep}2{os.linesep}",
+            f"DISCLAIMER,var1,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,value1{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",,value2{os.linesep}",
             True,
         ),
         (
@@ -244,7 +252,8 @@ def test_get_units_substr(
                     "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
                 }
             },
-            f"var1.v1 (m),var1.v2 (s){os.linesep}1,1{os.linesep}2,2{os.linesep}",
+            f"DISCLAIMER,var1.v1,var1.v2,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1,value1{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",2,2,value2{os.linesep}",
             True,
         ),
         (
@@ -271,10 +280,13 @@ def test_get_units_substr(
                     ],
                 }
             },
-            f"simple_key.key1 (random unit 1),simple_key.key2 (random unit 2){os.linesep}"
-            f'1,"[1, 1]"{os.linesep}'
-            f'2,"[2, 2]"{os.linesep}'
-            f'3,"[3, 3]"{os.linesep}',
+            f"DISCLAIMER,simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
+            f"simple_key.subkey3,simple_key.subkey4{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\","
+            f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\","
+            f'3,"[3, 3]",,,,{os.linesep}',
             True,
         ),
         (
@@ -282,7 +294,8 @@ def test_get_units_substr(
                 "simple_key1": {"values": [1, 2, 3]},
                 "simple_key2": {"values": [4, 5, 6]},
             },
-            f"simple_key1,simple_key2{os.linesep}" f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+            f"DISCLAIMER,simple_key1,simple_key2{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"1,4{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,5{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,6{os.linesep}",
             True,
         ),
         (
@@ -304,8 +317,13 @@ def test_get_units_substr(
                     ],
                 },
             },
-            f"simple_key1 (random unit),simple_key2 (random unit){os.linesep}"
-            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep},8{os.linesep},9{os.linesep}",
+            f"DISCLAIMER,simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
+            f"simple_key2.subkey1{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"1,Farm,Field,4,Tractor{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"2,,,5,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"3,,,6,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f",,,8,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f",,,9,{os.linesep}",
             True,
         ),
         ({}, "", False),
@@ -324,8 +342,10 @@ def test_dict_to_file_csv(
         mock_output_manager._dict_to_file_csv(data, "test")
 
     if should_write:
-        open_mock.assert_called_with("test", "w", encoding="utf-8", errors="strict", newline="")
+        open_mock.assert_any_call("test", "w", encoding="utf-8", errors="strict", newline="")
+
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
+
     assert written_data == expected_result
 
 
@@ -345,7 +365,7 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
         mock_output_manager.dict_to_file_json(data, "test")
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == json.dumps(data, indent=2)
+    assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, indent=2)
 
 
 def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> None:
@@ -364,7 +384,7 @@ def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> 
         mock_output_manager.dict_to_file_json(data, "test", minify_output_file=True)
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == json.dumps(data, separators=(",", ":"))
+    assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, separators=(",", ":"))
 
 
 def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None:
@@ -780,6 +800,7 @@ def output_manager_original_method_states(
     """Fixture to store original methods of OutputManager"""
     return {
         "_add_to_pool": mock_output_manager._add_to_pool,
+        "_write_disclaimer": mock_output_manager._write_disclaimer,
         "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
         "dict_to_file_json": mock_output_manager.dict_to_file_json,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
@@ -1894,6 +1915,47 @@ def test_route_logs(
     mock_output_manager._route_logs = output_manager_original_method_states["_route_logs"]
 
 
+def test_remove_disclaimer_from_input_file() -> None:
+    output_manager = OutputManager()
+    dummy_input = (
+        f"{DISCLAIMER_MESSAGE}\n"
+        "{\n"
+        '    "vars": {\n'
+        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
+        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
+        "    }\n"
+        "}"
+    )
+    expected = (
+        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
+        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
+        '"info_map": {}}\n    }\n}'
+    )
+    with patch("builtins.open", mock_open(read_data=dummy_input)):
+        actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
+    assert actual == expected
+
+
+def test_remove_disclaimer_from_input_file_no_disclaimer() -> None:
+    output_manager = OutputManager()
+    dummy_input = (
+        "{\n"
+        '    "vars": {\n'
+        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
+        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
+        "    }\n"
+        "}"
+    )
+    expected = (
+        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
+        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
+        '"info_map": {}}\n    }\n}'
+    )
+    with patch("builtins.open", mock_open(read_data=dummy_input)):
+        actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
+    assert actual == expected
+
+
 def test_load_variables_pool_from_file_valid_path(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -2120,10 +2182,10 @@ def test_get_error_and_warning_counts(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.CREDITS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.ERRORS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.WARNINGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.LOGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
     ],
 )
 def test_print_credits(
