@@ -90,6 +90,38 @@ def test_process_bedding_configs(mocker: MockerFixture) -> None:
     assert list(actual_bedding_configs.keys()) == expected_bedding_config_keys
 
 
+def test_process_bedding_configs_error(mocker: MockerFixture) -> None:
+    """Tests that _process_bedding_configs() raises error when a config is defined multiple times."""
+    # Arrange
+    bedding_configs = [
+        {
+            "name": "sawdusty",
+            "bedding_type": "sawdust",
+            "bedding_mass_per_day": 1.97,
+            "bedding_density": 250.0,
+            "bedding_dry_matter_content": 0.9,
+            "bedding_cleaned_fraction": 1.0,
+        },
+        {
+            "name": "sawdusty",
+            "bedding_type": "sawdust",
+            "bedding_mass_per_day": 1.97,
+            "bedding_density": 250.0,
+            "bedding_dry_matter_content": 0.9,
+            "bedding_cleaned_fraction": 1.0,
+        },
+    ]
+
+    mocker.patch(
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingConfig.__init__",
+        return_value=None,
+    )
+    expected_error_message = "Duplicate configurations for 'sawdusty'."
+
+    with pytest.raises(ValueError, match=expected_error_message):
+        ManureManagerConfigHandler._process_bedding_configs(bedding_configs)
+
+
 def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
     """Unit test for the _process_manure_handler_configs() method in manure_manager_config_handler.py."""
     # Arrange
