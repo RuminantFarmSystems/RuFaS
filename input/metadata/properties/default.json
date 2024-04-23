@@ -4338,7 +4338,7 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Name of the bedding configuration to be used for in the manure management scenario."
+          "description": "Name of the bedding configuration to be used for in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
         },
         "manure_handler": {
           "type": "string",
