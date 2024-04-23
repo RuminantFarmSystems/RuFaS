@@ -1625,8 +1625,8 @@ def test_filter_variables_pool_complex(
     }
     expected_result: Dict[str, OutputManager.pool_element_type] = {
         "test_case_1_0": {"values": ["value1", "value2", "value3"]},
-        'test_case_1_1.a': {'values': ['A', 'AA']},
-        'test_case_1_2.a': {'values': ['AAA']}
+        "test_case_1_1.a": {"values": ["A", "AA"]},
+        "test_case_1_2.a": {"values": ["AAA"]},
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
