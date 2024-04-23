@@ -88,6 +88,8 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
+    time : Time
+        A Time object used to track the simulation time
     """
 
     __instance = None

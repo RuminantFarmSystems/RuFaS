@@ -101,6 +101,13 @@ class GraphGenerator:
     """
     Graph Generator is used to generate graphs from the simulation results.
     NOTE: This class is not multi-thread safe!!!
+
+    Attributes
+    ----------
+    metadata_prefix : str
+        A string to prefix the metadata of the graph.
+    time : Time
+        A Time object used to track the simulation time
     """
 
     def __init__(self, metadata_prefix: str = "", time=None) -> None:
