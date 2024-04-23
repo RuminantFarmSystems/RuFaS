@@ -64,7 +64,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
         # fmt: on
         methane_emission = max(methane_emission, 0.0)
-        accumulated_output.storage_methane += methane_emission
 
         return methane_emission, methane_emission_from_degradable_volatile_solids
 
