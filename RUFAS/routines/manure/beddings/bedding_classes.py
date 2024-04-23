@@ -355,7 +355,7 @@ class BeddingFactory:
     Notes
     -----
     This class leverages the Factory design pattern to instantiate bedding objects of different types.
-    Based on the bedding type and the configuration provided, a new new bedding instance will be manufactured.
+    Based on the bedding type and the configuration provided, a new bedding instance will be manufactured.
 
     """
 
@@ -367,9 +367,6 @@ class BeddingFactory:
     ) -> BaseBedding:
         """
         Create a bedding object of the specified type.
-
-        If a custom bedding configuration is provided, it is used to create the bedding object. Otherwise,
-        the default configuration for the bedding type is used.
 
         Parameters
         ----------

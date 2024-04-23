@@ -160,7 +160,7 @@ class ManureManager:
             bedding_config = self.manure_manager_config_handler.get_bedding_config(mm_pen.bedding_type)
             self.beddings[mm_pen.id] = BeddingFactory.get_instance(
                 bedding_name=mm_pen.bedding_type,
-                bedding_config=bedding_config,  # type: ignore
+                bedding_config=bedding_config,
             )
 
             manure_handler_config = self.manure_manager_config_handler.get_manure_handler_config(mm_pen.manure_handler)
