@@ -467,7 +467,7 @@ def test_biogas_energy_content() -> None:
 
     # Arrange
     CH4_volume = 10.0
-    expected = CH4_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+    expected = CH4_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     # Act
     actual = GasEmissionsCalculator.biogas_energy_content(CH4_volume)

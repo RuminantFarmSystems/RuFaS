@@ -11,9 +11,9 @@ from typing import Any, Dict, List, Union, Tuple
 import pandas as pd
 from deprecated.sphinx import deprecated
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -105,6 +105,7 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self._exclude_info_maps_flag = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -135,15 +136,26 @@ class OutputManager(object):
         value: Any,
         info_map: Dict[str, Any],
     ) -> None:
-        """Adds value and info map at key in the given pool."""
+        """
+        Adds value and info map at key in the given pool.
+        Parameters
+        ----------
+        pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+            The pool to add the value and info_map to.
+        key : str
+            The key to add the value and info_map at.
+        value : Any
+            The value to be added to the pool.
+        info_map : Dict[str, Any]
+            The info map to be added to the pool.
+        """
+
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        # reduced_info_map is identical to info_map without the class key and
-        # the function key; as they are already stored in element key and
-        # having them increases the final file size.
-        reduced_info_map = {k: info_map[k] for k in info_map.keys() - {"class", "function"}}
-        pool[key]["info_maps"].append(reduced_info_map)
+        if not self._exclude_info_maps_flag:
+            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+            pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
             pool[key]["values"].append(value)
@@ -537,24 +549,85 @@ class OutputManager(object):
             A list of (column_name, column_data) tuples.
 
         """
-        column_list = []
-        mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
-        for field in mandatory_fields:
-            data_list = data_dict[field]
-            if data_list and isinstance(data_list[0], dict):
-                csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
-                for nested_dictionary in data_list:
-                    for subkey, value in nested_dictionary.items():
-                        csv_column_lists[subkey].append(value)
 
-                for subkey in csv_column_lists.keys():
-                    column_title = f"{variable_name}.{subkey}"
-                    column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
-            else:
-                column_title = f"{variable_name}"
-                column_list.append(pd.Series(data_list, dtype=object, name=column_title))
+        column_list = []
+        units = data_dict["info_maps"][0]["units"] if data_dict.get("info_maps", []) else None
+        data_list = data_dict["values"]
+        if data_list and isinstance(data_list[0], dict):
+            csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+            for nested_dictionary in data_list:
+                for subkey, value in nested_dictionary.items():
+                    csv_column_lists[subkey].append(value)
+
+            for subkey in csv_column_lists.keys():
+                column_title = f"{variable_name}.{subkey}{self._get_units_substr(variable_name, units, subkey)}"
+                column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
+        else:
+            column_title = f"{variable_name}{self._get_units_substr(variable_name, units)}"
+            column_list.append(pd.Series(data_list, dtype=object, name=column_title))
 
         return column_list
+
+    def _get_units_substr(
+        self, variable_name: str, units: str | Dict[str, str] | None, subkey: str | None = None
+    ) -> str:
+        """Get the units substring for a column title.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable or group of variables associated with the units.
+        units : str | Dict[str, str] | None
+            The units associated with the data.
+        subkey : str | None, optional
+            The subkey to retrieve the units for, if units is a dictionary. Default is None.
+
+        Returns
+        -------
+        str
+            The formatted units substring for the column title.
+
+        Examples
+        --------
+        >>> output_manager = OutputManager()
+        >>> output_manager._get_units_substr("temperature", "C")
+        ' (C)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
+        ' (m/s)'
+        >>> output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
+        ' (degrees)'
+        >>> output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
+        ''
+        """
+
+        if not isinstance(units, dict):
+            return f" ({units})" if units else ""
+
+        if subkey is None:
+            self.add_error(
+                "units_subkey_missing",
+                f"Variable {variable_name} has a dictionary for its 'units' property, "
+                f"but the 'values' associated with this variable are not dictionaries themselves.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_units_substr.__name__,
+                },
+            )
+            return ""
+
+        if subkey in units:
+            return f" ({units[subkey]})"
+
+        self.add_error(
+            "units_key_error",
+            f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._get_units_substr.__name__,
+            },
+        )
+
+        return ""
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary to a csv file.
@@ -1095,10 +1168,10 @@ class OutputManager(object):
 
             parsable_dicts = []
 
-            if not exclude_info_maps:
+            if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
 
-            is_variable_nested = isinstance(variable_data["values"][0], Dict)
+            is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
@@ -1293,3 +1366,14 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+
+    def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
+        """
+        Sets the exclude_info_maps flag to the given value.
+        Parameters
+        ----------
+        exclude_info_maps : bool
+            The value to set the exclude_info_maps flag to.
+        """
+
+        self._exclude_info_maps_flag = exclude_info_maps

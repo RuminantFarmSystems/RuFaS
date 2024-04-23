@@ -16,6 +16,7 @@
       "type": "number",
       "description": "The random seed",
       "minimum": 0,
+      "maximum": 4294967295,
       "default": 42
     },
     "set_seed": {
@@ -833,7 +834,7 @@
           "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
           "type": "number",
           "minimum": 0.5,
-          "maximum": 2,
+          "maximum": 3,
           "default": 1.2
         },
         "manure_management_scenario_id": {
@@ -998,17 +999,11 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1130,17 +1125,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|SynchED)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1262,17 +1251,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1424,17 +1407,11 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED)$"
+          "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "tai_method_h": {
+        "repro_sub_protocol": {
           "type": "string",
-          "description": "Heifer Reproduction Program",
-          "pattern": "^(md5CG2P|md5CGP)$"
-        },
-        "synch_ed_method_h": {
-          "type": "string",
-          "description": "Heifer SynchED Program",
-          "pattern": "^(2P|CP)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -4561,8 +4538,8 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|no cover|N/A)",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|crust|no cover|N/A)",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
@@ -4883,6 +4860,26 @@
       "type": "bool",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "default": false
+    },
+    "simulate_water_stress": {
+      "type": "bool",
+      "description": "Whether water stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_temp_stress": {
+      "type": "bool",
+      "description": "Whether temperature stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_nitrogen_stress": {
+      "type": "bool",
+      "description": "Whether nitrogen stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_phosphorus_stress": {
+      "type": "bool",
+      "description": "Whether phosphrorus stress affects crops grown in this field.",
+      "default": true
     }
   },
   "weather_properties": {

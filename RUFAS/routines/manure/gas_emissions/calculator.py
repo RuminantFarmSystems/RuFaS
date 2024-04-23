@@ -780,12 +780,12 @@ class GasEmissionsCalculator:
 
     @classmethod
     def methane_volume_via_Chen_equation(
-        cls, manure_total_volatile_solids: float, hydraulic_retention_time: int
+        cls, manure_total_degradable_volatile_solids: float, hydraulic_retention_time: int
     ) -> float:
         """Calculates CH4 generation volume using the Chen-Hashimoto equation.
 
         Args:
-            manure_total_volatile_solids: total volatile solids, kg.
+            manure_total_degradable_volatile_solids: total volatile solids, kg.
             hydraulic_retention_time: hydraulic retention time, days.
 
         Returns:
@@ -803,7 +803,7 @@ class GasEmissionsCalculator:
                     - 1
                 )
             )
-            * manure_total_volatile_solids
+            * manure_total_degradable_volatile_solids
             * GeneralConstants.GRAMS_TO_KG
         )
 
@@ -818,7 +818,7 @@ class GasEmissionsCalculator:
             Biogas energy content, MJ.
 
         """
-        return methane_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
     def methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:

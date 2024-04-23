@@ -56,7 +56,9 @@ def test_gas_emission_constants() -> None:
     assert GasEmissionConstants.FRACTION_OF_HANDLED_MANURE == approx(0.9)
     assert GasEmissionConstants.METHANE_FACTOR == approx(0.67)
     assert GasEmissionConstants.METHANE_ENERGY_DENSITY == approx(55.0)
-    assert GasEmissionConstants.METHANE_DENSITY == approx(0.657)
+    assert GasEmissionConstants.AD_METHANE_DENSITY == approx(0.629)
+    assert GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO == approx(9.25)
+    assert GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO == approx(2.86)
     assert GasEmissionConstants.METHANE_POTENTIAL_Go == approx(240.0)
     assert GasEmissionConstants.MCF_CONSTANT_A == approx(7.11)
     assert GasEmissionConstants.MCF_CONSTANT_B == approx(0.0884)
@@ -89,16 +91,25 @@ def test_gas_emission_constants() -> None:
     ][ManureCoverEnum.COVER.value] == approx(0.005)
     assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
         ManureTreatmentType.SLURRY_STORAGE_OUTDOOR
+    ][ManureCoverEnum.CRUST.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+        ManureTreatmentType.SLURRY_STORAGE_OUTDOOR
     ][ManureCoverEnum.NO_COVER.value] == approx(0.0)
     assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR
     ][ManureCoverEnum.COVER.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+        ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR
+    ][ManureCoverEnum.CRUST.value] == approx(0.005)
     assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR
     ][ManureCoverEnum.NO_COVER.value] == approx(0.0)
     assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
         ManureTreatmentType.ANAEROBIC_LAGOON
     ][ManureCoverEnum.COVER.value] == approx(0.005)
+    assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+        ManureTreatmentType.ANAEROBIC_LAGOON
+    ][ManureCoverEnum.CRUST.value] == approx(0.005)
     assert GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
         ManureTreatmentType.ANAEROBIC_LAGOON
     ][ManureCoverEnum.NO_COVER.value] == approx(0.0)
