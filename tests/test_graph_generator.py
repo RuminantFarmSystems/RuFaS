@@ -170,7 +170,7 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     mock_log_pool = [{"error": "mock_error_message"}]
-    graph_generator._log_non_int_float_data = MagicMock(return_value=mock_log_pool)
+    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
@@ -190,7 +190,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
-    graph_generator._log_non_int_float_data = MagicMock(return_value=mock_log_pool)
+    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
     graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
@@ -271,7 +271,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
                     "message": "variable1 key contains data that is non-numerical and can't be graphed.",
                     "info_map": {
                         "class": "GraphGenerator",
-                        "function": "_log_non_int_float_data",
+                        "function": "_log_non_numerical_data",
                     },
                 }
             ],
@@ -297,7 +297,7 @@ def test_prepare_plot_data_logic(
     mock_filter_dict.side_effect = expected_util_filter_dict
 
     # Act
-    log_pool = mock_graph_generator._log_non_int_float_data(filtered_pool, graph_details)
+    log_pool = mock_graph_generator._log_non_numerical_data(filtered_pool, graph_details)
 
     # Assert
     assert log_pool == expected_result

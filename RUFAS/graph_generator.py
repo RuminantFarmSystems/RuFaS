@@ -157,7 +157,7 @@ class GraphGenerator:
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             prepared_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
-            log_pool = self._log_non_int_float_data(filtered_pool, graph_details)
+            log_pool = self._log_non_numerical_data(filtered_pool, graph_details)
             all_logs = log_pool + graph_filter_validation_logs
 
             found_errors = any("error" in log for log in all_logs)
@@ -234,7 +234,7 @@ class GraphGenerator:
                 )
         return graph_filter_validation_logs
 
-    def _log_non_int_float_data(
+    def _log_non_numerical_data(
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
@@ -257,7 +257,7 @@ class GraphGenerator:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._log_non_int_float_data.__name__,
+            "function": self._log_non_numerical_data.__name__,
         }
         title = graph_details.get("title")
         log_pool: List[Dict[str, str | Dict[str, str]]] = []
