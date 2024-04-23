@@ -296,7 +296,7 @@ def test_validate_constants(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, mock_prep_data, expected_result, expected_exception",
+    "filtered_pool, filter_content, expected_result, expected_exception",
     [
         # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
@@ -308,7 +308,6 @@ def test_validate_constants(
                 "horizontal_order": ["var1", "var2"],
                 "horizontal_first": True,
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_ver_agg": [5.0]},
             None,
         ),
@@ -322,7 +321,6 @@ def test_validate_constants(
                 "horizontal_order": ["var1", "var2"],
                 "horizontal_first": False,
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"ver_hor_agg": [5.0]},
             None,
         ),
@@ -331,14 +329,12 @@ def test_validate_constants(
             {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
             {"name": "Report"},
             {"var1": [1, 2], "var2": [3, 4]},
-            {"var1": [1, 2], "var2": [3, 4]},
             None,
         ),
         # Case where report_data is empty after preparing with constants
         (
             {"var1": {"values": []}},
             {"name": "Report", "horizontal_aggregation": "sum"},
-            {},
             None,
             ValueError,
         ),
@@ -350,7 +346,6 @@ def test_validate_constants(
                 "horizontal_aggregation": "sum",
                 "horizontal_order": ["var1", "var2"],
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_agg": [4, 6]},
             None,
         ),
@@ -358,7 +353,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
             {"name": "Report", "vertical_aggregation": "average"},
-            {"var1": [1, 3], "var2": [2, 4]},
             {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
             None,
         ),
@@ -366,7 +360,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 2]}},
             {"name": "Report", "vertical_aggregation": "unsupported"},
-            {"var1": [1, 2]},
             None,
             ValueError,
         ),
@@ -374,7 +367,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 2]}},
             {"name": "Report2", "horizontal_aggregation": "unsupported"},
-            {"var1": [1, 2]},
             None,
             ValueError,
         ),
@@ -382,7 +374,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
             {"name": "Report", "vertical_aggregation": "average", "variables": ["var1", "var2"]},
-            {"var1": [1, 3], "var2": [2, 4]},
             {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
             None,
         ),
@@ -390,7 +381,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}},
             {"name": "Report", "vertical_aggregation": "average"},
-            {"var1": [1, 3]},
             {"ver_agg": [2.0]},
             None,
         ),
@@ -403,7 +393,6 @@ def test_validate_constants(
                 "vertical_aggregation": "average",
                 "horizontal_first": True,
             },
-            {"var1": [1, 2, 3], "var2": [4, 5, None]},
             {"hor_ver_agg": [5.0]},
             None,
         ),
@@ -416,7 +405,6 @@ def test_validate_constants(
                 "vertical_aggregation": "average",
                 "horizontal_first": False,
             },
-            {"var1": [1, 2, 3], "var2": [4, 5, None]},
             {"ver_hor_agg": [6.5]},
             None,
         ),
@@ -427,7 +415,6 @@ def test_validate_constants(
                 "name": "Report",
                 "horizontal_aggregation": "sum",
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_agg": [4, 6]},
             None,
         ),
@@ -436,7 +423,6 @@ def test_validate_constants(
 def test_perform_aggregations(
     filtered_pool: Dict[str, Dict[str, List[Any]]],
     filter_content: Dict[str, Any],
-    mock_prep_data: Dict[str, List[Any]],
     expected_result: Dict[str, List[Any]],
     expected_exception: Type[Exception],
     mocker: MockerFixture,
@@ -447,11 +433,6 @@ def test_perform_aggregations(
 
     # Arrange
     report_generator = ReportGenerator()
-    mocker.patch.object(
-        report_generator,
-        "_prepare_report_data_with_constants",
-        return_value=mock_prep_data,
-    )
 
     def mock_apply_horizontal_aggregation(
         data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
