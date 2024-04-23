@@ -86,7 +86,7 @@ class Time:
 
     def advance(self) -> None:
         """
-        Advances the time in the simulation by 1 day and automatically detects end of months and years.
+        Advances the time in the simulation by 1 day and automatically detects end of years.
         """
 
         self.simulation_day += 1
@@ -146,6 +146,9 @@ class Time:
         om.add_variable(
             "calendar_year", self.calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR.value})
         )
+        om.add_variable(
+            "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value})
+        )
 
     @property
     def is_last_day_of_simulation(self):
@@ -168,6 +171,7 @@ class Time:
         ----------
         simulation_day : int
             The simulation day to convert to a date object.
+
         Returns
         -------
         datetime.date
@@ -182,18 +186,3 @@ class Time:
 
     def __str__(self) -> str:
         return f"Year: {self.year}, Day: {self.day}. Simulation Day: {self.simulation_day}"
-
-    def to_dict(self) -> dict[str, str | int]:
-        """
-        Returns a dictionary representation of the Time object.
-
-        Returns
-        -------
-        dict[str, str | int]
-            A dictionary representation of the Time object.
-        """
-
-        return {
-            "simulation_day": self.simulation_day,
-            "simulation_year_day": f"Year: {self.year}, Day: {self.day}",
-        }

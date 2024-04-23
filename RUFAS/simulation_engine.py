@@ -2,7 +2,6 @@
 
 import time as timer
 from enum import Enum
-from typing import Optional
 
 from RUFAS import routines
 from RUFAS.input_manager import InputManager
@@ -90,18 +89,6 @@ class SimulationEngine:
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
-        om.add_variable(
-            "simulation_day_final_value",
-            self.time.to_dict(),
-            {
-                "class": self.__class__.__name__,
-                "function": self.simulate.__name__,
-                "units": {
-                    "simulation_day": MeasurementUnits.UNITLESS.value,
-                    "simulation_year_day": MeasurementUnits.UNITLESS.value,
-                },
-            },
-        )
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -124,20 +111,12 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def _advance_time(self, print_day: Optional[bool] = False) -> None:
+    def _advance_time(self) -> None:
         """
         Advances time and increments simulation_day.
         """
 
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._advance_time.__name__,
-            "print_day": print_day,
-        }
         self.time.advance()
-        if print_day:
-            simulating_day_log = f"simulating day: {self.time.simulation_day}"
-            om.add_log("simulation_day", simulating_day_log, info_map)
         self.animal_manager.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:
