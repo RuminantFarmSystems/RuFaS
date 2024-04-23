@@ -474,7 +474,7 @@ def test_perform_aggregations(
         """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
 
         return {key: [aggregator([value for value in values if value is not None])] for key, values in data.items()}
-      
+
     mocker.patch.object(
         report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
     )
