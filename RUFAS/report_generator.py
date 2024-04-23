@@ -1,5 +1,6 @@
 import re
 from typing import Dict, List, Any, Callable
+
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
@@ -137,14 +138,22 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
 class ReportGenerator:
     """
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
+
+    Attributes
+    ----------
+    reports : Dict[str, Dict[str, List[Any]]]
+        A dictionary containing the generated reports, with the report name as the key and the report data as the value.
+    time : Time | None
+        A Time object used to track the simulation time
     """
 
-    def __init__(self) -> None:
+    def __init__(self, time=None) -> None:
         """
         Initializes the ReportGenerator.
         """
 
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
+        self.time = time
 
     def clear_reports(self) -> None:
         """
