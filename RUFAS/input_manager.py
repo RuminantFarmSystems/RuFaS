@@ -2055,6 +2055,10 @@ class InputManager:
                         is_primitive_type = self._check_property_type_primitive(nested_value)
                         if is_primitive_type:
                             name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
+                            nested_value["description"] = \
+                                nested_value.get("description",
+                                                 value.get("properties", {}).get("description",
+                                                                                 "No description available"))
                             record = self._create_record(nested_value, name)
                             records.append(record)
                         else:
