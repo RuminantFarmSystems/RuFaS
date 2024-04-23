@@ -203,58 +203,6 @@ class GasEmissionsCalculator:
             return -math.tanh(hours + 3.5) / 3.5
 
     @classmethod
-    def _ambient_temperature(cls, hours: float, min_temp: float, max_temp: float) -> float:
-        """
-        Calculate the ambient temperature based on the time of the day and the minimum and maximum barn temperatures.
-
-        Notes
-        -----
-        The ambient temperature is calculated as follows:
-
-        .. math::
-
-            T_{ambient} = modified\\_hours \\cdot \\frac{T_{max} - T_{min}}{2} + \\frac{T_{max} + T_{min}}{2}
-
-        where:
-
-            :math:`T_{ambient}` is the ambient temperature,
-
-            :math:`T_{min}` and :math:`T_{max}` are the minimum and maximum barn temperatures, respectively,
-
-            :math:`modified_{hours}` is the result of the :func:`_modified_hours` function.
-
-        Parameters
-        ----------
-        hours : float
-            The hour(s) of the day, must be in the range of [0, 24].
-        min_temp : float
-            The minimum barn temperature (:math:`^{\\circ}C`).
-        max_temp : float
-            The maximum barn temperature (:math:`^{\\circ}C`). Must be greater than or equal to `min_temp`.
-
-        Returns
-        -------
-        float
-            The ambient temperature (:math:`^{\\circ}C`).
-
-        Raises
-        ------
-        ValueError
-            If the input `hours` is not in the range [0, 24].
-            If `min_temp` is greater than `max_temp`.
-
-        """
-        if not 0 <= hours <= 24:
-            raise ValueError(f"Hours should be between 0 and 24. Hours provided: {hours}")
-        if min_temp > max_temp:
-            raise ValueError(
-                f"Minimum temperature cannot be greater than maximum temperature: {min_temp=}, {max_temp=}"
-            )
-
-        modified_hours = cls._modified_hours(hours)
-        return modified_hours * (max_temp - min_temp) / 2 + (max_temp + min_temp) / 2
-
-    @classmethod
     def housing_methane_emission(cls, barn_area: float, barn_temp: float) -> float:
         """
         Calculate housing methane emissions from manure handlers.
