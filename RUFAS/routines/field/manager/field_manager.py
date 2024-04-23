@@ -148,6 +148,10 @@ class FieldManager:
         watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
         watering_interval = field_configuration_data.get("watering_interval")
         supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
+        simulate_water_stress = field_configuration_data.get("simulate_water_stress")
+        simulate_temp_stress = field_configuration_data.get("simulate_temp_stress")
+        simulate_nitrogen_stress = field_configuration_data.get("simulate_nitrogen_stress")
+        simulate_phosphorus_stress = field_configuration_data.get("simulate_phosphorus_stress")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
         (
@@ -185,6 +189,10 @@ class FieldManager:
             watering_amount_in_liters=watering_amount_in_liters,
             watering_interval=watering_interval,
             supplement_manure_nutrient_deficiencies=supplement_manure,
+            simulate_water_stress=simulate_water_stress,
+            simulate_temp_stress=simulate_temp_stress,
+            simulate_nitrogen_stress=simulate_nitrogen_stress,
+            simulate_phosphorus_stress=simulate_phosphorus_stress,
         )
 
         return Field(
