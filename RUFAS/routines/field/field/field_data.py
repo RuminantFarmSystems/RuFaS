@@ -54,6 +54,14 @@ class FieldData:
         Amount of water to be added to the field from a manure application (mm).
     annual_irrigation_water_use_total : float, default=0.0
         Cumulative total of water used for irrigation in a year (mm).
+    simulate_water_stress : bool, default True
+        Whether water stress should affect growth of all crops grown in the field.
+    simulate_temp_stress : bool, default True
+        Whether temperature stress should affect growth of all crops grown in the field.
+    simulate_nitrogen_stress : bool, default True
+        Whether nitrogen stress should affect growth of all crops grown in the field.
+    simulate_phosphorus_stress : bool, default True
+        Whether phosphorus stress should affect growth of all crops grown in the field.
 
     Methods
     -------
@@ -89,7 +97,12 @@ class FieldData:
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
 
-    def __post_init__(self):
+    simulate_water_stress: bool = True
+    simulate_temp_stress: bool = True
+    simulate_nitrogen_stress: bool = True
+    simulate_phosphorus_stress: bool = True
+
+    def __post_init__(self) -> None:
         """
         Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
 
