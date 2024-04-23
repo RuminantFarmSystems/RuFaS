@@ -87,12 +87,14 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
     [
         (
             {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"{DISCLAIMER_MESSAGE}" f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+            f"DISCLAIMER,var1,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0,{os.linesep}\"{DISCLAIMER_MESSAGE}\",True,"
+            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",test,{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1.0, True, "test"]}},
-            f"{DISCLAIMER_MESSAGE}" f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1.0{os.linesep}\"{DISCLAIMER_MESSAGE}\",True{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",test{os.linesep}",
             True,
         ),
         (
@@ -102,12 +104,14 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}" f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+            f"DISCLAIMER,var1,var1.v{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,2"
+            f"{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,3{os.linesep}",
             True,
         ),
         (
             {"var1": {"values": [1, 2, 3]}},
-            f"{DISCLAIMER_MESSAGE}" f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            f"DISCLAIMER,var1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1{os.linesep}\"{DISCLAIMER_MESSAGE}\",2{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",3{os.linesep}",
             True,
         ),
         (
@@ -117,7 +121,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}" f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+            f"DISCLAIMER,var1,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,value1{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",,value2{os.linesep}",
             True,
         ),
         (
@@ -127,8 +132,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+            f"DISCLAIMER,var1.v1,var1.v2,var1.map1{os.linesep}\"{DISCLAIMER_MESSAGE}\",1,1,value1{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\",2,2,value2{os.linesep}",
             True,
         ),
         (
@@ -155,11 +160,12 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     ],
                 }
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
-            f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
+            f"DISCLAIMER,simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
+            f"simple_key.subkey3,simple_key.subkey4{os.linesep}\"{DISCLAIMER_MESSAGE}\","
             f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\","
             f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
+            f"\"{DISCLAIMER_MESSAGE}\","
             f'3,"[3, 3]",,,,{os.linesep}',
             True,
         ),
@@ -168,9 +174,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                 "simple_key1": {"values": [1, 2, 3]},
                 "simple_key2": {"values": [4, 5, 6]},
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"simple_key1,simple_key2{os.linesep}"
-            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+            f"DISCLAIMER,simple_key1,simple_key2{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"1,4{os.linesep}\"{DISCLAIMER_MESSAGE}\",2,5{os.linesep}\"{DISCLAIMER_MESSAGE}\",3,6{os.linesep}",
             True,
         ),
         (
@@ -188,13 +193,12 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     ],
                 },
             },
-            f"{DISCLAIMER_MESSAGE}"
-            f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
-            f"simple_key2.subkey1{os.linesep}"
-            f"1,Farm,Field,4,Tractor{os.linesep}"
-            f"2,,,5,{os.linesep}"
-            f"3,,,6,{os.linesep}"
-            f",,,8,{os.linesep}"
+            f"DISCLAIMER,simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
+            f"simple_key2.subkey1{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"1,Farm,Field,4,Tractor{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"2,,,5,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f"3,,,6,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
+            f",,,8,{os.linesep}\"{DISCLAIMER_MESSAGE}\","
             f",,,9,{os.linesep}",
             True,
         ),
@@ -215,13 +219,9 @@ def test_dict_to_file_csv(
 
     if should_write:
         open_mock.assert_any_call("test", "w", encoding="utf-8", errors="strict", newline="")
-        open_mock.assert_any_call("test", "r")
-        open_mock.assert_any_call("test", "w", newline="")
 
-    written_data = "".join(call[1][0] for call in open_mock().write.mock_calls[:-1])
+    written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
 
-    if written_data:
-        written_data = DISCLAIMER_MESSAGE + written_data
     assert written_data == expected_result
 
 
@@ -241,7 +241,7 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
         mock_output_manager.dict_to_file_json(data, "test")
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == DISCLAIMER_MESSAGE + "\n" + json.dumps(data, indent=2)
+    assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, indent=2)
 
 
 def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> None:
@@ -260,7 +260,7 @@ def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> 
         mock_output_manager.dict_to_file_json(data, "test", minify_output_file=True)
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == DISCLAIMER_MESSAGE + "\n" + json.dumps(data, separators=(",", ":"))
+    assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, separators=(",", ":"))
 
 
 def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None:
@@ -663,7 +663,6 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
-        "print_disclaimer": mock_output_manager.print_disclaimer,
         "_validate_units": mock_output_manager._validate_units,
     }
 
@@ -2016,10 +2015,10 @@ def test_get_error_and_warning_counts(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.ERRORS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.WARNINGS, "RuFaS: Ruminant Farm Systems Model.\n"),
-        (LogVerbosity.LOGS, "RuFaS: Ruminant Farm Systems Model.\n"),
+        (LogVerbosity.CREDITS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.ERRORS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.WARNINGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (LogVerbosity.LOGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
     ],
 )
 def test_print_credits(
@@ -2030,29 +2029,6 @@ def test_print_credits(
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
     mock_output_manager.print_credits()
-
-    captured = capfd.readouterr()
-    assert captured.out == expected_output
-
-
-@pytest.mark.parametrize(
-    "log_verbose, expected_output",
-    [
-        (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, f"{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.ERRORS, f"{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.WARNINGS, f"{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.LOGS, f"{DISCLAIMER_MESSAGE}\n"),
-    ],
-)
-def test_print_disclaimer(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
-) -> None:
-    """
-    Unit test for the print_disclaimer() method in OutputManager class.
-    """
-    mock_output_manager._OutputManager__log_verbose = log_verbose
-    mock_output_manager.print_disclaimer()
 
     captured = capfd.readouterr()
     assert captured.out == expected_output

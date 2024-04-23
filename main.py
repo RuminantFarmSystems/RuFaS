@@ -131,7 +131,6 @@ def run_rufas(
     output_manager = OutputManager()
     output_manager.set_log_verbose(verbose)
     output_manager.print_credits()
-    output_manager.print_disclaimer()
     output_manager.create_directory(output_dir)
 
     if load_pool:
