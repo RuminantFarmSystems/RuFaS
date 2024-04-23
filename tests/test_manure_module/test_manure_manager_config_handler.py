@@ -407,9 +407,7 @@ def test_get_bedding_config(mocker: MockerFixture) -> None:
     manure_manager_config_handler.bedding_configs = mock_bedding_configs
 
     # Act
-    actual_bedding_config = manure_manager_config_handler.get_bedding_config(
-        bedding_name=mock_bedding_name
-    )
+    actual_bedding_config = manure_manager_config_handler.get_bedding_config(bedding_name=mock_bedding_name)
 
     # Assert
     patch_for_manure_manager_config_handler_init.assert_called_once_with(
