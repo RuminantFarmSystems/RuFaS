@@ -1747,6 +1747,10 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 0.0,
                 "watering_interval": 0,
                 "supplement_manure_nutrient_deficiencies": True,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
         (
@@ -1765,6 +1769,10 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 500.0,
                 "watering_interval": 3,
                 "supplement_manure_nutrient_deficiencies": False,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
     ],
@@ -1828,6 +1836,10 @@ def test_setup_field(
         assert new_field.field_data.supplement_manure_nutrient_deficiencies == field_config.get(
             "supplement_manure_nutrient_deficiencies"
         )
+        assert new_field.field_data.simulate_water_stress == field_config.get("simulate_water_stress")
+        assert new_field.field_data.simulate_temp_stress == field_config.get("simulate_temp_stress")
+        assert new_field.field_data.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
+        assert new_field.field_data.simulate_phosphorus_stress == field_config.get("simulate_phosphorus_stress")
 
         assert new_field.soil == mocked_soil_profile
         assert new_field.available_fertilizer_mixes == {
