@@ -4338,8 +4338,7 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Bedding Type -- The material used for bedding pack.",
-          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+          "description": "Name of the bedding configuration to be used for in the manure management scenario."
         },
         "manure_handler": {
           "type": "string",
