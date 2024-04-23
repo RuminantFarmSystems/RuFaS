@@ -1736,7 +1736,8 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
 
     # Act
-    anaerobic_lagoon._update_methane_emission(mock_daily_output)
+    actual_methane_emission, actual_methane_emission_from_VSd = anaerobic_lagoon._update_methane_emission(
+        mock_daily_output)
 
     # Assert
     # fmt: off
@@ -1749,7 +1750,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
     # fmt: on
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    assert mock_daily_output.storage_methane == expected_methane_emission
+    assert actual_methane_emission == expected_methane_emission
 
 
 @pytest.mark.parametrize(
