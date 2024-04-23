@@ -833,29 +833,17 @@ class OutputManager(object):
 
     def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
-        Returns a filtered variables pool based on either inclusion or exclusion.
+        Returns a filtered variables pool based on options specified in filter_content.
 
         Parameters
         ----------
-        filter_patterns : List[str]
-            A list of patterns the user has selected to filter the variables pool.
-
-        input_file_name : str, optional
-            The filter patterns file name - necessary for logging purposes
+        filter_content : Dict[str, Any]
+            A dictionary that contains filtering options.
 
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
-
-        Notes
-        -----
-        The first item in the filter_patterns list will determine whether the patterns are treated as
-        exclusionary or inclusionary. If the first pattern matches the value of the exclude_keyword
-        variable defined in this function, it will treat the rest of the filter list as exclusionary
-        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
-        as inclusionary.
-
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
@@ -867,7 +855,6 @@ class OutputManager(object):
             "filter_by_exclusion": filter_by_exclusion,
             "use_filter_name": use_filter_name,
         }
-        filter_excl_msg: str = ""
         if filter_by_exclusion:
             filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
@@ -895,10 +882,8 @@ class OutputManager(object):
             sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
-                if use_filter_name:
-                    results[f"{filter_name}_{counter}"] = {"values": sliced_data}
-                else:
-                    results[key] = {"values": sliced_data}
+                combined_key = f"{filter_name}_{counter}" if use_filter_name else key
+                results[combined_key] = {"values": sliced_data}
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -910,14 +895,12 @@ class OutputManager(object):
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
-                    if use_filter_name:
-                        combined_key = f"{filter_name}_{counter}.{filtered_key}"
-                    else:
-                        combined_key = filtered_key
-                    if combined_key in results:
+                    combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
+                    if combined_key in results.keys():
                         results[combined_key]["values"].extend(filtered_value)
                     else:
                         results[combined_key] = {"values": filtered_value}
+            counter += 1
         return results
 
     def save_results(

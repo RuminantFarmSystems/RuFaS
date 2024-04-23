@@ -132,7 +132,7 @@ class GraphGenerator:
 
         Returns
         -------
-        log_pool : List[Dict[str, str | Dict[str, str]]]
+        log_pool : List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
 
@@ -157,8 +157,8 @@ class GraphGenerator:
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             prepared_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
-            log_pool = self._log_non_numerical_data(filtered_pool, graph_details)
-            all_logs = log_pool + graph_filter_validation_logs
+            non_numeric_data_logs = self._log_non_numerical_data(filtered_pool, graph_details)
+            all_logs = non_numeric_data_logs + graph_filter_validation_logs
 
             found_errors = any("error" in log for log in all_logs)
             if found_errors:
@@ -169,7 +169,7 @@ class GraphGenerator:
             fig, _ = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
-            self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
+            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
                 graph_details["legend"] = list(prepared_data.keys())
@@ -178,11 +178,11 @@ class GraphGenerator:
             matplotlib.pyplot.close()
             return all_logs
         except Exception as e:
-            all_logs = {
+            all_logs = [{
                 "error": f"Error plotting {graph_details.get('title')} data set",
                 "message": f"Unforeseen error {e} when trying to graph data.",
                 "info_map": info_map,
-            }
+            }]
 
         return all_logs
 
@@ -261,25 +261,29 @@ class GraphGenerator:
         }
         title = graph_details.get("title")
         log_pool: List[Dict[str, str | Dict[str, str]]] = []
-        non_int_float_keys = [
-            key
-            for key, value in filtered_pool.items()
-            if not (
-                isinstance(value["values"], (int, float))
-                or (
-                    isinstance(value["values"], list)
-                    and all(isinstance(item, (int, float)) for item in value["values"])
+        for key, value in filtered_pool.items():
+            if isinstance(value["values"], list):
+                if non_numerical_data := [item for item in value["values"] if not isinstance(item, (int, float))]:
+                    non_numerical_data_types = set([
+                        type(non_numerical_item) for non_numerical_item in non_numerical_data
+                    ])
+                    log_pool.append(
+                        {
+                            "error": f"Can't plot {title} data set",
+                            "message": f"{key} key contains non-numerical data that are {non_numerical_data_types} "
+                                       "and can't be graphed.",
+                            "info_map": info_map,
+                        }
+                    )
+            elif not isinstance(value["values"], (int, float)):
+                log_pool.append(
+                    {
+                        "error": f"Can't plot {title} data set",
+                        "message": f"{key} key contains non-numerical data that are {type(value['values'])} "
+                                   "and can't be graphed.",
+                        "info_map": info_map,
+                    }
                 )
-            )
-        ]
-        for key in non_int_float_keys:
-            log_pool.append(
-                {
-                    "error": f"Can't plot {title} data set",
-                    "message": f"{key} key contains data that is non-numerical and can't be graphed.",
-                    "info_map": info_map,
-                }
-            )
         return log_pool
 
     def _draw_graph(
