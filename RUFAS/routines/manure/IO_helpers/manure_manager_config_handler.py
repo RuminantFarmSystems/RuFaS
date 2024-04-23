@@ -70,9 +70,7 @@ class ManureManagerConfigHandler:
             return self.bedding_configs[bedding_name]
         except KeyError:
             info_map = {"class": self.__class__.__name__, "function": self.get_bedding_config.__name__}
-            error_title = (
-                f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'."
-            )
+            error_title = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'."
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
@@ -175,9 +173,7 @@ class ManureManagerConfigHandler:
                 raise ValueError(f"Duplicate configurations for '{bedding_name}'.")
             bedding_type = BeddingType(config["bedding_type"])
             del config["bedding_type"]
-            available_bedding_configs[bedding_name] = BeddingConfig(
-                **config, bedding_type=bedding_type
-            )
+            available_bedding_configs[bedding_name] = BeddingConfig(**config, bedding_type=bedding_type)
         return available_bedding_configs
 
     @classmethod
