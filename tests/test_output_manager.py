@@ -1914,47 +1914,6 @@ def test_route_logs(
     mock_output_manager._route_logs = output_manager_original_method_states["_route_logs"]
 
 
-def test_remove_disclaimer_from_input_file() -> None:
-    output_manager = OutputManager()
-    dummy_input = (
-        f"{DISCLAIMER_MESSAGE}\n"
-        "{\n"
-        '    "vars": {\n'
-        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
-        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
-        "    }\n"
-        "}"
-    )
-    expected = (
-        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
-        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
-        '"info_map": {}}\n    }\n}'
-    )
-    with patch("builtins.open", mock_open(read_data=dummy_input)):
-        actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
-    assert actual == expected
-
-
-def test_remove_disclaimer_from_input_file_no_disclaimer() -> None:
-    output_manager = OutputManager()
-    dummy_input = (
-        "{\n"
-        '    "vars": {\n'
-        '        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},\n'
-        '        "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}\n'
-        "    }\n"
-        "}"
-    )
-    expected = (
-        '{\n    "vars": {\n        "var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, '
-        '"imvar2": 2}},\n        "var2": {"values": {"a": 1, "b": 2}, '
-        '"info_map": {}}\n    }\n}'
-    )
-    with patch("builtins.open", mock_open(read_data=dummy_input)):
-        actual = output_manager._remove_disclaimer_from_input_file(Path("path/to/file"))
-    assert actual == expected
-
-
 def test_load_variables_pool_from_file_valid_path(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
