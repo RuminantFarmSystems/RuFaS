@@ -393,7 +393,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, Any],
-    ) -> Dict[str, List[float]] | None:
+    ) -> Dict[str, List[float]]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
