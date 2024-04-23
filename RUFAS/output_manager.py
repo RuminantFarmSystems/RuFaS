@@ -682,7 +682,7 @@ class OutputManager(object):
 
         df = pd.concat(csv_columns, axis=1)
         df.insert(loc=0, column="DISCLAIMER", value=DISCLAIMER_MESSAGE)
-        print(df)
+
         df.to_csv(path, index=False)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
@@ -1242,25 +1242,6 @@ class OutputManager(object):
         self.warnings_pool = {}
         self.errors_pool = {}
         self.logs_pool = {}
-
-    def _remove_disclaimer_from_input_file(self, file_path: Path) -> str:
-        """
-        Read the input data file, remove the disclaimer message is it is present on the first line.
-
-        Parameters
-        ----------
-        file_path : Path
-            The path to the file to be loaded to the variables pool.
-
-        Returns
-        -------
-            The input file content joined into a string
-        """
-        with open(file_path, "r") as read_file:
-            lines = read_file.readlines()
-            if lines[0].strip("\n") == DISCLAIMER_MESSAGE:
-                lines = lines[1:]
-        return "".join(lines)
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """Loads the Output Manager variables pool from file path provided by user.
