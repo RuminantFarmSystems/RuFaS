@@ -903,10 +903,12 @@ def test_generate_report(
     mocker.patch.object(
         report_generator,
         "_prepare_report_data_to_be_graphed",
-        side_effect=lambda graph_data, filter_content, report_name: [{
-            "message": f"Prepared graph data for report: {report_name}",
-            "info_map": {},
-        }],
+        side_effect=lambda graph_data, filter_content, report_name: [
+            {
+                "message": f"Prepared graph data for report: {report_name}",
+                "info_map": {},
+            }
+        ],
     )
     mocker.patch("RUFAS.report_generator.Utility.filter_dictionary", return_value=expected_report_columns)
     if perform_aggregations_exception:
