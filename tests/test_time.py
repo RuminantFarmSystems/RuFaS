@@ -455,7 +455,7 @@ def test_record_time(mock_time: Time) -> None:
     time = mock_time
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         time.record_time()
-        assert add_var.call_count == 3
+        assert add_var.call_count == 4
 
 
 def test_is_last_day_of_simulation(mock_time: Time) -> None:

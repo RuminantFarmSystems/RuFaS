@@ -260,19 +260,15 @@ def test_run_pre_annual_routines(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "print_day, initial_simulation_day, time_str_return_value, expected_simulation_day",
+    "initial_simulation_day, time_str_return_value, expected_simulation_day",
     [
-        (True, 0, "1", 1),
-        (False, 0, "1", 1),
-        (True, 10, "11", 11),
-        (False, 10, "11", 11),
-        (True, 365, "366", 366),
-        (False, 365, "366", 366),
+        (0, "1", 1),
+        (10, "11", 11),
+        (365, "366", 366),
     ],
 )
 def test_advance_time(
     mocker: MockerFixture,
-    print_day: bool,
     initial_simulation_day: int,
     time_str_return_value,
     expected_simulation_day: int,
@@ -289,25 +285,13 @@ def test_advance_time(
     simulation_engine.time = mock_time
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.animal_manager.simulation_day = initial_simulation_day
-    patch_for_add_log = mocker.patch("RUFAS.simulation_engine.om.add_log")
 
     # Act
-    simulation_engine._advance_time(print_day)
+    simulation_engine._advance_time()
 
     # Assert
     simulation_engine.time.advance.assert_called_once()
     assert simulation_engine.animal_manager.simulation_day == expected_simulation_day
-
-    if print_day:
-        expected_log_message = f"simulating day: {time_str_return_value}"
-        expected_info_map = {
-            "class": "SimulationEngine",
-            "function": "_advance_time",
-            "print_day": print_day,
-        }
-        patch_for_add_log.assert_called_once_with("simulation_day", expected_log_message, expected_info_map)
-    else:
-        patch_for_add_log.assert_not_called()
 
 
 @pytest.mark.parametrize(
