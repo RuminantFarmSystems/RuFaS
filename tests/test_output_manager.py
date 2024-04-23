@@ -281,9 +281,9 @@ def test_get_units_substr(
             },
             f"DISCLAIMER,simple_key.key1 (random unit 1),simple_key.key2 (random unit 2)"
             f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
-            f"1,\"[1, 1]\"{os.linesep}"
+            f'1,"[1, 1]"{os.linesep}'
             f'"{DISCLAIMER_MESSAGE}",'
-            f"2,\"[2, 2]\"{os.linesep}"
+            f'2,"[2, 2]"{os.linesep}'
             f'"{DISCLAIMER_MESSAGE}",'
             f'3,"[3, 3]"{os.linesep}',
             True,
