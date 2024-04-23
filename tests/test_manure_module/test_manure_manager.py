@@ -160,8 +160,8 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
 
     mock_manure_manager_config_handler = mocker.MagicMock()
 
-    mock_custom_bedding_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_custom_bedding_config.return_value = mock_custom_bedding_config
+    mock_bedding_config = mocker.MagicMock()
+    mock_manure_manager_config_handler.get_bedding_config.return_value = mock_bedding_config
     mock_bedding = mocker.MagicMock()
     patch_for_bedding_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.BeddingFactory.get_instance",
@@ -218,10 +218,10 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     # Assert
     patch_for_manure_manager_pen_init.assert_called_once_with(mock_pen)
 
-    mock_manure_manager_config_handler.get_custom_bedding_config.assert_called_once_with(bedding_type)
+    mock_manure_manager_config_handler.get_bedding_config.assert_called_once_with(bedding_type)
     patch_for_bedding_factory_get_instance.assert_called_once_with(
-        bedding_type_name=bedding_type,
-        custom_bedding_config=mock_custom_bedding_config,
+        bedding_name=bedding_type,
+        bedding_config=mock_bedding_config,
     )
     assert manure_manager.beddings[pen_id] == mock_bedding
 
