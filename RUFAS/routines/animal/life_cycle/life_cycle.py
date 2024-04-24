@@ -165,7 +165,7 @@ class LifeCycleManager:
             "greater_than_3": 0.0,
         }
 
-        self.replacement_market: List[Cow] = []
+        self.replacement_market: List[HeiferIII] = []
         self.animal_population: Optional[AnimalPopulation] = None
 
     def initialize_herd(
@@ -191,7 +191,7 @@ class LifeCycleManager:
             heiferIIs=list(map(HeiferII, animal_population["heiferIIs"])),
             heiferIIIs=list(map(HeiferIII, animal_population["heiferIIIs"])),
             cows=list(map(Cow, animal_population["cows"])),
-            replacement=list(map(Cow, animal_population["replacement"])),
+            replacement=list(map(HeiferIII, animal_population["replacement"])),
         )
         self.herd_num = herd_data["herd_num"]
         self._set_avg_CI()
@@ -525,16 +525,6 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
-        heiferI_vals.update(repro_sub_protocol=HeiferII.get_user_defined_repro_sub_protocol())
-        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
-            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-            heiferI_vals.update(synch_ed_method_h="")
-        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-        else:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h="")
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 

@@ -26,7 +26,7 @@ class AnimalPopulation:
         A list of HeiferIII (stage III heifers) instances in the herd.
     cows : List[Cow]
         A list of Cow instances in the herd.
-    replacement : List[Cow]
+    replacement : List[HeiferIII]
         A list of replacement Cow instances in the herd.
     current_animal_id : int, default=0
         The highest ID number among all animals in the herd.
@@ -40,7 +40,7 @@ class AnimalPopulation:
     heiferIIs: List[HeiferII]
     heiferIIIs: List[HeiferIII]
     cows: List[Cow]
-    replacement: List[Cow]
+    replacement: List[HeiferIII]
 
     current_animal_id: int = 0
     order_by_random: bool = True
@@ -53,6 +53,7 @@ class AnimalPopulation:
         if ids:
             self.current_animal_id = max(ids)
 
+    # TODO: Need to return a str
     def __repr__(self):
         """Dictionary representation of the AnimalPopulation object"""
         return {
@@ -61,7 +62,7 @@ class AnimalPopulation:
             "heiferIIs": [heiferII.get_heiferII_values() for heiferII in self.heiferIIs],
             "heiferIIIs": [heiferIII.get_heiferIII_values() for heiferIII in self.heiferIIIs],
             "cows": [cow.get_cow_values() for cow in self.cows],
-            "replacement": [replacement.get_replacement_values() for replacement in self.replacement],
+            "replacement": [replacement.get_heiferIII_values() for replacement in self.replacement],
         }
 
     def next_id(self) -> int:
@@ -143,9 +144,9 @@ class AnimalPopulation:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self) -> List[Cow]:
+    def get_replacement_cows(self) -> List[HeiferIII]:
         """
-        Retrieve a list of replacement Cow instances.
+        Retrieve a list of replacement heiferIII instances.
 
         Returns
         -------
