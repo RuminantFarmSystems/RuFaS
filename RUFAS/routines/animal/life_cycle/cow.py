@@ -751,10 +751,6 @@ class Cow(HeiferIII):
             If reproduction program not in list of current reproduction programs.
 
         """
-        # if self.culled:
-        #     # TODO: remove this part of the code if never should be used
-        #     print("CULLED HERE")
-        #     return None
 
         new_born = False
         self.days_born += 1
