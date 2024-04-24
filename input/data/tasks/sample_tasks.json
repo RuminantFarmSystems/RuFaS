@@ -3,18 +3,26 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SIGNLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json"
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 1",
+      "log_verbosity": "logs"
+    },
+    {
+      "task_type": "INPUT_DATA_VALIDATION",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 21",
+      "log_verbosity": "logs"
     },
     {
       "task_type": "SIMULATION_SIGNLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json"
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 3",
+      "log_verbosity": "logs"
     },
     {
-      "task_type": "SIMULATION_SIGNLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json"
-    },
-    {
-      "task_type": "SENSITIVITY_ANALYSIS"
+      "task_type": "SENSITIVITY_ANALYSIS",
+      "output_prefix": "Task 4",
+      "log_verbosity": "logs"
     }
   ]
 }
