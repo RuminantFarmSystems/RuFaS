@@ -2072,8 +2072,11 @@ class InputManager:
                 for nested_key, nested_value in property_value.items():
                     if isinstance(nested_value, dict):
                         if self._check_property_type_primitive(nested_value):
-                            name = prefix + sep + property_key + sep + nested_key if prefix \
+                            name = (
+                                prefix + sep + property_key + sep + nested_key
+                                if prefix
                                 else property_key + sep + nested_key
+                            )
                             nested_value["description"] = nested_value.get(
                                 "description",
                                 property_value.get("properties", {}).get("description", "No description available"),
