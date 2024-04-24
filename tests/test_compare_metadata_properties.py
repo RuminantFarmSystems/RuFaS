@@ -69,7 +69,7 @@ def test_compare_metadata_properties() -> None:
 )
 def test_compare_metadata_properties_file_handling_errors(error: Type[FileNotFoundError | PermissionError],
                                                           function_to_patch: str, expected_message: str,
-                                                          capsys: pytest.CaptureFixture
+                                                          capsys: pytest.CaptureFixture[str]
                                                           ) -> None:
     """
     Test error handling for file errors during the write process in compare_metadata_properties.
