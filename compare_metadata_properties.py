@@ -57,7 +57,7 @@ def compare_metadata_properties() -> None:
             sections = {
                 "dictionary_item_added": "Items added:\n",
                 "dictionary_item_removed": "Items removed:\n",
-                "values_changed": "Values changed:\n"
+                "values_changed": "Values changed:\n",
             }
 
             for key, heading in sections.items():
