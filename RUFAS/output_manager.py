@@ -90,6 +90,8 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
+    time : Time
+        A Time object used to track the simulation time
     """
 
     __instance = None
@@ -124,6 +126,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self.time = None
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -951,7 +954,7 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator()
+        report_generator = ReportGenerator(self.time)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -1044,7 +1047,7 @@ class OutputManager(object):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    graph_generator = GraphGenerator(self.__metadata_prefix, self.time)
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
