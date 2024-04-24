@@ -2206,24 +2206,37 @@ class Cow(HeiferIII):
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
-            # cull_reason_cull_prob = []
-            if cull_reason_rand <= 0.1633:
-                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull_prob"]
+            cull_prob = 0
+            if cull_reason_rand <= (
+                    cull_prob := cull_prob + AnimalBase.config["feet_leg_cull"]["probability"]
+            ):
+                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull"]["cull_day_prob"]
                 self.cull_reason = const.LAMENESS_CULL
-            elif cull_reason_rand <= 0.4516:
-                cull_reason_cull_prob = AnimalBase.config["injury_cull_prob"]
+
+            elif cull_reason_rand <= (
+                    cull_prob := cull_prob + AnimalBase.config["injury_cull"]["probability"]
+            ):
+                cull_reason_cull_prob = AnimalBase.config["injury_cull"]["cull_day_prob"]
                 self.cull_reason = const.INJURY_CULL
-            elif cull_reason_rand <= 0.6955:
-                cull_reason_cull_prob = AnimalBase.config["mastitis_cull_prob"]
+
+            elif cull_reason_rand <= (
+                    cull_prob := cull_prob + AnimalBase.config["mastitis_cull"]["probability"]
+            ):
+                cull_reason_cull_prob = AnimalBase.config["mastitis_cull"]["cull_day_prob"]
                 self.cull_reason = const.MASTITIS_CULL
-            elif cull_reason_rand <= 0.8346:
-                cull_reason_cull_prob = AnimalBase.config["disease_cull_prob"]
+
+            elif cull_reason_rand <= (
+                    cull_prob := cull_prob + AnimalBase.config["disease_cull"]["probability"]
+            ):
+                cull_reason_cull_prob = AnimalBase.config["disease_cull"]["cull_day_prob"]
                 self.cull_reason = const.DISEASE_CULL
-            elif cull_reason_rand <= 0.8991:
-                cull_reason_cull_prob = AnimalBase.config["udder_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob + AnimalBase.config["udder_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["udder_cull"]["cull_day_prob"]
                 self.cull_reason = const.UDDER_CULL
+
             else:
-                cull_reason_cull_prob = AnimalBase.config["unknown_cull_prob"]
+                cull_reason_cull_prob = AnimalBase.config["unknown_cull"]["cull_day_prob"]
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()
