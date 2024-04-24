@@ -42,6 +42,7 @@ def main() -> None:
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),
             clear_output_directory=cmd_arguments.clear_output,
+            produce_graphics=not cmd_arguments.no_graphics,
         )
         # run_rufas(
         #     load_pool,

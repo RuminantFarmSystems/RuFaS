@@ -67,6 +67,7 @@ class TaskManager:
         exclude_info_maps: bool,
         output_directory: Path,
         clear_output_directory: bool,
+        produce_graphics: bool,
     ) -> None:
         self.input_manager.start_data_processing(metadata_path)
         self.output_manager.run_startup_sequence(
@@ -77,8 +78,8 @@ class TaskManager:
             workers, maxtasksperchild=1
         )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
         self._parse_input_tasks()
-        self._handle_single_run_tasks()
-        self._handle_multi_run_tasks()
+        self._handle_single_run_tasks(produce_graphics)
+        self._handle_multi_run_tasks(produce_graphics)
 
     def _parse_input_tasks(self) -> None:
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
@@ -89,20 +90,21 @@ class TaskManager:
             else:
                 self.parsed_single_run_args.append(input_task)
 
-    def _handle_single_run_tasks(self) -> None:
-        results = self.pool.imap_unordered(self.task_single, self.parsed_single_run_args)
+    def _handle_single_run_tasks(self, produce_graphics: bool) -> None:
+        task_with_args = partial(self.task_single, produce_graphics=produce_graphics)
+        results = self.pool.imap_unordered(task_with_args, self.parsed_single_run_args)
         for _ in results:
             pass
 
-    def _handle_multi_run_tasks(self) -> None:
+    def _handle_multi_run_tasks(self, produce_graphics: bool) -> None:
         # TODO use self.input_manager to read input and patch it for each task
-        task_with_args = partial(self.task_multi, const_var=1)
+        task_with_args = partial(self.task_multi, produce_graphics=produce_graphics)
         results = self.pool.imap_unordered(task_with_args, self.parsed_multi_run_args)
         for _ in results:
             pass
 
     @staticmethod
-    def task_single(args: Dict[str, Any]) -> None:  # TODO imeplement
+    def task_single(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
         output_manager = OutputManager()
         output_manager.run_startup_sequence(
             LogVerbosity(args["log_verbosity"]),
@@ -127,7 +129,7 @@ class TaskManager:
             print("error")
 
     @staticmethod
-    def task_multi(args: Dict[str, Any], const_var: int) -> None:  # TODO imeplement
+    def task_multi(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
         output_manager = OutputManager()
         output_manager.run_startup_sequence(
             LogVerbosity(args["log_verbosity"]),
