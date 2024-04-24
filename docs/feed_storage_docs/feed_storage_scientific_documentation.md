@@ -96,7 +96,7 @@ The loss coefficients for the different hay storages are defined in the table:
 |Protected Tarped   |0.0000108         |
 |Unprotected Outdoor|0.00006           |
 
-Table: 1.2.9
+Table: $1.2.9$
 
 $L_{additional}$ for protected indoor hay is 0.
 
@@ -158,10 +158,28 @@ Where $mass_{fresh}$ is the fresh mass of the crop when it is ensiled ($kg$) and
 
 ## 2 Nutrient Loss
 
-The equation for recalculating the percentage of dry matter  nurient:
+Nutrient loss associated with loss of dry matter from stored crops is calculated for hay, silage and baleage.
+
+The equation for recalculating the percentage of dry matter nurient:
 
 $$
-n_{updated} = \frac{(\frac{n_{initial}}{100} - C) \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.1}
+n_{updated} = \frac{max(0, \frac{n_{initial}}{100} - C) \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.1}
 $$
 
-Where $n_{updated}$ is the updated percentage of the target nutrient in the stored crop's dry 
+Where $n_{updated}$ is the percentage of the target nutrient in the stored crop's dry matter mass after accounting for dry matter loss, $n_{initial}$ is the percentage of the target nutrient in the stored crop's dry matter mass before accounting for dry matter loss, $C$ is the fractional loss coefficient specific to the nutrient and storage type, and $DL_{fraction}$ is the fraction of dry matter lost.
+
+$DL_{fraction}$ is calculated with the equation:
+
+$$
+DL_{fraction} = \frac{DM_{updated}}{DM_{initial}} \tag{2.2}
+$$
+
+Where $DM_{updated}$ is the dry matter mass in the stored crop after accounting for dry matter loss ($kg$), and $DM_{initial}$ is the amount of dry matter mass in the stored crop before accounting for dry matter loss ($kg$).
+
+### 2.1 Nutrient Loss in Hay
+
+The following fractional loss coefficients are used in equation $2.1$ when recalculating the nutrient percentages in hay:
+
+|||
+
+
