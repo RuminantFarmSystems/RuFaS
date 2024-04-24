@@ -217,7 +217,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
 
 
 @pytest.mark.parametrize(
-    ['combined_var_input', 'expected_output'],
+    ["combined_var_input", "expected_output"],
     [
         ("dummy_var", "dummy_var"),
         ("dummy_prefix.dummy_var", "dummy_var"),
@@ -231,7 +231,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
         ("DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3", "dummy_var.dummy_var2.dummy_var3"),
         ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4", "dummy_var.dummy_var2.dummy_var3.dummy_var4"),
         ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.field='field'", "dummy_var.dummy_var2.dummy_var3"),
-    ]
+    ],
 )
 def test_generage_legend_keys(combined_var_input: str, expected_output: str, graph_generator: GraphGenerator) -> None:
     actual_output = graph_generator._generage_legend_keys(combined_var_input)
