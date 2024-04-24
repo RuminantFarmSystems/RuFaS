@@ -2,9 +2,10 @@ from functools import partial
 from typing import Any, Dict, List
 import multiprocessing
 from enum import Enum
+from pathlib import Path
 
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.simulation_engine import SimulationEngine
 
 
@@ -59,8 +60,18 @@ class TaskManager:
         self.parsed_single_run_args: List[Dict[str, Any]] = []
         self.parsed_multi_run_args: List[Dict[str, Any]] = []
 
-    def start(self, metadata_path: str) -> None:
+    def start(
+        self,
+        metadata_path: str,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+    ) -> None:
         self.input_manager.start_data_processing(metadata_path)
+        self.output_manager.run_startup_sequence(
+            verbosity, exclude_info_maps, output_directory, clear_output_directory, Path("")
+        )  # TODO get the correct value for self.output_manager.run_startup_sequence variables_file_path arg
         workers: int = self.input_manager.get_data("tasks.parallel_workers")
         self.pool = multiprocessing.Pool(
             workers, maxtasksperchild=1
@@ -92,7 +103,16 @@ class TaskManager:
 
     @staticmethod
     def task_single(args: Dict[str, Any]) -> None:  # TODO imeplement
+        output_manager = OutputManager()
+        output_manager.run_startup_sequence(
+            LogVerbosity(args["log_verbosity"]),
+            args["exclude_info_maps"],
+            Path(args["output_directory"]),
+            False,
+            Path(""),
+        )
         input_manager = InputManager()
+
         if args["task_type"] == TaskType.HERD_INITIALIZATION:
             pass
         elif args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
@@ -108,6 +128,14 @@ class TaskManager:
 
     @staticmethod
     def task_multi(args: Dict[str, Any], const_var: int) -> None:  # TODO imeplement
+        output_manager = OutputManager()
+        output_manager.run_startup_sequence(
+            LogVerbosity(args["log_verbosity"]),
+            args["exclude_info_maps"],
+            Path(args["output_directory"]),
+            False,
+            Path(""),
+        )
         input_manager = InputManager()
         if args["task_type"] == TaskType.SIMULATION_MULTI_RUN:
             pass

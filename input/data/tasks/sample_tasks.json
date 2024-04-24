@@ -6,6 +6,14 @@
       "output pool path":"input/data/animal/default_animal.json"
     },
     {
+      "task_type": "SIMULATION_SIGNLE_RUN",
+      "output pool path":"input/data/animal/default_animal.json"
+    },
+    {
+      "task_type": "SIMULATION_SIGNLE_RUN",
+      "output pool path":"input/data/animal/default_animal.json"
+    },
+    {
       "task_type": "SENSITIVITY_ANALYSIS"
     }
   ]

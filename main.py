@@ -30,29 +30,37 @@ NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 def main() -> None:
     cmd_arguments = parse_gnu_args()
-    if cmd_arguments.load_pool:
-        load_pool = True
-    else:
-        load_pool = False
+    # if cmd_arguments.load_pool:
+    #     load_pool = True
+    # else:
+    #     load_pool = False
     try:
-        run_rufas(
-            load_pool,
-            produce_graphics=not cmd_arguments.no_graphics,
-            format_option=cmd_arguments.format_option,
-            verbose=LogVerbosity(cmd_arguments.verbose),
-            clear_output=cmd_arguments.clear_output,
+        task_manager = TaskManager()
+        task_manager.start(
+            "input/metadata/task_manager_metadata.json",
+            verbosity=LogVerbosity(cmd_arguments.verbose),
             exclude_info_maps=cmd_arguments.exclude_info_maps,
-            only_run_validation=cmd_arguments.only_run_validation,
-            graphics_dir=Path(cmd_arguments.graphics_dir),
-            vars_file_path=Path(cmd_arguments.load_pool),
-            output_dir=Path(cmd_arguments.output_dir),
-            filters_dir=Path(cmd_arguments.filters_dir),
-            csv_dir=Path(cmd_arguments.csv_dir),
-            init_herd=cmd_arguments.init_herd,
-            save_animals=cmd_arguments.save_animals,
-            save_animals_dir=Path(cmd_arguments.save_animals_dir),
-            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
+            output_directory=Path(cmd_arguments.output_dir),
+            clear_output_directory=cmd_arguments.clear_output,
         )
+        # run_rufas(
+        #     load_pool,
+        #     produce_graphics=not cmd_arguments.no_graphics,
+        #     format_option=cmd_arguments.format_option,
+        #     verbose=LogVerbosity(cmd_arguments.verbose),
+        #     clear_output=cmd_arguments.clear_output,
+        #     exclude_info_maps=cmd_arguments.exclude_info_maps,
+        #     only_run_validation=cmd_arguments.only_run_validation,
+        #     graphics_dir=Path(cmd_arguments.graphics_dir),
+        #     vars_file_path=Path(cmd_arguments.load_pool),
+        #     output_dir=Path(cmd_arguments.output_dir),
+        #     filters_dir=Path(cmd_arguments.filters_dir),
+        #     csv_dir=Path(cmd_arguments.csv_dir),
+        #     init_herd=cmd_arguments.init_herd,
+        #     save_animals=cmd_arguments.save_animals,
+        #     save_animals_dir=Path(cmd_arguments.save_animals_dir),
+        #     terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
+        # )
     except Exception as e:
         info_map = {
             "class": "No caller class",
@@ -69,7 +77,7 @@ def main() -> None:
         output_manager.dump_all_nondata_pools(
             cmd_arguments.output_dir,
             cmd_arguments.exclude_info_maps,
-            cmd_arguments.format_option,
+            "block",
         )
         output_manager.add_error(
             "Early termination",
@@ -502,10 +510,20 @@ def parse_gnu_args() -> argparse.Namespace:
         help="CAUTION! Clears output directory before running the simulation",
         action="store_true",
     )
+    parser.add_argument(
+        "-i",
+        "--exclude_info_maps",
+        help="Exclude info_maps from the output",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-O",
+        "--output-dir",
+        help="The saving directory for output",
+        default="output/",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    # main()
-    task_manager = TaskManager()
-    task_manager.start("input/metadata/task_manager_metadata.json")
+    main()

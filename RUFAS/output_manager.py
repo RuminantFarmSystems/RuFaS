@@ -1316,3 +1316,18 @@ class OutputManager(object):
         """
 
         self._exclude_info_maps_flag = exclude_info_maps
+
+    def run_startup_sequence(
+        self,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+        variables_file_path: Path,
+    ) -> None:  # TODO test coverage and docstring
+        self.set_exclude_info_maps_flag(exclude_info_maps)
+        self.set_log_verbose(verbosity)
+        self.print_credits()
+        self.create_directory(output_directory)
+        if clear_output_directory:
+            self.clear_output_dir(variables_file_path, output_directory)
