@@ -155,3 +155,13 @@ M_{effluent} = mass_{fresh} \cdot ((1 - dryfrac) - 0.7) \tag{1.3.1.4}
 $$
 
 Where $mass_{fresh}$ is the fresh mass of the crop when it is ensiled ($kg$) and $dryfrac$ is the fraction of the crop's fresh mass which is dry matter when it is ensiled.
+
+## 2 Nutrient Loss
+
+The equation for recalculating the percentage of dry matter  nurient:
+
+$$
+n_{updated} = \frac{(\frac{n_{initial}}{100} - C) \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.1}
+$$
+
+Where $n_{updated}$ is the updated percentage of the target nutrient in the stored crop's dry 
