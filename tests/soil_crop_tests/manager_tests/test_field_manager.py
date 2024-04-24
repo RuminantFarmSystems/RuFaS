@@ -10,6 +10,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.field.manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -23,6 +24,7 @@ from pytest_mock.plugin import MockerFixture
 from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -44,35 +46,37 @@ def input_manager_original_method_states(
 
 
 @pytest.mark.parametrize("field_blob_names", [[], ["field_1", "field_2", "field_3"]])
-def test_field_manager_init(field_blob_names) -> None:
+def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) -> None:
     """Tests that FieldManager init method runs correctly."""
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
+    mocked_manure_manager = mocker.MagicMock(ManureManager)
+    mocked_feed_manager = mocker.MagicMock(FeedManager)
     expected_field_setup_calls = [
         call(field_name, mocked_manure_manager, mocked_feed_manager) for field_name in field_blob_names
     ]
-    with (
-        patch(
-            "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
-            return_value=field_blob_names,
-        ) as patched_data_keys_by_properties,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-            return_value=MagicMock(Field),
-        ) as patched_field_setup,
-        patch.object(om, "add_warning") as warning,
-    ):
-        field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
+    data_keys_by_properties = mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_blob_names
+    )
+    get_manure_supplier = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._get_manure_supplier",
+        return_value=mocked_manure_manager,
+    )
+    field_setup = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
+    )
+    add_warning = mocker.patch.object(om, "add_warning")
 
-        assert len(field_manager.fields) == len(field_blob_names)
-        assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-        patched_data_keys_by_properties.assert_called_once()
-        if len(field_blob_names) > 0:
-            patched_field_setup.assert_has_calls(expected_field_setup_calls)
-            warning.assert_not_called()
-        else:
-            patched_field_setup.assert_not_called()
-            warning.assert_called_once()
+    field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
+
+    assert len(field_manager.fields) == len(field_blob_names)
+    assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
+    data_keys_by_properties.assert_called_once()
+    get_manure_supplier.assert_called_once_with(mocked_manure_manager)
+    if len(field_blob_names) > 0:
+        field_setup.assert_has_calls(expected_field_setup_calls)
+        add_warning.assert_not_called()
+    else:
+        field_setup.assert_not_called()
+        add_warning.assert_called_once()
 
 
 @pytest.fixture
@@ -98,15 +102,15 @@ def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
         ],
         [],
@@ -148,15 +152,15 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
+                manure_supplier=MagicMock(ManureManager),
             ),
         ],
         [],
@@ -176,6 +180,26 @@ def test_annual_update_routine(fields: List[Field]):
         for field in fields:
             assert field.perform_annual_reset.call_count == 1
         assert fm.output_gatherer.send_annual_variables.call_count == 1
+
+
+@pytest.mark.parametrize("animals", [True, False])
+def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
+    """Tests that the correct manure supplier is provided for setting up Fields."""
+    mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
+    get_data = mocker.patch.object(im, "get_data", return_value=animals)
+    add_log = mocker.patch.object(om, "add_log")
+    mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
+    field_manager = FieldManager()
+
+    actual = field_manager._get_manure_supplier(mock_manure_manager)
+
+    get_data.assert_called_once_with("config.simulate_animals")
+    if animals:
+        assert actual == mock_manure_manager
+        add_log.assert_not_called()
+    else:
+        assert isinstance(actual, FieldManureSupplier)
+        add_log.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1723,6 +1747,10 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 0.0,
                 "watering_interval": 0,
                 "supplement_manure_nutrient_deficiencies": True,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
         (
@@ -1741,6 +1769,10 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 500.0,
                 "watering_interval": 3,
                 "supplement_manure_nutrient_deficiencies": False,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
     ],
@@ -1804,13 +1836,17 @@ def test_setup_field(
         assert new_field.field_data.supplement_manure_nutrient_deficiencies == field_config.get(
             "supplement_manure_nutrient_deficiencies"
         )
+        assert new_field.field_data.simulate_water_stress == field_config.get("simulate_water_stress")
+        assert new_field.field_data.simulate_temp_stress == field_config.get("simulate_temp_stress")
+        assert new_field.field_data.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
+        assert new_field.field_data.simulate_phosphorus_stress == field_config.get("simulate_phosphorus_stress")
 
         assert new_field.soil == mocked_soil_profile
         assert new_field.available_fertilizer_mixes == {
             "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
             "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
         }
-        assert new_field.manure_manager == mocked_manure_manager
+        assert new_field.manure_supplier == mocked_manure_manager
 
         mock_input_manager.get_data.assert_called_once_with(field_name)
         patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
