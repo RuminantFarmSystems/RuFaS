@@ -180,6 +180,24 @@ Where $DM_{updated}$ is the dry matter mass in the stored crop after accounting 
 
 The following fractional loss coefficients are used in equation $2.1$ when recalculating the nutrient percentages in hay:
 
-|||
+Unprotected Hay
+|Nutrient|Fractional Loss Coefficient|
+|-|-|
+|Acid Detergent Fiber|0.0|
+|Neutral Detergent Fiber|0.17|
+|Crude Protein|0.4|
+Table $2.1.1$
+
+Protected Indoor, Protected Wrapped, Protected Tarped Hay
+|Nutrient|Fractional Loss Coefficient|
+|-|-|
+|Acid Detergent Fiber|0.0|
+|Neutral Detergent Fiber|0.0|
+|Crude Protein|0.0|
+Table $2.1.2$
+
+### 2.2 Nutrient Loss in Silage and Baleage
+
+The following fractional loss coefficients are used in equation $2.1$ when recalculating nutrient percentages in Silage and Baleage after losing dry matter to fermentation (i.e. after losing dry matter as calculated with equations $1.3.1$ and $1.3.2$).
 
 
