@@ -707,10 +707,10 @@
           },
           "unknown_cull": {
             "type": "object",
-            "description": "Cull probabilities due to unknown health issues.",
+            "description": "Cull probabilities due to other health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to unknown health issues.",
+              "description": "The probability of culling due to other health issues.",
               "minimum": 0,
               "maximum": 1
             },
@@ -744,7 +744,7 @@
               "maximum": 1
             }
           },
-          "death_cull_prob": {
+          "death_day_prob": {
             "type": "array",
             "description": "Culling probability for death",
             "properties": {
