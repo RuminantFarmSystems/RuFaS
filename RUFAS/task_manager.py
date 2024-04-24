@@ -130,7 +130,7 @@ class TaskManager:
         input_manager = InputManager()
         if args["task_type"] == TaskType.INPUT_DATA_VALIDATION:
             TaskManager.handle_input_data_validation(args, input_manager, output_manager, False)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, False)
+            TaskManager.handle_post_processing(args, input_manager, output_manager)
             return
 
         is_data_valid = TaskManager.handle_input_data_validation(args, input_manager, output_manager, True)
@@ -140,17 +140,17 @@ class TaskManager:
                 f"Data not valid for {args['output_prefix']}, task not run",
                 info_map,
             )
-            TaskManager.handle_post_processing(args, input_manager, output_manager, False)
+            TaskManager.handle_post_processing(args, input_manager, output_manager)
             return
 
         TaskManager.set_random_seed(input_manager, output_manager)
 
         if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
             TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics)
+            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
         if args["task_type"] == TaskType.POST_PROCESSING:
-            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics)
+            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
 
     @staticmethod
     def task_multi(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
@@ -163,7 +163,7 @@ class TaskManager:
             Path(""),
             "multi_prefix",
         )
-        input_manager = InputManager()
+        # input_manager = InputManager()
         if args["task_type"] == TaskType.SIMULATION_MULTI_RUN:
             pass
         elif args["task_type"] == TaskType.SENSITIVITY_ANALYSIS:
@@ -224,7 +224,12 @@ class TaskManager:
 
     @staticmethod
     def handle_post_processing(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, produce_graphics: bool
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        produce_graphics: bool = False,
+        save_results: bool = False,
+        load_pool_from_file: bool = False,
     ) -> None:
         info_map = {
             "class": TaskManager.__name__,
@@ -232,18 +237,24 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-
         input_manager.dump_get_data_logs(Path(args["output_directory"]))
+
+        if load_pool_from_file:
+            output_manager.flush_pools()
+            output_manager.load_variables_pool_from_file(Path(args['output_pool_path']))
+            output_manager.set_metadata_prefix("reload")
+
         output_manager.print_errors_warnings_logs_counts()
 
-        output_manager.save_results(
-            Path(args["output_directory"]),
-            Path(args["filters_directory"]),
-            args["exclude_info_maps"],
-            produce_graphics,
-            Path(args["graphics_directory"]),
-            Path(args["CSV_directory"]),
-        )
+        if save_results:
+            output_manager.save_results(
+                Path(args["output_directory"]),
+                Path(args["filters_directory"]),
+                args["exclude_info_maps"],
+                produce_graphics,
+                Path(args["graphics_directory"]),
+                Path(args["CSV_directory"]),
+            )
         output_manager.dump_all_nondata_pools(
             Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
         )
