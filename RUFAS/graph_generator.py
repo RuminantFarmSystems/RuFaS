@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Tuple
 
@@ -178,7 +179,7 @@ class GraphGenerator:
                     if selected_variables := graph_details.get("variables"):
                         graph_details["legend"] = selected_variables
                     else:
-                        graph_details["legend"] = list(key.split(".")[-1] for key in prepared_data.keys())
+                        graph_details["legend"] = list(self._generage_legend_keys(key) for key in prepared_data.keys())
                 else:
                     graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
@@ -193,6 +194,23 @@ class GraphGenerator:
             }
 
         return all_logs
+
+    def _generage_legend_keys(self, combined_var_name: str) -> str:
+        combined_var_name_list = combined_var_name.split('.')
+        if len(combined_var_name_list) == 1:
+            # no prefix and no suffix
+            return combined_var_name_list[0]
+        elif len(combined_var_name_list) == 2:
+            # prefix.name
+            return combined_var_name_list[1]
+
+        elif len(combined_var_name_list) >= 3:
+            # class.method.* or prefix.*
+            slice_start = 2 if re.match('([A-Z][a-z0-9]+)+', combined_var_name_list[0]) else 1
+            # *.suffix or no suffix
+            slice_end = -1 if '=' in combined_var_name_list[-1] else len(combined_var_name_list)
+
+            return ".".join(combined_var_name_list[slice_start:slice_end])
 
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]
