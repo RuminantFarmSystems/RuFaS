@@ -4538,8 +4538,8 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|no cover|N/A)",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|crust|no cover|N/A)",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
@@ -4698,40 +4698,40 @@
           "maximum": 1.9,
           "default": 1.4
         },
-        "percent_organic_carbon_content": {
+        "organic_carbon_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
+          "description": "Fraction of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 1.2
+          "maximum": 1.0,
+          "default": 0.012
         },
-        "percent_clay_content": {
+        "clay_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
+          "description": "Fraction of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 22.5
+          "maximum": 1.0,
+          "default": 0.225
         },
-        "percent_silt_content": {
+        "silt_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
+          "description": "Fraction of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 62.5
+          "maximum": 1.0,
+          "default": 0.625
         },
-        "percent_sand_content": {
+        "sand_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
+          "description": "Fraction of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 12.5
+          "maximum": 1.0,
+          "default": 0.125
         },
-        "percent_rock_content": {
+        "rock_fraction": {
           "type": "number",
-          "description": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
+          "description": "Fraction of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
           "minimum": 0.0,
-          "maximum": 100.0,
-          "default": 1.3
+          "maximum": 1.0,
+          "default": 0.013
         },
         "initial_labile_inorganic_phosphorus_concentration": {
           "type": "number",
@@ -4860,6 +4860,26 @@
       "type": "bool",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "default": false
+    },
+    "simulate_water_stress": {
+      "type": "bool",
+      "description": "Whether water stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_temp_stress": {
+      "type": "bool",
+      "description": "Whether temperature stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_nitrogen_stress": {
+      "type": "bool",
+      "description": "Whether nitrogen stress affects crops grown in this field.",
+      "default": true
+    },
+    "simulate_phosphorus_stress": {
+      "type": "bool",
+      "description": "Whether phosphrorus stress affects crops grown in this field.",
+      "default": true
     }
   },
   "weather_properties": {
