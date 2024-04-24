@@ -68,6 +68,28 @@ class LogVerbosity(Enum):
         return self.value[:-1].upper()
 
 
+class OriginLabel(Enum):
+    """
+    An enumeration representing the different labels for data origins when generating json output files.
+
+    Attributes
+    ----------
+    TRUE_AND_REPORT_ORIGINS : str
+        Indicates that both the true origin and report origin should be included.
+    TRUE_ORIGIN : str
+        Indicates that only the true origin should be included.
+    REPORT_ORIGIN : str
+        Indicates that only the report origin should be included.
+    NONE : str
+        Indicates that no origin information should be included.
+    """
+
+    TRUE_AND_REPORT_ORIGINS = "true and report origins"
+    TRUE_ORIGIN = "true origin"
+    REPORT_ORIGIN = "report origin"
+    NONE = "none"
+
+
 class OutputManager(object):
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
@@ -77,6 +99,13 @@ class OutputManager(object):
     OutputManager is singleton, i.e., only one instance of it can exist. After
     the first instance is created, future calls to the constructor method
     returns the first instance. Also, the initializer method only works once.
+
+    Class Attributes
+    ----------------
+    pool_element_type : Dict[str, List[Any]]
+        Type alias for the pool elements
+    JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
+        Maximum depth for recursive serialization in JSON output files (default: 4)
 
     Attributes
     ----------
@@ -88,10 +117,13 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
+    _include_detailed_values : bool
+        Set to True to include detailed values in the json output files after the simulation
     """
 
     __instance = None
     pool_element_type = Dict[str, List[Any]]
+    JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
@@ -105,7 +137,8 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self._exclude_info_maps_flag = False
+            self._include_detailed_values: bool = False
+            self._exclude_info_maps_flag: bool = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
@@ -396,7 +429,13 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
+    def dict_to_file_json(
+        self,
+        data_dict: Dict[str, Any],
+        path: str,
+        minify_output_file: bool = False,
+        origin_label: OriginLabel = OriginLabel.NONE,
+    ) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -409,6 +448,9 @@ class OutputManager(object):
 
         minify_output_file : bool
             Boolean flag indicating whether to minify the output JSON file.
+
+        origin_label : OriginLabel
+            The origin label specifying the format of the detailed values string. Default is OriginLabel.NONE.
 
         Raises
         ------
@@ -433,16 +475,16 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
-                data_dict = self._add_detailed_data_origin(data_dict)
+                data_dict = self._add_detailed_values(data_dict, origin_label)
                 if minify_output_file:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=4),
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         separators=(",", ":"),
                     )
                 else:
                     json.dump(
-                        Utility.make_serializable(data_dict, max_depth=4),
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         indent=2,
                     )
@@ -450,19 +492,9 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _add_detailed_data_origin(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _add_detailed_values(self, data_dict: Dict[str, Any], origin_label: OriginLabel) -> Dict[str, Any]:
         """
-        Adds a `detailed_data_origins` list to each sub-dictionary that has information about data origins.
-
-        Notes
-        -----
-        This method iterates over each key in the provided dictionary. For keys that correspond to
-        dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
-        named `detailed_data_origins`. This list contains details about the data origin, including the class name,
-        function name, and the key itself, paired with each corresponding value from the `values` list.
-        The format used for detailing the origin is "[class_name.function_name]->[key]",
-        where `class_name` and `function_name` are derived from the `data_origin`
-        entries within `info_maps`.
+        Adds a `detailed_values` list to each sub-dictionary to replace the original `values` list.
 
         Parameters
         ----------
@@ -474,8 +506,31 @@ class OutputManager(object):
         Returns
         -------
         Dict[str, Any]
-            The modified dictionary with a `detailed_data_origins` list added to each sub-dictionary that meets the
-            criteria. This list provides detailed information on the origin of each value.
+            The modified dictionary with a `detailed_values` list added to each sub-dictionary that meets the
+            criteria. This list provides detailed information on the origins and units of each value.
+
+        Notes
+        -----
+        When the flag `include_detailed_values` is set to True, this method iterates over each key in the
+        provided dictionary, and it will create a `detailed_values` list that integrates the data origins,
+        values, and units. Depending on the `origin_label` parameter, the format of the detailed values will vary:
+
+        - If `origin_label` is `OriginLabel.TRUE_AND_REPORT_ORIGINS`, the format is:
+          "[true_origin_class.true_origin_function]->[report_origin]: value (units)"
+          or "[true_origin_class.true_origin_function]->[report_origin]: subkey1 = value1 (units1),
+           subkey2 = value2 (units2), ..." if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.TRUE_ORIGIN`, the format is:
+          "[true_origin_class.true_origin_function]: value (units)"
+          or "[true_origin_class.true_origin_function]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.REPORT_ORIGIN`, the format is:
+          "[report_origin]: value (units)"
+          or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.NONE`, the format is simply "value (units)".
 
         Examples
         --------
@@ -486,52 +541,184 @@ class OutputManager(object):
         ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"}
         ...         ],
         ...         "values": [193, 194]
+        ...     },
+        ...     "WeatherModuleReporter.report_daily_weather.temperature": {
+        ...         "info_maps": [
+        ...             {"data_origin": [["WeatherManager", "daily_temperature"]],
+        ...              "units": {"avg": "°C", "min": "°C", "max": "°C"}},
+        ...             {"data_origin": [["WeatherManager", "daily_temperature"]],
+        ...              "units": {"avg": "°C", "min": "°C", "max": "°C"}}
+        ...         ],
+        ...         "values": [
+        ...             {"avg": 25.5, "min": 18.2, "max": 32.1},
+        ...             {"avg": 26.1, "min": 19.7, "max": 33.4}
+        ...         ]
         ...     }
         ... }
         >>> output_manager = OutputManager()
-        >>> modified_data_dict = output_manager._add_detailed_data_origin(example_data_dict)
+        >>> output_manager.set_include_detailed_values(True)
+        >>> modified_data_dict = output_manager._add_detailed_values(
+        ...     example_data_dict, OriginLabel.TRUE_AND_REPORT_ORIGINS
+        ... )
         >>> assert modified_data_dict[
-        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_data_origins"
+        ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_values"
         ... ] == [
-        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
-        ...     193)],
-        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
-        ...     194)]
+        ...    "[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]: "
+        ...    "193 (animals)",
+        ...    "[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]: "
+        ...    "194 (animals)"
+        ... ]
+        >>> assert modified_data_dict[
+        ...     "WeatherModuleReporter.report_daily_weather.temperature"]["detailed_values"
+        ... ] == [
+        ...    "[WeatherManager.daily_temperature]->[WeatherModuleReporter.report_daily_weather.temperature]: "
+        ...    "avg = 25.5 (°C), min = 18.2 (°C), max = 32.1 (°C)",
+        ...    "[WeatherManager.daily_temperature]->[WeatherModuleReporter.report_daily_weather.temperature]: "
+        ...    "avg = 26.1 (°C), min = 19.7 (°C), max = 33.4 (°C)"
         ... ]
         """
 
-        for key in data_dict:
-            if not isinstance(data_dict[key], dict):
-                continue
+        if not self._include_detailed_values:
+            return data_dict
 
-            sub_data_dict = data_dict[key]
-            if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
-                continue
-
-            if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+        for key, sub_data_dict in data_dict.items():
+            if not self._can_add_detailed_values(sub_data_dict):
                 continue
 
             data_origins: List[List[Tuple[str, str]]] = []
+            units: List[str | Dict[str, str]] = []
             for info_map in sub_data_dict["info_maps"]:
                 if "data_origin" not in info_map:
                     break
+                if "units" not in info_map:
+                    break
                 data_origins.append(info_map["data_origin"])
+                units.append(info_map["units"])
 
-            if len(data_origins) != len(sub_data_dict["values"]):
+            if len(data_origins) != len(sub_data_dict["values"]) or len(units) != len(sub_data_dict["values"]):
                 continue
 
-            detailed_data_origins: List[List[Tuple[str, Any]]] = []
+            detailed_values: List[str] = []
             for index, value in enumerate(sub_data_dict["values"]):
-                detailed_origin_for_value = []
                 for origin in data_origins[index]:
-                    class_name, function_name = origin
-                    origin_key = f"[{class_name}.{function_name}]->[{key}]"
-                    detailed_origin_for_value.append((origin_key, value))
-                detailed_data_origins.append(detailed_origin_for_value)
+                    detailed_origin_data = {
+                        "true_origin_class": origin[0],
+                        "true_origin_function": origin[1],
+                        "report_origin": key,
+                        "value": value,
+                        "units": units[index],
+                    }
+                    detailed_value = self._format_detailed_value_str(origin_label, detailed_origin_data)
+                    detailed_values.append(detailed_value)
 
-            sub_data_dict["detailed_data_origins"] = detailed_data_origins
+            sub_data_dict["detailed_values"] = detailed_values
 
         return data_dict
+
+    def _format_detailed_value_str(self, origin_label: OriginLabel, data: dict[str, Any]) -> str:
+        """
+        Formats the detailed values string based on the provided origin label and data.
+
+        Parameters
+        ----------
+        origin_label : OriginLabel
+            The origin label specifying the format of the detailed values string.
+            It can be one of the following:
+            - OriginLabel.TRUE_AND_REPORT_ORIGINS: Include both true origin and report origin.
+            - OriginLabel.TRUE_ORIGIN: Include only the true origin.
+            - OriginLabel.REPORT_ORIGIN: Include only the report origin.
+            - OriginLabel.NONE: Include no origin information.
+
+        data : dict[str, Any]
+            A dictionary containing the necessary data for formatting the detailed values string.
+            It should have the following keys:
+            - "true_origin_class": The class name of the true origin.
+            - "true_origin_function": The function name of the true origin.
+            - "report_origin": The report origin which already includes the class and function names.
+            - "value": The value associated with the origin.
+            - "units": The units associated with the value.
+
+        Returns
+        -------
+        str
+            The formatted detailed values string based on the provided origin label and data.
+
+        Notes
+        -----
+        The format of the detailed values string depends on the `origin_label` parameter:
+        - If `origin_label` is `OriginLabel.TRUE_AND_REPORT_ORIGINS`, the format is:
+          "[true_origin_class.true_origin_function]->[report_origin]: value (units)"
+          or "[true_origin_class.true_origin_function]->[report_origin]: subkey1 = value1 (units1),
+           subkey2 = value2 (units2), ..." if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.TRUE_ORIGIN`, the format is:
+          "[true_origin_class.true_origin_function]: value (units)"
+          or "[true_origin_class.true_origin_function]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.REPORT_ORIGIN`, the format is:
+          "[report_origin]: value (units)"
+          or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.NONE`, the format is simply "value (units)".
+        """
+
+        true_origin_class = data["true_origin_class"]
+        true_origin_function = data["true_origin_function"]
+        report_origin = data["report_origin"]
+        value = data["value"]
+        units = data["units"]
+
+        origin_label_str = ""
+        if origin_label is OriginLabel.TRUE_AND_REPORT_ORIGINS:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]->[{report_origin}]"
+        elif origin_label is OriginLabel.TRUE_ORIGIN:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]"
+        elif origin_label is OriginLabel.REPORT_ORIGIN:
+            origin_label_str = f"[{report_origin}]"
+
+        if isinstance(value, dict) and isinstance(units, dict):
+            formatted_values = [f"{subkey} = {value[subkey]} ({units[subkey]})" for subkey in value.keys()]
+            return (
+                f"{origin_label_str}: {', '.join(formatted_values)}"
+                if origin_label_str
+                else f"{', '.join(formatted_values)}"
+            )
+
+        return f"{origin_label_str}: {value} ({units})" if origin_label_str else f"{value} ({units})"
+
+    def _can_add_detailed_values(self, sub_data_dict: Dict[str, Any]) -> bool:
+        """
+        Checks if the provided sub_data_dict has the necessary structure and data to add detailed values.
+
+        Parameters
+        ----------
+        sub_data_dict : Dict[str, Any]
+            The dictionary to check for compatibility with adding detailed values.
+
+        Returns
+        -------
+        bool
+            True if the sub_data_dict meets the requirements for adding detailed values, False otherwise.
+
+        Notes
+        -----
+        The sub_data_dict should meet the following requirements:
+        - It must be a dictionary.
+        - It must contain the keys "info_maps" and "values".
+        - The length of the "info_maps" list and the "values" list must be equal.
+        """
+
+        if not isinstance(sub_data_dict, dict):
+            return False
+        if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+            return False
+        if not sub_data_dict["info_maps"] or not sub_data_dict["values"]:
+            return False
+        if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+            return False
+        return True
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
@@ -693,11 +880,10 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def generate_file_name(self, base_name: str, extension: str) -> str:
-        """
-        Returns a file name using the given base_name and timestamp.
-        """
-        timestamp: str = Utility.get_timestamp(include_millis=False)
+    def generate_file_name(self, base_name: str, extension: str, include_millis: bool = False) -> str:
+        """Returns a file name using the given base_name and timestamp."""
+
+        timestamp: str = Utility.get_timestamp(include_millis=include_millis)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
@@ -1001,11 +1187,13 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-            file_path = os.path.join(
+            self._save_to_json(
+                filter_file,
                 save_path,
-                self.generate_file_name(f"saved_variables_{filter_file}", "json"),
+                filtered_pool,
+                filter_content,
             )
-            self.dict_to_file_json(filtered_pool, file_path)
+
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = os.path.join(
@@ -1030,6 +1218,37 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+
+    def _save_to_json(
+        self,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        filter_content: Dict[str, Union[str, int]],
+    ) -> None:
+        """
+        Saves the filtered pool to a JSON file.
+
+        Parameters
+        ----------
+        filter_file : str
+            The name of the filter file being processed.
+        save_path : Path
+            The directory path where the JSON file will be saved.
+        filtered_pool : Dict[str, pool_element_type]
+            The pool of filtered data to be saved.
+        filter_content : Dict[str, Union[str, int]]
+            Additional content from the filter that might influence the file naming.
+        """
+
+        if "name" in filter_content:
+            base_name = f"saved_variables_{filter_content['name']}"
+        else:
+            base_name = f"saved_variables_{filter_file}"
+        origin_label = self._get_origin_label(filter_content)
+        file_name = self.generate_file_name(base_name, "json")
+        file_path = os.path.join(save_path, file_name)
+        self.dict_to_file_json(filtered_pool, file_path, origin_label=origin_label)
 
     def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
@@ -1367,6 +1586,11 @@ class OutputManager(object):
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
 
+    def set_include_detailed_values(self, flag: bool) -> None:
+        """Sets the flag for adding detailed values to the output files."""
+
+        self._include_detailed_values = flag
+
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
         Sets the exclude_info_maps flag to the given value.
@@ -1377,3 +1601,56 @@ class OutputManager(object):
         """
 
         self._exclude_info_maps_flag = exclude_info_maps
+
+    def _get_origin_label(self, filter_content: Dict[str, str | int]) -> OriginLabel:
+        """
+        Retrieves the origin label from the provided filter content.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, str | int]
+            A dictionary containing filter information, which may include the "origin_label" key.
+
+        Returns
+        -------
+        OriginLabel
+            The origin label corresponding to the value in the filter content.
+            If the "origin_label" key is not present or has an invalid value, OriginLabel.NONE is returned.
+
+        Notes
+        -----
+        This method checks the value of the `origin_label` key in the provided `filter_content` dictionary.
+        If the value is a valid string matching one of the supported options defined in the `OriginLabel` enum,
+        the corresponding `OriginLabel` member is returned. If the value is invalid or the key is not present,
+        `OriginLabel.NONE` is returned, and an error is added to the Output Manager's errors pool.
+        """
+
+        if "origin_label" not in filter_content:
+            return OriginLabel.NONE
+
+        origin_label_value = filter_content["origin_label"]
+        supported_options = [label.value for label in OriginLabel]
+
+        if not isinstance(origin_label_value, str):
+            self.add_error(
+                "invalid_origin_label",
+                f"Origin label must be a string. Received {origin_label_value} of type {type(origin_label_value)}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_origin_label.__name__,
+                },
+            )
+            return OriginLabel.NONE
+
+        if origin_label_value not in supported_options:
+            self.add_error(
+                "invalid_origin_label",
+                f"Origin label must be one of {supported_options}. Received {origin_label_value}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_origin_label.__name__,
+                },
+            )
+            return OriginLabel.NONE
+
+        return OriginLabel(origin_label_value)
