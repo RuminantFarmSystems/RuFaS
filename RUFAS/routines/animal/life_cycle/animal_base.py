@@ -143,8 +143,8 @@ class AnimalBase:
 
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
-        print('P intake', self.p_intake)
-        print('P Req', self.p_req)
+        print("P intake", self.p_intake)
+        print("P Req", self.p_req)
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
