@@ -1,10 +1,11 @@
 import json
+from typing import Type
 import pytest
 from unittest.mock import MagicMock, mock_open, patch
 from compare_metadata_properties import load_json, compare_metadata_properties
 
 
-def test_load_json_success():
+def test_load_json_success() -> None:
     """Test loading a valid JSON file."""
     mock_data = '{"name": "test"}'
     with patch("builtins.open", mock_open(read_data=mock_data)):
@@ -18,14 +19,14 @@ def test_load_json_success():
     "error, file_name",
     [(FileNotFoundError, "nonexistent.json"), (PermissionError, "restricted.json"), (OSError, "error.json")],
 )
-def test_load_json_errors(error, file_name):
+def test_load_json_errors(error: Type[FileNotFoundError | PermissionError | OSError], file_name: str) -> None:
     """Test error handling for various file errors in load_json."""
     with patch("builtins.open", side_effect=error):
         result = load_json(file_name)
         assert result is None, f"Should return None when {error.__name__} occurs"
 
 
-def test_compare_metadata_properties():
+def test_compare_metadata_properties() -> None:
     """Test basic functionality of comparing two JSON files."""
     test_args = ["script_name", "file1.json", "file2.json"]
     with patch("sys.argv", test_args):
@@ -66,7 +67,10 @@ def test_compare_metadata_properties():
         (OSError, "builtins.open", "An unexpected OS error occurred:"),
     ],
 )
-def test_compare_metadata_properties_file_handling_errors(error, function_to_patch, expected_message, capsys):
+def test_compare_metadata_properties_file_handling_errors(error: Type[FileNotFoundError | PermissionError],
+                                                          function_to_patch: str, expected_message: str,
+                                                          capsys: pytest.CaptureFixture
+                                                          ) -> None:
     """
     Test error handling for file errors during the write process in compare_metadata_properties.
     """
