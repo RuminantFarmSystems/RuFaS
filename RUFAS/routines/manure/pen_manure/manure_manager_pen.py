@@ -1,5 +1,4 @@
 from typing import List, NamedTuple
-from typing import Set
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -24,8 +23,6 @@ class ManureManagerPen:
         The number of animals in this pen.
     num_lactating_cows : int
         The number of lactating cows in this pen.
-    classes_in_pen : Set[str]
-        Set of unique animal classes in this pen.
     animal_combination : AnimalCombination
         An AnimalCombination enum that describes the current animal makeup in this pen.
     housing_type : str
@@ -64,7 +61,6 @@ class ManureManagerPen:
         self.id: int = pen.id
         self.animals_in_pen = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
-        self.classes_in_pen: Set[str] = pen.classes_in_pen
         self.animal_combination: Pen.AnimalCombination = pen.animal_combination
 
         self.housing_type: str = pen.housing_type
@@ -155,6 +151,11 @@ class ManureManagerPen:
 
         barn_area = barn_area_by_pen_type[self.pen_type]
 
-        if "Cow" in self.classes_in_pen:
+        pen_contains_cows = (
+            self.animal_combination == AnimalCombination.LAC_COW
+            or self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP
+            or self.animal_combination == AnimalCombination.CLOSE_UP
+        )
+        if pen_contains_cows:
             return barn_area.has_cows * self.num_stalls
         return barn_area.no_cows * self.num_stalls
