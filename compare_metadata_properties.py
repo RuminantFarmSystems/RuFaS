@@ -48,32 +48,25 @@ def compare_metadata_properties() -> None:
     data2 = load_json(args.file2)
 
     diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
-    print(diff.keys())
 
     file_name = "diff_results_" + os.path.basename(str(args.file1)) + "_vs_" + os.path.basename(str(args.file2))
     try:
         with open(f"output/{file_name}.txt", "w") as file:
             file.write(f"Comparing changes going from '{args.file1}' to '{args.file2}'\n\n")
 
-            if "dictionary_item_added" in diff:
-                file.write("Items added:\n")
-                for key, value in diff["dictionary_item_added"].items():
-                    file.write(f"{key}: {value}\n")
-                file.write("\n")
+            sections = {
+                "dictionary_item_added": "Items added:\n",
+                "dictionary_item_removed": "Items removed:\n",
+                "values_changed": "Values changed:\n"
+            }
 
-            if "dictionary_item_removed" in diff:
-                file.write("Items removed:\n")
-                for key, value in diff["dictionary_item_removed"].items():
-                    file.write(f"{key}: {value}\n")
-                file.write("\n")
+            for key, heading in sections.items():
+                if key in diff:
+                    file.write(heading)
+                    for sub_key, value in diff[key].items():
+                        file.write(f"{sub_key}: {value}\n")
+                    file.write("\n")
 
-            if "values_changed" in diff:
-                file.write("Values changed:\n")
-                for key, details in diff["values_changed"].items():
-                    new_value = details["new_value"]
-                    old_value = details["old_value"]
-                    file.write(f"{key}: {{'new_value': {new_value}, 'old_value': {old_value}}}\n")
-                file.write("\n")
     except FileNotFoundError:
         print(f"Error: The directory 'output' does not exist or {file_name}.txt cannot be accessed.")
     except PermissionError:
