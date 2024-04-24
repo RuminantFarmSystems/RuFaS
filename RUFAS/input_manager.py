@@ -2048,15 +2048,16 @@ class InputManager:
             A list of flattened data entries from the json file.
         """
         records = []
-        for key, value in data.items():
-            if isinstance(value, dict):
-                for nested_key, nested_value in value.items():
+        for property_key, property_value in data.items():
+            if isinstance(property_value, dict):
+                for nested_key, nested_value in property_value.items():
                     if isinstance(nested_value, dict):
                         if self._check_property_type_primitive(nested_value):
-                            name = prefix + sep + key + sep + nested_key if prefix else key + sep + nested_key
+                            name = prefix + sep + property_key + sep + nested_key if prefix \
+                                else property_key + sep + nested_key
                             nested_value["description"] = nested_value.get(
                                 "description",
-                                value.get("properties", {}).get("description", "No description available"),
+                                property_value.get("properties", {}).get("description", "No description available"),
                             )
                             record = self._create_record(nested_value, name)
                             records.append(record)
@@ -2064,17 +2065,17 @@ class InputManager:
                             records.extend(
                                 self._parse_metadata_properties(
                                     nested_value,
-                                    prefix + sep + key if prefix else key + sep + nested_key,
+                                    prefix + sep + property_key if prefix else property_key + sep + nested_key,
                                     sep,
                                 )
                             )
-                    elif self._check_property_type_primitive(value):
-                        name = prefix + sep + key
-                        record = self._create_record(value, name)
+                    elif self._check_property_type_primitive(property_value):
+                        name = prefix + sep + property_key
+                        record = self._create_record(property_value, name)
                         records.append(record)
                         break
-                    elif value.get("type") == "object":
-                        self._parse_metadata_properties(value, prefix + sep + key, sep)
+                    elif property_value.get("type") == "object":
+                        self._parse_metadata_properties(property_value, prefix + sep + property_key, sep)
 
         return records
 
