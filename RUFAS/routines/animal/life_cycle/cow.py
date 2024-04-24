@@ -2176,16 +2176,16 @@ class Cow(HeiferIII):
         if death_rand <= death_rate:
             death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
             death_date_random = random()
-            for i in range(len(AnimalBase.config["death_cull_prob"]) - 1):
+            for i in range(len(AnimalBase.config["death_day_prob"]) - 1):
                 if (
-                    AnimalBase.config["death_cull_prob"][i]
+                    AnimalBase.config["death_day_prob"][i]
                     <= death_date_random
-                    < AnimalBase.config["death_cull_prob"][i + 1]
+                    < AnimalBase.config["death_day_prob"][i + 1]
                 ):
-                    death_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
-                    death_time_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_time_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
+                    death_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
+                    death_time_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_time_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
             self.future_death_date = round(
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
