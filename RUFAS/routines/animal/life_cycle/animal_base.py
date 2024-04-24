@@ -3,6 +3,7 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.input_manager import InputManager
+from RUFAS.general_constants import GeneralConstants
 
 im = InputManager()
 
@@ -46,31 +47,31 @@ class AnimalBase:
         self.body_weight_history = []
         self.events = AnimalEvents()
         self.pen_history = []
-        self.daily_growth = 0.0
+        self.daily_growth = 0
         self.nutrient_rqmts = {}
         self.set_default_nutrient_rqmts()
-        self.dry_matter_intake = 0.0
+        self.dry_matter_intake = 0
         self.manure_excretion = {}
         self.ration_formulation = {"objective": 0.00}
-        self.DMIest = 0.0
-        self.DBW = 0.0
-        self.p_animal = 0.0
-        self.p_intake = 0.0
-        self.p_conc_ration = 0.0
-        self.p_excrt = 0.0
-        self.birth_weight = 0.0
-        self.body_weight = 0.0
-        self.mature_body_weight = 0.0
-        self.p_req = 0.0
-        self.dP_reserves = 0.0
-        self.p_excess = 0.0
-        self.p_gest = 0.0
-        self.p_growth = 0.0
-        self.p_maint_feces = 0.0
-        self.conceptus_weight = 0.0
-        self.calf_birth_weight = 0.0
-        self.tissue_changed = 0.0
-        self.sold_at_day: int | None = None
+        self.DMIest = 0
+        self.DBW = 0
+        self.p_animal = 0
+        self.p_intake = 0
+        self.p_conc_ration = 0
+        self.p_excrt = 0
+        self.birth_weight = 0
+        self.body_weight = 0
+        self.mature_body_weight = 0
+        self.p_req = 0
+        self.dP_reserves = 0
+        self.p_excess = 0
+        self.p_gest = 0
+        self.p_growth = 0
+        self.p_maint_feces = 0
+        self.conceptus_weight = 0
+        self.calf_birth_weight = 0
+        self.tissue_changed = 0
+        self.sold_at_day: int = None
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
             self.pen_history = args["pen_history"]
@@ -102,10 +103,10 @@ class AnimalBase:
         Sets this animal's phosphorus intake.
 
         Args:
-            p_intake: the phosphorus intake
-            p_conc_ration: the concentration of P in the ration
+            p_intake: the phosphorus intake (grams)
+            p_conc_ration: the concentration of P in the ration (% DM)
         """
-        self.p_intake = p_intake
+        self.p_intake = p_intake * GeneralConstants.KG_TO_GRAMS
         self.p_conc_ration = p_conc_ration
 
     def daily_p_update(self):
@@ -142,7 +143,6 @@ class AnimalBase:
 
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
-
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
