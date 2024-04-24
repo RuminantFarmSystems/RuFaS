@@ -431,15 +431,15 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-# <<<<<<< HEAD
-#     def dict_to_file_json(
-#         self,
-#         data_dict: Dict[str, Any],
-#         path: str,
-#         minify_output_file: bool = False,
-#         origin_label: OriginLabel = OriginLabel.NONE,
-#     ) -> None:
-# =======
+    # <<<<<<< HEAD
+    #     def dict_to_file_json(
+    #         self,
+    #         data_dict: Dict[str, Any],
+    #         path: str,
+    #         minify_output_file: bool = False,
+    #         origin_label: OriginLabel = OriginLabel.NONE,
+    #     ) -> None:
+    # =======
     def _write_disclaimer(self, file_pointer: TextIO) -> None:
         """
         Writes the predefined disclaimer message to a given file.
@@ -462,11 +462,11 @@ class OutputManager(object):
 
     # def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
     def dict_to_file_json(
-            self,
-            data_dict: Dict[str, Any],
-            path: str,
-            minify_output_file: bool = False,
-            origin_label: OriginLabel = OriginLabel.NONE,
+        self,
+        data_dict: Dict[str, Any],
+        path: str,
+        minify_output_file: bool = False,
+        origin_label: OriginLabel = OriginLabel.NONE,
     ) -> None:
         """Saves a dictionary into a JSON file
 
