@@ -226,7 +226,6 @@ class Pen:
 
         self.animals_in_pen = {}
 
-
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
         self.avg_DBW = 0.0
