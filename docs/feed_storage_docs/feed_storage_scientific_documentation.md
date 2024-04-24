@@ -11,7 +11,7 @@ The two types of grain simulated in RuFaS are dry and high-moisture.
 The cumulative amount of dry matter lost from dry grain is calculated with the equation:
 
 $$
-L_{gaseous} = M_i * 0.01 \tag{1.1.1}
+L_{gaseous} = M_i \cdot 0.01 \tag{1.1.1}
 $$
 
 Where $L_{gaseous}$ is the total amount of dry matter lost as gas (kg) and $M_i$ is the mass of dry matter at the time of storage (kg).
@@ -19,7 +19,7 @@ Where $L_{gaseous}$ is the total amount of dry matter lost as gas (kg) and $M_i$
 The cumulative amount of dry matter lost from high-moisture grain is calculated with the equation:
 
 $$
-L_{gaseous} = M_i * 0.05 \tag{1.1.2}
+L_{gaseous} = M_i \cdot 0.05 \tag{1.1.2}
 $$
 
 Where ${L}_{gaseous}$ is the total amount of dry matter lost as gas (kg) and $M_i$ is the mass of dry matter at the time of storage (kg).
@@ -54,7 +54,7 @@ Where $L_{first 30 days}$ is the total gaseous dry matter loss that occurred in 
 The total sensible heat generated is generated with the equation:
 
 $$
-Q = 104 * moisture^{2.18} * {b_{density}}^{0.5} + 5.72(moisture^{1.23} * {b_{density}}^{0.94}) \tag{1.2.4}
+Q = 104 \cdot moisture^{2.18} \cdot {b_{density}}^{0.5} + 5.72(moisture^{1.23} \cdot {b_{density}}^{0.94}) \tag{1.2.4}
 $$
 
 Where $moisture$ is the fraction of fresh mass in the hay that is not dry matter when the hay is stored (unitless) and $b_{density}$ is the density of the hay bale when stored ($kg / m^3$).
@@ -76,7 +76,7 @@ $$
 $L_{post 30 days}$ is calculated with the equation:
 
 $$
-L_{post 30 days} = 0.0001 * max(0, d - 30) \tag{1.2.7}
+L_{post 30 days} = 0.0001 \cdot max(0, d - 30) \tag{1.2.7}
 $$
 
 Where $d$ is the number of days that the hay has been stored for.
