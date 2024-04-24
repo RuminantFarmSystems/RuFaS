@@ -1,6 +1,7 @@
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.crop_data import CropData
 import pytest
+from pytest_mock import MockerFixture
 from math import exp
 
 
@@ -122,92 +123,19 @@ def test_calc_growth_factor(w_stress, t_stress, n_stress, p_stress):
     )
 
 
-# ---- member function tests ----
-# @pytest.mark.parametrize("uptake,trans", [
-#     (1, 1),  # all 1
-#     (1, 0),  # no trans
-#     (0, 1),  # no uptake
-#     (0, 0),  # both 0
-#     (-1, 0),  # negative uptake
-#     (0, -1),  # negative trans
-#     (22.35, 18.90),  # arbitrary uptake > trans
-#     (22.35, 24.66)  # arbitrary uptake < trans
-# ])
-# def test_assess_water_stress(uptake, trans):
-#     """test that water stress is correctly updated"""
-#     data = CropData(water_uptake=uptake)
-#     gc = GrowthConstraints(data)
-#     gc.assess_water_stress(trans)
-#     assert data.water_stress == calc_water_stress(uptake, trans)
-#
-#
-# @pytest.mark.parametrize("stored,opt", [
-#     (1, 1),  # all 1
-#     (1, 0),  # opt 0
-#     (0, 1),  # 0 stored
-#     (0, 0),  # both 0
-#     (-1, 0),  # negative storage
-#     (0, -1),  # negative optimal
-#     (0.5, 1),  # stored < opt
-#     (1, 0.5),  # stored > opt
-#     (125.33, 180.4)  # arbitrary
-# ])
-# def test_assess_nitrogen_stress(stored, opt):
-#     """test that nitrogen stress is correctly updated"""
-#     data = CropData(nitrogen=stored, optimal_nitrogen=opt)
-#     gc = GrowthConstraints(data)
-#     gc.assess_nitrogen_stress()
-#     assert data.nitrogen_stress == calc_nutrient_stress(stored, opt)
-#
-#
-# @pytest.mark.parametrize("stored,opt", [
-#     (1, 1),  # all 1
-#     (1, 0),  # opt 0
-#     (0, 1),  # 0 stored
-#     (0, 0),  # both 0
-#     (-1, 0),  # negative storage
-#     (0, -1),  # negative optimal
-#     (0.5, 1),  # stored < opt
-#     (1, 0.5),  # stored > opt
-#     (125.33, 180.4)  # arbitrary
-# ])
-# def test_assess_phosphorus_stress(stored, opt):
-#     """test that phosphorus stress is correctly updated"""
-#     data = CropData(phosphorus=stored, optimal_phosphorus=opt)
-#     gc = GrowthConstraints(data)
-#     gc.assess_phosphorus_stress()
-#     assert data.phosphorus_stress == calc_nutrient_stress(stored, opt)
-#
-#
-# @pytest.mark.parametrize("w_stress,t_stress,n_stress,p_stress", [
-#     (1.0, 0, 0, 0),  # water stressed
-#     (0, 0.8, 0, 0),  # temperature stressed
-#     (0, 0, 0.5, 0),  # nitrogen stressed
-#     (1, 0, 0, 0.4),  # phosphorus stressed
-#     (1, 1, 1, 1),  # all stresses
-#     (0, 0, 0, 0),  # no stress
-#     (0.38, 0.54, 0.2, .11)  # arbitrary
-# ])
-# def test_determine_growth_factor(w_stress, t_stress, n_stress, p_stress):
-#     """check that the growth factor is properly updated"""
-#     data = CropData(water_stress=w_stress, temp_stress=t_stress, nitrogen_stress=n_stress,
-#                     phosphorus_stress=p_stress)
-#     gc = GrowthConstraints(data)
-#     gc.determine_growth_factor()
-#     assert data.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
-
-
 @pytest.mark.parametrize(
-    "trans,temp",
+    "trans,temp,stressors,returned_stress,expected_stress",
     [
-        (0, 0),  # all zero
-        (18.8, 10.4),  # trans < uptake; temp < min
-        (18.8, 19.7),  # trans < uptake; temp > min
-        (18.8, 26.3),  # trans < uptake; temp > opt
-        (27.1, 19.7),  # trans > uptake; temp > min
+        (0, 0, False, 0.1, 0.0),  # all zero
+        (18.8, 10.4, True, 0.3, 0.3),  # trans < uptake; temp < min
+        (18.8, 19.7, False, 0.4, 0.0),  # trans < uptake; temp > min
+        (18.8, 26.3, True, 0.4, 0.4),  # trans < uptake; temp > opt
+        (27.1, 19.7, False, 0.5, 0.0),  # trans > uptake; temp > min
     ],
 )
-def test_constrain_growth(trans, temp):
+def test_constrain_growth(
+    mocker: MockerFixture, trans: float, temp: float, stressors: bool, returned_stress: float, expected_stress: float
+) -> None:
     """integration test: check that the growth factor is properly determined"""
     # initialize with arbitrary crop values
     data = CropData(
@@ -220,10 +148,21 @@ def test_constrain_growth(trans, temp):
         optimal_temperature=24.0,
     )
     gc = GrowthConstraints(data)
-    gc.constrain_growth(trans, temp)
+    water_stress = mocker.patch.object(gc, "_determine_water_stress", return_value=returned_stress)
+    temp_stress = mocker.patch.object(gc, "_determine_temperature_stress", return_value=returned_stress)
+    nutrient_stress = mocker.patch.object(gc, "_determine_nutrient_stress", return_value=returned_stress)
+    growth_factor = mocker.patch.object(gc, "_determine_growth_factor", return_value=0.55)
 
-    w_stress = GrowthConstraints._determine_water_stress(22.33, trans)
-    t_stress = GrowthConstraints._determine_temperature_stress(temp, 12.8, 24.0)
-    n_stress = GrowthConstraints._determine_nutrient_stress(38.7, 77.1)
-    p_stress = GrowthConstraints._determine_nutrient_stress(12.9, 31.2)
-    assert data.growth_factor == GrowthConstraints._determine_growth_factor(w_stress, t_stress, n_stress, p_stress)
+    gc.constrain_growth(trans, temp, stressors, stressors, stressors, stressors)
+
+    if stressors:
+        assert water_stress.call_count == 1
+        assert temp_stress.call_count == 1
+        assert nutrient_stress.call_count == 2
+    else:
+        assert water_stress.call_count == 0
+        assert temp_stress.call_count == 0
+        assert nutrient_stress.call_count == 0
+
+    growth_factor.assert_called_once_with(*[expected_stress] * 4)
+    assert gc.data.growth_factor == 0.55
