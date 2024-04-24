@@ -3982,7 +3982,7 @@ def test_validate_input_by_type_value_error() -> None:
 
 def test_increment_in_elements_counter() -> None:
     """
-    Unit test for the increment() method of the ElementsCounter class. SOMETHING SOMETHING BREAK LINTING AND SO FORTH
+    Unit test for the increment() method of the ElementsCounter class. SOMETHING SOMETHING BREAK LINTING AND SO FORTH AND SO ON
     """
 
     # Arrange
