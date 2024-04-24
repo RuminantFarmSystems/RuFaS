@@ -34,11 +34,12 @@ def test_compare_metadata_properties():
         ):
             with patch(
                 "compare_metadata_properties.load_json",
-                side_effect=[{"key": "value1"}, {"key": "value2", "key2": "value3"}],
+                side_effect=[{"key": "value1", "key3": "value4"}, {"key": "value2", "key2": "value3"}],
             ):
                 with patch("deepdiff.DeepDiff") as mock_deepdiff:
                     mock_deepdiff.return_value = {
                         "dictionary_item_added": {"root['key2']": "value3"},
+                        "dictionary_item_removed": {"root['key3']": "value4"},
                         "values_changed": {"root['key']": {"new_value": "value2", "old_value": "value1"}},
                     }
                     with patch("pprint.pformat", return_value="diff_output"):

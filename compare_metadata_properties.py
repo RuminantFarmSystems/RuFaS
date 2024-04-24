@@ -48,6 +48,7 @@ def compare_metadata_properties() -> None:
     data2 = load_json(args.file2)
 
     diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
+    print(diff.keys())
 
     file_name = "diff_results_" + os.path.basename(str(args.file1)) + "_vs_" + os.path.basename(str(args.file2))
     try:
@@ -57,6 +58,12 @@ def compare_metadata_properties() -> None:
             if "dictionary_item_added" in diff:
                 file.write("Items added:\n")
                 for key, value in diff["dictionary_item_added"].items():
+                    file.write(f"{key}: {value}\n")
+                file.write("\n")
+
+            if "dictionary_item_removed" in diff:
+                file.write("Items removed:\n")
+                for key, value in diff["dictionary_item_removed"].items():
                     file.write(f"{key}: {value}\n")
                 file.write("\n")
 
