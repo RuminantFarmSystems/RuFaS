@@ -410,9 +410,11 @@ class OutputManager(object):
 
         Example
         -------
-        >>>
-        ... with open('output.txt', 'w') as f:
-        ...    self._write_disclaimer(f)
+        >>> output_manager = OutputManager()
+        >>> import io
+        >>> file_like_string = io.StringIO()
+        >>> output_manager._write_disclaimer(file_like_string)
+        >>> assert file_like_string.getvalue() == DISCLAIMER_MESSAGE + "\\n"
         """
         file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
@@ -681,7 +683,9 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
-        df.insert(loc=0, column="DISCLAIMER", value=DISCLAIMER_MESSAGE)
+        disclaimer_column = [DISCLAIMER_MESSAGE] + [""] * (len(df) - 1)
+        disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
+        df = pd.concat([disclaimer_df, df], axis=1)
 
         df.to_csv(path, index=False)
 
