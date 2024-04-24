@@ -218,20 +218,20 @@ class AnimalModuleReporter:
             }
             nutrient_amount_units = {
                 "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL.value,
-                "CP": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "ADF": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "NDF": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "lignin": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "ash": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "N": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
                 "as_fed": MeasurementUnits.PERCENT.value,
-                "EE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "starch": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "TDN": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "DE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "CP": MeasurementUnits.KILOGRAMS.value,
+                "ADF": MeasurementUnits.KILOGRAMS.value,
+                "NDF": MeasurementUnits.KILOGRAMS.value,
+                "lignin": MeasurementUnits.KILOGRAMS.value,
+                "ash": MeasurementUnits.KILOGRAMS.value,
+                "phosphorus": MeasurementUnits.KILOGRAMS.value,
+                "potassium": MeasurementUnits.KILOGRAMS.value,
+                "N": MeasurementUnits.KILOGRAMS.value,
+                "EE": MeasurementUnits.KILOGRAMS.value,
+                "starch": MeasurementUnits.KILOGRAMS.value,
+                "TDN": MeasurementUnits.KILOGRAMS.value,
+                "DE": MeasurementUnits.KILOGRAMS.value,
+                "calcium": MeasurementUnits.KILOGRAMS.value,
             }
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_ration_interval_data.__name__
