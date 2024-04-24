@@ -13,6 +13,7 @@ This will produce a list of the differences in a .txt file saved in the output d
 
 """
 
+from typing import Any, Dict, Type
 from deepdiff import DeepDiff
 
 import argparse
@@ -20,7 +21,7 @@ import json
 import os
 
 
-def load_json(file_path: str):
+def load_json(file_path: str) -> Any:
     """
     Loads a json file.
     """
