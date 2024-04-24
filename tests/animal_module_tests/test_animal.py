@@ -1062,9 +1062,9 @@ def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float
 @pytest.mark.parametrize(
     "animal_dict, expected",
     [
-        (lazy_fixture("cow_a"), 59.28),
-        (lazy_fixture("cow_b"), 33.18),
-        (lazy_fixture("cow_d"), 0.0),
+        (lazy_fixture("cow_a"), 58.509883196394625),
+        (lazy_fixture("cow_b"), 43.0705),
+        (lazy_fixture("cow_d"), 25.17437708134691),
         (lazy_fixture("heifer_a"), 16.85),
         (lazy_fixture("heifer_b"), 16.44),
     ],

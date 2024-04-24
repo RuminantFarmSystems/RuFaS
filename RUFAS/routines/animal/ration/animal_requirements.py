@@ -1642,10 +1642,13 @@ class AnimalRequirements:
             P_Growth = 0.0
         if day_of_pregnancy is None:
             P_Preg: float = 0.0
+        elif day_of_pregnancy < 190:
+            P_Preg: float = 0.0
         else:
-            P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
-                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
-            )
+            P_Preg = (
+                (0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy))
+                - (0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)))
+            ) * (body_weight / 715)
         if milk_true_protein is None or milk_production is None:
             P_Lact: float = 0.0
         else:
