@@ -128,49 +128,29 @@ class TaskManager:
             args["output_prefix"],
         )
         input_manager = InputManager()
-        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...\n", info_map)
-        is_data_valid = input_manager.start_data_processing(args["metadata_file_path"])
-        output_manager.add_log(
-            "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
-        )
+        if args["task_type"] == TaskType.INPUT_DATA_VALIDATION:
+            TaskManager.handle_input_data_validation(args, input_manager, output_manager, False)
+            TaskManager.handle_post_processing(args, input_manager, output_manager, False)
+            return
+
+        is_data_valid = TaskManager.handle_input_data_validation(args, input_manager, output_manager, True)
         if not is_data_valid:
             output_manager.add_error(
                 "No task run",
                 f"Data not valid for {args['output_prefix']}, task not run",
                 info_map,
             )
-            output_manager.dump_all_nondata_pools(
-                Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
-            )
+            TaskManager.handle_post_processing(args, input_manager, output_manager, False)
             return
 
         TaskManager.set_random_seed(input_manager, output_manager)
 
-        task_type_to_handler_map = {
-            TaskType.HERD_INITIALIZATION: TaskManager.handle_herd_initializaition,
-            TaskType.SIMULATION_SIGNLE_RUN: TaskManager.handle_single_simulation_run,
-            TaskType.INPUT_DATA_VALIDATION: TaskManager.handle_input_data_validation,
-            TaskType.END_TO_END_TESTING: TaskManager.handle_end_to_end_testing,
-            TaskType.POST_PROCESSING: TaskManager.handle_post_processing,
-        }
-        task_type_to_handler_map[args["task_type"]](args, input_manager, output_manager)
+        if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
+            TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
+            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics)
 
-        output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-
-        input_manager.dump_get_data_logs(Path(args["output_directory"]))
-        output_manager.print_errors_warnings_logs_counts()
-
-        output_manager.save_results(
-            Path(args["output_directory"]),
-            Path(args["filters_directory"]),
-            args["exclude_info_maps"],
-            produce_graphics,
-            Path(args["graphics_directory"]),
-            Path(args["CSV_directory"]),
-        )
-        output_manager.dump_all_nondata_pools(
-            Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
-        )
+        if args["task_type"] == TaskType.POST_PROCESSING:
+            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics)
 
     @staticmethod
     def task_multi(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
@@ -223,9 +203,18 @@ class TaskManager:
 
     @staticmethod
     def handle_input_data_validation(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
+        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> None:
-        pass
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_input_data_validation.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...\n", info_map)
+        is_data_valid = input_manager.start_data_processing(args["metadata_file_path"], eager_termination)
+        output_manager.add_log(
+            "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
+        )
 
     @staticmethod
     def handle_end_to_end_testing(
@@ -235,9 +224,29 @@ class TaskManager:
 
     @staticmethod
     def handle_post_processing(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
+        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, produce_graphics: bool
     ) -> None:
-        pass
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_post_processing.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
+
+        input_manager.dump_get_data_logs(Path(args["output_directory"]))
+        output_manager.print_errors_warnings_logs_counts()
+
+        output_manager.save_results(
+            Path(args["output_directory"]),
+            Path(args["filters_directory"]),
+            args["exclude_info_maps"],
+            produce_graphics,
+            Path(args["graphics_directory"]),
+            Path(args["CSV_directory"]),
+        )
+        output_manager.dump_all_nondata_pools(
+            Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
+        )
 
     @staticmethod  # TODO potential rename
     def handle_sensitivity_analysis(
