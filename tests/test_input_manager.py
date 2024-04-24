@@ -3982,7 +3982,7 @@ def test_validate_input_by_type_value_error() -> None:
 
 def test_increment_in_elements_counter() -> None:
     """
-    Unit test for the increment() method of the ElementsCounter class.
+    Unit test for the increment() method of the ElementsCounter class. SOMETHING SOMETHING BREAK LINTING AND SO FORTH
     """
 
     # Arrange
@@ -3994,7 +3994,7 @@ def test_increment_in_elements_counter() -> None:
     counter.increment(ElementState.FIXED)
 
     # Assert
-    assert counter.valid_elements == 1
+    assert counter.valid_elements == 2
     assert counter.invalid_elements == 1
     assert counter.fixed_elements == 1
     assert counter.total_elements() == 3
