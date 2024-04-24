@@ -10,7 +10,7 @@
     {
       "task_type": "INPUT_DATA_VALIDATION",
       "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "Task 21",
+      "output_prefix": "Task 2",
       "log_verbosity": "logs"
     },
     {

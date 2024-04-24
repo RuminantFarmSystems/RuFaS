@@ -204,7 +204,7 @@ class TaskManager:
     @staticmethod
     def handle_input_data_validation(
         args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
-    ) -> None:
+    ) -> bool:
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_input_data_validation.__name__,
@@ -215,6 +215,7 @@ class TaskManager:
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
+        return is_data_valid
 
     @staticmethod
     def handle_end_to_end_testing(
