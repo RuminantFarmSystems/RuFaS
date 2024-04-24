@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, Type
+from typing import Dict, List, Any, Optional, Type, Callable
 
 import pytest
 from pytest_mock import MockerFixture
@@ -112,7 +112,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: Dict[str, List[float]], aggregator_key: str, expected: List[float]
+    report_data: Dict[str, List[float]], aggregator_key: str, expected: Dict[str, List[float]]
 ) -> None:
     """
     Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
@@ -218,7 +218,7 @@ def test_apply_horizontal_aggregation(
                 "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
             },
             {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7], "name": "value"},
+            {"a": [1, 3, 5, 7]},
             None,
         ),
         # Case without selected variables but required
@@ -232,8 +232,15 @@ def test_apply_horizontal_aggregation(
         (
             {"var1": {"values": [1, 2, 3, 4]}},
             {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"name": "value", "var1": [1, 2, 3, 4]},
+            {"Constant1": 10, "var1": [1, 2, 3, 4]},
             None,
+        ),
+        # Case with invalid constant name
+        (
+            {"var1": {"values": [1, 2, 3, 4]}},
+            {"variables": ["var1"], "constants": [{"name": "", "value": 10}]},
+            None,
+            ValueError,
         ),
     ],
 )
@@ -243,7 +250,7 @@ def test_prepare_report_data_with_constants(
     expected_result: Dict[str, List[Any]],
     expected_exception: Type[Exception],
     mocker: MockerFixture,
-):
+) -> None:
     """
     Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
     """
@@ -254,10 +261,22 @@ def test_prepare_report_data_with_constants(
         "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
         side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
     )
+
+    def mock_add_constants_to_report_data(
+        report_data: Dict[str, List[Any]],
+        _filter_content: Dict[str, Any],
+    ) -> None:
+        """Mock function for _add_constants_to_report_data() method in report_generator.py file."""
+        constants = _filter_content.get("constants", [])
+        for constant in constants:
+            if not constant["name"]:
+                raise ValueError("Constant name cannot be empty.")
+            report_data[constant["name"]] = constant["value"]
+
     mocker.patch.object(
         report_generator,
         "_add_constants_to_report_data",
-        side_effect=lambda report_data, _: report_data.update({"name": "value"}),
+        side_effect=mock_add_constants_to_report_data,
     )
 
     # Act and assert
@@ -357,7 +376,7 @@ def test_validate_constants(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, mock_prep_data," "expected_result, expected_exception",
+    "filtered_pool, filter_content, mock_prep_data, expected_result, expected_exception",
     [
         # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
@@ -370,7 +389,7 @@ def test_validate_constants(
                 "horizontal_first": True,
             },
             {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_ver_agg": [6.0]},
+            {"hor_ver_agg": [5.0]},
             None,
         ),
         # Case with valid horizontal and vertical aggregations, with horizontal_first = False
@@ -384,7 +403,7 @@ def test_validate_constants(
                 "horizontal_first": False,
             },
             {"var1": [1, 2], "var2": [3, 4]},
-            {"ver_hor_agg": [3.5]},
+            {"ver_hor_agg": [5.0]},
             None,
         ),
         # Case with no aggregation specified
@@ -412,7 +431,7 @@ def test_validate_constants(
                 "horizontal_order": ["var1", "var2"],
             },
             {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_agg": [5, 7]},
+            {"hor_agg": [4, 6]},
             None,
         ),
         # Case with only vertical aggregation specified
@@ -420,7 +439,7 @@ def test_validate_constants(
             {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
             {"name": "Report", "vertical_aggregation": "average"},
             {"var1": [1, 3], "var2": [2, 4]},
-            {"ver_agg": [3.5]},
+            {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
             None,
         ),
         # Case with unsupported vertical aggregation type
@@ -439,16 +458,57 @@ def test_validate_constants(
             None,
             ValueError,
         ),
-        # Case with only horizontal aggregation specified
+        # Case with variables specified and vertical aggregation only
+        (
+            {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
+            {"name": "Report", "vertical_aggregation": "average", "variables": ["var1", "var2"]},
+            {"var1": [1, 3], "var2": [2, 4]},
+            {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
+            None,
+        ),
+        # Case with a single vertically aggregated column
+        (
+            {"var1": {"values": [1, 3]}},
+            {"name": "Report", "vertical_aggregation": "average"},
+            {"var1": [1, 3]},
+            {"ver_agg": [2.0]},
+            None,
+        ),
+        # Case with non-uniform column lengths and horizontal_first = True
+        (
+            {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5]}},
+            {
+                "name": "Report",
+                "horizontal_aggregation": "sum",
+                "vertical_aggregation": "average",
+                "horizontal_first": True,
+            },
+            {"var1": [1, 2, 3], "var2": [4, 5, None]},
+            {"hor_ver_agg": [5.0]},
+            None,
+        ),
+        # Case with non-uniform column lengths and horizontal_first = False
+        (
+            {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5]}},
+            {
+                "name": "Report",
+                "horizontal_aggregation": "sum",
+                "vertical_aggregation": "average",
+                "horizontal_first": False,
+            },
+            {"var1": [1, 2, 3], "var2": [4, 5, None]},
+            {"ver_hor_agg": [6.5]},
+            None,
+        ),
+        # Case with empty horizontal_order
         (
             {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
             {
-                "name": "Report5",
+                "name": "Report",
                 "horizontal_aggregation": "sum",
-                "horizontal_order": ["var1", "var2"],
             },
             {"var1": [1, 2], "var2": [3, 4]},
-            {"hor_agg": [5, 7]},
+            {"hor_agg": [4, 6]},
             None,
         ),
     ],
@@ -457,7 +517,7 @@ def test_perform_aggregations(
     filtered_pool: Dict[str, Dict[str, List[Any]]],
     filter_content: Dict[str, Any],
     mock_prep_data: Dict[str, List[Any]],
-    expected_result: List[Any],
+    expected_result: Dict[str, List[Any]],
     expected_exception: Type[Exception],
     mocker: MockerFixture,
 ) -> None:
@@ -472,12 +532,33 @@ def test_perform_aggregations(
         "_prepare_report_data_with_constants",
         return_value=mock_prep_data,
     )
-    mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=[5, 7])
+
+    def mock_apply_horizontal_aggregation(
+        data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
+    ) -> List[Any]:
+        """Mock function for _apply_horizontal_aggregation() method in report_generator.py file."""
+
+        aggregated_values = []
+        for i in range(len(data[loop_list[0]])):
+            values = [data[key][i] for key in loop_list if i < len(data[key])]
+            non_none_values = [value for value in values if value is not None]
+            if non_none_values:
+                aggregated_values.append(aggregator(non_none_values))
+            else:
+                aggregated_values.append(None)
+        return aggregated_values
+
+    def mock_apply_vertical_aggregation(
+        data: Dict[str, List[Any]], aggregator: Callable[[List[Any]], Any]
+    ) -> Dict[str, List[Any]]:
+        """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
+
+        return {key: [aggregator([value for value in values if value is not None])] for key, values in data.items()}
+
     mocker.patch.object(
-        report_generator,
-        "_apply_vertical_aggregation",
-        return_value={"some_key": [3.5]},
+        report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
     )
+    mocker.patch.object(report_generator, "_apply_vertical_aggregation", side_effect=mock_apply_vertical_aggregation)
 
     # Act and assert
     if expected_exception:
@@ -486,6 +567,82 @@ def test_perform_aggregations(
     else:
         result = report_generator._perform_aggregations(filtered_pool, filter_content)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content, expected_result",
+    [
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6]},
+            "sum",
+            "average",
+            {"horizontal_first": True, "horizontal_order": ["var1", "var2"]},
+            {"hor_ver_agg": [7.0]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6]},
+            "average",
+            "sum",
+            {"horizontal_first": False},
+            {"ver_hor_agg": [10.5]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
+            "product",
+            "subtraction",
+            {"horizontal_first": True},
+            {"hor_ver_agg": [-214]},
+        ),
+        (
+            {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
+            "subtraction",
+            "product",
+            {"horizontal_first": False},
+            {"ver_hor_agg": [-618]},
+        ),
+    ],
+)
+def test_handle_horizontal_and_vertical_aggregations(
+    aggregate_report: Dict[str, List[Any]],
+    horizontal_agg_key: str,
+    vertical_agg_key: str,
+    filter_content: Dict[str, Any],
+    expected_result: Dict[str, List[Any]],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for _handle_horizontal_and_vertical_aggregations() method in report_generator.py file.
+    """
+
+    # Arrange
+    report_generator = ReportGenerator()
+
+    def mock_apply_horizontal_aggregation(
+        data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
+    ) -> List[Any]:
+        """Mock function for _apply_horizontal_aggregation() method in report_generator.py file."""
+
+        return [aggregator([data[key][i] for key in loop_list]) for i in range(len(data[loop_list[0]]))]
+
+    def mock_apply_vertical_aggregation(
+        data: Dict[str, List[Any]], aggregator: Callable[[List[Any]], Any]
+    ) -> Dict[str, List[Any]]:
+        """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
+
+        return {key: [aggregator(values)] for key, values in data.items()}
+
+    mocker.patch.object(
+        report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
+    )
+    mocker.patch.object(report_generator, "_apply_vertical_aggregation", side_effect=mock_apply_vertical_aggregation)
+
+    # Act
+    result = report_generator._handle_horizontal_and_vertical_aggregations(
+        aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
+    )
+
+    # Assert
+    assert result == expected_result
 
 
 @pytest.mark.parametrize(
@@ -541,7 +698,7 @@ def test_extract_and_check_aggregation_keys(
     expected_horizontal: str | None,
     expected_vertical: str | None,
     expected_exception: Type[Exception],
-):
+) -> None:
     """
     Unit test for _extract_and_check_aggregation_keys() method in report_generator.py file.
     """
@@ -560,66 +717,6 @@ def test_extract_and_check_aggregation_keys(
         ) = report_generator._extract_and_check_aggregation_keys(filter_content)
         assert horizontal_key == expected_horizontal
         assert vertical_key == expected_vertical
-
-
-@pytest.mark.parametrize(
-    "horizontally_aggregated, vertically_aggregated, filter_content, expected",
-    [
-        # Test case with both horizontal and vertical aggregation, horizontal first
-        (
-            [1, 2, 3],
-            [4, 5, 6],
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": True,
-            },
-            {"hor_ver_agg": [sum([1, 2, 3])]},
-        ),
-        # Test case with both horizontal and vertical aggregation, vertical first
-        (
-            [1, 2, 3],
-            {"a": [4, 5, 6], "b": [7, 8, 9]},
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "sum",
-                "horizontal_first": False,
-            },
-            {"ver_hor_agg": [a + b for a, b in zip([4, 5, 6], [7, 8, 9])]},
-        ),
-        # Test case with only horizontal aggregation
-        ([1, 2, 3], None, {"horizontal_aggregation": "sum"}, {"hor_agg": [1, 2, 3]}),
-        # Test case with only vertical aggregation
-        (
-            None,
-            {"some_key": [4, 5, 6]},
-            {"vertical_aggregation": "sum"},
-            {"ver_agg": [4, 5, 6]},
-        ),
-        # Test case with no aggregation
-        (None, None, {}, None),
-    ],
-)
-def test_combine_aggregate_report_data(
-    horizontally_aggregated: List[int | float] | None,
-    vertically_aggregated: List[int | float] | None,
-    filter_content: Dict[str, Any],
-    expected: Dict[str, List[int | float]] | None,
-) -> None:
-    """
-    Unit test for _combine_aggregate_report_data() method in report_generator.py file.
-    """
-
-    # Arrange
-    report_generator = ReportGenerator()
-
-    # Act
-    result = report_generator._combine_aggregate_report_data(
-        horizontally_aggregated, vertically_aggregated, filter_content
-    )
-
-    # Assert
-    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -988,7 +1085,7 @@ def test_report_generator_init() -> None:
     """
 
     # Arrange
-    expected_reports = {}
+    expected_reports: Dict[str, Dict[str, List[Any]]] = {}
 
     # Act
     report_generator = ReportGenerator()
@@ -1011,3 +1108,41 @@ def test_clear_reports() -> None:
 
     # Assert
     assert report_generator.reports == {}
+
+
+@pytest.mark.parametrize(
+    "filter_content, expected_result, expected_exception",
+    [
+        ({"horizontal_first": True}, True, None),
+        ({"horizontal_first": False}, False, None),
+        ({}, False, None),
+        ({"horizontal_first": "true"}, None, ValueError),
+        ({"horizontal_first": "false"}, None, ValueError),
+        ({"horizontal_first": 1}, None, ValueError),
+        ({"horizontal_first": None}, None, ValueError),
+    ],
+)
+def test_get_horizontal_first_value(
+    filter_content: Dict[str, Any],
+    expected_result: bool,
+    expected_exception: Exception | None,
+) -> None:
+    """
+    Unit test for the _get_horizontal_first_value method of ReportGenerator class in report_generator.py file.
+    """
+
+    # Arrange
+    report_generator = ReportGenerator()
+
+    # Act & Assert
+    if expected_exception:
+        with pytest.raises(ValueError) as exc_info:
+            report_generator._get_horizontal_first_value(filter_content)
+        assert str(exc_info.value) == (
+            f"The value of 'horizontal_first' in the report filter should be a boolean. "
+            f"Value provided: {repr(filter_content['horizontal_first'])} "
+            f"(type {type(filter_content['horizontal_first'])})"
+        )
+    else:
+        result = report_generator._get_horizontal_first_value(filter_content)
+        assert result == expected_result
