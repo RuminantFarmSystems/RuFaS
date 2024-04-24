@@ -860,7 +860,8 @@ def test_ensure_unique_report_name_with_timestamp(
 
 @pytest.mark.parametrize(
     "filter_content, filtered_pool, reports, reference_exception, "
-    "perform_aggregations_exception, expected_report_columns, expected_log_messages",
+    "perform_aggregations_exception, expected_report_columns, expected_log_messages,"
+    "expected_get_reports_by_regex_calls",
     [
         # Standard report generation
         (
@@ -871,6 +872,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {"standard_report_some_filter": {"values": [1, 2, 3]}},
             ["Start generating individual report: standard_report"],
+            0,
         ),
         # Report with name as an empty string
         (
@@ -881,6 +883,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {"some_filter": {"values": [1, 2, 3]}},
             ["Start generating individual report: "],
+            0,
         ),
         # Report with cross-references
         (
@@ -895,6 +898,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "report_with_references_ref1": {"values": [4, 5, 6]},
             },
             ["Start generating individual report: report_with_references"],
+            1,
         ),
         # Report generation with missing cross-references
         (
@@ -908,6 +912,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: error_report",
                 "Error generating the individual report (error_report) => KeyError: ",
             ],
+            0,
         ),
         # Report generation with error in _perform_aggregations
         (
@@ -921,6 +926,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: error_report",
                 "Error generating the individual report (error_report) => ValueError: ",
             ],
+            0,
         ),
         # Report with graph_details, without enable_graph_and_report - tests graph_data
         # creation and filtering reports by exclusion
@@ -936,6 +942,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {},
             ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
+            0,
         ),
         # Report with both graph_details and enable_graph_and_report set - tests enabling both graph and report data
         (
@@ -954,6 +961,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: full_feature_report",
                 "Prepared graph data for report: full_feature_report",
             ],
+            0,
         ),
         # Report with enable_graph_and_report set but without graph_details
         # tests warning log for missing graph_details
@@ -972,6 +980,23 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: graph_report_missing_details",
                 "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
             ],
+            0,
+        ),
+        # Existing test cases with added last parameter 'expected_get_reports_by_regex_calls'
+        # Example for the report with cross-references test case:
+        (
+            {"name": "report_with_references", "filters": ["some_filter"], "cross_references": ["ref1"]},
+            {"some_filter": [1, 2, 3]},
+            {"ref1": {"values": [4, 5, 6]}},
+            None,
+            None,
+            {
+                "ref1": {"values": [4, 5, 6]},
+                "report_with_references_some_filter": {"values": [1, 2, 3]},
+                "report_with_references_ref1": {"values": [4, 5, 6]},
+            },
+            ["Start generating individual report: report_with_references"],
+            1,
         ),
     ],
 )
@@ -983,6 +1008,7 @@ def test_generate_report(
     perform_aggregations_exception: Optional[Type[BaseException]],
     expected_report_columns: Dict[str, List[Any]],
     expected_log_messages: List[str],
+    expected_get_reports_by_regex_calls: int,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -1022,6 +1048,8 @@ def test_generate_report(
             | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
         )
 
+    get_reports_by_regex_spy = mocker.spy(report_generator, "_get_reports_by_regex")
+
     # Act
     event_logs = report_generator.generate_report(filter_content, filtered_pool)
 
@@ -1031,6 +1059,8 @@ def test_generate_report(
     log_messages = [log["message"] for log in event_logs]
     for expected_message in expected_log_messages:
         assert expected_message in log_messages
+
+    assert get_reports_by_regex_spy.call_count == expected_get_reports_by_regex_calls
 
 
 def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
