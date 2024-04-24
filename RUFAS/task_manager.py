@@ -104,7 +104,7 @@ class TaskManager:
             pass
 
     @staticmethod
-    def task_single(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
+    def task_single(args: Dict[str, Any], produce_graphics: bool) -> None:
         output_manager = OutputManager()
         output_manager.run_startup_sequence(
             LogVerbosity(args["log_verbosity"]),
@@ -115,18 +115,27 @@ class TaskManager:
         )
         input_manager = InputManager()
 
-        if args["task_type"] == TaskType.HERD_INITIALIZATION:
-            pass
-        elif args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
-            pass
-        elif args["task_type"] == TaskType.INPUT_DATA_VALIDATION:
-            pass
-        elif args["task_type"] == TaskType.END_TO_END_TESTING:
-            pass
-        elif args["task_type"] == TaskType.POST_PROCESSING:
-            pass
-        else:
-            print("error")
+        task_type_to_handler_map = {
+            TaskType.HERD_INITIALIZATION: TaskManager.handle_herd_initializaition,
+            TaskType.SIMULATION_SIGNLE_RUN: TaskManager.handle_single_simulation_run,
+            TaskType.INPUT_DATA_VALIDATION: TaskManager.handle_input_data_validation,
+            TaskType.END_TO_END_TESTING: TaskManager.handle_end_to_end_testing,
+            TaskType.POST_PROCESSING: TaskManager.handle_post_processing,
+        }
+
+        task_type_to_handler_map[args["task_type"]](input_manager, output_manager)
+
+        output_manager.save_results(
+            Path(args["output_directory"]),
+            Path(args["filters_directory"]),
+            args["exclude_info_maps"],
+            produce_graphics,
+            Path(args["graphics_directory"]),
+            Path(args["CSV_directory"]),
+        )
+        output_manager.dump_all_nondata_pools(
+            Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
+        )
 
     @staticmethod
     def task_multi(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
@@ -147,11 +156,29 @@ class TaskManager:
             print("error")
 
     @staticmethod
-    def bar1(args: Dict[str, Any], const_var: int, input_manager: InputManager) -> None:  # TODO remove
-        print(f"bar 1 {args['task_type']=}, {const_var=}, {input_manager=}")
-        print(args["task_type"].is_multi_run())
+    def handle_herd_initializaition(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
 
     @staticmethod
-    def bar2(args: Dict[str, Any], const_var: int, input_manager: InputManager) -> None:  # TODO remove
-        print(f"bar 2 {args['task_type']=}, {const_var=}, {input_manager=}")
-        print(args["task_type"].is_multi_run())
+    def handle_single_simulation_run(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
+
+    @staticmethod
+    def handle_input_data_validation(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
+
+    @staticmethod
+    def handle_end_to_end_testing(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
+
+    @staticmethod
+    def handle_post_processing(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
+
+    @staticmethod  # TODO potential rename
+    def handle_sensitivity_analysis(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
+
+    @staticmethod  # TODO potential rename
+    def handle_multi_simulation_run(input_manager: InputManager, output_manager: OutputManager) -> None:
+        pass
