@@ -87,7 +87,6 @@ class BaseManureHandler:
             specific to the choice of manure handler.
         """
 
-        self.name = name
         self.weather = weather
         self.time = time
         self.config = manure_handler_config
