@@ -1324,9 +1324,12 @@ class OutputManager(object):
         output_directory: Path,
         clear_output_directory: bool,
         variables_file_path: Path,
+        output_prefix: str,
     ) -> None:  # TODO test coverage and docstring
+        self.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.set_log_verbose(verbosity)
+        self.set_metadata_prefix(output_prefix)
         self.print_credits()
         self.create_directory(output_directory)
         if clear_output_directory:

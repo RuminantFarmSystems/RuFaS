@@ -7,12 +7,9 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
-import random
 import traceback
 from pathlib import Path
 from typing import List
-
-import numpy
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -20,12 +17,6 @@ from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.task_manager import TaskManager
-from RUFAS.units import MeasurementUnits
-
-
-"""These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
-NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 
 def main() -> None:
@@ -289,42 +280,6 @@ def run_validation(
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
-def set_random_seed(input_manager: InputManager) -> None:
-    """
-    Sets the random seed for this simulation, if one is provided.
-
-    Parameters
-    ----------
-    input_manager : InputManager
-        The Input Manager instance that contains all input data.
-
-    Notes
-    -----
-    The packages seeded are Python's builtin `random` library and the NumPy `random` library. If the input indicates
-    that there should be no random seeding, the random libraries are "seeded" with `None`, which seeds the random
-    libraries with the system time.
-
-    """
-    set_seed = input_manager.get_data("config.set_seed")
-
-    om = OutputManager()
-    info_map: dict[str, str | MeasurementUnits] = {"class": "No caller class", "function": set_random_seed.__name__}
-
-    if set_seed:
-        seed = input_manager.get_data("config.random_seed")
-        log_name = "Randomization seed set."
-        log_message = f"Randomization libraries being seeded with {seed}."
-        om.add_log(log_name, log_message, info_map)
-    else:
-        seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-        info_map["units"] = MeasurementUnits.UNITLESS
-        om.add_variable("generated_random_seed", seed, info_map)
-        om.add_log("Generated random seed", f"Seeding random libaries with generated seed: {seed}", info_map)
-
-    random.seed(seed)
-    numpy.random.seed(seed)
-
-
 def initialize_herd(
     init_herd: bool = False,
     save_animals: bool = False,
@@ -446,7 +401,7 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", f"Data is valid. Simulating {metadata_file['prefix']} scenario", info_map
             )
-            set_random_seed(input_manager)
+            # set_random_seed(input_manager)
             try:
                 initialize_herd(
                     init_herd=init_herd,
