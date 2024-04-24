@@ -404,7 +404,6 @@ class Cow(HeiferIII):
             self.lactose_milk = 0.0
             self.CP_milk = 0.0
             self.mPrt = 0.0
-            # return 0, 0, 0
 
         if self.milking:
             self.days_in_milk += 1
@@ -443,16 +442,12 @@ class Cow(HeiferIII):
             self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
-            # daily_fat_correct_milk_production = 0.0
             self.milk_fat_kg = 0.0
             self.milk_protein_kg = 0.0
 
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
-
-        # if not self.milking:
-        # 	self.daily_growth = self.body_weight - prev_weight
 
     def get_user_defined_milk_fat_percent(self) -> float:
         """
@@ -649,7 +644,7 @@ class Cow(HeiferIII):
         Parameters
         ----------
         vertical_dist_to_parlor : float
-            Vertical distance to milking parlor, km.
+            Vertical distance to milking parlor (km).
         horizontal_dist_to_parlor : float
             Horizontal distance to milking parlor, km.
 
