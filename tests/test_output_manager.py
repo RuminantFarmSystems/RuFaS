@@ -2686,7 +2686,8 @@ def test_format_detailed_value_str(origin_label: OriginLabel, data: Dict[str, An
             {"origin_label": "invalid_label"},
             OriginLabel.NONE,
             [
-                "Origin label must be one of ['true and report origins', 'true origin', 'report origin', 'none']. Received invalid_label."
+                "Origin label must be one of ['true and report origins', 'true origin', 'report origin', 'none']. "
+                "Received invalid_label."
             ],
         ),
     ],
