@@ -2207,27 +2207,19 @@ class Cow(HeiferIII):
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
             cull_prob = 0
-            if cull_reason_rand <= (
-                    cull_prob := cull_prob + AnimalBase.config["feet_leg_cull"]["probability"]
-            ):
+            if cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["feet_leg_cull"]["probability"]):
                 cull_reason_cull_prob = AnimalBase.config["feet_leg_cull"]["cull_day_prob"]
                 self.cull_reason = const.LAMENESS_CULL
 
-            elif cull_reason_rand <= (
-                    cull_prob := cull_prob + AnimalBase.config["injury_cull"]["probability"]
-            ):
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["injury_cull"]["probability"]):
                 cull_reason_cull_prob = AnimalBase.config["injury_cull"]["cull_day_prob"]
                 self.cull_reason = const.INJURY_CULL
 
-            elif cull_reason_rand <= (
-                    cull_prob := cull_prob + AnimalBase.config["mastitis_cull"]["probability"]
-            ):
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["mastitis_cull"]["probability"]):
                 cull_reason_cull_prob = AnimalBase.config["mastitis_cull"]["cull_day_prob"]
                 self.cull_reason = const.MASTITIS_CULL
 
-            elif cull_reason_rand <= (
-                    cull_prob := cull_prob + AnimalBase.config["disease_cull"]["probability"]
-            ):
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["disease_cull"]["probability"]):
                 cull_reason_cull_prob = AnimalBase.config["disease_cull"]["cull_day_prob"]
                 self.cull_reason = const.DISEASE_CULL
 
