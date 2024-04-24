@@ -13,7 +13,7 @@ This will produce a list of the differences in a .txt file saved in the output d
 
 """
 
-from typing import Any, Dict, Type
+from typing import Any
 from deepdiff import DeepDiff
 
 import argparse
