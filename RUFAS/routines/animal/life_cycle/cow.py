@@ -32,11 +32,11 @@ im = InputManager()
 
 
 class MilkProductionHistory:
-    def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
-        self.simulation_day = sim_day
-        self.days_in_milk = days_in_milk
-        self.milk_production = milk_prod
-        self.days_born = days_born
+    def __init__(self, sim_day: int, days_in_milk: int, milk_prod: float, days_born: int) -> None:
+        self.simulation_day: int = sim_day
+        self.days_in_milk: int = days_in_milk
+        self.milk_production: float = milk_prod
+        self.days_born: int = days_born
 
 
 class Cow(HeiferIII):
@@ -120,21 +120,21 @@ class Cow(HeiferIII):
         self.calving_to_preg_time = 0
         self.milking = False
         self.days_in_milk = 0
-        self.estimated_daily_milk_produced = 0
+        self.estimated_daily_milk_produced = 0.0
         # Milk production as estimated from the lactation curve, kg/day.
-        self.milk_fat_kg = 0
+        self.milk_fat_kg = 0.0
         # Milk fat content estimate, kg/day.
-        self.milk_protein_kg = 0
+        self.milk_protein_kg = 0.0
         # Milk protein content estimate, kg/day.
         self.milk_production_reduction = 0.0
         self.latest_milk_production_305days = 0.0
-        self.single_acc_milk_prod = 0
+        self.single_acc_milk_prod = 0.0
         self.future_cull_date = 0
         self.future_death_date = 0
         self.cull_reason = None
         self.repro_program = args["repro_program"]
         self.first_ai = False
-        self.fat_percent = 0
+        self.fat_percent = 0.0
 
         # TAI params
         self.presynch_method = args["presynch_method"]
@@ -242,7 +242,7 @@ class Cow(HeiferIII):
         }
 
     @property
-    def is_lactating(self):
+    def is_lactating(self) -> bool:
         """
         Check if the cow is lactating.
 
@@ -269,18 +269,18 @@ class Cow(HeiferIII):
 
         return not self.is_lactating
 
-    def set_breed_index(self):
+    def set_breed_index(self) -> None:
         """Sets the cow's breed index for use in the lactation curve parameter calculation"""
         if self.breed == "HO":
             self.breed_index = 0
         if self.breed == "JE":
             self.breed_index = 1
 
-    def set_parity_index(self):
+    def set_parity_index(self) -> None:
         """Sets the cow's parity index for use in the lactation curve parameter calculation"""
         self.parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
 
-    def set_lactation_curve_params(self):
+    def set_lactation_curve_params(self) -> None:
         """
         Sets cow's lactation curve parameters based on cow's lactation curve attribute.
         Currently only set up for wood model.
@@ -311,9 +311,9 @@ class Cow(HeiferIII):
                 * (1 - math.exp((AnimalBase.config["c"] - self.days_in_milk) / AnimalBase.config["b"]) / 2)
                 * math.exp((0 - AnimalBase.config["d"]) * self.days_in_milk)
             )
-        return 0
+        return 0.0
 
-    def update_milk_production_history(self, sim_day):
+    def update_milk_production_history(self, sim_day: int) -> None:
         """
         Updates the animal's milk production history by appending a
         MilkProductionHistory object to the list.
@@ -324,7 +324,9 @@ class Cow(HeiferIII):
 
         Parameter
         ---------
-            sim_day: simulation day
+        sim_day : int
+            Day of simulation.
+
         """
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
             del self.milk_production_history[-1]
@@ -343,7 +345,7 @@ class Cow(HeiferIII):
             self.latest_milk_production_305days = np.sum(milk_history)
 
     @staticmethod
-    def determine_param_value(mean, std):
+    def determine_param_value(mean: float, std: float) -> float:
         """
         Determine parameter value distribution for lactation curve model
         parameters.
@@ -355,7 +357,7 @@ class Cow(HeiferIII):
         """
         return np.random.normal(mean, std)
 
-    def milking_update(self, sim_day: int, calving_interval: int | float):
+    def milking_update(self, sim_day: int, calving_interval: int | float) -> None:
         """
         Updates milking status for lactating cows, using breed and parity
         to estimate daily milk production from specific lactation curves
@@ -370,15 +372,6 @@ class Cow(HeiferIII):
             value of animal_config["use_input_calving_interval"] exists
             and is True; otherwise, it is a float (average herd calving
             interval). See logic in _set_avg_CI in lifecycle.py.
-
-        Returns
-        -------
-        estimated_daily_milk_produced : float
-            Estimated daily milk production from the lactation curve.
-        fat_percent : float
-            Calculated with days in milk, for temporary use.
-        daily_fat_correct_milk_production : float
-            Calculated from estimated milk production and fat percent, for temporary use.
 
         Notes
         ------
@@ -403,7 +396,7 @@ class Cow(HeiferIII):
             self.milking = False
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
-            self.estimated_daily_milk_produced = 0
+            self.estimated_daily_milk_produced = 0.0
             self.latest_milk_production_305days = 0.0
             self.fat_percent = 0.0
             self.milk_fat_kg = 0.0
@@ -411,7 +404,6 @@ class Cow(HeiferIII):
             self.lactose_milk = 0.0
             self.CP_milk = 0.0
             self.mPrt = 0.0
-            return 0, 0, 0
 
         if self.milking:
             self.days_in_milk += 1
@@ -443,29 +435,19 @@ class Cow(HeiferIII):
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
             self.fat_percent = self.get_user_defined_milk_fat_percent()
-            daily_fat_correct_milk_production = (
-                0.4 * estimated_daily_milk_produced + 0.15 * self.fat_percent * estimated_daily_milk_produced
-            )
+            # daily_fat_correct_milk_production = (
+            #     0.4 * estimated_daily_milk_produced + 0.15 * self.fat_percent * estimated_daily_milk_produced
+            # )
             self.milk_fat_kg = (self.fat_percent / 100) * self.estimated_daily_milk_produced
             self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
-            daily_fat_correct_milk_production = 0.0
             self.milk_fat_kg = 0.0
             self.milk_protein_kg = 0.0
 
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
-
-        # if not self.milking:
-        # 	self.daily_growth = self.body_weight - prev_weight
-
-        return (
-            self.estimated_daily_milk_produced,
-            self.fat_percent,
-            daily_fat_correct_milk_production,
-        )
 
     def get_user_defined_milk_fat_percent(self) -> float:
         """
@@ -561,9 +543,10 @@ class Cow(HeiferIII):
                 nutrient_conc=nutrient_conc,
             )
 
-    def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}):
+    def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}) -> None:
         """
         Calculates this Cow's nutrient requirements.
+
         """
         if nutrient_conc and nutrient_conc["dm"] != 0.0:
             NDF_conc = nutrient_conc["NDF"] / 100
@@ -602,11 +585,15 @@ class Cow(HeiferIII):
         ) / self.DMIest_requirement
         self.DMDP_requirement = (animal_requirements["MP_requirement"]) / self.DMIest_requirement
 
-    def phosphorus_rqmts(self, DMI):
+    def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
-        Args:
-            DMI: the Dry Matter Intake (kg)
+
+        Parameters
+        ----------
+        DMI : float
+            The Dry Matter Intake (kg).
+
         """
         # amount of P required for endogenous losses (g) (A.1EF.E.1)
         self.p_maint_feces = 0.001 * DMI * 1000
@@ -649,28 +636,40 @@ class Cow(HeiferIII):
         else:
             self.p_req = p_absorb / 0.664
 
-    def calc_daily_walking_dist(self, vertical_dist_to_parlor, horizontal_dist_to_parlor):
+    def calc_daily_walking_dist(self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float) -> None:
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
-        Args:
-            vertical_dist_to_parlor: vertical distance to milking parlor, km
-            horizontal_dist_to_parlor: horizontal distance to milking parlor, km
+
+        Parameters
+        ----------
+        vertical_dist_to_parlor : float
+            Vertical distance to milking parlor (km).
+        horizontal_dist_to_parlor : float
+            Horizontal distance to milking parlor, km.
+
         """
         # multiplied by 2 for return trip
         self.DVD = 2 * vertical_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
         self.DHD = 2 * horizontal_dist_to_parlor * AnimalBase.config["cow_times_milked_per_day"]
 
-    def get_bw_change(self, CI):  # noqa
+    def get_bw_change(self, CI: int | float) -> float:  # noqa
         """
-        life cycle psedocode @[A.1A.C.56/57/58]
         Calculates the body weight change for a cow.
 
-        Args:
-            CI: the calving interval used in the body weight
-                change calculation
+        Parameters
+        ----------
+        calving_interval : int | float
+            The calving interval used in the body weight
+                change calculation, can be from config or average value.
 
-        Returns: the daily body weight change for a cow.
+        Returns
+        -------
+            The daily body weight change for a cow.
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.56/57/58]
 
         """
         # on the calving day
@@ -725,7 +724,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day, calving_interval):  # noqa
+    def update(self, sim_day: int, calving_interval: int | float) -> bool:  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
 
@@ -733,20 +732,11 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The simulation day.
-        calving_interval : int
-            The size of the calving interval in days.
+        calving_interval : int | float
+            The size of the calving interval in days, can be average current calving interval instead of input value.
 
         Returns
         -------
-        float
-            estimated daily milk production from the lactation curve.
-        float
-            fat_percent calculated with days in milk, for temporary use.
-        float
-            daily_fat_correct_milk_production calculated form estimated milk
-            production and fat percent, for temporary use.
-        bool
-            cull_stage which is True if a cow is culled, False if it stays in the herd.
         bool
             new_born status which is True if a calf is born.
 
@@ -756,8 +746,6 @@ class Cow(HeiferIII):
             If reproduction program not in list of current reproduction programs.
 
         """
-        if self.culled:
-            return None
 
         new_born = False
         self.days_born += 1
@@ -800,11 +788,7 @@ class Cow(HeiferIII):
                 )
 
         # if self.milking:
-        (
-            estimated_daily_milk_produced,
-            fat_percent,
-            daily_fat_correct_milk_production,
-        ) = self.milking_update(sim_day, calving_interval)
+        self.milking_update(sim_day, calving_interval)
 
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
@@ -870,15 +854,9 @@ class Cow(HeiferIII):
 
         self._check_do_not_breed_flag(sim_day)
 
-        cull_stage = self.cull_update(sim_day)
+        self.cull_update(sim_day)
 
-        return (
-            estimated_daily_milk_produced,
-            fat_percent,
-            daily_fat_correct_milk_production,
-            cull_stage,
-            new_born,
-        )
+        return new_born
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
         if self.should_decrease_conception_rate_in_rebreeding():
@@ -2145,29 +2123,25 @@ class Cow(HeiferIII):
         return AnimalBase.config["decrease_conception_rate_by_parity"]
 
     # Cull methods
-    def cull_update(self, sim_day):
+    def cull_update(self, sim_day: int) -> None:
         """
-        Update culling time and cull reasons for cow to leave the herd
-        The reasons are reproduction failure, low production, and health issues
-        Returns: not culled
+        Update culling time and cull reasons for cow to leave the herd.
+
+        The reasons for culling are reproduction failure, low production, and health issues.
         """
         if self.do_not_breed and self.estimated_daily_milk_produced < AnimalBase.config["cull_milk_production"]:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
             self.cull_reason = const.LOW_PROD_CULL
-            return True
         if self.days_born == self.future_cull_date:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, self.cull_reason)
-            return True
         if self.days_born == self.future_death_date:
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.DEATH_CULL)
             self.cull_reason = const.DEATH_CULL
-            return True
-        return False
 
-    def death_update(self):
+    def death_update(self) -> None:
         if self.calves >= 4:
             death_rate = AnimalBase.config["parity_death_prob"][3]
         else:
@@ -2191,7 +2165,7 @@ class Cow(HeiferIII):
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
             )
 
-    def health_cull_update(self):
+    def health_cull_update(self) -> None:
         """
         Update cows culled for health problem, first cull or not in this parity
         will be determined with parity specific culling rate, then a cull reason
