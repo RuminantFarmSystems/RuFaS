@@ -31,32 +31,6 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Update All Badges to Unknown Initially
-        run: |
-          flake8_badge_url="https://img.shields.io/badge/Flake8-unknown-lightgrey"
-          flake8_badge_markdown_str="[![Flake8](${flake8_badge_url})]"
-          sed -i "s|\[\!\[Flake8\]\(.*\)\]|${flake8_badge_markdown_str}|" ./README.md
-          
-          pytest_badge_url="https://img.shields.io/badge/Pytest-unknown-lightgrey"
-          pytest_badge_markdown_str="[![Pytest](${pytest_badge_url})]"
-          sed -i "s|\[\!\[Pytest\]\(.*\)\]|${pytest_badge_markdown_str}|" ./README.md
-          
-          coverage_badge_url="https://img.shields.io/badge/Coverage-unknown-lightgrey"
-          coverage_badge_markdown_str="[![Coverage](${coverage_badge_url})]"
-          sed -i "s|\[\!\[Coverage\]\(.*\)\]|${coverage_badge_markdown_str}|" ./README.md
-          
-          mypy_badge_url="https://img.shields.io/badge/Mypy-unknown-lightgrey"
-          mypy_badge_markdown_str="[![Mypy](${mypy_badge_url})]"
-          sed -i "s|\[\!\[Mypy\]\(.*\)\]|${mypy_badge_markdown_str}|" ./README.md
-
-      - name: Commit & Push Initial Badge Updates
-        uses: EndBug/add-and-commit@v7
-        with:
-          message: "Set all badges to unknown at the start"
-          add: "README.md"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
-
       - name: Set up dependency for getting changed files
         id: files
         uses: jitterbit/get-changed-files@v1
@@ -87,7 +61,7 @@ jobs:
               unauthorized_paths+="$path, "
             fi
           done
-  
+          
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
@@ -107,7 +81,7 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
-      
+  
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
