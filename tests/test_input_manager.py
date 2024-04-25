@@ -9,6 +9,7 @@ import pytest
 from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
 
 
@@ -68,6 +69,7 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "_check_max_depth": mock_input_manager._check_max_depth,
     }
 
 
@@ -392,6 +394,8 @@ def test_populate_pool_valid(
 
     # Arrange
     input_manager = InputManager()
+    input_depth_limit = 5
+    input_manager.input_depth_limit = input_depth_limit
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
@@ -406,8 +410,9 @@ def test_populate_pool_valid(
         side_effect=lambda input_data, _: (input_data, None, None),
     )
     mocker.patch.object(input_manager, "_log_missing_keys")
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "_check_max_depth", return_value=input_depth_limit + 1)
+
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -416,7 +421,14 @@ def test_populate_pool_valid(
     assert result
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
-
+    patch_for_add_warning.assert_called_with(
+        "Max input depth exceeded",
+        f"Max depth of input file path/to/csv/file2.csv exceeds limit of {input_depth_limit}",
+        {
+            "class": "InputManager",
+            "function": "_populate_pool",
+        }
+    )
     input_manager.pool = {}
 
 
@@ -4017,6 +4029,27 @@ def test_validate_input_by_type_value_error() -> None:
         input_manager._validate_input_by_type(
             variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter
         )
+
+
+@pytest.mark.parametrize(
+    "data, expected_depth", [
+        ({"key1": "value1", "key2": "value2"}, 0),
+        ({"key1": {"key2": {"key3": "value3"}}}, 2),
+        ([{"key1": "value1"}, {"key2": {"key3": "value3"}}], 2),
+        ({"key1": [{"key2": "value2"}, {"key3": {"key4": ["value4"]}}]}, 3),
+        ("I am not a dict or list", 0),
+        ([], 0),
+        ({}, 0),
+        ([[], [{}], [[{"key": "value"}]]], 3)
+    ]
+)
+def test_check_max_depth(mock_input_manager: InputManager, data: Dict[str, Any] | List[Any],
+                         expected_depth: int, input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test various depths of nested data structures."""
+    assert mock_input_manager._check_max_depth(data) == expected_depth
+    mock_input_manager._check_max_depth = input_manager_original_method_states[
+        "_check_max_depth"
+    ]
 
 
 def test_increment_in_elements_counter() -> None:

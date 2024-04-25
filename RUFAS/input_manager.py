@@ -2025,7 +2025,7 @@ class InputManager:
         else:
             return False
 
-    def dump_get_data_logs(self, data_pool, path: Path) -> None:
+    def dump_get_data_logs(self, path: Path) -> None:
         """
         Dumps the stored get data logs to a JSON file at the specified path.
 
@@ -2039,7 +2039,7 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def _check_max_depth(self, data: Dict[str, Any], current_depth=0):
+    def _check_max_depth(self, data: Any, current_depth: int = 0) -> Any:
         """
         Recursively find the maximum depth of nested dictionaries.
         """
@@ -2052,10 +2052,15 @@ class InputManager:
                 if isinstance(value, dict):
                     depth = self._check_max_depth(value, current_depth + 1)
                     max_depth = max(max_depth, depth)
+                elif isinstance(value, list):
+                    for item in value:
+                        depth = self._check_max_depth(item, current_depth + 1)
+                        max_depth = max(max_depth, depth)
+
         elif isinstance(data, list):
-            list_depths = [self._check_max_depth(item, current_depth + 1) for item in data]
-            if list_depths:
-                max_depth = max(max_depth, max(list_depths))
+            for item in data:
+                depth = self._check_max_depth(item, current_depth + 1)
+                max_depth = max(max_depth, depth)
 
         return max_depth
 
