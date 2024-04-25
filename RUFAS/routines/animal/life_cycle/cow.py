@@ -2150,16 +2150,16 @@ class Cow(HeiferIII):
         if death_rand <= death_rate:
             death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
             death_date_random = random()
-            for i in range(len(AnimalBase.config["death_cull_prob"]) - 1):
+            for i in range(len(AnimalBase.config["death_day_prob"]) - 1):
                 if (
-                    AnimalBase.config["death_cull_prob"][i]
+                    AnimalBase.config["death_day_prob"][i]
                     <= death_date_random
-                    < AnimalBase.config["death_cull_prob"][i + 1]
+                    < AnimalBase.config["death_day_prob"][i + 1]
                 ):
-                    death_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
-                    death_time_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_time_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
+                    death_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
+                    death_time_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_time_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
             self.future_death_date = round(
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
@@ -2180,24 +2180,29 @@ class Cow(HeiferIII):
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
-            # cull_reason_cull_prob = []
-            if cull_reason_rand <= 0.1633:
-                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull_prob"]
+            cull_prob = 0
+            if cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["feet_leg_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull"]["cull_day_prob"]
                 self.cull_reason = const.LAMENESS_CULL
-            elif cull_reason_rand <= 0.4516:
-                cull_reason_cull_prob = AnimalBase.config["injury_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["injury_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["injury_cull"]["cull_day_prob"]
                 self.cull_reason = const.INJURY_CULL
-            elif cull_reason_rand <= 0.6955:
-                cull_reason_cull_prob = AnimalBase.config["mastitis_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["mastitis_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["mastitis_cull"]["cull_day_prob"]
                 self.cull_reason = const.MASTITIS_CULL
-            elif cull_reason_rand <= 0.8346:
-                cull_reason_cull_prob = AnimalBase.config["disease_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["disease_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["disease_cull"]["cull_day_prob"]
                 self.cull_reason = const.DISEASE_CULL
-            elif cull_reason_rand <= 0.8991:
-                cull_reason_cull_prob = AnimalBase.config["udder_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob + AnimalBase.config["udder_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["udder_cull"]["cull_day_prob"]
                 self.cull_reason = const.UDDER_CULL
+
             else:
-                cull_reason_cull_prob = AnimalBase.config["unknown_cull_prob"]
+                cull_reason_cull_prob = AnimalBase.config["unknown_cull"]["cull_day_prob"]
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()
