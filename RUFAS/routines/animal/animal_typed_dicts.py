@@ -200,7 +200,7 @@ class AnimalConfigTypedDict(TypedDict):
 
     # from_literature -> culling
     parity_death_prob: List[float]
-    death_cull_prob: List[float]
+    death_day_prob: List[float]
     parity_cull_prob: List[float]
     mastitis_cull_prob: List[float]
     feet_leg_cull_prob: List[float]
