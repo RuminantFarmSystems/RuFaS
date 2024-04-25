@@ -202,8 +202,9 @@ class GraphGenerator:
 
         return all_logs
 
-    def _generate_legend_keys(self, combined_var_name: str, omit_legend_prefix: bool = False,
-                              omit_legend_suffix: bool = False) -> str:
+    def _generate_legend_keys(
+        self, combined_var_name: str, omit_legend_prefix: bool = False, omit_legend_suffix: bool = False
+    ) -> str:
         """
         Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
 
