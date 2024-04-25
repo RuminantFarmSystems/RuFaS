@@ -209,86 +209,6 @@ def test_apply_horizontal_aggregation(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, expected_result, expected_exception",
-    [
-        # Case with selected variables and slice parameters
-        (
-            {
-                "var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-                "var2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-            },
-            {"variables": ["a"], "slice_start": 0, "slice_end": 2},
-            {"a": [1, 3, 5, 7]},
-            None,
-        ),
-        # Case without selected variables but required
-        (
-            {"var1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]}},
-            {},
-            None,
-            KeyError,
-        ),
-        # Case with constants addition
-        (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "Constant1", "value": 10}]},
-            {"Constant1": 10, "var1": [1, 2, 3, 4]},
-            None,
-        ),
-        # Case with invalid constant name
-        (
-            {"var1": {"values": [1, 2, 3, 4]}},
-            {"variables": ["var1"], "constants": [{"name": "", "value": 10}]},
-            None,
-            ValueError,
-        ),
-    ],
-)
-def test_prepare_report_data_with_constants(
-    filtered_pool: Dict[str, Dict[str, List[Any]]],
-    filter_content: Dict[str, Any],
-    expected_result: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
-    mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
-    """
-
-    # Arrange
-    report_generator = ReportGenerator()
-    mocker.patch(
-        "RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists",
-        side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]},
-    )
-
-    def mock_add_constants_to_report_data(
-        report_data: Dict[str, List[Any]],
-        _filter_content: Dict[str, Any],
-    ) -> None:
-        """Mock function for _add_constants_to_report_data() method in report_generator.py file."""
-        constants = _filter_content.get("constants", [])
-        for constant in constants:
-            if not constant["name"]:
-                raise ValueError("Constant name cannot be empty.")
-            report_data[constant["name"]] = constant["value"]
-
-    mocker.patch.object(
-        report_generator,
-        "_add_constants_to_report_data",
-        side_effect=mock_add_constants_to_report_data,
-    )
-
-    # Act and assert
-    if expected_exception:
-        with pytest.raises(expected_exception):
-            report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-    else:
-        result = report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
-        assert result == expected_result
-
-
-@pytest.mark.parametrize(
     "report_data, filter_content, expected_report_data, expected_exception",
     [
         # Valid case with a valid constant
@@ -376,7 +296,7 @@ def test_validate_constants(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, mock_prep_data, expected_result, expected_exception",
+    "filtered_pool, filter_content, expected_result, expected_exception",
     [
         # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
@@ -388,7 +308,6 @@ def test_validate_constants(
                 "horizontal_order": ["var1", "var2"],
                 "horizontal_first": True,
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_ver_agg": [5.0]},
             None,
         ),
@@ -402,7 +321,6 @@ def test_validate_constants(
                 "horizontal_order": ["var1", "var2"],
                 "horizontal_first": False,
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"ver_hor_agg": [5.0]},
             None,
         ),
@@ -411,14 +329,12 @@ def test_validate_constants(
             {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
             {"name": "Report"},
             {"var1": [1, 2], "var2": [3, 4]},
-            {"var1": [1, 2], "var2": [3, 4]},
             None,
         ),
         # Case where report_data is empty after preparing with constants
         (
             {"var1": {"values": []}},
             {"name": "Report", "horizontal_aggregation": "sum"},
-            {},
             None,
             ValueError,
         ),
@@ -430,7 +346,6 @@ def test_validate_constants(
                 "horizontal_aggregation": "sum",
                 "horizontal_order": ["var1", "var2"],
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_agg": [4, 6]},
             None,
         ),
@@ -438,7 +353,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
             {"name": "Report", "vertical_aggregation": "average"},
-            {"var1": [1, 3], "var2": [2, 4]},
             {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
             None,
         ),
@@ -446,7 +360,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 2]}},
             {"name": "Report", "vertical_aggregation": "unsupported"},
-            {"var1": [1, 2]},
             None,
             ValueError,
         ),
@@ -454,7 +367,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 2]}},
             {"name": "Report2", "horizontal_aggregation": "unsupported"},
-            {"var1": [1, 2]},
             None,
             ValueError,
         ),
@@ -462,7 +374,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}, "var2": {"values": [2, 4]}},
             {"name": "Report", "vertical_aggregation": "average", "variables": ["var1", "var2"]},
-            {"var1": [1, 3], "var2": [2, 4]},
             {"var1_ver_agg": [2.0], "var2_ver_agg": [3.0]},
             None,
         ),
@@ -470,7 +381,6 @@ def test_validate_constants(
         (
             {"var1": {"values": [1, 3]}},
             {"name": "Report", "vertical_aggregation": "average"},
-            {"var1": [1, 3]},
             {"ver_agg": [2.0]},
             None,
         ),
@@ -483,7 +393,6 @@ def test_validate_constants(
                 "vertical_aggregation": "average",
                 "horizontal_first": True,
             },
-            {"var1": [1, 2, 3], "var2": [4, 5, None]},
             {"hor_ver_agg": [5.0]},
             None,
         ),
@@ -496,7 +405,6 @@ def test_validate_constants(
                 "vertical_aggregation": "average",
                 "horizontal_first": False,
             },
-            {"var1": [1, 2, 3], "var2": [4, 5, None]},
             {"ver_hor_agg": [6.5]},
             None,
         ),
@@ -507,7 +415,6 @@ def test_validate_constants(
                 "name": "Report",
                 "horizontal_aggregation": "sum",
             },
-            {"var1": [1, 2], "var2": [3, 4]},
             {"hor_agg": [4, 6]},
             None,
         ),
@@ -516,7 +423,6 @@ def test_validate_constants(
 def test_perform_aggregations(
     filtered_pool: Dict[str, Dict[str, List[Any]]],
     filter_content: Dict[str, Any],
-    mock_prep_data: Dict[str, List[Any]],
     expected_result: Dict[str, List[Any]],
     expected_exception: Type[Exception],
     mocker: MockerFixture,
@@ -527,11 +433,6 @@ def test_perform_aggregations(
 
     # Arrange
     report_generator = ReportGenerator()
-    mocker.patch.object(
-        report_generator,
-        "_prepare_report_data_with_constants",
-        return_value=mock_prep_data,
-    )
 
     def mock_apply_horizontal_aggregation(
         data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
@@ -860,7 +761,8 @@ def test_ensure_unique_report_name_with_timestamp(
 
 @pytest.mark.parametrize(
     "filter_content, filtered_pool, reports, reference_exception, "
-    "perform_aggregations_exception, expected_report_columns, expected_log_messages",
+    "perform_aggregations_exception, expected_report_columns, expected_log_messages,"
+    "expected_get_reports_by_regex_calls",
     [
         # Standard report generation
         (
@@ -871,6 +773,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {"standard_report_some_filter": {"values": [1, 2, 3]}},
             ["Start generating individual report: standard_report"],
+            0,
         ),
         # Report with name as an empty string
         (
@@ -881,6 +784,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {"some_filter": {"values": [1, 2, 3]}},
             ["Start generating individual report: "],
+            0,
         ),
         # Report with cross-references
         (
@@ -895,6 +799,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "report_with_references_ref1": {"values": [4, 5, 6]},
             },
             ["Start generating individual report: report_with_references"],
+            1,
         ),
         # Report generation with missing cross-references
         (
@@ -908,6 +813,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: error_report",
                 "Error generating the individual report (error_report) => KeyError: ",
             ],
+            0,
         ),
         # Report generation with error in _perform_aggregations
         (
@@ -921,6 +827,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: error_report",
                 "Error generating the individual report (error_report) => ValueError: ",
             ],
+            0,
         ),
         # Report with graph_details, without enable_graph_and_report - tests graph_data
         # creation and filtering reports by exclusion
@@ -936,6 +843,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             {},
             ["Start generating individual report: graph_report", "Prepared graph data for report: graph_report"],
+            0,
         ),
         # Report with both graph_details and enable_graph_and_report set - tests enabling both graph and report data
         (
@@ -954,6 +862,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: full_feature_report",
                 "Prepared graph data for report: full_feature_report",
             ],
+            0,
         ),
         # Report with enable_graph_and_report set but without graph_details
         # tests warning log for missing graph_details
@@ -972,6 +881,23 @@ def test_ensure_unique_report_name_with_timestamp(
                 "Start generating individual report: graph_report_missing_details",
                 "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
             ],
+            0,
+        ),
+        # Existing test cases with added last parameter 'expected_get_reports_by_regex_calls'
+        # Example for the report with cross-references test case:
+        (
+            {"name": "report_with_references", "filters": ["some_filter"], "cross_references": ["ref1"]},
+            {"some_filter": [1, 2, 3]},
+            {"ref1": {"values": [4, 5, 6]}},
+            None,
+            None,
+            {
+                "ref1": {"values": [4, 5, 6]},
+                "report_with_references_some_filter": {"values": [1, 2, 3]},
+                "report_with_references_ref1": {"values": [4, 5, 6]},
+            },
+            ["Start generating individual report: report_with_references"],
+            1,
         ),
     ],
 )
@@ -983,6 +909,7 @@ def test_generate_report(
     perform_aggregations_exception: Optional[Type[BaseException]],
     expected_report_columns: Dict[str, List[Any]],
     expected_log_messages: List[str],
+    expected_get_reports_by_regex_calls: int,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -1002,10 +929,12 @@ def test_generate_report(
     mocker.patch.object(
         report_generator,
         "_prepare_report_data_to_be_graphed",
-        side_effect=lambda graph_data, filter_content, report_name: {
-            "message": f"Prepared graph data for report: {report_name}",
-            "info_map": {},
-        },
+        side_effect=lambda graph_data, filter_content, report_name: [
+            {
+                "message": f"Prepared graph data for report: {report_name}",
+                "info_map": {},
+            }
+        ],
     )
     mocker.patch("RUFAS.report_generator.Utility.filter_dictionary", return_value=expected_report_columns)
     if perform_aggregations_exception:
@@ -1022,6 +951,8 @@ def test_generate_report(
             | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
         )
 
+    get_reports_by_regex_spy = mocker.spy(report_generator, "_get_reports_by_regex")
+
     # Act
     event_logs = report_generator.generate_report(filter_content, filtered_pool)
 
@@ -1031,6 +962,8 @@ def test_generate_report(
     log_messages = [log["message"] for log in event_logs]
     for expected_message in expected_log_messages:
         assert expected_message in log_messages
+
+    assert get_reports_by_regex_spy.call_count == expected_get_reports_by_regex_calls
 
 
 def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
