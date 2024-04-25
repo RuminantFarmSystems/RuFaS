@@ -293,6 +293,11 @@ class ReportGenerator:
             such as 'name', 'filters', 'cross_references', and aggregation instructions.
         individual_report_name : str
             The name of the report to be graphed.
+
+        Returns
+        -------
+        List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]
+            Returns the logs from GraphGenerator.generate_graph()
         """
 
         graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
