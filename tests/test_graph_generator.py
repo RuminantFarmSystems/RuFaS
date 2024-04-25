@@ -234,7 +234,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
     ],
 )
 def test_generage_legend_keys(combined_var_input: str, expected_output: str, graph_generator: GraphGenerator) -> None:
-    actual_output = graph_generator._generage_legend_keys(combined_var_input)
+    actual_output = graph_generator._generate_legend_keys(combined_var_input)
     assert actual_output == expected_output
 
 

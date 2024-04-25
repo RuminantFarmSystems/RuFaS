@@ -197,7 +197,7 @@ class GraphGenerator:
 
         return all_logs
 
-    def _generage_legend_keys(self, combined_var_name: str) -> str:
+    def _generate_legend_keys(self, combined_var_name: str) -> str:
         """
         Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
 
@@ -209,7 +209,7 @@ class GraphGenerator:
         Returns
         -------
         str
-            The striped variable name.
+            The stripped variable name.
         """
         combined_var_name_list: List[str] = combined_var_name.split(".")
         if len(combined_var_name_list) == 1:
