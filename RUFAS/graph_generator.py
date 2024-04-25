@@ -170,7 +170,7 @@ class GraphGenerator:
             fig, _ = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
-            
+
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
