@@ -1,6 +1,7 @@
 from typing import Optional
 from math import exp, log, atan, sin
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -70,17 +71,17 @@ class SoilErosion:
 
         """
         erodibility_factor = self._determine_soil_erodibility_factor(
-            self.data.soil_layers[0].percent_sand_content,
-            self.data.soil_layers[0].percent_silt_content,
-            self.data.soil_layers[0].percent_clay_content,
-            self.data.soil_layers[0].percent_organic_carbon_content,
+            self.data.soil_layers[0].sand_fraction,
+            self.data.soil_layers[0].silt_fraction,
+            self.data.soil_layers[0].clay_fraction,
+            self.data.soil_layers[0].organic_carbon_fraction,
         )
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(
             self.data.slope_length, self.data.average_subbasin_slope
         )
-        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
+        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].rock_fraction)
 
         peak_runoff_rate = self._determine_peak_runoff_rate(
             self.data.accumulated_runoff,
@@ -112,16 +113,16 @@ class SoilErosion:
 
     # --- Static methods ---
     @staticmethod
-    def _determine_coarse_sand_factor(percent_sand_content: float, percent_silt_content: float) -> float:
+    def _determine_coarse_sand_factor(sand_fraction: float, silt_fraction: float) -> float:
         """
         Calculates the coarseness factor of soil erodibility.
 
         Parameters
         ----------
-        percent_sand_content : float
-            Percent of soil content that is sand.
-        percent_silt_content : float
-            Percent of soil content that is silt.
+        sand_fraction : float
+            Fraction of soil content that is sand.
+        silt_fraction : float
+            Fraction of soil content that is silt.
 
         Notes
         -------
@@ -138,19 +139,19 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.6
 
         """
-        return 0.2 + 0.3 * exp((-0.256) * percent_sand_content * (1 - (percent_silt_content / 100)))
+        return 0.2 + 0.3 * exp((-0.256) * sand_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE * (1 - silt_fraction))
 
     @staticmethod
-    def _determine_clay_silt_ratio_factor(percent_silt_content: float, percent_clay_content: float) -> float:
+    def _determine_clay_silt_ratio_factor(silt_fraction: float, clay_fraction: float) -> float:
         """
         Calculates the component factor of erodibility that is based on the clay-silt ratio.
 
         Parameters
         ----------
-        percent_silt_content : float
-            Percent of silt in the given layer of soil.
-        percent_clay_content : float
-            Percent of clay in the given layer of soil.
+        silt_fraction : float
+            Fraction of silt in the given layer of soil.
+        clay_fraction : float
+            Fraction of clay in the given layer of soil.
 
         Notes
         -----
@@ -167,20 +168,20 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.7
 
         """
-        if percent_silt_content == 0 and percent_clay_content == 0:
-            raise ValueError("Cannot have percent silt content and percent clay content both be 0")
-        return (percent_silt_content / (percent_clay_content + percent_silt_content)) ** 0.3
+        if silt_fraction == 0 and clay_fraction == 0:
+            raise ValueError("Cannot have fractions of silt and clay in the soil both be 0")
+        return (silt_fraction / ((clay_fraction) + (silt_fraction))) ** 0.3
 
     @staticmethod
-    def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
+    def _determine_carbon_content_factor(organic_carbon_fraction: float) -> float:
         """
-        Calculate a factor based on the percent of organic carbon content for use in calculating soil erodibility
+        Calculate a factor based on the fraction of organic carbon content for use in calculating soil erodibility
         factor.
 
         Parameters
         ----------
-        percent_organic_carbon : float
-            The percent of organic carbon content in the given layer of soil.
+        organic_carbon_fraction : float
+            The fraction of organic carbon content in the given layer of soil.
 
         Notes
         -------
@@ -198,18 +199,22 @@ class SoilErosion:
 
         """
         return 1 - (
-            (0.25 * percent_organic_carbon) / (percent_organic_carbon + exp(3.72 - (2.95 * percent_organic_carbon)))
+            (0.25 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)
+            / (
+                organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+                + exp(3.72 - (2.95 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE))
+            )
         )
 
     @staticmethod
-    def _determine_high_sand_factor(percent_sand_content: float) -> float:
+    def _determine_high_sand_factor(sand_fraction: float) -> float:
         """
         Calculate a factor based on the percent sand content for use in calculating soil erodibility factor.
 
         Parameters
         ----------
-        percent_sand_content : float
-            The percent of sand in the given layer of soil.
+        sand_fraction : float
+            The fraction of sand in the given layer of soil.
 
         Notes
         -----
@@ -225,29 +230,29 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.9
 
         """
-        not_sand_fraction = 1 - (percent_sand_content / 100)
+        not_sand_fraction = 1 - sand_fraction
         return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 * not_sand_fraction)))
 
     @staticmethod
     def _determine_soil_erodibility_factor(
-        percent_sand_content: float,
-        percent_silt_content: float,
-        percent_clay_content: float,
-        percent_organic_carbon_content: float,
+        sand_fraction: float,
+        silt_fraction: float,
+        clay_fraction: float,
+        organic_carbon_fraction: float,
     ) -> float:
         """
         Calculate the soil erodibility factor for use in calculating the sediment yield on a given day.
 
         Parameters
         ----------
-        percent_sand_content : float
-            Percent of sand in the given layer of soil.
-        percent_silt_content : float
-            Percent of silt in the given layer of soil.
-        percent_clay_content : float
-            Percent of clay in the given layer of soil.
-        percent_organic_carbon_content : float
-            Percent of organic carbon content in the given layer of soil.
+        sand_fraction : float
+            Fraction of sand in the given layer of soil.
+        silt_fraction : float
+            Fraction of silt in the given layer of soil.
+        clay_fraction : float
+            Fraction of clay in the given layer of soil.
+        organic_carbon_fraction : float
+            Fraction of organic carbon content in the given layer of soil.
 
         Notes
         -----
@@ -266,10 +271,10 @@ class SoilErosion:
 
         """
 
-        coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(percent_sand_content, percent_silt_content)
-        clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(percent_silt_content, percent_clay_content)
-        carbon_content_factor = SoilErosion._determine_carbon_content_factor(percent_organic_carbon_content)
-        high_sand_factor = SoilErosion._determine_high_sand_factor(percent_sand_content)
+        coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(sand_fraction, silt_fraction)
+        clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(silt_fraction, clay_fraction)
+        carbon_content_factor = SoilErosion._determine_carbon_content_factor(organic_carbon_fraction)
+        high_sand_factor = SoilErosion._determine_high_sand_factor(sand_fraction)
         return coarse_sand_factor * clay_silt_factor * carbon_content_factor * high_sand_factor
 
     @staticmethod
@@ -376,14 +381,14 @@ class SoilErosion:
         return first_term * second_term
 
     @staticmethod
-    def _determine_coarse_fragment_factor(percent_rock_content: float) -> float:
+    def _determine_coarse_fragment_factor(rock_fraction: float) -> float:
         """
         Calculate the coarse fragment factor for use in calculating sediment yield.
 
         Parameters
         -----------
-        percent_rock_content : float
-            Percent rock in the first soil layer.
+        rock_fraction : float
+            Fraction rock in the first soil layer.
 
         Notes
         -----
@@ -400,7 +405,7 @@ class SoilErosion:
         SWAT Theoretical documentation eqn. 4:1.1.15
 
         """
-        return exp(-0.053 * percent_rock_content)
+        return exp(-0.053 * rock_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE)
 
     @staticmethod
     def _determine_peak_runoff_rate(
