@@ -117,32 +117,6 @@ class ManureManager:
         self._manure_nutrient_manager = ManureNutrientManager()
         self.configure_manure_manager_components(pen_list)
 
-    @property
-    def data(self) -> list[dict]:
-        """
-        Get all the daily output data for each animal pen.
-
-        Returns
-        -------
-        list[dict]
-            A list of dictionaries containing the daily output data for each animal pen.
-            The keys and their associated data types of each dictionary are as follows:
-            {
-                'simulation_day': int,
-                'pen': ManureManagerPen,
-                'animal_manure_excretions': PenManure,
-                'manure_handler_daily_output': ManureHandlerDailyOutput,
-                'reception_pit_daily_output': ReceptionPitDailyOutput,
-                'manure_separator_daily_output': ManureSeparatorDailyOutput,
-                'manure_separator_after_digestion_daily_output': ManureSeparatorDailyOutput,
-                'manure_treatment_daily_output': ManureTreatmentDailyOutput,
-                'manure_treatment_accumulated_output': ManureTreatmentDailyOutput,
-                'anaerobic_digestion_daily_output': ManureTreatmentDailyOutput
-            }
-
-        """
-        return self._daily_output_per_pen
-
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 
