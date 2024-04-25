@@ -218,24 +218,62 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
 
 
 @pytest.mark.parametrize(
-    ["combined_var_input", "expected_output"],
+    ["combined_var_input", "omit_legend_prefix", "omit_legend_suffix", "expected_output"],
     [
-        ("dummy_var", "dummy_var"),
-        ("dummy_prefix.dummy_var", "dummy_var"),
-        ("DummyClass.dummy_method.dummy_var", "dummy_var"),
-        ("dummy_prefix.dummy_var.dummy_var2", "dummy_var.dummy_var2"),
-        ("dummy_prefix.dummy_var.field='field'", "dummy_var"),
-        ("DummyClass.dummy_method.dummy_var.field='field'", "dummy_var"),
-        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3", "dummy_var.dummy_var2.dummy_var3"),
-        ("dummy_prefix.dummy_var.dummy_var2.field='field'", "dummy_var.dummy_var2"),
-        ("DummyClass.dummy_method.dummy_var.dummy_var2.field='field'", "dummy_var.dummy_var2"),
-        ("DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3", "dummy_var.dummy_var2.dummy_var3"),
-        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4", "dummy_var.dummy_var2.dummy_var3.dummy_var4"),
-        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.field='field'", "dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_var", True, True, "dummy_var"),
+        ("dummy_prefix.dummy_var", True, True, "dummy_var"),
+        ("DummyClass.dummy_method.dummy_var", True, True, "dummy_var"),
+        ("dummy_prefix.dummy_var.dummy_var2", True, True, "dummy_var.dummy_var2"),
+        ("dummy_prefix.dummy_var.field='field'", True, True, "dummy_var"),
+        ("DummyClass.dummy_method.dummy_var.field='field'", True, True, "dummy_var"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3", True, True, "dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.field='field'", True, True, "dummy_var.dummy_var2"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.field='field'", True, True, "dummy_var.dummy_var2"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3", True, True, "dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4", True, True,
+         "dummy_var.dummy_var2.dummy_var3.dummy_var4"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.field='field'", True, True, "dummy_var.dummy_var2.dummy_var3"),
+
+        ("dummy_var", True, False, "dummy_var"),
+        ("dummy_prefix.dummy_var", True, False, "dummy_var"),
+        ("DummyClass.dummy_method.dummy_var", True, False, "dummy_var"),
+        ("dummy_prefix.dummy_var.dummy_var2", True, False, "dummy_var.dummy_var2"),
+        ("dummy_prefix.dummy_var.field='field'", True, False, "dummy_var.field='field'"),
+        ("DummyClass.dummy_method.dummy_var.field='field'", True, False, "dummy_var.field='field'"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3", True, False, "dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.field='field'", True, False, "dummy_var.dummy_var2.field='field'"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.field='field'", True, False,
+         "dummy_var.dummy_var2.field='field'"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3", True, False, "dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4", True, False,
+         "dummy_var.dummy_var2.dummy_var3.dummy_var4"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.field='field'", True, False,
+         "dummy_var.dummy_var2.dummy_var3.field='field'"),
+
+        ("dummy_var", False, True, "dummy_var"),
+        ("Time.dummy_var", False, True, "dummy_var"),
+        ("DummyClass.dummy_method.dummy_var", False, True, "DummyClass.dummy_method.dummy_var"),
+        ("dummy_prefix.dummy_var.dummy_var2", False, True, "dummy_prefix.dummy_var.dummy_var2"),
+        ("dummy_prefix.dummy_var.field='field'", False, True, "dummy_prefix.dummy_var"),
+        ("DummyClass.dummy_method.dummy_var.field='field'", False, True, "DummyClass.dummy_method.dummy_var"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3", False, True, "dummy_prefix.dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.field='field'", False, True, "dummy_prefix.dummy_var.dummy_var2"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.field='field'", False, True,
+         "DummyClass.dummy_method.dummy_var.dummy_var2"),
+        ("DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3", False, True,
+         "DummyClass.dummy_method.dummy_var.dummy_var2.dummy_var3"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4", False, True,
+         "dummy_prefix.dummy_var.dummy_var2.dummy_var3.dummy_var4"),
+        ("dummy_prefix.dummy_var.dummy_var2.dummy_var3.field='field'", False, True,
+         "dummy_prefix.dummy_var.dummy_var2.dummy_var3"),
     ],
 )
-def test_generage_legend_keys(combined_var_input: str, expected_output: str, graph_generator: GraphGenerator) -> None:
-    actual_output = graph_generator._generate_legend_keys(combined_var_input)
+def test_generage_legend_keys(combined_var_input: str,
+                              omit_legend_prefix: bool,
+                              omit_legend_suffix: bool,
+                              expected_output: str,
+                              graph_generator: GraphGenerator) -> None:
+    actual_output = graph_generator._generate_legend_keys(combined_var_input, omit_legend_prefix, omit_legend_suffix)
     assert actual_output == expected_output
 
 

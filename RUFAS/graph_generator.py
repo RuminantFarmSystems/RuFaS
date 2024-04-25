@@ -174,13 +174,16 @@ class GraphGenerator:
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
-                if graph_details.get("omit_legend_prefix", False):
-                    if selected_variables := graph_details.get("variables"):
-                        graph_details["legend"]: List[str] = selected_variables
-                    else:
-                        graph_details["legend"]: List[str] = list(
-                            self._generage_legend_keys(key) for key in prepared_data.keys()
-                        )
+                omit_legend_prefix = graph_details.get("omit_legend_prefix", False)
+                omit_legend_suffix = graph_details.get("omit_legend_suffix", False)
+
+                if selected_variables := graph_details.get("variables"):
+                    graph_details["legend"]: List[str] = selected_variables
+                elif omit_legend_prefix or omit_legend_suffix:
+                    graph_details["legend"]: List[str] = list(
+                        self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix)
+                        for key in prepared_data.keys()
+                    )
                 else:
                     graph_details["legend"] = list(prepared_data.keys())
 
@@ -199,7 +202,8 @@ class GraphGenerator:
 
         return all_logs
 
-    def _generate_legend_keys(self, combined_var_name: str) -> str:
+    def _generate_legend_keys(self, combined_var_name: str, omit_legend_prefix: bool = False,
+                              omit_legend_suffix: bool = False) -> str:
         """
         Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
 
@@ -212,20 +216,56 @@ class GraphGenerator:
         -------
         str
             The stripped variable name.
+
+        Notes
+        -----
+            This function identifies prefix and suffix according to the following logic:
+                prefix:
+                    All combined variable names are guaranteed to have a prefix of the following types:
+                        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
+                        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
+                        - special cases => variables from the Time and Weather classes (e.g. Time.day, Weather.rainfall)
+                    For the special cases of variables from the Time and Weather classes, they do not have any suffixes,
+                    resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second element
+                    after splitting the combined variable name by ".".
+
+                     We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+                     string parsing:
+                     The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+                     the words in a phrase by making the first letter of each word capitalized and not using spaces
+                     e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+                     separated by underscores.
+                     Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
+                     ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+
+                     * `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
+                     is unlikely to appear.
+
+                 suffix:
+                    Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
+                    After some investigation, we found that all suffixes from the Crop and Soil module follows the
+                    pattern of field='*', for example:
+                        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
+                        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
+                    Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
+                    check if the variable name has suffix.
         """
         combined_var_name_list: List[str] = combined_var_name.split(".")
+
+        slice_start: int = 0
+        slice_end: int = len(combined_var_name_list)
+
         if len(combined_var_name_list) == 1:
-            # no prefix and no suffix
             return combined_var_name_list[0]
         elif len(combined_var_name_list) == 2:
-            # prefix.name
             return combined_var_name_list[1]
 
         elif len(combined_var_name_list) >= 3:
-            # class.method.* or prefix.*
-            slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
-            # *.suffix or no suffix
-            slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
+            if omit_legend_prefix:
+                slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
+
+            if omit_legend_suffix:
+                slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
 
             return ".".join(combined_var_name_list[slice_start:slice_end])
 
