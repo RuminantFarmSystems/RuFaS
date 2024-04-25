@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Collection
 
@@ -169,10 +170,20 @@ class GraphGenerator:
             fig, _ = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
+            
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
             legend = graph_details.get("legend")
             if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+                if graph_details.get("omit_legend_prefix", False):
+                    if selected_variables := graph_details.get("variables"):
+                        graph_details["legend"]: List[str] = selected_variables
+                    else:
+                        graph_details["legend"]: List[str] = list(
+                            self._generage_legend_keys(key) for key in prepared_data.keys()
+                        )
+                else:
+                    graph_details["legend"] = list(prepared_data.keys())
+
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
@@ -187,6 +198,36 @@ class GraphGenerator:
             ]
 
         return all_logs
+
+    def _generate_legend_keys(self, combined_var_name: str) -> str:
+        """
+        Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
+
+        Parameters
+        ----------
+        combined_var_name: str
+            The combined variable name to be processed.
+
+        Returns
+        -------
+        str
+            The stripped variable name.
+        """
+        combined_var_name_list: List[str] = combined_var_name.split(".")
+        if len(combined_var_name_list) == 1:
+            # no prefix and no suffix
+            return combined_var_name_list[0]
+        elif len(combined_var_name_list) == 2:
+            # prefix.name
+            return combined_var_name_list[1]
+
+        elif len(combined_var_name_list) >= 3:
+            # class.method.* or prefix.*
+            slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
+            # *.suffix or no suffix
+            slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
+
+            return ".".join(combined_var_name_list[slice_start:slice_end])
 
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]
@@ -203,7 +244,9 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
+        optional_graph_filter_keys = (
+            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "omit_legend_prefix"]
+        )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
