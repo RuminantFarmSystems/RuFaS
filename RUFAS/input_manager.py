@@ -83,6 +83,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+            self.input_depth_limit = 5
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -312,6 +313,10 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._populate_pool.__name__,
+        }
 
         data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
@@ -338,6 +343,13 @@ class InputManager:
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
             self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
+            input_max_depth = self._check_max_depth(filtered_input_data)
+            if input_max_depth > self.input_depth_limit:
+                om.add_warning("Max input depth exceeded",
+                               f"Max depth of input file {file_path} exceeds limit of {self.input_depth_limit}",
+                               info_map)
+
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
@@ -350,7 +362,6 @@ class InputManager:
                     elements_counter=self.elements_counter,
                     called_during_initialization=False,
                 )
-
                 if is_element_acceptable:
                     validated_data[metadata_property] = filtered_input_data[metadata_property]
                 elif eager_termination:
@@ -2027,6 +2038,31 @@ class InputManager:
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def _check_max_depth(self, data: Any, current_depth: int = 0) -> Any:
+        """
+        Recursively find the maximum depth of nested dictionaries.
+        """
+        if not isinstance(data, (dict, list)):
+            return current_depth
+
+        max_depth = current_depth
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, dict):
+                    depth = self._check_max_depth(value, current_depth + 1)
+                    max_depth = max(max_depth, depth)
+                elif isinstance(value, list):
+                    for item in value:
+                        depth = self._check_max_depth(item, current_depth + 1)
+                        max_depth = max(max_depth, depth)
+
+        elif isinstance(data, list):
+            for item in data:
+                depth = self._check_max_depth(item, current_depth + 1)
+                max_depth = max(max_depth, depth)
+
+        return max_depth
 
 
 class ElementState(Enum):
