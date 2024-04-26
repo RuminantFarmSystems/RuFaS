@@ -10,7 +10,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 )
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import PenTypedDict, AvailableFeedsTypedDict, FeedInfoTypedDict
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
 
 import scipy
 
