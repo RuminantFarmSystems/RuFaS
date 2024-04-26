@@ -426,7 +426,7 @@ def test_populate_pool_valid(
         {
             "class": "InputManager",
             "function": "_populate_pool",
-        }
+        },
     )
     input_manager.pool = {}
 
@@ -4031,7 +4031,8 @@ def test_validate_input_by_type_value_error() -> None:
 
 
 @pytest.mark.parametrize(
-    "data, expected_depth", [
+    "data, expected_depth",
+    [
         ({"key1": "value1", "key2": "value2"}, 0),
         ({"key1": {"key2": {"key3": "value3"}}}, 2),
         ([{"key1": "value1"}, {"key2": {"key3": "value3"}}], 2),
@@ -4039,16 +4040,18 @@ def test_validate_input_by_type_value_error() -> None:
         ("I am not a dict or list", 0),
         ([], 0),
         ({}, 0),
-        ([[], [{}], [[{"key": "value"}]]], 3)
-    ]
+        ([[], [{}], [[{"key": "value"}]]], 3),
+    ],
 )
-def test_check_max_depth(mock_input_manager: InputManager, data: Dict[str, Any] | List[Any],
-                         expected_depth: int, input_manager_original_method_states: Dict[str, Callable]) -> None:
+def test_check_max_depth(
+    mock_input_manager: InputManager,
+    data: Dict[str, Any] | List[Any],
+    expected_depth: int,
+    input_manager_original_method_states: Dict[str, Callable],
+) -> None:
     """Test various depths of nested data structures."""
     assert mock_input_manager._check_max_depth(data) == expected_depth
-    mock_input_manager._check_max_depth = input_manager_original_method_states[
-        "_check_max_depth"
-    ]
+    mock_input_manager._check_max_depth = input_manager_original_method_states["_check_max_depth"]
 
 
 def test_increment_in_elements_counter() -> None:

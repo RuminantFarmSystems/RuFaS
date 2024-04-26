@@ -346,9 +346,11 @@ class InputManager:
 
             input_max_depth = self._check_max_depth(filtered_input_data)
             if input_max_depth > self.input_depth_limit:
-                om.add_warning("Max input depth exceeded",
-                               f"Max depth of input file {file_path} exceeds limit of {self.input_depth_limit}",
-                               info_map)
+                om.add_warning(
+                    "Max input depth exceeded",
+                    f"Max depth of input file {file_path} exceeds limit of {self.input_depth_limit}",
+                    info_map,
+                )
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
