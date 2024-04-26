@@ -162,7 +162,6 @@ class TaskManager:
             TaskManager.handle_post_processing(args, input_manager, output_manager)
 
         if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
-            TaskManager.handle_herd_initializaition(args, input_manager, output_manager)
             TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
             TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
@@ -198,7 +197,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Herd initialization start", "Initializing herd data...", info_map)
-        herd_factory = HerdFactory(args["init_herd"], args["save_animals"], args["save_animals_directory"])
+        herd_factory = HerdFactory(args["init_herd"], args["save_animals"], Path(args["save_animals_directory"]))
         herd_factory.initialize_herd()
         output_manager.add_log("Herd initialization complete", "Herd data initialized.", info_map)
 
