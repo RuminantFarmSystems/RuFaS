@@ -2,6 +2,7 @@ from dataclasses import dataclass, InitVar
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 
 
@@ -752,5 +753,7 @@ class SoilData:
             Average clay percent of the soil (unitless).
 
         """
-        clay_percentages = self.get_vectorized_layer_attribute("percent_clay_content")
+        clay_fractions = self.get_vectorized_layer_attribute("clay_fraction")
+        clay_percentages = [clay_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE for clay_fraction in clay_fractions]
+
         return sum(clay_percentages) / len(clay_percentages)
