@@ -68,6 +68,7 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "_check_max_depth": mock_input_manager._check_max_depth,
     }
 
 
@@ -249,7 +250,6 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 def test_start_data_processing(
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
@@ -392,6 +392,8 @@ def test_populate_pool_valid(
 
     # Arrange
     input_manager = InputManager()
+    input_depth_limit = 5
+    input_manager.input_depth_limit = input_depth_limit
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
@@ -406,8 +408,9 @@ def test_populate_pool_valid(
         side_effect=lambda input_data, _: (input_data, None, None),
     )
     mocker.patch.object(input_manager, "_log_missing_keys")
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "_check_max_depth", return_value=input_depth_limit + 1)
+
+    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -416,13 +419,19 @@ def test_populate_pool_valid(
     assert result
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
-
+    patch_for_add_warning.assert_called_with(
+        "Max input depth exceeded",
+        f"Max depth of input file path/to/csv/file2.csv exceeds limit of {input_depth_limit}",
+        {
+            "class": "InputManager",
+            "function": "_populate_pool",
+        },
+    )
     input_manager.pool = {}
 
 
 def test_populate_pool_invalid(
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
@@ -2710,7 +2719,6 @@ def test_get_variable_modifiability(
     variable_properties: Dict[str, Any],
     expected_modifiability: Modifiability,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(
@@ -2734,7 +2742,6 @@ def test_get_variable_modifiability_unknown_modifiability(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         mock_input_manager._get_variable_modifiability(
@@ -2757,7 +2764,6 @@ def test_log_missing_data_initialization_input_not_required(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2784,7 +2790,6 @@ def test_log_missing_data_initialization_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2812,7 +2817,6 @@ def test_log_missing_data_runtime_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2843,7 +2847,6 @@ def test_set_nested_value(
     value: Any,
     expected_result: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     actual_result = mock_input_manager._set_nested_value(
@@ -3518,7 +3521,7 @@ def test_add_default_values_to_array_inputs(
 
 
 def test_dump_get_data_logs(
-    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable]
+    mock_input_manager: InputManager,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -4017,6 +4020,30 @@ def test_validate_input_by_type_value_error() -> None:
         input_manager._validate_input_by_type(
             variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter
         )
+
+
+@pytest.mark.parametrize(
+    "data, expected_depth",
+    [
+        ({"key1": "value1", "key2": "value2"}, 0),
+        ({"key1": {"key2": {"key3": "value3"}}}, 2),
+        ([{"key1": "value1"}, {"key2": {"key3": "value3"}}], 2),
+        ({"key1": [{"key2": "value2"}, {"key3": {"key4": ["value4"]}}]}, 3),
+        ("I am not a dict or list", 0),
+        ([], 0),
+        ({}, 0),
+        ([[], [{}], [[{"key": "value"}]]], 3),
+    ],
+)
+def test_check_max_depth(
+    mock_input_manager: InputManager,
+    data: Dict[str, Any] | List[Any],
+    expected_depth: int,
+    input_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test various depths of nested data structures."""
+    assert mock_input_manager._check_max_depth(data) == expected_depth
+    mock_input_manager._check_max_depth = input_manager_original_method_states["_check_max_depth"]
 
 
 def test_increment_in_elements_counter() -> None:
