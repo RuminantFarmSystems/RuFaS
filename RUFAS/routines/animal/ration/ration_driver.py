@@ -31,7 +31,7 @@ class RationManager:
 
     @classmethod
     def formulate_ration(
-        cls, pen: PenTypedDict, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
+        cls, pen, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -141,7 +141,7 @@ class RationManager:
             return pen.ration, ration_vals
 
     @staticmethod
-    def calc_milk_average(pen: PenTypedDict) -> float:
+    def calc_milk_average(pen) -> float:
         """
         Calculates average milk produced in a pen.
 
@@ -159,7 +159,7 @@ class RationManager:
         return starting_milk_average
 
     @classmethod
-    def reduce_milk_production(cls, pen: PenTypedDict, reduction: float) -> None:
+    def reduce_milk_production(cls, pen, reduction: float) -> None:
         """
         Reduces milk production for all animals in a pen.
         Only does so if post-reduction production would be above 1.0.
@@ -244,7 +244,7 @@ class RationManager:
     def get_user_defined_ration(  # noqa
         cls,
         req: animal_requirements.AnimalRequirements,
-        pen: PenTypedDict,
+        pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
