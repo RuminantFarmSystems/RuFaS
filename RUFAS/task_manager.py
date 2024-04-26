@@ -23,7 +23,7 @@ class TaskType(Enum):
     """
 
     HERD_INITIALIZATION = "Herd Initialization"
-    SIMULATION_SIGNLE_RUN = "A single simulation run"
+    SIMULATION_SINGLE_RUN = "A single simulation run"
     SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
     INPUT_DATA_VALIDATION = "Input data validation"
