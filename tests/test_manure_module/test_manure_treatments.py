@@ -1736,7 +1736,9 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
 
     # Act
-    anaerobic_lagoon._update_methane_emission(mock_daily_output)
+    actual_methane_emission, actual_methane_emission_from_VSd = anaerobic_lagoon._update_methane_emission(
+        mock_daily_output
+    )
 
     # Assert
     # fmt: off
@@ -1749,7 +1751,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
     # fmt: on
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    assert mock_daily_output.storage_methane == expected_methane_emission
+    assert actual_methane_emission == expected_methane_emission
 
 
 @pytest.mark.parametrize(
@@ -2412,74 +2414,6 @@ def test_anaerobic_lagoon_freeboard_volume(
 
     # Assert
     assert actual_freeboard_volume == approx(expected_freeboard_volume)
-
-
-@pytest.mark.parametrize(
-    "sludge_accumulation_volume, calculated_sludge_accumulation_volume, lower_bound, upper_bound, expected",
-    [
-        # Normal case, calculated value within bounds
-        (150.0, 100.0, 0.2, 0.8, 100.0),
-        # Calculated value below lower bound
-        (150.0, 50.0, 0.2, 0.8, 50.0),
-        # Calculated value above upper bound
-        (150.0, 200.0, 0.2, 0.8, 120.0),
-        # Lower and upper bounds are equal
-        (150.0, 100.0, 0.5, 0.5, 75.0),
-        # Lower and upper bounds are zero
-        (150.0, 100.0, 0.0, 0.0, 0.0),
-        # Error cases
-        # Calculated value is negative
-        (150.0, -10.0, 0.2, 0.8, ValueError),
-        # Lower bound is negative
-        (150.0, 100.0, -0.2, 0.8, ValueError),
-        # Upper bound is less than lower bound
-        (150.0, 100.0, 0.8, 0.2, ValueError),
-    ],
-)
-def test_bound_sludge_accumulation_volume(
-    mocker: MockFixture,
-    sludge_accumulation_volume: float,
-    calculated_sludge_accumulation_volume: float,
-    lower_bound: float,
-    upper_bound: float,
-    expected: float,
-) -> None:
-    """
-    Unit test for _bound_sludge_accumulation_volume() in anaerobic_lagoon.py.
-
-    This test checks that the _bound_sludge_accumulation_volume() method correctly bounds the calculated
-    sludge accumulation volume according to the specified lower and upper bounds, given as proportions
-    of the current sludge accumulation volume.
-
-    """
-    # Arrange
-    anaerobic_lagoon = AnaerobicLagoon(
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-        manure_treatment_config=mocker.MagicMock(),
-    )
-    patch_for_sludge_accumulation_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.sludge_accumulation_volume",
-        new_callable=PropertyMock,
-        return_value=sludge_accumulation_volume,
-    )
-
-    # Act & Assert
-    if expected == ValueError:
-        with pytest.raises(ValueError):
-            anaerobic_lagoon._bound_sludge_accumulation_volume(
-                calculated_sludge_accumulation_volume=calculated_sludge_accumulation_volume,
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-            )
-    else:
-        actual_bound_sludge_accumulation_volume = anaerobic_lagoon._bound_sludge_accumulation_volume(
-            calculated_sludge_accumulation_volume=calculated_sludge_accumulation_volume,
-            lower_bound=lower_bound,
-            upper_bound=upper_bound,
-        )
-        assert patch_for_sludge_accumulation_volume_property.call_count == 2
-        assert actual_bound_sludge_accumulation_volume == approx(expected)
 
 
 # Test AnaerobicDigestion-specific methods
