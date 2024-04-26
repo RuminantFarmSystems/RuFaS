@@ -58,7 +58,7 @@ class TaskType(Enum):
 
     def is_multi_run(self) -> bool:
         """returns True if the task type requires multiple simulation runs; otherwise false"""
-        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
 
 
 class TaskManager:
@@ -77,10 +77,21 @@ class TaskManager:
         clear_output_directory: bool,
         produce_graphics: bool,
     ) -> None:
-        self.input_manager.start_data_processing(metadata_path)
         self.output_manager.run_startup_sequence(
             verbosity, exclude_info_maps, output_directory, clear_output_directory, Path(""), "Task Manager"
         )  # TODO get the correct value for self.output_manager.run_startup_sequence variables_file_path arg
+        is_data_valid = self.input_manager.start_data_processing(metadata_path)
+        if not is_data_valid:
+            TaskManager.handle_post_processing(
+                {
+                    "output_directory": output_directory,
+                    "exclude_info_maps": exclude_info_maps,
+                    "variable_name_style": "verbose",
+                },
+                self.input_manager,
+                self.output_manager,
+            )
+            raise Exception("Task Manager's input data is invalid.")
         workers: int = self.input_manager.get_data("tasks.parallel_workers")
         self.pool = multiprocessing.Pool(
             workers, maxtasksperchild=1
@@ -145,7 +156,13 @@ class TaskManager:
 
         TaskManager.set_random_seed(input_manager, output_manager)
 
-        if args["task_type"] == TaskType.SIMULATION_SIGNLE_RUN:
+        if args["task_type"] == TaskType.HERD_INITIALIZATION:
+            args["init_herd"] = True
+            TaskManager.handle_herd_initializaition(args, input_manager, output_manager)
+            TaskManager.handle_post_processing(args, input_manager, output_manager)
+
+        if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
+            TaskManager.handle_herd_initializaition(args, input_manager, output_manager)
             TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
             TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
@@ -242,7 +259,7 @@ class TaskManager:
 
         if load_pool_from_file:
             output_manager.flush_pools()
-            output_manager.load_variables_pool_from_file(Path(args['output_pool_path']))
+            output_manager.load_variables_pool_from_file(Path(args["output_pool_path"]))
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts()
