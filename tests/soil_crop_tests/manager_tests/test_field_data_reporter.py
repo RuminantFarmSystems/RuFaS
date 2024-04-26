@@ -29,8 +29,8 @@ def test_send_daily_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
-    field_2 = Field(field_data=field_data_2, manure_manager=MagicMock(ManureManager))
+    field_1 = Field(field_data=field_data_1, manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(field_data=field_data_2, manure_supplier=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -231,8 +231,8 @@ def test_send_annual_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data_1, manure_manager=MagicMock(ManureManager))
-    field_2 = Field(field_data_2, manure_manager=MagicMock(ManureManager))
+    field_1 = Field(field_data_1, manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(field_data_2, manure_supplier=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
