@@ -1479,341 +1479,121 @@
     "adjustment_dict": {
       "type": "object",
       "description": "adjustment values for the wood lactation curve coefficients",
-      "1": {
+      "parity": {
         "type": "array",
-        "description": "adjustment values for each wood coefficient for first parity cows",
+        "description": "a list of each parity group (1,2,3+) and their corresponding wood adjustment values",
         "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
+          "type": "object",
+          "description": "the parity group and its corresponding adjustment values",
+          "parity": {
+            "type": "string",
+            "description": "the parity value, 1, 2, or 3 (representing 3+)"
+          }, 
+          "adjustments": {
+            "type": "array",
+            "description": "A list of 3 floats containing the adjustment values for the 3 wood coefficents",
+            "properties": {
+              "type": "number",
+              "description": "the wood coefficient adjustment value"
+            }
+          }
         }
       },
-      "2": {
+      "year": {
         "type": "array",
-        "description": "adjustment values for each wood coefficient for second parity cows",
+        "description": "a list of each year (2006-2016) and their corresponding wood adjustment values",
         "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
+          "type": "object",
+          "description": "the year and its corresponding adjustment values",
+          "year": {
+            "type": "string",
+            "description": "the year (2006-2016)"
+          }, 
+          "adjustments": {
+            "type": "array",
+            "description": "A list of 3 floats containing the adjustment values for the 3 wood coefficents",
+            "properties": {
+              "type": "number",
+              "description": "the wood coefficient adjustment value"
+            }
+          }
         }
       },
-      "3": {
+      "month": {
         "type": "array",
-        "description": "adjustment values for each wood coefficient for third and above parity cows",
+        "description": "a list of each month (January-December) and their corresponding wood adjustment values",
         "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
+          "type": "object",
+          "description": "the month and its corresponding adjustment values",
+          "month": {
+            "type": "string",
+            "description": "the month (January-December)"
+          }, 
+          "adjustments": {
+            "type": "array",
+            "description": "A list of 3 floats containing the adjustment values for the 3 wood coefficents",
+            "properties": {
+              "type": "number",
+              "description": "the wood coefficient adjustment value"
+            }
+          }
         }
       },
-      "2006": {
+      "region": {
         "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2006",
+        "description": "a list of each region and their corresponding wood adjustment values",
         "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
+          "type": "object",
+          "description": "the region and its corresponding adjustment values",
+          "region": {
+            "type": "string",
+            "description": "the geographical region"
+          }, 
+          "adjustments": {
+            "type": "array",
+            "description": "A list of 3 floats containing the adjustment values for the 3 wood coefficents",
+            "properties": {
+              "type": "number",
+              "description": "the wood coefficient adjustment value"
+            }
+          }
         }
       },
-      "2007": {
+      "milking_frequency": {
         "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2007",
+        "description": "a list of the possible milking frequencies (2 or 3 times per day) and their corresponding wood adjustment values",
         "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2008": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2008",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2009": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2009",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2010": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2010",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2011": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2011",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2012": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2012",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2013": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2013",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2014": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2014",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2015": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2015",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2016": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in 2016",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "January": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of January",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "February": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of February",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "March": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of March",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "April": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of April",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "May": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of May",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "June": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of June",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "July": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of July",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "August": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of August",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "September": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of September",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "October": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of October",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "November": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of November",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "December": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows calving in the month of December",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Appalachian": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Appalachian region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Corn Belt": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Corn Belt region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Delta": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Delta region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Lake": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Lake region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Mountain": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Mountain region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Northeast": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Northeast region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Northern Plains": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Northern Plains region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "New York": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the New York region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Pennsylvania": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Pennsylvania region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Southeast": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Southeast region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Southern Plains": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Southern Plains region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "West Coast": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the West Coast region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "Wisconsin": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows in the Wisconsin region",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "2x/d": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows milked twice a day",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
-        }
-      },
-      "3x/d": {
-        "type": "array",
-        "description": "adjustment values for each wood coefficient for cows milked thrice a day",
-        "properties": {
-          "type": "number",
-          "description": "wood coefficient adjustment"
+          "type": "object",
+          "description": "the year and its corresponding adjustment values",
+          "milking_frequency": {
+            "type": "string",
+            "description": "the milking frequency (2x/d or 3x/d)"
+          }, 
+          "adjustments": {
+            "type": "array",
+            "description": "A list of 3 floats containing the adjustment values for the 3 wood coefficents",
+            "properties": {
+              "type": "number",
+              "description": "the wood coefficient adjustment value"
+            }
+          }
         }
       }
     },
     "fips_region": {
       "type": "array",
-      "description" : "The corresponding region for each state/location that can be described by the FIPS code. FIPS codes that do not correspond to a region in the dataset are the empty string.",
+      "description" : "The first two digits of all possible FIPS codes and the geographic region to which they correspond to in the M. Li et al. lactation curve paper.",
       "properties": {
-        "type": "string",
-        "description": "Each index corresponds to the state/location with the FIPS code that has the same first two digits as that index. The value at that index is the corresponding region for that state/location."
+        "type": "object",
+        "description": "the FIPS state code and its corresponding geographic region",
+        "code": {
+          "type": "number",
+          "decription": "The FIPS state code"
+        },
+        "region": {
+          "type": "string",
+          "decription": "One of the 13 possible geographic regions or 'None' if the location is not included in the dataset"
+        }
       }
     },
     "parity_milk_adjustments": {

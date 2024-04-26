@@ -46,13 +46,41 @@ class AnimalBase:
         parameter_b = 24.7 * 1e-2
         parameter_c = 33.76 * 1e-4
         t = AnimalBase.get_t_values()
+
         adjustment_dict = im.get_data("lactation.adjustment_dict")
 
-        for category in [lactation_group, year, month, region, milking_frequency]:
-            if category:
-                parameter_a += adjustment_dict[category][0]
-                parameter_b += adjustment_dict[category][1] * 1e-2
-                parameter_c += adjustment_dict[category][2] * 1e-4
+        farm_specific = {}
+        farm_specific["parity"] = lactation_group
+        farm_specific["year"] = year
+        farm_specific["month"] = month
+        farm_specific["region"] = region
+        farm_specific["milking_frequency"] = milking_frequency
+
+        for category in ["parity", "year", "month", "region", "milking_frequency"]:
+            if farm_specific[category]:
+                print(category)
+                adjustment_applied = False
+                x = 0
+                while (x<len(adjustment_dict[category]) and (not adjustment_applied)):
+                    if adjustment_dict[category][x][category] == farm_specific[category]:
+                        parameter_a += adjustment_dict[category][x]["adjustments"][0]
+                        parameter_b += adjustment_dict[category][x]["adjustments"][1] * 1e-2
+                        parameter_c += adjustment_dict[category][x]["adjustments"][2] * 1e-4
+                        adjustment_applied = True
+                        
+                        print(adjustment_dict[category][x][category])
+                        print(farm_specific[category])
+
+                    x = x+1
+
+            
+
+
+        # for category in [lactation_group, year, month, region, milking_frequency]:
+        #     if category:
+        #         parameter_a += adjustment_dict[category][0]
+        #         parameter_b += adjustment_dict[category][1] * 1e-2
+        #         parameter_c += adjustment_dict[category][2] * 1e-4
 
         if MY_305d == None:
             MY_305d = AnimalBase.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
@@ -75,17 +103,26 @@ class AnimalBase:
 
     @staticmethod
     def set_lactation_curve_parameters():
-        fips_region = im.get_data("lactation.fips_region")
+        region_dict = im.get_data("lactation.fips_region")
 
         year = im.get_data("config.end_date")[:4]
         if int(year) > 2016:
             year = "2016"
 
-        region = im.get_data("config.FIPS_county_code")
-        if region != None:
-            region = fips_region[int((region / 1000))]
-            if region == "":
-                region = None
+        FIPS_code = im.get_data("config.FIPS_county_code")
+        FIPS_state_code = None
+        if FIPS_code != None:
+            FIPS_state_code = int(FIPS_code / 1000)
+        region= None
+        if FIPS_state_code != None:
+            for code_region in region_dict:
+                if code_region["code"] == FIPS_state_code:
+                    region= code_region["region"]
+                    print(str(FIPS_state_code))
+                    print(region)
+                    print(code_region["code"])
+                    print(code_region["region"])
+                    
 
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
