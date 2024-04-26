@@ -234,26 +234,26 @@ class Pen:
         self.ration = {}
         self.ration_per_animal = {}
         self.ration_nutrient_amount = {
-            "dm": 0,
-            "CP": 0,
-            "ADF": 0,
-            "NDF": 0,
-            "lignin": 0,
-            "ash": 0,
-            "phosphorus": 0,
-            "potassium": 0,
-            "N": 0,
+            "dm": 0.0,
+            "CP": 0.0,
+            "ADF": 0.0,
+            "NDF": 0.0,
+            "lignin": 0.0,
+            "ash": 0.0,
+            "phosphorus": 0.0,
+            "potassium": 0.0,
+            "N": 0.0,
         }
         self.ration_nutrient_conc = {
-            "dm": 0,
-            "CP": 0,
-            "ADF": 0,
-            "NDF": 0,
-            "lignin": 0,
-            "ash": 0,
-            "phosphorus": 0,
-            "potassium": 0,
-            "N": 0,
+            "dm": 0.0,
+            "CP": 0.0,
+            "ADF": 0.0,
+            "NDF": 0.0,
+            "lignin": 0.0,
+            "ash": 0.0,
+            "phosphorus": 0.0,
+            "potassium": 0.0,
+            "N": 0.0,
         }
         self.dry_matter_intake = 0.0
 
