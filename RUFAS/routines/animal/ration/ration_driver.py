@@ -79,6 +79,10 @@ class RationManager:
         )
         num_reattempts: int = 0
 
+        if solution is None:
+            # safeguard if scipy SLSQP bounds error still occurs after many iterations
+            # using previous cycles ration for this pen
+            return pen.ration, ration_vals
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
@@ -102,13 +106,8 @@ class RationManager:
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 num_reattempts += 1
 
-        if solution is not None:
-            ration = cls.make_ration_from_solution(available_feeds, solution)
-            return ration, ration_vals
-        # safeguard if scipy SLSQP bounds error still occurs after many iterations
-        # using previous cycles ration for this pen
-        else:
-            return pen.ration, ration_vals
+        ration = cls.make_ration_from_solution(available_feeds, solution)
+        return ration, ration_vals
 
     @classmethod
     def handle_failed_constraints(
@@ -319,6 +318,7 @@ class RationManager:
             previous_ration = pen.ration_per_animal
         else:
             previous_ration = None
+
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
