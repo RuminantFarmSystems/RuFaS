@@ -31,6 +31,7 @@ class PenTypedDict(TypedDict):
     manure_storage: str
     max_stocking_density: float
     ration: Dict[str, float | str]
+    ration_per_animal: Dict[str, float | str]
     animals_in_pen: Dict[str, Any]
 
 

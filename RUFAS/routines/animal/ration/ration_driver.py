@@ -31,8 +31,8 @@ class RationManager:
 
     @classmethod
     def formulate_ration(
-        cls, pen: PenTypedDict, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
-    ) -> Tuple[Dict[str, float], Dict[str, float]]:
+        cls, pen: PenTypedDict, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario: Any
+    ) -> Tuple[Dict[str, str | float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -65,7 +65,7 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
 
-        if udrm.is_udr:
+        if udrm.use_user_defined_ration:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
@@ -77,7 +77,6 @@ class RationManager:
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
-        # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts: int = 0
 
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
@@ -275,8 +274,8 @@ class RationManager:
         req: animal_requirements.AnimalRequirements,
         pen: PenTypedDict,
         available_feeds: AvailableFeedsTypedDict,
-        animal_grouping_scenario,
-    ) -> tuple[Dict[str, float], Dict[str, float]]:
+        animal_grouping_scenario: Any,
+    ) -> tuple[Dict[str, str | float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -330,6 +329,12 @@ class RationManager:
                                       pen=pen,
                                       available_feeds=available_feeds,
                                       info_map=info_map)
+        if solution is None:
+            if pen.ration:
+                return pen.ration, ration_vals
+            else:
+                om.add_error()
+                raise
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
