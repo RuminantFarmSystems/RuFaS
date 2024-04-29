@@ -180,6 +180,26 @@ class Weather:
             raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
 
         return current_conditions
+    
+    def get_conditions_series(self, time: Time, starting_offset: int, ending_offset: int) -> list[CurrentDayConditions]:
+        """
+        Generates a series of CurrentDayConditions.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance containing the current time information of the simulation.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Returns
+        -------
+        list[CurrentDayConditions]
+            Series of current day conditions in chronological order.
+        
+        """
 
     def record_weather(self, time: Time) -> None:
         """
