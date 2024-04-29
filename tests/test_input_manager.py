@@ -73,7 +73,7 @@ def input_manager_original_method_states(
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
         "_create_record": mock_input_manager._create_record,
-        "_extract_input_data_by_key_list": mock_input_manager._extract_input_data_by_key_list
+        "_extract_input_data_by_key_list": mock_input_manager._extract_input_data_by_key_list,
     }
 
 
@@ -4341,9 +4341,7 @@ def test_add_in_elements_counter() -> None:
     assert counter2.fixed_elements == 2
 
 
-def test_extract_input_data_by_key_list_no_error(
-        mock_input_manager: InputManager,
-        mocker: MockerFixture) -> None:
+def test_extract_input_data_by_key_list_no_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
     dummy_var_path: list[str | int] = ["dummy_var_path"]
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
@@ -4355,7 +4353,7 @@ def test_extract_input_data_by_key_list_no_error(
         input_data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
-        called_during_initialization=True
+        called_during_initialization=True,
     )
 
     assert result == dummy_value
@@ -4365,7 +4363,7 @@ def test_extract_input_data_by_key_list_no_error(
         input_data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
-        called_during_initialization=False
+        called_during_initialization=False,
     )
 
     assert result == dummy_value
@@ -4389,11 +4387,12 @@ def test_extract_input_data_by_key_list_no_error(
     ],
 )
 def test_extract_input_data_by_key_list_key_error(
-        var_path: List[str | int],
-        var_name: str,
-        called_during_initialization: bool,
-        mock_input_manager: InputManager,
-        mocker: MockerFixture) -> None:
+    var_path: List[str | int],
+    var_name: str,
+    called_during_initialization: bool,
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+) -> None:
     dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     patch_extract = mocker.patch.object(mock_input_manager, "_extract_value_by_key_list", side_effect=KeyError)
@@ -4403,11 +4402,13 @@ def test_extract_input_data_by_key_list_key_error(
         input_data=dummy_input_data,
         variable_path=var_path,
         variable_properties=dummy_var_properties,
-        called_during_initialization=called_during_initialization
+        called_during_initialization=called_during_initialization,
     )
 
     assert result is None
     patch_extract.assert_called_once_with(dummy_input_data, var_path)
-    patch_log_missing_data.assert_called_once_with(variable_properties=dummy_var_properties,
-                                                   var_name=var_name,
-                                                   called_during_initialization=called_during_initialization)
+    patch_log_missing_data.assert_called_once_with(
+        variable_properties=dummy_var_properties,
+        var_name=var_name,
+        called_during_initialization=called_during_initialization,
+    )
