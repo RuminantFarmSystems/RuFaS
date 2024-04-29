@@ -459,7 +459,7 @@ class Utility:
             return False
 
     @staticmethod
-    def generate_time_series(date: datetime.date, days_before: int, days_after: int) -> list[datetime.date]:
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
         """
         Generates a list of dates based on a given date and when the dates should start and end relative to the given
         date.
@@ -467,35 +467,36 @@ class Utility:
         Parameters
         ----------
         date : datetime.date
-            Date around which the time sequence will be generated.
-        days_before : int
-            Number of days before the given date to start the time sequence, the minimum for this value is 0.
-        days_after : int
-            Number of days after the given date to end the time sequence, the minimum for this value is 0.
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
 
         Raises
         ------
         ValueError
-            If the days_before value is negative.
-            If the days after value is negative.
+            If the starting_offset is greater than the ending_offset.
 
         Examples
         --------
         >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
         [datetime.date(2024, 6, 1)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 0)
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
         [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
         >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
         [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 1, 1)
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
         [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
 
         """
-        if days_before < 0:
-            raise ValueError(f"Cannot have negative value for 'days_before', passed {days_before}.")
-        if days_after < 0:
-            raise ValueError(f"Cannot have negative value for 'days_after', passed {days_after}.")
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
 
-        time_series = [date + datetime.timedelta(day) for day in range(-days_before, days_after + 1)]
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
 
         return time_series
