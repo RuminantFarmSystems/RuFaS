@@ -118,8 +118,7 @@ class OutputManager(object):
 
             self.manage_pool_size: bool = False
             self.available_memory: int = 0
-            self.max_memory_usage: int | None = None
-            self.current_pool_size: int = 0
+            self.min_memory_threshold: int | None = None
             self.saved_pool_num: int = 0
             self.saved_pool_path: Path | None = None
 
@@ -132,38 +131,22 @@ class OutputManager(object):
                 },
             )
 
-    def setup_pool_overflow_control(self, pool_size_config: List[str], output_dir: Path) -> None:
+    def setup_pool_overflow_control(self, max_memory_use_percentage: int,
+                                    min_free_memory_threshold: int,
+                                    output_dir: Path) -> None:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.setup_pool_overflow_control.__name__,
         }
+        self.manage_pool_size = True
+
         self.available_memory = psutil.virtual_memory().available
         available_memory_gb = self.available_memory / (1024**3)
 
-        # if isinstance(pool_size_config, str):
-        #     max_memory_use_percentage = int(pool_size_config) / 100
-        #     if max_memory_use_percentage <= 0 or max_memory_use_percentage >= 1:
-        #         return
-        #     self.manage_pool_size = True
-        #     self.max_memory_usage = max_memory_use_percentage * self.available_memory
-        # elif isinstance(pool_size_config, List):
-        if isinstance(pool_size_config, List):
-            max_memory_use_percentage = int(pool_size_config[0]) / 100
-            max_memory_usage = int(pool_size_config[1]) if pool_size_config[1] else None
-            if (
-                max_memory_use_percentage <= 0
-                or max_memory_use_percentage >= 1
-                or (max_memory_usage and max_memory_usage <= 0)
-            ):
-                return
-            self.manage_pool_size = True
-            self.max_memory_usage = (
-                min(max_memory_usage, (max_memory_use_percentage * self.available_memory))
-                if max_memory_usage
-                else (max_memory_use_percentage * self.available_memory)
-            )
-
-        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self.min_memory_threshold = min(
+            min_free_memory_threshold,
+            ((1 - max_memory_use_percentage) * self.available_memory)) if max_memory_use_percentage > 0 \
+            else min_free_memory_threshold
 
         self.saved_pool_num = 0
         self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
@@ -173,7 +156,7 @@ class OutputManager(object):
             f"Created {self.saved_pool_path} for saved pools during simulation.\n"
             f"Current system available memory: {available_memory_gb:.2f} GB = "
             f"{self.available_memory} Bytes.\n"
-            f"Maximum memory usage: {self.max_memory_usage} Bytes.",
+            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
             info_map,
         )
 
@@ -249,8 +232,8 @@ class OutputManager(object):
         self._add_to_pool(self.variables_pool, key, value, info_map)
 
         if self.manage_pool_size:
-            self.current_pool_size += sys.getsizeof(value.__repr__()) + sys.getsizeof(info_map.__repr__())
-            if self.current_pool_size >= self.max_memory_usage:
+            self.available_memory = psutil.virtual_memory().available
+            if self.available_memory < self.min_memory_threshold:
                 self._save_current_variable_pool()
 
     def _save_current_variable_pool(self) -> None:
@@ -265,12 +248,12 @@ class OutputManager(object):
         self.create_directory(self.saved_pool_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_path, saved_pool_file_name)
-        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=False)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
         self.add_log(
             "save_current_variable_pool",
             "Saved the current variable pool due to pool size exceeding limit.\n"
-            f"Current pool size of {self.current_pool_size} bytes exceeds the maximum memory usage of "
-            f"{self.max_memory_usage} bytes.\n"
+            f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
+            f"{self.min_memory_threshold} bytes.\n"
             f"The pool is saved to {saved_pool_file_path}",
             info_map,
         )
