@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  BRANCH_NAME: ${{ github.head_ref || github.ref }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -72,6 +71,8 @@ jobs:
 
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
           black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
@@ -97,8 +98,9 @@ jobs:
       - name: Fetch latest commit SHA
         id: fetch-latest-sha
         run: |
-          echo "Branch name: ${{ env.BRANCH_NAME }}"
-          LATEST_SHA=$(git rev-parse origin/"${{ env.BRANCH_NAME }}")
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Branch name: $BRANCH_NAME"
+          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
           echo "::set-output name=sha::$LATEST_SHA"
