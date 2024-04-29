@@ -20,6 +20,7 @@ class AnimalBase:
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
+        AnimalBase.config["ration"] = im.get_data("animal.ration")
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """

@@ -620,7 +620,11 @@ class AnimalRequirements:
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
 
-        phosphorus_requirement = phosphorus_requirement * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100
+        if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
+            phosphorus_requirement = phosphorus_requirement *\
+                AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100
+        # if AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER > 0:
+            # phosphorus_requirement = phosphorus_requirement * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100
         # Requirements summary dictionary
         return {
             "NEmaint_requirement": net_energy_maintenance,

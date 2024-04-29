@@ -845,6 +845,12 @@
         "type": "number",
         "minimum": 1,
         "default": 30
+      },
+      "phosphorus_requirement_buffer": {
+        "description": "Percentage increase in phosphorus nutrient requirement in calculation of animal requirements.",
+        "type": "number",
+        "minimum": 0,
+        "default": 35
       }
     },
     "pen_information": {
