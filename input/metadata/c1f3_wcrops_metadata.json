@@ -70,17 +70,10 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
+    "soil": {
       "title": "Soil data",
       "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/ARL_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/ARL_soil.json",
+      "path": "input/data/soil/spruce_haven_cohort_2_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
