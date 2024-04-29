@@ -200,7 +200,8 @@ class GraphGenerator:
         self, graph_details: Dict[str, str | List[str]]
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
-        Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
+        Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
+
         Parameters
         ----------
         graph_details : Dict[str, str | List[str]]
