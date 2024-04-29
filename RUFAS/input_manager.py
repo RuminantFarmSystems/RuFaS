@@ -993,7 +993,9 @@ class InputManager:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        array_value = self._extract_value_by_key_list(input_data, variable_path)
+        array_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
@@ -1051,7 +1053,9 @@ class InputManager:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        object_value = self._extract_value_by_key_list(input_data, variable_path)
+        object_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
@@ -1094,7 +1098,9 @@ class InputManager:
         called_during_initialization: bool = False,
     ) -> bool:
         """Validates an input data number element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {
@@ -1148,7 +1154,9 @@ class InputManager:
         called_during_initialization: bool = False,
     ) -> bool:
         """Validates an input data string element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
@@ -1214,7 +1222,9 @@ class InputManager:
         called_during_initialization: bool = False,
     ) -> bool:
         """Validates an input data bool element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
@@ -1298,6 +1308,54 @@ class InputManager:
             else:
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
+
+    def _extract_input_data_by_key_list(
+        self,
+        input_data: List[Any] | Dict[str, Any],
+        variable_path: Sequence[str | int],
+        variable_properties: Dict[str, Any],
+        called_during_initialization: bool,
+    ) -> Any:
+        """
+         Extracts a value from the input data based on a specified path and handles missing data by calling
+         InputManager._log_missing_data().
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling InputManager._log_missing_data().
+        """
+        result = None
+        try:
+            result = self._extract_value_by_key_list(input_data, variable_path)
+        except KeyError:
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
+            self._log_missing_data(
+                variable_properties=variable_properties,
+                var_name=var_name,
+                called_during_initialization=called_during_initialization,
+            )
+        return result
 
     def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
         """
