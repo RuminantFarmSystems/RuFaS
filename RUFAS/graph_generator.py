@@ -259,7 +259,18 @@ class GraphGenerator:
         return graph_filter_validation_logs
 
     def _validate_graph_title(self, title: str) -> List[Dict[str, str | Dict[str, str]]]:
-        """Validates a graph title."""
+        """Validates a graph title.
+
+        Parameters
+        ----------
+        title : str
+            The title of the graph from the graph filter.
+
+        Returns
+        -------
+        List[Dict[str, str | Dict[str, str]]]
+            The errors to be reported to OutputManager.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_graph_title.__name__,
