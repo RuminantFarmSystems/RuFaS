@@ -12,18 +12,6 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
-    "random_seed": {
-      "type": "number",
-      "description": "The random seed",
-      "minimum": 0,
-      "maximum": 4294967295,
-      "default": 42
-    },
-    "set_seed": {
-      "type": "bool",
-      "description": "Whether or not to set random seed",
-      "default": true
-    },
     "simulate_animals": {
       "type": "bool",
       "description": "Whether or not to simulate animals during the simulation",
