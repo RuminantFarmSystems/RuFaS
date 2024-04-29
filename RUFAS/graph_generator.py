@@ -265,14 +265,15 @@ class GraphGenerator:
             "function": self._validate_graph_title.__name__,
         }
         graph_title_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
-        protected_chars = ["<", ">", ":", "/", "\"", "|", "\\", "?", "*", "."]
+        protected_chars = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
         for char in protected_chars:
             if char in title:
-                graph_title_validation_logs.append({
-                    "error": f"Can't plot {title} data set",
-                    "message": f"Graph title contains prohibited character '{char}'",
-                    "info_map": info_map,
-                }
+                graph_title_validation_logs.append(
+                    {
+                        "error": f"Can't plot {title} data set",
+                        "message": f"Graph title contains prohibited character '{char}'",
+                        "info_map": info_map,
+                    }
                 )
                 print("prot char")
         return graph_title_validation_logs
