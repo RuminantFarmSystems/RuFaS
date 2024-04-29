@@ -6,8 +6,8 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple
 import psutil
+from typing import Any, Dict, List, Union, Tuple, TextIO
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -16,6 +16,8 @@ from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
+
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 class LogVerbosity(Enum):
@@ -464,6 +466,26 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
+    def _write_disclaimer(self, file_pointer: TextIO) -> None:
+        """
+        Writes the predefined disclaimer message to a given file.
+
+        Parameters
+        ----------
+        file_pointer: TextIO
+            A file-like object (supporting the `.write()` method) that points to the file where the disclaimer should
+            be written.
+
+        Example
+        -------
+        >>> output_manager = OutputManager()
+        >>> import io
+        >>> file_like_string = io.StringIO()
+        >>> output_manager._write_disclaimer(file_like_string)
+        >>> assert file_like_string.getvalue() == DISCLAIMER_MESSAGE + "\\n"
+        """
+        file_pointer.write(DISCLAIMER_MESSAGE + "\n")
+
     def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
@@ -499,6 +521,7 @@ class OutputManager(object):
             "function": self.dict_to_file_json.__name__,
         }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
+        data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
         try:
             with open(path, "w") as json_file:
                 data_dict = self._add_detailed_data_origin(data_dict)
@@ -728,6 +751,9 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
+        disclaimer_column = [DISCLAIMER_MESSAGE] + [""] * (len(df) - 1)
+        disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
+        df = pd.concat([disclaimer_df, df], axis=1)
 
         df.to_csv(path, index=False)
 
@@ -756,6 +782,7 @@ class OutputManager(object):
         self.add_log("save_txt_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as var_names_file:
+                self._write_disclaimer(var_names_file)
                 var_names_file.writelines(data_list)
                 self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
@@ -1337,7 +1364,9 @@ class OutputManager(object):
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
             with open(file_path) as file:
-                self.variables_pool = json.load(file)
+                loaded_pool: OutputManager.pool_element_type = json.load(file)
+                loaded_pool.pop("DISCLAIMER", None)
+                self.variables_pool = loaded_pool
                 self.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {str(file_path)}.",
@@ -1452,6 +1481,7 @@ class OutputManager(object):
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
+            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
 
     def print_errors_warnings_logs_counts(self) -> None:
         """
@@ -1471,3 +1501,21 @@ class OutputManager(object):
         """
 
         self._exclude_info_maps_flag = exclude_info_maps
+
+    def run_startup_sequence(
+        self,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+        variables_file_path: Path,
+        output_prefix: str,
+    ) -> None:  # TODO test coverage and docstring
+        self.flush_pools()
+        self.set_exclude_info_maps_flag(exclude_info_maps)
+        self.set_log_verbose(verbosity)
+        self.set_metadata_prefix(output_prefix)
+        self.print_credits()
+        self.create_directory(output_directory)
+        if clear_output_directory:
+            self.clear_output_dir(variables_file_path, output_directory)

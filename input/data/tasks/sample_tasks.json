@@ -1,0 +1,43 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "HERD_INITIALIZATION",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "HerdInit",
+      "log_verbosity": "logs",
+      "exclude_info_maps": false,
+      "init_herd": true,
+      "save_animals":  true,
+      "save_animals_directory": "output/"
+    },
+    {
+      "task_type": "INPUT_DATA_VALIDATION",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 22"
+     },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 1",
+      "log_verbosity": "logs"
+    },
+    {
+      "task_type": "INPUT_DATA_VALIDATION",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 2",
+      "log_verbosity": "logs"
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 3",
+      "log_verbosity": "logs"
+    },
+    {
+      "task_type": "SENSITIVITY_ANALYSIS",
+      "output_prefix": "Task 4",
+      "log_verbosity": "logs"
+    }
+  ]
+}
