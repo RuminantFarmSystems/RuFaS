@@ -188,7 +188,7 @@ class GraphGenerator:
         except Exception as e:
             all_logs = [
                 {
-                    "error": f"Error plotting {graph_details.get('title')} data set",
+                    "error": f"Error plotting '{graph_details.get('title')}' data set",
                     "message": f"Unforeseen error {e} when trying to graph data.",
                     "info_map": info_map,
                 }
@@ -211,6 +211,7 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
+        enabled_graph_types = ["plot", "stackplot"]
         optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
@@ -222,10 +223,23 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph " "filter file.",
+                        "message": f"Required key '{required_key}' not in your graph filter file.",
                         "info_map": info_map,
                     }
                 )
+        if graph_details.get("type") not in enabled_graph_types:
+            graph_filter_validation_logs.append(
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": f"Graph type '{graph_details.get('type')}' "
+                    f"not in list of currently enabled graph-types, {enabled_graph_types}.",
+                    "info_map": info_map,
+                }
+            )
+        if graph_details.get("title"):
+            graph_title_validation_logs = self._validate_graph_title(graph_details.get("title"))
+            graph_filter_validation_logs.extend(graph_title_validation_logs)
+
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
 
@@ -243,6 +257,25 @@ class GraphGenerator:
                     }
                 )
         return graph_filter_validation_logs
+
+    def _validate_graph_title(self, title: str) -> List[Dict[str, str | Dict[str, str]]]:
+        """Validates a graph title."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_graph_title.__name__,
+        }
+        graph_title_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
+        protected_chars = ["<", ">", ":", "/", "\"", "|", "\\", "?", "*", "."]
+        for char in protected_chars:
+            if char in title:
+                graph_title_validation_logs.append({
+                    "error": f"Can't plot {title} data set",
+                    "message": f"Graph title contains prohibited character '{char}'",
+                    "info_map": info_map,
+                }
+                )
+                print("prot char")
+        return graph_title_validation_logs
 
     def _log_non_numerical_data(
         self,

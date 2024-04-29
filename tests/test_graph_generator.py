@@ -118,7 +118,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
         expected_output = [
             {
-                "error": "Error plotting Example Graph data set",
+                "error": "Error plotting 'Example Graph' data set",
                 "message": "Unforeseen error Test Exception when trying to graph data.",
                 "info_map": {
                     "class": graph_generator.__class__.__name__,
@@ -135,7 +135,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
             produce_graphics=produce_graphics,
         )
 
-        assert result == expected_output, "Function did not return expected error log when an exception is raised."
+        assert result == expected_output
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
@@ -328,7 +328,7 @@ def test_log_non_numerical_data(
     [
         (
             {
-                "type": "bar",
+                "type": "plot",
                 "title": "Valid Graph",
                 "filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -338,7 +338,7 @@ def test_log_non_numerical_data(
         ),
         (
             {
-                "type": "bar",
+                "type": "stackplot",
                 "title": "Valid Graph",
                 "bad_filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -348,7 +348,7 @@ def test_log_non_numerical_data(
         ),
         (
             {
-                "type": "bar",
+                "type": "plot",
                 "tightle": "Valid Graph",
                 "filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -357,6 +357,16 @@ def test_log_non_numerical_data(
             "Invalid filter file key 'tightle' does not matchany optional keys. "
             "Please see Graph Generator wiki for a list of valid filterkeys.",
         ),
+        (
+            {
+                "type": "dummy_plot",
+                "tightle": "Valid Graph",
+                "filters": ["a", "b"],
+                "variables": ["a", "b"],
+            },
+            1,
+            "Graph type 'dummy_plot' not in list of currently enabled graph-types, ['plot', 'stackplot'].",
+        ),
     ],
 )
 def test_validate_graph_filter(
@@ -364,9 +374,34 @@ def test_validate_graph_filter(
     graph_details: Dict[str, str],
     expected_length: int,
     expected_message: str,
-):
+) -> None:
+    """Test for the _validate_graph_filter() method in graph_generator.py"""
     result = graph_generator._validate_graph_filter(graph_details)
     assert len(result) == expected_length
 
+    if expected_length > 0:
+        assert expected_message in result[0]["message"]
+
+
+@pytest.mark.parametrize(
+    "title, expected_length, expected_message",
+    [
+        (
+            "Valid Graph",
+            0,
+            None,
+        ),
+        (
+            "Invalid / Graph",
+            1,
+            "Graph title contains prohibited character '/'",
+        ),
+    ],
+)
+def test_validate_graph_title(graph_generator: GraphGenerator, title: str,
+                              expected_length: int, expected_message: str) -> None:
+    """Test for the _validate_graph_title() method in graph_generator.py"""
+    result = graph_generator._validate_graph_title(title)
+    assert len(result) == expected_length
     if expected_length > 0:
         assert expected_message in result[0]["message"]
