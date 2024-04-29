@@ -425,8 +425,8 @@ class GraphGenerator:
         try:
             plt.savefig(graph_path)
             return graph_path
-        except Exception:
-            raise
+        except Exception as e:
+            raise Exception(f"An error occurred while trying to save the graph: {e}") from e
 
     def _generate_graph_path(
         self,
