@@ -108,6 +108,7 @@ class AnimalBase:
         """
         self.p_intake = p_intake
         self.p_conc_ration = p_conc_ration
+        print(p_intake)
 
     def daily_p_update(self):
         """

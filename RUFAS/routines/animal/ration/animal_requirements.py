@@ -621,15 +621,15 @@ class AnimalRequirements:
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
 
         if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
-            og_phos = phosphorus_requirement
-            print(f'original phos: {og_phos}')
+            # og_phos = phosphorus_requirement
+            # print(f'original phos: {og_phos}')
             phosphorus_requirement = phosphorus_requirement *\
                 (1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100))
-            print(f'increased phos: {phosphorus_requirement}')
-            if og_phos > 0:
-                print(phosphorus_requirement / og_phos)
-            else:
-                print(animal_type)
+            # print(f'increased phos: {phosphorus_requirement}')
+            # if og_phos > 0:
+            #     print(phosphorus_requirement / og_phos)
+            # else:
+            #     print(animal_type)
         # if AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER > 0:
             # phosphorus_requirement = phosphorus_requirement * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100
         # Requirements summary dictionary
@@ -1656,16 +1656,17 @@ class AnimalRequirements:
         if day_of_pregnancy is None:
             P_Preg: float = 0.0
         else:
-            P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
-                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
-            )
+            # P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
+            #     (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
+            # )
+            P_Preg = (0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy) - 0.02743
+                      * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))) *\
+                body_weight / 715
         if milk_true_protein is None or milk_production is None:
             P_Lact: float = 0.0
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
         phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
-        if phosphorus_requirement <= 0:
-            print("GOT ONE")
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     def calculate_NRC_DMI(
