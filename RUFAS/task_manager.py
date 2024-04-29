@@ -96,11 +96,8 @@ class TaskManager:
         )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         expanded_args = self._expand_multi_runs_to_single_runs(parsed_multi_run_args)
-        runnable_args = parsed_single_run_args.extend(expanded_args)
+        runnable_args = parsed_single_run_args + expanded_args
         self._run_tasks(runnable_args, produce_graphics)
-
-    def _expand_multi_runs_to_single_runs(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        pass
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         parsed_single_run_args: List[Dict[str, Any]] = []
@@ -113,6 +110,35 @@ class TaskManager:
             else:
                 parsed_single_run_args.append(input_task)
         return parsed_single_run_args, parsed_multi_run_args
+
+    def _expand_multi_runs_to_single_runs(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        expanded_args: List[Dict[str, Any]] = []
+        task_type_to_expander_map = {
+            TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
+            TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
+            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
+        }
+        for multi_run_arg in multi_run_args:
+            expanded_args += task_type_to_expander_map["task_type"](multi_run_arg)
+
+        return expanded_args
+
+    def _expand_simulation_multi_run_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        single_run_args = []
+        for args in multi_run_args:
+            for _ in range(args["multi_run_counts"]):
+                new_args = args.copy()
+                new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
+                new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
+                single_run_args.append(new_args)
+
+        return single_run_args
+
+    def _expand_sensitivity_analysis_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        pass
+
+    def _expand_end_to_end_testing_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        pass
 
     def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
         task_with_args = partial(self.task, produce_graphics=produce_graphics)
@@ -250,43 +276,18 @@ class TaskManager:
         )
 
     @staticmethod
-    def set_random_seed(input_manager: InputManager, output_manager: OutputManager) -> None:
-        """
-        Sets the random seed for a task.
-
-        Parameters
-        ----------
-        input_manager : InputManager
-            The Input Manager instance the task.
-
-        output_manager : OutputManager
-            The Output Manager instance for the task.
-
-        Notes
-        -----
-        The packages seeded are Python's builtin `random` library and the NumPy `random` library. If the input indicates
-        that there should be no random seeding, the random libraries are "seeded" with `None`, which seeds the random
-        libraries with the system time.
-        """
-        set_seed = input_manager.get_data("config.set_seed")
-
+    def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
         info_map: dict[str, str | MeasurementUnits] = {
             "class": TaskManager.__name__,
             "function": TaskManager.set_random_seed.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
+        output_manager.add_log("Random seed recieved", f"Received {random_seed} as random seed.", info_map)
+        if random_seed is None:
+            random_seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
 
-        if set_seed:
-            seed = input_manager.get_data("config.random_seed")
-            output_manager.add_log(
-                "Randomization seed set.", f"Randomization libraries being seeded with {seed}.", info_map
-            )
-        else:
-            seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-            output_manager.add_variable("generated_random_seed", seed, info_map)
-            output_manager.add_log(
-                "Generated random seed", f"Seeding random libaries with generated seed: {seed}", info_map
-            )
+        random.seed(random_seed)
+        numpy.random.seed(random_seed)
 
-        random.seed(seed)
-        numpy.random.seed(seed)
+        output_manager.add_variable("random_seed", random_seed, info_map)
+        output_manager.add_log("Random seed used", f"Seeded libaries with {random_seed=}", info_map)

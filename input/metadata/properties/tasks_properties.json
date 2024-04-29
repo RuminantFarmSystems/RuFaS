@@ -89,6 +89,20 @@
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
           "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
           "default": ""
+        },
+        "random_seed": {
+          "type": "number",
+          "description": "The random seed, use null value to auto-generate it",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "default": 42
+        },
+        "multi_run_counts": {
+          "type": "number",
+          "description": "If task type is multi_run, indicates how many single simulations should run.",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 4
         }
       }
     }
