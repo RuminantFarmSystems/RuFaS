@@ -1309,6 +1309,35 @@ class InputManager:
                                         variable_path: Sequence[str | int],
                                         variable_properties: Dict[str, Any],
                                         called_during_initialization: bool) -> Any:
+        """
+         Extracts a value from the input data based on a specified path and handles missing data by calling
+         InputManager._log_missing_data().
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling InputManager._log_missing_data().
+        """
         result = None
         try:
             result = self._extract_value_by_key_list(input_data, variable_path)
