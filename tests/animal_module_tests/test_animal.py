@@ -2722,7 +2722,7 @@ def test_calc_rqmts() -> None:
         "NEl_requirement": 1,
         "MP_requirement": 1,
         "Ca_requirement": 1,
-        "P_requirement": 1 * AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100,
+        "P_requirement": 1 * (1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)),
         "DMIest_requirement": 1,
     }
     # expected = {
