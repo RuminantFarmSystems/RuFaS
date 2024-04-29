@@ -1349,7 +1349,7 @@ class InputManager:
         try:
             result = self._extract_value_by_key_list(input_data, variable_path)
         except KeyError:
-            var_name: str = [name for name in reversed(variable_path) if type(name) == str][0]
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
             self._log_missing_data(
                 variable_properties=variable_properties,
                 var_name=var_name,
