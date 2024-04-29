@@ -123,7 +123,7 @@ class TaskManager:
 
         return expanded_args
 
-    def _expand_simulation_multi_run_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _expand_simulation_multi_run_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]: #TODO Test
         single_run_args = []
         for args in multi_run_args:
             for _ in range(args["multi_run_counts"]):
