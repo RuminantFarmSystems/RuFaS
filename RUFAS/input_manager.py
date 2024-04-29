@@ -348,7 +348,7 @@ class InputManager:
                     eager_termination=eager_termination,
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
-                    called_during_initialization=False,
+                    called_during_initialization=True,
                 )
 
                 if is_element_acceptable:
