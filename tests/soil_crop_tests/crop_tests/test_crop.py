@@ -5,8 +5,8 @@ import pytest
 from unittest.mock import MagicMock
 
 
-@pytest.mark.parametrize("in_growing_system", [True, False])
-def test_grow_crop(in_growing_system: bool) -> None:
+@pytest.mark.parametrize("in_growing_system,stressors", [(True, False), (True, True), (False, False)])
+def test_grow_crop(in_growing_system: bool, stressors: bool) -> None:
     mocked_soil_data = MagicMock(SoilData)
     mocked_crop_data = MagicMock(CropData)
     mocked_crop_data.in_growing_system = MagicMock(return_value=in_growing_system)
@@ -18,7 +18,7 @@ def test_grow_crop(in_growing_system: bool) -> None:
     crop.growth_constraints.constrain_growth = MagicMock()
     crop.leaf_area_index.grow_canopy = MagicMock()
     crop.biomass_allocation.allocate_biomass = MagicMock()
-    crop.grow_crop(mocked_soil_data, 2, 2, 2, 2)
+    crop.grow_crop(mocked_soil_data, 2, 2, 2, 2, *[stressors] * 4)
     if not CropData.in_growing_season:
         assert crop.heat_units.absorb_heat_units.call_count == 0
         assert crop.root_development.develop_roots.call_count == 0
