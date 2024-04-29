@@ -396,8 +396,9 @@ def test_validate_graph_filter(
         ),
     ],
 )
-def test_validate_graph_title(graph_generator: GraphGenerator, title: str,
-                              expected_length: int, expected_message: str) -> None:
+def test_validate_graph_title(
+    graph_generator: GraphGenerator, title: str, expected_length: int, expected_message: str
+) -> None:
     """Test for the _validate_graph_title() method in graph_generator.py"""
     result = graph_generator._validate_graph_title(title)
     assert len(result) == expected_length
