@@ -1317,8 +1317,8 @@ class InputManager:
         called_during_initialization: bool,
     ) -> Any:
         """
-         Extracts a value from the input data based on a specified path and handles missing data by calling
-         InputManager._log_missing_data().
+        Extracts a value from the input data based on a specified path and handles missing data by calling
+        InputManager._log_missing_data().
 
         Parameters
         ----------
