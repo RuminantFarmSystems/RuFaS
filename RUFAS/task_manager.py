@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 import multiprocessing
 from enum import Enum
 from pathlib import Path
@@ -65,8 +65,6 @@ class TaskManager:
     def __init__(self):
         self.input_manager = InputManager()
         self.output_manager = OutputManager()
-        self.parsed_single_run_args: List[Dict[str, Any]] = []
-        self.parsed_multi_run_args: List[Dict[str, Any]] = []
 
     def start(
         self,
@@ -96,34 +94,34 @@ class TaskManager:
         self.pool = multiprocessing.Pool(
             workers, maxtasksperchild=1
         )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
-        self._parse_input_tasks()
-        self._handle_single_run_tasks(produce_graphics)
-        self._handle_multi_run_tasks(produce_graphics)
+        parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
+        expanded_args = self._expand_multi_runs_to_single_runs(parsed_multi_run_args)
+        runnable_args = parsed_single_run_args.extend(expanded_args)
+        self._run_tasks(runnable_args, produce_graphics)
 
-    def _parse_input_tasks(self) -> None:
+    def _expand_multi_runs_to_single_runs(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        pass
+
+    def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        parsed_single_run_args: List[Dict[str, Any]] = []
+        parsed_multi_run_args: List[Dict[str, Any]] = []
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             if input_task["task_type"].is_multi_run():
-                self.parsed_multi_run_args.append(input_task)
+                parsed_multi_run_args.append(input_task)
             else:
-                self.parsed_single_run_args.append(input_task)
+                parsed_single_run_args.append(input_task)
+        return parsed_single_run_args, parsed_multi_run_args
 
-    def _handle_single_run_tasks(self, produce_graphics: bool) -> None:
-        task_with_args = partial(self.task_single, produce_graphics=produce_graphics)
-        results = self.pool.imap_unordered(task_with_args, self.parsed_single_run_args)
-        for _ in results:
-            pass
-
-    def _handle_multi_run_tasks(self, produce_graphics: bool) -> None:
-        # TODO use self.input_manager to read input and patch it for each task
-        task_with_args = partial(self.task_multi, produce_graphics=produce_graphics)
-        results = self.pool.imap_unordered(task_with_args, self.parsed_multi_run_args)
+    def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
+        task_with_args = partial(self.task, produce_graphics=produce_graphics)
+        results = self.pool.imap_unordered(task_with_args, single_run_args)
         for _ in results:
             pass
 
     @staticmethod
-    def task_single(args: Dict[str, Any], produce_graphics: bool) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool) -> None:
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.task_single.__name__,
@@ -167,25 +165,6 @@ class TaskManager:
 
         if args["task_type"] == TaskType.POST_PROCESSING:
             TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
-
-    @staticmethod
-    def task_multi(args: Dict[str, Any], produce_graphics: bool) -> None:  # TODO imeplement
-        output_manager = OutputManager()
-        output_manager.run_startup_sequence(
-            LogVerbosity(args["log_verbosity"]),
-            args["exclude_info_maps"],
-            Path(args["output_directory"]),
-            False,
-            Path(""),
-            "multi_prefix",
-        )
-        # input_manager = InputManager()
-        if args["task_type"] == TaskType.SIMULATION_MULTI_RUN:
-            pass
-        elif args["task_type"] == TaskType.SENSITIVITY_ANALYSIS:
-            pass
-        else:
-            print("error")
 
     @staticmethod
     def handle_herd_initializaition(
@@ -234,12 +213,6 @@ class TaskManager:
         return is_data_valid
 
     @staticmethod
-    def handle_end_to_end_testing(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
-    ) -> None:
-        pass
-
-    @staticmethod
     def handle_post_processing(
         args: Dict[str, Any],
         input_manager: InputManager,
@@ -275,18 +248,6 @@ class TaskManager:
         output_manager.dump_all_nondata_pools(
             Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
         )
-
-    @staticmethod  # TODO potential rename
-    def handle_sensitivity_analysis(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
-    ) -> None:
-        pass
-
-    @staticmethod  # TODO potential rename
-    def handle_multi_simulation_run(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
-    ) -> None:
-        pass
 
     @staticmethod
     def set_random_seed(input_manager: InputManager, output_manager: OutputManager) -> None:
