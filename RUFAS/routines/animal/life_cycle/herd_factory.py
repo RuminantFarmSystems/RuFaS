@@ -147,13 +147,13 @@ class HerdFactory:
             cow_stage = heiferIII.update(simulation_day)
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
-
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["cow_repro_method"])
                 cow = Cow(args)
                 self.pre_animal_population.cows.append(cow)
             else:
-                # sim day >= 3000 and random 10% chance of becoming a replacement
+                # Random 1% chance of becoming a replacement
+                # Because a replacement is taken out of the cohort, we don't want the probability to be too high
                 if random.random() < 0.01:
                     args = heiferIII.get_heiferIII_values()
                     args.update(id=self.pre_animal_population.next_id())
@@ -168,8 +168,8 @@ class HerdFactory:
         """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
-            _, _, _, culled, new_born = cow.update(simulation_day, self.CI)
-            if culled or cow.calves > 4:
+            new_born = cow.update(simulation_day, self.CI)
+            if cow.culled or cow.calves > 4:
                 continue
             else:
                 remaining_cows.append(cow)
@@ -244,35 +244,35 @@ class HerdFactory:
                 herd_data["calves"],
             )
         )
-        heiferIs = list(
+        heiferIs: List[HeiferI] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferI"] * len(herd_data["heiferIs"]),
                 herd_data["heiferIs"],
             )
         )
-        heiferIIs = list(
+        heiferIIs: List[HeiferII] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferII"] * len(herd_data["heiferIIs"]),
                 herd_data["heiferIIs"],
             )
         )
-        heiferIIIs = list(
+        heiferIIIs: List[HeiferIII] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferIII"] * len(herd_data["heiferIIIs"]),
                 herd_data["heiferIIIs"],
             )
         )
-        cows = list(
+        cows: List[Cow] = list(
             map(
                 self._init_animal_from_data,
                 ["cow"] * len(herd_data["cows"]),
                 herd_data["cows"],
             )
         )
-        replacement = list(
+        replacement: List[HeiferIII] = list(
             map(
                 self._init_animal_from_data,
                 ["replacement"] * len(herd_data["replacement"]),
