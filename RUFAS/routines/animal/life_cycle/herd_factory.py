@@ -340,7 +340,6 @@ class HerdFactory:
         post_animals = []
 
         if len(pre_animals) == 0 and animal_num > 0:
-            print(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
             raise ValueError(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
 
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
