@@ -21,6 +21,7 @@ from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
 import RUFAS.routines.animal.clustering_pen_grouping
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
 
@@ -2720,7 +2721,7 @@ def test_calc_rqmts() -> None:
         "NEl_requirement": 1,
         "MP_requirement": 1,
         "Ca_requirement": 1,
-        "P_requirement": 1,
+        "P_requirement": 1 * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100,
         "DMIest_requirement": 1,
     }
     assert actual == expected
