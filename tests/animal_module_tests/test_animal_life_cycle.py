@@ -154,8 +154,8 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     )
 
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
-    mock_replacement_cows = [mocker.MagicMock(autospec=Cow) for _ in range(herd_data["replace_num"])]
-    mock_animal_population.get_replacement_cows.return_value = mock_replacement_cows
+    mock_replacement_heiferIIIs = [mocker.MagicMock(autospec=Cow) for _ in range(herd_data["replace_num"])]
+    mock_animal_population.get_replacement_heiferIIIs.return_value = mock_replacement_heiferIIIs
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.life_cycle.AnimalPopulation",
         return_value=mock_animal_population,
@@ -175,8 +175,8 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII)
     assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII)
     assert patch_get_animals.call_args_list[4] == mocker.call(Cow)
-    mock_animal_population.get_replacement_cows.assert_called_once_with()
-    assert life_cycle_manager.replacement_market == mock_replacement_cows
+    mock_animal_population.get_replacement_heiferIIIs.assert_called_once_with()
+    assert life_cycle_manager.replacement_market == mock_replacement_heiferIIIs
     assert len(results) == 5
 
 

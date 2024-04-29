@@ -67,7 +67,7 @@ def test_get_animals(
     result_heiferIIs = mock_animal_population.get_heiferIIs()
     result_heiferIIIs = mock_animal_population.get_heiferIIIs()
     result_cows = mock_animal_population.get_cows()
-    result_replacement = mock_animal_population.get_replacement_cows()
+    result_replacement = mock_animal_population.get_replacement_heiferIIIs()
 
     assert result_calves == calves
     assert len(result_calves) == num_calf

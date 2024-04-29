@@ -144,9 +144,9 @@ class AnimalPopulation:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self) -> List[HeiferIII]:
+    def get_replacement_heiferIIIs(self) -> List[HeiferIII]:
         """
-        Retrieve a list of replacement heiferIII instances.
+        Retrieve a list of replacement Heifer III instances.
 
         Returns
         -------
