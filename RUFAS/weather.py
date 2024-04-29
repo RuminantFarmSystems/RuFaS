@@ -203,7 +203,6 @@ class Weather:
         """
         current_date = time.convert_simulation_day_to_date(time.simulation_day)
         date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
-        calendar_start_year = time.calendar_year - time.year - 1
 
         starting_year_index = time.year + (current_date.year - date_series[0].year)
         starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
@@ -223,7 +222,7 @@ class Weather:
                 end_day = len(self.__mean_daily_temperature[year]) - 1
 
             for day in range(start_day, end_day):
-                month = Utility.day_to_month_conversion(day, calendar_start_year + year)
+                month = Utility.day_to_month_conversion(day, time.start_year_int + year)
                 daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
                 conditions = CurrentDayConditions(
                     incoming_light=self.__radiation[year - 1][day - 1],
