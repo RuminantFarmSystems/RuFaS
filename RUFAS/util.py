@@ -457,3 +457,46 @@ class Utility:
             return True
         else:
             return False
+
+    @staticmethod
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
+        """
+        Generates a list of dates based on a given date and when the dates should start and end relative to the given
+        date.
+
+        Parameters
+        ----------
+        date : datetime.date
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Raises
+        ------
+        ValueError
+            If the starting_offset is greater than the ending_offset.
+
+        Examples
+        --------
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+        [datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+
+        """
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
+
+        return time_series
