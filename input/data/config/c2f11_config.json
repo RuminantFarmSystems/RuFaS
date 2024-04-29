@@ -5,5 +5,6 @@
   "set_seed": false,
   "simulate_animals": true,
   "nutrient_standard": "NASEM",
-  "FIPS_county_code": 55081
+  "FIPS_county_code": 55081,
+  "include_detailed_values": false
 }
