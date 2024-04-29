@@ -42,12 +42,12 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_weather = Weather({}, mock_time)
-    mock_weather._Weather__radiation = [[1.0, 2.0, 3.0]]
-    mock_weather._Weather__min_daily_temperature = [[1.1, 2.1, 3.1]]
-    mock_weather._Weather__mean_daily_temperature = [[1.2, 2.2, 3.2]]
-    mock_weather._Weather__max_daily_temperature = [[1.3, 2.3, 3.3]]
-    mock_weather._Weather__precipitation = [[1.4, 2.4, 3.4]]
-    mock_weather._Weather__irrigation = [[1.5, 2.5, 3.5]]
+    mock_weather._Weather__radiation = [[1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]
+    mock_weather._Weather__min_daily_temperature = [[1.1, 2.1, 3.1], [1.1, 2.1, 3.1], [1.1, 2.1, 3.1]]
+    mock_weather._Weather__mean_daily_temperature = [[1.2, 2.2, 3.2], [1.2, 2.2, 3.2], [1.2, 2.2, 3.2]]
+    mock_weather._Weather__max_daily_temperature = [[1.3, 2.3, 3.3], [1.3, 2.3, 3.3], [1.3, 2.3, 3.3]]
+    mock_weather._Weather__precipitation = [[1.4, 2.4, 3.4], [1.4, 2.4, 3.4], [1.4, 2.4, 3.4]]
+    mock_weather._Weather__irrigation = [[1.5, 2.5, 3.5], [1.5, 2.5, 3.5], [1.5, 2.5, 3.5]]
     mock_weather._Weather__mean_annual_temperature = 15.0
     mock_weather._Weather__latitude = 43.0723
 
@@ -200,6 +200,114 @@ def test_get_current_day_conditions_error(
     ):
         mock_weather.get_current_day_conditions(mocked_time)
     assert str(e.value) == expected
+
+
+@pytest.mark.parametrize(
+    "start,end,expected",
+    [
+        (-2, 0, [
+            CurrentDayConditions(
+                radiation=3.0,
+                min_air_temperature=3.1,
+                mean_air_temperature=3.2,
+                max_air_temperature=3.3,
+                precipitation=3.4,
+                irrigation=3.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=1.0,
+                min_air_temperature=1.1,
+                mean_air_temperature=1.2,
+                max_air_temperature=1.3,
+                precipitation=1.4,
+                irrigation=1.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=2.0,
+                min_air_temperature=2.1,
+                mean_air_temperature=2.2,
+                max_air_temperature=2.3,
+                precipitation=2.4,
+                irrigation=2.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            )
+        ]),
+        (-1, 1, [
+            CurrentDayConditions(
+                radiation=1.0,
+                min_air_temperature=1.1,
+                mean_air_temperature=1.2,
+                max_air_temperature=1.3,
+                precipitation=1.4,
+                irrigation=1.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=2.0,
+                min_air_temperature=2.1,
+                mean_air_temperature=2.2,
+                max_air_temperature=2.3,
+                precipitation=2.4,
+                irrigation=2.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=3.0,
+                min_air_temperature=3.1,
+                mean_air_temperature=3.2,
+                max_air_temperature=3.3,
+                precipitation=3.4,
+                irrigation=3.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+        ]),
+        (0, 2, [
+            CurrentDayConditions(
+                radiation=2.0,
+                min_air_temperature=2.1,
+                mean_air_temperature=2.2,
+                max_air_temperature=2.3,
+                precipitation=2.4,
+                irrigation=2.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=3.0,
+                min_air_temperature=3.1,
+                mean_air_temperature=3.2,
+                max_air_temperature=3.3,
+                precipitation=3.4,
+                irrigation=3.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+            CurrentDayConditions(
+                radiation=1.0,
+                min_air_temperature=1.1,
+                mean_air_temperature=1.2,
+                max_air_temperature=1.3,
+                precipitation=1.4,
+                irrigation=1.5,
+                annual_mean_air_temperature=15.0,
+                daylength=15.6,
+            ),
+        ])
+    ]
+)
+def test_get_conditions_series(mock_weather: Weather, mock_time: Time, mocker: MockerFixture, start: int, end: int, expected: list[CurrentDayConditions]) -> None:
+    """Tests that series of CurrentDayConditions are created correctly."""
+    setattr(mock_time, "year", 2)
+    setattr(mock_time, "day", 2)
+    
 
 
 def test_record_weather(
