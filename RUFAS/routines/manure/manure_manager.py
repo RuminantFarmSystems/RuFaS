@@ -147,27 +147,29 @@ class ManureManager:
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            if mm_pen.manure_separator.lower() == "none":
-                self.manure_separators[mm_pen.id] = None
-            else:
-                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
-                    mm_pen.manure_separator
+            separator_config = self.manure_manager_config_handler.get_manure_separator_config(mm_pen.manure_separator)
+            separator = (
+                None
+                if not separator_config
+                else ManureSeparatorFactory.get_instance(
+                    configuration_name=mm_pen.manure_separator,
+                    manure_separator_config=separator_config,
                 )
-                self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
-                    manure_separator_type_name=mm_pen.manure_separator,
-                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
-                )
+            )
+            self.manure_separators[mm_pen.id] = separator
 
-            if mm_pen.manure_separator_after_digestion.lower() == "none":
-                self.manure_separators_after_digestion[mm_pen.id] = None
-            else:
-                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
-                    mm_pen.manure_separator_after_digestion
+            separator_config_post_digester = self.manure_manager_config_handler.get_manure_separator_config(
+                mm_pen.manure_separator_after_digestion
+            )
+            separator_post_digester = (
+                None
+                if not separator_config_post_digester
+                else ManureSeparatorFactory.get_instance(
+                    configuration_name=mm_pen.manure_separator_after_digestion,
+                    manure_separator_config=separator_config_post_digester,
                 )
-                self.manure_separators_after_digestion[mm_pen.id] = ManureSeparatorFactory.get_instance(
-                    manure_separator_type_name=mm_pen.manure_separator_after_digestion,
-                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
-                )
+            )
+            self.manure_separators_after_digestion[mm_pen.id] = separator_post_digester
 
             custom_manure_treatment_config = self.manure_manager_config_handler.get_custom_manure_treatment_config(
                 mm_pen.manure_treatment
@@ -665,11 +667,7 @@ class ManureManager:
         pen: ManureManagerPen,
         manure_handler_daily_output: ManureHandlerDailyOutput,
         reception_pit_daily_output: ReceptionPitDailyOutput,
-    ) -> Tuple[
-        Optional[ManureSeparatorDailyOutput],
-        ManureTreatmentDailyOutput,
-        ManureTreatmentDailyOutput,
-    ]:
+    ) -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput,]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
