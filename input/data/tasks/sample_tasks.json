@@ -31,6 +31,8 @@
       "output_prefix": "Task 5",
       "log_verbosity": "logs",
       "sampler": "fractional_factorial",
+      "SA_load_balancing_start": 0.5,
+      "SA_load_balancing_stop": 0.75,
       "SA_input_variables": [
         {
           "variable_name": "first var",
@@ -47,9 +49,7 @@
           "lower_bound": -100,
           "upper_bound": 100
         }
-      ],
-      "SA_load_balancing_start": 0.5,
-      "SA_load_balancing_stop": 0.75
+      ]
     }
   ]
 }
