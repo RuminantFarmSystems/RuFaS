@@ -28,7 +28,7 @@ class TaskType(Enum):
     SIMULATION_SINGLE_RUN = "A single simulation run"
     SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
-    INPUT_DATA_VALIDATION = "Input data validation"
+    INPUT_DATA_AUDITION = "Validates input data and saves metadata properties as CSV"
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
 
@@ -107,6 +107,12 @@ class TaskManager:
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
+            input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
+            input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
+            input_task["filters_directory"] = Path(input_task["filters_directory"])
+            input_task["CSV_directory"] = Path(input_task["CSV_directory"])
+            input_task["graphics_directory"] = Path(input_task["graphics_directory"])
+            input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
@@ -196,18 +202,18 @@ class TaskManager:
         output_manager.run_startup_sequence(
             LogVerbosity(args["log_verbosity"]),
             args["exclude_info_maps"],
-            Path(args["output_directory"]),
+            args["output_directory"],
             False,
             Path(""),
             args["output_prefix"],
         )
         input_manager = InputManager()
-        if args["task_type"] == TaskType.INPUT_DATA_VALIDATION:
-            TaskManager.handle_input_data_validation(args, input_manager, output_manager, False)
+        if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
+            TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
             TaskManager.handle_post_processing(args, input_manager, output_manager)
             return
 
-        is_data_valid = TaskManager.handle_input_data_validation(args, input_manager, output_manager, True)
+        is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
         if not is_data_valid:
             output_manager.add_error(
                 "No task run",
@@ -221,7 +227,7 @@ class TaskManager:
 
         if args["task_type"] == TaskType.HERD_INITIALIZATION:
             args["init_herd"] = True
-            TaskManager.handle_herd_initializaition(args, input_manager, output_manager)
+            TaskManager.handle_herd_initializaition(args, output_manager)
             TaskManager.handle_post_processing(args, input_manager, output_manager)
 
         if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
@@ -235,7 +241,7 @@ class TaskManager:
 
     @staticmethod
     def handle_herd_initializaition(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
+        args: Dict[str, Any], output_manager: OutputManager
     ) -> None:
         info_map = {
             "class": TaskManager.__name__,
@@ -243,7 +249,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Herd initialization start", "Initializing herd data...", info_map)
-        herd_factory = HerdFactory(args["init_herd"], args["save_animals"], Path(args["save_animals_directory"]))
+        herd_factory = HerdFactory(args["init_herd"], args["save_animals"], args["save_animals_directory"])
         herd_factory.initialize_herd()
         output_manager.add_log("Herd initialization complete", "Herd data initialized.", info_map)
 
@@ -256,7 +262,7 @@ class TaskManager:
             "function": TaskManager.handle_single_simulation_run.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        TaskManager.handle_herd_initializaition(args, input_manager, output_manager)
+        TaskManager.handle_herd_initializaition(args, output_manager)
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
         simulator = SimulationEngine()
@@ -264,19 +270,28 @@ class TaskManager:
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
-    def handle_input_data_validation(
+    def handle_input_data_audit(
         args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager.handle_input_data_validation.__name__,
+            "function": TaskManager.handle_input_data_audit.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...\n", info_map)
+        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
         is_data_valid = input_manager.start_data_processing(args["metadata_file_path"], eager_termination)
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
+        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
+
+        output_manager.add_log(
+            "Saving metadata properties",
+            f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
+            info_map,
+        )
+        input_manager.dump_metadata_properties(args["output_directory"])
+
         return is_data_valid
 
     @staticmethod
@@ -294,26 +309,26 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-        input_manager.dump_get_data_logs(Path(args["output_directory"]))
+        input_manager.dump_get_data_logs(args["output_directory"])
 
         if load_pool_from_file:
             output_manager.flush_pools()
-            output_manager.load_variables_pool_from_file(Path(args["output_pool_path"]))
+            output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts()
 
         if save_results:
             output_manager.save_results(
-                Path(args["output_directory"]),
-                Path(args["filters_directory"]),
+                args["output_directory"],
+                args["filters_directory"],
                 args["exclude_info_maps"],
                 produce_graphics,
-                Path(args["graphics_directory"]),
-                Path(args["CSV_directory"]),
+                args["graphics_directory"],
+                args["CSV_directory"],
             )
         output_manager.dump_all_nondata_pools(
-            Path(args["output_directory"]), args["exclude_info_maps"], args["variable_name_style"]
+            args["output_directory"], args["exclude_info_maps"], args["variable_name_style"]
         )
 
     @staticmethod
