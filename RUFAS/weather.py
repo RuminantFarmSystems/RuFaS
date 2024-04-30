@@ -208,8 +208,6 @@ class Weather:
         starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
         ending_year_index = time.year + (date_series[-1].year - current_date.year)
         ending_day_index = date_series[-1].toordinal() - date(date_series[-1].year, 1, 1).toordinal() + 1
-        # import pdb
-        # pdb.set_trace()
         conditions_series = []
         for year in range(starting_year_index, ending_year_index + 1):
             if starting_year_index == ending_year_index:
