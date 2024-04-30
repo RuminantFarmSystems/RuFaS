@@ -148,7 +148,7 @@
           "maximum": 0.99,
           "default": 0
         },
-        "SA_load_balancing_end": {
+        "SA_load_balancing_stop": {
           "type": "number",
           "description": "The upper bound value for sensitivity analysis load balancing",
           "minimum": 0.01,
