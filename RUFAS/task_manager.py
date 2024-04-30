@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Any, Dict, List, Tuple
 import multiprocessing
+import traceback
 from enum import Enum
 from pathlib import Path
 import numpy
@@ -208,47 +209,58 @@ class TaskManager:
             "function": TaskManager.task.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        # TODO : wrap in try catch
         output_manager = OutputManager()
-        output_manager.run_startup_sequence(
-            LogVerbosity(args["log_verbosity"]),
-            args["exclude_info_maps"],
-            args["output_directory"],
-            False,
-            Path(""),
-            args["output_prefix"],
-        )
-        input_manager = InputManager()
-        if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
-            TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
-            TaskManager.handle_post_processing(args, input_manager, output_manager)
-            return
+        try:
+            output_manager.run_startup_sequence(
+                LogVerbosity(args["log_verbosity"]),
+                args["exclude_info_maps"],
+                args["output_directory"],
+                False,
+                Path(""),
+                args["output_prefix"],
+            )
+            input_manager = InputManager()
+            if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
+                TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
+                TaskManager.handle_post_processing(args, input_manager, output_manager)
+                return
 
-        is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
-        if not is_data_valid:
+            is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
+            if not is_data_valid:
+                output_manager.add_error(
+                    "No task run",
+                    f"Data not valid for {args['output_prefix']}, task not run",
+                    info_map,
+                )
+                TaskManager.handle_post_processing(args, input_manager, output_manager)
+                return
+
+            TaskManager.set_random_seed(args["random_seed"], output_manager)
+
+            if args["task_type"] == TaskType.HERD_INITIALIZATION:
+                args["init_herd"] = True
+                TaskManager.handle_herd_initializaition(args, output_manager)
+                TaskManager.handle_post_processing(args, input_manager, output_manager)
+
+            if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
+                if args["input_patch"]:
+                    input_manager.pool.update(args["input_patch"])
+                TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
+
+            if args["task_type"] == TaskType.POST_PROCESSING:
+                TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
+        except Exception as e:
+            info_map.update(args)
             output_manager.add_error(
-                "No task run",
-                f"Data not valid for {args['output_prefix']}, task not run",
+                "Failed to finish the task",
+                f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
-            TaskManager.handle_post_processing(args, input_manager, output_manager)
-            return
-
-        TaskManager.set_random_seed(args["random_seed"], output_manager)
-
-        if args["task_type"] == TaskType.HERD_INITIALIZATION:
-            args["init_herd"] = True
-            TaskManager.handle_herd_initializaition(args, output_manager)
-            TaskManager.handle_post_processing(args, input_manager, output_manager)
-
-        if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
-            if args["input_patch"]:
-                input_manager.pool.update(args["input_patch"])
-            TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
-
-        if args["task_type"] == TaskType.POST_PROCESSING:
-            TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
+            output_manager.dump_all_nondata_pools(args["output_directory"], args["exclude_info_maps"], "block")
+            output_manager.add_log(
+                "Early termination", "Unexpected early termination. Please see logs for details.", info_map
+            )
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
