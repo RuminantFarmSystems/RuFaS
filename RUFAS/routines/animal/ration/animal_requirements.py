@@ -1,6 +1,6 @@
-import math
 from typing import Dict, List
 
+import math
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
@@ -1651,7 +1651,6 @@ class AnimalRequirements:
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
         phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
-
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     def calculate_NRC_DMI(
