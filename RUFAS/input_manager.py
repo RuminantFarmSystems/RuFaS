@@ -67,6 +67,19 @@ class Modifiability(Enum):
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
+
+    Attributes
+    ----------
+    __metadata : Dict[str, Any]
+        The guidelines used to validate the input data.
+    __pool : Dict[str, Any]
+        The input data pool.
+    __get_data_logs_pool : Dict[str, str]
+        The logs for each instance of data being fetched from Input Manager.
+    elements_counter : ElementsCounter()
+        An instance of the class to keep track of the number of elements in each state during validation.
+    metadata_depth_limit : int
+        The maximum depth allowed for a metadata properties structure.
     """
 
     __instance = None
@@ -83,7 +96,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
-            self.input_depth_limit = 5
+            self.metadata_depth_limit = 5
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -2041,9 +2054,20 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def _check_max_depth(self, data: Any, current_depth: int = 0) -> Any:
-        """
-        Recursively find the maximum depth of nested dictionaries.
+    def _check_max_depth(self, data: Any, current_depth: int = 0) -> int:
+        """Recursively find the maximum depth of nested dictionaries.
+
+        Parameters
+        ----------
+        data : Any
+            The data structure to be checked.
+        current_depth : int, optional
+            The current depth of the data structure, by default 0
+
+        Returns
+        -------
+        int
+            The levels of depth of the data structure.
         """
         if not isinstance(data, (dict, list)):
             return current_depth
