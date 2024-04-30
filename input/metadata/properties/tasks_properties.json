@@ -110,37 +110,50 @@
           "pattern": "fractional_factorial|saltelli_sobol",
           "default": "saltelli_sobol"
         },
-        "saltelli_skip":{
-          "type":"number",
+        "saltelli_skip": {
+          "type": "number",
           "description": "The saltelli skip value for Sensitivity Analysis",
-          "minimum":0,
-          "default":0
+          "minimum": 0,
+          "default": 0
         },
-        "saltelli_number":{
-          "type":"number",
+        "saltelli_number": {
+          "type": "number",
           "description": "The saltelli sampling value for Sensitivity Analysis",
-          "minimum":2,
-          "default":2
+          "minimum": 2,
+          "default": 2
         },
-        "SA_input_variables":
-        {
-          "type":"array",
-          "description":"The input variables to perform Sensitivity Analysis on",
-          "properties":{
-              "type":"object",
-              "variable_name":{
-                "type":"string",
-                "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
-              },              
-              "lower_bound":{
-                "type":"number",
-                "description":"The lower bound for sampling"
-              },
-              "upper_bound":{
-                "type":"number",
-                "description":"The upper bound for sampling"
-              }
+        "SA_input_variables": {
+          "type": "array",
+          "description": "The input variables to perform Sensitivity Analysis on",
+          "properties": {
+            "type": "object",
+            "variable_name": {
+              "type": "string",
+              "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
+            },
+            "lower_bound": {
+              "type": "number",
+              "description": "The lower bound for sampling"
+            },
+            "upper_bound": {
+              "type": "number",
+              "description": "The upper bound for sampling"
+            }
           }
+        },
+        "SA_load_balancing_start": {
+          "type": "number",
+          "description": "The lower bound value for sensitivity analysis load balancing",
+          "minimum": 0,
+          "maximum": 0.99,
+          "default": 0
+        },
+        "SA_load_balancing_end": {
+          "type": "number",
+          "description": "The upper bound value for sensitivity analysis load balancing",
+          "minimum": 0.01,
+          "maximum": 1,
+          "default": 1
         }
       }
     }
