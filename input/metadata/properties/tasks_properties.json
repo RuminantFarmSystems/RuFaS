@@ -125,18 +125,22 @@
         "SA_input_variables": {
           "type": "array",
           "description": "The input variables to perform Sensitivity Analysis on",
+          "default": [{}],
           "properties": {
             "type": "object",
             "variable_name": {
               "type": "string",
+              "default": "no_name",
               "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
             },
             "lower_bound": {
               "type": "number",
+              "default": 0,
               "description": "The lower bound for sampling"
             },
             "upper_bound": {
               "type": "number",
+              "default": 1,
               "description": "The upper bound for sampling"
             }
           }

@@ -108,6 +108,7 @@ class TaskManager:
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
+            input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
@@ -139,7 +140,7 @@ class TaskManager:
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
             new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-            new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{i+1}"
+            new_args["output_prefix"] = f"{new_args['output_prefix']} run {i+1}"
             single_run_args.append(new_args)
 
         return single_run_args
@@ -187,7 +188,7 @@ class TaskManager:
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
             run_number = f"{i+1}".zfill(digits)
-            new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{run_number}"
+            new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
             new_args["input_patch"] = {names[j]: sampled_values[i, j] for j in range(variables_count)}
             single_run_args.append(new_args)
 
