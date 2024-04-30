@@ -137,7 +137,7 @@ class InputManager:
         """
         self._load_metadata(metadata_path)
         self._load_properties()
-        # self._check_max_depth()
+        self._check_max_depth()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -2058,29 +2058,34 @@ class InputManager:
         int
             The levels of depth of the data structure.
         """
-        pass
-        # for key, value in self.__metadata.items():
-        #     print(key)
-        # if not isinstance(data, (dict, list)):
-        #     return current_depth
+        primitive_types: List[str] = ["number", "string", "bool"]
+        nested_types: List[str] = ["object", "array"]
+        zero_depth_properties = {key: self.__metadata["properties"][key]
+                                  for key in self.__metadata["properties"].keys()}  # depth is 0
+        
+            print(key)
+        # second_level_nested_properties = self._get_nested_properties(first_level_properties)  # depth is 1
+        # print(second_level_nested_properties)
+        # for first_level_key in first_level_properties.keys():
+        #     if first_level_properties[first_level_key].get("type") in nested_types:
+        #         first_level_nested_property = first_level_properties[first_level_key]
+        # first_level_nested_properties = {key: value for key, value in first_level_properties.items()
+        #                                  if value.get("type") in nested_types}
+        # for second_level_key, second_level_value in first_level_nested_property.items():
+        #     if isinstance(second_level_value, dict) and second_level_value.get("type") in ["object", "array"]:
+        #         print(first_level_key, second_level_key)
 
-        # max_depth = current_depth
-        # if isinstance(data, dict):
-        #     for key, value in data.items():
-        #         if isinstance(value, dict):
-        #             depth = self._check_max_depth(value, current_depth + 1)
-        #             max_depth = max(max_depth, depth)
-        #         elif isinstance(value, list):
-        #             for item in value:
-        #                 depth = self._check_max_depth(item, current_depth + 1)
-        #                 max_depth = max(max_depth, depth)
-
-        # elif isinstance(data, list):
-        #     for item in data:
-        #         depth = self._check_max_depth(item, current_depth + 1)
-        #         max_depth = max(max_depth, depth)
-
-        # return max_depth
+    @staticmethod
+    def _get_nested_properties(properties_data: Dict[str, Any]) -> Dict[str, Any] | None:
+        nested_types: List[str] = ["object", "array"]
+        # return {key: value for key, value in properties_data.items()
+        #         if value.get("type") in nested_types}
+        for key in properties_data.keys():
+            print(key)
+            if properties_data[key].get("type") in nested_types:
+                first_level_nested_property = properties_data[key]
+                print(first_level_nested_property, "juju")
+        return {}
 
     def dump_metadata_properties(self, output_dir: Path) -> None:
         """
