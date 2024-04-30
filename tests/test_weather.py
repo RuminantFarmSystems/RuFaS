@@ -1,3 +1,4 @@
+from datetime import date
 import pytest
 from pytest_mock.plugin import MockerFixture
 from unittest.mock import MagicMock, patch
@@ -7,6 +8,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 
 om = OutputManager()
 
@@ -30,6 +32,7 @@ def mock_weather_input() -> dict:
 def mock_time() -> Time:
     """Fixture for Time object."""
     mock_time = MagicMock(auto_spec=Time)
+    mock_time.calendar_year = 2023
     mock_time.year = 1
     mock_time.day = 1
     mock_time.start_year_int = 2022
@@ -205,109 +208,71 @@ def test_get_current_day_conditions_error(
 @pytest.mark.parametrize(
     "start,end,expected",
     [
-        (-2, 0, [
-            CurrentDayConditions(
-                radiation=3.0,
-                min_air_temperature=3.1,
-                mean_air_temperature=3.2,
-                max_air_temperature=3.3,
-                precipitation=3.4,
-                irrigation=3.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=1.0,
-                min_air_temperature=1.1,
-                mean_air_temperature=1.2,
-                max_air_temperature=1.3,
-                precipitation=1.4,
-                irrigation=1.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=2.0,
-                min_air_temperature=2.1,
-                mean_air_temperature=2.2,
-                max_air_temperature=2.3,
-                precipitation=2.4,
-                irrigation=2.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            )
-        ]),
-        (-1, 1, [
-            CurrentDayConditions(
-                radiation=1.0,
-                min_air_temperature=1.1,
-                mean_air_temperature=1.2,
-                max_air_temperature=1.3,
-                precipitation=1.4,
-                irrigation=1.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=2.0,
-                min_air_temperature=2.1,
-                mean_air_temperature=2.2,
-                max_air_temperature=2.3,
-                precipitation=2.4,
-                irrigation=2.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=3.0,
-                min_air_temperature=3.1,
-                mean_air_temperature=3.2,
-                max_air_temperature=3.3,
-                precipitation=3.4,
-                irrigation=3.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-        ]),
-        (0, 2, [
-            CurrentDayConditions(
-                radiation=2.0,
-                min_air_temperature=2.1,
-                mean_air_temperature=2.2,
-                max_air_temperature=2.3,
-                precipitation=2.4,
-                irrigation=2.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=3.0,
-                min_air_temperature=3.1,
-                mean_air_temperature=3.2,
-                max_air_temperature=3.3,
-                precipitation=3.4,
-                irrigation=3.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-            CurrentDayConditions(
-                radiation=1.0,
-                min_air_temperature=1.1,
-                mean_air_temperature=1.2,
-                max_air_temperature=1.3,
-                precipitation=1.4,
-                irrigation=1.5,
-                annual_mean_air_temperature=15.0,
-                daylength=15.6,
-            ),
-        ])
-    ]
+        (
+            -1,
+            1,
+            [
+                CurrentDayConditions(
+                    incoming_light=1.0,
+                    min_air_temperature=1.1,
+                    mean_air_temperature=1.2,
+                    max_air_temperature=1.3,
+                    precipitation=1.4,
+                    irrigation=1.5,
+                    annual_mean_air_temperature=15.0,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=2.0,
+                    min_air_temperature=2.1,
+                    mean_air_temperature=2.2,
+                    max_air_temperature=2.3,
+                    precipitation=2.4,
+                    irrigation=2.5,
+                    annual_mean_air_temperature=15.0,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=3.0,
+                    min_air_temperature=3.1,
+                    mean_air_temperature=3.2,
+                    max_air_temperature=3.3,
+                    precipitation=3.4,
+                    irrigation=3.5,
+                    annual_mean_air_temperature=15.0,
+                    daylength=15.6,
+                ),
+            ],
+        )
+    ],
 )
-def test_get_conditions_series(mock_weather: Weather, mock_time: Time, mocker: MockerFixture, start: int, end: int, expected: list[CurrentDayConditions]) -> None:
+def test_get_conditions_series(
+    mock_weather: Weather,
+    mock_time: Time,
+    mocker: MockerFixture,
+    start: int,
+    end: int,
+    expected: list[CurrentDayConditions],
+) -> None:
     """Tests that series of CurrentDayConditions are created correctly."""
     setattr(mock_time, "year", 2)
     setattr(mock_time, "day", 2)
-    
+    setattr(mock_time, "simulation_day", 5)
+    setattr(mock_time, "end_year_int", 2024)
+    convert_sim_day_to_date = mocker.patch.object(
+        mock_time, "convert_simulation_day_to_date", return_value=date(2023, 1, 2)
+    )
+    time_series_gen = mocker.patch.object(Utility, "generate_time_series", wraps=Utility.generate_time_series)
+    day_to_month = mocker.patch.object(Utility, "day_to_month_conversion", return_value=1)
+    daylength = mocker.patch.object(CurrentDayConditions, "determine_daylength", return_value=15.6)
+
+    actual = mock_weather.get_conditions_series(mock_time, start, end)
+
+    assert actual == expected
+    convert_sim_day_to_date.assert_called_once()
+    time_series_gen.assert_called_once()
+    assert day_to_month.call_count == len(expected)
+    assert daylength.call_count == len(expected)
 
 
 def test_record_weather(

@@ -204,14 +204,18 @@ class Weather:
         current_date = time.convert_simulation_day_to_date(time.simulation_day)
         date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
 
-        starting_year_index = time.year + (current_date.year - date_series[0].year)
+        starting_year_index = time.year - (current_date.year - date_series[0].year)
         starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
         ending_year_index = time.year + (date_series[-1].year - current_date.year)
         ending_day_index = date_series[-1].toordinal() - date(date_series[-1].year, 1, 1).toordinal() + 1
-
+        # import pdb
+        # pdb.set_trace()
         conditions_series = []
         for year in range(starting_year_index, ending_year_index + 1):
-            if year == starting_year_index:
+            if starting_year_index == ending_year_index:
+                start_day = starting_day_index
+                end_day = ending_day_index
+            elif year == starting_year_index:
                 start_day = starting_day_index
                 end_day = len(self.__mean_daily_temperature[year]) - 1
             elif year == ending_year_index:
@@ -221,7 +225,7 @@ class Weather:
                 start_day = 0
                 end_day = len(self.__mean_daily_temperature[year]) - 1
 
-            for day in range(start_day, end_day):
+            for day in range(start_day, end_day + 1):
                 month = Utility.day_to_month_conversion(day, time.start_year_int + year)
                 daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
                 conditions = CurrentDayConditions(
