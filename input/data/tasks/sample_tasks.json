@@ -1,5 +1,5 @@
 {
-  "parallel_workers": 4,
+  "parallel_workers": 8,
   "tasks": [
     {
       "task_type": "INPUT_DATA_VALIDATION",

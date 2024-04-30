@@ -151,7 +151,7 @@ class TaskManager:
     def task(args: Dict[str, Any], produce_graphics: bool) -> None:
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager.task_single.__name__,
+            "function": TaskManager.task.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager = OutputManager()
@@ -179,7 +179,7 @@ class TaskManager:
             TaskManager.handle_post_processing(args, input_manager, output_manager)
             return
 
-        TaskManager.set_random_seed(input_manager, output_manager)
+        TaskManager.set_random_seed(args["random_seed"], output_manager)
 
         if args["task_type"] == TaskType.HERD_INITIALIZATION:
             args["init_herd"] = True
