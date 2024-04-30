@@ -1504,6 +1504,10 @@ class AnimalRequirements:
             )
         Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
         calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
+        if isinstance(calcium_requirement, complex):
+            print(f"Calcium requirement is complex: {calcium_requirement}")
+            calcium_requirement = calcium_requirement.real
+        calcium_requirement = float(calcium_requirement)
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
     def calculate_NRC_phosphorus_requirements(
@@ -1651,6 +1655,12 @@ class AnimalRequirements:
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
         phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
+
+        if isinstance(phosphorus_requirement, complex):
+            print(f"Phosphorus requirement is complex: {phosphorus_requirement}")
+            phosphorus_requirement = phosphorus_requirement.real
+        phosphorus_requirement = float(phosphorus_requirement)
+
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     def calculate_NRC_DMI(

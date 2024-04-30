@@ -27,7 +27,7 @@ class AnimalPopulation:
     cows : List[Cow]
         A list of Cow instances in the herd.
     replacement : List[HeiferIII]
-        A list of replacement Cow instances in the herd.
+        A list of replacement heifer III instances in the herd.
     current_animal_id : int, default=0
         The highest ID number among all animals in the herd.
     order_by_random : bool, default=0

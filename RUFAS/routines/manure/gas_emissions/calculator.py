@@ -2,10 +2,13 @@ import math
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+
+om = OutputManager()
 
 
 class GasEmissionsCalculator:
@@ -71,10 +74,15 @@ class GasEmissionsCalculator:
             If the total volatile solids is not positive.
         """
         if accumulated_liquid_manure_total_degradable_volatile_solids <= 0:
-            raise ValueError(
-                "Total degradable volatile solids must be positive. Total degradable volatile solids provided: "
-                f"{accumulated_liquid_manure_total_degradable_volatile_solids}"
+            om.add_error(
+                "negative_volatile_solids",
+                f"Total degradable volatile solids must be positive. Total degradable volatile solids provided: {accumulated_liquid_manure_total_degradable_volatile_solids}",
+                {
+                    "class": cls.__name__,
+                    "function": cls.methane_emission_from_slurry_storage.__name__,
+                },
             )
+            return 0.0, 0.0
 
         arrhenius_exponent = cls._arrhenius_exponent(temp)
 
