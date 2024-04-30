@@ -202,6 +202,16 @@ class AnimalPopulation:
         cow_avg_parity = self._average([cow.calves for cow in self.cows])
         cow_avg_CI = self._average([cow.CI for cow in self.cows])
 
+        avg_replacement_calf_birth_weight = self._average(
+            [replacement.calf_birth_weight for replacement in self.replacement]
+        )
+        avg_replacement_birth_weight = self._average([replacement.birth_weight for replacement in self.replacement])
+        avg_replacement_wean_weight = self._average([replacement.wean_weight for replacement in self.replacement])
+        avg_replacement_mature_body_weight = self._average(
+            [replacement.mature_body_weight for replacement in self.replacement]
+        )
+        avg_replacement_body_weight = self._average([replacement.body_weight for replacement in self.replacement])
+
         summary = {
             "num_calf": num_calf,
             "num_heiferI": num_heiferI,
@@ -219,5 +229,11 @@ class AnimalPopulation:
             "cow_avg_days_in_milk": cow_avg_days_in_milk,
             "cow_avg_parity": cow_avg_parity,
             "cow_avg_CI": cow_avg_CI,
+
+            "avg_replacement_calf_birth_weight": avg_replacement_calf_birth_weight,
+            "avg_replacement_birth_weight": avg_replacement_birth_weight,
+            "avg_replacement_wean_weight": avg_replacement_wean_weight,
+            "avg_replacement_mature_body_weight": avg_replacement_mature_body_weight,
+            "avg_replacement_body_weight": avg_replacement_body_weight,
         }
         return summary
