@@ -4048,7 +4048,8 @@ def test_check_max_depth(
     """Test various depths of nested data structures."""
     assert mock_input_manager._check_max_depth(data) == expected_depth
     mock_input_manager._check_max_depth = input_manager_original_method_states["_check_max_depth"]
-=======
+
+
 def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
     """Tests dump_metadata_properties() function in InputManager."""
     mock_records = [{"name": "example", "value": 42}]
