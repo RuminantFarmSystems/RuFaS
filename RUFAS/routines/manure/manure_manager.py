@@ -147,9 +147,7 @@ class ManureManager:
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            separator_config = self.manure_manager_config_handler.get_manure_separator_config(
-                mm_pen.manure_separator
-            )
+            separator_config = self.manure_manager_config_handler.get_manure_separator_config(mm_pen.manure_separator)
             separator = None
             if separator_config:
                 separator = ManureSeparatorFactory.get_instance(
