@@ -68,6 +68,10 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "dump_metadata_properties": mock_input_manager.dump_metadata_properties,
+        "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
+        "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
+        "_create_record": mock_input_manager._create_record,
     }
 
 
@@ -4017,6 +4021,174 @@ def test_validate_input_by_type_value_error() -> None:
         input_manager._validate_input_by_type(
             variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter
         )
+
+
+def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
+    """Tests dump_metadata_properties() function in InputManager."""
+    mock_records = [{"name": "example", "value": 42}]
+    output_dir = Path("/fake/directory")
+    metadata = {"properties": "test_properties"}
+    mock_input_manager.meta_data = metadata
+
+    with (
+        patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
+        patch("pandas.DataFrame.to_csv") as mock_to_csv,
+        patch("os.path.join", return_value="output.csv") as mock_join,
+        patch(
+            "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
+        ) as mock_generate_file_name,
+    ):
+
+        mock_input_manager.dump_metadata_properties(output_dir)
+
+        mock_parse.assert_called_once_with("test_properties")
+        mock_join.assert_called_once_with(output_dir, "output.csv")
+        mock_to_csv.assert_called_once_with("output.csv", index=False)
+        mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
+
+
+@pytest.mark.parametrize(
+    "nested_data, expected_primitive_call_counts, expected_create_record_call_count, expected_results",
+    [
+        (
+            {
+                "level1": {
+                    "level2": {
+                        "property1": {"type": "string", "value": "Hello"},
+                        "property2": {"type": "number", "value": 42},
+                    },
+                    "description": "Level 1 description",
+                }
+            },
+            {"True": 2, "False": 2},
+            2,
+            [{"mocked": "record"}, {"mocked": "record"}],
+        ),
+        (
+            {
+                "level1": {
+                    "level2": {
+                        "nestedProperty": {
+                            "type": "object",
+                            "innerProperty": {"type": "string", "value": "Nested", "description": "Deep description"},
+                        }
+                    },
+                    "description": "Level 1 description",
+                }
+            },
+            {"True": 2, "False": 3},
+            2,
+            [{"mocked": "record"}],
+        ),
+    ],
+)
+def test_parse_metadata_properties(
+    mock_input_manager: InputManager,
+    nested_data: Dict[str, Any],
+    expected_primitive_call_counts: Dict[str, int],
+    expected_create_record_call_count: int,
+    expected_results: List[Dict[str, str]],
+):
+    """Tests _parse_metadata_properties() function in InputManager."""
+
+    def side_effect_check_property_type_primitive(value):
+        """Function to mock check_property_type_primitive dynamically."""
+        return value.get("type") in ["string", "number"]
+
+    with (
+        patch.object(
+            mock_input_manager, "_check_property_type_primitive", side_effect=side_effect_check_property_type_primitive
+        ) as mock_primitive,
+        patch.object(mock_input_manager, "_create_record", return_value={"mocked": "record"}) as mock_create_record,
+    ):
+
+        prefix = ""
+        sep = "_"
+
+        result = mock_input_manager._parse_metadata_properties(nested_data, prefix, sep)
+
+        true_count = sum(1 for call in mock_primitive.call_args_list if call[0][0].get("type") in ["string", "number"])
+        false_count = len(mock_primitive.call_args_list) - true_count
+
+        assert true_count == expected_primitive_call_counts["True"]
+        assert false_count == expected_primitive_call_counts["False"]
+        assert mock_create_record.call_count == expected_create_record_call_count
+        assert result == expected_results
+
+
+@pytest.mark.parametrize(
+    "property_dict, expected_result",
+    [
+        # Direct primitive types
+        ({"type": "bool"}, True),
+        ({"type": "string"}, True),
+        ({"type": "number"}, True),
+        # Array containing primitive types
+        ({"type": "array", "properties": {"type": "bool"}}, True),
+        ({"type": "array", "properties": {"type": "string"}}, True),
+        ({"type": "array", "properties": {"type": "number"}}, True),
+        # Non-primitive type
+        ({"type": "object"}, False),
+        ({"type": "array", "properties": {"type": "object"}}, False),
+        # Invalid or unexpected type cases
+        ({"type": "array", "properties": {}}, False),  # Array but properties are empty
+        ({"type": "complex"}, False),  # Unsupported type
+    ],
+)
+def test_check_property_type_primitive(
+    mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
+):
+    """Tests _check_property_type_primitive() function in InputManager."""
+    result = mock_input_manager._check_property_type_primitive(property_dict)
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "data_entry, name, expected_record",
+    [
+        (
+            {
+                "type": "string",
+                "description": "A simple string",
+                "pattern": "[A-Za-z]+",
+                "default": "example",
+                "maximum": "",
+                "minimum": "",
+            },
+            "user_details_properties_name",
+            {
+                "properties_group": "user_details_properties",
+                "name": "name",
+                "type": "string",
+                "description": "A simple string",
+                "pattern": "[A-Za-z]+",
+                "default": "example",
+                "maximum": "",
+                "minimum": "",
+            },
+        ),
+        (
+            {"type": "number", "description": "A simple number"},
+            "config_properties_version",
+            {
+                "properties_group": "config_properties",
+                "name": "version",
+                "type": "number",
+                "description": "A simple number",
+                "pattern": "",
+                "default": "",
+                "maximum": "",
+                "minimum": "",
+            },
+        ),
+    ],
+)
+def test_create_record(
+    mock_input_manager: InputManager, data_entry: Dict[str, str], name: str, expected_record: Dict[str, str]
+):
+    """Tests _create_record() function in InputManager."""
+    result = mock_input_manager._create_record(data_entry, name)
+    assert result == expected_record
 
 
 def test_increment_in_elements_counter() -> None:
