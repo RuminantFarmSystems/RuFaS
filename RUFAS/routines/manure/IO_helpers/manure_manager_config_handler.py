@@ -241,7 +241,7 @@ class ManureManagerConfigHandler:
     @classmethod
     def _process_manure_separator_configs(
         cls, manure_separator_configs: List[Dict]
-    ) -> Dict[str , ManureSeparatorConfig | None]:
+    ) -> Dict[str, ManureSeparatorConfig | None]:
         """
         Returns a dictionary of manure separator config objects, with the key being the name of the separator config.
 
