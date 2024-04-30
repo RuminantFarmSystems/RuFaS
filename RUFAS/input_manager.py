@@ -137,6 +137,7 @@ class InputManager:
         """
         self._load_metadata(metadata_path)
         self._load_properties()
+        # self._check_max_depth()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -326,10 +327,6 @@ class InputManager:
             If faulty data type found in data blob key.
 
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._populate_pool.__name__,
-        }
 
         data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
@@ -356,14 +353,6 @@ class InputManager:
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
             self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
-
-            input_max_depth = self._check_max_depth(filtered_input_data)
-            if input_max_depth > self.input_depth_limit:
-                om.add_warning(
-                    "Max input depth exceeded",
-                    f"Max depth of input file {file_path} exceeds limit of {self.input_depth_limit}",
-                    info_map,
-                )
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
@@ -2054,7 +2043,7 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def _check_max_depth(self, data: Any, current_depth: int = 0) -> int:
+    def _check_max_depth(self):
         """Recursively find the maximum depth of nested dictionaries.
 
         Parameters
@@ -2069,26 +2058,29 @@ class InputManager:
         int
             The levels of depth of the data structure.
         """
-        if not isinstance(data, (dict, list)):
-            return current_depth
+        pass
+        # for key, value in self.__metadata.items():
+        #     print(key)
+        # if not isinstance(data, (dict, list)):
+        #     return current_depth
 
-        max_depth = current_depth
-        if isinstance(data, dict):
-            for key, value in data.items():
-                if isinstance(value, dict):
-                    depth = self._check_max_depth(value, current_depth + 1)
-                    max_depth = max(max_depth, depth)
-                elif isinstance(value, list):
-                    for item in value:
-                        depth = self._check_max_depth(item, current_depth + 1)
-                        max_depth = max(max_depth, depth)
+        # max_depth = current_depth
+        # if isinstance(data, dict):
+        #     for key, value in data.items():
+        #         if isinstance(value, dict):
+        #             depth = self._check_max_depth(value, current_depth + 1)
+        #             max_depth = max(max_depth, depth)
+        #         elif isinstance(value, list):
+        #             for item in value:
+        #                 depth = self._check_max_depth(item, current_depth + 1)
+        #                 max_depth = max(max_depth, depth)
 
-        elif isinstance(data, list):
-            for item in data:
-                depth = self._check_max_depth(item, current_depth + 1)
-                max_depth = max(max_depth, depth)
+        # elif isinstance(data, list):
+        #     for item in data:
+        #         depth = self._check_max_depth(item, current_depth + 1)
+        #         max_depth = max(max_depth, depth)
 
-        return max_depth
+        # return max_depth
 
     def dump_metadata_properties(self, output_dir: Path) -> None:
         """
