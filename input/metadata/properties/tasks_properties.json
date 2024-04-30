@@ -13,7 +13,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_VALIDATION|END_TO_END_TESTING|POST_PROCESSING",
+          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDITION|END_TO_END_TESTING|POST_PROCESSING",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
