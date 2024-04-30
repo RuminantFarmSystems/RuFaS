@@ -128,7 +128,7 @@ class ManureManagerConfigHandler:
         Raises
         ------
         KeyError
-            If the specified manure separator config is not present and is not "none".
+            If the specified manure separator config name is not present and is not "none".
 
         """
         if manure_separator_name == "none":
