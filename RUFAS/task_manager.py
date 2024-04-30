@@ -81,6 +81,12 @@ class TaskManager:
         self.output_manager.run_startup_sequence(
             verbosity, exclude_info_maps, output_directory, clear_output_directory, Path(""), "Task Manager"
         )
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.start.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
@@ -94,12 +100,25 @@ class TaskManager:
             )
             raise Exception("Task Manager's input data is invalid.")
         workers: int = self.input_manager.get_data("tasks.parallel_workers")
+        self.output_manager.add_log(
+            "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
+        )
         self.pool = multiprocessing.Pool(
             workers, maxtasksperchild=1
         )  # maxtasksperchild=1 to maintain isolation between tasks and ensure no memory leaks happens in IO Managers
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
+        self.output_manager.add_log(
+            "Task Manager parsed tasks",
+            f"Parsed {len(parsed_single_run_args)+len(parsed_multi_run_args)} tasks args.",
+            info_map,
+        )
         expanded_args = self._expand_multi_runs_to_single_runs(parsed_multi_run_args)
         runnable_args = parsed_single_run_args + expanded_args
+        self.output_manager.add_log(
+            "Task Manager expanded tasks",
+            f"Expanded task args to {len(runnable_args)}. Starting the tasks...",
+            info_map,
+        )
         self._run_tasks(runnable_args, produce_graphics)
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:

@@ -28,26 +28,28 @@
     },
     {
       "task_type": "SENSITIVITY_ANALYSIS",
-      "output_prefix": "Task 4",
+      "output_prefix": "Task 5",
       "log_verbosity": "logs",
       "sampler": "fractional_factorial",
-      "SA_input_variables":[
+      "SA_input_variables": [
         {
-          "variable_name":"first var",
+          "variable_name": "first var",
           "lower_bound": 1,
           "upper_bound": 100
         },
         {
-          "variable_name":"second var",
+          "variable_name": "second var",
           "lower_bound": -10,
           "upper_bound": 10
         },
         {
-          "variable_name":"third var",
+          "variable_name": "third var",
           "lower_bound": -100,
           "upper_bound": 100
         }
-      ]
+      ],
+      "SA_load_balancing_start": 0.5,
+      "SA_load_balancing_stop": 0.75
     }
   ]
 }
