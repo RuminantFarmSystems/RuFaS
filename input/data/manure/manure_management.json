@@ -230,6 +230,7 @@
   ],
   "manure_separator_configs": [
     {
+      "name": "rotary screen",
       "manure_separator_type": "rotary screen",
       "percent_dry_solids": 0.20,
       "total_solids_removal_efficiency_for_separator": 0.35,
@@ -240,6 +241,7 @@
       "potassium_removal_efficiency_for_separator": 0.15
     },
     {
+      "name": "screw press",
       "manure_separator_type": "screw press",
       "percent_dry_solids": 0.35,
       "total_solids_removal_efficiency_for_separator": 0.25,
