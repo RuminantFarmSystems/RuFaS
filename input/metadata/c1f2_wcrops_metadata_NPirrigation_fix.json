@@ -91,12 +91,12 @@
       "type": "json",
       "properties": "NA"
     },
-       "Corn 2020 Fertilizer schedule": {
-      "title": "Fertilizer schedule.",
-      "description": "No fertilizer is scheduled to be used.",
-      "path": "input/data/fertilizer_schedule/c1f2_corn_2020_fertilizer_schedule.json",
+       "no_manure": {
+      "title": "Manure schedule.",
+      "description": "No manure is scheduled to be used.",
+      "path": "input/data/manure_schedule/no_manure.json",
       "type": "json",
-      "properties": "fertilizer_schedule_properties"
+      "properties": "manure_schedule_properties"
     },
     "Corn 2020 Crop data": {
       "title": "Corn 2020 Crop data",
@@ -112,12 +112,12 @@
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "Corn 2020 Manure schedule": {
-      "title": "Corn 2020 Manure schedule.",
+    "Corn 2020 Fertilizer schedule": {
+      "title": "Corn 2020 Fertilizer schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/c1f2_corn_2020_manure_schedule.json",
+      "path": "input/data/fertilizer_schedule/c1f2_corn_2020_fertilizer_schedule.json",
       "type": "json",
-      "properties": "manure_schedule_properties"
+      "properties": "fertilizer_schedule_properties"
     },
     "Corn 2020 Tillage schedule": {
       "title": "Corn 2020 Tillage schedule.",
@@ -129,16 +129,9 @@
     "Corn 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_corn_2020_field.json",
+      "path": "input/data/field/c1f2_corn_2020_field_nomanure.json",
       "type": "json",
       "properties": "field_properties"
-    },
-       "Wheat 2020 Fertilizer schedule": {
-      "title": "Fertilizer schedule.",
-      "description": "No fertilizer is scheduled to be used.",
-      "path": "input/data/fertilizer_schedule/c1f2_wheat_2020_fertilizer_schedule.json",
-      "type": "json",
-      "properties": "fertilizer_schedule_properties"
     },
     "Wheat 2020 Crop data": {
       "title": "Wheat 2020 Crop data",
@@ -150,16 +143,16 @@
     "Wheat 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_wheat_2020_field.json",
+      "path": "input/data/field/c1f2_wheat_2020_field_nomanure.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "Wheat 2020 Manure schedule": {
-      "title": "Corn 2020 Manure schedule.",
+    "Wheat 2020 Fertilizer schedule": {
+      "title": "Corn 2020 Fertilizer schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/c1f2_wheat_2020_manure_schedule.json",
+      "path": "input/data/fertilizer_schedule/c1f2_wheat_2020_fertilizer_schedule.json",
       "type": "json",
-      "properties": "manure_schedule_properties"
+      "properties": "fertilizer_schedule_properties"
     },
     "Wheat 2020 Tillage schedule": {
       "title": "Corn 2020 Tillage schedule.",
@@ -167,13 +160,6 @@
       "path": "input/data/tillage_schedule/c1f2_wheat_2020_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
-    },
-       "Alfalfa 2020 Fertilizer schedule": {
-      "title": "Fertilizer schedule.",
-      "description": "No fertilizer is scheduled to be used.",
-      "path": "input/data/fertilizer_schedule/c1f2_alfalfa_2020_fertilizer_schedule.json",
-      "type": "json",
-      "properties": "fertilizer_schedule_properties"
     },
     "Alfalfa 2020 Crop data": {
       "title": "Wheat 2020 Crop data",
@@ -185,16 +171,16 @@
     "Alfalfa 2020 Field": {
       "title": "Corn 2020 Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c1f2_alfalfa_2020_field.json",
+      "path": "input/data/field/c1f2_alfalfa_2020_field_nomanure.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "Alfalfa 2020 Manure schedule": {
-      "title": "Corn 2020 Manure schedule.",
+    "Alfalfa 2020 Fertilizer schedule": {
+      "title": "Alfalfa 2020 Fertilizer schedule.",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/c1f2_alfalfa_2020_manure_schedule.json",
+      "path": "input/data/fertilizer_schedule/c1f2_alfalfa_2020_fertilizer_schedule.json",
       "type": "json",
-      "properties": "manure_schedule_properties"
+      "properties": "fertilizer_schedule_properties"
     },
     "Alfalfa 2020 Tillage schedule": {
       "title": "Corn 2020 Tillage schedule.",

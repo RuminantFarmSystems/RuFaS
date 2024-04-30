@@ -1583,6 +1583,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Julian day of year to harvest",
             "minimum": 1,
             "maximum": 366
           }
@@ -1948,6 +1949,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of diesel per gallon",
         "minimum": 0,
         "default": 5.0
       }
@@ -1957,6 +1959,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of electricity per kwh",
         "minimum": 0,
         "default": 0.15
       }
@@ -1966,6 +1969,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of natural gas per kwh",
         "minimum": 0,
         "default": 0.053
       }
@@ -1975,6 +1979,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of water per gallon",
         "minimum": 0,
         "default": 0.008
       }
@@ -3148,7 +3153,6 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "description": "Purchased Feed",
           "minimum": 1,
           "maximum": 306
         },
@@ -5013,6 +5017,7 @@
       "description": "Irrigation (mm H2O).",
       "type": "array",
       "properties": {
+        "description": "Irrigation (mm H2O).",
         "type": "number",
         "default": 0
       }
