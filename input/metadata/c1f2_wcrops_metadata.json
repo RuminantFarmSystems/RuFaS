@@ -73,7 +73,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/barnyard_100yr.csv",
+      "path": "input/data/weather/c1f2_extended_weather_irrigation.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -91,10 +91,10 @@
       "type": "json",
       "properties": "NA"
     },
-       "no_fert": {
+       "Corn 2020 Fertilizer schedule": {
       "title": "Fertilizer schedule.",
       "description": "No fertilizer is scheduled to be used.",
-      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
+      "path": "input/data/fertilizer_schedule/c1f2_corn_2020_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
@@ -133,6 +133,13 @@
       "type": "json",
       "properties": "field_properties"
     },
+       "Wheat 2020 Fertilizer schedule": {
+      "title": "Fertilizer schedule.",
+      "description": "No fertilizer is scheduled to be used.",
+      "path": "input/data/fertilizer_schedule/c1f2_wheat_2020_fertilizer_schedule.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
     "Wheat 2020 Crop data": {
       "title": "Wheat 2020 Crop data",
       "description": "Crop selection and detailed rotation schedules.",
@@ -160,6 +167,13 @@
       "path": "input/data/tillage_schedule/c1f2_wheat_2020_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
+    },
+       "Alfalfa 2020 Fertilizer schedule": {
+      "title": "Fertilizer schedule.",
+      "description": "No fertilizer is scheduled to be used.",
+      "path": "input/data/fertilizer_schedule/c1f2_alfalfa_2020_fertilizer_schedule.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
     },
     "Alfalfa 2020 Crop data": {
       "title": "Wheat 2020 Crop data",
