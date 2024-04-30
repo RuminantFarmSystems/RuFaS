@@ -575,7 +575,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
-    mock_input_manager.dump_metadata_properties.return_value = None
+    mock_input_manager.save_metadata_properties.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
@@ -597,7 +597,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_input_manager.dump_metadata_properties.call_count == len(metadata_file_list)
+    assert mock_input_manager.save_metadata_properties.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exclude_info_maps, format_option)
