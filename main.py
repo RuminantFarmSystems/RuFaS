@@ -159,7 +159,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if audit_input_data:
-        run_validation(metadata_files, exclude_info_maps, format_option, output_dir)
+        run_audit(metadata_files, exclude_info_maps, format_option, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -229,13 +229,13 @@ def run_load_vars_pool(
     output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
-def run_validation(
+def run_audit(
     metadata_files: List[Path],
     exclude_info_maps: bool,
     format_option: str,
     output_dir: Path,
 ) -> None:
-    """Instantiates I/O Managers and triggers validation of input data.
+    """Instantiates I/O Managers and triggers audit of input data.
 
     Parameters
     ----------
@@ -250,34 +250,34 @@ def run_validation(
     """
     info_map = {
         "class": "No caller class",
-        "function": run_validation.__name__,
+        "function": run_audit.__name__,
     }
     output_manager = OutputManager()
     input_manager = InputManager()
     output_manager.add_log(
-        "Validation only",
-        "***Only validating data, no simulation will follow.***",
+        "Input Data Audit only",
+        "***Only auditing input data, no simulation will follow.***",
         info_map,
     )
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
         output_manager.add_log(
-            "Validation start",
-            f"Validating data for {str(metadata_file['path'])}...\n",
+            "Audit start",
+            f"Auditing data for {str(metadata_file['path'])}...\n",
             info_map,
         )
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
-            output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
+            output_manager.add_log("Audit validation result", "Data is valid.\n\n", info_map)
         else:
             output_manager.add_warning(
-                "Validation",
+                "Audit validation result",
                 f"Data not valid for {metadata_file['path']}.\n\n",
                 info_map,
             )
         output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
-        input_manager.dump_metadata_properties(output_dir)
+        input_manager.save_metadata_properties(output_dir)
 
 
 def set_random_seed(input_manager: InputManager) -> None:

@@ -16,7 +16,7 @@ from main import (
     parse_gnu_args,
     run_load_vars_pool,
     run_rufas,
-    run_validation,
+    run_audit,
     METADATA_PATHS,
     initialize_herd,
     set_random_seed,
@@ -496,7 +496,7 @@ def test_run_rufas(
     # Arrange
     metadata_file_list = METADATA_PATHS
     patch_execute_simulations = mocker.patch("main.execute_simulations")
-    patch_run_validation = mocker.patch("main.run_validation")
+    patch_run_audit = mocker.patch("main.run_audit")
     patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.clear_output_dir.return_value = None
@@ -540,7 +540,7 @@ def test_run_rufas(
         )
         return
     elif audit_input_data:
-        patch_run_validation.assert_called_once_with(
+        patch_run_audit.assert_called_once_with(
             metadata_file_list,
             exclude_info_maps,
             format_option,
@@ -569,13 +569,13 @@ def test_run_rufas(
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
-def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
-    """Checks that run_validation() calls the correct functions in the correct order"""
+def test_run_audit(mocker: MockerFixture, is_data_valid: bool) -> None:
+    """Checks that run_audit() calls the correct functions in the correct order"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
-    mock_input_manager.dump_metadata_properties.return_value = None
+    mock_input_manager.save_metadata_properties.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
@@ -593,11 +593,11 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     format_option = "verbose"
     output_dir = Path("output/")
 
-    run_validation(metadata_file_list, exclude_info_maps, format_option, output_dir)
+    run_audit(metadata_file_list, exclude_info_maps, format_option, output_dir)
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_input_manager.dump_metadata_properties.call_count == len(metadata_file_list)
+    assert mock_input_manager.save_metadata_properties.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exclude_info_maps, format_option)
