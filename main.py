@@ -159,7 +159,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if audit_input_data:
-        run_audit(metadata_files, exclude_info_maps, format_option, output_dir)
+        run_input_audit(metadata_files, exclude_info_maps, format_option, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -229,7 +229,7 @@ def run_load_vars_pool(
     output_manager.dump_all_nondata_pools(output_dir, exclude_info_maps, format_option)
 
 
-def run_audit(
+def run_input_audit(
     metadata_files: List[Path],
     exclude_info_maps: bool,
     format_option: str,
@@ -250,7 +250,7 @@ def run_audit(
     """
     info_map = {
         "class": "No caller class",
-        "function": run_audit.__name__,
+        "function": run_input_audit.__name__,
     }
     output_manager = OutputManager()
     input_manager = InputManager()
