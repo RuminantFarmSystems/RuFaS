@@ -4415,7 +4415,7 @@
         },
         "manure_separator": {
           "type": "string",
-          "description": "Name of the manure separator to be used in this scenario. Must match 'name' attribute of the Manure Separator Config to be used."
+          "description": "Name of the manure separator to be used in this scenario. Must match 'name' attribute of the Manure Separator Config to be used unless no separator ('none') is used."
         },
         "manure_separator_after_digestion": {
           "type": "string",
@@ -4512,7 +4512,7 @@
         "manure_separator_type": {
           "type": "string",
           "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-          "pattern": "^(screw press|rotary screen|none)$"
+          "pattern": "^(screw press|rotary screen)$"
         },
         "percent_dry_solids": {
           "type": "number"

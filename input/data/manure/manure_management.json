@@ -250,17 +250,6 @@
       "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
       "phosphorus_removal_efficiency_for_separator": 0.20,
       "potassium_removal_efficiency_for_separator": 0.23
-    },
-    {
-      "name": "none",
-      "manure_separator_type": "none",
-      "percent_dry_solids": 0.35,
-      "total_solids_removal_efficiency_for_separator": 0.25,
-      "volatile_solids_removal_efficiency_for_separator": 0.30,
-      "nitrogen_removal_efficiency_for_separator": 0.30,
-      "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
-      "phosphorus_removal_efficiency_for_separator": 0.20,
-      "potassium_removal_efficiency_for_separator": 0.23
     }
   ],
   "manure_treatment_configs": [
