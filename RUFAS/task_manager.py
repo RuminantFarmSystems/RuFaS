@@ -5,6 +5,8 @@ from enum import Enum
 from pathlib import Path
 import numpy
 import random
+from SALib.sample import ff as fractional_factorial_sampler
+from SALib.sample import saltelli as saltelli_sampler
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -136,13 +138,42 @@ class TaskManager:
         return single_run_args
 
     def _expand_sensitivity_analysis_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+        SA_input_variables: List[Dict[str, float | str]] = multi_run_args["SA_input_variables"]
+        names: List[str] = []
+        bounds: List[List[float]] = []
+        for input_variable in SA_input_variables:
+            names.append(input_variable["variable_name"])
+            bounds.append([input_variable["lower_bound"], input_variable["upper_bound"]])
+        variables_count = len(names)
+        parsed_SA_input_variables = {
+            "num_vars": variables_count,
+            "names": names,
+            "bounds": bounds,
+            "sample_scaled": True,
+        }
+        if multi_run_args["sampler"] == "fractional_factorial":
+            sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables)
+        elif multi_run_args["sampler"] == "saltelli_sobol":
+            sampled_values = saltelli_sampler.sample(
+                parsed_SA_input_variables,
+                multi_run_args["saltelli_number"],
+                skip_values=multi_run_args["saltelli_skip"],
+            )
+        else:
+            # TODO error to OM
+            pass
+        # TODO niceto have load balancing
+
+        digits = len(str(len(sampled_values)))
         single_run_args = []
-        for i in range(multi_run_args["multi_run_counts"]):
+        for i in range(len(sampled_values)):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-            new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{i+1}"
+            run_number = f"{i+1}".zfill(digits)
+            new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{run_number}"
+            new_args["input_patch"] = {names[j]: sampled_values[i, j] for j in range(variables_count)}
             single_run_args.append(new_args)
+        return single_run_args
 
     def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         pass
@@ -194,6 +225,8 @@ class TaskManager:
             TaskManager.handle_post_processing(args, input_manager, output_manager)
 
         if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
+            if args["input_patch"]:
+                input_manager.pool.update(args["input_patch"])
             TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
             TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
