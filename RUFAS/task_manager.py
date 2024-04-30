@@ -79,7 +79,7 @@ class TaskManager:
     ) -> None:
         self.output_manager.run_startup_sequence(
             verbosity, exclude_info_maps, output_directory, clear_output_directory, Path(""), "Task Manager"
-        )  # TODO get the correct value for self.output_manager.run_startup_sequence variables_file_path arg
+        )
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
@@ -166,19 +166,30 @@ class TaskManager:
                 skip_values=multi_run_args["saltelli_skip"],
             )
         else:
-            # TODO error to OM
-            pass
-        # TODO niceto have load balancing
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager.task.__name__,
+                "units": MeasurementUnits.UNITLESS,
+                "output_prefix": multi_run_args["output_prefix"],
+            }
+            self.output_manager.add_log(
+                "Invalid sampler", f"The sampler {multi_run_args['sampler']} is not supported", info_map
+            )
+
+        single_run_args = []
 
         digits = len(str(len(sampled_values)))
-        single_run_args = []
-        for i in range(len(sampled_values)):
+        start = int(multi_run_args["SA_load_balancing_start"] * len(sampled_values))
+        stop = int(multi_run_args["SA_load_balancing_stop"] * len(sampled_values))
+
+        for i in range(start, stop):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
             run_number = f"{i+1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{run_number}"
             new_args["input_patch"] = {names[j]: sampled_values[i, j] for j in range(variables_count)}
             single_run_args.append(new_args)
+
         return single_run_args
 
     def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -240,9 +251,7 @@ class TaskManager:
             TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
 
     @staticmethod
-    def handle_herd_initializaition(
-        args: Dict[str, Any], output_manager: OutputManager
-    ) -> None:
+    def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_herd_initializaition.__name__,
