@@ -4415,13 +4415,11 @@
         },
         "manure_separator": {
           "type": "string",
-          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-          "pattern": "^(screw press|rotary screen|none)$"
+          "description": "Name of the manure separator to be used in this scenario. Must match 'name' attribute of the Manure Separator Config to be used."
         },
         "manure_separator_after_digestion": {
           "type": "string",
-          "description": "Manure Separator Type After Digestion -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand after digestion",
-          "pattern": "^(screw press|rotary screen|none)$"
+          "description": "Name of the manure separator to be used after digestion in this scenario. Must match 'name' attribute of the Manure Separator Config to be used."
         },
         "manure_treatment": {
           "type": "string",
@@ -4507,6 +4505,10 @@
       "type": "array",
       "properties": {
         "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Name of the unique manure separator config."
+        },
         "manure_separator_type": {
           "type": "string",
           "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
