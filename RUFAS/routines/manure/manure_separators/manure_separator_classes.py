@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Dict
-from typing import Optional
 from typing import Type
 
-from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
     ManureSeparatorDailyOutput,
 )
@@ -14,7 +13,7 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 )
 
 
-class ManureSeparatorType(DefaultEnum):
+class ManureSeparatorType(Enum):
     """Enumerates the different types of manure separators.
 
     Attributes
@@ -36,11 +35,6 @@ class ManureSeparatorType(DefaultEnum):
     SAND_LANE_MANURE_SEPARATION : str
         The sand lane method of sand-manure separation.
 
-    Notes
-    -----
-    The default organic separator is ROTARY_SCREEN.
-    The default sand lane separation method is SAND_LANE_MANURE_SEPARATION.
-
     """
 
     ROTARY_SCREEN = "rotary screen"
@@ -49,37 +43,24 @@ class ManureSeparatorType(DefaultEnum):
     DECANTING_CENTRIFUGE = "decanting centrifuge"
     MOVING_DISC_PRESS = "moving disc press"
     SLOPE_SCREEN = "slope screen"
-
     MECHANICAL_SAND_SEPARATOR = "mechanical sand separator"
     SAND_LANE_MANURE_SEPARATION = "sand lane manure separation"
-
-    DEFAULT_ORGANIC = ROTARY_SCREEN
-    DEFAULT_SAND = SAND_LANE_MANURE_SEPARATION
-
-    @classmethod
-    def get_default_type(cls, bedding_type="ORGANIC") -> DefaultEnum:
-        """Returns the default manure separator type for the given bedding type."""
-        if bedding_type == "ORGANIC":
-            return cls.DEFAULT_ORGANIC
-        return cls.DEFAULT_SAND
 
 
 class BaseManureSeparator:
     """Base class for all manure separators.
 
-    Attributes:
-        config: ManureSeparatorConfig object containing the configuration for the manure separator.
+    Attributes
+    ----------
+    name : str
+        The unique name for the separator configuration used in this separator.
+    config : ManureSeparatorConfig
+        The configuration for the manure separator.
 
     """
 
-    def __init__(self, manure_separator_config: ManureSeparatorConfig) -> None:
-        """Initializes the manure separator.
-
-        Args:
-            manure_separator_config: ManureSeparatorConfig object containing the
-                configuration for the manure separator.
-
-        """
+    def __init__(self, name: str, manure_separator_config: ManureSeparatorConfig) -> None:
+        self.name = name
         self.config = manure_separator_config
 
     def daily_update(self, manure_separator_daily_input: LiquidManurePortionProtocol) -> ManureSeparatorDailyOutput:
@@ -275,18 +256,28 @@ class MechanicalSandSeparator(BaseManureSeparator):
 class ManureSeparatorConfig:
     """Class for storing manure separator configuration data.
 
-    Attributes:
-        percent_dry_solids: Percent dry content in manure solids.
-        total_solids_removal_efficiency_for_separator: Percent of total solids removed from manure.
-        volatile_solids_removal_efficiency_for_separator: Percent of volatile solids removed from manure.
-        nitrogen_removal_efficiency_for_separator: Percent of nitrogen removed from manure.
-        total_ammoniacal_nitrogen_removal_efficiency_for_separator: Percent of total ammonia nitrogen removed from
-        manure.
-        phosphorus_removal_efficiency_for_separator: Percent of phosphorus removed from manure.
-        potassium_removal_efficiency_for_separator: Percent of potassium removed from manure.
+    Attributes
+    ----------
+    manure_separator_type : ManureSeparatorType
+        The type of manure separator that will be created with this configuration.
+    percent_dry_solids : float, default 1.0
+        Percent dry content in manure solids.
+    total_solids_removal_efficiency_for_separator : float, default 0.0
+        Percent of total solids removed from manure.
+    volatile_solids_removal_efficiency_for_separator : float, default 0.0
+        Percent of volatile solids removed from manure.
+    nitrogen_removal_efficiency_for_separator : float, default 0.0
+        Percent of nitrogen removed from manure.
+    total_ammoniacal_nitrogen_removal_efficiency_for_separator : float, default 0.0
+        Percent of total ammonia nitrogen removed from manure.
+    phosphorus_removal_efficiency_for_separator : float, default 0.0
+        Percent of phosphorus removed from manure.
+    potassium_removal_efficiency_for_separator : float, default 0.0
+        Percent of potassium removed from manure.
 
     """
 
+    manure_separator_type: ManureSeparatorType
     percent_dry_solids: float = 1.0
     total_solids_removal_efficiency_for_separator: float = 0.0
     volatile_solids_removal_efficiency_for_separator: float = 0.0
@@ -296,64 +287,27 @@ class ManureSeparatorConfig:
     potassium_removal_efficiency_for_separator: float = 0.0
 
 
-class DefaultManureSeparatorConfigFactory:
-    """Class for creating default manure separator configuration data."""
-
-    ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
-        percent_dry_solids=0.2,
-        total_solids_removal_efficiency_for_separator=0.35,
-        volatile_solids_removal_efficiency_for_separator=0.40,
-        nitrogen_removal_efficiency_for_separator=0.3,
-        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,
-        phosphorus_removal_efficiency_for_separator=0.4,
-        potassium_removal_efficiency_for_separator=0.15,
-    )
-    SCREW_PRESS_CONFIG = ManureSeparatorConfig(
-        percent_dry_solids=0.35,
-        total_solids_removal_efficiency_for_separator=0.25,
-        volatile_solids_removal_efficiency_for_separator=0.30,
-        nitrogen_removal_efficiency_for_separator=0.3,
-        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,
-        phosphorus_removal_efficiency_for_separator=0.2,
-        potassium_removal_efficiency_for_separator=0.23,
-    )
-
-    @classmethod
-    def get_instance(cls, manure_separator_type: ManureSeparatorType) -> ManureSeparatorConfig:
-        """Return a default manure separator configuration data instance for the given separator type.
-
-        Args:
-            manure_separator_type: The type of manure separator.
-
-        Returns:
-            A default ManureSeparatorConfig object for the given manure separator type.
-
-        """
-
-        manure_separator_config_by_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {
-            ManureSeparatorType.ROTARY_SCREEN: cls.ROTARY_SCREEN_CONFIG,
-            ManureSeparatorType.SCREW_PRESS: cls.SCREW_PRESS_CONFIG,
-        }
-        return manure_separator_config_by_type.get(manure_separator_type, ManureSeparatorConfig())
-
-
 class ManureSeparatorFactory:
     """A class that contains the logic for creating different types of manure separators."""
 
     @classmethod
     def get_instance(
         cls,
-        manure_separator_type_name: str,
-        custom_manure_separator_config: Optional[ManureSeparatorConfig] = None,
+        configuration_name: str,
+        manure_separator_config: ManureSeparatorConfig,
     ) -> BaseManureSeparator:
         """Return an instance of a specific subtype of BaseManureSeparator.
 
-        Args:
-            manure_separator_type_name: The name of the manure separator type.
-            custom_manure_separator_config: A ManureSeparatorConfig object for
-                a custom manure separator.
+        Parameters
+        ----------
+        configuration_name : str
+            The name of the manure separator type.
+        manure_separator_config : ManureSeparatorConfig
+            A manure separator config to be used to manufacture the separator.
 
-        Returns:
+        Returns
+        -------
+        BaseManureSeparator
             An instance of a specific subtype of BaseManureSeparator.
 
         """
@@ -368,11 +322,6 @@ class ManureSeparatorFactory:
             ManureSeparatorType.SAND_LANE_MANURE_SEPARATION: SandLaneSystem,
         }
 
-        manure_separator_type = ManureSeparatorType.get_type(manure_separator_type_name)
-        manure_separator_class = manure_separator_class_by_type[manure_separator_type]
+        manure_separator_class = manure_separator_class_by_type[manure_separator_config.manure_separator_type]
 
-        if custom_manure_separator_config:
-            return manure_separator_class(custom_manure_separator_config)
-        else:
-            default_manure_separator_config = DefaultManureSeparatorConfigFactory.get_instance(manure_separator_type)
-            return manure_separator_class(default_manure_separator_config)
+        return manure_separator_class(configuration_name, manure_separator_config)
