@@ -11,9 +11,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerType,
     ManureHandlerConfig,
 )
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    ManureSeparatorType, ManureSeparatorConfig
-)
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorType, ManureSeparatorConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
@@ -579,7 +577,7 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
         ("screw press", ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS)),
         ("rotary screen", ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.ROTARY_SCREEN)),
         ("none", None),
-    ]
+    ],
 )
 def test_get_manure_separator_config(mocker: MockerFixture, name: str, expected: ManureSeparatorConfig | None) -> None:
     """Unit test for _get_manure_separator_config() in manure_manager_config_handler.py."""
