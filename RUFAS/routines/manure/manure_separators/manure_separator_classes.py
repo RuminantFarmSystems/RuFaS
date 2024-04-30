@@ -53,20 +53,13 @@ class BaseManureSeparator:
     Attributes
     ----------
     name : str
-        The unique name for this separator configuration.
+        The unique name for the separator configuration used in this separator.
     config : ManureSeparatorConfig
         The configuration for the manure separator.
 
     """
 
     def __init__(self, name: str, manure_separator_config: ManureSeparatorConfig) -> None:
-        """Initializes the manure separator.
-
-        Args:
-            manure_separator_config: ManureSeparatorConfig object containing the
-                configuration for the manure separator.
-
-        """
         self.name = name
         self.config = manure_separator_config
 

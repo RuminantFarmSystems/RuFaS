@@ -110,14 +110,13 @@ class ManureManagerConfigHandler:
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
 
-    def get_manure_separator_config(self, manure_separator_type_name: str) -> Optional[ManureSeparatorConfig]:
+    def get_manure_separator_config(self, manure_separator_name: str) -> Optional[ManureSeparatorConfig]:
         """
-        Returns the manure separator config for the given manure separator type name, or None if no separation is to
-        occur.
+        Returns the config for the given manure separator name, or None if no separation is to occur.
 
         Parameters
         ----------
-        manure_separator_type_name : str
+        manure_separator_name : str
             The name of the manure separator type for which to get the config.
 
         Returns
@@ -132,17 +131,14 @@ class ManureManagerConfigHandler:
             If the specified manure separator config is not present and is not "none".
 
         """
-        if manure_separator_type_name == "none":
+        if manure_separator_name == "none":
             return None
         try:
-            return self.manure_separator_configs[manure_separator_type_name]
+            return self.manure_separator_configs[manure_separator_name]
         except KeyError:
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self.get_manure_separator_config.__name__,
-            }
+            info_map = {"class": self.__class__.__name__, "function": self.get_manure_separator_config.__name__}
             error_title = (
-                f"Attempted to use a non-existent manure separator configuration called '{manure_separator_type_name}'."
+                f"Attempted to use a non-existent manure separator configuration called '{manure_separator_name}'."
             )
             error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
