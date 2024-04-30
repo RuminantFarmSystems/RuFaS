@@ -103,6 +103,44 @@
           "minimum": 0,
           "maximum": 100,
           "default": 4
+        },
+        "sampler": {
+          "type": "string",
+          "description": "The sampler for Sensitivity Analysis",
+          "pattern": "fractional_factorial|saltelli_sobol",
+          "default": "saltelli_sobol"
+        },
+        "saltelli_skip":{
+          "type":"number",
+          "description": "The saltelli skip value for Sensitivity Analysis",
+          "minimum":0,
+          "default":0
+        },
+        "saltelli_number":{
+          "type":"number",
+          "description": "The saltelli sampling value for Sensitivity Analysis",
+          "minimum":2,
+          "default":2
+        },
+        "SA_input_variables":
+        {
+          "type":"array",
+          "description":"The input variables to perform Sensitivity Analysis on",
+          "properties":{
+              "type":"object",
+              "variable_name":{
+                "type":"string",
+                "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
+              },              
+              "lower_bound":{
+                "type":"number",
+                "description":"The lower bound for sampling"
+              },
+              "upper_bound":{
+                "type":"number",
+                "description":"The upper bound for sampling"
+              }
+          }
         }
       }
     }
