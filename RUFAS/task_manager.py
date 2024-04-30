@@ -119,25 +119,26 @@ class TaskManager:
             TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
-            expanded_args += task_type_to_expander_map["task_type"](multi_run_arg)
+            task_type = multi_run_arg["task_type"]
+            expanded_args += task_type_to_expander_map[task_type](multi_run_arg)
 
         return expanded_args
 
-    def _expand_simulation_multi_run_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]: #TODO Test
+    def _expand_simulation_multi_run_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         single_run_args = []
-        for args in multi_run_args:
-            for _ in range(args["multi_run_counts"]):
-                new_args = args.copy()
-                new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-                new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-                single_run_args.append(new_args)
+        for i in range(multi_run_args["multi_run_counts"]):
+            new_args = multi_run_args.copy()
+            new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
+            new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
+            new_args["output_prefix"] = f"{new_args['output_prefix']}_run_{i+1}"
+            single_run_args.append(new_args)
 
         return single_run_args
 
-    def _expand_sensitivity_analysis_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _expand_sensitivity_analysis_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         pass
 
-    def _expand_end_to_end_testing_args(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         pass
 
     def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:

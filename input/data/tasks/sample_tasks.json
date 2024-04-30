@@ -22,12 +22,14 @@
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "Task 3",
-      "log_verbosity": "logs"
+      "log_verbosity": "logs",
+      "random_seed": 42
     },
     {
-      "task_type": "SENSITIVITY_ANALYSIS",
+      "task_type": "SIMULATION_MULTI_RUN",
       "output_prefix": "Task 4",
-      "log_verbosity": "logs"
+      "log_verbosity": "logs",
+      "random_seed": 42
     }
   ]
 }
