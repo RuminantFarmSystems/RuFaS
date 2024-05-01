@@ -16,6 +16,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
+RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -82,7 +83,14 @@ class TaskManager:
             Whether to produce graphics.
         """
         self.output_manager.run_startup_sequence(
-            verbosity, exclude_info_maps, output_directory, clear_output_directory, Path(""), "Task Manager"
+            verbosity,
+            exclude_info_maps,
+            output_directory,
+            clear_output_directory,
+            Path(""),
+            "Task Manager",
+            RUFAS_VERSION,
+            "TASK MANAGER",
         )
         info_map = {
             "class": TaskManager.__name__,
@@ -100,6 +108,7 @@ class TaskManager:
                 },
                 self.input_manager,
                 self.output_manager,
+                "TASK_MANAGER",
             )
             raise Exception("Task Manager's input data is invalid.")
         workers: int = self.input_manager.get_data("tasks.parallel_workers")
@@ -122,6 +131,8 @@ class TaskManager:
             f"Expanded task args to {len(runnable_args)}. Starting the tasks...",
             info_map,
         )
+        for i in range(len(runnable_args)):
+            runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics)
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -256,7 +267,7 @@ class TaskManager:
     def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(self.task, produce_graphics=produce_graphics)
-        results = self.pool.imap_unordered(task_with_args, single_run_args)
+        results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
 
@@ -268,6 +279,7 @@ class TaskManager:
             "function": TaskManager.task.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
+        task_id = args["task_id"]
         output_manager = OutputManager()
         try:
             output_manager.run_startup_sequence(
@@ -277,11 +289,13 @@ class TaskManager:
                 False,
                 Path(""),
                 args["output_prefix"],
+                RUFAS_VERSION,
+                task_id,
             )
             input_manager = InputManager()
             if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
-                TaskManager.handle_post_processing(args, input_manager, output_manager)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
                 return
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
@@ -291,7 +305,7 @@ class TaskManager:
                     f"Data not valid for {args['output_prefix']}, task not run",
                     info_map,
                 )
-                TaskManager.handle_post_processing(args, input_manager, output_manager)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
                 return
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
@@ -299,16 +313,18 @@ class TaskManager:
             if args["task_type"] == TaskType.HERD_INITIALIZATION:
                 args["init_herd"] = True
                 TaskManager.handle_herd_initializaition(args, output_manager)
-                TaskManager.handle_post_processing(args, input_manager, output_manager)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
             if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
                 if args["input_patch"]:
                     Utility.deep_merge(input_manager.pool, args["input_patch"])
                 TaskManager.handle_single_simulation_run(args, output_manager)
-                TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
             if args["task_type"] == TaskType.POST_PROCESSING:
-                TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True, True)
+                TaskManager.handle_post_processing(
+                    args, input_manager, output_manager, task_id, produce_graphics, True, True
+                )
         except Exception as e:
             info_map.update(args)
             output_manager.add_error(
@@ -380,6 +396,7 @@ class TaskManager:
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
+        task_id: str,
         produce_graphics: bool = False,
         save_results: bool = False,
         load_pool_from_file: bool = False,
@@ -395,6 +412,8 @@ class TaskManager:
             Manager to handle input processing.
         output_manager : OutputManager
             Manager to handle output logging and errors.
+        task_id: str
+            The ID that Task Manager has assigned to this task.
         produce_graphics : bool
             Whether to produce graphics during post-processing.
         save_results : bool
@@ -415,7 +434,7 @@ class TaskManager:
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
 
-        output_manager.print_errors_warnings_logs_counts()
+        output_manager.print_errors_warnings_logs_counts(task_id)
 
         if save_results:
             output_manager.save_results(
