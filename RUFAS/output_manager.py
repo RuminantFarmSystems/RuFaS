@@ -1240,13 +1240,13 @@ class OutputManager(object):
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_filtered_variables_counts(self, path: str) -> None:
+    def dump_filtered_variables_counts(self, path: Path) -> None:
         """
         Dumps the data about filtered variable counts to a JSON file in the given path to a directory.
 
         Parameters
         ----------
-        path : str
+        path : Path
             The path to the directory where the file will be saved.
         """
 
