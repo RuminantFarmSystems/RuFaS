@@ -162,6 +162,8 @@ class Weather:
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
+        if time.simulation_day == 1000:
+            self.get_conditions_series(time, -10, 0)
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(day, time.calendar_year)

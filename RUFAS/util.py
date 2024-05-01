@@ -500,3 +500,7 @@ class Utility:
         time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
 
         return time_series
+
+    @staticmethod
+    def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
