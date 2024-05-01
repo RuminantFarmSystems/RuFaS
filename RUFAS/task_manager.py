@@ -294,7 +294,7 @@ class TaskManager:
 
             if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
                 if args["input_patch"]:
-                    input_manager.pool.update(args["input_patch"])
+                    Utility.deep_merge(input_manager.pool, args["input_patch"])
                 TaskManager.handle_single_simulation_run(args, output_manager)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
