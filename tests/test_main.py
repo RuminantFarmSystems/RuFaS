@@ -1,11 +1,12 @@
 import argparse
+from pathlib import Path
 import sys
 import pytest
-from mock import ANY, patch
+from mock import patch
 from pytest_mock import MockerFixture
 
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
-
+from RUFAS.output_manager import LogVerbosity
 
 @pytest.fixture
 def mock_task_manager():
@@ -24,10 +25,10 @@ def test_main_success(mock_task_manager, monkeypatch):
     main()
 
     mock_instance.start.assert_called_once_with(
-        "input/metadata/task_manager_metadata.json",
-        verbosity=ANY,
+        Path("input/metadata/task_manager_metadata.json"),
+        verbosity=LogVerbosity.ERRORS,
         exclude_info_maps=False,
-        output_directory=ANY,
+        output_directory=Path("output"),
         clear_output_directory=False,
         produce_graphics=True,
     )
