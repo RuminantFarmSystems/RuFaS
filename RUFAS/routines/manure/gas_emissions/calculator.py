@@ -298,8 +298,8 @@ class GasEmissionsCalculator:
         urine_total_ammoniacal_nitrogen: float,
         urine: float,
         temp: float,
-        pH : float = GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
-        housing_specific_constant : float = GasEmissionConstants.HOUSING_HSC,
+        pH: float = GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+        housing_specific_constant: float = GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """
         Calculate housing ammonia emission.
@@ -456,7 +456,7 @@ class GasEmissionsCalculator:
         manure_density: float,
         temp: float,
         storage_area_per_animal: float = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
-        pH : float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
+        pH: float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
     ) -> float:
         """
         Calculate storage ammonia emissions for manure treatments.
