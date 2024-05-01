@@ -37,6 +37,32 @@ class Utility:
         return result
 
     @staticmethod
+    def convert_flat_dict_to_nested_dict(flat_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert a flat dictionary with dot-separated keys into a nested dictionary structure.
+
+        Parameters
+        ----------
+        flat_dict : Dict[str, Any]
+            A dictionary with string keys that include dots to signify nested levels.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A nested dictionary where the structure is determined by splitting the keys on dots.
+        """
+        nested_dict = {}
+        for flat_key, value in flat_dict.items():
+            keys = flat_key.split(".")
+            current = nested_dict
+            for key in keys[:-1]:
+                if key not in current:
+                    current[key] = {}
+                current = current[key]
+            current[keys[-1]] = value
+        return nested_dict
+
+    @staticmethod
     def get_base_dir():
         """
         Gets the base directory as reference for all relative paths.

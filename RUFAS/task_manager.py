@@ -1,19 +1,21 @@
-from functools import partial
-from typing import Any, Dict, List, Tuple
-import multiprocessing
-import traceback
 from enum import Enum
-from pathlib import Path
+from functools import partial
+import multiprocessing
 import numpy
+from pathlib import Path
 import random
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
+import traceback
+from typing import Any, Dict, List, Tuple
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-from RUFAS.units import MeasurementUnits
-from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
+from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
+
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -233,6 +235,7 @@ class TaskManager:
             run_number = f"{i+1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
             new_args["input_patch"] = {names[j]: sampled_values[i, j] for j in range(variables_count)}
+            new_args["input_patch"] = Utility.convert_flat_dict_to_nested_dict(new_args["input_patch"])
             single_run_args.append(new_args)
 
         return single_run_args
