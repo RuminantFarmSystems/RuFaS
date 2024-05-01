@@ -98,6 +98,13 @@ class Time:
         else:
             self.day += 1
 
+        curr_date = Utility.convert_ordinal_date_to_month_date(self.calendar_year, self.day)
+        curr_date_2 = self.convert_simulation_day_to_date(self.simulation_day)
+        try:
+            assert curr_date == curr_date_2
+        except AssertionError:
+            print(f"{curr_date} {curr_date_2} {self.calendar_year} {self.day}")
+
     def end_year(self) -> bool:
         """
         Determines if the current day is the last day of the year in the simulation.
@@ -114,7 +121,7 @@ class Time:
         the day is reset to 1 and the year is incremented by 1.
         """
 
-        return self.day > len(self.years[self.year - 1])
+        return self.day == len(self.years[self.year - 1])
 
     def end_simulation(self):
         """
@@ -177,7 +184,8 @@ class Time:
         datetime.date
             The date object that corresponds to the simulation day.
         """
-
+        # import pdb
+        # pdb.set_trace()
         start_year = int(self.start_full_date[0])
         start_day_of_year = int(self.start_full_date[1])
         start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
