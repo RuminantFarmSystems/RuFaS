@@ -288,3 +288,35 @@ def test_generate_time_series_error() -> None:
     """Tests that generate_time_series correctly throws error when given invalid input."""
     with pytest.raises(ValueError, match="greater than ending offset"):
         Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 1)
+
+
+@pytest.mark.parametrize(
+    "year,day,expected",
+    [
+        (2020, 1, datetime.date(2020, 1, 1)),
+        (2020, 60, datetime.date(2020, 2, 29)),
+        (2021, 60, datetime.date(2021, 3, 1)),
+        (2020, 365, datetime.date(2020, 12, 30)),
+        (2020, 366, datetime.date(2020, 12, 31)),
+        (2021, 365, datetime.date(2021, 12, 31)),
+    ]
+)
+def test_convert_ordinal_date_to_month_date(year: int, day: int, expected: datetime.date) -> None:
+    """Tests that convert_ordinal_date_to_month_date correctly converts dates."""
+    actual = Utility.convert_ordinal_date_to_month_date(year, day)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "year,day",
+    [
+        (2020, 0),
+        (2020, 367),
+        (2021, 366),
+    ]
+)
+def test_convert_ordinal_date_to_month_date_error(year: int, day: int) -> None:
+    """Tests that convert_ordinal_date_to_month_date throws an error when given invalid date."""
+    with pytest.raises(ValueError, match="Invalid day"):
+        Utility.convert_ordinal_date_to_month_date(year, day)
