@@ -881,6 +881,9 @@ class GasEmissionsCalculator:
         float
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
+        References
+        ----------
+        .. [1] Open Lots Design Document, V1 eqn. M.1.A.1
         """
         return GasEmissionConstants.MCF_CONSTANT_A * ambient_barn_temp - GasEmissionConstants.MCF_CONSTANT_B
 
