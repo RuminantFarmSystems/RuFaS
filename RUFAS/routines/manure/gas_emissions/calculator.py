@@ -14,7 +14,7 @@ class GasEmissionsCalculator:
         cls,
         accumulated_liquid_manure_total_degradable_volatile_solids: float,
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
-        temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+        temp: float = GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
     ) -> Tuple[float, float]:
         """
         Calculate the methane emission from manure storage using total volatile solids.
@@ -298,8 +298,8 @@ class GasEmissionsCalculator:
         urine_total_ammoniacal_nitrogen: float,
         urine: float,
         temp: float,
-        pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
-        housing_specific_constant=GasEmissionConstants.HOUSING_HSC,
+        pH : float = GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+        housing_specific_constant : float = GasEmissionConstants.HOUSING_HSC,
     ) -> float:
         """
         Calculate housing ammonia emission.
@@ -402,7 +402,7 @@ class GasEmissionsCalculator:
         pH : float, optional
             pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as
                 :attr:`DEFAULT_PH_FOR_HOUSING_AMMONIA` in :class:`GasEmissionConstants`.
-        hsc : float, optional
+        housing_specific_constant : float, optional
             Housing-specific constant (unitless). Default is set to 260 s/m. This value is listed as
                 :attr:`HOUSING_HSC` in :class:`GasEmissionConstants`.
 
@@ -455,8 +455,8 @@ class GasEmissionsCalculator:
         manure_volume: float,
         manure_density: float,
         temp: float,
-        storage_area_per_animal=GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
-        pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
+        storage_area_per_animal: float = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
+        pH : float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
     ) -> float:
         """
         Calculate storage ammonia emissions for manure treatments.
