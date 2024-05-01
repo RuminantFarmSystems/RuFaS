@@ -869,7 +869,7 @@ class GasEmissionsCalculator:
         """
         Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
 
-        MCF(T) = 0.0625 * T - 0.25 
+        MCF(T) = 0.0625 * T - 0.25
 
         Parameters
         ----------
