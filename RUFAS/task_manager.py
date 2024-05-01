@@ -439,7 +439,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Random seed received", f"Received {random_seed} as random seed.", info_map)
-        if random_seed is None:
+        if random_seed == 0 :
             random_seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
 
         random.seed(random_seed)

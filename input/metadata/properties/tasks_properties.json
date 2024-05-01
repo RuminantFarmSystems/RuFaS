@@ -92,10 +92,10 @@
         },
         "random_seed": {
           "type": "number",
-          "description": "The random seed, use null value to auto-generate it",
+          "description": "The random seed, set it to 0 to auto-generate it",
           "minimum": 0,
           "maximum": 4294967295,
-          "default": 42
+          "default": 0
         },
         "multi_run_counts": {
           "type": "number",
