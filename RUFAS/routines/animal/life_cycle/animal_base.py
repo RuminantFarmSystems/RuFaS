@@ -3,6 +3,7 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.input_manager import InputManager
+from RUFAS.general_constants import GeneralConstants
 
 im = InputManager()
 
@@ -102,11 +103,14 @@ class AnimalBase:
         """
         Sets this animal's phosphorus intake.
 
-        Args:
-            p_intake: the phosphorus intake
-            p_conc_ration: the concentration of P in the ration
+        Parameters
+        ----------
+        p_intake : float
+            The phosphorus intake (grams).
+        p_conc_ration : float
+            The concentration of P in the ration (% DM).
         """
-        self.p_intake = p_intake
+        self.p_intake = p_intake * GeneralConstants.KG_TO_GRAMS
         self.p_conc_ration = p_conc_ration
 
     def daily_p_update(self):
