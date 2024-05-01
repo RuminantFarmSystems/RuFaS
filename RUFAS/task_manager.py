@@ -54,7 +54,7 @@ class TaskManager:
 
     def start(
         self,
-        metadata_path: str,
+        metadata_path: Path,
         verbosity: LogVerbosity,
         exclude_info_maps: bool,
         output_directory: Path,
@@ -66,7 +66,7 @@ class TaskManager:
 
         Parameters
         ----------
-        metadata_path : str
+        metadata_path : Path
             Path to the metadata file that contains task management inputs.
         verbosity : LogVerbosity
             Level of verbosity for logging.
@@ -138,6 +138,7 @@ class TaskManager:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
+            input_task["output_directory"] = Path(input_task["output_directory"])
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
             input_task["CSV_directory"] = Path(input_task["CSV_directory"])

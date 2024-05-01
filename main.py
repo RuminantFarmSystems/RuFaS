@@ -20,7 +20,7 @@ def main() -> None:
     try:
         task_manager = TaskManager()
         task_manager.start(
-            "input/metadata/task_manager_metadata.json",
+            Path("input/metadata/task_manager_metadata.json"),
             verbosity=LogVerbosity(cmd_arguments.verbose),
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),

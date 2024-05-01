@@ -5,31 +5,31 @@
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "Task 1",
-      "log_verbosity": "logs"
+      "log_verbosity": "errors"
     },
     {
       "task_type": "INPUT_DATA_AUDITION",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "Task 2",
-      "log_verbosity": "logs"
+      "log_verbosity": "errors"
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "Task 3",
-      "log_verbosity": "logs",
+      "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
       "output_prefix": "Task 4",
-      "log_verbosity": "logs",
+      "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SENSITIVITY_ANALYSIS",
       "output_prefix": "Task 5",
-      "log_verbosity": "logs",
+      "log_verbosity": "errors",
       "sampler": "fractional_factorial",
       "SA_load_balancing_start": 0.5,
       "SA_load_balancing_stop": 0.75,
