@@ -4018,17 +4018,27 @@ def test_validate_input_by_type_value_error() -> None:
         )
 
 
-@pytest.mark.parametrize("metadata, limit, expected_depth, expected_path, should_raise", [
-    ({"properties": {}}, 5, 0, [], False),
-    ({"properties": {"a": 1}}, 1, 1, ['a'], False),
-    ({"properties": {"a": {"b": {"c": {}}}}}, 2, 3, ['a', 'b', 'c'], True),
-    ({"properties": {"a": {"b": {"c": 1}}}}, 3, 3, ['a', 'b', 'c'], False),
-    ({"properties": {"a": [{"b": 1}, {"c": 2}]}}, 3, 3, ['a', 1, 'c'], False),
-    ({"properties": {"a": {"b": 1}}}, 2, 2, ['a', 'b'], False),
-    ({"properties": {"a": {"b": {"c": 1}}}}, 2, 3, ['a', 'b', 'c'], True)
-])
-def test_check_max_depth(mock_input_manager: InputManager, mocker: MockerFixture, metadata: Dict[str, Any],
-                         limit: int, expected_depth: int, expected_path: List[str], should_raise: bool) -> None:
+@pytest.mark.parametrize(
+    "metadata, limit, expected_depth, expected_path, should_raise",
+    [
+        ({"properties": {}}, 5, 0, [], False),
+        ({"properties": {"a": 1}}, 1, 1, ["a"], False),
+        ({"properties": {"a": {"b": {"c": {}}}}}, 2, 3, ["a", "b", "c"], True),
+        ({"properties": {"a": {"b": {"c": 1}}}}, 3, 3, ["a", "b", "c"], False),
+        ({"properties": {"a": [{"b": 1}, {"c": 2}]}}, 3, 3, ["a", 1, "c"], False),
+        ({"properties": {"a": {"b": 1}}}, 2, 2, ["a", "b"], False),
+        ({"properties": {"a": {"b": {"c": 1}}}}, 2, 3, ["a", "b", "c"], True),
+    ],
+)
+def test_check_max_depth(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    metadata: Dict[str, Any],
+    limit: int,
+    expected_depth: int,
+    expected_path: List[str],
+    should_raise: bool,
+) -> None:
     """Tests _check_max_depth() function in InputManager."""
     mock_input_manager.meta_data = metadata
     mock_input_manager.metadata_depth_limit = limit
@@ -4044,10 +4054,16 @@ def test_check_max_depth(mock_input_manager: InputManager, mocker: MockerFixture
         mock_input_manager._check_max_depth()
         mock_add_log.assert_called()
         assert mock_add_log.call_args_list == [
-            call("Metadata properties depth", f"Max depth of metadata properties is {expected_depth}",
-                 {'class': 'InputManager', 'function': '_check_max_depth'}),
-            call("Metadata properties path", f"Deepest path of metadata properties is {expected_path}",
-                 {'class': 'InputManager', 'function': '_check_max_depth'})
+            call(
+                "Metadata properties depth",
+                f"Max depth of metadata properties is {expected_depth}",
+                {"class": "InputManager", "function": "_check_max_depth"},
+            ),
+            call(
+                "Metadata properties path",
+                f"Deepest path of metadata properties is {expected_path}",
+                {"class": "InputManager", "function": "_check_max_depth"},
+            ),
         ]
 
 

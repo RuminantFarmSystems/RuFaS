@@ -2064,12 +2064,14 @@ class InputManager:
             current_obj, depth, path = stack.pop()
 
             if depth > self.metadata_depth_limit:
-                om.add_error("Max metadata depth exceeded.",
-                             "Metadata depth exceeds maximum allowed depth of "
-                             f"{self.metadata_depth_limit} at path {path}",
-                             info_map)
-                raise ValueError("Metadata depth exceeds maximum allowed depth of "
-                                 f"{self.metadata_depth_limit} at path {path}")
+                om.add_error(
+                    "Max metadata depth exceeded.",
+                    "Metadata depth exceeds maximum allowed depth of " f"{self.metadata_depth_limit} at path {path}",
+                    info_map,
+                )
+                raise ValueError(
+                    "Metadata depth exceeds maximum allowed depth of " f"{self.metadata_depth_limit} at path {path}"
+                )
 
             if depth > max_depth:
                 max_depth = depth
