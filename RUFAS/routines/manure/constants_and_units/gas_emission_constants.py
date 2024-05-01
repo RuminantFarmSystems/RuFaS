@@ -79,13 +79,13 @@ class GasEmissionConstants:
     MCF_CONSTANT_A: float = 0.0625
     """
     Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-    Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature. 
+    Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
     """
 
     MCF_CONSTANT_B: float = 0.25
     """
     Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-    Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.  
+    Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
     """
 
     MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
