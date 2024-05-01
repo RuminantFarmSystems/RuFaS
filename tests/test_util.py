@@ -279,20 +279,20 @@ def test_filter_dictionary(
             datetime.date(2024, 3, 1),
             -2,
             0,
-            [datetime.date(2024, 2, 28), datetime.date(2024, 2, 29), datetime.date(2024, 3, 1)]
+            [datetime.date(2024, 2, 28), datetime.date(2024, 2, 29), datetime.date(2024, 3, 1)],
         ),
         (
             datetime.date(2024, 2, 28),
             0,
             2,
-            [datetime.date(2024, 2, 28), datetime.date(2024, 2, 29), datetime.date(2024, 3, 1)]
+            [datetime.date(2024, 2, 28), datetime.date(2024, 2, 29), datetime.date(2024, 3, 1)],
         ),
         (
             datetime.date(2023, 2, 28),
             0,
             2,
-            [datetime.date(2023, 2, 28), datetime.date(2023, 3, 1), datetime.date(2023, 3, 2)]
-        )
+            [datetime.date(2023, 2, 28), datetime.date(2023, 3, 1), datetime.date(2023, 3, 2)],
+        ),
     ],
 )
 def test_generate_time_series(date: datetime.date, start: int, end: int, expected: list[datetime.date]) -> None:
