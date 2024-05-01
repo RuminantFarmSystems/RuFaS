@@ -299,7 +299,7 @@ def test_generate_time_series_error() -> None:
         (2020, 365, datetime.date(2020, 12, 30)),
         (2020, 366, datetime.date(2020, 12, 31)),
         (2021, 365, datetime.date(2021, 12, 31)),
-    ]
+    ],
 )
 def test_convert_ordinal_date_to_month_date(year: int, day: int, expected: datetime.date) -> None:
     """Tests that convert_ordinal_date_to_month_date correctly converts dates."""
@@ -308,14 +308,7 @@ def test_convert_ordinal_date_to_month_date(year: int, day: int, expected: datet
     assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "year,day",
-    [
-        (2020, 0),
-        (2020, 367),
-        (2021, 366),
-    ]
-)
+@pytest.mark.parametrize("year,day", [(2020, 0), (2020, 367), (2021, 366)])
 def test_convert_ordinal_date_to_month_date_error(year: int, day: int) -> None:
     """Tests that convert_ordinal_date_to_month_date throws an error when given invalid date."""
     with pytest.raises(ValueError, match="Invalid day"):
