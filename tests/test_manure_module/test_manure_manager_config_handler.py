@@ -11,9 +11,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerType,
     ManureHandlerConfig,
 )
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    ManureSeparatorType,
-)
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorType, ManureSeparatorConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
@@ -200,8 +198,9 @@ def test_process_manure_handler_configs(mocker: MockerFixture) -> None:
 def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
     """Unit test for the _process_manure_separator_configs() method in manure_manager_config_handler.py."""
     # Arrange
-    manure_separator_json_configs = [
+    manure_separator_configs = [
         {
+            "name": "screener",
             "manure_separator_type": "rotary screen",
             "percent_dry_solids": 0.20,
             "total_solids_removal_efficiency_for_separator": 0.35,
@@ -212,6 +211,7 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
             "potassium_removal_efficiency_for_separator": 0.15,
         },
         {
+            "name": "presser",
             "manure_separator_type": "screw press",
             "percent_dry_solids": 0.35,
             "total_solids_removal_efficiency_for_separator": 0.25,
@@ -223,14 +223,6 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
         },
     ]
 
-    patch_for_manure_separator_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureSeparatorType.get_type",
-        side_effect=[
-            ManureSeparatorType.ROTARY_SCREEN,
-            ManureSeparatorType.SCREW_PRESS,
-        ],
-    )
-
     patch_for_manure_separator_config_init = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureSeparatorConfig.__init__",
         return_value=None,
@@ -238,19 +230,15 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
 
     # Act
     actual_manure_separator_configs = ManureManagerConfigHandler._process_manure_separator_configs(
-        manure_separator_json_configs
+        manure_separator_configs
     )
 
     # Assert
     assert len(actual_manure_separator_configs) == 2
-    assert patch_for_manure_separator_type_get_type.call_count == 2
-    assert patch_for_manure_separator_type_get_type.call_args_list == [
-        mocker.call("rotary screen"),
-        mocker.call("screw press"),
-    ]
     assert patch_for_manure_separator_config_init.call_count == 2
     assert patch_for_manure_separator_config_init.call_args_list == [
         mocker.call(
+            manure_separator_type=ManureSeparatorType.ROTARY_SCREEN,
             percent_dry_solids=0.20,
             total_solids_removal_efficiency_for_separator=0.35,
             volatile_solids_removal_efficiency_for_separator=0.40,
@@ -260,6 +248,7 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
             potassium_removal_efficiency_for_separator=0.15,
         ),
         mocker.call(
+            manure_separator_type=ManureSeparatorType.SCREW_PRESS,
             percent_dry_solids=0.35,
             total_solids_removal_efficiency_for_separator=0.25,
             volatile_solids_removal_efficiency_for_separator=0.30,
@@ -269,8 +258,39 @@ def test_process_manure_separator_configs(mocker: MockerFixture) -> None:
             potassium_removal_efficiency_for_separator=0.23,
         ),
     ]
-    assert ManureSeparatorType.ROTARY_SCREEN in actual_manure_separator_configs
-    assert ManureSeparatorType.SCREW_PRESS in actual_manure_separator_configs
+    assert "screener" in actual_manure_separator_configs
+    assert "presser" in actual_manure_separator_configs
+
+
+def test_process_manure_separator_configs_error(mocker: MockerFixture) -> None:
+    """Unit test to check _process_manure_separator_configs() method raises error on invalid input correctly."""
+    manure_separator_configs = [
+        {
+            "name": "screener",
+            "manure_separator_type": "rotary screen",
+            "percent_dry_solids": 0.20,
+            "total_solids_removal_efficiency_for_separator": 0.35,
+            "volatile_solids_removal_efficiency_for_separator": 0.40,
+            "nitrogen_removal_efficiency_for_separator": 0.30,
+            "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.15,
+            "phosphorus_removal_efficiency_for_separator": 0.40,
+            "potassium_removal_efficiency_for_separator": 0.15,
+        },
+        {
+            "name": "screener",
+            "manure_separator_type": "screw press",
+            "percent_dry_solids": 0.35,
+            "total_solids_removal_efficiency_for_separator": 0.25,
+            "volatile_solids_removal_efficiency_for_separator": 0.30,
+            "nitrogen_removal_efficiency_for_separator": 0.30,
+            "total_ammoniacal_nitrogen_removal_efficiency_for_separator": 0.10,
+            "phosphorus_removal_efficiency_for_separator": 0.20,
+            "potassium_removal_efficiency_for_separator": 0.23,
+        },
+    ]
+
+    with pytest.raises(ValueError, match="Duplicate configurations"):
+        ManureManagerConfigHandler._process_manure_separator_configs(manure_separator_configs)
 
 
 def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
@@ -551,72 +571,47 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     mock_add_error.assert_called_once_with(expected_title, expected_message, expected_info_map)
 
 
-def test_get_custom_manure_separator_config(mocker: MockerFixture) -> None:
-    """Unit test for _get_custom_manure_separator_config() in manure_manager_config_handler.py."""
-    # Case 1: Custom manure separator config is provided
-
-    # Arrange
-    mock_manure_separator_type_name = "default"
-    mock_manure_separator_type = ManureSeparatorType.DEFAULT_ORGANIC
-    patch_for_manure_separator_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureSeparatorType.get_type",
-        return_value=mock_manure_separator_type,
-    )
-    mock_manure_manager_config = mocker.MagicMock()
-    patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        ("screw press", ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS)),
+        ("rotary screen", ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.ROTARY_SCREEN)),
+        ("none", None),
+    ],
+)
+def test_get_manure_separator_config(mocker: MockerFixture, name: str, expected: ManureSeparatorConfig | None) -> None:
+    """Unit test for _get_manure_separator_config() in manure_manager_config_handler.py."""
+    configs = {
+        "screw press": ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS),
+        "rotary screen": ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.ROTARY_SCREEN),
+    }
+    mocker.patch(
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
         return_value=None,
     )
+    handler = ManureManagerConfigHandler()
+    handler.manure_separator_configs = configs
 
-    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
+    actual = handler.get_manure_separator_config(name)
 
-    mock_manure_separator_config = mocker.MagicMock()
-    mock_custom_separator_configs = {mock_manure_separator_type: mock_manure_separator_config}
-    manure_manager_config_handler.custom_manure_separator_configs = mock_custom_separator_configs
+    assert actual == expected
 
-    # Act
-    actual_manure_separator_config = manure_manager_config_handler.get_custom_manure_separator_config(
-        manure_separator_type_name=mock_manure_separator_type_name
-    )
 
-    # Assert
-    patch_for_manure_manager_config_handler_init.assert_called_once_with(
-        manure_manager_config=mock_manure_manager_config
-    )
-    patch_for_manure_separator_type_get_type.assert_called_once_with(mock_manure_separator_type_name)
-    assert actual_manure_separator_config == mock_manure_separator_config
-
-    # --------------------
-
-    # Case 2: There is no custom separator config
-
-    mock_manure_separator_type_name = "default"
-    mock_manure_separator_type = ManureSeparatorType.DEFAULT_SAND
-    patch_for_manure_separator_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureSeparatorType.get_type",
-        return_value=mock_manure_separator_type,
-    )
-    mock_manure_manager_config = mocker.MagicMock()
-    patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
+def test_get_manure_separator_config_error(mocker: MockerFixture) -> None:
+    """Unit test for _get_manure_separator_config() raising errors in manure_manager_config_handler.py."""
+    configs = {
+        "screw press": ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS),
+        "rotary screen": ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.ROTARY_SCREEN),
+    }
+    mocker.patch(
+        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
         return_value=None,
     )
+    handler = ManureManagerConfigHandler()
+    handler.manure_separator_configs = configs
 
-    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
-
-    manure_manager_config_handler.custom_manure_separator_configs = {}
-
-    # Act
-    actual_manure_separator_config = manure_manager_config_handler.get_custom_manure_separator_config(
-        manure_separator_type_name=mock_manure_separator_type_name
-    )
-
-    # Assert
-    patch_for_manure_manager_config_handler_init.assert_called_once_with(
-        manure_manager_config=mock_manure_manager_config
-    )
-    patch_for_manure_separator_type_get_type.assert_called_once_with(mock_manure_separator_type_name)
-    assert actual_manure_separator_config is None
+    with pytest.raises(KeyError, match="Attempted to use a non-existent manure separator configuration"):
+        handler.get_manure_separator_config("not here")
 
 
 def test_get_custom_manure_treatment_config(mocker: MockerFixture) -> None:
@@ -703,7 +698,7 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
 
     mock_custom_bedding_configs = mocker.MagicMock()
     mock_manure_handler_configs = mocker.MagicMock()
-    mock_custom_manure_separator_configs = mocker.MagicMock()
+    mock_manure_separator_configs = mocker.MagicMock()
     mock_custom_manure_treatment_configs = mocker.MagicMock()
     patch_for_process_bedding_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
@@ -718,7 +713,7 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     patch_for_process_manure_separator_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
         ".ManureManagerConfigHandler._process_manure_separator_configs",
-        return_value=mock_custom_manure_separator_configs,
+        return_value=mock_manure_separator_configs,
     )
     patch_for_process_manure_treatment_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
@@ -736,5 +731,5 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     patch_for_process_manure_treatment_configs.assert_called_once_with(mock_manure_treatment_json_configs)
     assert manure_manager_config_handler.bedding_configs == mock_custom_bedding_configs
     assert manure_manager_config_handler.manure_handler_configs == mock_manure_handler_configs
-    assert manure_manager_config_handler.custom_manure_separator_configs == mock_custom_manure_separator_configs
+    assert manure_manager_config_handler.manure_separator_configs == mock_manure_separator_configs
     assert manure_manager_config_handler.custom_manure_treatment_configs == mock_custom_manure_treatment_configs
