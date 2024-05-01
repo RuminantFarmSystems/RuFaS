@@ -104,8 +104,8 @@ class OutputManager(object):
         Set to True to include detailed values in the json output files after the simulation
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
-    _filters_counter : Counter[str]
-        A Counter object used to keep track of the number of times each filter is used
+    _filtered_variables_counter : Counter[str]
+        A Counter object used to keep track of the number of times each filtered variable is added to the variables_pool
     """
 
     __instance = None
@@ -143,7 +143,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
-            self._filters_counter: Counter[str] = collections.Counter()
+            self._filtered_variables_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -937,7 +937,6 @@ class OutputManager(object):
             filter_patterns=filter_content.get("filters", []),
             filter_by_exclusion=filter_by_exclusion,
         )
-        self._filters_counter.update(filtered_pool.keys())
         self.add_log(
             "num_filter_pattern_matches",
             f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
@@ -1050,6 +1049,7 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
+                    self._filtered_variables_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1240,9 +1240,9 @@ class OutputManager(object):
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_filters_usage_data(self, path: str) -> None:
+    def dump_filtered_variables_counts(self, path: str) -> None:
         """
-        Dumps the filters usage data to a JSON file in the given path to a directory.
+        Dumps the data about filtered variable counts to a JSON file in the given path to a directory.
 
         Parameters
         ----------
@@ -1251,7 +1251,7 @@ class OutputManager(object):
         """
 
         file_path = os.path.join(path, self.generate_file_name("filters_usage", "json"))
-        self.dict_to_file_json(self._filters_counter, file_path)
+        self.dict_to_file_json(self._filtered_variables_counter, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
@@ -1353,7 +1353,7 @@ class OutputManager(object):
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
-        self.dump_filters_usage_data(path)
+        self.dump_filtered_variables_counts(path)
 
     def flush_pools(self) -> None:
         """

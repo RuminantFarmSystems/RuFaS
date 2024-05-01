@@ -838,7 +838,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     patch_for_dump_warnings = mocker.patch.object(output_manager, "dump_warnings")
     patch_for_dump_logs = mocker.patch.object(output_manager, "dump_logs")
     patch_for_dump_variable_names_and_contexts = mocker.patch.object(output_manager, "dump_variable_names_and_contexts")
-    patch_for_dump_filters_usage_data = mocker.patch.object(output_manager, "dump_filters_usage_data")
+    patch_for_dump_filters_usage_data = mocker.patch.object(output_manager, "dump_filtered_variables_counts")
 
     # Act
     output_manager.dump_all_nondata_pools(path, False, "verbose")
@@ -973,9 +973,9 @@ def test_dump_errors(
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
-def test_dump_filters_usage_data(mocker: MockerFixture) -> None:
+def test_dump_filtered_variables_counts(mocker: MockerFixture) -> None:
     """
-    Unit test for dump_filters_usage_data() method in OutputManager class.
+    Unit test for dump_filtered_variables_counts() method in OutputManager class.
     """
 
     # Arrange
@@ -991,12 +991,12 @@ def test_dump_filters_usage_data(mocker: MockerFixture) -> None:
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
 
     # Act
-    output_manager.dump_filters_usage_data(path)
+    output_manager.dump_filtered_variables_counts(path)
 
     # Assert
     patch_for_os_path_join.assert_called_once_with(path, expected_file_name)
     patch_for_generate_file_name.assert_called_once_with("filters_usage", "json")
-    patch_for_dict_to_file_json.assert_called_once_with(output_manager._filters_counter, expected_full_path)
+    patch_for_dict_to_file_json.assert_called_once_with(output_manager._filtered_variables_counter, expected_full_path)
 
 
 @pytest.mark.parametrize(
