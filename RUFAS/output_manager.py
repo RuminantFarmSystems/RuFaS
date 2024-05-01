@@ -1522,7 +1522,7 @@ class OutputManager(object):
         output_prefix: str,
         version_number: str,
         task_id: str,
-    ) -> None:  
+    ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
         self.flush_pools()
