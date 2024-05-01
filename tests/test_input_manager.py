@@ -416,8 +416,6 @@ def test_populate_pool_valid(
     )
     mocker.patch.object(input_manager, "_log_missing_keys")
 
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-
     # Act
     result = input_manager._populate_pool(eager_termination=True)
 
