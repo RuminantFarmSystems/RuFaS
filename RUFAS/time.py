@@ -177,7 +177,6 @@ class Time:
         datetime.date
             The date object that corresponds to the simulation day.
         """
-
         start_year = int(self.start_full_date[0])
         start_day_of_year = int(self.start_full_date[1])
         start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
