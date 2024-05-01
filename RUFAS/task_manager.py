@@ -21,9 +21,7 @@ NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 
 class TaskType(Enum):
-    """
-    Enum different types of task that TaskManager handles.
-    """
+    """Enum for different task types handled by TaskManager."""
 
     HERD_INITIALIZATION = "Herd Initialization"
     SIMULATION_SINGLE_RUN = "A single simulation run"
@@ -35,24 +33,7 @@ class TaskType(Enum):
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
-        """
-        Converts a string to a corresponding TaskType enum member.
-
-        Parameters
-        ----------
-        input_str : str
-            The string representing a task type.
-
-        Returns
-        -------
-        TaskType
-            The corresponding TaskType enum member.
-
-        Raises
-        ------
-        ValueError
-            If the input string does not correspond to any TaskType enum member.
-        """
+        """Converts a string to a TaskType enum."""
         normalized_input = "_".join(input_str.strip().upper().split())
         try:
             return TaskType[normalized_input]
@@ -60,11 +41,13 @@ class TaskType(Enum):
             raise ValueError(f"The string '{input_str}' is not a match with any acceptable TaskType.")
 
     def is_multi_run(self) -> bool:
-        """returns True if the task type requires multiple simulation runs; otherwise false"""
+        """Checks if the task type involves multiple runs."""
         return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
 
 
 class TaskManager:
+    """Manager class for handling tasks related to simulations and analyses."""
+
     def __init__(self):
         self.input_manager = InputManager()
         self.output_manager = OutputManager()
@@ -78,6 +61,24 @@ class TaskManager:
         clear_output_directory: bool,
         produce_graphics: bool,
     ) -> None:
+        """
+        Initializes and starts the task management process.
+
+        Parameters
+        ----------
+        metadata_path : str
+            Path to the metadata file that contains task management inputs.
+        verbosity : LogVerbosity
+            Level of verbosity for logging.
+        exclude_info_maps : bool
+            Flag to exclude information maps.
+        output_directory : Path
+            Path to the directory where outputs will be saved.
+        clear_output_directory : bool
+            Whether to clear the output directory.
+        produce_graphics : bool
+            Whether to produce graphics.
+        """
         self.output_manager.run_startup_sequence(
             verbosity, exclude_info_maps, output_directory, clear_output_directory, Path(""), "Task Manager"
         )
@@ -122,6 +123,14 @@ class TaskManager:
         self._run_tasks(runnable_args, produce_graphics)
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """
+        Parses input tasks into single and multiple run tasks.
+
+        Returns
+        -------
+        Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]
+            Parsed single run and multi-run task arguments.
+        """
         parsed_single_run_args: List[Dict[str, Any]] = []
         parsed_multi_run_args: List[Dict[str, Any]] = []
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
@@ -141,6 +150,19 @@ class TaskManager:
         return parsed_single_run_args, parsed_multi_run_args
 
     def _expand_multi_runs_to_single_runs(self, multi_run_args: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Expands multi-run tasks into single-run tasks for execution.
+
+        Parameters
+        ----------
+        multi_run_args : List[Dict[str, Any]]
+            List of multi-run task arguments.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            Expanded list of single-run tasks.
+        """
         expanded_args: List[Dict[str, Any]] = []
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
@@ -165,6 +187,7 @@ class TaskManager:
         return single_run_args
 
     def _expand_sensitivity_analysis_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Expands sensitivity analysis multi-run tasks into single-run tasks."""
         SA_input_variables: List[Dict[str, float | str]] = multi_run_args["SA_input_variables"]
         names: List[str] = []
         bounds: List[List[float]] = []
@@ -214,9 +237,11 @@ class TaskManager:
         return single_run_args
 
     def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Placeholder for expanding end-to-end testing multi-run tasks."""
         pass
 
     def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
+        """Runs the tasks based on the provided arguments."""
         task_with_args = partial(self.task, produce_graphics=produce_graphics)
         results = self.pool.imap_unordered(task_with_args, single_run_args)
         for _ in results:
@@ -224,6 +249,7 @@ class TaskManager:
 
     @staticmethod
     def task(args: Dict[str, Any], produce_graphics: bool) -> None:
+        """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.task.__name__,
@@ -265,7 +291,7 @@ class TaskManager:
             if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
                 if args["input_patch"]:
                     input_manager.pool.update(args["input_patch"])
-                TaskManager.handle_single_simulation_run(args, input_manager, output_manager)
+                TaskManager.handle_single_simulation_run(args, output_manager)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, produce_graphics, True)
 
             if args["task_type"] == TaskType.POST_PROCESSING:
@@ -284,6 +310,7 @@ class TaskManager:
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
+        """Handles initialization of the herd based on specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_herd_initializaition.__name__,
@@ -295,9 +322,8 @@ class TaskManager:
         output_manager.add_log("Herd initialization complete", "Herd data initialized.", info_map)
 
     @staticmethod
-    def handle_single_simulation_run(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager
-    ) -> None:
+    def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
+        """Conducts a single simulation run based on provided arguments."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_single_simulation_run.__name__,
@@ -314,6 +340,7 @@ class TaskManager:
     def handle_input_data_audit(
         args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
+        """Validates input data saves metadata properies to CSV."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_input_data_audit.__name__,
@@ -344,6 +371,24 @@ class TaskManager:
         save_results: bool = False,
         load_pool_from_file: bool = False,
     ) -> None:
+        """
+        Handles post-processing tasks based on specified arguments.
+
+        Parameters
+        ----------
+        args : Dict[str, Any]
+            Arguments for post-processing.
+        input_manager : InputManager
+            Manager to handle input processing.
+        output_manager : OutputManager
+            Manager to handle output logging and errors.
+        produce_graphics : bool
+            Whether to produce graphics during post-processing.
+        save_results : bool
+            Whether to save results after processing.
+        load_pool_from_file : bool
+            Whether to load data pool from file.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_post_processing.__name__,
@@ -374,12 +419,13 @@ class TaskManager:
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
+        """Sets the random seed for the task run."""
         info_map: dict[str, str | MeasurementUnits] = {
             "class": TaskManager.__name__,
             "function": TaskManager.set_random_seed.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        output_manager.add_log("Random seed recieved", f"Received {random_seed} as random seed.", info_map)
+        output_manager.add_log("Random seed received", f"Received {random_seed} as random seed.", info_map)
         if random_seed is None:
             random_seed = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
 
