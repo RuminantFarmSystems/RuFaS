@@ -867,9 +867,9 @@ class GasEmissionsCalculator:
     @classmethod
     def _methane_conversion_factor(cls, ambient_barn_temp: float) -> float:
         """
-        Calculate the Methane Conversion Factor (MCF) using the exponential function:
+        Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
 
-        MCF(T) = 7.11 * e^(0.0884 * t)
+        MCF(T) = 0.0625 * T - 0.25 
 
         Parameters
         ----------
@@ -882,7 +882,7 @@ class GasEmissionsCalculator:
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
         """
-        return GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp)
+        return GasEmissionConstants.MCF_CONSTANT_A * ambient_barn_temp - GasEmissionConstants.MCF_CONSTANT_B
 
     @classmethod
     def ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
