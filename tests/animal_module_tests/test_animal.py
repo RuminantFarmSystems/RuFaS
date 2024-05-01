@@ -21,7 +21,7 @@ from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
 import RUFAS.routines.animal.clustering_pen_grouping
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+# from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
 

@@ -621,16 +621,9 @@ class AnimalRequirements:
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
 
         if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
-            # og_phos = phosphorus_requirement
-            # print(f'original phos: {og_phos}')
             phosphorus_requirement = phosphorus_requirement * (
                 1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)
             )
-            # print(f'increased phos: {phosphorus_requirement}')
-            # if og_phos > 0:
-            #     print(phosphorus_requirement / og_phos)
-            # else:
-            #     print(animal_type)
         # if AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER > 0:
         # phosphorus_requirement = phosphorus_requirement * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100
         # Requirements summary dictionary
@@ -1657,9 +1650,6 @@ class AnimalRequirements:
         if day_of_pregnancy is None or day_of_pregnancy < 190:
             P_Preg: float = 0.0
         else:
-            # P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
-            #     (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
-            # )
             P_Preg = (
                 (
                     0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy)

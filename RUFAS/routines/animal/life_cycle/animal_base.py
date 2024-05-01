@@ -99,7 +99,7 @@ class AnimalBase:
         self.ration_formulation = ration
         self.dry_matter_intake = DMI
 
-    def set_p_intake(self, p_intake, p_conc_ration):
+    def set_p_intake(self, p_intake: float, p_conc_ration: float) -> None:
         """
         Sets this animal's phosphorus intake.
 
