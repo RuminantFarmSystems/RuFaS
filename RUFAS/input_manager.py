@@ -67,6 +67,19 @@ class Modifiability(Enum):
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
+
+    Attributes
+    ----------
+    __metadata : Dict[str, Any]
+        The guidelines used to validate the input data.
+    __pool : Dict[str, Any]
+        The input data pool.
+    __get_data_logs_pool : Dict[str, str]
+        The logs for each instance of data being fetched from Input Manager.
+    elements_counter : ElementsCounter()
+        An instance of the class to keep track of the number of elements in each state during validation.
+    metadata_depth_limit : int
+        The maximum depth allowed for a metadata properties structure.
     """
 
     __instance = None
@@ -83,6 +96,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+            self.metadata_depth_limit = 8
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -123,6 +137,7 @@ class InputManager:
         """
         self._load_metadata(metadata_path)
         self._load_properties()
+        self._check_max_depth()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -338,6 +353,7 @@ class InputManager:
             ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
             self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
@@ -350,7 +366,6 @@ class InputManager:
                     elements_counter=self.elements_counter,
                     called_during_initialization=False,
                 )
-
                 if is_element_acceptable:
                     validated_data[metadata_property] = filtered_input_data[metadata_property]
                 elif eager_termination:
@@ -2027,6 +2042,48 @@ class InputManager:
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def _check_max_depth(self) -> None:
+        """Iteratively traverses the metadata properties to check the max depth.
+
+        Raises
+        ------
+        ValueError
+            If the depth of the metadata exceeds the metadata_depth_limit.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._check_max_depth.__name__,
+        }
+
+        stack = [(self.__metadata["properties"], 0, [])]
+        max_depth = 0
+        deepest_path = []
+
+        while stack:
+            current_obj, depth, path = stack.pop()
+
+            if depth > self.metadata_depth_limit:
+                om.add_error("Max metadata depth exceeded.",
+                             "Metadata depth exceeds maximum allowed depth of "
+                             f"{self.metadata_depth_limit} at path {path}",
+                             info_map)
+                raise ValueError("Metadata depth exceeds maximum allowed depth of "
+                                 f"{self.metadata_depth_limit} at path {path}")
+
+            if depth > max_depth:
+                max_depth = depth
+                deepest_path = path
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    stack.append((value, depth + 1, path + [key]))
+            elif isinstance(current_obj, list):
+                for index, item in enumerate(current_obj):
+                    stack.append((item, depth + 1, path + [index]))
+
+        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {max_depth}", info_map)
+        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
     def dump_metadata_properties(self, output_dir: Path) -> None:
         """
