@@ -399,8 +399,6 @@ def test_populate_pool_valid(
 
     # Arrange
     input_manager = InputManager()
-    input_depth_limit = 5
-    input_manager.input_depth_limit = input_depth_limit
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata)
     mocker.patch.object(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
@@ -4050,9 +4048,11 @@ def test_check_max_depth(
             mock_input_manager._check_max_depth()
         assert str(exc_info.value) == f"Metadata depth exceeds maximum allowed depth of {limit} at path {expected_path}"
         mock_add_error.assert_called_once()
+        mock_add_log.assert_not_called()
     else:
         mock_input_manager._check_max_depth()
         mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
         assert mock_add_log.call_args_list == [
             call(
                 "Metadata properties depth",
