@@ -162,8 +162,6 @@ class Weather:
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
-        if time.simulation_day == 1000:
-            self.get_conditions_series(time, -10, 0)
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(day, time.calendar_year)
@@ -203,7 +201,7 @@ class Weather:
             Series of current day conditions in chronological order.
 
         """
-        current_date = time.convert_simulation_day_to_date(time.simulation_day)
+        current_date = Utility.convert_ordinal_date_to_month_date(time.calendar_year, time.day)
         date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
 
         starting_year_index = time.year - (current_date.year - date_series[0].year)

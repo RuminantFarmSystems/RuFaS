@@ -259,9 +259,7 @@ def test_get_conditions_series(
     setattr(mock_time, "day", 2)
     setattr(mock_time, "simulation_day", 5)
     setattr(mock_time, "end_year_int", 2024)
-    convert_sim_day_to_date = mocker.patch.object(
-        mock_time, "convert_simulation_day_to_date", return_value=date(2023, 1, 2)
-    )
+    date_conversion = mocker.patch.object(Utility, "convert_ordinal_date_to_month_date", return_value=date(2023, 1, 2))
     time_series_gen = mocker.patch.object(Utility, "generate_time_series", wraps=Utility.generate_time_series)
     day_to_month = mocker.patch.object(Utility, "day_to_month_conversion", return_value=1)
     daylength = mocker.patch.object(CurrentDayConditions, "determine_daylength", return_value=15.6)
@@ -269,7 +267,7 @@ def test_get_conditions_series(
     actual = mock_weather.get_conditions_series(mock_time, start, end)
 
     assert actual == expected
-    convert_sim_day_to_date.assert_called_once()
+    date_conversion.assert_called_once()
     time_series_gen.assert_called_once()
     assert day_to_month.call_count == len(expected)
     assert daylength.call_count == len(expected)
