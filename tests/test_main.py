@@ -8,6 +8,7 @@ from pytest_mock import MockerFixture
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 from RUFAS.output_manager import LogVerbosity
 
+
 @pytest.fixture
 def mock_task_manager():
     with patch("main.TaskManager") as mock:
