@@ -51,7 +51,7 @@ class TaskType(Enum):
 class TaskManager:
     """Manager class for handling tasks related to simulations and analyses."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.input_manager = InputManager()
         self.output_manager = OutputManager()
 
@@ -98,7 +98,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path)
+        is_data_valid = self.input_manager.start_data_processing(metadata_path.as_posix())
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 {
@@ -205,10 +205,11 @@ class TaskManager:
 
         SA_input_variables: List[Dict[str, float | str]] = multi_run_args["SA_input_variables"]
 
-        names: List[str] = [input_variable["variable_name"] for input_variable in SA_input_variables]
+        names: List[str] = [str(input_variable["variable_name"]) for input_variable in SA_input_variables]
         variables_count = len(names)
         bounds: List[List[float]] = [
-            [input_variable["lower_bound"], input_variable["upper_bound"]] for input_variable in SA_input_variables
+            [float(input_variable["lower_bound"]), float(input_variable["upper_bound"])]
+            for input_variable in SA_input_variables
         ]
         parsed_SA_input_variables = {
             "num_vars": variables_count,
@@ -262,7 +263,7 @@ class TaskManager:
 
     def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Placeholder for expanding end-to-end testing multi-run tasks."""
-        pass
+        return []
 
     def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
         """Runs the tasks based on the provided arguments."""
