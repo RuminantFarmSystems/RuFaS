@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
+from .general_constants import GeneralConstants
 
 
 class Utility:
@@ -37,7 +38,7 @@ class Utility:
         return result
 
     @staticmethod
-    def get_base_dir():
+    def get_base_dir() -> Path:
         """
         Gets the base directory as reference for all relative paths.
 
@@ -174,7 +175,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -503,4 +504,10 @@ class Utility:
 
     @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        """Generates a datetime.date based on a year and ordinal day."""
+        maximum_day = (
+            GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+        )
+        if not 1 <= day <= maximum_day:
+            raise ValueError(f"Invalid day: {day} of year {year}.")
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
