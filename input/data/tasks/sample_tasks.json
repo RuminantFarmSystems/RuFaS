@@ -38,17 +38,20 @@
         {
           "variable_name": "animal.herd_information.calf_num",
           "lower_bound": 6,
-          "upper_bound": 10
+          "upper_bound": 10,
+          "data_type":"int"
         },
         {
           "variable_name": "animal.herd_information.cow_num",
           "lower_bound": 98,
-          "upper_bound": 102
+          "upper_bound": 102,
+          "data_type":"int"
         },
         {
           "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
           "lower_bound": 378,
-          "upper_bound": 382
+          "upper_bound": 382,
+          "data_type":"int"
         }
       ]
     }

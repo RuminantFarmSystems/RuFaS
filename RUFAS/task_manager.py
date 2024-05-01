@@ -191,19 +191,24 @@ class TaskManager:
 
     def _expand_sensitivity_analysis_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Expands sensitivity analysis multi-run tasks into single-run tasks."""
+
         SA_input_variables: List[Dict[str, float | str]] = multi_run_args["SA_input_variables"]
-        names: List[str] = []
-        bounds: List[List[float]] = []
-        for input_variable in SA_input_variables:
-            names.append(input_variable["variable_name"])
-            bounds.append([input_variable["lower_bound"], input_variable["upper_bound"]])
+
+        names: List[str] = [input_variable["variable_name"] for input_variable in SA_input_variables]
         variables_count = len(names)
+        bounds: List[List[float]] = [
+            [input_variable["lower_bound"], input_variable["upper_bound"]] for input_variable in SA_input_variables
+        ]
         parsed_SA_input_variables = {
             "num_vars": variables_count,
             "names": names,
             "bounds": bounds,
             "sample_scaled": True,
         }
+
+        data_type_str_to_class_map = {"float": float, "int": int}
+        data_types = [data_type_str_to_class_map[input_variable["data_type"]] for input_variable in SA_input_variables]
+
         if multi_run_args["sampler"] == "fractional_factorial":
             sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables)
         elif multi_run_args["sampler"] == "saltelli_sobol":
@@ -213,28 +218,32 @@ class TaskManager:
                 skip_values=multi_run_args["saltelli_skip"],
             )
         else:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager.task.__name__,
-                "units": MeasurementUnits.UNITLESS,
-                "output_prefix": multi_run_args["output_prefix"],
-            }
             self.output_manager.add_log(
-                "Invalid sampler", f"The sampler {multi_run_args['sampler']} is not supported", info_map
+                "Invalid sampler",
+                f"The sampler {multi_run_args['sampler']} is not supported",
+                {
+                    "class": TaskManager.__name__,
+                    "function": TaskManager.task.__name__,
+                    "units": MeasurementUnits.UNITLESS,
+                    "output_prefix": multi_run_args["output_prefix"],
+                },
             )
 
         single_run_args = []
 
         digits = len(str(len(sampled_values)))
-        start = int(multi_run_args["SA_load_balancing_start"] * len(sampled_values))
-        stop = int(multi_run_args["SA_load_balancing_stop"] * len(sampled_values))
+        start_sample = int(multi_run_args["SA_load_balancing_start"] * len(sampled_values))
+        stop_sample = int(multi_run_args["SA_load_balancing_stop"] * len(sampled_values))
 
-        for i in range(start, stop):
+        for sample_number in range(start_sample, stop_sample):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            run_number = f"{i+1}".zfill(digits)
+            run_number = f"{sample_number+1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
-            new_args["input_patch"] = {names[j]: sampled_values[i, j] for j in range(variables_count)}
+            new_args["input_patch"] = {
+                names[variable_number]: data_types[variable_number](sampled_values[sample_number, variable_number])
+                for variable_number in range(variables_count)
+            }
             new_args["input_patch"] = Utility.convert_flat_dict_to_nested_dict(new_args["input_patch"])
             single_run_args.append(new_args)
 
