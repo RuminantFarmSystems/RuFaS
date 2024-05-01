@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import collections
 import json
 import os
 import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO
+from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
 from deprecated.sphinx import deprecated
@@ -101,6 +102,10 @@ class OutputManager(object):
         A Time object used to track the simulation time
     _include_detailed_values : bool
         Set to True to include detailed values in the json output files after the simulation
+    _exclude_info_maps_flag : bool
+        Set to True to exclude info_maps when adding variables to the variables_pool
+    _filtered_variables_counter : Counter[str]
+        A Counter object used to keep track of the number of times each filtered variable is added to the variables_pool
     """
 
     __instance = None
@@ -138,6 +143,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
+            self._filtered_variables_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -1043,6 +1049,7 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
+                    self._filtered_variables_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1233,6 +1240,19 @@ class OutputManager(object):
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
+    def dump_filtered_variables_counts(self, path: Path) -> None:
+        """
+        Dumps the data about filtered variable counts to a JSON file in the given path to a directory.
+
+        Parameters
+        ----------
+        path : Path
+            The path to the directory where the file will be saved.
+        """
+
+        file_path = os.path.join(path, self.generate_file_name("filters_usage", "json"))
+        self.dict_to_file_json(self._filtered_variables_counter, file_path)
+
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
         path: Path,
@@ -1333,6 +1353,7 @@ class OutputManager(object):
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
+        self.dump_filtered_variables_counts(path)
 
     def flush_pools(self) -> None:
         """
