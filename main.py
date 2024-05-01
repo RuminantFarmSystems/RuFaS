@@ -9,13 +9,14 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 import argparse
 import traceback
 from pathlib import Path
+import sys
 
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.task_manager import TaskManager
 
 
 def main() -> None:
-    cmd_arguments = parse_gnu_args()
+    cmd_arguments = parse_gnu_args(sys.argv[1:])
     try:
         task_manager = TaskManager()
         task_manager.start(
@@ -57,7 +58,7 @@ class CaseInsensitiveArgumentAction(argparse.Action):
             setattr(namespace, action, values)
 
 
-def parse_gnu_args() -> argparse.Namespace:
+def parse_gnu_args(args=None):
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser(description="RuFaS: Whole dairy farm simulation")
     parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
@@ -87,12 +88,12 @@ def parse_gnu_args() -> argparse.Namespace:
         action="store_true",
     )
     parser.add_argument(
-        "-O",
+        "-o",
         "--output-dir",
         help="The saving directory for output",
         default="output/",
     )
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 if __name__ == "__main__":
