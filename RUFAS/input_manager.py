@@ -96,7 +96,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
-            self.metadata_depth_limit = 5
+            self.metadata_depth_limit = 8
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -2043,49 +2043,47 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def _check_max_depth(self):
-        """Recursively find the maximum depth of nested dictionaries.
+    def _check_max_depth(self) -> None:
+        """Iteratively traverses the metadata properties to check the max depth.
 
-        Parameters
-        ----------
-        data : Any
-            The data structure to be checked.
-        current_depth : int, optional
-            The current depth of the data structure, by default 0
-
-        Returns
-        -------
-        int
-            The levels of depth of the data structure.
+        Raises
+        ------
+        ValueError
+            If the depth of the metadata exceeds the metadata_depth_limit.
         """
-        primitive_types: List[str] = ["number", "string", "bool"]
-        nested_types: List[str] = ["object", "array"]
-        zero_depth_properties = {key: self.__metadata["properties"][key]
-                                  for key in self.__metadata["properties"].keys()}  # depth is 0
-        
-            print(key)
-        # second_level_nested_properties = self._get_nested_properties(first_level_properties)  # depth is 1
-        # print(second_level_nested_properties)
-        # for first_level_key in first_level_properties.keys():
-        #     if first_level_properties[first_level_key].get("type") in nested_types:
-        #         first_level_nested_property = first_level_properties[first_level_key]
-        # first_level_nested_properties = {key: value for key, value in first_level_properties.items()
-        #                                  if value.get("type") in nested_types}
-        # for second_level_key, second_level_value in first_level_nested_property.items():
-        #     if isinstance(second_level_value, dict) and second_level_value.get("type") in ["object", "array"]:
-        #         print(first_level_key, second_level_key)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._check_max_depth.__name__,
+        }
 
-    @staticmethod
-    def _get_nested_properties(properties_data: Dict[str, Any]) -> Dict[str, Any] | None:
-        nested_types: List[str] = ["object", "array"]
-        # return {key: value for key, value in properties_data.items()
-        #         if value.get("type") in nested_types}
-        for key in properties_data.keys():
-            print(key)
-            if properties_data[key].get("type") in nested_types:
-                first_level_nested_property = properties_data[key]
-                print(first_level_nested_property, "juju")
-        return {}
+        stack = [(self.__metadata["properties"], 0, [])]
+        max_depth = 0
+        deepest_path = []
+
+        while stack:
+            current_obj, depth, path = stack.pop()
+
+            if depth > self.metadata_depth_limit:
+                om.add_error("Max metadata depth exceeded.",
+                             "Metadata depth exceeds maximum allowed depth of "
+                             f"{self.metadata_depth_limit} at path {path}",
+                             info_map)
+                raise ValueError("Metadata depth exceeds maximum allowed depth of "
+                                 f"{self.metadata_depth_limit} at path {path}")
+
+            if depth > max_depth:
+                max_depth = depth
+                deepest_path = path
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    stack.append((value, depth + 1, path + [key]))
+            elif isinstance(current_obj, list):
+                for index, item in enumerate(current_obj):
+                    stack.append((item, depth + 1, path + [index]))
+
+        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {max_depth}", info_map)
+        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
     def dump_metadata_properties(self, output_dir: Path) -> None:
         """
