@@ -63,6 +63,27 @@ class Utility:
         return nested_dict
 
     @staticmethod
+    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
+        """
+        Recursively merges dict2 into dict1 in place.
+
+        Parameters
+        ----------
+        dict1 : Dict[str, Any]
+            The primary dictionary to be updated.
+        dict2 : Dict[str, Any]
+            The dictionary containing updates to be merged into dict1.
+        """
+        for key in dict2:
+            if key in dict1:
+                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                    Utility.deep_merge(dict1[key], dict2[key])
+                else:
+                    dict1[key] = dict2[key]
+            else:
+                dict1[key] = dict2[key]
+
+    @staticmethod
     def get_base_dir():
         """
         Gets the base directory as reference for all relative paths.

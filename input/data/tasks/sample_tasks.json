@@ -46,7 +46,7 @@
           "upper_bound": 102
         },
         {
-          "variable_name": "animal.management_decisions.breeding_start_day_h",
+          "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
           "lower_bound": 378,
           "upper_bound": 382
         }

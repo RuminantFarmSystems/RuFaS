@@ -263,3 +263,21 @@ def test_convert_flat_dict_to_nested_dict() -> None:
     x = {"aic": 1, "aid": 2, "ajc": 3, "ajd": 4, "bic": 5, "bid": 6, "bjc": 7, "bjd": 8}
     actual = Utility.convert_flat_dict_to_nested_dict(x)
     assert actual == x
+
+
+def test_deep_merge() -> None:
+    x = {
+        "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 8}},
+    }
+
+    y = {
+        "b": {"j": {"d": 9, "e": 10}, "k": 11},
+    }
+
+    expected = {
+        "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 9, "e": 10}, "k": 11},
+    }
+    Utility.deep_merge(x, y)
+    assert x == expected
