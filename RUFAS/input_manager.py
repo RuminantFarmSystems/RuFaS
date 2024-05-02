@@ -2117,7 +2117,8 @@ class InputManager:
 
         return records
 
-    def _check_property_type_primitive(self, property: dict) -> bool:
+    def _check_property_type_primitive(self, property: Dict[str, Any]) -> bool:
+        """Checks whether the property's "type" is primitive or an array of primitive types."""
         if property.get("type") in ["bool", "string", "number"]:
             return True
         elif property.get("type") == "array":
