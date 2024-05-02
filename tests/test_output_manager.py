@@ -980,7 +980,7 @@ def test_dump_filtered_variables_counts(mocker: MockerFixture) -> None:
 
     # Arrange
     path = "/fake/directory"
-    expected_file_name = "filters_usage.json"
+    expected_file_name = "filtered_variables_count.json"
     expected_full_path = os.path.join(path, expected_file_name)
     output_manager = OutputManager()
 
@@ -995,7 +995,7 @@ def test_dump_filtered_variables_counts(mocker: MockerFixture) -> None:
 
     # Assert
     patch_for_os_path_join.assert_called_once_with(path, expected_file_name)
-    patch_for_generate_file_name.assert_called_once_with("filters_usage", "json")
+    patch_for_generate_file_name.assert_called_once_with("filtered_variables_counts", "json")
     patch_for_dict_to_file_json.assert_called_once_with(output_manager._filtered_variables_counter, expected_full_path)
 
 
