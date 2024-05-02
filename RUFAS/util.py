@@ -22,7 +22,7 @@ class Utility:
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result = {}
+        result: Dict[str, List[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
