@@ -149,9 +149,9 @@ class OutputManager(object):
             )
             self.time = None
 
-    def setup_pool_overflow_control(self, max_memory_use_percentage: int,
-                                    min_free_memory_threshold: int,
-                                    output_dir: Path) -> None:
+    def setup_pool_overflow_control(
+        self, max_memory_use_percentage: int, min_free_memory_threshold: int, output_dir: Path
+    ) -> None:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.setup_pool_overflow_control.__name__,
@@ -163,8 +163,9 @@ class OutputManager(object):
 
         self.min_memory_threshold = min(
             min_free_memory_threshold,
-            ((1 - max_memory_use_percentage / 100) * self.available_memory)) if max_memory_use_percentage > 0 \
+            ((1 - max_memory_use_percentage / 100) * self.available_memory) if max_memory_use_percentage > 0 \
             else min_free_memory_threshold
+        )
 
         self.saved_pool_num = 0
         self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
