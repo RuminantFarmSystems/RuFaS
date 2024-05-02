@@ -1,12 +1,8 @@
 import datetime
-import json
 import re
 import shutil
-import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
-
-from RUFAS import errors
 
 
 class Utility:
@@ -37,7 +33,7 @@ class Utility:
         return result
 
     @staticmethod
-    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Dict | List]:
+    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of
         dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
@@ -55,10 +51,10 @@ class Utility:
         Dict[str, Union[Dict, list]]
             A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
         """
-        nested_structure = {}
+        nested_structure: Dict[str, Any] = {}
         for flat_key, value in input_dict.items():
             keys = flat_key.split(".")
-            current = nested_structure
+            current: Dict[str, Any] | List[Any] = nested_structure
             for i, key in enumerate(keys[:-1]):
                 next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
 
@@ -120,78 +116,6 @@ class Utility:
                 target[key] = value
 
     @staticmethod
-    def get_base_dir():
-        """
-        Gets the base directory as reference for all relative paths.
-
-        Unfrozen application - gets the project directory
-        Frozen application - gets the executable directory
-
-        Returns
-        -------
-        Path: The reference directory for all paths in the program.
-
-        """
-
-        # Frozen
-        if getattr(sys, "frozen", False):
-            #
-            # Get the executable file path
-            # Resolve to absolute path
-            # Take the parent base_dir/RUFAS_exe
-            #                 parent = base_dir/
-
-            return Path(sys.executable).resolve().parent
-
-        # Unfrozen
-        else:
-            #
-            # Get path of current file (util.py)
-            # Resolve to absolute path
-            # Get the 2nd parent  base_dir/RUFAS/util.py
-            #                     parent[0] = base_dir/RUFAS
-            #                     parent[1] = base_dir/
-            return Path(__file__).resolve().parents[1]
-
-    @staticmethod
-    def read_json_file(file_path: Path) -> Dict[Any, Any]:
-        """
-        Description:
-            Reads and interprets the JSON file at the given path. Compiles the
-            information into dictionaries used to instantiate simulation objects.
-
-        Parameters
-        ----------
-        file_path (Path): Path to the input json file
-
-        Raises
-        ------
-        InvalidJSONFileError
-            If the json file at the given path does not conform with the format required.
-
-        Returns
-        -------
-        Dict[Any, Any]
-            The data read from the json file.
-
-        """
-
-        try:
-            if file_path.suffix == ".json":
-                if not file_path.is_file():
-                    raise errors.UserInput((str(file_path), "does not exist"))
-            else:
-                raise errors.UserInput((str(file_path), "is not a JSON file"))
-
-            with file_path.open("r") as f:
-                data = json.load(f)
-
-            return data
-
-        except errors.UserInput as e:
-            print(e.msg)
-
-    @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
         """
         Calculate the new average given the number of values,
@@ -215,15 +139,17 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
+    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
         """
         Remove items from a list given a list of indices.
         The operation is done in-place.
 
         Parameters
         ----------
-        arr: a list of items
-        removed_idx: a list that contains indices of the items to be removed
+        data: List[Any] a list of items
+            The list to remove items from
+        indices_to_remove : List[Any]
+            The list that contains indices of the items to be removed
 
         Returns
         -------
@@ -231,9 +157,10 @@ class Utility:
 
         """
 
-        # Safer to remove elements from the back
-        for idx in sorted(removed_idx, reverse=True):
-            del arr[idx]
+        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
+        # to prevent the shifting of indices from affecting later removals.
+        for idx in sorted(indices_to_remove, reverse=True):
+            del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
@@ -257,7 +184,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -455,6 +382,8 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
+
+        return -1
 
     @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
