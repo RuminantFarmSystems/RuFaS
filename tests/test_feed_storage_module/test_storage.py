@@ -147,15 +147,17 @@ def test_record_stored_crops() -> None:
 
 
 @pytest.mark.parametrize(
-    "dry_matter,percentage,category,temp,expected",
+    "dry_matter,percentage,category,temps,expected",
     [
-        (100.0, 25.0, CropCategory.ALFALFA, 20.0, 1.378),
-        (40.0, 20.0, CropCategory.ALFALFA, 6.0, 0.624),
-        (150.0, 19.0, CropCategory.ALFALFA, 10.0, 0.0),
-        (200.0, 23.0, CropCategory.ALFALFA, 46.0, 0.0),
-        (140.0, 15.0, CropCategory.CORN, 30.0, 1.2096),
-        (55.0, 66.0, CropCategory.GRASS, 25.0, 0.0),
-        (120.0, 4.0, CropCategory.SMALL_GRAIN, 15.0, 0.0),
+        (100.0, 25.0, CropCategory.ALFALFA, [20.0] * 3, 4.286303394879),
+        (40.0, 20.0, CropCategory.ALFALFA, [6.0, 4.0, 6.0], 0.624),
+        (150.0, 19.0, CropCategory.ALFALFA, [10.0] * 4, 0.0),
+        (200.0, 23.0, CropCategory.ALFALFA, [46.0, 44.0, 46.0], 2.9016),
+        (140.0, 15.0, CropCategory.CORN, [30.0, 28.0, 29.0], 1.2096),
+        (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 2.019438),
+        (55.0, 66.0, CropCategory.GRASS, [25.0] * 2, 0.0),
+        (120.0, 4.0, CropCategory.SMALL_GRAIN, [15.0], 0.0),
+        (100.0, 24.0, CropCategory.GRASS, [], 0.0)
     ],
 )
 def test_calculate_dry_matter_loss_to_gas(
@@ -165,7 +167,7 @@ def test_calculate_dry_matter_loss_to_gas(
     dry_matter: float,
     percentage: float,
     category: CropCategory,
-    temp: float,
+    temps: list[float],
     expected: float,
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Sileage."""
@@ -176,11 +178,14 @@ def test_calculate_dry_matter_loss_to_gas(
     )
     harvested_crop.dry_matter_percentage = percentage
     harvested_crop.category = category
-    mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
-    mock_conditions.mean_air_temperature = temp
-    mock_time = mocker.MagicMock(autospec=Time)
 
-    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions, mock_time)
+    mock_conditions = []
+    for temp in temps:
+        condition = mocker.MagicMock(autospec=CurrentDayConditions)
+        condition.mean_air_temperature = temp
+        mock_conditions.append(condition)
+
+    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions)
 
     assert pytest.approx(actual) == expected
 
