@@ -191,9 +191,9 @@ class Weather:
         time : Time
             Time instance containing the current time information of the simulation.
         starting_offset : int
-            Number of days before or after the given date to start the time series.
+            Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
-            Number of days before or after the given date to end the time series.
+            Number of days before or after the given date to end the weather conditions series.
 
         Returns
         -------
