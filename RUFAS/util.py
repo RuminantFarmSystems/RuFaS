@@ -1,12 +1,8 @@
 import datetime
-import json
 import re
 import shutil
-import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
-
-from RUFAS import errors
 
 
 class Utility:
@@ -26,7 +22,7 @@ class Utility:
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result = {}
+        result: Dict[str, List[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
@@ -37,123 +33,87 @@ class Utility:
         return result
 
     @staticmethod
-    def convert_flat_dict_to_nested_dict(flat_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Convert a flat dictionary with dot-separated keys into a nested dictionary structure.
+        Convert a dictionary with flat, dot-separated keys into a nested structure composed of
+        dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
+        while non-numeric segments indicate dictionary keys.
 
         Parameters
         ----------
-        flat_dict : Dict[str, Any]
-            A dictionary with string keys that include dots to signify nested levels.
+        input_dict : Dict[str, Any]
+            A dictionary where the keys are strings that may include dots to signify hierarchical
+            levels in the resulting nested structure. Numeric key segments result in list creations,
+            and non-numeric segments result in dictionary creations.
 
         Returns
         -------
-        Dict[str, Any]
-            A nested dictionary where the structure is determined by splitting the keys on dots.
+        Dict[str, Union[Dict, list]]
+            A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
         """
-        nested_dict = {}
-        for flat_key, value in flat_dict.items():
+        nested_structure: Dict[str, Any] = {}
+        for flat_key, value in input_dict.items():
             keys = flat_key.split(".")
-            current = nested_dict
-            for key in keys[:-1]:
-                if key not in current:
-                    current[key] = {}
-                current = current[key]
-            current[keys[-1]] = value
-        return nested_dict
+            current: Dict[str, Any] | List[Any] = nested_structure
+            for i, key in enumerate(keys[:-1]):
+                next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
 
-    @staticmethod
-    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
-        """
-        Recursively merges dict2 into dict1 in place.
-
-        Parameters
-        ----------
-        dict1 : Dict[str, Any]
-            The primary dictionary to be updated.
-        dict2 : Dict[str, Any]
-            The dictionary containing updates to be merged into dict1.
-        """
-        for key in dict2:
-            if key in dict1:
-                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                    Utility.deep_merge(dict1[key], dict2[key])
+                if key.isdigit():
+                    key = int(key)
+                    while len(current) <= key:
+                        current.append([] if next_key_is_digit else {})
+                    current = current[key]
                 else:
-                    dict1[key] = dict2[key]
+                    if isinstance(current, list):
+                        current = current[-1]
+                    if key not in current:
+                        current[key] = [] if next_key_is_digit else {}
+                    current = current[key]
+
+            last_key = keys[-1]
+            if last_key.isdigit():
+                last_key = int(last_key)
+                while len(current) <= last_key:
+                    current.append(None)
+                current[last_key] = value
             else:
-                dict1[key] = dict2[key]
+                current[last_key] = value
+
+        return nested_structure
 
     @staticmethod
-    def get_base_dir():
+    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
         """
-        Gets the base directory as reference for all relative paths.
-
-        Unfrozen application - gets the project directory
-        Frozen application - gets the executable directory
-
-        Returns
-        -------
-        Path: The reference directory for all paths in the program.
-
-        """
-
-        # Frozen
-        if getattr(sys, "frozen", False):
-            #
-            # Get the executable file path
-            # Resolve to absolute path
-            # Take the parent base_dir/RUFAS_exe
-            #                 parent = base_dir/
-
-            return Path(sys.executable).resolve().parent
-
-        # Unfrozen
-        else:
-            #
-            # Get path of current file (util.py)
-            # Resolve to absolute path
-            # Get the 2nd parent  base_dir/RUFAS/util.py
-            #                     parent[0] = base_dir/RUFAS
-            #                     parent[1] = base_dir/
-            return Path(__file__).resolve().parents[1]
-
-    @staticmethod
-    def read_json_file(file_path: Path) -> Dict[Any, Any]:
-        """
-        Description:
-            Reads and interprets the JSON file at the given path. Compiles the
-            information into dictionaries used to instantiate simulation objects.
+        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
+        that contain dictionaries and dictionaries that contain lists.
 
         Parameters
         ----------
-        file_path (Path): Path to the input json file
-
-        Raises
-        ------
-        InvalidJSONFileError
-            If the json file at the given path does not conform with the format required.
-
-        Returns
-        -------
-        Dict[Any, Any]
-            The data read from the json file.
-
+        target : Dict[Any, Any]
+            The primary dictionary to be updated.
+        updates : Dict[Any, Any]
+            The dictionary containing updates to be merged into target.
         """
+        for key, value in updates.items():
+            if key in target:
+                if isinstance(value, dict) and isinstance(target[key], dict):
+                    Utility.deep_merge(target[key], value)
+                elif isinstance(value, list) and isinstance(target[key], list):
+                    if len(target[key]) < len(value):
+                        target[key].extend([None] * (len(value) - len(target[key])))
 
-        try:
-            if file_path.suffix == ".json":
-                if not file_path.is_file():
-                    raise errors.UserInput((str(file_path), "does not exist"))
+                    for i, item in enumerate(value):
+                        if i < len(target[key]):
+                            if isinstance(item, dict) and isinstance(target[key][i], dict):
+                                Utility.deep_merge(target[key][i], item)
+                            else:
+                                target[key][i] = item
+                        else:
+                            target[key].append(item)
+                else:
+                    target[key] = value
             else:
-                raise errors.UserInput((str(file_path), "is not a JSON file"))
-
-            with file_path.open("r") as f:
-                data = json.load(f)
-
-            return data
-
-        except errors.UserInput as e:
-            print(e.msg)
+                target[key] = value
 
     @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
@@ -179,15 +139,17 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
+    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
         """
         Remove items from a list given a list of indices.
         The operation is done in-place.
 
         Parameters
         ----------
-        arr: a list of items
-        removed_idx: a list that contains indices of the items to be removed
+        data: List[Any] a list of items
+            The list to remove items from
+        indices_to_remove : List[Any]
+            The list that contains indices of the items to be removed
 
         Returns
         -------
@@ -195,9 +157,10 @@ class Utility:
 
         """
 
-        # Safer to remove elements from the back
-        for idx in sorted(removed_idx, reverse=True):
-            del arr[idx]
+        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
+        # to prevent the shifting of indices from affecting later removals.
+        for idx in sorted(indices_to_remove, reverse=True):
+            del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
@@ -221,7 +184,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -419,6 +382,8 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
+
+        return -1
 
     @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
