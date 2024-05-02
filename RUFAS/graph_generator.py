@@ -57,7 +57,7 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot"]
+TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter"]
 
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
@@ -212,7 +212,6 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        enabled_graph_types = ["plot", "stackplot"]
         optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
@@ -228,15 +227,6 @@ class GraphGenerator:
                         "info_map": info_map,
                     }
                 )
-        if graph_details.get("type") not in enabled_graph_types:
-            graph_filter_validation_logs.append(
-                {
-                    "error": f"Can't plot {graph_details.get('title')} data set",
-                    "message": f"Graph type '{graph_details.get('type')}' "
-                    f"not in list of currently enabled graph-types, {enabled_graph_types}.",
-                    "info_map": info_map,
-                }
-            )
         if graph_details.get("title"):
             graph_title_validation_logs = self._validate_graph_title(graph_details.get("title"))
             graph_filter_validation_logs.extend(graph_title_validation_logs)
