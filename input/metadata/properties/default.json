@@ -12,18 +12,6 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
-    "random_seed": {
-      "type": "number",
-      "description": "The random seed",
-      "minimum": 0,
-      "maximum": 4294967295,
-      "default": 42
-    },
-    "set_seed": {
-      "type": "bool",
-      "description": "Whether or not to set random seed",
-      "default": true
-    },
     "simulate_animals": {
       "type": "bool",
       "description": "Whether or not to simulate animals during the simulation",
@@ -41,6 +29,11 @@
       "maximum": 56045,
       "default": null,
       "description": "Unique 5-digit code that represents a specific U.S. county."
+    },
+    "include_detailed_values": {
+      "type": "bool",
+      "description": "Whether or not to add detailed_values property to the json output",
+      "default": false
     }
   },
   "animal_properties": {
@@ -1578,6 +1571,7 @@
           "default": [],
           "properties": {
             "type": "number",
+            "description": "Julian day of year to harvest",
             "minimum": 1,
             "maximum": 366
           }
@@ -1943,6 +1937,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of diesel per gallon",
         "minimum": 0,
         "default": 5.0
       }
@@ -1952,6 +1947,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of electricity per kwh",
         "minimum": 0,
         "default": 0.15
       }
@@ -1961,6 +1957,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of natural gas per kwh",
         "minimum": 0,
         "default": 0.053
       }
@@ -1970,6 +1967,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "description": "cost of water per gallon",
         "minimum": 0,
         "default": 0.008
       }
@@ -3143,7 +3141,6 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
-          "description": "Purchased Feed",
           "minimum": 1,
           "maximum": 300
         },
@@ -4398,8 +4395,7 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Bedding Type -- The material used for bedding pack.",
-          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+          "description": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
         },
         "manure_handler": {
           "type": "string",
@@ -4426,6 +4422,10 @@
       "type": "array",
       "properties": {
         "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Unique identifier for this bedding configuration."
+        },
         "bedding_type": {
           "type": "string",
           "description": "Bedding Type -- The material used for bedding pack.",
@@ -5005,6 +5005,7 @@
       "description": "Irrigation (mm H2O).",
       "type": "array",
       "properties": {
+        "description": "Irrigation (mm H2O).",
         "type": "number",
         "default": 0
       }

@@ -2,7 +2,7 @@ import json
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union
 
 import pandas as pd
 import pytest
@@ -1740,6 +1740,7 @@ def test_save_results(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mock_output_manager.time = MagicMock()
 
     # Act
     mock_output_manager.save_results(
@@ -1887,21 +1888,73 @@ def test_route_save_functions_csv(
     mock_output_manager._route_save_functions = output_manager_original_method_states["_route_save_functions"]
 
 
-def test_route_save_functions_json(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+def test_route_save_functions_json(mocker: MockerFixture) -> None:
+
+    # Arrange
+    output_manager = OutputManager()
+    patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
+    filter_file = "json_file"
+    save_path = Path("save_path")
+    filtered_pool = {"key": {"var": "value"}}
+    produce_graphics = True
+    filter_content = {"filters": "regex"}
+    graphics_dir = Path("graphics_dir")
+    csvs_dir = Path("csvs_dir")
+
+    # Act
+    output_manager._route_save_functions(
+        filter_file, save_path, filtered_pool, produce_graphics, filter_content, graphics_dir, csvs_dir
+    )
+
+    # Assert
+    patch_for_save_to_json.assert_called_once_with(filter_file, save_path, filtered_pool, filter_content)
+
+
+@pytest.mark.parametrize(
+    "filter_content, filter_file_extension, expected_filename",
+    [
+        # Name provided without .json
+        ({"name": "test_name"}, ".json", "saved_variables_test_name.json"),
+        # No name provided, but filter_file ends with .json
+        (
+            {},
+            ".json",
+            "saved_variables_filter_file_with_millis.json",
+        ),
+        # No name, filter_file does not end with .json
+        ({}, ".txt", "saved_variables_filter_file.json"),
+    ],
+)
+def test_save_to_json(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    filter_content: Dict[str, Union[str, int]],
+    filter_file_extension: str,
+    expected_filename: str,
 ) -> None:
-    mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager.generate_file_name = MagicMock(return_value="filename.json")
-    mock_output_manager._route_save_functions(
-        "json_file", "save_path", {"key": {"var": "value"}}, True, {"filters": "regex"}, "graphics_dir", "csvs_dir"
+    """
+    Unit test for the _save_to_json() method in the OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    patch_for_generate_file_name = mocker.patch.object(
+        output_manager, "generate_file_name", return_value=expected_filename
     )
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
-        {"key": {"var": "value"}}, os.path.join("save_path", "filename.json")
+    patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
+    filter_file = f"filter_file{filter_file_extension}"
+    save_path = tmp_path  # Using pytest's tmp_path fixture
+    filtered_pool = {"key": "value"}
+
+    # Act
+    output_manager._save_to_json(filter_file, save_path, filtered_pool, filter_content)
+
+    # Assert
+    base_name = (
+        f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
     )
-    # Restore original method
-    mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
-    mock_output_manager._route_save_functions = output_manager_original_method_states["_route_save_functions"]
+    patch_for_generate_file_name.assert_called_once_with(base_name, "json")
+    patch_for_dict_to_file_json.assert_called_once_with(filtered_pool, os.path.join(save_path, expected_filename))
 
 
 def test_route_save_functions_graph(
@@ -2241,10 +2294,22 @@ def test_get_error_and_warning_counts(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.ERRORS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.WARNINGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.LOGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (
+            LogVerbosity.CREDITS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.ERRORS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.WARNINGS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.LOGS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
     ],
 )
 def test_print_credits(
@@ -2254,7 +2319,9 @@ def test_print_credits(
     Unit test for the print_credits() method in OutputManager class.
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
-    mock_output_manager.print_credits()
+    task_id = "id"
+    version = "v"
+    mock_output_manager.print_credits(version, task_id)
 
     captured = capfd.readouterr()
     assert captured.out == expected_output
@@ -2264,24 +2331,25 @@ def test_print_credits(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.ERRORS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.WARNINGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.LOGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.CREDITS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.ERRORS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.WARNINGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.LOGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
     ],
 )
 def test_print_errors_warnings_logs(
     mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
 ):
     mock_output_manager._OutputManager__log_verbose = log_verbose
+    task_id = "id"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
-        mock_output_manager.print_errors_warnings_logs_counts()
+        mock_output_manager.print_errors_warnings_logs_counts(task_id)
         captured = capfd.readouterr()
         assert captured.out == expected_output
 
 
 @pytest.mark.parametrize(
-    "input_data,expected",
+    "input_data, detailed_values_flag, expected",
     [
         # Basic test case with a single data_origin per value
         (
@@ -2294,6 +2362,7 @@ def test_print_errors_warnings_logs(
                     "values": [10, 20],
                 }
             },
+            True,  # detailed_values_flag
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
@@ -2301,7 +2370,7 @@ def test_print_errors_warnings_logs(
                         {"data_origin": [["SourceClassA", "method_a"]], "units": MeasurementUnits.UNITLESS.value},
                     ],
                     "values": [10, 20],
-                    "detailed_data_origins": [
+                    "detailed_values": [
                         [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
                         [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
                     ],
@@ -2322,6 +2391,7 @@ def test_print_errors_warnings_logs(
                     "values": [30, 40],
                 }
             },
+            True,  # detailed_values_flag
             {
                 "ModuleB.variable_y": {
                     "info_maps": [
@@ -2332,7 +2402,7 @@ def test_print_errors_warnings_logs(
                         {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                     ],
                     "values": [30, 40],
-                    "detailed_data_origins": [
+                    "detailed_values": [
                         [
                             ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
                             ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
@@ -2342,14 +2412,6 @@ def test_print_errors_warnings_logs(
                 }
             },
         ),
-        (
-            {
-                "ModuleC.non_dict": "This is a string, not a dict",
-            },
-            {
-                "ModuleC.non_dict": "This is a string, not a dict",
-            },
-        ),
         # Missing both keys
         (
             {
@@ -2357,6 +2419,7 @@ def test_print_errors_warnings_logs(
                     "other_key": "some_value",
                 }
             },
+            True,  # detailed_values_flag
             {
                 "ModuleD.missing_both": {
                     "other_key": "some_value",
@@ -2370,6 +2433,7 @@ def test_print_errors_warnings_logs(
                     "values": [50, 60],
                 }
             },
+            True,  # detailed_values_flag
             {
                 "ModuleE.missing_info_maps": {
                     "values": [50, 60],
@@ -2383,27 +2447,126 @@ def test_print_errors_warnings_logs(
                     "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
                 }
             },
+            True,  # detailed_values_flag
             {
                 "ModuleF.missing_values": {
                     "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
                 }
             },
         ),
+        # _detailed_values_flag set to False
+        (
+            {
+                "ModuleG.variable_z": {
+                    "info_maps": [{"data_origin": [["SourceClassG", "method_g"]], "units": "units_g"}],
+                    "values": [70],
+                }
+            },
+            False,  # detailed_values_flag
+            {
+                "ModuleG.variable_z": {
+                    "info_maps": [{"data_origin": [["SourceClassG", "method_g"]], "units": "units_g"}],
+                    "values": [70],
+                }
+            },
+        ),
+        (
+            {
+                "ModuleK.no_data_origin": {
+                    "info_maps": [
+                        {"units": "units_k"},  # Missing data_origin
+                        {"data_origin": [["ClassW", "method_w"]], "units": "units_w"},
+                    ],
+                    "values": [110, 120],
+                }
+            },
+            True,  # detailed_values_flag
+            {
+                "ModuleK.no_data_origin": {
+                    "info_maps": [
+                        {"units": "units_k"},
+                        {"data_origin": [["ClassW", "method_w"]], "units": "units_w"},
+                    ],
+                    "values": [110, 120],
+                }
+            },
+        ),
     ],
 )
-def test_add_detailed_data_origin(input_data: Dict[str, Dict[str, Any]], expected: Dict[str, Dict[str, Any]]) -> None:
+def test_add_detailed_values(
+    input_data: Dict[str, Any], detailed_values_flag: bool, expected: Dict[str, Any], mocker: MockerFixture
+) -> None:
     """
-    Unit test for the _add_detailed_data_origin() method in OutputManager class
+    Unit test for the _add_detailed_values() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    mocker.patch.object(output_manager, "_include_detailed_values", detailed_values_flag)
+
+    # Act
+    result = output_manager._add_detailed_values(input_data)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "new_flag_value",
+    [
+        True,
+        False,
+    ],
+)
+def test_set_detailed_values(new_flag_value: bool) -> None:
+    """
+    Unit test for the set_include_detailed_values() method in OutputManager class.
+    """
+
+    # Arrange
+    manager1 = OutputManager()
+
+    # Assert initial value
+    assert not manager1._include_detailed_values
+
+    # Act
+    manager1.set_include_detailed_values(new_flag_value)
+
+    # Assert
+    assert manager1._include_detailed_values == new_flag_value
+
+    # Clean up
+    manager1.set_include_detailed_values(False)
+
+
+@pytest.mark.parametrize(
+    "sub_data_dict, expected_result",
+    [
+        # Case 1: All conditions met
+        ({"info_maps": [{"data_origin": "source"}], "values": [1]}, True),
+        # Case 2: Not a dictionary
+        ("not_a_dict", False),
+        # Case 3: Missing 'info_maps' key
+        ({"values": [1]}, False),
+        # Case 4: Missing 'values' key
+        ({"info_maps": [{"data_origin": "source"}]}, False),
+        # Case 5: 'info_maps' and 'values' have different lengths
+        ({"info_maps": [{"data_origin": "source"}, {"data_origin": "source2"}], "values": [1]}, False),
+    ],
+)
+def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result: bool) -> None:
+    """
+    Unit test for the _can_add_detailed_values() method in OutputManager class.
     """
 
     # Arrange
     output_manager = OutputManager()
 
     # Act
-    result = output_manager._add_detailed_data_origin(input_data)
+    result = output_manager._can_add_detailed_values(sub_data_dict)
 
     # Assert
-    assert result == expected
+    assert result == expected_result
 
 
 @pytest.mark.parametrize("flag_value", [False, True])
