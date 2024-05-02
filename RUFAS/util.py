@@ -37,51 +37,87 @@ class Utility:
         return result
 
     @staticmethod
-    def convert_flat_dict_to_nested_dict(flat_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Dict | List]:
         """
-        Convert a flat dictionary with dot-separated keys into a nested dictionary structure.
+        Convert a dictionary with flat, dot-separated keys into a nested structure composed of
+        dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
+        while non-numeric segments indicate dictionary keys.
 
         Parameters
         ----------
-        flat_dict : Dict[str, Any]
-            A dictionary with string keys that include dots to signify nested levels.
+        input_dict : Dict[str, Any]
+            A dictionary where the keys are strings that may include dots to signify hierarchical
+            levels in the resulting nested structure. Numeric key segments result in list creations,
+            and non-numeric segments result in dictionary creations.
 
         Returns
         -------
-        Dict[str, Any]
-            A nested dictionary where the structure is determined by splitting the keys on dots.
+        Dict[str, Union[Dict, list]]
+            A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
         """
-        nested_dict = {}
-        for flat_key, value in flat_dict.items():
+        nested_structure = {}
+        for flat_key, value in input_dict.items():
             keys = flat_key.split(".")
-            current = nested_dict
-            for key in keys[:-1]:
-                if key not in current:
-                    current[key] = {}
-                current = current[key]
-            current[keys[-1]] = value
-        return nested_dict
+            current = nested_structure
+            for i, key in enumerate(keys[:-1]):
+                next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
+
+                if key.isdigit():
+                    key = int(key)
+                    while len(current) <= key:
+                        current.append([] if next_key_is_digit else {})
+                    current = current[key]
+                else:
+                    if isinstance(current, list):
+                        current = current[-1]
+                    if key not in current:
+                        current[key] = [] if next_key_is_digit else {}
+                    current = current[key]
+
+            last_key = keys[-1]
+            if last_key.isdigit():
+                last_key = int(last_key)
+                while len(current) <= last_key:
+                    current.append(None)
+                current[last_key] = value
+            else:
+                current[last_key] = value
+
+        return nested_structure
 
     @staticmethod
-    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
+    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
         """
-        Recursively merges dict2 into dict1 in place.
+        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
+        that contain dictionaries and dictionaries that contain lists.
 
         Parameters
         ----------
-        dict1 : Dict[str, Any]
+        target : Dict[Any, Any]
             The primary dictionary to be updated.
-        dict2 : Dict[str, Any]
-            The dictionary containing updates to be merged into dict1.
+        updates : Dict[Any, Any]
+            The dictionary containing updates to be merged into target.
         """
-        for key in dict2:
-            if key in dict1:
-                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                    Utility.deep_merge(dict1[key], dict2[key])
+        for key, value in updates.items():
+            if key in target:
+                if isinstance(value, dict) and isinstance(target[key], dict):
+                    Utility.deep_merge(target[key], value)
+                elif isinstance(value, list) and isinstance(target[key], list):
+                    if len(target[key]) < len(value):
+                        target[key].extend([None] * (len(value) - len(target[key])))
+
+                    for i, item in enumerate(value):
+                        if i < len(target[key]):
+                            if isinstance(item, dict) and isinstance(target[key][i], dict):
+                                Utility.deep_merge(target[key][i], item)
+                            else:
+                                target[key][i] = item
+                        else:
+                            target[key].append(item)
                 else:
-                    dict1[key] = dict2[key]
+                    target[key] = value
             else:
-                dict1[key] = dict2[key]
+                target[key] = value
 
     @staticmethod
     def get_base_dir():
