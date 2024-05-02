@@ -1756,10 +1756,10 @@ def test_anaerobic_lagoon_update_methane_emission(
 
 @pytest.mark.parametrize(
     "num_animals, liquid_manure_total_ammoniacal_nitrogen, daily_final_manure_volume,"
-    "mock_storage_ammonia_emission_value",
+    "liquid_manure_daily_volume, mock_storage_ammonia_emission_value",
     [
-        (100, 1.0, 1000.0, 10.0),  # Normal case
-        (100, 0.0, 1000.0, 0.0),  # Zero ammoniacal nitrogen
+        (100, 1.0, 1000.0, 800.0, 10.0),
+        (100, 0.0, 1000.0, 800.0, 0.0),
     ],
 )
 def test_anaerobic_lagoon_update_ammonia_emission(
@@ -1767,6 +1767,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     num_animals: int,
     liquid_manure_total_ammoniacal_nitrogen: float,
     daily_final_manure_volume: float,
+    liquid_manure_daily_volume: float,
     mock_storage_ammonia_emission_value: float,
 ) -> None:
     # Arrange
@@ -1776,6 +1777,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     mock_current_pen.num_animals = num_animals
     mock_accumulated_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen
+    mock_accumulated_output.liquid_manure_daily_volume = liquid_manure_daily_volume
 
     patch_for_calc_storage_ammonia_emission = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon" ".GasEmissionsCalculator.storage_ammonia_emission",
@@ -1799,7 +1801,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     patch_for_calc_storage_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
         manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-        manure_volume=daily_final_manure_volume,
+        manure_volume=liquid_manure_daily_volume,
         manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
         temp=mock_temp_value,
     )
