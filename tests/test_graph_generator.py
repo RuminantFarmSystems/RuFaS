@@ -35,23 +35,6 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
             assert result == mock_generate_graph_path.return_value
 
 
-@pytest.mark.skip
-def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
-    graph_details: Dict[str, str] = {
-        "title": "Test Graph",
-        "x_label": "X Axis",
-        "y_label": "Y Axis",
-    }
-    filter_file_name: str = "test_filter.png"
-    save_path = Path(r"/path/to/save")
-    graphics_dir = Path("graphics")
-
-    with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
-        mock_savefig.side_effect = Exception("test")
-        with pytest.raises(Exception, match="test"):
-            graph_generator._save_graph(graph_details, filter_file_name, save_path, graphics_dir)
-
-
 def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
