@@ -20,3 +20,4 @@ mypy
 black
 coverage
 deepdiff
+psutil
