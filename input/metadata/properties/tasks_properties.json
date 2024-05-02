@@ -13,7 +13,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_VALIDATION|END_TO_END_TESTING|POST_PROCESSING",
+          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDITION|END_TO_END_TESTING|POST_PROCESSING",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
@@ -89,6 +89,81 @@
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
           "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
           "default": ""
+        },
+        "random_seed": {
+          "type": "number",
+          "description": "The random seed, set it to 0 to auto-generate it",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "default": 0
+        },
+        "multi_run_counts": {
+          "type": "number",
+          "description": "If task type is multi_run, indicates how many single simulations should run.",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 4
+        },
+        "sampler": {
+          "type": "string",
+          "description": "The sampler for Sensitivity Analysis",
+          "pattern": "fractional_factorial|saltelli_sobol",
+          "default": "saltelli_sobol"
+        },
+        "saltelli_skip": {
+          "type": "number",
+          "description": "The saltelli skip value for Sensitivity Analysis",
+          "minimum": 0,
+          "default": 0
+        },
+        "saltelli_number": {
+          "type": "number",
+          "description": "The saltelli sampling value for Sensitivity Analysis",
+          "minimum": 2,
+          "default": 2
+        },
+        "SA_input_variables": {
+          "type": "array",
+          "description": "The input variables to perform Sensitivity Analysis on",
+          "default": [{}],
+          "properties": {
+            "type": "object",
+            "variable_name": {
+              "type": "string",
+              "default": "no_name",
+              "description": "The name of the variable to be sampled, has to match within Input Manager Pool"
+            },
+            "lower_bound": {
+              "type": "number",
+              "default": 0,
+              "description": "The lower bound for sampling"
+            },
+            "upper_bound": {
+              "type": "number",
+              "default": 1,
+              "description": "The upper bound for sampling"
+            },
+            "data_type": {
+              "type": "string",
+              "description": "Specifies the data type of this variable",
+              "default": "float",
+              "pattern": "float|int"
+            }
+          }
+        },
+        "SA_load_balancing_start": {
+          "type": "number",
+          "description": "The lower bound value for sensitivity analysis load balancing",
+          "minimum": 0,
+          "maximum": 0.99,
+          "default": 0
+        },
+        "SA_load_balancing_stop": {
+          "type": "number",
+          "description": "The upper bound value for sensitivity analysis load balancing",
+          "minimum": 0.01,
+          "maximum": 1,
+          "default": 1
         }
       }
     }
