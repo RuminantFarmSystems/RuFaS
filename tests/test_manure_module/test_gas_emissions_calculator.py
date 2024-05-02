@@ -17,7 +17,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 def test_mcf() -> None:
     """Tests _methane_conversion_factor() in calculator.py."""
     assert GasEmissionsCalculator._methane_conversion_factor(1.0) == pytest.approx(
-        (GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B))
+        (GasEmissionConstants.MCF_CONSTANT_A - GasEmissionConstants.MCF_CONSTANT_B)
     )
 
 
