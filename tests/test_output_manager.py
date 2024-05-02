@@ -595,34 +595,35 @@ def test_add_variable(
 
 
 @pytest.mark.parametrize(
-    "units, expected_exception, expected_message",
+    "units, expected_result",
     [
-        (MeasurementUnits.ANIMALS, None, None),
+        (MeasurementUnits.ANIMALS, MeasurementUnits.ANIMALS.value),
         (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "second": MeasurementUnits.ANIMALS,
+                "nested": {"third": MeasurementUnits.DAYS},
+            },
             {
                 "first": MeasurementUnits.ANIMALS.value,
                 "second": MeasurementUnits.ANIMALS.value,
                 "nested": {"third": MeasurementUnits.DAYS.value},
             },
-            None,
-            None,
         ),
-        ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+        ("invalid_unit", ValueError("'invalid_unit' is not a valid MeasurementUnits value")),
         (
             {
-                "first": MeasurementUnits.ANIMALS.value,
+                "first": MeasurementUnits.ANIMALS,
                 "invalid": "not_a_unit",
             },
-            ValueError,
-            "'not_a_unit' is not a valid MeasurementUnits value",
+            ValueError("'not_a_unit' is not a valid MeasurementUnits value"),
         ),
         (
             {
                 "first": {"nested_invalid": "definitely_not_a_unit"},
-                "second": MeasurementUnits.ANIMALS.value,
+                "second": MeasurementUnits.ANIMALS,
             },
-            ValueError,
-            "'definitely_not_a_unit' is not a valid MeasurementUnits value",
+            ValueError("'definitely_not_a_unit' is not a valid MeasurementUnits value"),
         ),
     ],
 )
@@ -630,19 +631,15 @@ def test_validate_units(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
-    expected_exception: ValueError,
-    expected_message: str,
+    expected_result: Dict[str, str] | str | Exception,
 ) -> None:
     """Test for function _validate_units in file output_manager.py"""
-    if expected_exception:
-        with pytest.raises(expected_exception) as e:
+    if isinstance(expected_result, Exception):
+        with pytest.raises(type(expected_result)) as e:
             mock_output_manager._validate_units(units)
-        assert expected_message in str(e.value)
+        assert str(expected_result) == str(e.value)
     else:
-        mock_output_manager._validate_units(units)
-
-    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
-
+        assert mock_output_manager._validate_units(units) == expected_result
 
 @pytest.mark.parametrize(
     "dummy_value, exclude_info_maps_flag",
