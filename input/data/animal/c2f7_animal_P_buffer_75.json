@@ -147,7 +147,7 @@
 	"pasture_concentrate": 0,
 	"methane_model": "Mutian",
 	"ration": {
-		"phosphorus_requirement_buffer": 35,
+		"phosphorus_requirement_buffer": 75,
 		"user_input": false,
 		"formulation_interval": 30
 	},

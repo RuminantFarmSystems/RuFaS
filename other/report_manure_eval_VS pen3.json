@@ -1,0 +1,783 @@
+{
+  "multiple": [
+    {
+            "name": "Pen 3 average no. milking cows",
+            "filters": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+    {
+            "name": "Ambient temperature, C",
+            "filters": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.tempC"],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+
+
+
+
+
+
+{"name": "Lac Cow Manure DegVS excretion, kg/cow/d",
+          "filters": [
+                "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_degradable_volatile_solids",
+                "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+          "horizontal_aggregation": "division",
+          "horizontal_order": [
+                "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_degradable_volatile_solids",
+                "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+          "horizontal_first": "true",
+          "vertical_aggregation": "average",
+          "slice_start": -365},
+
+{"name": "Lac Cow Manure NonDegVS excretion, kg/cow/d",
+        "filters": [
+              "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+{"name": "Lac Cow Manure DegVS excretion, kg/cow/year",
+        "filters": [
+              "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow Manure NonDegVS excretion, kg/cow/year",
+      "filters": [
+            "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_non_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_aggregation": "division",
+      "horizontal_order": [
+            "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_non_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_first": "true",
+      "vertical_aggregation": "sum",
+      "slice_start": -365},
+
+{"name": "Lac Cow Manure DegVS excretion, kg/year",
+    "filters": [
+          "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_degradable_volatile_solids$"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow Manure NonDegVS excretion, kg/year",
+  "filters": [
+        "AnimalModuleReporter.report_animal_module_manure.daily_aggregate_lactating_cow_non_degradable_volatile_solids$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+
+
+
+
+
+
+
+
+{"name": "Lac Cow Manure Handler total VS, kg/cow/d",
+        "filters": [
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+{"name": "Lac Cow Manure Handler DegVS, kg/cow/d",
+      "filters": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_aggregation": "division",
+      "horizontal_order": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_first": "true",
+      "vertical_aggregation": "average",
+      "slice_start": -365},
+{"name": "Lac Cow Manure Handler Non DegVS, kg/cow/d",
+      "filters": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_aggregation": "division",
+      "horizontal_order": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_first": "true",
+      "vertical_aggregation": "average",
+      "slice_start": -365},
+{"name": "Lac Cow manure housing methane emissions, kg/cow/d",
+      "filters": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.housing_methane",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_aggregation": "division",
+      "horizontal_order": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.housing_methane",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_first": "true",
+      "vertical_aggregation": "average",
+      "slice_start": -365},
+
+
+{"name": "Lac Cow Manure Handler total VS, kg/cow/year",
+      "filters": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_aggregation": "division",
+      "horizontal_order": [
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+      "horizontal_first": "true",
+      "vertical_aggregation": "sum",
+      "slice_start": -365},
+
+{"name": "Lac Cow Manure Handler DegVS, kg/cow/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow Manure Handler Non DegVS, kg/cow/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure housing methane emissions, kg/cow/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.housing_methane",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.housing_methane",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+
+{"name": "Lac Cow Manure Handler total VS, kg/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow Manure Handler DegVS, kg/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow Manure Handler Non DegVS, kg/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure housing methane emissions, kg/year",
+    "filters": [
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.housing_methane"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+
+
+
+
+
+
+
+
+
+{"name": "Lac Cow reception pit total VS, kg/cow/d",
+    "filters": [
+          "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "average",
+    "slice_start": -365},
+{"name": "Lac Cow reception pit DegVS, kg/cow/d",
+  "filters": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_aggregation": "division",
+  "horizontal_order": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_first": "true",
+  "vertical_aggregation": "average",
+  "slice_start": -365},
+{"name": "Lac Cow reception pit NonDegVS, kg/cow/d",
+  "filters": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_aggregation": "division",
+  "horizontal_order": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_first": "true",
+  "vertical_aggregation": "average",
+  "slice_start": -365},
+
+
+{"name": "Lac Cow reception pit total VS, kg/cow/year",
+  "filters": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_aggregation": "division",
+  "horizontal_order": [
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+  "horizontal_first": "true",
+  "vertical_aggregation": "sum",
+  "slice_start": -365},
+{"name": "Lac Cow reception pit DegVS, kg/cow/year",
+"filters": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+      "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+"horizontal_aggregation": "division",
+"horizontal_order": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+      "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+"horizontal_first": "true",
+"vertical_aggregation": "sum",
+"slice_start": -365},
+{"name": "Lac Cow reception pit Non DegVS, kg/cow/year",
+"filters": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+      "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+"horizontal_aggregation": "division",
+"horizontal_order": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+      "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+"horizontal_first": "true",
+"vertical_aggregation": "sum",
+"slice_start": -365},
+
+
+{"name": "Lac Cow reception pit Total VS, kg/year",
+"filters": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+"vertical_aggregation": "sum",
+"slice_start": -365},
+{"name": "Lac Cow reception pit DegVS, kg/year",
+"filters": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+"vertical_aggregation": "sum",
+"slice_start": -365},
+{"name": "Lac Cow reception pit Non DegVS, kg/year",
+"filters": [
+      "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+"vertical_aggregation": "sum",
+"slice_start": -365},
+
+
+
+
+
+
+{"name": "Lac Cow manure separator liquid total VS, kg/cow/d",
+        "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure separator liquid DegVS, kg/cow/d",
+        "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure separator liquid NonDegVS, kg/cow/d",
+        "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure separator solid total VS, kg/cow/d",
+        "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [ "ManureSeparatorDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+
+{"name": "Lac Cow manure separator liquid total VS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator liquid DegVS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [
+          "ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator liquid NonDegVS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator solid total VS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_order": [ "ManureSeparatorDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_first": "true",
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+
+
+{"name": "Lac Cow manure separator liquid total VS, kg/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator liquid DegVS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator liquid NonDegVS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+{"name": "Lac Cow manure separator solid total VS, kg/cow/year",
+    "filters": ["ManureSeparatorDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids"],
+    "vertical_aggregation": "sum",
+    "slice_start": -365},
+
+
+
+
+
+
+{"name": "Lac Cow anaerobic digestion manure effluent total VS, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent DegVS, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals" ],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent NonDegVS, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane mass, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.biogas",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.biogas",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane volume, m3/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.methane_generation_volume",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.methane_generation_volume",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+    {"name": "Lac Cow anaerobic digestion manure effluent total VS, kg/cow/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+              "AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent DegVS, kg/cow/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals" ],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent NonDegVS, kg/cow/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane mass, kg/cow/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.biogas",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.biogas",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane volume, m3/cow/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.methane_generation_volume",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.methane_generation_volume",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+{"name": "Lac Cow anaerobic digestion manure effluent total VS, kg/year",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent DegVS, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion manure effluent NonDegVS, kg/cow/d",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane mass, kg/cow/d",
+        "filters": ["^AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.biogas$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion biogas methane volume, m3/cow/d",
+        "filters": ["^AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.methane_generation_volume$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+{"name": "Lac Cow anaerobic digestion manure sludge DegVS, kg/cow/d (confirm 0)",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.sludge_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.sludge_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow anaerobic digestion solid manure DegVS, kg/cow/d (confirm 0)",
+        "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+
+
+
+
+
+{"name": "Lac Cow post-digestion separator liquid total VS, kg/cow/d",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid DegVS, kg/cow/d",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid NonDegVS, kg/cow/d",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator solid total VS, kg/cow/d",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+{"name": "Lac Cow post-digestion separator liquid total VS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid DegVS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid NonDegVS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator solid total VS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+{"name": "Lac Cow post-digestion separator liquid total VS, kg/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid DegVS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator liquid NonDegVS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow post-digestion separator solid total VS, kg/cow/year",
+        "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+
+
+
+
+
+{"name": "Lac Cow manure total VS entering storage, kg/cow/d",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure DegVS entering storage, kg/cow/d",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure NonDegVS entering storage, kg/cow/d",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+{"name": "Lac Cow manure storage methane emissions, kg/cow/d",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.storage_methane",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.storage_methane",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+{"name": "Lac Cow manure total VS entering storage, kg/cow/year",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure DegVS entering storage, kg/cow/year",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure NonDegVS entering storage, kg/cow/year",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure storage methane emissions, kg/cow/year",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.storage_methane",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.storage_methane",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+{"name": "Lac Cow manure total VS entering storage, kg/year",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure DegVS entering storage, kg/year",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure NonDegVS entering storage, kg/year",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_total_non_degradable_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+{"name": "Lac Cow manure storage methane emissions, kg/year",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.storage_methane"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+
+
+
+
+
+{"name": "Lac Cow solid manure total VS entering storage, kg/cow/d",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "average",
+        "slice_start": -365},
+
+{"name": "Lac Cow solid manure total VS entering storage, kg/cow/year",
+        "filters": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids",
+              "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_first": "true",
+        "vertical_aggregation": "sum",
+        "slice_start": -365},
+
+{"name": "Lac Cow solid manure total VS entering storage, kg/year",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_total_volatile_solids"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365}
+    ]
+}  
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
