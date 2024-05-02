@@ -7,6 +7,7 @@ from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.weather import Weather
 from .sample_crop_data import sample_crop_data
 
 om = OutputManager()
@@ -157,7 +158,7 @@ def test_record_stored_crops() -> None:
         (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 2.019438),
         (55.0, 66.0, CropCategory.GRASS, [25.0] * 2, 0.0),
         (120.0, 4.0, CropCategory.SMALL_GRAIN, [15.0], 0.0),
-        (100.0, 24.0, CropCategory.GRASS, [], 0.0)
+        (100.0, 24.0, CropCategory.GRASS, [], 0.0),
     ],
 )
 def test_calculate_dry_matter_loss_to_gas(
@@ -170,7 +171,7 @@ def test_calculate_dry_matter_loss_to_gas(
     temps: list[float],
     expected: float,
 ) -> None:
-    """Tests calculate_dry_matter_loss_to_gas in Sileage."""
+    """Tests calculate_dry_matter_loss_to_gas in Storage."""
     mocker.patch(
         "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
         new_callable=mocker.PropertyMock,
@@ -188,6 +189,33 @@ def test_calculate_dry_matter_loss_to_gas(
     actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions)
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("curr_day,last_day,expected_offset", [(1, 1, None), (13, 30, None), (10, 9, 0), (100, 1, -98)])
+def test_get_conditions(
+    storage: Storage,
+    mocker: MockerFixture,
+    curr_day: int,
+    last_day: int,
+    expected_offset: int,
+) -> None:
+    """Tests _get_conditions in Storage."""
+    mock_curr_time = mocker.MagicMock(autospec=Time)
+    mock_curr_time.simulation_day = curr_day
+    mock_last_degradation_time = mocker.MagicMock(autospec=Time)
+    mock_last_degradation_time.simulation_day = last_day
+    returned_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)]
+    mock_weather = mocker.MagicMock(autospec=Weather)
+    mock_weather.get_conditions_series.return_value = returned_conditions
+
+    actual = storage._get_conditions(mock_last_degradation_time, mock_curr_time, mock_weather)
+
+    if expected_offset is None:
+        assert actual == []
+        mock_weather.get_conditions_series.assert_not_called()
+    else:
+        assert actual == returned_conditions
+        mock_weather.get_conditions_series.assert_called_once_with(mock_curr_time, expected_offset, 0)
 
 
 @pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])
