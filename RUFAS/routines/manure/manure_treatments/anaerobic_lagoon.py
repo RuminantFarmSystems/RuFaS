@@ -87,7 +87,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         storage_ammonia_emission = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
-            manure_volume=daily_output.daily_final_manure_volume,
+            manure_volume=self._accumulated_output.liquid_manure_daily_volume,
             manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
             temp=self._get_current_day_average_temperature_celsius(),
         )
