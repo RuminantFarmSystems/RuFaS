@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
 
+from RUFAS.util import Utility
+
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
 Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
@@ -178,8 +180,10 @@ class GraphGenerator:
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
-            legend = graph_details.get("legend")
-            if not legend:
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
+                graph_details["title"] = corrected_graph_title
+            if not graph_details.get("legend"):
                 graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
@@ -227,9 +231,6 @@ class GraphGenerator:
                         "info_map": info_map,
                     }
                 )
-        if graph_details.get("title"):
-            graph_title_validation_logs = self._validate_graph_title(graph_details.get("title"))
-            graph_filter_validation_logs.extend(graph_title_validation_logs)
 
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
@@ -248,37 +249,6 @@ class GraphGenerator:
                     }
                 )
         return graph_filter_validation_logs
-
-    def _validate_graph_title(self, title: str) -> List[Dict[str, str | Dict[str, str]]]:
-        """Validates a graph title.
-
-        Parameters
-        ----------
-        title : str
-            The title of the graph from the graph filter.
-
-        Returns
-        -------
-        List[Dict[str, str | Dict[str, str]]]
-            The errors to be reported to OutputManager.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_graph_title.__name__,
-        }
-        graph_title_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
-        protected_chars = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
-        for char in protected_chars:
-            if char in title:
-                graph_title_validation_logs.append(
-                    {
-                        "error": f"Can't plot {title} data set",
-                        "message": f"Graph title contains prohibited character '{char}'",
-                        "info_map": info_map,
-                    }
-                )
-                print("prot char")
-        return graph_title_validation_logs
 
     def _log_non_numerical_data(
         self,

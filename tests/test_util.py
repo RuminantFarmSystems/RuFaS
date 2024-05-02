@@ -249,3 +249,10 @@ def test_filter_dictionary(
     expected_result: Dict[str, Any],
 ) -> None:
     assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
+
+
+def test_remove_special_chars() -> None:
+    """Tests remove_special_chars() function in util.py"""
+    charred_word = "<>:/w\"o|\\r?d?*."
+    expected_result = "word"
+    assert Utility.remove_special_chars(charred_word) == expected_result

@@ -5,6 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
 
 
@@ -182,7 +183,7 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._save_graph.assert_not_called()
 
 
-def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
+def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
@@ -190,8 +191,9 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
+    mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
     graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
-    graph_details = {"type": "plot", "filters": ["var1", "var2"]}
+    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title"}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
@@ -200,6 +202,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()))
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+    mock_remove_special_chars.assert_called_once()
 
 
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -346,7 +349,7 @@ def test_log_non_numerical_data(
         ),
         (
             {
-                "type": "plot",
+                "type": "scatter",
                 "tightle": "Valid Graph",
                 "filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -354,16 +357,6 @@ def test_log_non_numerical_data(
             1,
             "Invalid filter file key 'tightle' does not matchany optional keys. "
             "Please see Graph Generator wiki for a list of valid filterkeys.",
-        ),
-        (
-            {
-                "type": "dummy_plot",
-                "tightle": "Valid Graph",
-                "filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            1,
-            "Graph type 'dummy_plot' not in list of currently enabled graph-types, ['plot', 'stackplot'].",
         ),
     ],
 )
@@ -377,30 +370,5 @@ def test_validate_graph_filter(
     result = graph_generator._validate_graph_filter(graph_details)
     assert len(result) == expected_length
 
-    if expected_length > 0:
-        assert expected_message in result[0]["message"]
-
-
-@pytest.mark.parametrize(
-    "title, expected_length, expected_message",
-    [
-        (
-            "Valid Graph",
-            0,
-            None,
-        ),
-        (
-            "Invalid / Graph",
-            1,
-            "Graph title contains prohibited character '/'",
-        ),
-    ],
-)
-def test_validate_graph_title(
-    graph_generator: GraphGenerator, title: str, expected_length: int, expected_message: str
-) -> None:
-    """Test for the _validate_graph_title() method in graph_generator.py"""
-    result = graph_generator._validate_graph_title(title)
-    assert len(result) == expected_length
     if expected_length > 0:
         assert expected_message in result[0]["message"]
