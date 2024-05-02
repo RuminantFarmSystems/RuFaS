@@ -251,18 +251,41 @@ def test_filter_dictionary(
     assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
 
 
-def test_convert_flat_dict_to_nested_dict() -> None:
+def flatten_keys_to_nested_structure_nested_dict() -> None:
     x = {"a.i.c": 1, "a.i.d": 2, "a.j.c": 3, "a.j.d": 4, "b.i.c": 5, "b.i.d": 6, "b.j.c": 7, "b.j.d": 8}
-    actual = Utility.convert_flat_dict_to_nested_dict(x)
+    actual = Utility.flatten_keys_to_nested_structure(x)
     expected = {
         "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 8}},
     }
     assert actual == expected
 
+
+def flatten_keys_to_nested_structure_flat_dict() -> None:
     x = {"aic": 1, "aid": 2, "ajc": 3, "ajd": 4, "bic": 5, "bid": 6, "bjc": 7, "bjd": 8}
-    actual = Utility.convert_flat_dict_to_nested_dict(x)
+    actual = Utility.flatten_keys_to_nested_structure(x)
     assert actual == x
+
+
+def flatten_keys_to_nested_structure_dict_w_list() -> None:
+    x = {
+        "a.i.0": 1,
+        "a.i.1": 2,
+        "a.j.c": 3,
+        "a.j.d": 4,
+        "b.i.c": 5,
+        "b.i.d": 6,
+        "b.j.c": 7,
+        "b.j.d.0": 8,
+        "b.j.d.1": 9,
+        "b.j.d.2": 10,
+    }
+    actual = Utility.flatten_keys_to_nested_structure(x)
+    expected = {
+        "a": {"i": [1, 2], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, 9, 10]}},
+    }
+    assert actual == expected
 
 
 def test_deep_merge() -> None:
