@@ -1,0 +1,834 @@
+{
+    "multiple": [
+      {
+          "name": "Pen 3 number of milking cows",
+          "filters": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+        "name": "Pen 4 number of milking cows",
+        "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+      {
+            "name": "Total number of milking cows",
+            "cross_references":[
+                "Pen 4 number of milking cows_ver_agg",
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "sum"
+      },
+      {
+          "name": "Whole herd daily milk production, kg",
+          "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+          "name": "Daily milk production per cow, kg/cow",
+          "cross_references":[
+                "Whole herd daily milk production, kg_ver_agg",
+                "Total number of milking cows_hor_agg"
+            ],
+          "horizontal_aggregation": "division"
+      },
+
+
+
+      {
+          "name": "Pen 4 daily DMI per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_4_LAC_COW"],
+          "variables": ["dm"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      }, 
+      {
+          "name": "Pen 4 daily CP intake per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_4_LAC_COW"],
+          "variables": ["CP"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 dietary CP, %",
+            "cross_references":[
+                "Pen 4 daily CP intake per cow, kg/cow_CP_ver_agg",
+                "Pen 4 daily DMI per cow, kg/cow_dm_ver_agg"
+            ],
+            "constants": {
+                "By 0.01": 0.01
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Pen 4 daily CP intake per cow, kg/cow_CP_ver_agg",
+                "Pen 4 daily DMI per cow, kg/cow_dm_ver_agg", 
+                "By 0.01"
+            ]
+      },
+        
+      {
+            "name": "Pen 4 daily nitrogen intake per cow, kg/cow",
+        "cross_references": ["Pen 4 daily CP intake per cow, kg/cow_CP_ver_agg"],
+        "variables": ["nitrogen"],
+        "constants":{"N_content" : 0.18},
+        "horizontal_aggregation": "product", 
+        "horizontal_order":["Pen 4 daily CP intake per cow, kg/cow_CP_ver_agg", "N_content"]
+    },
+
+     {
+          "name": "Pen 4 dietary nitrogen, %",
+          "cross_references":[
+              "Pen 4 daily nitrogen intake per cow, kg/cow_hor_agg",
+              "Pen 4 daily DMI per cow, kg/cow_dm_ver_agg"
+          ],
+          "constants": {
+              "By 0.01": 0.01
+          },
+          "horizontal_aggregation": "division",
+          "horizontal_order": [
+              "Pen 4 daily nitrogen intake per cow, kg/cow_N_conent_ver_agg",
+              "Pen 4 daily DMI per cow, kg/cow_dm_ver_agg", 
+              "By 0.01"
+          ]
+    },
+
+      {
+          "name": "Pen 4 daily manure nitrogen, g/d",
+          "filters": ["^AnimalModuleReporter.report_pen_manure_properties.pen_4_daily_manure_nitrogen$"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 daily manure nitrogen, kg/d",
+            "cross_references":[
+                "Pen 4 daily manure nitrogen, g/d_ver_agg"
+            ],
+            "constants": {
+                "By 1000": 1000 
+            },
+            "horizontal_aggregation": "division"
+      },
+      {
+            "name": "Pen 4 daily manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 daily manure nitrogen, kg/d_hor_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 annual manure nitrogen, g/yr",
+          "filters": ["^AnimalModuleReporter.report_pen_manure_properties.pen_4_daily_manure_nitrogen$"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 annual manure nitrogen, kg/yr",
+            "cross_references":[
+                "Pen 4 annual manure nitrogen, g/yr_ver_agg"
+            ],
+            "constants": {
+                "By 1000": 1000 
+            },
+            "horizontal_aggregation": "division"
+      },
+      {
+            "name": "Pen 4 annual manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 annual manure nitrogen, kg/yr_hor_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+
+      {
+          "name": "Pen 4 Manure handler daily liquid manure nitrogen, kg/d",
+          "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure handler daily liquid manure nitrogen, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure handler daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure handler annual liquid manure nitrogen, kg/yr",
+          "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure handler annual liquid manure nitrogen, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure handler annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      
+      {
+        "name": "Pen 4 Manure handler daily liquid manure TAN, kg/d",
+        "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure handler daily liquid manure TAN, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure handler daily liquid manure TAN, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure handler annual liquid manure TAN, kg/yr",
+        "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure handler annual liquid manure TAN, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure handler annual liquid manure TAN, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    
+    {
+        "name": "Pen 4 Manure handler daily housing ammonia, kg/d",
+        "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.housing_ammonia$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure handler daily housing ammonia, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure handler daily housing ammonia, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure handler annual housing ammonia, kg/yr",
+        "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.housing_ammonia$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure handler annual housing ammonia, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure handler annual housing ammonia, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+    
+
+
+
+
+      {
+          "name": "Pen 4 Reception pit daily liquid manure nitrogen, kg/d",
+          "filters": ["ReceptionPitDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Reception pit daily liquid manure nitrogen, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Reception pit daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Reception pit annual liquid manure nitrogen, kg/yr",
+          "filters": ["ReceptionPitDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Reception pit annual liquid manure nitrogen, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Reception pit annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      
+
+
+
+      {
+        "name": "Pen 4 Reception pit daily liquid manure TAN, kg/d",
+        "filters": ["ReceptionPitDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Reception pit daily liquid manure TAN, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Reception pit daily liquid manure TAN, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Reception pit annual liquid manure TAN, kg/yr",
+        "filters": ["ReceptionPitDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Reception pit annual liquid manure TAN, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Reception pit annual liquid manure TAN, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    
+
+
+      {
+          "name": "Pen 4 Manure separator daily liquid manure nitrogen, kg/d",
+          "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator daily liquid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure separator daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure separator annual liquid manure nitrogen, kg/yr",
+          "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator annual liquid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure separator annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+       {
+          "name": "Pen 4 Manure separator daily solid manure nitrogen, kg/d",
+          "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator daily solid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure separator daily solid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure separator annual solid manure nitrogen, kg/yr",
+          "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator annual solid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure separator annual solid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+
+      {
+        "name": "Pen 4 Manure separator daily liquid manure TAN, kg/d",
+        "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure separator daily liquid manure TAN per cow, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure separator daily liquid manure TAN, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure separator annual liquid manure TAN, kg/yr",
+        "filters": ["ManureSeparatorDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure separator annual liquid manure TAN per cow, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure separator annual liquid manure TAN, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+
+
+
+      {
+          "name": "Pen 4 Anaerobic digestion daily liquid manure nitrogen, kg/d",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion daily liquid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Anaerobic digestion annual liquid manure nitrogen, kg/yr",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion annual liquid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+      {
+          "name": "Pen 4 Anaerobic digestion daily sludge manure nitrogen, kg/d",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.sludge_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion daily sludge manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion daily sludge manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Anaerobic digestion annual sludge manure nitrogen, kg/yr",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.sludge_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion annual sludge manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion annual sludge manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+      {
+          "name": "Pen 4 Anaerobic digestion daily solid manure nitrogen, kg/d",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion daily solid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion daily solid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Anaerobic digestion annual solid manure nitrogen, kg/yr",
+          "filters": ["AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Anaerobic digestion annual solid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Anaerobic digestion annual solid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      
+
+
+
+      {
+          "name": "Pen 4 Manure separator after digestion daily liquid manure nitrogen, kg/d",
+          "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator after digestion daily liquid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure separator after digestion daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure separator after digestion annual liquid manure nitrogen, kg/yr",
+          "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator after digestion annual liquid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure separator after digestion annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+       {
+          "name": "Pen 4 Manure separator after digestion daily solid manure nitrogen, kg/d",
+          "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator after digestion daily solid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure separator after digestion daily solid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure separator after digestion annual solid manure nitrogen, kg/yr",
+          "filters": ["ManureSeparatorAfterDigestionDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure separator after digestion annual solid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure separator after digestion annual solid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+
+
+
+      {
+          "name": "Pen 4 Manure treatment daily liquid manure nitrogen, kg/d",
+          "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen$"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure treatment daily liquid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure treatment daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure treatment annual liquid manure nitrogen, kg/yr",
+          "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen$"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure treatment annual liquid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure treatment annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+      {
+        "name": "Pen 4 Manure treatment daily liquid manure TAN, kg/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment daily liquid manure TAN per cow, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure treatment daily liquid manure TAN, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure treatment annual liquid manure TAN, kg/yr",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment annual liquid manure TAN per cow, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure treatment annual liquid manure TAN, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+    {
+        "name": "Pen 4 Manure treatment daily storage ammonia, kg/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.storage_ammonia$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment daily storage ammonia per cow, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure treatment daily storage ammonia, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure treatment annual storage ammonia, kg/yr",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.storage_ammonia$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment annual storage ammonia per cow, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure treatment annual storage ammonia, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+
+    {
+        "name": "Pen 4 Manure treatment daily storage nitrous oxide, kg/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.storage_nitrous_oxide$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment daily storage nitrous oxide per cow, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Manure treatment daily storage nitrous oxide, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Manure treatment annual storage nitrous oxide, kg/yr",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.storage_nitrous_oxide$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Manure treatment annual storage nitrous oxide per cow, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Manure treatment annual storage nitrous oxide, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+      {
+          "name": "Pen 4 Manure treatment daily sludge manure nitrogen, kg/d",
+          "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.sludge_manure_nitrogen$"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+
+      {
+            "name": "Pen 4 Manure treatment daily sludge manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure treatment daily sludge manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      
+      
+      {
+          "name": "Pen 4 Manure treatment daily solid manure nitrogen, kg/d",
+          "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen$"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure treatment daily solid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Manure treatment daily solid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Manure treatment annual solid manure nitrogen, kg/yr",
+          "filters": ["^ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen$"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Manure treatment annual solid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Manure treatment annual solid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+    
+
+
+    
+
+      {
+          "name": "Pen 4 Accumulated manure treatment daily liquid manure nitrogen, kg/d",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment daily liquid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment daily liquid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Accumulated manure treatment annual liquid manure nitrogen, kg/yr",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment annual liquid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment annual liquid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+
+      {
+        "name": "Pen 4 Accumulated manure treatment daily liquid manure TAN, kg/d",
+        "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Accumulated manure treatment daily liquid manure TAN per cow, kg/cow/d",
+          "cross_references":[
+              "Pen 4 Accumulated manure treatment daily liquid manure TAN, kg/d_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+    {
+        "name": "Pen 4 Accumulated manure treatment annual liquid manure TAN, kg/yr",
+        "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.liquid_manure_total_ammoniacal_nitrogen$"],
+        "vertical_aggregation": "sum",
+        "slice_start": -365
+    },
+    {
+          "name": "Pen 4 Accumulated manure treatment annual liquid manure TAN per cow, kg/cow/yr",
+          "cross_references":[
+              "Pen 4 Accumulated manure treatment annual liquid manure TAN, kg/yr_ver_agg", 
+              "Pen 4 number of milking cows_ver_agg"
+          ],
+          "horizontal_aggregation": "division"
+    },
+
+
+
+      {
+          "name": "Pen 4 Accumulated manure treatment daily sludge manure nitrogen, kg/d",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.sludge_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment daily sludge manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment daily sludge manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Accumulated manure treatment annual sludge manure nitrogen, kg/yr",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.sludge_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment annual sludge manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment annual sludge manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      
+      {
+          "name": "Pen 4 Accumulated manure treatment daily solid manure nitrogen, kg/d",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment daily solid manure nitrogen per cow, kg/cow/d",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment daily solid manure nitrogen, kg/d_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      },
+      {
+          "name": "Pen 4 Accumulated manure treatment annual solid manure nitrogen, kg/yr",
+          "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_4_LAC_COW.solid_manure_nitrogen"],
+          "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+            "name": "Pen 4 Accumulated manure treatment annual solid manure nitrogen per cow, kg/cow/yr",
+            "cross_references":[
+                "Pen 4 Accumulated manure treatment annual solid manure nitrogen, kg/yr_ver_agg", 
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+      }
+      
+    
+    ]
+  }
