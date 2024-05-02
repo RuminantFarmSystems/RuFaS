@@ -163,8 +163,11 @@ class OutputManager(object):
 
         self.min_memory_threshold = max(
             min_free_memory_threshold,
-            ((100 - max_memory_use_percentage) / 100 * self.available_memory) if max_memory_use_percentage > 0
-            else min_free_memory_threshold
+            (
+                ((100 - max_memory_use_percentage) / 100 * self.available_memory)
+                if max_memory_use_percentage > 0
+                else min_free_memory_threshold
+            ),
         )
 
         self.saved_pool_num = 0
