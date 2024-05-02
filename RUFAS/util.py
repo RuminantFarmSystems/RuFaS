@@ -86,25 +86,38 @@ class Utility:
         return nested_structure
 
     @staticmethod
-    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
+    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
         """
-        Recursively merges dict2 into dict1 in place.
+        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
+        that contain dictionaries and dictionaries that contain lists.
 
         Parameters
         ----------
-        dict1 : Dict[str, Any]
+        target : Dict[Any, Any]
             The primary dictionary to be updated.
-        dict2 : Dict[str, Any]
-            The dictionary containing updates to be merged into dict1.
+        updates : Dict[Any, Any]
+            The dictionary containing updates to be merged into target.
         """
-        for key in dict2:
-            if key in dict1:
-                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                    Utility.deep_merge(dict1[key], dict2[key])
+        for key, value in updates.items():
+            if key in target:
+                if isinstance(value, dict) and isinstance(target[key], dict):
+                    Utility.deep_merge(target[key], value)
+                elif isinstance(value, list) and isinstance(target[key], list):
+                    if len(target[key]) < len(value):
+                        target[key].extend([None] * (len(value) - len(target[key])))
+
+                    for i, item in enumerate(value):
+                        if i < len(target[key]):
+                            if isinstance(item, dict) and isinstance(target[key][i], dict):
+                                Utility.deep_merge(target[key][i], item)
+                            else:
+                                target[key][i] = item
+                        else:
+                            target[key].append(item)
                 else:
-                    dict1[key] = dict2[key]
+                    target[key] = value
             else:
-                dict1[key] = dict2[key]
+                target[key] = value
 
     @staticmethod
     def get_base_dir():
