@@ -37,6 +37,53 @@ class Utility:
         return result
 
     @staticmethod
+    def convert_flat_dict_to_nested_dict(flat_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert a flat dictionary with dot-separated keys into a nested dictionary structure.
+
+        Parameters
+        ----------
+        flat_dict : Dict[str, Any]
+            A dictionary with string keys that include dots to signify nested levels.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A nested dictionary where the structure is determined by splitting the keys on dots.
+        """
+        nested_dict = {}
+        for flat_key, value in flat_dict.items():
+            keys = flat_key.split(".")
+            current = nested_dict
+            for key in keys[:-1]:
+                if key not in current:
+                    current[key] = {}
+                current = current[key]
+            current[keys[-1]] = value
+        return nested_dict
+
+    @staticmethod
+    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
+        """
+        Recursively merges dict2 into dict1 in place.
+
+        Parameters
+        ----------
+        dict1 : Dict[str, Any]
+            The primary dictionary to be updated.
+        dict2 : Dict[str, Any]
+            The dictionary containing updates to be merged into dict1.
+        """
+        for key in dict2:
+            if key in dict1:
+                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                    Utility.deep_merge(dict1[key], dict2[key])
+                else:
+                    dict1[key] = dict2[key]
+            else:
+                dict1[key] = dict2[key]
+
+    @staticmethod
     def get_base_dir():
         """
         Gets the base directory as reference for all relative paths.
