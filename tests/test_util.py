@@ -290,7 +290,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     assert actual == expected
 
 
-def test_deep_merge() -> None:
+def test_deep_merge_dict() -> None:
     x = {
         "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 8}},
@@ -306,3 +306,22 @@ def test_deep_merge() -> None:
     }
     Utility.deep_merge(x, y)
     assert x == expected
+
+
+def test_deep_merge_dict_w_list() -> None:
+    a = {
+        "a": {"i": [1, 2], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, {"x": [9, 10], "y": 11}, 12]}},
+    }
+
+    b = {
+        "a": {"i": [11, 12, 13]},
+        "b": {"i": {"c": 15}, "j": {"d": [8, {"x": [19, 110]}]}},
+    }
+
+    expected = {
+        "a": {"i": [11, 12, 13], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 15, "d": 6}, "j": {"c": 7, "d": [8, {"x": [19, 110], "y": 11}, 12]}},
+    }
+    Utility.deep_merge(a, b)
+    assert a == expected
