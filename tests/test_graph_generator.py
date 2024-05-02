@@ -298,7 +298,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
         ),
     ],
 )
-def test_generage_legend_keys(
+def test_generate_legend_keys(
     combined_var_input: str,
     omit_legend_prefix: bool,
     omit_legend_suffix: bool,
