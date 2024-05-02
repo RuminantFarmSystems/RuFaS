@@ -50,10 +50,6 @@ def animal_manager_fixture(mocker: MockerFixture) -> AnimalManager:
     return animal_manager
 
 
-def test___init__() -> None:
-    pass
-
-
 def test_data_padder() -> None:
     """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
     reference_variable = "reference"
