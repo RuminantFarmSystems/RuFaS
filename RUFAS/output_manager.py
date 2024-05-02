@@ -161,9 +161,9 @@ class OutputManager(object):
         self.available_memory = psutil.virtual_memory().available
         available_memory_gb = self.available_memory / (1024**3)
 
-        self.min_memory_threshold = min(
+        self.min_memory_threshold = max(
             min_free_memory_threshold,
-            ((1 - max_memory_use_percentage / 100) * self.available_memory) if max_memory_use_percentage > 0 \
+            ((100 - max_memory_use_percentage) / 100 * self.available_memory) if max_memory_use_percentage > 0
             else min_free_memory_threshold
         )
 
@@ -257,9 +257,10 @@ class OutputManager(object):
         self._add_to_pool(self.variables_pool, key, value, info_map)
 
         if self.add_var_call % 100 == 0:
-            print(self.add_var_call)
+            # print(self.add_var_call)
+            pass
         if self.manage_pool_size:
-            # self.available_memory = psutil.virtual_memory().available
+            self.available_memory = psutil.virtual_memory().available
             if self.available_memory < self.min_memory_threshold:
                 self._save_current_variable_pool()
 

@@ -7,7 +7,7 @@
       "output_prefix": "Task 1",
       "log_verbosity": "warnings",
       "pool_overflow_control": true,
-      "max_memory_use_percentage": 80,
+      "max_memory_use_percentage": 5,
       "min_free_memory_threshold": 1073741824
     }
   ]
