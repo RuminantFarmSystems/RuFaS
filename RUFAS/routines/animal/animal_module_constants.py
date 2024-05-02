@@ -79,6 +79,9 @@ class AnimalModuleConstants:
     MINIMUM_PHOSPHORUS: float = 0.0
     """Minimum phosphorus estimate, g/day"""
 
+    PHOSPHORUS_PERCENT_BUFFER: float = 50
+    """Percentage increase in phosphorus requirement, see animal_requirements.py."""
+
     MINIMUM_CALCIUM: float = 0.0
     """Minimum calcium estimate, g/day"""
 

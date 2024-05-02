@@ -1,0 +1,141 @@
+{
+    "multiple": [
+        {
+            "name": "Fertilizer",
+            "filters": [
+                "Field._record_fertilizer_application.fertilizer_application.field='.*'"
+            ],
+            "variables": [
+                "mass",
+                "nitrogen",
+                "phosphorus",
+                "application_depth",
+                "surface_remainder_fraction",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Tillage",
+            "filters": [
+                "TillageApplication._record_tillage\\.tillage_record\\.field='.*'"
+            ],
+            "variables": [
+                "tillage_depth",
+                "incorporation_fraction",
+                "mixing_fraction",
+                "implement",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Manure",
+            "filters": [
+                "Field._record_manure_application\\.manure_application\\.field='.*'"
+            ],
+            "variables": [
+                "dry_matter_mass",
+                "dry_matter_fraction",
+                "field_coverage",
+                "surface_remainder_fraction",
+                "application_depth",
+                "nitrogen",
+                "phosphorus",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Yield",
+            "filters": [
+                "CropManagement._record_yield.harvest_yield.field='.*'"
+            ],
+            "variables": [
+                "crop",
+                "wet_yield",
+                "dry_yield",
+                "nitrogen",
+                "phosphorus",
+                "harvest_index",
+                "planting_date",
+                "harvest_date",
+                "residue_nitrogen",
+                "yield_residue"
+            ]
+        },
+        {
+            "name": "Total eroded sediment",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.eroded_sediment.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Phosphorus Runoff",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Nitrate Runoff",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.nitrate_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Phosphorus Runoff prior year",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -730,
+            "slice_end": -365
+        },
+        {
+            "name": "Nitrate Runoff prior year",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.nitrate_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -730,
+            "slice_end": -365
+        },
+        {
+            "name": "Soil CO2 emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.profile_carbon_emissions.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Soil N2O emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field=.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "profile_carbon_total-1",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.profile_carbon_total.field=.*"
+            ],
+            "slice_start": -1
+        },
+        {
+            "name": "profile_carbon_total-365",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.profile_carbon_total.field=.*"
+            ],
+            "slice_start": -365,
+            "slice_end": -364
+        }
+    ]
+}
