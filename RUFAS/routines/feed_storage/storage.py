@@ -6,6 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.weather import Weather
 
 """Temperature below which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
 ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 5.0
@@ -19,20 +20,20 @@ NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 0.0
 """Temperature above which ensiled non-alfalfa crops does not lose dry matter to fermentation (degrees C)."""
 NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT = 40.0
 
-"""Dry matter percentage of fresh mass below which ensiled alfalfa does not lose dry matter to fermentation."""
-ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 20.0
+"""Dry matter fraction of fresh mass below which ensiled alfalfa does not lose dry matter to fermentation."""
+ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 0.20
 
-"""Dry matter percentage of fresh mass above which ensiled alfalfa does not lose dry matter to fermentation."""
-ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
-
-"""
-Dry matter percentage of fresh mass below which ensiled non-alfalfa crops does not lose dry matter to fermentation.
-"""
-NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 15.0
+"""Dry matter fraction of fresh mass above which ensiled alfalfa does not lose dry matter to fermentation."""
+ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 0.60
 
 """
-Dry matter percentage of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
-NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 60.0
+Dry matter fraction of fresh mass below which ensiled non-alfalfa crops does not lose dry matter to fermentation.
+"""
+NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 0.15
+
+"""
+Dry matter fraction of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
+NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 0.60
 
 om = OutputManager()
 
@@ -140,21 +141,22 @@ class Storage:
         storage_crop = copy.deepcopy(crop)
         self.stored.append(storage_crop)
 
-    def process_degradations(self, current_conditions: CurrentDayConditions, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: Time) -> None:
         """
         Processes the degradations and losses of nutrients and dry matter in the stored crops.
 
         Parameters
         ----------
-        current_conditions : float
-            Conditions on the current day of the simulation.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
         time : Time
             Time instance tracking the current time of the simulation.
 
         """
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, current_conditions, time)
+            weather_conditions = self._get_conditions(crop, weather, time)
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions)
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent,
@@ -215,9 +217,7 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, current_conditions: CurrentDayConditions, time: Time
-    ) -> float:
+    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, conditions: list[CurrentDayConditions]) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
 
@@ -235,6 +235,10 @@ class Storage:
         float
             The amount of dry matter lost to gas, specific to fermentation in kg.
 
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation equations 1.3.1 and 1.3.2
+
         Notes
         -----
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
@@ -242,8 +246,7 @@ class Storage:
         but the structure of the loss equation remains the same.
 
         """
-        dry_matter_fraction = crop.dry_matter_percentage / 100
-        average_temperature = current_conditions.mean_air_temperature
+        dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
         lower_temp_limit = (
@@ -263,17 +266,33 @@ class Storage:
             else NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
         )
 
-        if (not lower_temp_limit <= average_temperature <= upper_temp_limit) or (
-            not lower_dry_matter_limit <= crop.dry_matter_percentage <= upper_dry_matter_limit
-        ):
-            return 0.0
+        coefficient = 0.0364 if is_alfalfa else 0.0193
+        base_loss_fraction = 0.0156 if is_alfalfa else 0.00864
 
-        if is_alfalfa:
-            dry_matter_loss_fraction = 0.0156 - 0.0364 * (dry_matter_fraction - 0.20)
-        else:
-            dry_matter_loss_fraction = 0.00864 - 0.0193 * (dry_matter_fraction - 0.15)
+        dry_matter_loss_fraction = 0.0
+
+        for day in conditions:
+            outside_temp_range = not lower_temp_limit <= day.mean_air_temperature <= upper_temp_limit
+            outside_dry_fraction_range = not lower_dry_matter_limit <= dry_matter_fraction <= upper_dry_matter_limit
+            if outside_temp_range or outside_dry_fraction_range:
+                continue
+
+            fraction_lost = base_loss_fraction - coefficient * (dry_matter_fraction - lower_dry_matter_limit)
+            dry_matter_loss_fraction += fraction_lost
+            dry_matter_fraction -= fraction_lost
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
+
+    def _get_conditions(self, crop: HarvestedCrop, weather: Weather, time: Time) -> list[CurrentDayConditions]:
+        """"""
+        days_since_last_degradation = time.simulation_day - crop.last_time_degraded.simulation_day
+
+        if days_since_last_degradation <= 0:
+            return []
+
+        conditions = weather.get_conditions_series(time, -days_since_last_degradation + 1, 0)
+
+        return conditions
 
     def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
