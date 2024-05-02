@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
 
+from RUFAS.util import Utility
+
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
 Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
@@ -57,7 +59,7 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot"]
+TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter"]
 
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
@@ -178,8 +180,10 @@ class GraphGenerator:
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
-            legend = graph_details.get("legend")
-            if not legend:
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
+                graph_details["title"] = corrected_graph_title
+            if not graph_details.get("legend"):
                 graph_details["legend"] = list(prepared_data.keys())
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
@@ -188,7 +192,7 @@ class GraphGenerator:
         except Exception as e:
             all_logs = [
                 {
-                    "error": f"Error plotting {graph_details.get('title')} data set",
+                    "error": f"Error plotting '{graph_details.get('title')}' data set",
                     "message": f"Unforeseen error {e} when trying to graph data.",
                     "info_map": info_map,
                 }
@@ -200,7 +204,8 @@ class GraphGenerator:
         self, graph_details: Dict[str, str | List[str]]
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
-        Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
+        Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
+
         Parameters
         ----------
         graph_details : Dict[str, str | List[str]]
@@ -222,10 +227,11 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph " "filter file.",
+                        "message": f"Required key '{required_key}' not in your graph filter file.",
                         "info_map": info_map,
                     }
                 )
+
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
 
@@ -392,8 +398,8 @@ class GraphGenerator:
         try:
             plt.savefig(graph_path)
             return graph_path
-        except Exception:
-            raise
+        except Exception as e:
+            raise Exception(f"An error occurred while trying to save the graph: {e}") from e
 
     def _generate_graph_path(
         self,
