@@ -163,8 +163,11 @@ class OutputManager(object):
 
         self.min_memory_threshold = min(
             min_free_memory_threshold,
-            ((1 - max_memory_use_percentage / 100) * self.available_memory) if max_memory_use_percentage > 0 \
-            else min_free_memory_threshold
+            (
+                ((1 - max_memory_use_percentage / 100) * self.available_memory)
+                if max_memory_use_percentage > 0
+                else min_free_memory_threshold
+            ),
         )
 
         self.saved_pool_num = 0
@@ -178,11 +181,13 @@ class OutputManager(object):
             f"Minimum free memory: {self.min_memory_threshold} Bytes.",
             info_map,
         )
-        print("Pool Overflow Control Setup",
+        print(
+            "Pool Overflow Control Setup",
             f"Created {self.saved_pool_path} for saved pools during simulation.\n"
             f"Current system available memory: {available_memory_gb:.2f} GB = "
             f"{self.available_memory} Bytes.\n"
-            f"Minimum free memory: {self.min_memory_threshold} Bytes.")
+            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
+        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -284,11 +289,13 @@ class OutputManager(object):
             f"The pool is saved to {saved_pool_file_path}",
             info_map,
         )
-        print("save_current_variable_pool",
+        print(
+            "save_current_variable_pool",
             "Saved the current variable pool due to pool size exceeding limit.\n"
             f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
             f"{self.min_memory_threshold} bytes.\n"
-            f"The pool is saved to {saved_pool_file_path}")
+            f"The pool is saved to {saved_pool_file_path}",
+        )
         self.variables_pool = {}
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_num += 1
@@ -1634,7 +1641,7 @@ class OutputManager(object):
         task_id: str,
         pool_overflow_control: bool = False,
         max_memory_use_percentage: int | None = None,
-        min_free_memory_threshold: int | None = None
+        min_free_memory_threshold: int | None = None,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1646,6 +1653,8 @@ class OutputManager(object):
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
         if pool_overflow_control:
-            self.setup_pool_overflow_control(max_memory_use_percentage=max_memory_use_percentage,
-                                             min_free_memory_threshold=min_free_memory_threshold,
-                                             output_dir=output_directory)
+            self.setup_pool_overflow_control(
+                max_memory_use_percentage=max_memory_use_percentage,
+                min_free_memory_threshold=min_free_memory_threshold,
+                output_dir=output_directory,
+            )
