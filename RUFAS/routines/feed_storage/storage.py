@@ -155,7 +155,7 @@ class Storage:
         """
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            weather_conditions = self._get_conditions(crop, weather, time)
+            weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
             gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions)
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
@@ -225,10 +225,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The stored crop that is losing dry matter.
-        current_conditions : CurrentDayConditions
-            Current conditions of the simulated day.
-        time : Time
-            Time instance containing the current time of the simulation.
+        conditions : list[CurrentDayConditions]
+            List of daily conditions over which dry matter loss will be calculated for.
 
         Returns
         -------
@@ -283,14 +281,33 @@ class Storage:
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
 
-    def _get_conditions(self, crop: HarvestedCrop, weather: Weather, time: Time) -> list[CurrentDayConditions]:
-        """"""
-        days_since_last_degradation = time.simulation_day - crop.last_time_degraded.simulation_day
+    def _get_conditions(
+        self, last_degradations_time: Time, current_time: Time, weather: Weather
+    ) -> list[CurrentDayConditions]:
+        """
+        Gets a series of weather conditions for a time period which will have weather conditions calculated for it.
 
-        if days_since_last_degradation <= 0:
+        Parameters
+        ----------
+        last_degradations_time : Time
+            Time instance recording the last day a crop's degradations were processed.
+        time : Time
+            Time instance containing the current time of the simulation.
+        weather : Weather
+            Weather instance containing all weather data for the simulation.
+
+        Notes
+        -----
+        If the current day is the same as or before the last day that the crop was degraded, no weather conditions will
+        be returned.
+
+        """
+        starting_day_offset = last_degradations_time.simulation_day - current_time.simulation_day
+
+        if starting_day_offset >= 0:
             return []
 
-        conditions = weather.get_conditions_series(time, -days_since_last_degradation + 1, 0)
+        conditions = weather.get_conditions_series(current_time, starting_day_offset + 1, 0)
 
         return conditions
 
