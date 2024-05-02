@@ -1250,7 +1250,7 @@ class OutputManager(object):
             The path to the directory where the file will be saved.
         """
 
-        file_path = os.path.join(path, self.generate_file_name("filters_usage", "json"))
+        file_path = os.path.join(path, self.generate_file_name("filtered_variables_counts", "json"))
         self.dict_to_file_json(self._filtered_variables_counter, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
