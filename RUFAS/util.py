@@ -495,9 +495,9 @@ class Utility:
         str
             The input string with the special characters filtered out.
         """
-        chars_to_remove = ['<', '>', ':', '/', '"', '|', '\\', '?', '*', '.']
+        chars_to_remove = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
 
-        filtered_string = ''.join(char for char in input_string if char not in chars_to_remove)
+        filtered_string = "".join(char for char in input_string if char not in chars_to_remove)
 
         return filtered_string
 

@@ -253,7 +253,7 @@ def test_filter_dictionary(
 
 def test_remove_special_chars() -> None:
     """Tests remove_special_chars() function in util.py"""
-    charred_word = "<>:/w\"o|\\r?d?*."
+    charred_word = '<>:/w"o|\\r?d?*.'
     expected_result = "word"
     assert Utility.remove_special_chars(charred_word) == expected_result
 
