@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
+from .general_constants import GeneralConstants
 
 
 class Utility:
@@ -84,7 +85,7 @@ class Utility:
                 dict1[key] = dict2[key]
 
     @staticmethod
-    def get_base_dir():
+    def get_base_dir() -> Path:
         """
         Gets the base directory as reference for all relative paths.
 
@@ -221,7 +222,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -504,3 +505,56 @@ class Utility:
             return True
         else:
             return False
+
+    @staticmethod
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
+        """
+        Generates a list of dates based on a given date and when the dates should start and end relative to the given
+        date.
+
+        Parameters
+        ----------
+        date : datetime.date
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Raises
+        ------
+        ValueError
+            If the starting_offset is greater than the ending_offset.
+
+        Examples
+        --------
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+        [datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+
+        """
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
+
+        return time_series
+
+    @staticmethod
+    def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        """Generates a datetime.date based on a year and ordinal day."""
+        maximum_day = (
+            GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+        )
+        if not 1 <= day <= maximum_day:
+            raise ValueError(f"Invalid day: {day} of year {year}.")
+        return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
