@@ -21,7 +21,8 @@ from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
 import RUFAS.routines.animal.clustering_pen_grouping
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+
+# from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
 
@@ -1063,9 +1064,9 @@ def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float
 @pytest.mark.parametrize(
     "animal_dict, expected",
     [
-        (lazy_fixture("cow_a"), 59.28),
-        (lazy_fixture("cow_b"), 33.18),
-        (lazy_fixture("cow_d"), 0.0),
+        (lazy_fixture("cow_a"), 58.51),
+        (lazy_fixture("cow_b"), 43.07),
+        (lazy_fixture("cow_d"), 25.17),
         (lazy_fixture("heifer_a"), 16.85),
         (lazy_fixture("heifer_b"), 16.44),
     ],

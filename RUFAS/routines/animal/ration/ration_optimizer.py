@@ -520,7 +520,7 @@ class RationOptimizer:
                 ration_config.dP_list.append(0.80)
             else:
                 ration_config.dP_list.append(0)
-        return sum(
+        return float(sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -528,7 +528,7 @@ class RationOptimizer:
                     ration_config.dP_list,
                 ),
             )
-        ) - (ration_config.P_requirement * GeneralConstants.GRAMS_TO_KG)
+        ) - (ration_config.P_requirement * GeneralConstants.GRAMS_TO_KG))
 
     # fmt: off
     @staticmethod
