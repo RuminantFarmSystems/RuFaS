@@ -1594,9 +1594,7 @@ class AnimalManager:
             "class": self.__class__.__name__,
             "function": self._record_animal_counts.__name__,
         }
-        om.add_variable(
-            "sim_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
-        )
+        om.add_variable("sim_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
             "num_animals",
             len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows),
@@ -1604,12 +1602,8 @@ class AnimalManager:
         )
         om.add_variable("num_calves", len(self.calves), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_heiferIs", len(self.heiferIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
-        om.add_variable(
-            "num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
-        )
-        om.add_variable(
-            "num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS})
-        )
+        om.add_variable("num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in self.cows if cow.is_lactating]),
