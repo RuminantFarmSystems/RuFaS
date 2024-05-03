@@ -114,7 +114,7 @@ def test_process_bedding_configs_error(mocker: MockerFixture) -> None:
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.BeddingConfig.__init__",
         return_value=None,
     )
-    expected_error_message = "Duplicate configurations for 'sawdusty'."
+    expected_error_message = "Bedding config 'sawdusty' has multiple configurations"
 
     with pytest.raises(ValueError, match=expected_error_message):
         ManureManagerConfigHandler._process_bedding_configs(bedding_configs)
@@ -289,7 +289,7 @@ def test_process_manure_separator_configs_error(mocker: MockerFixture) -> None:
         },
     ]
 
-    with pytest.raises(ValueError, match="Duplicate configurations"):
+    with pytest.raises(ValueError, match="Manure separator 'screener' has multiple configurations"):
         ManureManagerConfigHandler._process_manure_separator_configs(manure_separator_configs)
 
 
@@ -478,7 +478,7 @@ def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     )
     manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
     manure_manager_config_handler.bedding_configs = {}
-    expected_error_message = "Attempted to use a non-existent manure bedding configuration called 'not present'."
+    expected_error_message = "Unknown manure bedding configuration name"
 
     with pytest.raises(KeyError, match=expected_error_message):
         manure_manager_config_handler.get_bedding_config("not present")
@@ -551,8 +551,8 @@ def test_get_manure_handler_config(
 
 def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
-    expected_title = "Attempted to use a non-existent manure handler configuration called 'not there'."
-    expected_message = "Raising ValueError."
+    expected_title = "Unknown manure handler configuration name"
+    expected_message = "Attempted to use a non-existent manure handler configuration called 'not there'"
     expected_info_map = {
         "class": "ManureManagerConfigHandler",
         "function": "get_manure_handler_config",

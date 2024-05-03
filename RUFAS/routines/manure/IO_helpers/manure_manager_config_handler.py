@@ -70,8 +70,8 @@ class ManureManagerConfigHandler:
             return self.bedding_configs[bedding_name]
         except KeyError:
             info_map = {"class": self.__class__.__name__, "function": self.get_bedding_config.__name__}
-            error_title = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'."
-            error_message = "Raising ValueError."
+            error_title = "Unknown manure bedding configuration name"
+            error_message = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'"
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_title)
 
@@ -101,14 +101,12 @@ class ManureManagerConfigHandler:
                 "class": self.__class__.__name__,
                 "function": self.get_manure_handler_config.__name__,
             }
-            # fmt: off
-            error_title = (
-                f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'."
+            error_title = "Unknown manure handler configuration name"
+            error_message = (
+                f"Attempted to use a non-existent manure handler configuration called '{manure_handler_type_name}'"
             )
-            # fmt: on
-            error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
-            raise KeyError(error_title)
+            raise KeyError(error_message)
 
     def get_manure_separator_config(self, manure_separator_name: str) -> Optional[ManureSeparatorConfig]:
         """
@@ -137,12 +135,12 @@ class ManureManagerConfigHandler:
             return self.manure_separator_configs[manure_separator_name]
         except KeyError:
             info_map = {"class": self.__class__.__name__, "function": self.get_manure_separator_config.__name__}
-            error_title = (
-                f"Attempted to use a non-existent manure separator configuration called '{manure_separator_name}'."
+            error_title = "Unknown manure separator configuration name"
+            error_message = (
+                f"Attempted to use a non-existent manure separator configuration called '{manure_separator_name}'"
             )
-            error_message = "Raising ValueError."
             om.add_error(error_title, error_message, info_map)
-            raise KeyError(error_title)
+            raise KeyError(error_message)
 
     def get_custom_manure_treatment_config(self, manure_treatment_type_name: str) -> Optional[ManureTreatmentConfig]:
         """Returns the custom manure treatment config for the given manure treatment type name, or None if no custom
@@ -183,10 +181,10 @@ class ManureManagerConfigHandler:
         for config in bedding_configs:
             bedding_name = config.pop("name")
             if bedding_name in available_bedding_configs:
-                error_name = f"Bedding config '{bedding_name}' has multiple configurations."
-                error_message = "Raising ValueError."
+                error_name = "Duplicate bedding configurations found"
+                error_message = f"Bedding config '{bedding_name}' has multiple configurations"
                 om.add_error(error_name, error_message, info_map)
-                raise ValueError(f"Duplicate configurations for '{bedding_name}'.")
+                raise ValueError(error_message)
             bedding_type = BeddingType(config["bedding_type"])
             del config["bedding_type"]
             available_bedding_configs[bedding_name] = BeddingConfig(**config, bedding_type=bedding_type)
@@ -225,10 +223,10 @@ class ManureManagerConfigHandler:
         for manure_handler_config in manure_handler_configs:
             handler_name = manure_handler_config.pop("name")
             if handler_name in available_manure_handler_configs:
-                error_name = f"Manure handler '{handler_name}' has multiple configurations."
-                error_message = "Raising ValueError."
+                error_name = "Duplicate manure handler configurations"
+                error_message = f"Manure handler '{handler_name}' has multiple configurations"
                 om.add_error(error_name, error_message, info_map)
-                raise ValueError(f"Duplicate configurations for '{handler_name}'.")
+                raise ValueError(error_message)
             handler_type = ManureHandlerType(manure_handler_config["manure_handler_type"])
             manure_handler_config["manure_handler_type"] = handler_type
             available_manure_handler_configs[handler_name] = ManureHandlerConfig(**manure_handler_config)
@@ -258,19 +256,18 @@ class ManureManagerConfigHandler:
         for config in manure_separator_configs:
             name = config.pop("name")
             if name in available_manure_separator_configs:
-                error_name = f"Manure separator '{name}' has multiple configurations."
-                error_message = "Raising ValueError."
+                error_name = "Duplicate manure separator configurations"
+                error_message = f"Manure separator '{name}' has multiple configurations"
                 om.add_error(error_name, error_message, info_map)
-                raise ValueError(f"Duplicate configurations for '{name}'.")
+                raise ValueError(error_message)
             config["manure_separator_type"] = ManureSeparatorType(config["manure_separator_type"])
             available_manure_separator_configs[name] = ManureSeparatorConfig(**config)
         return available_manure_separator_configs
 
     @classmethod
-    def _process_manure_treatment_configs(cls, manure_treatment_json_configs: List[Dict]) -> Dict[
-        ManureTreatmentType,
-        Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
-    ]:
+    def _process_manure_treatment_configs(
+        cls, manure_treatment_json_configs: List[Dict]
+    ) -> Dict[ManureTreatmentType, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
         There is one special case that involves a combination of anaerobic digestion and anaerobic
@@ -311,8 +308,10 @@ class ManureManagerConfigHandler:
                 manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION],
                 manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_LAGOON],
             )
-            manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] = (
-                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR]
-            ) = combo_config
+            manure_treatment_config_by_type[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
+            ] = manure_treatment_config_by_type[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
+            ] = combo_config
 
         return manure_treatment_config_by_type
