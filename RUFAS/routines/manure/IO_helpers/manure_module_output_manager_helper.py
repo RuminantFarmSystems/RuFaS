@@ -4,6 +4,7 @@ from dataclasses import fields, dataclass
 from typing import Dict, Any
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 class ManureModuleOutputManagerHelper:
@@ -46,4 +47,4 @@ class ManureModuleOutputManagerHelper:
                 attribute = getattr(dataclass_object, field.name)
                 unit = getattr(dataclass_object, field.name + "_unit")
 
-                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
+                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": MeasurementUnits(unit)}))
