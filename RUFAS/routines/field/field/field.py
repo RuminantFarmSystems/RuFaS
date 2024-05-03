@@ -1531,7 +1531,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("manure_water", manure_water, info_map)
 
@@ -1821,7 +1821,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": year, "day": day},
             "field_size": self.field_data.field_size,
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("field_watering", watering_amount, info_map)
 
