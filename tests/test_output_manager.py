@@ -641,6 +641,7 @@ def test_validate_units(
     else:
         assert mock_output_manager._validate_units(units) == expected_result
 
+
 @pytest.mark.parametrize(
     "dummy_value, exclude_info_maps_flag",
     [
