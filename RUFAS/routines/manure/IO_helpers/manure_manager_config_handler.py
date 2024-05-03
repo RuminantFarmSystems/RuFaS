@@ -73,7 +73,7 @@ class ManureManagerConfigHandler:
             error_title = "Unknown manure bedding configuration name"
             error_message = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'"
             om.add_error(error_title, error_message, info_map)
-            raise KeyError(error_title)
+            raise KeyError(error_message)
 
     def get_manure_handler_config(self, manure_handler_type_name: str) -> ManureHandlerConfig:
         """Returns the manure handler config for the given manure handler type name.
