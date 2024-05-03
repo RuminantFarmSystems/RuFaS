@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List, Union
 
 import pandas as pd
 import pytest
+from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -13,7 +14,6 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
-from freezegun import freeze_time
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -627,7 +627,8 @@ def test_add_variable(
                 "second": MeasurementUnits.ANIMALS,
             },
             TypeError(
-                "The following unit does not have the type MeasurementUnits: definitely_not_a_unit (type <class 'str'>)."
+                "The following unit does not have the type MeasurementUnits: "
+                "definitely_not_a_unit (type <class 'str'>)."
             ),
         ),
         (
