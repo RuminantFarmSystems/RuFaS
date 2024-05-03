@@ -421,7 +421,7 @@ class AnimalModuleReporter:
             {},
             animal_manager.simulation_day,
             info_map,
-            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value,
+            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
         )
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
