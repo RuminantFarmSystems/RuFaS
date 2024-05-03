@@ -1,4 +1,5 @@
 import datetime
+import re
 import os
 from pathlib import Path
 from typing import Dict, List, Any, Callable, Optional, Collection
@@ -6,6 +7,8 @@ from typing import Dict, List, Any, Callable, Optional, Collection
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
+
+from RUFAS.util import Utility
 
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
@@ -57,7 +60,7 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot"]
+TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter"]
 
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
@@ -177,10 +180,25 @@ class GraphGenerator:
             fig, _ = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
+
             self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
-            legend = graph_details.get("legend")
-            if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
+                graph_details["title"] = corrected_graph_title
+            if not graph_details.get("legend"):
+                omit_legend_prefix = graph_details.get("omit_legend_prefix", False)
+                omit_legend_suffix = graph_details.get("omit_legend_suffix", False)
+
+                if selected_variables := graph_details.get("variables"):
+                    graph_details["legend"]: List[str] = selected_variables
+                elif omit_legend_prefix or omit_legend_suffix:
+                    graph_details["legend"]: List[str] = list(
+                        self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix)
+                        for key in prepared_data.keys()
+                    )
+                else:
+                    graph_details["legend"] = list(prepared_data.keys())
+
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
@@ -188,7 +206,7 @@ class GraphGenerator:
         except Exception as e:
             all_logs = [
                 {
-                    "error": f"Error plotting {graph_details.get('title')} data set",
+                    "error": f"Error plotting '{graph_details.get('title')}' data set",
                     "message": f"Unforeseen error {e} when trying to graph data.",
                     "info_map": info_map,
                 }
@@ -196,11 +214,80 @@ class GraphGenerator:
 
         return all_logs
 
+    def _generate_legend_keys(
+        self, combined_var_name: str, omit_legend_prefix: bool = False, omit_legend_suffix: bool = False
+    ) -> str:
+        """
+        Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
+
+        Parameters
+        ----------
+        combined_var_name: str
+            The combined variable name to be processed.
+
+        Returns
+        -------
+        str
+            The stripped variable name.
+
+        Notes
+        -----
+            This function identifies prefix and suffix according to the following logic:
+                prefix:
+                    All combined variable names are guaranteed to have a prefix of the following types:
+                        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
+                        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
+                        - special cases => variables from the Time and Weather classes (e.g. Time.day, Weather.rainfall)
+                    For the special cases of variables from the Time and Weather classes, they do not have any suffixes,
+                    resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second element
+                    after splitting the combined variable name by ".".
+
+                     We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+                     string parsing:
+                     The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+                     the words in a phrase by making the first letter of each word capitalized and not using spaces
+                     e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+                     separated by underscores.
+                     Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
+                     ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+
+                     * `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
+                     is unlikely to appear.
+
+                 suffix:
+                    Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
+                    After some investigation, we found that all suffixes from the Crop and Soil module follows the
+                    pattern of field='*', for example:
+                        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
+                        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
+                    Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
+                    check if the variable name has suffix.
+        """
+        combined_var_name_list: List[str] = combined_var_name.split(".")
+
+        slice_start: int = 0
+        slice_end: int = len(combined_var_name_list)
+
+        if len(combined_var_name_list) == 1:
+            return combined_var_name_list[0]
+        elif len(combined_var_name_list) == 2:
+            return combined_var_name_list[1]
+
+        elif len(combined_var_name_list) >= 3:
+            if omit_legend_prefix:
+                slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
+
+            if omit_legend_suffix:
+                slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
+
+            return ".".join(combined_var_name_list[slice_start:slice_end])
+
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
-        Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
+        Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
+
         Parameters
         ----------
         graph_details : Dict[str, str | List[str]]
@@ -211,7 +298,9 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
+        optional_graph_filter_keys = (
+            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "omit_legend_prefix"]
+        )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
@@ -222,10 +311,11 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph " "filter file.",
+                        "message": f"Required key '{required_key}' not in your graph filter file.",
                         "info_map": info_map,
                     }
                 )
+
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
 
@@ -392,8 +482,8 @@ class GraphGenerator:
         try:
             plt.savefig(graph_path)
             return graph_path
-        except Exception:
-            raise
+        except Exception as e:
+            raise Exception(f"An error occurred while trying to save the graph: {e}") from e
 
     def _generate_graph_path(
         self,
