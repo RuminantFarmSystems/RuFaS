@@ -12,7 +12,7 @@ from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.output_manager import LogVerbosity, OutputManager, OriginLabel
 from RUFAS.units import MeasurementUnits
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
@@ -1949,7 +1949,9 @@ def test_save_to_json(
         f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
     )
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")
-    patch_for_dict_to_file_json.assert_called_once_with(filtered_pool, os.path.join(save_path, expected_filename))
+    patch_for_dict_to_file_json.assert_called_once_with(
+        filtered_pool, os.path.join(save_path, expected_filename), origin_label=OriginLabel.NONE
+    )
 
 
 def test_route_save_functions_graph(
@@ -2344,9 +2346,9 @@ def test_print_errors_warnings_logs(
 
 
 @pytest.mark.parametrize(
-    "input_data, detailed_values_flag, expected",
+    "input_data, detailed_values_flag, origin_label, expected",
     [
-        # Basic test case with a single data_origin per value
+        # Basic test case with a single data_origin per value and origin_label=TRUE_AND_REPORT_ORIGINS
         (
             {
                 "ModuleA.variable_x": {
@@ -2358,6 +2360,7 @@ def test_print_errors_warnings_logs(
                 }
             },
             True,  # detailed_values_flag
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
                 "ModuleA.variable_x": {
                     "info_maps": [
@@ -2366,130 +2369,207 @@ def test_print_errors_warnings_logs(
                     ],
                     "values": [10, 20],
                     "detailed_values": [
-                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 10)],
-                        [("[SourceClassA.method_a]->[ModuleA.variable_x]", 20)],
+                        "[SourceClassA.method_a]->[ModuleA.variable_x]: 10 (unitless)",
+                        "[SourceClassA.method_a]->[ModuleA.variable_x]: 20 (unitless)",
                     ],
                 }
             },
         ),
-        # Test case with multiple data_origin entries for a single value
+        # Test case with a single data_origin per value and origin_label=TRUE_ORIGIN
         (
             {
                 "ModuleB.variable_y": {
                     "info_maps": [
-                        {
-                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": MeasurementUnits.MILLIMETERS.value,
-                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                         {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                     ],
                     "values": [30, 40],
                 }
             },
             True,  # detailed_values_flag
+            OriginLabel.TRUE_ORIGIN,
             {
                 "ModuleB.variable_y": {
                     "info_maps": [
-                        {
-                            "data_origin": [["SourceClassB", "method_b"], ["SourceClassC", "method_c"]],
-                            "units": MeasurementUnits.MILLIMETERS.value,
-                        },
+                        {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                         {"data_origin": [["SourceClassB", "method_b"]], "units": MeasurementUnits.MILLIMETERS.value},
                     ],
                     "values": [30, 40],
                     "detailed_values": [
-                        [
-                            ("[SourceClassB.method_b]->[ModuleB.variable_y]", 30),
-                            ("[SourceClassC.method_c]->[ModuleB.variable_y]", 30),
-                        ],
-                        [("[SourceClassB.method_b]->[ModuleB.variable_y]", 40)],
+                        "[SourceClassB.method_b]: 30 (mm)",
+                        "[SourceClassB.method_b]: 40 (mm)",
                     ],
                 }
             },
         ),
-        # Missing both keys
+        # Test case with a single data_origin per value and origin_label=REPORT_ORIGIN
         (
             {
-                "ModuleD.missing_both": {
-                    "other_key": "some_value",
+                "ModuleC.variable_z": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassC", "method_c"]],
+                            "units": MeasurementUnits.DEGREES_CELSIUS.value,
+                        },
+                        {
+                            "data_origin": [["SourceClassC", "method_c"]],
+                            "units": MeasurementUnits.DEGREES_CELSIUS.value,
+                        },
+                    ],
+                    "values": [25.5, 26.1],
                 }
             },
             True,  # detailed_values_flag
+            OriginLabel.REPORT_ORIGIN,
             {
-                "ModuleD.missing_both": {
-                    "other_key": "some_value",
+                "ModuleC.variable_z": {
+                    "info_maps": [
+                        {
+                            "data_origin": [["SourceClassC", "method_c"]],
+                            "units": MeasurementUnits.DEGREES_CELSIUS.value,
+                        },
+                        {
+                            "data_origin": [["SourceClassC", "method_c"]],
+                            "units": MeasurementUnits.DEGREES_CELSIUS.value,
+                        },
+                    ],
+                    "values": [25.5, 26.1],
+                    "detailed_values": [
+                        "[ModuleC.variable_z]: 25.5 (°C)",
+                        "[ModuleC.variable_z]: 26.1 (°C)",
+                    ],
                 }
             },
         ),
-        # Missing `info_maps` key
+        # Test case with a single data_origin per value and origin_label=NONE
         (
             {
-                "ModuleE.missing_info_maps": {
+                "ModuleD.variable_w": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
+                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
+                    ],
+                    "values": [1.5, 2.0],
+                }
+            },
+            True,  # detailed_values_flag
+            OriginLabel.NONE,
+            {
+                "ModuleD.variable_w": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
+                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
+                    ],
+                    "values": [1.5, 2.0],
+                    "detailed_values": [
+                        "1.5 (m)",
+                        "2.0 (m)",
+                    ],
+                }
+            },
+        ),
+        # Test case with dictionary values and origin_label=TRUE_AND_REPORT_ORIGINS
+        (
+            {
+                "ModuleE.variable_dict": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassE", "method_e"]], "units": {"key1": "unit1", "key2": "unit2"}},
+                        {"data_origin": [["SourceClassE", "method_e"]], "units": {"key1": "unit1", "key2": "unit2"}},
+                    ],
+                    "values": [{"key1": 10, "key2": 20}, {"key1": 30, "key2": 40}],
+                }
+            },
+            True,  # detailed_values_flag
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            {
+                "ModuleE.variable_dict": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassE", "method_e"]], "units": {"key1": "unit1", "key2": "unit2"}},
+                        {"data_origin": [["SourceClassE", "method_e"]], "units": {"key1": "unit1", "key2": "unit2"}},
+                    ],
+                    "values": [{"key1": 10, "key2": 20}, {"key1": 30, "key2": 40}],
+                    "detailed_values": [
+                        "[SourceClassE.method_e]->[ModuleE.variable_dict]: key1 = 10 (unit1), key2 = 20 (unit2)",
+                        "[SourceClassE.method_e]->[ModuleE.variable_dict]: key1 = 30 (unit1), key2 = 40 (unit2)",
+                    ],
+                }
+            },
+        ),
+        # Test case with missing data_origin and units
+        (
+            {
+                "ModuleF.missing_data_origin_units": {
+                    "info_maps": [
+                        {"other_key": "other_value"},
+                        {"other_key": "other_value"},
+                    ],
                     "values": [50, 60],
                 }
             },
             True,  # detailed_values_flag
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
-                "ModuleE.missing_info_maps": {
+                "ModuleF.missing_data_origin_units": {
+                    "info_maps": [
+                        {"other_key": "other_value"},
+                        {"other_key": "other_value"},
+                    ],
                     "values": [50, 60],
                 }
             },
         ),
-        # Missing `values` key
+        # Test case with mismatched lengths of data_origins, units, and values
         (
             {
-                "ModuleF.missing_values": {
-                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                "ModuleG.mismatched_lengths": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassG", "method_g"]], "units": MeasurementUnits.DAYS.value},
+                    ],
+                    "values": [70, 80],
                 }
             },
             True,  # detailed_values_flag
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
-                "ModuleF.missing_values": {
-                    "info_maps": [{"data_origin": [["ClassX", "method_x"]]}],
+                "ModuleG.mismatched_lengths": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassG", "method_g"]], "units": MeasurementUnits.DAYS.value},
+                    ],
+                    "values": [70, 80],
                 }
             },
         ),
-        # _detailed_values_flag set to False
+        # Test case with _include_detailed_values set to False
         (
             {
-                "ModuleG.variable_z": {
-                    "info_maps": [{"data_origin": [["SourceClassG", "method_g"]], "units": "units_g"}],
-                    "values": [70],
+                "ModuleH.include_detailed_values_false": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                    ],
+                    "values": [90, 100],
                 }
             },
             False,  # detailed_values_flag
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
-                "ModuleG.variable_z": {
-                    "info_maps": [{"data_origin": [["SourceClassG", "method_g"]], "units": "units_g"}],
-                    "values": [70],
-                }
-            },
-        ),
-        (
-            {
-                "ModuleK.no_data_origin": {
+                "ModuleH.include_detailed_values_false": {
                     "info_maps": [
-                        {"units": "units_k"},  # Missing data_origin
-                        {"data_origin": [["ClassW", "method_w"]], "units": "units_w"},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
                     ],
-                    "values": [110, 120],
-                }
-            },
-            True,  # detailed_values_flag
-            {
-                "ModuleK.no_data_origin": {
-                    "info_maps": [
-                        {"units": "units_k"},
-                        {"data_origin": [["ClassW", "method_w"]], "units": "units_w"},
-                    ],
-                    "values": [110, 120],
+                    "values": [90, 100],
                 }
             },
         ),
     ],
 )
 def test_add_detailed_values(
-    input_data: Dict[str, Any], detailed_values_flag: bool, expected: Dict[str, Any], mocker: MockerFixture
+    input_data: Dict[str, Any],
+    detailed_values_flag: bool,
+    origin_label: OriginLabel,
+    expected: Dict[str, Any],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _add_detailed_values() method in OutputManager class.
@@ -2500,7 +2580,7 @@ def test_add_detailed_values(
     mocker.patch.object(output_manager, "_include_detailed_values", detailed_values_flag)
 
     # Act
-    result = output_manager._add_detailed_values(input_data)
+    result = output_manager._add_detailed_values(input_data, origin_label)
 
     # Assert
     assert result == expected
@@ -2547,6 +2627,16 @@ def test_set_detailed_values(new_flag_value: bool) -> None:
         ({"info_maps": [{"data_origin": "source"}]}, False),
         # Case 5: 'info_maps' and 'values' have different lengths
         ({"info_maps": [{"data_origin": "source"}, {"data_origin": "source2"}], "values": [1]}, False),
+        # Case 6: Empty 'info_maps' list
+        ({"info_maps": [], "values": [1]}, False),
+        # Case 7: Empty 'values' list
+        ({"info_maps": [{"data_origin": "source"}], "values": []}, False),
+        # Case 8: Both 'info_maps' and 'values' are empty lists
+        ({"info_maps": [], "values": []}, False),
+        # Case 9: 'info_maps' contains a dictionary without 'data_origin' key
+        ({"info_maps": [{"other_key": "value"}], "values": [1]}, True),
+        # Case 10: 'info_maps' contains a non-dictionary element
+        ({"info_maps": ["not_a_dictionary"], "values": [1]}, True),
     ],
 )
 def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result: bool) -> None:
@@ -2584,3 +2674,160 @@ def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
 
     # Cleanup
     output_manager._exclude_info_maps_flag = False
+
+
+@pytest.mark.parametrize(
+    "origin_label, data, expected_output",
+    [
+        (
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            {
+                "true_origin_class": "ClassA",
+                "true_origin_function": "method_a",
+                "report_origin": "ModuleA.variable_x",
+                "value": 10,
+                "units": "unitless",
+            },
+            "[ClassA.method_a]->[ModuleA.variable_x]: 10 (unitless)",
+        ),
+        (
+            OriginLabel.TRUE_ORIGIN,
+            {
+                "true_origin_class": "ClassB",
+                "true_origin_function": "method_b",
+                "report_origin": "ModuleB.variable_y",
+                "value": 20.5,
+                "units": "meters",
+            },
+            "[ClassB.method_b]: 20.5 (meters)",
+        ),
+        (
+            OriginLabel.REPORT_ORIGIN,
+            {
+                "true_origin_class": "ClassC",
+                "true_origin_function": "method_c",
+                "report_origin": "ModuleC.variable_z",
+                "value": 30,
+                "units": "seconds",
+            },
+            "[ModuleC.variable_z]: 30 (seconds)",
+        ),
+        (
+            OriginLabel.NONE,
+            {
+                "true_origin_class": "ClassD",
+                "true_origin_function": "method_d",
+                "report_origin": "ModuleD.variable_w",
+                "value": 40,
+                "units": "kg",
+            },
+            "40 (kg)",
+        ),
+        (
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            {
+                "true_origin_class": "ClassE",
+                "true_origin_function": "method_e",
+                "report_origin": "ModuleE.variable_dict",
+                "value": {"key1": 50, "key2": 60},
+                "units": {"key1": "unit1", "key2": "unit2"},
+            },
+            "[ClassE.method_e]->[ModuleE.variable_dict]: key1 = 50 (unit1), key2 = 60 (unit2)",
+        ),
+        (
+            OriginLabel.NONE,
+            {
+                "true_origin_class": "ClassF",
+                "true_origin_function": "method_f",
+                "report_origin": "ModuleF.variable_dict",
+                "value": {"key1": 70, "key2": 80},
+                "units": {"key1": "unit3", "key2": "unit4"},
+            },
+            "key1 = 70 (unit3), key2 = 80 (unit4)",
+        ),
+        (
+            OriginLabel.TRUE_ORIGIN,
+            {
+                "true_origin_class": "ClassG",
+                "true_origin_function": "method_g",
+                "report_origin": "ModuleG.variable_dict",
+                "value": {"key1": 90, "key2": 100, "key3": 110},
+                "units": {"key1": "unit5", "key2": "unit6", "key3": "unit7"},
+            },
+            "[ClassG.method_g]: key1 = 90 (unit5), key2 = 100 (unit6), key3 = 110 (unit7)",
+        ),
+        (
+            OriginLabel.REPORT_ORIGIN,
+            {
+                "true_origin_class": "ClassH",
+                "true_origin_function": "method_h",
+                "report_origin": "ModuleH.variable_dict",
+                "value": {"key1": 120, "key2": 130},
+                "units": {"key1": "unit8", "key2": "unit9"},
+            },
+            "[ModuleH.variable_dict]: key1 = 120 (unit8), key2 = 130 (unit9)",
+        ),
+    ],
+)
+def test_format_detailed_value_str(origin_label: OriginLabel, data: Dict[str, Any], expected_output: str) -> None:
+    """
+    Unit test for the _format_detailed_value_str() method in OutputManager class.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+
+    # Act
+    result = output_manager._format_detailed_value_str(origin_label, data)
+
+    # Assert
+    assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "filter_content, expected_origin_label, expected_error_messages",
+    [
+        # Case 1: Valid origin label
+        ({"origin_label": "true and report origins"}, OriginLabel.TRUE_AND_REPORT_ORIGINS, []),
+        # Case 2: Another valid origin label
+        ({"origin_label": "report origin"}, OriginLabel.REPORT_ORIGIN, []),
+        # Case 3: Missing origin label
+        ({}, OriginLabel.NONE, []),
+        # Case 4: Invalid origin label type
+        (
+            {"origin_label": 123},
+            OriginLabel.NONE,
+            ["Origin label must be a string. Received 123 of type <class 'int'>."],
+        ),
+        # Case 5: Unsupported origin label value
+        (
+            {"origin_label": "invalid_label"},
+            OriginLabel.NONE,
+            [
+                "Origin label must be one of ['true and report origins', 'true origin', 'report origin', 'none']. "
+                "Received invalid_label."
+            ],
+        ),
+    ],
+)
+def test_get_origin_label(
+    filter_content: Dict[str, Union[str, int]],
+    expected_origin_label: OriginLabel,
+    expected_error_messages: List[str],
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the _get_origin_label() method in OutputManager class.
+    """
+    # Arrange
+    output_manager = OutputManager()
+    mocked_add_error = mocker.patch.object(output_manager, "add_error")
+
+    # Act
+    result = output_manager._get_origin_label(filter_content)
+
+    # Assert
+    assert result == expected_origin_label
+    assert mocked_add_error.call_count == len(expected_error_messages)
+    for idx, expected_message in enumerate(expected_error_messages):
+        assert mocked_add_error.call_args_list[idx][0][1] == expected_message

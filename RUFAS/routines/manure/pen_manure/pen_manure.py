@@ -53,7 +53,7 @@ class PenManure:
 
     manure_volume: Optional[float] = None
     """Volume of manure (m^3)."""
-    manure_volume_unit: str = MeasurementUnits.CUBIC_METERS
+    manure_volume_unit: str = MeasurementUnits.CUBIC_METERS.value
     """Unit for manure_volume"""
 
     total_solids: float = 0.0
