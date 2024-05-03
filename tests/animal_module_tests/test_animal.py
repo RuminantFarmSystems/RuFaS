@@ -2093,7 +2093,9 @@ def test_ration_optimizer_optimize(
 ) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
 
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration)
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.make_user_bounds",
@@ -2146,7 +2148,9 @@ def test_ration_optimizer_optimize_with_prev_ration(
     expected_constraints = mock_heifer_constraints
     prev_ration = {"a": 3, "b": 6}
     expected_x0 = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0]
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration)
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
@@ -2275,7 +2279,6 @@ def test_calculate_rqmts() -> None:
 
 
 def test_formulate_ration_use_user_defined_ration_true(mocker: MockerFixture) -> None:
-
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
