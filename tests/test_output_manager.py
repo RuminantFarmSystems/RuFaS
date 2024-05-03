@@ -813,7 +813,6 @@ def output_manager_original_method_states(
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
         "add_warning": mock_output_manager.add_warning,
-        "dump_variables": mock_output_manager.dump_variables,
         "dump_logs": mock_output_manager.dump_logs,
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
@@ -873,42 +872,6 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mock_method:
         mock_method.return_value = timestamp
         assert om.generate_file_name(base_name, extension) == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
-
-
-def test_dump_variables(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for function dump_variables in output_manager.py"""
-    filtered_info_maps_dict = {}
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
-
-    mock_output_manager.dump_variables("dummy_path", False)
-
-    mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager.generate_file_name.assert_called_once_with("all_variables", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
-    )
-
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
-
-    mock_output_manager.dump_variables("dummy_path", True)
-
-    mock_output_manager._exclude_info_maps.assert_called_once()
-    mock_output_manager.generate_file_name.assert_called_once_with("all_variables", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
-        filtered_info_maps_dict, os.path.join("dummy_path", "dummy_name")
-    )
-
-    # Restore original methods
-    mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
-    mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
 
 
 def test_dump_logs(
