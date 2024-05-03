@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO
 
 import pandas as pd
-from deprecated.sphinx import deprecated
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -1187,31 +1186,6 @@ class OutputManager(object):
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
 
-    @deprecated(
-        reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_results() is not working.""",
-        version="MVP",
-    )
-    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
-        """
-        Dumps variables_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
-        """
-        pool = self.variables_pool
-        if exclude_info_maps:
-            pool = self._exclude_info_maps(self.variables_pool)
-
-        json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
-        self.dict_to_file_json(pool, json_file_path)
-
     def dump_logs(self, path: Path) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
@@ -1477,21 +1451,24 @@ class OutputManager(object):
         logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
         return errors_count, warnings_count, logs_count
 
-    def print_credits(self) -> None:
+    def print_credits(self, version_number: str, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
-            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
+            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
+            sys.stdout.write(f"Starting task: {task_id}\n")
 
-    def print_errors_warnings_logs_counts(self) -> None:
+    def print_errors_warnings_logs_counts(self, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
-            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+            sys.stdout.write(
+                f"Finished task: {task_id} with {errors_count} error(s), "
+                f"{warnings_count} warning(s), and {logs_count} log(s).\n"
+            )
 
     def set_include_detailed_values(self, flag: bool) -> None:
         """Sets the flag for adding detailed values to the output files."""
@@ -1508,3 +1485,24 @@ class OutputManager(object):
         """
 
         self._exclude_info_maps_flag = exclude_info_maps
+
+    def run_startup_sequence(
+        self,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+        variables_file_path: Path,
+        output_prefix: str,
+        version_number: str,
+        task_id: str,
+    ) -> None:
+        """Performs various tasks that are needed to setup and run the Output Manager."""
+        self.print_credits(version_number, task_id)
+        self.flush_pools()
+        self.set_exclude_info_maps_flag(exclude_info_maps)
+        self.set_log_verbose(verbosity)
+        self.set_metadata_prefix(output_prefix)
+        self.create_directory(output_directory)
+        if clear_output_directory:
+            self.clear_output_dir(variables_file_path, output_directory)
