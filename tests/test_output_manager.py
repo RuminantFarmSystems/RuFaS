@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List, Union
 
 import pandas as pd
 import pytest
+from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -13,7 +14,6 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
-from freezegun import freeze_time
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -813,7 +813,6 @@ def output_manager_original_method_states(
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
         "add_warning": mock_output_manager.add_warning,
-        "dump_variables": mock_output_manager.dump_variables,
         "dump_logs": mock_output_manager.dump_logs,
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
@@ -828,37 +827,39 @@ def output_manager_original_method_states(
     }
 
 
-def test_dump_all_nondata_pools(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
+def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     """Test case for function dump_all_nondata_pools in output_manager.py"""
+
+    # Arrange
+    output_manager = OutputManager()
     path = "dummy_path"
-    mock_output_manager.dump_errors = MagicMock()
-    mock_output_manager.dump_warnings = MagicMock()
-    mock_output_manager.dump_logs = MagicMock()
-    mock_output_manager.dump_variable_names_and_contexts = MagicMock()
+    patch_for_dump_errors = mocker.patch.object(output_manager, "dump_errors")
+    patch_for_dump_warnings = mocker.patch.object(output_manager, "dump_warnings")
+    patch_for_dump_logs = mocker.patch.object(output_manager, "dump_logs")
+    patch_for_dump_variable_names_and_contexts = mocker.patch.object(output_manager, "dump_variable_names_and_contexts")
+    patch_for_report_variables_usage_counts = mocker.patch.object(output_manager, "report_variables_usage_counts")
 
-    mock_output_manager.dump_all_nondata_pools(path, False, "verbose")
+    # Act
+    output_manager.dump_all_nondata_pools(path, False, "verbose")
 
-    mock_output_manager.dump_errors.assert_called_once_with(path)
-    mock_output_manager.dump_warnings.assert_called_once_with(path)
-    mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
+    # Assert
+    patch_for_dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
+    patch_for_dump_errors.assert_called_once_with(path)
+    patch_for_dump_warnings.assert_called_once_with(path)
+    patch_for_dump_logs.assert_called_once_with(path)
+    patch_for_report_variables_usage_counts.assert_called_once_with(path)
 
-    mock_output_manager.dump_all_nondata_pools(path, True, "verbose")
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True, "verbose")
-    assert mock_output_manager.dump_logs.call_count == 2
-    assert mock_output_manager.dump_warnings.call_count == 2
-    assert mock_output_manager.dump_errors.call_count == 2
+    # Act
+    output_manager.dump_all_nondata_pools(path, True, "verbose")
 
-    # Restore original methods
-    mock_output_manager.dump_logs = output_manager_original_method_states["dump_logs"]
-    mock_output_manager.dump_warnings = output_manager_original_method_states["dump_warnings"]
-    mock_output_manager.dump_errors = output_manager_original_method_states["dump_errors"]
-    mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
-        "dump_variable_names_and_contexts"
-    ]
+    # Assert
+    assert patch_for_dump_variable_names_and_contexts.call_count == 2
+    assert patch_for_dump_errors.call_count == 2
+    assert patch_for_dump_warnings.call_count == 2
+    assert patch_for_dump_logs.call_count == 2
+    assert patch_for_report_variables_usage_counts.call_count == 2
+
+    output_manager.flush_pools()
 
 
 def test_generate_file_name(mocker: MockerFixture) -> None:
@@ -873,42 +874,6 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mock_method:
         mock_method.return_value = timestamp
         assert om.generate_file_name(base_name, extension) == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
-
-
-def test_dump_variables(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for function dump_variables in output_manager.py"""
-    filtered_info_maps_dict = {}
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
-
-    mock_output_manager.dump_variables("dummy_path", False)
-
-    mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager.generate_file_name.assert_called_once_with("all_variables", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
-    )
-
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
-    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
-
-    mock_output_manager.dump_variables("dummy_path", True)
-
-    mock_output_manager._exclude_info_maps.assert_called_once()
-    mock_output_manager.generate_file_name.assert_called_once_with("all_variables", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
-        filtered_info_maps_dict, os.path.join("dummy_path", "dummy_name")
-    )
-
-    # Restore original methods
-    mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
-    mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
 
 
 def test_dump_logs(
@@ -969,6 +934,36 @@ def test_dump_errors(
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
+
+
+def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
+    """
+    Unit test for report_variables_usage_counts() method in OutputManager class.
+    """
+
+    # Arrange
+    path = "/fake/directory"
+    expected_file_name = "variables_usage_counts.csv"
+    expected_full_path = os.path.join(path, expected_file_name)
+    output_manager = OutputManager()
+
+    patch_for_os_path_join = mocker.patch("os.path.join", return_value=expected_full_path)
+    patch_for_generate_file_name = mocker.patch.object(
+        output_manager, "generate_file_name", return_value=expected_file_name
+    )
+    patch_for_dict_to_file_json = mocker.patch.object(output_manager, "_dict_to_file_csv")
+    data_dict: Dict[str, Dict[str, List[Any]]] = {
+        "variable_name": {"values": []},
+        "usage_count": {"values": []},
+    }
+
+    # Act
+    output_manager.report_variables_usage_counts(path)
+
+    # Assert
+    patch_for_os_path_join.assert_called_once_with(path, expected_file_name)
+    patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
+    patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
 
 
 @pytest.mark.parametrize(
@@ -2294,10 +2289,22 @@ def test_get_error_and_warning_counts(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.ERRORS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.WARNINGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
-        (LogVerbosity.LOGS, f"RuFaS: Ruminant Farm Systems Model.\n{DISCLAIMER_MESSAGE}\n"),
+        (
+            LogVerbosity.CREDITS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.ERRORS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.WARNINGS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
+        (
+            LogVerbosity.LOGS,
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+        ),
     ],
 )
 def test_print_credits(
@@ -2307,7 +2314,9 @@ def test_print_credits(
     Unit test for the print_credits() method in OutputManager class.
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
-    mock_output_manager.print_credits()
+    task_id = "id"
+    version = "v"
+    mock_output_manager.print_credits(version, task_id)
 
     captured = capfd.readouterr()
     assert captured.out == expected_output
@@ -2317,18 +2326,19 @@ def test_print_credits(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.ERRORS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.WARNINGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
-        (LogVerbosity.LOGS, "2 error(s), 1 warning(s), and 5 log(s) found.\n"),
+        (LogVerbosity.CREDITS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.ERRORS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.WARNINGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.LOGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
     ],
 )
 def test_print_errors_warnings_logs(
     mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
 ):
     mock_output_manager._OutputManager__log_verbose = log_verbose
+    task_id = "id"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
-        mock_output_manager.print_errors_warnings_logs_counts()
+        mock_output_manager.print_errors_warnings_logs_counts(task_id)
         captured = capfd.readouterr()
         assert captured.out == expected_output
 
