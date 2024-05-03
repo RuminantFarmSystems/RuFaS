@@ -197,6 +197,13 @@ def test_filter_dictionary(
     assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
 
 
+def test_remove_special_chars() -> None:
+    """Tests remove_special_chars() function in util.py"""
+    charred_word = '<>:/w"o|\\r?d?*.'
+    expected_result = "word"
+    assert Utility.remove_special_chars(charred_word) == expected_result
+
+
 def test_flatten_keys_to_nested_structure_nested_dict() -> None:
     x = {"a.i.c": 1, "a.i.d": 2, "a.j.c": 3, "a.j.d": 4, "b.i.c": 5, "b.i.d": 6, "b.j.c": 7, "b.j.d": 8}
     actual = Utility.flatten_keys_to_nested_structure(x)
