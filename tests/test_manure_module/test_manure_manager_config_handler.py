@@ -478,7 +478,7 @@ def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     )
     manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
     manure_manager_config_handler.bedding_configs = {}
-    expected_error_message = "Unknown manure bedding configuration name"
+    expected_error_message = "Attempted to use a non-existent manure bedding configuration called 'not present'"
 
     with pytest.raises(KeyError, match=expected_error_message):
         manure_manager_config_handler.get_bedding_config("not present")
