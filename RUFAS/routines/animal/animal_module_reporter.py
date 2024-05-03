@@ -145,16 +145,16 @@ class AnimalModuleReporter:
 
         """
         units = {
-            "days_in_milk": MeasurementUnits.DAYS.value,
-            "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY.value,
-            "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY.value,
-            "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY.value,
-            "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY.value,
-            "lactating": MeasurementUnits.UNITLESS.value,
-            "parity": MeasurementUnits.UNITLESS.value,
-            "cow_id": MeasurementUnits.UNITLESS.value,
-            "pen_id": MeasurementUnits.UNITLESS.value,
-            "simulation_day": MeasurementUnits.SIMULATION_DAY.value,
+            "days_in_milk": MeasurementUnits.DAYS,
+            "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY,
+            "lactating": MeasurementUnits.UNITLESS,
+            "parity": MeasurementUnits.UNITLESS,
+            "cow_id": MeasurementUnits.UNITLESS,
+            "pen_id": MeasurementUnits.UNITLESS,
+            "simulation_day": MeasurementUnits.SIMULATION_DAY,
         }
 
         info_map = {
@@ -215,21 +215,21 @@ class AnimalModuleReporter:
                 "simulation_day": simulation_day,
             }
             nutrient_amount_units = {
-                "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL.value,
-                "CP": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "ADF": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "NDF": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "lignin": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "ash": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "N": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "as_fed": MeasurementUnits.PERCENT.value,
-                "EE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "starch": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "TDN": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "DE": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
+                "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "CP": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "ADF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "NDF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "lignin": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "ash": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "N": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "as_fed": MeasurementUnits.PERCENT,
+                "EE": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "starch": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "TDN": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "DE": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
             }
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_ration_interval_data.__name__
@@ -285,7 +285,7 @@ class AnimalModuleReporter:
                 pen.avg_nutrient_rqmts,
                 dict(info_map, **{"units": avg_nutrient_rqmts_units}),
             )
-            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS.value for key in ration_per_animal.keys()}
+            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_animal.keys()}
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.ration_per_animal_for_pen_0_CALF",
                 f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -301,18 +301,18 @@ class AnimalModuleReporter:
             )
             if pen.animal_combination != AnimalCombination.CALF:
                 ration_supply_report_units = {
-                    "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM.value,
-                    "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM.value,
-                    "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM.value,
-                    "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM.value,
-                    "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM.value,
-                    "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                    "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                    "fat": MeasurementUnits.GRAMS.value,
-                    "fat_percentage": MeasurementUnits.PERCENT.value,
-                    "forage_NDF": MeasurementUnits.PERCENT.value,
-                    "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER.value,
-                    "metabolizable_protein": MeasurementUnits.GRAMS.value,
+                    "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                    "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                    "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                    "fat": MeasurementUnits.GRAMS,
+                    "fat_percentage": MeasurementUnits.PERCENT,
+                    "forage_NDF": MeasurementUnits.PERCENT,
+                    "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                    "metabolizable_protein": MeasurementUnits.GRAMS,
                 }
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
@@ -365,7 +365,7 @@ class AnimalModuleReporter:
             AnimalModuleReporter.report_daily_feed_emissions(
                 ration_total, pen.id, pen.animal_combination.name, animal_manager
             )
-            ration_total_units = {key: MeasurementUnits.KILOGRAMS.value for key in ration_total.keys()}
+            ration_total_units = {key: MeasurementUnits.KILOGRAMS for key in ration_total.keys()}
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_daily_ration.__name__
             AnimalModuleReporter.data_padder(
@@ -444,23 +444,23 @@ class AnimalModuleReporter:
 
         """
         manure_value_units = {
-            "urea": MeasurementUnits.GRAMS_PER_LITER.value,
-            "urine": MeasurementUnits.KILOGRAMS.value,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER.value,
-            "urine_nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "manure_nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "manure_mass": MeasurementUnits.KILOGRAMS.value,
-            "total_solids": MeasurementUnits.KILOGRAMS.value,
-            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS.value,
-            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS.value,
-            "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS.value,
-            "organic_phosphorus_fraction": MeasurementUnits.UNITLESS.value,
-            "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS.value,
-            "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS.value,
-            "phosphorus": MeasurementUnits.GRAMS.value,
-            "phosphorus_fraction": MeasurementUnits.UNITLESS.value,
-            "potassium": MeasurementUnits.GRAMS.value,
-            "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY.value,
+            "urea": MeasurementUnits.GRAMS_PER_LITER,
+            "urine": MeasurementUnits.KILOGRAMS,
+            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "urine_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_mass": MeasurementUnits.KILOGRAMS,
+            "total_solids": MeasurementUnits.KILOGRAMS,
+            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "phosphorus": MeasurementUnits.GRAMS,
+            "phosphorus_fraction": MeasurementUnits.UNITLESS,
+            "potassium": MeasurementUnits.GRAMS,
+            "enteric_methane_g": MeasurementUnits.GRAMS_PER_DAY,
         }
         for output_data_dict in manure_excretions_output_data.values():
             for manure_property, manure_value in output_data_dict["manure"].items():

@@ -210,10 +210,10 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units})
 
-    def _validate_units(self, units: Dict[str, Any] | str) -> Dict[str, Any] | str:
+    def _validate_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
-        Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
-        valid MeasurementUnits values (including nested dictionaries). Converts the MeasurementUnits
+        Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
+        valid MeasurementUnits enum members (including nested dictionaries). Converts the MeasurementUnits
         enum values to their string representations.
 
         Parameters
@@ -229,17 +229,24 @@ class OutputManager(object):
 
         Raises
         ------
+        TypeError
+            If any unit or nested unit does not have the type MeasurementUnits.
         ValueError
             If any unit or nested unit is not a valid MeasurementUnits value.
 
         """
         if isinstance(units, dict):
             return {key: self._validate_units(unit) for key, unit in units.items()}
-        else:
-            try:
-                return str(MeasurementUnits(units))
-            except ValueError:
-                raise ValueError(f"'{units}' is not a valid MeasurementUnits value")
+
+        if type(units) is not MeasurementUnits:
+            raise TypeError(
+                f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)})."
+            )
+
+        try:
+            return str(units)
+        except ValueError:
+            raise ValueError(f"'{units}' is not a valid MeasurementUnits value.")
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
