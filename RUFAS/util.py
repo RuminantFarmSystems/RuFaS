@@ -447,6 +447,26 @@ class Utility:
         }
 
     @staticmethod
+    def remove_special_chars(input_string: str) -> str:
+        """Function to remove special characters from a string.
+
+        Parameters
+        ----------
+        input_string : str
+            The string from which the special characters should be removed.
+
+        Returns
+        -------
+        str
+            The input string with the special characters filtered out.
+        """
+        chars_to_remove = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
+
+        filtered_string = "".join(char for char in input_string if char not in chars_to_remove)
+
+        return filtered_string
+
+    @staticmethod
     def is_leap_year(year: int) -> bool:
         """
         Helper method determines if the given year is a leap year
