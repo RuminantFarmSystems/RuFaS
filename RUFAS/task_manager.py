@@ -388,7 +388,7 @@ class TaskManager:
             f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
             info_map,
         )
-        input_manager.dump_metadata_properties(args["output_directory"])
+        input_manager.save_metadata_properties(args["output_directory"])
 
         return is_data_valid
 
