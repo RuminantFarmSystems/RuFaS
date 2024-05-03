@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import collections
 import json
 import os
 import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO
+from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
-from deprecated.sphinx import deprecated
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -119,8 +119,14 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
+    time : Time
+        A Time object used to track the simulation time
     _include_detailed_values : bool
         Set to True to include detailed values in the json output files after the simulation
+    _exclude_info_maps_flag : bool
+        Set to True to exclude info_maps when adding variables to the variables_pool
+    _variables_usage_counter : Counter[str]
+        A Counter object used to keep track of the number of times a variables in the variables_pool is used.
     """
 
     __instance = None
@@ -157,6 +163,8 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self.time = None
+            self._variables_usage_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -228,6 +236,10 @@ class OutputManager(object):
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self._variables_usage_counter[f"{key}.{k}"] = 0
 
     def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
@@ -1054,52 +1066,79 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
         """
-        Returns a filtered variables pool based on either inclusion or exclusion.
+        Returns a filtered variables pool based on options specified in filter_content.
 
         Parameters
         ----------
-        filter_patterns : List[str]
-            A list of patterns the user has selected to filter the variables pool.
-
-        input_file_name : str, optional
-            The filter patterns file name - necessary for logging purposes
+        filter_content : Dict[str, Any]
+            A dictionary that contains filtering options.
 
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
-
-        Notes
-        -----
-        The first item in the filter_patterns list will determine whether the patterns are treated as
-        exclusionary or inclusionary. If the first pattern matches the value of the exclude_keyword
-        variable defined in this function, it will treat the rest of the filter list as exclusionary
-        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
-        as inclusionary.
-
         """
+        filter_name: str = filter_content.get("name", "NO NAME FOUND")
+        use_filter_name: bool = filter_content.get("use_name", False)
+        filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._filter_variables_pool.__name__,
+            "function": self.filter_variables_pool.__name__,
+            "filter_name": filter_name,
+            "filter_by_exclusion": filter_by_exclusion,
+            "use_filter_name": use_filter_name,
         }
-        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
-        filter_name = filter_content.get("filter_name", "NO_NAME")
         if filter_by_exclusion:
             filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
         else:
             filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
         self.add_log("filtering_log", filter_excl_msg, info_map)
-        filtered_pool = Utility.filter_dictionary(
-            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
+
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
+            dict_to_filter=self.variables_pool,
+            filter_patterns=filter_content.get("filters", []),
+            filter_by_exclusion=filter_by_exclusion,
         )
         self.add_log(
             "num_filter_pattern_matches",
             f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
             info_map,
         )
-        return filtered_pool
+
+        selected_variables: List[str] | None = filter_content.get("variables")
+        slice_start: int = filter_content.get("slice_start", 0)
+        slice_end: int | None = filter_content.get("slice_end")
+
+        results: Dict[str, OutputManager.pool_element_type] = {}
+        counter: int = 0
+        for key in filtered_pool.keys():
+            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
+            is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
+            if selected_variables is None or not is_data_in_dict:
+                combined_key = f"{filter_name}_{counter}" if use_filter_name else key
+                results[combined_key] = {"values": sliced_data}
+                self._variables_usage_counter.update([key])
+            elif is_data_in_dict:
+                if not isinstance(selected_variables, list):
+                    self.add_error(
+                        "Unpacking Pool Error",
+                        f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
+                        f"{is_data_in_dict=}, {selected_variables=}",
+                        info_map,
+                    )
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
+                filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
+                for filtered_key, filtered_value in filtered_data.items():
+                    combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
+                    if combined_key in results.keys():
+                        results[combined_key]["values"].extend(filtered_value)
+                    else:
+                        results[combined_key] = {"values": filtered_value}
+                    self._variables_usage_counter.update([f"{key}.{filtered_key}"])
+            counter += 1
+        return results
 
     def save_results(
         self,
@@ -1147,7 +1186,7 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator()
+        report_generator = ReportGenerator(self.time)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -1175,7 +1214,8 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_variables_pool(filter_content)
+                    filtered_pool = self.filter_variables_pool(filter_content)
+                    # self._variables_usage_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1242,7 +1282,7 @@ class OutputManager(object):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    graph_generator = GraphGenerator(self.__metadata_prefix, self.time)
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
@@ -1320,55 +1360,48 @@ class OutputManager(object):
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
 
-    @deprecated(
-        reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_results() is not working.""",
-        version="MVP",
-    )
-    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
-        """
-        Dumps variables_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
-        """
-        pool = self.variables_pool
-        if exclude_info_maps:
-            pool = self._exclude_info_maps(self.variables_pool)
-
-        json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
-        self.dict_to_file_json(pool, json_file_path)
-
-    def dump_logs(self, path: str) -> None:
+    def dump_logs(self, path: Path) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self.generate_file_name("logs", "json"))
         self.dict_to_file_json(self.logs_pool, file_path)
 
-    def dump_warnings(self, path: str) -> None:
+    def dump_warnings(self, path: Path) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self.generate_file_name("warnings", "json"))
         self.dict_to_file_json(self.warnings_pool, file_path)
 
-    def dump_errors(self, path: str) -> None:
+    def dump_errors(self, path: Path) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
+    def report_variables_usage_counts(self, path: Path) -> None:
+        """
+        Reports the usage counts of variables in the variables pool to a CSV file in the given path to a directory.
+
+        Parameters
+        ----------
+        path : Path
+            The path to the directory where the file will be saved.
+        """
+
+        filename = self.generate_file_name("variables_usage_counts", "csv")
+        file_path_csv = os.path.join(path, filename)
+        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
+        usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
+        data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
+        self._dict_to_file_csv(data_dict, file_path_csv)
+
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
-        path: str,
+        path: Path,
         exclude_info_maps: bool,
         format_option: str,
     ) -> None:
@@ -1455,7 +1488,7 @@ class OutputManager(object):
 
     def dump_all_nondata_pools(
         self,
-        path: str,
+        path: Path,
         exclude_info_maps: bool,
         format_option: str,
     ) -> None:
@@ -1466,6 +1499,7 @@ class OutputManager(object):
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
+        self.report_variables_usage_counts(path)
 
     def flush_pools(self) -> None:
         """
@@ -1610,21 +1644,24 @@ class OutputManager(object):
         logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
         return errors_count, warnings_count, logs_count
 
-    def print_credits(self) -> None:
+    def print_credits(self, version_number: str, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
-            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
+            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
+            sys.stdout.write(f"Starting task: {task_id}\n")
 
-    def print_errors_warnings_logs_counts(self) -> None:
+    def print_errors_warnings_logs_counts(self, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
-            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+            sys.stdout.write(
+                f"Finished task: {task_id} with {errors_count} error(s), "
+                f"{warnings_count} warning(s), and {logs_count} log(s).\n"
+            )
 
     def set_include_detailed_values(self, flag: bool) -> None:
         """Sets the flag for adding detailed values to the output files."""
@@ -1694,3 +1731,24 @@ class OutputManager(object):
             return OriginLabel.NONE
 
         return OriginLabel(origin_label_value)
+
+    def run_startup_sequence(
+        self,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+        variables_file_path: Path,
+        output_prefix: str,
+        version_number: str,
+        task_id: str,
+    ) -> None:
+        """Performs various tasks that are needed to setup and run the Output Manager."""
+        self.print_credits(version_number, task_id)
+        self.flush_pools()
+        self.set_exclude_info_maps_flag(exclude_info_maps)
+        self.set_log_verbose(verbosity)
+        self.set_metadata_prefix(output_prefix)
+        self.create_directory(output_directory)
+        if clear_output_directory:
+            self.clear_output_dir(variables_file_path, output_directory)
