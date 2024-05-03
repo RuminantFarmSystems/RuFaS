@@ -132,7 +132,7 @@ class Weather:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
             "prefix": "Weather",
         }
         om.add_variable(
