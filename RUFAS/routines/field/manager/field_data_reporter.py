@@ -929,7 +929,7 @@ class FieldDataReporter:
             om.add_variable(
                 "annual_soil_phosphorus_runoff",
                 field.soil.data.annual_soil_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS.value}),
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE.value}),
             )
             om.add_variable(
                 "annual_runoff_nitrates_total",
