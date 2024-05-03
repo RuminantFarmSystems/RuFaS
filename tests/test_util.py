@@ -163,20 +163,6 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-@pytest.mark.parametrize(
-    "year, day, expected_month",
-    [
-        (2000, 366, 12),  # leap year
-        (2001, 365, 12),  # normal year
-        (2000, 60, 2),
-        (2001, 60, 3),
-    ],
-)
-def test_day_to_month_conversion(year: int, day: int, expected_month: int):
-    """Tests that number of days were converted into months correctly"""
-    assert Utility.day_to_month_conversion(day, year) == expected_month
-
-
 def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
     result = Utility.convert_list_of_dicts_to_dict_of_lists([])
     assert result == {}

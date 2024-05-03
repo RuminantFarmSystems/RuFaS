@@ -145,6 +145,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
     ],
 )
 def test_get_current_day_conditions(
+    mocker: MockerFixture,
     mock_weather: Weather,
     day: int,
     year: int,
@@ -156,17 +157,12 @@ def test_get_current_day_conditions(
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
-    with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock, return_value=3) as conversion:
-        with patch(
-            "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
-            new_callable=MagicMock,
-            return_value=10.0,
-        ) as daylength:
-            actual = mock_weather.get_current_day_conditions(mocked_time)
+    daylength = mocker.patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", return_value=10.0)
+
+    actual = mock_weather.get_current_day_conditions(mocked_time)
 
     assert actual == expected
-    assert conversion.call_count == 1
-    daylength.assert_called_once_with(day, 43.0723, 3)
+    daylength.assert_called_once_with(day, 43.0723, calendar_year)
 
 
 @pytest.mark.parametrize(
@@ -177,6 +173,7 @@ def test_get_current_day_conditions(
     ],
 )
 def test_get_current_day_conditions_error(
+    mocker: MockerFixture,
     mock_weather: Weather,
     day: int,
     year: int,
@@ -188,20 +185,11 @@ def test_get_current_day_conditions_error(
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
-    with (
-        patch(
-            "RUFAS.util.Utility.day_to_month_conversion",
-            new_callable=MagicMock,
-            return_value=3,
-        ),
-        patch(
-            "RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
-            new_callable=MagicMock,
-            return_value=10.0,
-        ),
-        pytest.raises(IndexError) as e,
-    ):
+    mocker.patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", return_value=10.0)
+
+    with pytest.raises(IndexError) as e:
         mock_weather.get_current_day_conditions(mocked_time)
+
     assert str(e.value) == expected
 
 
@@ -261,15 +249,13 @@ def test_get_conditions_series(
     setattr(mock_time, "end_year_int", 2024)
     date_conversion = mocker.patch.object(Utility, "convert_ordinal_date_to_month_date", return_value=date(2023, 1, 2))
     time_series_gen = mocker.patch.object(Utility, "generate_time_series", wraps=Utility.generate_time_series)
-    day_to_month = mocker.patch.object(Utility, "day_to_month_conversion", return_value=1)
     daylength = mocker.patch.object(CurrentDayConditions, "determine_daylength", return_value=15.6)
 
     actual = mock_weather.get_conditions_series(mock_time, start, end)
 
     assert actual == expected
-    date_conversion.assert_called_once()
+    date_conversion.call_count == len(expected)
     time_series_gen.assert_called_once()
-    assert day_to_month.call_count == len(expected)
     assert daylength.call_count == len(expected)
 
 

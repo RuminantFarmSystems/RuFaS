@@ -164,8 +164,7 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = Utility.day_to_month_conversion(day, time.calendar_year)
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.calendar_year)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -224,8 +223,7 @@ class Weather:
                 end_day = len(self.__mean_daily_temperature[year]) - 1
 
             for day in range(start_day, end_day + 1):
-                month = Utility.day_to_month_conversion(day, time.start_year_int + year)
-                daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
+                daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.start_year_int + year)
                 conditions = CurrentDayConditions(
                     incoming_light=self.__radiation[year - 1][day - 1],
                     min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
