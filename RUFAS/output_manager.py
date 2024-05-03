@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO
 
 import pandas as pd
-from deprecated.sphinx import deprecated
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -1186,31 +1185,6 @@ class OutputManager(object):
                     and isinstance(log["info_map"], dict)
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
-
-    @deprecated(
-        reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_results() is not working.""",
-        version="MVP",
-    )
-    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
-        """
-        Dumps variables_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
-        """
-        pool = self.variables_pool
-        if exclude_info_maps:
-            pool = self._exclude_info_maps(self.variables_pool)
-
-        json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
-        self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: Path) -> None:
         """
