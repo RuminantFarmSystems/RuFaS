@@ -5,6 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
 
 
@@ -33,6 +34,21 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
             mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value)
             mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
             assert result == mock_generate_graph_path.return_value
+
+
+def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
+    graph_details: Dict[str, str] = {
+        "title": "Test Graph",
+        "x_label": "X Axis",
+        "y_label": "Y Axis",
+    }
+    filter_file_name: str = "test_filter.png"
+    graphics_dir = Path("graphics")
+
+    with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
+        mock_savefig.side_effect = Exception("test")
+        with pytest.raises(Exception, match="test"):
+            graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
 
 def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
@@ -101,7 +117,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
     with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
         expected_output = [
             {
-                "error": "Error plotting Example Graph data set",
+                "error": "Error plotting 'Example Graph' data set",
                 "message": "Unforeseen error Test Exception when trying to graph data.",
                 "info_map": {
                     "class": graph_generator.__class__.__name__,
@@ -118,7 +134,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
             produce_graphics=produce_graphics,
         )
 
-        assert result == expected_output, "Function did not return expected error log when an exception is raised."
+        assert result == expected_output
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
@@ -167,7 +183,7 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._save_graph.assert_not_called()
 
 
-def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
+def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
@@ -175,8 +191,9 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
+    mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
     graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
-    graph_details = {"type": "plot", "filters": ["var1", "var2"]}
+    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title"}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
@@ -185,6 +202,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()))
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+    mock_remove_special_chars.assert_called_once()
 
 
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -403,7 +421,7 @@ def test_log_non_numerical_data(
     [
         (
             {
-                "type": "bar",
+                "type": "plot",
                 "title": "Valid Graph",
                 "filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -413,7 +431,7 @@ def test_log_non_numerical_data(
         ),
         (
             {
-                "type": "bar",
+                "type": "stackplot",
                 "title": "Valid Graph",
                 "bad_filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -423,7 +441,7 @@ def test_log_non_numerical_data(
         ),
         (
             {
-                "type": "bar",
+                "type": "scatter",
                 "tightle": "Valid Graph",
                 "filters": ["a", "b"],
                 "variables": ["a", "b"],
@@ -439,7 +457,8 @@ def test_validate_graph_filter(
     graph_details: Dict[str, str],
     expected_length: int,
     expected_message: str,
-):
+) -> None:
+    """Test for the _validate_graph_filter() method in graph_generator.py"""
     result = graph_generator._validate_graph_filter(graph_details)
     assert len(result) == expected_length
 
