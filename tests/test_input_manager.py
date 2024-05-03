@@ -3,6 +3,7 @@ from functools import reduce
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Type, Union, Optional
 from typing import Tuple
+from unittest.mock import ANY
 
 import pandas as pd
 import pytest
@@ -68,7 +69,7 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
-        "dump_metadata_properties": mock_input_manager.dump_metadata_properties,
+        "save_metadata_properties": mock_input_manager.save_metadata_properties,
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
         "_create_record": mock_input_manager._create_record,
@@ -4023,8 +4024,8 @@ def test_validate_input_by_type_value_error() -> None:
         )
 
 
-def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
-    """Tests dump_metadata_properties() function in InputManager."""
+def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
+    """Tests save_metadata_properties() function in InputManager."""
     mock_records = [{"name": "example", "value": 42}]
     output_dir = Path("/fake/directory")
     metadata = {"properties": "test_properties"}
@@ -4039,12 +4040,44 @@ def test_dump_metadata_properties(mock_input_manager: InputManager) -> None:
         ) as mock_generate_file_name,
     ):
 
-        mock_input_manager.dump_metadata_properties(output_dir)
+        mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
         mock_join.assert_called_once_with(output_dir, "output.csv")
         mock_to_csv.assert_called_once_with("output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
+
+
+@pytest.mark.parametrize(
+    "exception, error_message",
+    [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
+)
+def test_save_metadata_properties_errors(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    exception: Type[FileNotFoundError | PermissionError | OSError],
+    error_message: str,
+) -> None:
+    output_dir = Path("/example/dir")
+    expected_path = str(output_dir / "file.csv")
+    metadata = {"properties": "test_properties"}
+    mock_input_manager.meta_data = metadata
+    mock_records = [{"key": "value"}]
+
+    mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
+    mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
+    mocker.patch("os.path.join", return_value=expected_path)
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    with pytest.raises(exception) as exc_info:
+        mock_input_manager.save_metadata_properties(output_dir)
+
+    assert str(exc_info.value) == error_message
+
+    mock_parse.assert_called_once_with("test_properties")
+    mock_add_error.assert_called_once_with(
+        "Save CSV failure.", f"Unable to save to {expected_path} because of {error_message}.", ANY
+    )
 
 
 @pytest.mark.parametrize(
