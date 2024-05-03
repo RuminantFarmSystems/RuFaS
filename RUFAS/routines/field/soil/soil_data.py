@@ -47,7 +47,7 @@ class SoilData:
     annual_runoff_grazing_manure_organic_phosphorus : float, default 0
         Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff (kg).
     annual_soil_phosphorus_runoff : float, default 0
-        Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg).
+        Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg / ha).
     annual_runoff_nitrates_total : float, default 0
         Cumulative total of nitrates that were removed from the top soil layer by runoff (kg).
     annual_runoff_ammonium_total : float, default 0

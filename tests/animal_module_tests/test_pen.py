@@ -222,21 +222,6 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     pen.update_classes_in_pen.assert_called_once()
 
 
-def test_call_animal_nutrient_rqmts():
-    """Unit test for function call_animal_nutrient_rqmts in file routines/animal/pen.py"""
-    pass
-
-
-def test_calc_avg_nutrient_rqmts():
-    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    pass
-
-
-def test_calc_avg_stats():
-    """Unit test for function calc_avg_stats in file routines/animal/pen.py"""
-    pass
-
-
 def test_set_avg_nutrient_rqmts(pen: Pen) -> None:
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
     avg_nutrient_rqmts = {
@@ -385,16 +370,6 @@ def test_calc_avg_growth(pen: Pen, pen_animals, expected) -> None:
     actual = pen.avg_growth
 
     assert actual == expected
-
-
-def test_calc_daily_walking_dist():
-    """Unit test for function calc_daily_walking_dist in file routines/animal/pen.py"""
-    pass
-
-
-def test_call_p_rqmts():
-    """Unit test for function call_p_rqmts in file routines/animal/pen.py"""
-    pass
 
 
 def test_daily_p_update():
