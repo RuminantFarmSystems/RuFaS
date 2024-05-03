@@ -2,63 +2,9 @@ import re
 from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
+from pytest_mock.plugin import MockerFixture
 
 from RUFAS.util import Utility
-
-
-def test_query():
-    """Unit test for function query in file util.py"""
-    pass
-
-
-def test_get_base_dir():
-    """Unit test for function get_base_dir in file util.py"""
-    pass
-
-
-def test_read_json_file():
-    """Unit test for function read_json_file in file util.py"""
-    pass
-
-
-def test_LP_solve():
-    """Unit test for function LP_solve in file util.py"""
-    pass
-
-
-def test_create_LP_problem():
-    """Unit test for function create_LP_problem in file util.py"""
-    pass
-
-
-def test_is_correct_structure():
-    """Unit test for function is_correct_structure in file util.py"""
-    pass
-
-
-def test_generate_LP_vars():
-    """Unit test for function generate_LP_vars in file util.py"""
-    pass
-
-
-def test_add_LP_constraints():
-    """Unit test for function add_LP_constraints in file util.py"""
-    pass
-
-
-def test_solve_with_fastest_solver():
-    """Unit test for function solve_with_fastest_solver in file util.py"""
-    pass
-
-
-def test_organize_results():
-    """Unit test for function organize_results in file util.py"""
-    pass
-
-
-def test_LP_print():
-    """Unit test for function LP_print in file util.py"""
-    pass
 
 
 def test_calc_average() -> None:
@@ -251,21 +197,53 @@ def test_filter_dictionary(
     assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
 
 
-def test_convert_flat_dict_to_nested_dict() -> None:
+def test_remove_special_chars() -> None:
+    """Tests remove_special_chars() function in util.py"""
+    charred_word = '<>:/w"o|\\r?d?*.'
+    expected_result = "word"
+    assert Utility.remove_special_chars(charred_word) == expected_result
+
+
+def test_flatten_keys_to_nested_structure_nested_dict() -> None:
     x = {"a.i.c": 1, "a.i.d": 2, "a.j.c": 3, "a.j.d": 4, "b.i.c": 5, "b.i.d": 6, "b.j.c": 7, "b.j.d": 8}
-    actual = Utility.convert_flat_dict_to_nested_dict(x)
+    actual = Utility.flatten_keys_to_nested_structure(x)
     expected = {
         "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 8}},
     }
     assert actual == expected
 
+
+def test_flatten_keys_to_nested_structure_flat_dict() -> None:
     x = {"aic": 1, "aid": 2, "ajc": 3, "ajd": 4, "bic": 5, "bid": 6, "bjc": 7, "bjd": 8}
-    actual = Utility.convert_flat_dict_to_nested_dict(x)
+    actual = Utility.flatten_keys_to_nested_structure(x)
     assert actual == x
 
 
-def test_deep_merge() -> None:
+def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
+    x = {
+        "a.i.0": 1,
+        "a.i.1": 2,
+        "a.j.c": 3,
+        "a.j.d": 4,
+        "b.i.c": 5,
+        "b.i.d": 6,
+        "b.j.c": 7,
+        "b.j.d.0": 8,
+        "b.j.d.1.x.0": 9,
+        "b.j.d.1.x.1": 10,
+        "b.j.d.1.y": 11,
+        "b.j.d.2": 12,
+    }
+    actual = Utility.flatten_keys_to_nested_structure(x)
+    expected = {
+        "a": {"i": [1, 2], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, {"x": [9, 10], "y": 11}, 12]}},
+    }
+    assert actual == expected
+
+
+def test_deep_merge_dict() -> None:
     x = {
         "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": 8}},
@@ -281,3 +259,82 @@ def test_deep_merge() -> None:
     }
     Utility.deep_merge(x, y)
     assert x == expected
+
+
+def test_deep_merge_dict_w_list() -> None:
+    a = {
+        "a": {"i": [1, 2], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, {"x": [9, 10], "y": 11}, 12]}},
+    }
+
+    b = {
+        "a": {"i": [11, 12, 13]},
+        "b": {"i": {"c": 15}, "j": {"d": [8, {"x": [19, 110]}]}},
+    }
+
+    expected = {
+        "a": {"i": [11, 12, 13], "j": {"c": 3, "d": 4}},
+        "b": {"i": {"c": 15, "d": 6}, "j": {"c": 7, "d": [8, {"x": [19, 110], "y": 11}, 12]}},
+    }
+    Utility.deep_merge(a, b)
+    assert a == expected
+
+
+class DummyClass:
+    def __init__(self, value: int) -> None:
+        self.value = value
+
+
+class DummyNestedClass:
+    def __init__(self, value: int) -> None:
+        self.value = DummyClass(value)
+
+
+@pytest.mark.parametrize(
+    "input_obj, depth, max_depth, expected_output",
+    [
+        (42, 0, 1, 42),
+        (3.14, 0, 1, 3.14),
+        ("test", 0, 1, "test"),
+        (True, 0, 1, True),
+        (False, 0, 1, False),
+        (None, 0, 1, None),
+        ([], 0, 1, []),
+        ((), 0, 1, ()),
+        ({}, 0, 1, {}),
+        (set(), 0, 1, []),
+        ([1, "test", True], 0, 1, [1, "test", True]),
+        ((1, "test", True), 0, 1, (1, "test", True)),
+        ({1, 2, 3}, 0, 1, [1, 2, 3]),
+        ({"a": 1, "b": 2}, 0, 1, {"a": 1, "b": 2}),
+        ({"a": [1, 2, 3], "b": {"c": 4}}, 0, 3, {"a": [1, 2, 3], "b": {"c": 4}}),
+        (["a", (1, 2), {"b": 3}], 0, 2, ["a", (1, 2), {"b": 3}]),
+        ([1, [2, [3, 4], 5], 6], 0, 2, [1, [2, "[3, 4]", 5], 6]),
+        ({"a": {"b": {"c": 42}}}, 0, 2, {"a": {"b": {"c": 42}}}),
+        (DummyClass(42), 0, 1, {"value": 42}),
+        (DummyNestedClass(42), 0, 2, {"value": {"value": 42}}),
+        ({"a": {"b": DummyClass(42)}}, 0, 3, {"a": {"b": {"value": 42}}}),
+        (
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+            0,
+            2,
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+        ),
+    ],
+)
+def test_make_serializable_recursive(
+    input_obj: object,
+    depth: int,
+    max_depth: int,
+    expected_output: object,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for function _make_serializable() in file util.py"""
+    # Arrange
+    _ = mocker.patch.object(Utility, "_get_str", side_effect=lambda x: str(x))
+
+    # Act
+    result = Utility._make_serializable(input_obj, depth, max_depth)
+
+    # Assert
+    assert result == expected_output
