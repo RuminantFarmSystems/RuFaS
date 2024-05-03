@@ -2,7 +2,7 @@ import json
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, Type
 
 import pandas as pd
 import pytest
@@ -559,39 +559,47 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "info_map, exception, exception_message",
+    "name, value, info_map, expected_exception",
     [
-        ({"units": MeasurementUnits.ANIMALS.value}, None, None),
-        ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
+        # Case 2: 'units' key missing, should raise KeyError
+        ("var2", 200, {"class": "TestClass", "function": "test_function"}, KeyError),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
     ],
 )
 def test_add_variable(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+    name: str,
+    value: Any,
     info_map: Dict[str, Any],
-    exception: KeyError | None,
-    exception_message: str,
+    expected_exception: Type[BaseException] | None,
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for function add_variable in file output_manager.py"""
-    key = "dummy_key"
-    name = "dummy_name"
-    value = "dummy_value"
-    mock_output_manager._generate_key = MagicMock(return_value=key)
-    mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._validate_units = MagicMock()
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
 
-    if exception:
-        with pytest.raises(KeyError) as e:
-            mock_output_manager.add_variable(name, value, info_map)
-        assert exception_message in str(e.value)
+    # Arrange
+    output_manager = OutputManager()
+    mocker.patch.object(output_manager, "_validate_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            output_manager.add_variable(name, value, info_map)
     else:
-        mock_output_manager.add_variable(name, value, info_map)
-        mock_output_manager._generate_key.assert_called_once_with(name, info_map)
-        mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
-
-    mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
-    mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
-    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+        # Act
+        output_manager.add_variable(name, value, info_map)
+        # Assert
+        patched_add_to_pool.assert_called_once_with(
+            output_manager.variables_pool, "key_with_prefix", value, {**info_map, "units": "validated_units"}
+        )
+        if isinstance(value, dict):
+            for k in value.keys():
+                assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
 
 
 @pytest.mark.parametrize(
