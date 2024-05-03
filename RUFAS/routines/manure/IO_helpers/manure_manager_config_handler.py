@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -234,14 +234,14 @@ class ManureManagerConfigHandler:
 
     @classmethod
     def _process_manure_separator_configs(
-        cls, manure_separator_configs: List[Dict]
+        cls, manure_separator_configs: list[dict[str, Any]]
     ) -> Dict[str, ManureSeparatorConfig | None]:
         """
         Returns a dictionary of manure separator config objects, with the key being the name of the separator config.
 
         Parameters
         ----------
-        manure_separator_configs : List[Dict]
+        manure_separator_configs : list[dict[str, Any]]
             A list of dictionaries containing the manure separator config information.
 
         Returns
