@@ -205,15 +205,16 @@ class OutputManager(object):
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
-        self._validate_units(units)
+        units = self._validate_units(units)
 
         key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, info_map)
+        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units})
 
-    def _validate_units(self, units: Dict[str, Any] | str) -> None:
+    def _validate_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
-        Recursively validates that units is either a valid MeasurementUnits value or a dictionary with
-        valid MeasurementUnits values (including nested dictionaries).
+        Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
+        valid MeasurementUnits enum members (including nested dictionaries). Converts the MeasurementUnits
+        enum values to their string representations.
 
         Parameters
         ----------
@@ -221,20 +222,31 @@ class OutputManager(object):
             Either a string that can be converted to an MeasurementUnits, or a dictionary mapping string keys to either
             MeasurementUnits values or further dictionaries.
 
+        Returns
+        -------
+        Dict[str, Any] | str
+            The validated and stringified units.
+
         Raises
         ------
+        TypeError
+            If any unit or nested unit does not have the type MeasurementUnits.
         ValueError
             If any unit or nested unit is not a valid MeasurementUnits value.
 
         """
         if isinstance(units, dict):
-            for key, unit in units.items():
-                self._validate_units(unit)
-        else:
-            try:
-                MeasurementUnits(units)
-            except ValueError:
-                raise ValueError(f"'{units}' is not a valid MeasurementUnits value")
+            return {key: self._validate_units(unit) for key, unit in units.items()}
+
+        if type(units) is not MeasurementUnits:
+            raise TypeError(
+                f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)})."
+            )
+
+        try:
+            return str(units)
+        except ValueError:
+            raise ValueError(f"'{units}' is not a valid MeasurementUnits value.")
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -944,11 +956,16 @@ class OutputManager(object):
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
+            sliced_info_maps: List[Dict[str, Any]] = (
+                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
+            )
             sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = {"values": sliced_data}
+                results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                    "values": sliced_data
+                }
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -962,9 +979,12 @@ class OutputManager(object):
                 for filtered_key, filtered_value in filtered_data.items():
                     combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
+                        results[combined_key].get("info_maps", []).extend(sliced_info_maps)
                         results[combined_key]["values"].extend(filtered_value)
                     else:
-                        results[combined_key] = {"values": filtered_value}
+                        results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                            "values": filtered_value
+                        }
             counter += 1
         return results
 

@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List, Union
 
 import pandas as pd
 import pytest
+from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -13,7 +14,6 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
-from freezegun import freeze_time
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -595,53 +595,71 @@ def test_add_variable(
 
 
 @pytest.mark.parametrize(
-    "units, expected_exception, expected_message",
+    "units, expected_result",
     [
-        (MeasurementUnits.ANIMALS, None, None),
+        (MeasurementUnits.ANIMALS, MeasurementUnits.ANIMALS.value),
         (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "second": MeasurementUnits.ANIMALS,
+                "nested": {"third": MeasurementUnits.DAYS},
+            },
             {
                 "first": MeasurementUnits.ANIMALS.value,
                 "second": MeasurementUnits.ANIMALS.value,
                 "nested": {"third": MeasurementUnits.DAYS.value},
             },
-            None,
-            None,
         ),
-        ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+        (
+            "invalid_unit",
+            TypeError("The following unit does not have the type MeasurementUnits: invalid_unit (type <class 'str'>)."),
+        ),
         (
             {
-                "first": MeasurementUnits.ANIMALS.value,
+                "first": MeasurementUnits.ANIMALS,
                 "invalid": "not_a_unit",
             },
-            ValueError,
-            "'not_a_unit' is not a valid MeasurementUnits value",
+            TypeError("The following unit does not have the type MeasurementUnits: not_a_unit (type <class 'str'>)."),
         ),
         (
             {
                 "first": {"nested_invalid": "definitely_not_a_unit"},
-                "second": MeasurementUnits.ANIMALS.value,
+                "second": MeasurementUnits.ANIMALS,
             },
-            ValueError,
-            "'definitely_not_a_unit' is not a valid MeasurementUnits value",
+            TypeError(
+                "The following unit does not have the type MeasurementUnits: "
+                "definitely_not_a_unit (type <class 'str'>)."
+            ),
+        ),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "invalid_type": 123,
+            },
+            TypeError("The following unit does not have the type MeasurementUnits: 123 (type <class 'int'>)."),
+        ),
+        (
+            {
+                "first": {"nested_invalid_type": True},
+                "second": MeasurementUnits.ANIMALS,
+            },
+            TypeError("The following unit does not have the type MeasurementUnits: True (type <class 'bool'>)."),
         ),
     ],
 )
 def test_validate_units(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
-    expected_exception: ValueError,
-    expected_message: str,
+    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]] | MeasurementUnits | str,
+    expected_result: Dict[str, str] | str | Exception,
 ) -> None:
     """Test for function _validate_units in file output_manager.py"""
-    if expected_exception:
-        with pytest.raises(expected_exception) as e:
+    if isinstance(expected_result, Exception):
+        with pytest.raises(type(expected_result)) as e:
             mock_output_manager._validate_units(units)
-        assert expected_message in str(e.value)
+        assert str(expected_result) == str(e.value)
     else:
-        mock_output_manager._validate_units(units)
-
-    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+        assert mock_output_manager._validate_units(units) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -732,7 +750,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
-        "units": MeasurementUnits.ANIMALS.value,
+        "units": MeasurementUnits.ANIMALS,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
@@ -775,7 +793,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS.value}
+    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
     om.add_warning("dummy_name", "dummy_msg", info_map)
