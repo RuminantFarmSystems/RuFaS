@@ -538,7 +538,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool = False
+        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -807,7 +807,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -965,7 +965,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -1025,7 +1025,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -1095,7 +1095,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
         input_data_value = self._extract_input_data_by_key_list(
@@ -1151,7 +1151,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
         input_data_value = self._extract_input_data_by_key_list(
@@ -1219,7 +1219,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
         input_data_value = self._extract_input_data_by_key_list(
