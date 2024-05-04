@@ -17,7 +17,7 @@
 
         },
         {
-            "crop_species": "wheat_straw",
+            "crop_species": "winter_wheat_hay",
             "planting_years": [2022],
             "pattern_repeat": 0,
             "planting_skip": 0,
@@ -47,7 +47,7 @@
 
         },
         {
-            "crop_species": "vegetable",
+            "crop_species": "corn_silage",
             "planting_years": [2020],
             "pattern_repeat": 0,
             "planting_skip": 0,
