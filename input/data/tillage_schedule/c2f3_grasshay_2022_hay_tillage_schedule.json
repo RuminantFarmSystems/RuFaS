@@ -1,10 +1,10 @@
 {
-    "years": [],
-    "days": [],
-    "incorporation_fractions": [],
-    "mixing_fractions": [],
-    "tillage_depths": [],
-    "implements": [],
+    "years": [1],
+    "days": [1],
+    "incorporation_fractions": [1],
+    "mixing_fractions": [1],
+    "tillage_depths": [1],
+    "implements": ["disk-harrow"],
     "pattern_repeat": 1,
     "pattern_skip": 0
 }
