@@ -3,13 +3,14 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "may5b",
+        "output_prefix": "may5b_sobol",
         "log_verbosity": "errors",
-        "sampler": "saltelli_sobol",
+        "sampler": "sobol",
         "saltelli_number": 32,
         "saltelli_skip": 128,
         "SA_load_balancing_start": 0,
         "SA_load_balancing_stop": 1,
+        "random_seed": 42,
         "SA_input_variables": [
           {
             "variable_name": "animal.herd_information.calf_num",
