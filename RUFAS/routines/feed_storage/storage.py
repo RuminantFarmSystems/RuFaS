@@ -8,33 +8,29 @@ from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.weather import Weather
 
-"""Temperature below which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
-ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 5.0
-
-"""Temperature above which ensiled alfalfa does not lose dry matter to fermentation (degrees C)."""
-ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT = 45.0
-
-"""Temperature below which ensiled non-alfalfa crops does not lose dry matter to fermentation (degrees C)."""
-NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT = 0.0
-
-"""Temperature above which ensiled non-alfalfa crops does not lose dry matter to fermentation (degrees C)."""
-NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT = 40.0
-
-"""Dry matter fraction of fresh mass below which ensiled alfalfa does not lose dry matter to fermentation."""
-ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 0.20
-
-"""Dry matter fraction of fresh mass above which ensiled alfalfa does not lose dry matter to fermentation."""
-ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 0.60
 
 """
-Dry matter fraction of fresh mass below which ensiled non-alfalfa crops does not lose dry matter to fermentation.
+These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and
+lower fractions of dry matter that allow fermentation, and the constants that regulate how dry matter is lost to
+fermentation. These values are defined in the Feed Storage Scientific Documentation, section 1.3.
 """
-NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT = 0.15
+ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
+    "lower_temp_limit": 5.0,
+    "upper_temp_limit": 45.0,
+    "lower_dry_matter_limit": 0.20,
+    "upper_dry_matter_limit": 0.60,
+    "loss_coefficient": 0.0364,
+    "base_loss_fraction": 0.0156,
+}
 
-"""
-Dry matter fraction of fresh mass above which ensiled non-alfalfa crops do not lose dry matter to fermentation."""
-NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT = 0.60
-
+NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
+    "lower_temp_limit": 0.0,
+    "upper_temp_limit": 40.0,
+    "lower_dry_matter_limit": 0.15,
+    "upper_dry_matter_limit": 0.60,
+    "loss_coefficient": 0.0193,
+    "base_loss_fraction": 0.00864,
+}
 om = OutputManager()
 
 
@@ -247,25 +243,13 @@ class Storage:
         dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
         is_alfalfa = crop.category is CropCategory.ALFALFA
-        lower_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_LOWER_TEMP_LIMIT
-        )
-        upper_temp_limit = (
-            ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT if is_alfalfa else NON_ALFALFA_GASEOUS_LOSS_UPPER_TEMP_LIMIT
-        )
-        lower_dry_matter_limit = (
-            ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_LOWER_DRY_MATTER_LIMIT
-        )
-        upper_dry_matter_limit = (
-            ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
-            if is_alfalfa
-            else NON_ALFALFA_GASEOUS_LOSS_UPPER_DRY_MATTER_LIMIT
-        )
-
-        coefficient = 0.0364 if is_alfalfa else 0.0193
-        base_loss_fraction = 0.0156 if is_alfalfa else 0.00864
+        constants = ALFALFA_FERMENTATION_CONSTANTS if is_alfalfa else NON_ALFALFA_FERMENTATION_CONSTANTS
+        lower_temp_limit = constants["lower_temp_limit"]
+        upper_temp_limit = constants["upper_temp_limit"]
+        lower_dry_matter_limit = constants["lower_dry_matter_limit"]
+        upper_dry_matter_limit = constants["upper_dry_matter_limit"]
+        loss_coefficient = constants["loss_coefficient"]
+        base_loss_fraction = constants["base_loss_fraction"]
 
         dry_matter_loss_fraction = 0.0
 
@@ -275,7 +259,7 @@ class Storage:
             if outside_temp_range or outside_dry_fraction_range:
                 continue
 
-            fraction_lost = base_loss_fraction - coefficient * (dry_matter_fraction - lower_dry_matter_limit)
+            fraction_lost = base_loss_fraction - loss_coefficient * (dry_matter_fraction - lower_dry_matter_limit)
             dry_matter_loss_fraction += fraction_lost
             dry_matter_fraction -= fraction_lost
 
