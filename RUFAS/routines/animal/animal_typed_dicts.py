@@ -200,7 +200,7 @@ class AnimalConfigTypedDict(TypedDict):
 
     # from_literature -> culling
     parity_death_prob: List[float]
-    death_cull_prob: List[float]
+    death_day_prob: List[float]
     parity_cull_prob: List[float]
     mastitis_cull_prob: List[float]
     feet_leg_cull_prob: List[float]
@@ -233,3 +233,13 @@ class InitialHerdSummaryTypedDict(TypedDict):
     cow_avg_days_in_milk: float
     cow_avg_parity: float
     cow_avg_CI: float
+
+
+class SoldAnimalTypedDict(TypedDict):
+    id: int
+    animal_type: str
+    sold_at_day: int
+    body_weight: float
+    cull_reason: str | None
+    days_in_milk: int | str
+    parity: int | str

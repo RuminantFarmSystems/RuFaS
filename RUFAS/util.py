@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
+from .general_constants import GeneralConstants
 
 
 class Utility:
@@ -37,7 +38,54 @@ class Utility:
         return result
 
     @staticmethod
-    def get_base_dir():
+    def convert_flat_dict_to_nested_dict(flat_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert a flat dictionary with dot-separated keys into a nested dictionary structure.
+
+        Parameters
+        ----------
+        flat_dict : Dict[str, Any]
+            A dictionary with string keys that include dots to signify nested levels.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A nested dictionary where the structure is determined by splitting the keys on dots.
+        """
+        nested_dict = {}
+        for flat_key, value in flat_dict.items():
+            keys = flat_key.split(".")
+            current = nested_dict
+            for key in keys[:-1]:
+                if key not in current:
+                    current[key] = {}
+                current = current[key]
+            current[keys[-1]] = value
+        return nested_dict
+
+    @staticmethod
+    def deep_merge(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> None:
+        """
+        Recursively merges dict2 into dict1 in place.
+
+        Parameters
+        ----------
+        dict1 : Dict[str, Any]
+            The primary dictionary to be updated.
+        dict2 : Dict[str, Any]
+            The dictionary containing updates to be merged into dict1.
+        """
+        for key in dict2:
+            if key in dict1:
+                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                    Utility.deep_merge(dict1[key], dict2[key])
+                else:
+                    dict1[key] = dict2[key]
+            else:
+                dict1[key] = dict2[key]
+
+    @staticmethod
+    def get_base_dir() -> Path:
         """
         Gets the base directory as reference for all relative paths.
 
@@ -174,7 +222,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -313,67 +361,6 @@ class Utility:
                     shutil.rmtree(file)
 
     @staticmethod
-    def day_to_month_conversion(day: int, calendar_year: int) -> int:
-        """
-        Converts the julian day into the corresponding month of the current calendar year.
-
-        Parameters
-        ----------
-        day : int
-            Current julian day of the simulation.
-        calendar_year : int
-            Current calendar year of the simulation.
-
-        Returns
-        -------
-        int
-            The corresponding month of the year (1 for January, 2 for February, etc.).
-
-        Notes
-        -----
-        The calendar year is specified so it can be determined if it is a leap year.
-
-        """
-        non_leap_cumulative_days_in_months = [
-            31,
-            59,
-            90,
-            120,
-            151,
-            181,
-            212,
-            243,
-            273,
-            304,
-            334,
-            365,
-        ]
-        leap_cumulative_days_in_months = [
-            31,
-            60,
-            91,
-            121,
-            152,
-            182,
-            213,
-            244,
-            274,
-            305,
-            335,
-            366,
-        ]
-
-        cumulative_days_in_months = (
-            leap_cumulative_days_in_months
-            if Utility.is_leap_year(calendar_year)
-            else non_leap_cumulative_days_in_months
-        )
-
-        for month, day_count in enumerate(cumulative_days_in_months):
-            if day <= day_count:
-                return month + 1
-
-    @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
         """
         Produces the current system time as a timestamp string.
@@ -457,3 +444,56 @@ class Utility:
             return True
         else:
             return False
+
+    @staticmethod
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
+        """
+        Generates a list of dates based on a given date and when the dates should start and end relative to the given
+        date.
+
+        Parameters
+        ----------
+        date : datetime.date
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Raises
+        ------
+        ValueError
+            If the starting_offset is greater than the ending_offset.
+
+        Examples
+        --------
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+        [datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+
+        """
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
+
+        return time_series
+
+    @staticmethod
+    def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        """Generates a datetime.date based on a year and ordinal day."""
+        maximum_day = (
+            GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+        )
+        if not 1 <= day <= maximum_day:
+            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+        return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)

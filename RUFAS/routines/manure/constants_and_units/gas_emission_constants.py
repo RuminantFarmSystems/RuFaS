@@ -56,24 +56,36 @@ class GasEmissionConstants:
     mass of methane.
     """
 
-    METHANE_DENSITY: float = 0.657
-    """Methane density (kg/:math:`m^3`)."""
+    AD_METHANE_DENSITY: float = 0.629
+    """
+    Unit conversion factor for methane generated from anaerobic digestion at 1 abr of pressure and 37.5C
+    (kg/:math:`m^3`).
+    """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide based on a molar ratio of 1:3
+    (methane : carbon dioxide).
+    """
+
+    AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 2.86
+    """
+    The mass conversion factor from methane to methane and carbon dioxide in anaerobic digestion (kg CH4 / kg CO2).
+    """
 
     METHANE_POTENTIAL_Go: float = 240.0
     """Methane potential (mL/g). Default is set to 240.0."""
 
-    MCF_CONSTANT_A: float = 7.11
+    MCF_CONSTANT_A: float = 0.0625
     """
     Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-    Methane Conversion Factor (MCF) calculation. This coefficient scales the exponential
-    function of ambient barn temperature.
+    Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
     """
 
-    MCF_CONSTANT_B: float = 0.0884
+    MCF_CONSTANT_B: float = 0.25
     """
     Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-    Methane Conversion Factor (MCF) calculation. This exponent coefficient determines the rate
-    at which MCF increases with ambient barn temperature.
+    Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
     """
 
     MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
@@ -270,14 +282,17 @@ class GasEmissionConstants:
     NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N: (Dict)[ManureTreatmentType, Dict[str, float]] = {
         ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: {
             ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
             ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.ANAEROBIC_LAGOON: {
             ManureCoverEnum.COVER.value: 0.005,
+            ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
         },
         ManureTreatmentType.ANAEROBIC_DIGESTION: {ManureCoverEnum.NOT_APPLICABLE.value: 0.0006},

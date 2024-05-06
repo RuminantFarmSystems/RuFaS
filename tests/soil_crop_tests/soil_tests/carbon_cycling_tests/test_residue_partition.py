@@ -146,28 +146,6 @@ def test_determine_plant_metabolic_active_carbon_usage(
 
 
 @pytest.mark.parametrize(
-    "plant_metabolic_carbon_amount, tillage_fraction",
-    [
-        (3, 0.4),  # default
-        (50, 0.4),  # increased carbon
-        (3, 1.0),  # increased tillage
-        (1.8, 0.33),  # decreased carbon & tillage
-        (0, 0.4),  # no carbon
-        (3, 0),  # no tillage
-        (0, 0),  # neither
-    ],
-)
-def test_determine_plant_metabolic_to_soil_carbon_amount(
-    plant_metabolic_carbon_amount: float, tillage_fraction: float
-) -> None:
-    """Tests that the the amount of metabolic carbon incorporated into soil during tillage was calculated correctly"""
-    expected = plant_metabolic_carbon_amount * tillage_fraction
-    assert expected == ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount(
-        plant_metabolic_carbon_amount, tillage_fraction
-    )
-
-
-@pytest.mark.parametrize(
     "plant_residue_metabolic_fraction",
     [
         0.1,  # low fraction

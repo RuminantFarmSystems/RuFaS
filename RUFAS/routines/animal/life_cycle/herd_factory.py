@@ -118,6 +118,7 @@ class HerdFactory:
                 args.update(repro_program=AnimalBase.config["heifer_repro_method"])
                 args.update(tai_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
                 args.update(synch_ed_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
+                args.update(repro_sub_protocol=AnimalBase.config["heifers"]["repro_sub_protocol"])
 
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
@@ -125,7 +126,7 @@ class HerdFactory:
                 remaining_heiferIs.append(heiferI)
         self.pre_animal_population.heiferIs = remaining_heiferIs
 
-    def _heiferIIs_update(self):
+    def _heiferIIs_update(self) -> None:
         """HeiferIIs update for generating herd simulation"""
         remaining_heiferIIs: List[HeiferII] = []
         for heiferII in self.pre_animal_population.heiferIIs:
@@ -168,7 +169,7 @@ class HerdFactory:
 
         self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
-    def _cows_update(self):
+    def _cows_update(self) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
@@ -311,7 +312,7 @@ class HerdFactory:
             cows=post_cows,
             replacement=post_replacement,
             current_animal_id=self.post_animal_population.current_animal_id,
-            order_by_random=im.get_data("config.set_seed"),
+            order_by_random=True,
         )
 
     def _random_sample_with_replacement_by_type(

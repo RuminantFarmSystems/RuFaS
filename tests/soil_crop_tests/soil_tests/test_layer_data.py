@@ -126,7 +126,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
         # Check everything
         assert layer.water_content == expected_water_content
-        calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
+        calc_psp.assert_called_once_with(layer.clay_fraction, 25, layer.organic_carbon_fraction)
         assert determine_nutrient_density.call_count == 3
         assert layer.mean_phosphorus_sorption_parameter == 0.5
         assert layer.labile_inorganic_phosphorus_content == 22
@@ -165,7 +165,7 @@ def test_initialize_carbon_pools(
         top_depth=top_depth,
         bottom_depth=750.0,
         bulk_density=1.5,
-        percent_organic_carbon_content=2.2,
+        organic_carbon_fraction=0.022,
     )
     assert actual.active_carbon_amount == pytest.approx(expected_active)
     assert actual.passive_carbon_amount == pytest.approx(expected_passive)
@@ -307,23 +307,6 @@ def test_acceptable_percolation_amount(water_content: float, saturation_content:
         else:
             expect = 0
         assert observe == expect
-
-
-@pytest.mark.parametrize("percent_organic_carbon_proportion", [0.98, 1.82, 2.49585])
-def test_percent_organic_matter_proportion(
-    percent_organic_carbon_proportion: float,
-) -> None:
-    """Test that percent_organic_matter_proportion() in LayerData correctly calculates the percent of organic matter
-    content in a layer of soil"""
-    layer = LayerData(
-        top_depth=0,
-        bottom_depth=30,
-        percent_organic_carbon_content=percent_organic_carbon_proportion,
-        field_size=1.98,
-    )
-    observe = layer.percent_organic_matter_proportion
-    expect = 1.72 * percent_organic_carbon_proportion
-    assert observe == expect
 
 
 @pytest.mark.parametrize(
