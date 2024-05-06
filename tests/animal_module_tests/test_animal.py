@@ -24,6 +24,8 @@ import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 
+# from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -1067,9 +1069,9 @@ def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float
 @pytest.mark.parametrize(
     "animal_dict, expected",
     [
-        (lazy_fixture("cow_a"), 59.28),
-        (lazy_fixture("cow_b"), 33.18),
-        (lazy_fixture("cow_d"), 0.0),
+        (lazy_fixture("cow_a"), 58.51),
+        (lazy_fixture("cow_b"), 43.07),
+        (lazy_fixture("cow_d"), 25.17),
         (lazy_fixture("heifer_a"), 16.85),
         (lazy_fixture("heifer_b"), 16.44),
     ],
@@ -2199,6 +2201,8 @@ def test_calc_rqmts() -> None:
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
     AnimalBase.config["nutrient_standard"] = "NRC"
+    AnimalBase.config["ration"] = {}
+    AnimalBase.config["ration"]["phosphorus_requirement_buffer"] = 35
     actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     expected = {
         "NEmaint_requirement": 1,
@@ -2207,9 +2211,19 @@ def test_calc_rqmts() -> None:
         "NEl_requirement": 1,
         "MP_requirement": 1,
         "Ca_requirement": 1,
-        "P_requirement": 1,
+        "P_requirement": 1 * (1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)),
         "DMIest_requirement": 1,
     }
+    # expected = {
+    #     "NEmaint_requirement": 1,
+    #     "NEg_requirement": 1,
+    #     "NEpreg_requirement": 1,
+    #     "NEl_requirement": 1,
+    #     "MP_requirement": 1,
+    #     "Ca_requirement": 1,
+    #     "P_requirement": 1 * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100,
+    #     "DMIest_requirement": 1,
+    # }
     assert actual == expected
     test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NRC_energy_growth_requirements.assert_called_once()
