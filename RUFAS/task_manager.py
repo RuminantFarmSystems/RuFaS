@@ -256,7 +256,7 @@ class TaskManager:
                 names[variable_number]: data_types[variable_number](sampled_values[sample_number, variable_number])
                 for variable_number in range(variables_count)
             }
-            new_args["input_patch"] = Utility.convert_flat_dict_to_nested_dict(new_args["input_patch"])
+            new_args["input_patch"] = Utility.flatten_keys_to_nested_structure(new_args["input_patch"])
             single_run_args.append(new_args)
 
         return single_run_args
@@ -388,7 +388,7 @@ class TaskManager:
             f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
             info_map,
         )
-        input_manager.dump_metadata_properties(args["output_directory"])
+        input_manager.save_metadata_properties(args["output_directory"])
 
         return is_data_valid
 
