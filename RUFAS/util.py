@@ -361,67 +361,6 @@ class Utility:
                     shutil.rmtree(file)
 
     @staticmethod
-    def day_to_month_conversion(day: int, calendar_year: int) -> int:
-        """
-        Converts the julian day into the corresponding month of the current calendar year.
-
-        Parameters
-        ----------
-        day : int
-            Current julian day of the simulation.
-        calendar_year : int
-            Current calendar year of the simulation.
-
-        Returns
-        -------
-        int
-            The corresponding month of the year (1 for January, 2 for February, etc.).
-
-        Notes
-        -----
-        The calendar year is specified so it can be determined if it is a leap year.
-
-        """
-        non_leap_cumulative_days_in_months = [
-            31,
-            59,
-            90,
-            120,
-            151,
-            181,
-            212,
-            243,
-            273,
-            304,
-            334,
-            365,
-        ]
-        leap_cumulative_days_in_months = [
-            31,
-            60,
-            91,
-            121,
-            152,
-            182,
-            213,
-            244,
-            274,
-            305,
-            335,
-            366,
-        ]
-
-        cumulative_days_in_months = (
-            leap_cumulative_days_in_months
-            if Utility.is_leap_year(calendar_year)
-            else non_leap_cumulative_days_in_months
-        )
-
-        for month, day_count in enumerate(cumulative_days_in_months):
-            if day <= day_count:
-                return month + 1
-
-    @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
         """
         Produces the current system time as a timestamp string.
@@ -556,5 +495,5 @@ class Utility:
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
         if not 1 <= day <= maximum_day:
-            raise ValueError(f"Invalid day: {day} of year {year}.")
+            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
