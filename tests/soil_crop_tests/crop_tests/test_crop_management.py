@@ -340,6 +340,7 @@ def test_store_harvested_crop(
         lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
         ash=mock_alfalfa_silage_data.ash,
     )
+    expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
     with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
         crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
