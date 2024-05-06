@@ -62,6 +62,8 @@ class Silage(Storage):
         the current time.
 
         """
+        # import pdb
+        # pdb.set_trace()
         days_of_effluent_processed = min(10, crop.last_time_degraded.simulation_day - crop.storage_time.simulation_day)
         total_days_of_effluent_since_storage = min(10, time.simulation_day - crop.storage_time.simulation_day)
         days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
