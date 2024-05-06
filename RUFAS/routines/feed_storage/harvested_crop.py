@@ -133,6 +133,10 @@ class HarvestedCrop:
         float
             Estimated maximum amount of mass that will flow out of this crop in kg.
 
+        Notes
+        -----
+        Only ensiled crops that start with less than 30% dry matter percentage will have estimated effluent loss.
+
         References
         ----------
         .. [1] Feed Storage Scientific Documentation, section 1.3.1
