@@ -21,8 +21,8 @@ class HarvestedCrop:
     storage_time : Time
         The time at which the crop was stored
     last_time_degraded : Time
-        The last time at which the quality and mass of the crop was recalculated. This value is initially set when to
-        the storage time of the crop.
+        The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
+        storage time of the crop.
     fresh_mass : float
         The fresh mass of the crop in kg.
     dry_matter_percentage : float
