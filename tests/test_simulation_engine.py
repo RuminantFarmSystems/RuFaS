@@ -14,12 +14,15 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
+    mock_time = mocker.MagicMock()
+    mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
 
     # Act
-    _ = SimulationEngine()
+    simulation_engine = SimulationEngine()
 
     # Assert
     mock_initialize_simulation.assert_called_once()
+    assert simulation_engine.time == mock_time
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
@@ -34,7 +37,8 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
-    simulation_engine.day_counter = 100
+    simulation_engine.time = mocker.MagicMock()
+    simulation_engine.time.simulation_day = 100
     simulation_engine.feed = mocker.MagicMock()
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.manure_manager = mocker.MagicMock()
@@ -62,7 +66,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
-    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager, 100)
+    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
 
 
@@ -133,7 +137,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_weather = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
 
     mock_time = mocker.MagicMock()
-    patch_for_time = mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
+    simulation_engine.time = mock_time
 
     mock_feed = mocker.MagicMock()
     patch_for_feed = mocker.patch("RUFAS.simulation_engine.Feed", return_value=mock_feed)
@@ -165,7 +169,6 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     )
 
     patch_for_weather.assert_called_once_with({}, mock_time)
-    patch_for_time.assert_called_once_with()
     patch_for_feed.assert_called_once_with({})
     patch_for_animal_manager.assert_called_once_with(
         {"manure_management_scenarios": {}}, mock_feed, mock_weather, mock_time
@@ -257,21 +260,17 @@ def test_run_pre_annual_routines(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "print_day, initial_simulation_day, to_str_return_value, expected_simulation_day",
+    "initial_simulation_day, time_str_return_value, expected_simulation_day",
     [
-        (True, 0, "Day 1", 1),
-        (False, 0, "Day 1", 1),
-        (True, 10, "Day 11", 11),
-        (False, 10, "Day 11", 11),
-        (True, 365, "Day 366", 366),
-        (False, 365, "Day 366", 366),
+        (0, "1", 1),
+        (10, "11", 11),
+        (365, "366", 366),
     ],
 )
 def test_advance_time(
     mocker: MockerFixture,
-    print_day: bool,
     initial_simulation_day: int,
-    to_str_return_value: str,
+    time_str_return_value,
     expected_simulation_day: int,
 ) -> None:
     """
@@ -281,30 +280,18 @@ def test_advance_time(
     # Arrange
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
-
-    simulation_engine.time = mocker.MagicMock()
-    simulation_engine.time.to_str.return_value = to_str_return_value
+    mock_time = mocker.MagicMock()
+    mock_time.simulation_day = initial_simulation_day + 1
+    simulation_engine.time = mock_time
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.animal_manager.simulation_day = initial_simulation_day
-    patch_for_add_log = mocker.patch("RUFAS.simulation_engine.om.add_log")
 
     # Act
-    simulation_engine._advance_time(print_day)
+    simulation_engine._advance_time()
 
     # Assert
     simulation_engine.time.advance.assert_called_once()
     assert simulation_engine.animal_manager.simulation_day == expected_simulation_day
-
-    if print_day:
-        expected_log_message = f"simulating day: {to_str_return_value}"
-        expected_info_map = {
-            "class": "SimulationEngine",
-            "function": "_advance_time",
-            "print_day": print_day,
-        }
-        patch_for_add_log.assert_called_once_with("simulation_day", expected_log_message, expected_info_map)
-    else:
-        patch_for_add_log.assert_not_called()
 
 
 @pytest.mark.parametrize(
