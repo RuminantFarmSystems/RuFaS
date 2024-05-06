@@ -213,6 +213,15 @@ class HerdFactory:
             self._heiferIIIs_update(simulation_day=day)
             self._cows_update(simulation_day=day)
 
+            if day % 500 == 0:
+                print(f"Day: {day}")
+                print(f"Calves: {len(self.pre_animal_population.calves)}")
+                print(f"HeiferIs: {len(self.pre_animal_population.heiferIs)}")
+                print(f"HeiferIIs: {len(self.pre_animal_population.heiferIIs)}")
+                print(f"HeiferIIIs: {len(self.pre_animal_population.heiferIIIs)}")
+                print(f"Cows: {len(self.pre_animal_population.cows)}")
+                print(f"Replacement: {len(self.pre_animal_population.replacement)}")
+
         return self.pre_animal_population
 
     def _init_animal_from_data(
