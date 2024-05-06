@@ -97,25 +97,32 @@ def test_process_degradations(
     """
     Test the process_degradations method of the Storage class.
     """
-    mock_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    mock_weather = mocker.MagicMock(autospec=Weather)
+    mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
     mock_time = mocker.MagicMock(autospec=Time)
     mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
     mock_second_crop = mocker.MagicMock(autospec=HarvestedCrop)
     storage.stored = [mock_first_crop, mock_second_crop]
+    mock_get_conditions = mocker.patch.object(storage, "_get_conditions", return_value=mock_conditions)
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
     mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
 
-    storage.process_degradations(mock_conditions, mock_time)
+    storage.process_degradations(mock_weather, mock_time)
 
+    expected_get_conditions_calls = [
+        call(mock_first_crop.last_time_degraded, mock_time, mock_weather),
+        call(mock_second_crop.last_time_degraded, mock_time, mock_weather),
+    ]
     expected_dry_mass_loss_calls = [
-        call(mock_first_crop, mock_conditions, mock_time),
-        call(mock_second_crop, mock_conditions, mock_time),
+        call(mock_first_crop, mock_conditions),
+        call(mock_second_crop, mock_conditions),
     ]
     expected_recalculate_percentage_call_count = len(storage.stored) * 4
     expected_reset_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
 
+    mock_get_conditions.assert_has_calls(expected_get_conditions_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
     mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
