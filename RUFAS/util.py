@@ -495,5 +495,5 @@ class Utility:
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
         if not 1 <= day <= maximum_day:
-            raise ValueError(f"Invalid day: {day} of year {year}.")
+            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
