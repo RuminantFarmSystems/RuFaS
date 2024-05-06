@@ -170,6 +170,7 @@ class Storage:
                 crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
+            crop.last_time_degraded = copy.deepcopy(time)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
         self.record_stored_crops(total_gaseous_dry_matter_loss)
 

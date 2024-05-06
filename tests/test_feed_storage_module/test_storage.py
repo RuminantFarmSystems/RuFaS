@@ -106,11 +106,9 @@ def test_process_degradations(
     mock_get_conditions = mocker.patch.object(storage, "_get_conditions", return_value=mock_conditions)
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
+    mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.storage.copy.deepcopy", return_value=mock_time)
     mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
-
-    storage.process_degradations(mock_weather, mock_time)
-
     expected_get_conditions_calls = [
         call(mock_first_crop.last_time_degraded, mock_time, mock_weather),
         call(mock_second_crop.last_time_degraded, mock_time, mock_weather),
@@ -119,6 +117,9 @@ def test_process_degradations(
         call(mock_first_crop, mock_conditions),
         call(mock_second_crop, mock_conditions),
     ]
+
+    storage.process_degradations(mock_weather, mock_time)
+
     expected_recalculate_percentage_call_count = len(storage.stored) * 4
     expected_reset_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
 
@@ -127,14 +128,16 @@ def test_process_degradations(
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
     mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
     mock_record.assert_called_once_with(expected_loss)
-    mock_first_crop.crude_protein_percent = percentage
-    mock_first_crop.adf = percentage
-    mock_first_crop.ndf = percentage
-    mock_first_crop.sugar = percentage
-    mock_second_crop.crude_protein_percent = percentage
-    mock_second_crop.adf = percentage
-    mock_second_crop.ndf = percentage
-    mock_second_crop.sugar = percentage
+    assert mock_first_crop.crude_protein_percent == percentage
+    assert mock_first_crop.adf == percentage
+    assert mock_first_crop.ndf == percentage
+    assert mock_first_crop.sugar == percentage
+    assert mock_second_crop.crude_protein_percent == percentage
+    assert mock_second_crop.adf == percentage
+    assert mock_second_crop.ndf == percentage
+    assert mock_second_crop.sugar == percentage
+    assert mock_deepcopy.call_count == 2
+    assert mock_first_crop.last_time_degraded == mock_second_crop.last_time_degraded == mock_time
 
 
 def test_give_feed(storage: Storage) -> None:
