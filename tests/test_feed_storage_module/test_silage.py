@@ -38,15 +38,17 @@ def test_acceptable_crops(silage: Silage):
 
 @pytest.mark.parametrize(
     "day_stored,last_day_processed,current,expected",
-    [
-        (1, 1, 6, 5),
-        (1, 3, 3, 0),
-        (40, 45, 50, 5),
-        (40, 45, 55, 5),
-        (10, 22, 25, 0)
-    ]
+    [(1, 1, 6, 5), (1, 3, 3, 0), (40, 45, 50, 5), (40, 45, 55, 5), (10, 22, 25, 0)],
 )
-def test_calculate_days_of_effluent_loss_to_process(mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop, day_stored: int, last_day_processed: int, current: int, expected: int) -> None:
+def test_calculate_days_of_effluent_loss_to_process(
+    mocker: MockerFixture,
+    silage: Silage,
+    harvested_crop: HarvestedCrop,
+    day_stored: int,
+    last_day_processed: int,
+    current: int,
+    expected: int,
+) -> None:
     """Tests _calculate_days_of_effluent_loss_to_process in Silage."""
     mock_time_stored = mocker.MagicMock(autospec=Time)
     mock_time_stored.simulation_day = day_stored

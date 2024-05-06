@@ -6,6 +6,12 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 
+"""Fraction of effluent that is dry matter by mass."""
+DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
+"""Number of days that loss of effluent occurs over after a crop is ensiled."""
+EFFLUENT_CONSTRAINER = 10
+
+
 class Silage(Storage):
     """
     Class representing the Silage storage type, inheriting from Storage.
@@ -38,11 +44,7 @@ class Silage(Storage):
         This method also records the total amount of gaseous dry matter loss happened from all stored crops.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
-        total_effluent_dry_matter_loss = 0.0
-        total_effluent_moisture_loss = 0.0
-        for crop in self.stored:
-            pass
+        pass
 
     def _calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
         """
@@ -62,34 +64,58 @@ class Silage(Storage):
         the current time.
 
         """
-        # import pdb
-        # pdb.set_trace()
-        days_of_effluent_processed = min(10, crop.last_time_degraded.simulation_day - crop.storage_time.simulation_day)
-        total_days_of_effluent_since_storage = min(10, time.simulation_day - crop.storage_time.simulation_day)
+        days_of_effluent_processed = min(
+            EFFLUENT_CONSTRAINER, crop.last_time_degraded.simulation_day - crop.storage_time.simulation_day
+        )
+        total_days_of_effluent_since_storage = min(
+            EFFLUENT_CONSTRAINER, time.simulation_day - crop.storage_time.simulation_day
+        )
         days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
         return days_of_effluent_to_process
 
-    def calculate_dry_matter_loss_to_effluent(
-        self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
-    ) -> float:
+    def calculate_dry_matter_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
         """
-        Calculates the dry matter loss to effluent, specific to Silage.
+        Calculates the dry matter loss to effluent.
 
         Parameters
         ----------
-        dry_matter : float
-            The amount of dry matter.
         estimated_maximum_effluent : float
             The estimated maximum effluent.
-        time_in_silo : int
-            Time in days the crop has been in the silo.
+        days_of_effluent_loss : int
+            The number of days effluent loss will be calculated for.
 
         Returns
         -------
         float
-            The amount of dry matter lost to effluent, specific to Silage.
+            The amount of dry matter lost to effluent, in kg.
+        
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
+            
         """
-        pass
+        return DRY_MATTER_FRACTION_OF_EFFLUENT * estimated_maximum_effluent * days_of_loss / EFFLUENT_CONSTRAINER
+    
+    def calculate_moisture_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
+        """
+        Calculates the moisture loss to effluent.
+
+        estimated_maximum_effluent : float
+            The estimated maximum effluent.
+        days_of_effluent_loss : int
+            The number of days effluent loss will be calculated for.
+
+        Returns
+        -------
+        float
+            The amount of moisture lost to effluent, in kg.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
+
+        """
+        return estimated_maximum_effluent * days_of_loss / EFFLUENT_CONSTRAINER / DRY_MATTER_FRACTION_OF_EFFLUENT
 
 
 class Bunker(Silage):
