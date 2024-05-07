@@ -146,10 +146,8 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         return_value=mock_reception_pit,
     )
 
-    mock_custom_manure_separator_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_custom_manure_separator_config.return_value = (
-        mock_custom_manure_separator_config
-    )
+    mock_manure_separator_config = mocker.MagicMock() if not manure_separator == "none" else None
+    mock_manure_manager_config_handler.get_manure_separator_config.return_value = mock_manure_separator_config
     mock_manure_separator = mocker.MagicMock()
     patch_for_manure_separator_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureSeparatorFactory.get_instance",
@@ -201,15 +199,14 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     patch_for_reception_pit_init.assert_called_once()
     assert manure_manager.reception_pits[pen_id] == mock_reception_pit
 
+    mock_manure_manager_config_handler.get_manure_separator_config.assert_called_with(manure_separator)
     if manure_separator == "none":
-        mock_manure_manager_config_handler.get_custom_manure_separator_config.assert_not_called()
         patch_for_manure_separator_factory_get_instance.assert_not_called()
         assert manure_manager.manure_separators[pen_id] is None
     else:
-        mock_manure_manager_config_handler.get_custom_manure_separator_config.assert_called_with(manure_separator)
         patch_for_manure_separator_factory_get_instance.assert_called_with(
-            manure_separator_type_name=manure_separator,
-            custom_manure_separator_config=mock_custom_manure_separator_config,
+            configuration_name=manure_separator,
+            manure_separator_config=mock_manure_separator_config,
         )
         assert manure_manager.manure_separators[pen_id] == mock_manure_separator
 
