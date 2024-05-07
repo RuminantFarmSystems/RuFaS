@@ -35,8 +35,8 @@ class LactationCurve:
             self.milking_freq = "2x/d"
 
         # Assuming Y = 1632 and Z = 2196 based on the given assumptions
-        self.P2_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P2_adjustment")
-        self.P3_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P3_adjustment")
+        self.parity2_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity2_MilkYield305_adjustment")
+        self.parity3_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity3_MilkYield305_adjustment")
 
         self.adjustment_dict = im.get_data("lactation.adjustment_dict")
 
@@ -122,11 +122,11 @@ class LactationCurve:
             percent_P3 = self.parity_percentages[2] * 100
 
             # Solving for P1-305 using the provided equation
-            P1_305 = total_avg_305 - percent_P2 * self.P2_MY305_adj / 100 - percent_P3 * self.P3_MY305_adj / 100
+            P1_305 = total_avg_305 - percent_P2 * self.parity2_MilkYield305_adj / 100 - percent_P3 * self.parity3_MilkYield305_adj / 100
 
             # Calculating 305-day milk yield for each lactation group
-            P2_305 = P1_305 + self.P2_MY305_adj
-            P3_305 = P1_305 + self.P3_MY305_adj
+            P2_305 = P1_305 + self.parity2_MilkYield305_adj
+            P3_305 = P1_305 + self.parity3_MilkYield305_adj
 
         else:
             P1_305 = None
