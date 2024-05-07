@@ -115,7 +115,7 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
 
         """
-        return estimated_maximum_effluent * days_of_loss / DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
+        return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
 
 
 class Bunker(Silage):

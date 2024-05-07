@@ -64,8 +64,24 @@ def test_calculate_days_of_effluent_loss_to_process(
     assert actual == expected
 
 
-def test_calculate_dry_matter_loss_to_effluent(silage: Silage):
-    pass
+@pytest.mark.parametrize(
+    "max_effluent,days,expected", [(100.0, 10.0, 10.35), (55.0, 0, 0.0), (80.0, 4, 3.312), (120.0, 8, 9.936)]
+)
+def test_calculate_dry_matter_loss_to_effluent(silage: Silage, max_effluent: float, days: int, expected: float) -> None:
+    """Tests calculate_dry_matter_loss_to_effluent in Silage."""
+    actual = silage.calculate_dry_matter_loss_to_effluent(max_effluent, days)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "max_effluent,days,expected", [(100.0, 10.0, 89.65), (70.0, 0, 0.0), (90.0, 7, 56.4795), (150.0, 3, 40.3425)]
+)
+def test_calculate_moisture_loss_to_effluent(silage: Silage, max_effluent: float, days: int, expected: float) -> None:
+    """Tests calculate_moisture_loss_to_effluent in Silage."""
+    actual = silage.calculate_moisture_loss_to_effluent(max_effluent, days)
+
+    assert pytest.approx(actual) == expected
 
 
 @pytest.fixture
