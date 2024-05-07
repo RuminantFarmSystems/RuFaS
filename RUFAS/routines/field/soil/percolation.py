@@ -42,13 +42,16 @@ class Percolation:
         -----
         RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
 
+        This routine calls the subroutine `_percolate_infiltrated_water` to handle percolating water from infiltration
+        into the soil profile. If that routine percolates water out of any soil layers (which is the case when there are
+        high or sustained amounts of infiltration), this routine will only percolate water out of the soil layers which
+        have not had water percolated out of them on the current day.
+
         References
         ----------
         SWAT sections 2:3.1 and 2
 
         """
-        # import pdb
-        # pdb.set_trace()
         top_layer_to_percolate = self._percolate_infiltrated_water()
 
         if top_layer_to_percolate is None:
@@ -90,12 +93,18 @@ class Percolation:
         """
         Percolates infiltrated water into the soil profile.
 
+        Returns
+        -------
+        int | None
+            The index of the topmost soil which has not had water percolated out of it, or None if all layers in the
+            soil profile have had water percolated out.
+
         Notes
         -----
         The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
         entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
-        infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
-        the entire soil profile.
+        infiltration in a row, this method fills soil layers to their saturation point going top-down, and records water
+        that is put below a layer as being percolated by it.
 
         """
         self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
