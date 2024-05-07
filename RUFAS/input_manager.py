@@ -2086,9 +2086,8 @@ class InputManager:
 
             if isinstance(current_obj, dict):
                 for key, value in current_obj.items():
-                    stack.append((value, depth + 1, path + [key]))
-
                     if isinstance(value, dict):
+                        stack.append((value, depth + 1, path + [key]))
                         value_type = value.get("type")
                         if value_type in type_to_validator_map:
                             type_to_validator_map[value_type](path + [key], value)

@@ -4017,29 +4017,46 @@ def test_validate_input_by_type_value_error() -> None:
 
 
 @pytest.mark.parametrize(
-    "metadata, limit, expected_depth, expected_path, should_raise",
+    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, validators_called",
     [
-        ({"properties": {}}, 5, 0, [], False),
-        ({"properties": {"a": 1}}, 1, 1, ["a"], False),
-        ({"properties": {"a": {"b": {"c": {}}}}}, 2, 3, ["a", "b", "c"], True),
-        ({"properties": {"a": {"b": {"c": 1}}}}, 3, 3, ["a", "b", "c"], False),
-        ({"properties": {"a": [{"b": 1}, {"c": 2}]}}, 3, 3, ["a", 1, "c"], False),
-        ({"properties": {"a": {"b": 1}}}, 2, 2, ["a", "b"], False),
-        ({"properties": {"a": {"b": {"c": 1}}}}, 2, 3, ["a", "b", "c"], True),
+        ({"properties": {"a": {"type": "number_"}}}, 2, 1, ["a"], False, [], [("number_", ["a"], {"type": "number_"})]),
+        ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, [],
+         [("array_", ["a", "b"], {"type": "array_"})]),
+        ({"properties": {"a": {"b": {"c": {"type": "bool_"}}}}}, 2, 3, ["a", "b", "c"], True,
+         ["Max metadata depth exceeded."], [("bool_", ["a", "b", "c"], {"type": "bool_"})]),
+        ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, [],
+         [("string_", ["a", "b", "c"], {"type": "string_"})]),
+        ({"properties": {"a": {"b": {"type": "invalid_type"}}}}, 3, 2, ["a", "b"], False,
+         ["Unrecognized metadata type."], []),
     ],
 )
 def test_check_max_depth(
     mock_input_manager: InputManager,
-    mocker: MockerFixture,
+    mocker,
     metadata: Dict[str, Any],
     limit: int,
     expected_depth: int,
     expected_path: List[str],
     should_raise: bool,
+    expected_errors: List[str],
+    validators_called: List[tuple],
 ) -> None:
     """Tests _check_max_depth() function in InputManager."""
+    # Mock validators
+    number_validator = Mock()
+    array_validator = Mock()
+    bool_validator = Mock()
+    string_validator = Mock()
+
+    # Assign validators to the manager
+    mock_input_manager._metadata_number_validator = number_validator
+    mock_input_manager._metadata_array_validator = array_validator
+    mock_input_manager._metadata_bool_validator = bool_validator
+    mock_input_manager._metadata_string_validator = string_validator
+
     mock_input_manager.meta_data = metadata
     mock_input_manager.metadata_depth_limit = limit
+
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
@@ -4047,24 +4064,67 @@ def test_check_max_depth(
         with pytest.raises(ValueError) as exc_info:
             mock_input_manager._check_max_depth()
         assert str(exc_info.value) == f"Metadata depth exceeds maximum allowed depth of {limit} at path {expected_path}"
-        mock_add_error.assert_called_once()
+        assert mock_add_error.call_count == len(expected_errors)
+        for error_msg in expected_errors:
+            mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
         mock_add_log.assert_not_called()
     else:
         mock_input_manager._check_max_depth()
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
         assert mock_add_log.call_args_list == [
-            call(
-                "Metadata properties depth",
-                f"Max depth of metadata properties is {expected_depth}",
-                {"class": "InputManager", "function": "_check_max_depth"},
-            ),
-            call(
-                "Metadata properties path",
-                f"Deepest path of metadata properties is {expected_path}",
-                {"class": "InputManager", "function": "_check_max_depth"},
-            ),
+            call("Metadata properties depth", f"Max depth of metadata properties is {expected_depth}",
+                 {"class": "InputManager", "function": "_check_max_depth"}),
+            call("Metadata properties path", f"Deepest path of metadata properties is {expected_path}",
+                 {"class": "InputManager", "function": "_check_max_depth"}),
         ]
+
+    # Check validators were called as expected
+    for validator, args, kwargs in validators_called:
+        if validator == "number_":
+            number_validator.assert_called_with(args, kwargs)
+        elif validator == "array_":
+            array_validator.assert_called_with(args, kwargs)
+        elif validator == "bool_":
+            bool_validator.assert_called_with(args, kwargs)
+        elif validator == "string_":
+            string_validator.assert_called_with(args, kwargs)
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (["some_key"], {"default": "not_a_number", "minimum": 3, "maximum": 7},
+         "Invalid metadata default number value.",
+         "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>", True),
+        (["some_key"], {"default": 5, "minimum": "not_a_number", "maximum": 7},
+         "Invalid metadata default minimum.",
+         "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>", True),
+        (["some_key"], {"default": 5, "minimum": 3, "maximum": "not_a_number"},
+         "Invalid metadata default maximum.",
+         "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>", True),
+        (["some_key"], {"default": 2, "minimum": 3, "maximum": 7}, "Invalid metadata default.",
+         "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3", True),
+        (["some_key"], {"default": 8, "minimum": 3, "maximum": 7}, "Invalid metadata default.",
+         "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7", True),
+        (["some_key"], {"minimum": 5, "maximum": 3}, "Invalid metadata array length range.",
+         "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3", True),
+        (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
+    ],
+)
+def test_metadata_number_validator(mock_input_manager: InputManager, mocker: MockerFixture, key_path: List[str],
+                                   value: Dict[str, Any], error_title: str, error_msg: str, should_raise: bool):
+    """Tests metadata_number_validator() method in InputManager"""
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {'class': 'InputManager', 'function': '_metadata_number_validator'}
+    if should_raise:
+        with pytest.raises(ValueError):
+            mock_input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        mock_input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.assert_not_called
 
 
 def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
