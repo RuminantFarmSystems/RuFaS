@@ -213,15 +213,6 @@ class HerdFactory:
             self._heiferIIIs_update(simulation_day=day)
             self._cows_update(simulation_day=day)
 
-            if day % 500 == 0:
-                print(f"Day: {day}")
-                print(f"Calves: {len(self.pre_animal_population.calves)}")
-                print(f"HeiferIs: {len(self.pre_animal_population.heiferIs)}")
-                print(f"HeiferIIs: {len(self.pre_animal_population.heiferIIs)}")
-                print(f"HeiferIIIs: {len(self.pre_animal_population.heiferIIIs)}")
-                print(f"Cows: {len(self.pre_animal_population.cows)}")
-                print(f"Replacement: {len(self.pre_animal_population.replacement)}")
-
         return self.pre_animal_population
 
     def _init_animal_from_data(
@@ -349,6 +340,14 @@ class HerdFactory:
         post_animals = []
 
         if len(pre_animals) == 0 and animal_num > 0:
+            om.add_error(
+                "Empty Population",
+                f"Cannot sample {animal_num} {animal_type}(s) from an empty population.",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._random_sample_with_replacement_by_type.__name__,
+                },
+            )
             raise ValueError(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
 
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
