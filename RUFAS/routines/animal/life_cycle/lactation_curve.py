@@ -118,20 +118,20 @@ class LactationCurve:
             total_avg_305 = self.annual_MY_lbs * 305 / (365 * self.num_milking_cows * 2.205)
 
             # Extracting percentage distribution for each lactation group
-            percent_P2 = self.parity_percentages[1] * 100
-            percent_P3 = self.parity_percentages[2] * 100
+            percent_parity2 = self.parity_percentages[1] * 100
+            percent_parity3 = self.parity_percentages[2] * 100
 
-            # Solving for P1-305 using the provided equation
-            P1_305 = total_avg_305 - percent_P2 * self.parity2_MilkYield305_adj / 100 - percent_P3 * self.parity3_MilkYield305_adj / 100
+            # Solving for parity1_305 using the provided equation
+            parity1_305 = total_avg_305 - percent_parity2 * self.parity2_MilkYield305_adj / 100 - percent_parity3 * self.parity3_MilkYield305_adj / 100
 
             # Calculating 305-day milk yield for each lactation group
-            P2_305 = P1_305 + self.parity2_MilkYield305_adj
-            P3_305 = P1_305 + self.parity3_MilkYield305_adj
+            parity2_305 = parity1_305 + self.parity2_MilkYield305_adj
+            parity3_305 = parity1_305 + self.parity3_MilkYield305_adj
 
         else:
-            P1_305 = None
-            P2_305 = None
-            P3_305 = None
+            parity1_305 = None
+            parity2_305 = None
+            parity3_305 = None
 
         return (
             self.get_wood_parameters(
@@ -139,20 +139,20 @@ class LactationCurve:
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P1_305,
+                MY_305d=parity1_305,
             ),
             self.get_wood_parameters(
                 lactation_group="2",
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P2_305,
+                MY_305d=parity2_305,
             ),
             self.get_wood_parameters(
                 lactation_group="3",
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P3_305,
+                MY_305d=parity3_305,
             ),
         )
