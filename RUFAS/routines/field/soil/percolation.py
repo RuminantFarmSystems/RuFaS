@@ -47,16 +47,17 @@ class Percolation:
         SWAT sections 2:3.1 and 2
 
         """
-        if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
-            self._percolate_excess_water()
+        # import pdb
+        # pdb.set_trace()
+        top_layer_to_percolate = self._percolate_infiltrated_water()
+
+        if top_layer_to_percolate is None:
             return
-        else:
-            self.data.soil_layers[0].water_content += self.data.infiltrated_water
 
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(layer_count)):
+        for layer_number in reversed(range(top_layer_to_percolate, layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
             if layer_number < deepest_layer:
@@ -75,9 +76,9 @@ class Percolation:
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
             else:
-                current_layer.percolated_water = 0
+                current_layer.percolated_water = 0.0
 
-        for layer_number in range(1, layer_count + 1):
+        for layer_number in range(top_layer_to_percolate + 1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
             percolated_water = layer_above.percolated_water
             if layer_number == deepest_layer + 1:
@@ -85,9 +86,9 @@ class Percolation:
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
 
-    def _percolate_excess_water(self) -> None:
+    def _percolate_infiltrated_water(self) -> int | None:
         """
-        Percolates large amounts of infiltrated water through the entire soil profile.
+        Percolates infiltrated water into the soil profile.
 
         Notes
         -----
@@ -99,7 +100,8 @@ class Percolation:
         """
         self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
-        for layer in self.data.soil_layers:
+        top_layer_to_percolate = None
+        for index, layer in enumerate(self.data.soil_layers):
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
@@ -108,9 +110,11 @@ class Percolation:
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0
+                top_layer_to_percolate = index
                 break
         if water_remaining_to_percolate > 0.0:
             self.data.vadose_zone_layer.water_content += water_remaining_to_percolate
+        return top_layer_to_percolate
 
     # --- Static methods ---
     @staticmethod
