@@ -624,8 +624,6 @@ class AnimalRequirements:
             phosphorus_requirement = phosphorus_requirement * (
                 1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)
             )
-        # if AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER > 0:
-        # phosphorus_requirement = phosphorus_requirement * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100
         # Requirements summary dictionary
         return {
             "NEmaint_requirement": net_energy_maintenance,

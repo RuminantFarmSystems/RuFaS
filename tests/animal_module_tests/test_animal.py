@@ -24,8 +24,6 @@ import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 
-# from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -2214,16 +2212,6 @@ def test_calc_rqmts() -> None:
         "P_requirement": 1 * (1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)),
         "DMIest_requirement": 1,
     }
-    # expected = {
-    #     "NEmaint_requirement": 1,
-    #     "NEg_requirement": 1,
-    #     "NEpreg_requirement": 1,
-    #     "NEl_requirement": 1,
-    #     "MP_requirement": 1,
-    #     "Ca_requirement": 1,
-    #     "P_requirement": 1 * AnimalModuleConstants.PHOSPHORUS_PERCENT_BUFFER / 100,
-    #     "DMIest_requirement": 1,
-    # }
     assert actual == expected
     test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NRC_energy_growth_requirements.assert_called_once()
