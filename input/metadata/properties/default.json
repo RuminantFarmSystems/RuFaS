@@ -4878,7 +4878,6 @@
     "field_size": {
       "type": "number",
       "description": "Size of the field.",
-      "units": "ha",
       "minimum": 0.0
     },
     "absolute_latitude": {

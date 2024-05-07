@@ -5,7 +5,7 @@ from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
+from typing import Any, Dict, List, Set, Union, Callable, Tuple, Sequence
 
 import pandas as pd
 
@@ -2098,12 +2098,11 @@ class InputManager:
         deepest_path = []
 
         type_to_validator_map: Dict[str, Callable] = {
-            "number_": self._metadata_number_validator,
-            "array_": self._metadata_array_validator,
-            "bool_": self._metadata_bool_validator,
-            "string_": self._metadata_string_validator,
+            "number": self._metadata_number_validator,
+            "array": self._metadata_array_validator,
+            "bool": self._metadata_bool_validator,
+            "string": self._metadata_string_validator,
         }
-
         while stack:
             current_obj, depth, path = stack.pop()
 
@@ -2138,6 +2137,8 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._metadata_number_validator.__name__,
         }
+        self._validate_metadata_properties_keys({"type", "description", "minimum", "maximum", "default"}, value,
+                                                key_path)
         default = value.get("default")
         minimum = value.get("minimum")
         maximum = value.get("maximum")
@@ -2188,10 +2189,10 @@ class InputManager:
 
     def _metadata_string_validator(self, key_path: List[str], value: dict) -> None:
         """Validator function for string type properties in metadata."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_string_validator.__name__,
-        }
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._metadata_string_validator.__name__,
+                    }
+        self._validate_metadata_properties_keys({"type", "description", "pattern", "default"}, value, key_path)
         default = value.get("default")
         pattern = value.get("pattern")
         if default is not None:
@@ -2214,10 +2215,10 @@ class InputManager:
 
     def _metadata_bool_validator(self, key_path: List[str], value: dict) -> None:
         """Validator function for bool type properties in metadata."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_bool_validator.__name__,
-        }
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._metadata_bool_validator.__name__,
+                    }
+        self._validate_metadata_properties_keys({"type", "description", "default"}, value, key_path)
         default = value.get("default")
         if default is not None and not isinstance(default, bool):
             om.add_error(
@@ -2229,10 +2230,12 @@ class InputManager:
 
     def _metadata_array_validator(self, key_path: List[str], value: dict) -> None:
         """Validator function for array type properties in metadata."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_array_validator.__name__,
-        }
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._metadata_array_validator.__name__,
+                    }
+        self._validate_metadata_properties_keys({"type", "properties", "description", "minimum_length",
+                                                 "maximum_length", "default"},
+                                                value, key_path)
         default = value.get("default")
         minimum_length = value.get("minimum_length")
         maximum_length = value.get("maximum_length")
@@ -2275,12 +2278,24 @@ class InputManager:
                 )
                 raise ValueError
         if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
-            om.add_error(
-                "Invalid metadata array length range.",
-                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
-                f"greater than 'maximum_length' value {maximum_length}",
-                info_map,
-            )
+            om.add_error("Invalid metadata array length range.",
+                         f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                         f"greater than 'maximum_length' value {maximum_length}", info_map)
+            raise ValueError
+
+    def _validate_metadata_properties_keys(self, valid_properties_keys: Set[str], properties: Dict[str, Any],
+                                           path: List[str]):
+        """Validates that keys in the metadata properties sections."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_metadata_properties_keys.__name__,
+                    }
+        property_type = properties.get("type", "Unknown type")
+        invalid_keys = set(properties.keys()) - valid_properties_keys
+        if invalid_keys:
+            om.add_error("Metadata Validation",
+                         f"Invalid keys '{invalid_keys}' in {property_type} for {path}. Valid"
+                         f" keys are {valid_properties_keys}",
+                         info_map)
             raise ValueError
 
     def save_metadata_properties(self, output_dir: Path) -> None:
