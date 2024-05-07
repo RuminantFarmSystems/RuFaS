@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import collections
 import json
 import os
 import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO
+from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
-from deprecated.sphinx import deprecated
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -101,6 +101,10 @@ class OutputManager(object):
         A Time object used to track the simulation time
     _include_detailed_values : bool
         Set to True to include detailed values in the json output files after the simulation
+    _exclude_info_maps_flag : bool
+        Set to True to exclude info_maps when adding variables to the variables_pool
+    _variables_usage_counter : Counter[str]
+        A Counter object used to keep track of the number of times a variables in the variables_pool is used.
     """
 
     __instance = None
@@ -138,6 +142,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
+            self._variables_usage_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -209,6 +214,10 @@ class OutputManager(object):
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self._variables_usage_counter[f"{key}.{k}"] = 0
 
     def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
@@ -949,6 +958,7 @@ class OutputManager(object):
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
                 results[combined_key] = {"values": sliced_data}
+                self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -965,6 +975,7 @@ class OutputManager(object):
                         results[combined_key]["values"].extend(filtered_value)
                     else:
                         results[combined_key] = {"values": filtered_value}
+                    self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
@@ -1043,6 +1054,7 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
+                    # self._variables_usage_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1187,31 +1199,6 @@ class OutputManager(object):
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
 
-    @deprecated(
-        reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_results() is not working.""",
-        version="MVP",
-    )
-    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
-        """
-        Dumps variables_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
-        """
-        pool = self.variables_pool
-        if exclude_info_maps:
-            pool = self._exclude_info_maps(self.variables_pool)
-
-        json_file_path = os.path.join(path, self.generate_file_name("all_variables", "json"))
-        self.dict_to_file_json(pool, json_file_path)
-
     def dump_logs(self, path: Path) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
@@ -1232,6 +1219,24 @@ class OutputManager(object):
         """
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
+
+    def report_variables_usage_counts(self, path: Path) -> None:
+        """
+        Reports the usage counts of variables in the variables pool to a CSV file in the given path to a directory.
+
+        Parameters
+        ----------
+        path : Path
+            The path to the directory where the file will be saved.
+        """
+
+        filename = self.generate_file_name("variables_usage_counts", "csv")
+        file_path_csv = os.path.join(path, filename)
+        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
+        usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
+        data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
+        self._dict_to_file_csv(data_dict, file_path_csv)
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
@@ -1333,6 +1338,7 @@ class OutputManager(object):
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
+        self.report_variables_usage_counts(path)
 
     def flush_pools(self) -> None:
         """
@@ -1477,21 +1483,24 @@ class OutputManager(object):
         logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
         return errors_count, warnings_count, logs_count
 
-    def print_credits(self) -> None:
+    def print_credits(self, version_number: str, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            sys.stdout.write("RuFaS: Ruminant Farm Systems Model.\n")
-            sys.stdout.write(DISCLAIMER_MESSAGE + "\n")
+            sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
+            sys.stdout.write(f"Starting task: {task_id}\n")
 
-    def print_errors_warnings_logs_counts(self) -> None:
+    def print_errors_warnings_logs_counts(self, task_id: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
-            sys.stdout.write(f"{errors_count} error(s), {warnings_count} warning(s), and {logs_count} log(s) found.\n")
+            sys.stdout.write(
+                f"Finished task: {task_id} with {errors_count} error(s), "
+                f"{warnings_count} warning(s), and {logs_count} log(s).\n"
+            )
 
     def set_include_detailed_values(self, flag: bool) -> None:
         """Sets the flag for adding detailed values to the output files."""
@@ -1508,3 +1517,24 @@ class OutputManager(object):
         """
 
         self._exclude_info_maps_flag = exclude_info_maps
+
+    def run_startup_sequence(
+        self,
+        verbosity: LogVerbosity,
+        exclude_info_maps: bool,
+        output_directory: Path,
+        clear_output_directory: bool,
+        variables_file_path: Path,
+        output_prefix: str,
+        version_number: str,
+        task_id: str,
+    ) -> None:
+        """Performs various tasks that are needed to setup and run the Output Manager."""
+        self.print_credits(version_number, task_id)
+        self.flush_pools()
+        self.set_exclude_info_maps_flag(exclude_info_maps)
+        self.set_log_verbose(verbosity)
+        self.set_metadata_prefix(output_prefix)
+        self.create_directory(output_directory)
+        if clear_output_directory:
+            self.clear_output_dir(variables_file_path, output_directory)
