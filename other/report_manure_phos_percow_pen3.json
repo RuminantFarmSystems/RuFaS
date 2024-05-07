@@ -1,0 +1,261 @@
+{
+    "multiple": [
+      {
+          "name": "Pen 3 number of milking cows",
+          "filters": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+          "name": "Pen 4 number of milking cows",
+          "filters": ["ManureHandlerDailyOutput_Pen_4_LAC_COW.num_animals"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Total number of milking cows",
+            "cross_references":[
+                "Pen 3 number of milking cows_ver_agg",
+                "Pen 4 number of milking cows_ver_agg"
+            ],
+            "horizontal_aggregation": "sum"
+      },
+      {
+          "name": "Whole herd daily milk production, kg",
+          "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+          "name": "Daily milk production per cow, kg/cow",
+          "cross_references":[
+                "Whole herd daily milk production, kg_ver_agg",
+                "Total number of milking cows_hor_agg"
+            ],
+          "horizontal_aggregation": "division"
+      },
+
+
+
+      {
+          "name": "Pen 3 daily DMI per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_3_LAC_COW"],
+          "variables": ["dm"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      }, 
+      {
+          "name": "Pen 3 daily phosphorus intake per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_3_LAC_COW"],
+          "variables": ["phosphorus"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      
+      {
+        "name": "Pen 3 dietary phosphorus, %",
+        "cross_references":[
+            "Pen 3 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+            "Pen 3 daily DMI per cow, kg/cow_dm_ver_agg"
+        ],
+        "constants": {
+            "By 0.01": 0.01
+        },
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+            "Pen 3 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+            "Pen 3 daily DMI per cow, kg/cow_dm_ver_agg", 
+            "By 0.01"
+        ]
+  },
+
+
+
+  {
+    "name": "Excretion- manure phosphorus, kg/cow/d",
+    "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_phosphorus",
+    "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "constants": {
+        "By 1000": 1000},
+    "horizontal_aggregation": "division",
+    "horizontal_order": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_phosphorus",
+    "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals",
+    "By 1000"],
+    "vertical_aggregation": "average",
+    "horizontal_first": true,
+    "slice_start": -365
+},
+{
+    "name": "Pen 3 daily manure phosphorus fraction",
+    "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_phosphorus_fraction"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+},
+  {
+      "name": "Pen 3 daily manure inorganic phosphorus fraction",
+      "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_inorganic_phosphorus_fraction"],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+  },
+  {
+      "name": "Pen 3 daily manure organic phosphorus fraction",
+      "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_organic_phosphorus_fraction"],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+  },
+  {
+      "name": "Pen 3 daily manure non water extractable inorganic phosphorus fraction",
+      "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_non_water_inorganic_phosphorus_fraction"],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+  },
+  {
+      "name": "Pen 3 daily manure non water extractable organic phosphorus fraction",
+      "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_non_water_organic_phosphorus_fraction"],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+  },
+
+
+
+
+
+
+  {
+    "name": "Pen 3 Manure handler daily liquid manure phosphorus, kg/cow/d",
+    "filters":[
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus", 
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_order": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus",
+         "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "vertical_aggregation": "average",
+    "horizontal_first": "true",
+    "slice_start": -365
+},
+{
+    "name": "Pen 3 reception pit daily liquid manure phosphorus, kg/cow/d",
+    "filters":[
+        "ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus", 
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "horizontal_order": ["ReceptionPitDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus",
+         "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "horizontal_aggregation": "division",
+    "horizontal_first": "true",
+    "vertical_aggregation": "average",
+    "slice_start": -365
+    },
+
+
+
+
+
+
+
+    {
+        "name": "Pen 3 liquid manure phosphorus entering storage, kg/cow/d",
+        "filters":[
+            "ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus", 
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"
+        ],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus",
+         "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "horizontal_first": "true",
+        "slice_start": -365
+    },
+    {
+        "name": "Pen 3 solid manure phosphorus entering storage, kg/cow/d",
+        "filters":[
+            "ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_phosphorus", 
+            "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"
+        ],
+        "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_phosphorus",
+         "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "horizontal_first": "true",
+        "slice_start": -365
+    },
+
+
+
+
+
+
+
+    {
+        "name": "Pen 3 Solid manure water extractable inorganic phosphorus added storage, kg/cow/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_water_extractable_inorganic_phosphorus",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+       "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_water_extractable_inorganic_phosphorus",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+        "name": "Pen 3 Solid manure  water extractable organic phosphorus added to storage, kg/cow/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_water_extractable_organic_phosphorus",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+       "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_water_extractable_organic_phosphorus",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+        "name": "Pen 3 Solid manure  non-water extractable inorganic phosphorus added to storage, kg/cow/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_non_water_extractable_inorganic_phosphorus",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+       "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_non_water_extractable_inorganic_phosphorus",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    {
+        "name": "Pen 3 Solid manure non-water extractable organic phosphorus added to storage, kg/cow/d",
+        "filters": ["^ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_non_water_extractable_organic_phosphorus",
+          "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+       "horizontal_aggregation": "division",
+        "horizontal_order": ["ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_non_water_extractable_organic_phosphorus",
+        "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+        "vertical_aggregation": "average",
+        "slice_start": -365
+    },
+    
+    
+    
+    {"name": "Pen 3 Solid storage phosphorus at end of storage period, kg",
+            "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_3_LAC_COW.solid_manure_phosphorus"],
+            "vertical_aggregation": "average",
+            "slice_start": -1},
+    
+    {"name": "Pen 3 Liquid storage phosphorus at end of storage period, kg",
+            "filters": ["Accumulated_ManureTreatmentDailyOutput_Pen_3_LAC_COW.liquid_manure_phosphorus"],
+            "vertical_aggregation": "average",
+            "slice_start": -1},
+    
+    {"name": "Pen 3 Solid storage phosphorus at end of storage period, kg/cow/d",
+        "cross_references":["Pen 3 Solid storage phosphorus at end of storage period, kg_ver_agg", 
+        "Total number of milking cows_ver_agg"],
+        "horizontal_aggregation": "division",
+        "slice_start": -1},
+    
+    {"name": "Pen 3 Liquid storage phosphorus at end of storage period, kg/cow/d",
+        "cross_references":["Pen 3 Liquid storage phosphorus at end of storage period, kg_ver_agg", 
+        "Total number of milking cows_ver_agg"],
+        "horizontal_aggregation": "division",
+        "slice_start": -1}
+
+
+
+
+  
+
+
+    
+    ]
+  }
