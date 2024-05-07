@@ -138,7 +138,7 @@ class InputManager:
         self._load_metadata(metadata_path)
         self._validate_metadata()
         self._load_properties()
-        self._check_max_depth()
+        self._validate_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -2085,8 +2085,9 @@ class InputManager:
                    "Top level metadata is valid.",
                    info_map)
 
-    def _check_max_depth(self) -> None:
-        """Iteratively traverses the metadata properties to check the max depth.
+    def _validate_properties(self) -> None:
+        """Iteratively traverses the metadata properties to check the max depth and routes
+        primitive properties to be validated by type.
 
         Raises
         ------
@@ -2095,7 +2096,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._check_max_depth.__name__,
+            "function": self._validate_properties.__name__,
         }
 
         stack = [(self.__metadata["properties"], 0, [])]

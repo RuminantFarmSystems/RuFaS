@@ -69,7 +69,7 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
-        "_check_max_depth": mock_input_manager._check_max_depth,
+        "_validate_properties": mock_input_manager._validate_properties,
         "save_metadata_properties": mock_input_manager.save_metadata_properties,
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
@@ -261,7 +261,7 @@ def test_start_data_processing(
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
-    patch_for_check_max_depth = mocker.patch.object(mock_input_manager, "_check_max_depth")
+    patch_for_validate_properties = mocker.patch.object(mock_input_manager, "_validate_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -271,7 +271,7 @@ def test_start_data_processing(
     patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
-    patch_for_check_max_depth.assert_called_once()
+    patch_for_validate_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4028,7 +4028,7 @@ def test_validate_input_by_type_value_error() -> None:
          ["Unrecognized metadata type."]),
     ],
 )
-def test_check_max_depth(
+def test_validate_properties(
     mocker: MockerFixture,
     metadata: Dict[str, Any],
     limit: int,
@@ -4037,7 +4037,7 @@ def test_check_max_depth(
     should_raise: bool,
     expected_errors: List[str],
 ) -> None:
-    """Tests _check_max_depth() function in InputManager."""
+    """Tests _validate_properties() function in InputManager."""
     input_manager = InputManager()
     input_manager.meta_data = metadata
     input_manager.metadata_depth_limit = limit
@@ -4047,21 +4047,21 @@ def test_check_max_depth(
 
     if should_raise:
         with pytest.raises(ValueError) as exc_info:
-            input_manager._check_max_depth()
+            input_manager._validate_properties()
         assert str(exc_info.value) == f"Metadata depth exceeds maximum allowed depth of {limit} at path {expected_path}"
         assert mock_add_error.call_count == len(expected_errors)
         for error_msg in expected_errors:
             mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
         mock_add_log.assert_not_called()
     else:
-        input_manager._check_max_depth()
+        input_manager._validate_properties()
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
         assert mock_add_log.call_args_list == [
             call("Metadata properties depth", f"Max depth of metadata properties is {expected_depth}",
-                 {"class": "InputManager", "function": "_check_max_depth"}),
+                 {"class": "InputManager", "function": "_validate_properties"}),
             call("Metadata properties path", f"Deepest path of metadata properties is {expected_path}",
-                 {"class": "InputManager", "function": "_check_max_depth"}),
+                 {"class": "InputManager", "function": "_validate_properties"}),
         ]
 
 
