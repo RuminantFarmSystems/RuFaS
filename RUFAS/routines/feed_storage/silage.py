@@ -88,14 +88,14 @@ class Silage(Storage):
         -------
         float
             The amount of dry matter lost to effluent, in kg.
-        
+
         References
         ----------
         .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
-            
+
         """
-        return DRY_MATTER_FRACTION_OF_EFFLUENT * estimated_maximum_effluent * days_of_loss / EFFLUENT_CONSTRAINER
-    
+        return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
+
     def calculate_moisture_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
         """
         Calculates the moisture loss to effluent.
@@ -115,7 +115,7 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
 
         """
-        return estimated_maximum_effluent * days_of_loss / EFFLUENT_CONSTRAINER / DRY_MATTER_FRACTION_OF_EFFLUENT
+        return estimated_maximum_effluent * days_of_loss / DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
 
 
 class Bunker(Silage):

@@ -5,6 +5,10 @@ from RUFAS.time import Time
 from .enums import CropCategory, CropType
 
 
+"""This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
+EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION = 0.3
+
+
 @dataclass
 class HarvestedCrop:
     """
@@ -133,15 +137,12 @@ class HarvestedCrop:
         float
             Estimated maximum amount of mass that will flow out of this crop in kg.
 
-        Notes
-        -----
-        Only ensiled crops that start with less than 30% dry matter percentage will have estimated effluent loss.
-
         References
         ----------
         .. [1] Feed Storage Scientific Documentation, section 1.3.1
 
         """
-        bounded_dry_matter_percentage = min(30.0, self.dry_matter_percentage)
-        effluent_fraction = (1.0 - bounded_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION) - 0.7
+        dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        bounded_dry_matter_fraction = min(EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION, dry_matter_fraction)
+        effluent_fraction = 1.0 - bounded_dry_matter_fraction - 0.7
         return self.fresh_mass * effluent_fraction
