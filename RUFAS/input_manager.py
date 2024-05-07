@@ -136,6 +136,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
+        self._validate_metadata()
         self._load_properties()
         self._check_max_depth()
         is_input_data_valid = self._populate_pool(eager_termination)
@@ -2042,6 +2043,47 @@ class InputManager:
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def _validate_metadata(self) -> None:
+        """Checks that top-level metadata has valid and required keys and values."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_metadata.__name__,
+        }
+        metadata_files = self.__metadata["files"]
+        required_keys = {"path", "type", "properties"}
+        optional_keys = {"title", "description"}
+        valid_keys = required_keys | optional_keys
+        valid_types = {"json", "csv"}
+        for key, data in metadata_files.items():
+            if not required_keys <= data.keys():
+                missing_keys = required_keys - data.keys()
+                om.add_error("Metadata Validation",
+                             f"Missing required keys '{missing_keys}' in {key}",
+                             info_map)
+                raise ValueError
+            invalid_keys = data.keys() - valid_keys
+            if invalid_keys:
+                om.add_error("Metadata Validation",
+                             f"Invalid keys '{invalid_keys}' in {key}",
+                             info_map)
+                raise ValueError
+
+            if data["type"] not in valid_types:
+                om.add_error("Metadata Validation",
+                             f"Invalid type '{data['type']}' in {key}. Expected 'json' or 'csv'.",
+                             info_map)
+                raise ValueError
+
+            if not os.path.isfile(data["path"]):
+                om.add_error("Metadata Validation",
+                             f"Invalid path '{data['path']}' in {key}",
+                             info_map)
+                raise ValueError
+
+        om.add_log("Metadata Validation",
+                   "Top level metadata is valid.",
+                   info_map)
 
     def _check_max_depth(self) -> None:
         """Iteratively traverses the metadata properties to check the max depth.
