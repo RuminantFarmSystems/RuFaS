@@ -16,7 +16,15 @@ class Silage(Storage):
     """
     Class representing the Silage storage type, inheriting from Storage.
 
-    Methods are placeholders as per the design document and are to be implemented.
+    Methods
+    -------
+    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: Time)
+        Calculates the number of days to effluent loss needs to be processed for in the given crop.
+    calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
+        Calculates the total dry matter lost to effluent that occurred over the given number of days.
+    calculate_moisture_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
+        Calculates the total moisture lost to effluent that occurred over the given number of days.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -46,7 +54,7 @@ class Silage(Storage):
         """
         pass
 
-    def _calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
+    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
         """
         Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
 

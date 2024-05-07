@@ -49,7 +49,7 @@ def test_calculate_days_of_effluent_loss_to_process(
     current: int,
     expected: int,
 ) -> None:
-    """Tests _calculate_days_of_effluent_loss_to_process in Silage."""
+    """Tests calculate_days_of_effluent_loss_to_process in Silage."""
     mock_time_stored = mocker.MagicMock(autospec=Time)
     mock_time_stored.simulation_day = day_stored
     mock_last_time_degraded = mocker.MagicMock(autospec=Time)
@@ -59,7 +59,7 @@ def test_calculate_days_of_effluent_loss_to_process(
     harvested_crop.storage_time = mock_time_stored
     harvested_crop.last_time_degraded = mock_last_time_degraded
 
-    actual = silage._calculate_days_of_effluent_loss_to_process(harvested_crop, mock_current_time)
+    actual = silage.calculate_days_of_effluent_loss_to_process(harvested_crop, mock_current_time)
 
     assert actual == expected
 

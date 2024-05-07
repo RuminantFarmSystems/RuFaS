@@ -144,5 +144,5 @@ class HarvestedCrop:
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         bounded_dry_matter_fraction = min(EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION, dry_matter_fraction)
-        effluent_fraction = 1.0 - bounded_dry_matter_fraction - 0.7
+        effluent_fraction = 1.0 - bounded_dry_matter_fraction - (1 - EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION)
         return self.fresh_mass * effluent_fraction
