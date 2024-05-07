@@ -1,4 +1,4 @@
-Feed Storage Theoretical Documentation
+Feed Storage Scientific Documentation
 ======================================
 
 This document details how stored feeds lose dry matter and nutrients.
@@ -70,7 +70,7 @@ that occurred after the first 30 days of storage (kg).
 .. math::
 
 
-   L_{first 30 days} = Q + 2433(\frac{moisture - MF(1 - moisture)(\frac{1}{1 - 0.004d})}{(1-moisture)(14206-2433[0.004d])(\frac{1}{1-0.004d})}) \tag{1.2.3}
+   L_{first 30 days} = Q + 2433(\frac{moisture - MF(1 - moisture)(\frac{1}{1 - 0.004 \cdot d})}{(1-moisture)(14206-2433[0.004 \cdot d])(\frac{1}{1-0.004 \cdot d})}) \tag{1.2.3}
 
 Where :math:`L_{first 30 days}` is the total gaseous dry matter loss
 that occurred in the hay in the first 30 days of storage (:math:`kg`),
@@ -136,9 +136,15 @@ calculated for, :math:`l` is the loss coefficient (unitless),
 (:math:`m`).
 
 The loss coefficients for the different hay storages are defined in the
-table: \| Hay Storage Type \| Loss Coefficient \| \|——————-|——————\|
-\|Protected Wrapped \|0.0000216 \| \|Protected Tarped \|0.0000108 \|
-\|Unprotected Outdoor|0.00006 \|
+table: 
+
+===================== =====================
+Hay Storage Type      Loss Coefficient
+===================== =====================
+Protected Wrapped     0.0000216
+Protected Tarped      0.0000108
+Unprotected Outdoor   0.00006
+===================== =====================
 
 Table: :math:`1.2.9`
 
@@ -282,14 +288,29 @@ before accounting for dry matter loss (:math:`kg`).
 The following fractional loss coefficients are used in equation
 :math:`2.1` when recalculating the nutrient percentages in hay:
 
-Unprotected Hay \|Nutrient|Fractional Loss Coefficient\| \|-|-\| \|Acid
-Detergent Fiber|0.0\| \|Neutral Detergent Fiber|0.17\| \|Crude
-Protein|0.4\| Table :math:`2.1.1`
+Unprotected Hay:
+
+======================= ===========================
+Nutrient                Fractional Loss Coefficient
+======================= ===========================
+Acid Detergent Fiber    0.0
+Neutral Detergent Fiber 0.17
+Crude Protein           0.4
+======================= ===========================
+
+Table :math:`2.1.1`
 
 Protected Indoor, Protected Wrapped, Protected Tarped Hay
-\|Nutrient|Fractional Loss Coefficient\| \|-|-\| \|Acid Detergent
-Fiber|0.0\| \|Neutral Detergent Fiber|0.0\| \|Crude Protein|0.0\| Table
-:math:`2.1.2`
+
+======================= ===========================
+Nutrient                Fractional Loss Coefficient
+======================= ===========================
+Acid Detergent Fiber    0.0
+Neutral Detergent Fiber 0.0
+Crude Protein           0.0
+======================= ===========================
+
+Table :math:`2.1.2`
 
 2.2 Nutrient Loss in Silage and Baleage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
