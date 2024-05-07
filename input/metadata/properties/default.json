@@ -1607,6 +1607,10 @@
         "type": "number",
         "description": "The P3 milk adjustment value"
       }
+    },
+    "assumed_milking_cow_percentage": {
+      "type": "number",
+      "description": "the number of cows within the total herd assumed to be in milk at any one time (305/365 is the assumed ratio)"
     }
   },
   "crop_schedule_properties": {

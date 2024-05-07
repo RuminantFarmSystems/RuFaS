@@ -26,7 +26,7 @@ class LactationCurve:
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
-        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * (305 / 365)
+        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * im.get_data("lactation.assumed_milking_cow_percentage")
 
         self.milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
         if self.milking_freq >= 2.5:
