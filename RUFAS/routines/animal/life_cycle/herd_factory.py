@@ -91,11 +91,11 @@ class HerdFactory:
             current_animal_id=0,
         )
 
-    def _calves_update(self) -> None:
+    def _calves_update(self, simulation_day: int) -> None:
         """Calves update for generating herd simulation"""
         remaining_calves: List[Calf] = []
         for calf in self.pre_animal_population.calves:
-            wean_day = calf.update(0)
+            wean_day = calf.update(simulation_day)
             if wean_day:
                 args = calf.get_calf_values()
                 args.update(id=self.pre_animal_population.next_id())
@@ -106,19 +106,16 @@ class HerdFactory:
                 remaining_calves.append(calf)
         self.pre_animal_population.calves = remaining_calves
 
-    def _heiferIs_update(self) -> None:
+    def _heiferIs_update(self, simulation_day: int) -> None:
         """heiferIs update for generating herd simulation"""
         remaining_heiferIs: List[HeiferI] = []
         for heiferI in self.pre_animal_population.heiferIs:
-            second_stage = heiferI.update(0)
+            second_stage = heiferI.update(simulation_day)
             if second_stage:
                 args = heiferI.get_heiferI_values()
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["heifer_repro_method"])
-                args.update(tai_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
-                args.update(synch_ed_method_h=AnimalBase.config["heifers"]["repro_sub_protocol"])
-                args.update(repro_sub_protocol=AnimalBase.config["heifers"]["repro_sub_protocol"])
 
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
@@ -126,11 +123,11 @@ class HerdFactory:
                 remaining_heiferIs.append(heiferI)
         self.pre_animal_population.heiferIs = remaining_heiferIs
 
-    def _heiferIIs_update(self) -> None:
+    def _heiferIIs_update(self, simulation_day: int) -> None:
         """HeiferIIs update for generating herd simulation"""
         remaining_heiferIIs: List[HeiferII] = []
         for heiferII in self.pre_animal_population.heiferIIs:
-            cull_stage, third_stage = heiferII.update(0)
+            cull_stage, third_stage = heiferII.update(simulation_day)
             if cull_stage:
                 continue
             if third_stage:
@@ -143,38 +140,36 @@ class HerdFactory:
                 remaining_heiferIIs.append(heiferII)
         self.pre_animal_population.heiferIIs = remaining_heiferIIs
 
-    def _heiferIIIs_update(self, day: int) -> None:
+    def _heiferIIIs_update(self, simulation_day: int) -> None:
         """HeiferIIIs update for generating herd simulation"""
         remaining_heiferIIIs: List[HeiferIII] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
-            cow_stage = heiferIII.update(0)
+            cow_stage = heiferIII.update(simulation_day)
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
-
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["cow_repro_method"])
-                args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
-                args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
-                args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
-
                 cow = Cow(args)
-
                 self.pre_animal_population.cows.append(cow)
-                if day >= 3000:
-                    args.update(id=self.pre_animal_population.next_id())
-                    replacement_cow = Cow(args)
-                    self.pre_animal_population.replacement.append(replacement_cow)
             else:
-                remaining_heiferIIIs.append(heiferIII)
+                # Random 1% chance of becoming a replacement
+                # Because a replacement is taken out of the cohort, we don't want the probability to be too high
+                if random.random() < 0.01:
+                    args = heiferIII.get_heiferIII_values()
+                    args.update(id=self.pre_animal_population.next_id())
+                    replacement_heiferIII = HeiferIII(args)
+                    self.pre_animal_population.replacement.append(replacement_heiferIII)
+                else:
+                    remaining_heiferIIIs.append(heiferIII)
 
         self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
-    def _cows_update(self) -> None:
+    def _cows_update(self, simulation_day: int) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
-            _, _, _, culled, new_born = cow.update(0, self.CI)
-            if culled or cow.calves > 4:
+            new_born = cow.update(simulation_day, self.CI)
+            if cow.culled or cow.calves > 4:
                 continue
             else:
                 remaining_cows.append(cow)
@@ -182,7 +177,7 @@ class HerdFactory:
                 args = AnimalBaseInitArgsTypedDict(
                     id=self.pre_animal_population.next_id(),
                     breed=self.breed,
-                    birth_date=0,
+                    birth_date=simulation_day,
                     days_born=0,
                     p_init=cow.p_gest_for_calf,
                     birth_weight=cow.calf_birth_weight,
@@ -212,11 +207,11 @@ class HerdFactory:
                 self.pre_animal_population.calves.append(calf)
 
         for day in tqdm(range(self.simulation_days)):
-            self._calves_update()
-            self._heiferIs_update()
-            self._heiferIIs_update()
-            self._heiferIIIs_update(day=day)
-            self._cows_update()
+            self._calves_update(simulation_day=day)
+            self._heiferIs_update(simulation_day=day)
+            self._heiferIIs_update(simulation_day=day)
+            self._heiferIIIs_update(simulation_day=day)
+            self._cows_update(simulation_day=day)
 
         return self.pre_animal_population
 
@@ -224,7 +219,7 @@ class HerdFactory:
         self, animal_type: str, animal_data: Dict[str, Any]
     ) -> Calf | HeiferI | HeiferII | HeiferIII | Cow:
         """Function to initialize an animal object from input data"""
-        ANIMAL_CLASSES: Dict[str, Type] = {
+        ANIMAL_CLASSES: Dict[str, Type[Calf | HeiferI | HeiferII | HeiferIII | Cow]] = {
             "calf": Calf,
             "heiferI": HeiferI,
             "heiferII": HeiferII,
@@ -249,35 +244,35 @@ class HerdFactory:
                 herd_data["calves"],
             )
         )
-        heiferIs = list(
+        heiferIs: List[HeiferI] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferI"] * len(herd_data["heiferIs"]),
                 herd_data["heiferIs"],
             )
         )
-        heiferIIs = list(
+        heiferIIs: List[HeiferII] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferII"] * len(herd_data["heiferIIs"]),
                 herd_data["heiferIIs"],
             )
         )
-        heiferIIIs = list(
+        heiferIIIs: List[HeiferIII] = list(
             map(
                 self._init_animal_from_data,
                 ["heiferIII"] * len(herd_data["heiferIIIs"]),
                 herd_data["heiferIIIs"],
             )
         )
-        cows = list(
+        cows: List[Cow] = list(
             map(
                 self._init_animal_from_data,
                 ["cow"] * len(herd_data["cows"]),
                 herd_data["cows"],
             )
         )
-        replacement = list(
+        replacement: List[HeiferIII] = list(
             map(
                 self._init_animal_from_data,
                 ["replacement"] * len(herd_data["replacement"]),
@@ -302,7 +297,7 @@ class HerdFactory:
         post_heiferIIs: List[HeiferII] = self._random_sample_with_replacement_by_type("heiferII")
         post_heiferIIIs: List[HeiferIII] = self._random_sample_with_replacement_by_type("heiferIII")
         post_cows: List[Cow] = self._random_sample_with_replacement_by_type("cow")
-        post_replacement: List[Cow] = self._random_sample_with_replacement_by_type("replacement")
+        post_replacement: List[HeiferIII] = self._random_sample_with_replacement_by_type("replacement")
 
         return AnimalPopulation(
             calves=post_calves,
@@ -343,6 +338,18 @@ class HerdFactory:
         animal_num = im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
+
+        if len(pre_animals) == 0 and animal_num > 0:
+            om.add_error(
+                "Empty Population",
+                f"Cannot sample {animal_num} {animal_type}(s) from an empty population.",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._random_sample_with_replacement_by_type.__name__,
+                },
+            )
+            raise ValueError(f"Cannot sample {animal_num} {animal_type}(s) from an empty population.")
+
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
         for choice in random_choices:
             animal = copy.deepcopy(pre_animals[choice])
@@ -373,6 +380,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
+
         im.add_dict_variable_to_pool(
             variable_name="runtime_animal_population",
             data=self.post_animal_population.__repr__(),

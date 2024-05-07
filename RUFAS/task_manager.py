@@ -313,7 +313,7 @@ class TaskManager:
 
             if args["task_type"] == TaskType.HERD_INITIALIZATION:
                 args["init_herd"] = True
-                TaskManager.handle_herd_initializaition(args, output_manager)
+                TaskManager.handle_herd_initialization(args, output_manager)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
             if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
@@ -339,11 +339,11 @@ class TaskManager:
             )
 
     @staticmethod
-    def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
+    def handle_herd_initialization(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Handles initialization of the herd based on specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager.handle_herd_initializaition.__name__,
+            "function": TaskManager.handle_herd_initialization.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Herd initialization start", "Initializing herd data...", info_map)
@@ -359,7 +359,7 @@ class TaskManager:
             "function": TaskManager.handle_single_simulation_run.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
-        TaskManager.handle_herd_initializaition(args, output_manager)
+        TaskManager.handle_herd_initialization(args, output_manager)
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
         simulator = SimulationEngine()

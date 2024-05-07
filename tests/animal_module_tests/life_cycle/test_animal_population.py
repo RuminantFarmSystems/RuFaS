@@ -67,7 +67,7 @@ def test_get_animals(
     result_heiferIIs = mock_animal_population.get_heiferIIs()
     result_heiferIIIs = mock_animal_population.get_heiferIIIs()
     result_cows = mock_animal_population.get_cows()
-    result_replacement = mock_animal_population.get_replacement_cows()
+    result_replacement = mock_animal_population.get_replacement_heiferIIIs()
 
     assert result_calves == calves
     assert len(result_calves) == num_calf
@@ -169,9 +169,6 @@ class MockAnimals:
             MagicMock(return_value={"dummy": "heiferIII"}) if animal_type == HeiferIII else None
         )
         dummy_animal.get_cow_values = MagicMock(return_value={"dummy": "cow"}) if animal_type == Cow else None
-        dummy_animal.get_replacement_values = (
-            MagicMock(return_value={"dummy": "replacement"}) if animal_type == Cow else None
-        )
         return dummy_animal
 
 
@@ -315,7 +312,7 @@ def test_repr(
 
     mock_replacement = MockAnimals(
         num_animal=num_replacement,
-        animal_type=Cow,
+        animal_type=HeiferIII,
         starting_id=mock_cows.current_max_id + 1,
     )
 
@@ -334,7 +331,7 @@ def test_repr(
         "heiferIIs": [{"dummy": "heiferII"}] * num_heiferII,
         "heiferIIIs": [{"dummy": "heiferIII"}] * num_heiferIII,
         "cows": [{"dummy": "cow"}] * num_cow,
-        "replacement": [{"dummy": "replacement"}] * num_replacement,
+        "replacement": [{"dummy": "heiferIII"}] * num_replacement,
     }
 
     actual = dummy_animal_population.__repr__()
