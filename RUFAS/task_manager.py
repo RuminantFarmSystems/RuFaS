@@ -110,6 +110,7 @@ class TaskManager:
                 self.output_manager,
                 "TASK_MANAGER",
             )
+            print("right before the exception")
             raise Exception("Task Manager's input data is invalid.")
         workers: int = self.input_manager.get_data("tasks.parallel_workers")
         self.output_manager.add_log(
