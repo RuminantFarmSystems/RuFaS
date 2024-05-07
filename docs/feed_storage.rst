@@ -131,7 +131,7 @@ calculated for, :math:`l` is the loss coefficient (unitless),
 :math:`rain_i` is the amount of rain on day :math:`i` (cm),
 :math:`high_i` is the high temperature on day :math:`i`
 (:math:`C^\circ`), :math:`low_i` is the low temperature on day :math:`i`
-(:math:`C^\circ`), b_{density} is the bale density (:math:`kg / m^3`)
+(:math:`C^\circ`), :math:`b_{density}` is the bale density (:math:`kg / m^3`)
 (eqn. 1.2.5), and :math:`b_{size}` is the diameter of the hay bale
 (:math:`m`).
 
