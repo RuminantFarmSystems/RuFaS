@@ -1555,8 +1555,7 @@
     "crop_schedules": {
       "type": "array",
       "description": "Array of all crop schedules to be executed over the run of the simulation.",
-      "minimum_length": 10,
-      "maximum_length": 5,
+      "minimum_length": 0,
       "properties": {
         "type": "object",
         "description": "Contains all the properties necessary to create a CropSchedule object.",
