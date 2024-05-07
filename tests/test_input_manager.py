@@ -3,7 +3,7 @@ from functools import reduce
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Type, Union, Optional
 from typing import Tuple
-from unittest.mock import ANY
+from unittest.mock import ANY, call
 
 import pandas as pd
 import pytest
@@ -69,6 +69,7 @@ def input_manager_original_method_states(
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
         "_is_input_required_upon_initialization": mock_input_manager._is_input_required_upon_initialization,
         "_is_modifiable_during_runtime": mock_input_manager._is_modifiable_during_runtime,
+        "_validate_properties": mock_input_manager._validate_properties,
         "save_metadata_properties": mock_input_manager.save_metadata_properties,
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
@@ -254,13 +255,14 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 def test_start_data_processing(
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
+    patch_for_validate_metadata = mocker.patch.object(mock_input_manager, "_validate_metadata")
+    patch_for_validate_properties = mocker.patch.object(mock_input_manager, "_validate_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -270,6 +272,8 @@ def test_start_data_processing(
     patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
+    patch_for_validate_metadata.assert_called_once()
+    patch_for_validate_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -411,8 +415,6 @@ def test_populate_pool_valid(
         side_effect=lambda input_data, _: (input_data, None, None),
     )
     mocker.patch.object(input_manager, "_log_missing_keys")
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -421,13 +423,11 @@ def test_populate_pool_valid(
     assert result
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
-
     input_manager.pool = {}
 
 
 def test_populate_pool_invalid(
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
@@ -2715,7 +2715,6 @@ def test_get_variable_modifiability(
     variable_properties: Dict[str, Any],
     expected_modifiability: Modifiability,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(
@@ -2739,7 +2738,6 @@ def test_get_variable_modifiability_unknown_modifiability(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         mock_input_manager._get_variable_modifiability(
@@ -2762,7 +2760,6 @@ def test_log_missing_data_initialization_input_not_required(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2789,7 +2786,6 @@ def test_log_missing_data_initialization_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2817,7 +2813,6 @@ def test_log_missing_data_runtime_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2848,7 +2843,6 @@ def test_set_nested_value(
     value: Any,
     expected_result: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     actual_result = mock_input_manager._set_nested_value(
@@ -3523,7 +3517,7 @@ def test_add_default_values_to_array_inputs(
 
 
 def test_dump_get_data_logs(
-    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable]
+    mock_input_manager: InputManager,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -4022,6 +4016,304 @@ def test_validate_input_by_type_value_error() -> None:
         input_manager._validate_input_by_type(
             variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter
         )
+
+
+@pytest.mark.parametrize(
+    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors",
+    [
+        ({"properties": {"a": {"type": "number_"}}}, 2, 1, ["a"], False, []),
+        ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, []),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "bool_"}}}}},
+            2,
+            3,
+            ["a", "b", "c"],
+            True,
+            ["Max metadata depth exceeded."],
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, []),
+        (
+            {"properties": {"a": {"b": {"type": "invalid_type"}}}},
+            3,
+            2,
+            ["a", "b"],
+            False,
+            ["Unrecognized metadata type."],
+        ),
+    ],
+)
+def test_validate_properties(
+    mocker: MockerFixture,
+    metadata: Dict[str, Any],
+    limit: int,
+    expected_depth: int,
+    expected_path: List[str],
+    should_raise: bool,
+    expected_errors: List[str],
+) -> None:
+    """Tests _validate_properties() function in InputManager."""
+    input_manager = InputManager()
+    input_manager.meta_data = metadata
+    input_manager.metadata_depth_limit = limit
+
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    if should_raise:
+        with pytest.raises(ValueError) as exc_info:
+            input_manager._validate_properties()
+        assert str(exc_info.value) == f"Metadata depth exceeds maximum allowed depth of {limit} at path {expected_path}"
+        assert mock_add_error.call_count == len(expected_errors)
+        for error_msg in expected_errors:
+            mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
+        mock_add_log.assert_not_called()
+    else:
+        input_manager._validate_properties()
+        mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
+        assert mock_add_log.call_args_list == [
+            call(
+                "Metadata properties depth",
+                f"Max depth of metadata properties is {expected_depth}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+            call(
+                "Metadata properties path",
+                f"Deepest path of metadata properties is {expected_path}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+        ]
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_number", "minimum": 3, "maximum": 7},
+            "Invalid metadata default number value.",
+            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": "not_a_number", "maximum": 7},
+            "Invalid metadata default minimum.",
+            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": 3, "maximum": "not_a_number"},
+            "Invalid metadata default maximum.",
+            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 2, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 8, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum": 5, "maximum": 3},
+            "Invalid metadata array length range.",
+            "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
+            True,
+        ),
+        (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
+    ],
+)
+def test_metadata_number_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests metadata_number_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_number_validator"}
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": 123, "pattern": None},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': Expected a string but got <class 'int'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": r"^[0-9]+$"},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
+            True,
+        ),
+        (["some_key"], {"default": "12345", "pattern": r"^[0-9]+$"}, "", "", False),
+        (["some_key"], {"default": "", "pattern": r"^[0-9]+$"}, "", "", False),
+    ],
+)
+def test_metadata_string_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_string_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_string_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_string_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_string_validator(key_path, value)
+        mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_bool"},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 1},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'int'>",
+            True,
+        ),
+        (["some_key"], {"default": True}, "", "", False),
+        (["some_key"], {"default": None}, "", "", False),
+    ],
+)
+def test_metadata_bool_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_bool_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_bool_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_bool_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_bool_validator(key_path, value)
+        mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_list"},
+            "Invalid metadata default array value.",
+            "Invalid 'default' for '['some_key']': Expected a list but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3], "minimum_length": "not_a_number"},
+            "Invalid metadata default array minimum length.",
+            "Invalid 'minimum_length' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3], "maximum_length": "not_a_number"},
+            "Invalid metadata default array maximum length.",
+            "Invalid 'maximum_length' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2], "minimum_length": 3},
+            "Invalid metadata default array length.",
+            "Invalid 'default' for '['some_key']': 'default' length of [1, 2] is less than 'minimum_length' length 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3, 4], "maximum_length": 3},
+            "Invalid metadata default array length.",
+            "Invalid 'default' for '['some_key']': 'default' length of [1, 2, 3, 4] is greater than 'maximum' length 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum_length": 5, "maximum_length": 3},
+            "Invalid metadata array length range.",
+            "Invalid length 'range' for key '['some_key']': 'minimum_length'"
+            " value 5 is greater than 'maximum_length' value 3",
+            True,
+        ),
+        (["some_key"], {"default": [1, 2, 3], "minimum_length": 1, "maximum_length": 5}, "", "", False),
+        (["some_key"], {"default": None, "minimum_length": 1, "maximum_length": 5}, "", "", False),
+    ],
+)
+def test_metadata_array_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_array_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_array_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_array_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_array_validator(key_path, value)
+        mock_add_error.assert_not_called
 
 
 def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
