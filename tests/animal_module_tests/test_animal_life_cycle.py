@@ -289,22 +289,16 @@ def test_evaluate_calves_for_weaning(mocker: MockerFixture, life_cycle_manager: 
 
 
 @pytest.mark.parametrize(
-    "heifer_repro_method, dummy_repro_sub_protocol, tai_method_h_value, synch_ed_method_h_value",
+    "heifer_repro_method",
     [
-        # TAI case
-        ("TAI", "dummy_tai", "dummy_tai", ""),
-        # SynchED case
-        ("SynchED", "dummy_synch_ed", "", "dummy_synch_ed"),
-        # Other case
-        ("Other", "", "", ""),
+        "TAI",
+        "SynchED",
+        "Other",
     ],
 )
 def test_convert_heiferI_to_heiferII(
     mocker: MockerFixture,
     heifer_repro_method: str,
-    dummy_repro_sub_protocol: str,
-    tai_method_h_value: str,
-    synch_ed_method_h_value: str,
 ) -> None:
     """
     Unit test for _convert_heiferI_to_heiferII() static method in file life_cycle.py
@@ -330,10 +324,6 @@ def test_convert_heiferI_to_heiferII(
         "RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_protocol",
         return_value=heifer_repro_method,
     )
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_sub_protocol",
-        return_value=dummy_repro_sub_protocol,
-    )
 
     # Act
     LifeCycleManager._convert_heiferI_to_heiferII(mock_heiferI, heiferIIs)
@@ -346,16 +336,10 @@ def test_convert_heiferI_to_heiferII(
         }
     )
     repro_program_update_call = mocker.call(repro_program=heifer_repro_method)
-    repro_sub_protocol_update_call = mocker.call(repro_sub_protocol=dummy_repro_sub_protocol)
-    tai_method_update_call = mocker.call(tai_method_h=tai_method_h_value)
-    synch_ed_method_update_call = mocker.call(synch_ed_method_h=synch_ed_method_h_value)
 
     expected_mock_calls = [
         basic_update_call,
         repro_program_update_call,
-        repro_sub_protocol_update_call,
-        tai_method_update_call,
-        synch_ed_method_update_call,
     ]
 
     assert mock_heiferI_vals.update.mock_calls == expected_mock_calls
@@ -607,16 +591,8 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Cow", return_value=mock_new_cow)
 
     cow_repro_method = "TAI"
-    cow_presynch_program = "Double OvSynch"
-    cow_ovsynch_program = "OvSynch 56"
-    cow_resynch_program = "TAIafterPD"
     animal_base_config = {
         "cow_repro_method": cow_repro_method,
-        "cows": {
-            "presynch_program": cow_presynch_program,
-            "ovsynch_program": cow_ovsynch_program,
-            "resynch_program": cow_resynch_program,
-        },
     }
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config",
@@ -637,9 +613,6 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
             }
         ),
         mocker.call(repro_program=cow_repro_method),
-        mocker.call(presynch_method=cow_presynch_program),
-        mocker.call(tai_method_c=cow_ovsynch_program),
-        mocker.call(resynch_method=cow_resynch_program),
     ]
 
     assert len(cows) == 1
