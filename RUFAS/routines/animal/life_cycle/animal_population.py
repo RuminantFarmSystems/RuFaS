@@ -53,7 +53,6 @@ class AnimalPopulation:
         if ids:
             self.current_animal_id = max(ids)
 
-    # TODO: Need to return a str
     def __repr__(self):
         """Dictionary representation of the AnimalPopulation object"""
         return {

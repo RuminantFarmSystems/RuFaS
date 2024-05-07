@@ -171,29 +171,6 @@ class Cow(HeiferIII):
             "calving_interval": self.CI,
         }
 
-    def get_replacement_values(self) -> Dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "birth_date": self.birth_date,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "events": str(self.events),
-            "repro_program": self.repro_program,
-            "mature_body_weight": self.mature_body_weight,
-            "estrus_count": self.estrus_count,
-            "estrus_day": self.estrus_day,
-            "conception_rate": self.conception_rate,
-            "ai_day": self.ai_day,
-            "abortion_day": self.abortion_day,
-            "days_in_preg": self.days_in_preg,
-            "gestation_length": self.gestation_length,
-            "p_gest_for_calf": self.p_gest_for_calf,
-            "calf_birth_weight": self.calf_birth_weight,
-        }
-
     @property
     def is_lactating(self) -> bool:
         """

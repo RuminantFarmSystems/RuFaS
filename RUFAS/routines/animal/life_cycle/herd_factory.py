@@ -368,20 +368,18 @@ class HerdFactory:
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
+            if self.save_animals:
+                timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
+                save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
+                om.dict_to_file_json(
+                    self.pre_animal_population.__repr__(),
+                    save_path,
+                    minify_output_file=True,
+                )
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-
-        # Only save to file on successful sampling
-        if self.init_herd and self.save_animals:
-            timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
-            save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
-            om.dict_to_file_json(
-                self.post_animal_population.__repr__(),
-                save_path,
-                minify_output_file=True,
-            )
 
         im.add_dict_variable_to_pool(
             variable_name="runtime_animal_population",
