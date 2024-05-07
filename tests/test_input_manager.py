@@ -261,6 +261,7 @@ def test_start_data_processing(
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
+    patch_for_validate_metadata = mocker.patch.object(mock_input_manager, "_validate_metadata")
     patch_for_validate_properties = mocker.patch.object(mock_input_manager, "_validate_properties")
 
     eager_termination = True
@@ -271,6 +272,7 @@ def test_start_data_processing(
     patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
+    patch_for_validate_metadata.assert_called_once()
     patch_for_validate_properties.assert_called_once()
 
 
