@@ -4,4 +4,4 @@ Scientific Documentation
 .. toctree::
    :maxdepth: 1
 
-   feed_storage
+   feed_storage.rst
