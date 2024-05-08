@@ -140,23 +140,6 @@ def test_process_degradations(
     assert mock_first_crop.last_time_degraded == mock_second_crop.last_time_degraded == mock_time
 
 
-def test_give_feed(storage: Storage) -> None:
-    """
-    Test the give_feed method of the Storage class.
-    """
-    pass
-
-
-def test_reset_mass_attributes_after_loss() -> None:
-    """Test reset_mass_attributes_after_loss method of Storage class."""
-    pass
-
-
-def test_record_stored_crops() -> None:
-    """Test record_stored_crops method of Storage class."""
-    pass
-
-
 @pytest.mark.parametrize(
     "dry_matter,percentage,category,temps,expected",
     [
