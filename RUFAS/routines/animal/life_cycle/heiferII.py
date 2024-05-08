@@ -110,13 +110,9 @@ class HeiferII(HeiferI):
         self.ai_day = 0
         self.estrus_day = 0
         self.conception_rate = 0.0
-        self.tai_program_start_day = 0
-        self.synch_ed_program_start_day = 0
         self.p_gest_for_calf = 0
         self._hormone_schedule = None
         self._TAI_conception_rate = 0.0
-
-        self.repro_sub_protocol = args["repro_sub_protocol"]
 
     def get_bw_change(self):
         """
@@ -161,16 +157,6 @@ class HeiferII(HeiferI):
         self.estrus_count = 0
         self.estrus_day = 0
 
-        # TAI variables
-        self.tai_method_h = args["tai_method_h"]
-        self.tai_program_start_day_h = 0
-
-        # synch_ED variables
-        self.synch_ed_method_h = args["synch_ed_method_h"]
-        self.synch_ed_program_start_day_h = 0
-        self.synch_ed_estrus_day = 0
-        self.synch_ed_stop_day = 0
-
         self.conception_rate = 0
         self.ai_day = 0
         self.abortion_day = 0
@@ -192,16 +178,6 @@ class HeiferII(HeiferI):
         # Estrus variables
         self.estrus_count = args["estrus_count"]
         self.estrus_day = args["estrus_day"]
-
-        # TAI variables
-        self.tai_method_h = args["repro_sub_protocol"]
-        self.tai_program_start_day_h = args["tai_program_start_day_h"]
-
-        # synch_ED variables
-        self.synch_ed_method_h = args["repro_sub_protocol"]
-        self.synch_ed_program_start_day_h = args["synch_ed_program_start_day_h"]
-        self.synch_ed_estrus_day = args["synch_ed_estrus_day"]
-        self.synch_ed_stop_day = args["synch_ed_stop_day"]
 
         self.conception_rate = args["conception_rate"]
         self.ai_day = args["ai_day"]
@@ -225,16 +201,9 @@ class HeiferII(HeiferI):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
-            "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
-            "tai_program_start_day_h": self.tai_program_start_day,
-            "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.conception_rate,
             "ai_day": self.ai_day,
             "abortion_day": self.abortion_day,

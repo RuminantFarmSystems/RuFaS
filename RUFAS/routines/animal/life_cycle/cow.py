@@ -53,24 +53,8 @@ class Cow(HeiferIII):
             args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
-            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
-                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
-            args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
-            args.synch_ed_method_h: synch ed protocols used for
-                reproduction programs, two of them: 2P and CP
             args.repro_program: reproduction program used in cow,
                     three of them: ED, TAI, and ED-TAI programs
-            args.presynch_method: presynch protocols used for presynch
-                programs, four of them: Presynch, Double OvSynch, G6G,
-                and user_defined
-            args.tai_method_c: timed-AI protocols used for reproduction
-                programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
-                5d CoSynch, and user-defined
-            args.resynch_method: resynch protocols used for resynch
-                programs, three of them: TAIafterPD, TAIbeforePD,
-                and PGFatPD
             (optional: include the following to assign cow information)
             args.birth_weight: the birth weight of the animal
             args.body_weight: current body weight of the animal
@@ -79,10 +63,6 @@ class Cow(HeiferIII):
             args.events: events of the animal
             args.estrus_count : number of estrus during ED program
             args.estrus_day: the age when the heifer is estrus in ED program
-            args.tai_program_start_day_h: start day for heifers in TAI program
-            args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
-            args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
-            args.synch_ed_stop_day: the age the the synch protocol stop for this round
             args.conception_rate: conception rate associated with repro programs and protocols
             args.ai_day: the age of animal for scheduled AI
             args.abortion_day: the age of the animal when abortion happens
@@ -136,13 +116,6 @@ class Cow(HeiferIII):
         self.first_ai = False
         self.fat_percent = 0.0
 
-        # TAI params
-        self.presynch_method = args["presynch_method"]
-        self.tai_method_c = args["tai_method_c"]
-        self.presynch_program_start_day = 0
-        self.tai_program_start_day_c = 0
-        self.resynch_method = args["resynch_method"]
-
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
         if self.is_pregnant:
@@ -183,16 +156,9 @@ class Cow(HeiferIII):
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.repro_program,
-            "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
-            "tai_program_start_day_h": self.tai_program_start_day_h,
-            "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.conception_rate,
             "ai_day": self.ai_day,
             "abortion_day": self.abortion_day,
@@ -200,45 +166,9 @@ class Cow(HeiferIII):
             "gestation_length": self.gestation_length,
             "p_gest_for_calf": self.p_gest_for_calf,
             "calf_birth_weight": self.calf_birth_weight,
-            "presynch_method": self.presynch_method,
-            "tai_method_c": self.tai_method_c,
-            "resynch_method": self.resynch_method,
             "days_in_milk": self.days_in_milk,
             "parity": self.calves,
             "calving_interval": self.CI,
-        }
-
-    def get_replacement_values(self) -> Dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "birth_date": self.birth_date,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "events": str(self.events),
-            "repro_program": self.repro_program,
-            "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
-            "mature_body_weight": self.mature_body_weight,
-            "estrus_count": self.estrus_count,
-            "estrus_day": self.estrus_day,
-            "tai_program_start_day_h": self.tai_program_start_day_h,
-            "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            "synch_ed_stop_day": self.synch_ed_stop_day,
-            "conception_rate": self.conception_rate,
-            "ai_day": self.ai_day,
-            "abortion_day": self.abortion_day,
-            "days_in_preg": self.days_in_preg,
-            "gestation_length": self.gestation_length,
-            "p_gest_for_calf": self.p_gest_for_calf,
-            "calf_birth_weight": self.calf_birth_weight,
-            "presynch_method": self.presynch_method,
-            "tai_method_c": self.tai_method_c,
-            "resynch_method": self.resynch_method,
         }
 
     @property

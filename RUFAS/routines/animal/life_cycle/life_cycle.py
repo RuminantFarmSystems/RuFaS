@@ -19,15 +19,11 @@ from RUFAS.routines.animal.animal_typed_dicts import (
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -165,7 +161,7 @@ class LifeCycleManager:
             "greater_than_3": 0.0,
         }
 
-        self.replacement_market: List[Cow] = []
+        self.replacement_market: List[HeiferIII] = []
         self.animal_population: Optional[AnimalPopulation] = None
 
     def initialize_herd(
@@ -191,7 +187,7 @@ class LifeCycleManager:
             heiferIIs=list(map(HeiferII, animal_population["heiferIIs"])),
             heiferIIIs=list(map(HeiferIII, animal_population["heiferIIIs"])),
             cows=list(map(Cow, animal_population["cows"])),
-            replacement=list(map(Cow, animal_population["replacement"])),
+            replacement=list(map(HeiferIII, animal_population["replacement"])),
         )
         self.herd_num = herd_data["herd_num"]
         self._set_avg_CI()
@@ -201,7 +197,7 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
-        self.replacement_market = self.animal_population.get_replacement_cows()
+        self.replacement_market = self.animal_population.get_replacement_heiferIIIs()
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
@@ -523,16 +519,6 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
-        heiferI_vals.update(repro_sub_protocol=HeiferII.get_user_defined_repro_sub_protocol())
-        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
-            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-            heiferI_vals.update(synch_ed_method_h="")
-        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
-        else:
-            heiferI_vals.update(tai_method_h="")
-            heiferI_vals.update(synch_ed_method_h="")
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 
@@ -715,9 +701,6 @@ class LifeCycleManager:
             }
         )
         args.update(repro_program=AnimalBase.config["cow_repro_method"])
-        args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
-        args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
-        args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
         new_cow = Cow(args)
         if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
@@ -765,9 +748,10 @@ class LifeCycleManager:
         sim_day: int,
         heiferIIIs: List[HeiferIII],
         cows: List[Cow],
-        animals_added: List[Cow],
+        animals_added: List[HeiferIII],
     ) -> None:
-        """Checks if replacement heifers are needed.
+        """
+        Checks if replacement heiferIIIs are needed.
 
         If the number of heifers is less than what is needed for the herd,
         add replacement heifers.
@@ -778,10 +762,29 @@ class LifeCycleManager:
             cows: The list of cows.
             animals_added: The list of animals added to the herd.
 
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+        heiferIIIs : List[HeiferIII]
+            The list of existing heiferIIIs.
+        cows : List[Cow]
+            The list of existing cows.
+        animals_added : List[HeiferIII]
+            The list of animals added to the herd.
         """
+
         buy_threshold = 1.01
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * buy_threshold and sim_day > 1:
             if len(self.replacement_market) == 0:
+                om.add_warning(
+                    "no_replacement_heiferIIIs_available",
+                    "No replacement heiferIIIs available for purchase.",
+                    {
+                        "class": self.__class__.__name__,
+                        "function": self._check_if_replacement_heifers_needed.__name__,
+                    },
+                )
                 break
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
