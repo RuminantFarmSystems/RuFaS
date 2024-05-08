@@ -252,10 +252,7 @@ class OutputManager(object):
                 f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)})."
             )
 
-        try:
-            return str(units)
-        except ValueError:
-            raise ValueError(f"'{units}' is not a valid MeasurementUnits value.")
+        return str(units)
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
