@@ -5,7 +5,7 @@ from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
+from typing import Any, Dict, List, Set, Union, Callable, Tuple, Sequence
 
 import pandas as pd
 
@@ -67,6 +67,19 @@ class Modifiability(Enum):
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
+
+    Attributes
+    ----------
+    __metadata : Dict[str, Any]
+        The guidelines used to validate the input data.
+    __pool : Dict[str, Any]
+        The input data pool.
+    __get_data_logs_pool : Dict[str, str]
+        The logs for each instance of data being fetched from Input Manager.
+    __valid_input_types : Set[str]
+        The currently valid input types we expect in the top-level metadata.
+    elements_counter : ElementsCounter()
+        An instance of the class to keep track of the number of elements in each state during validation.
     """
 
     __instance = None
@@ -82,6 +95,7 @@ class InputManager:
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
+            self.__valid_input_types: Set[str] = {"json", "csv"}
             self.elements_counter = ElementsCounter()
 
     @property
@@ -122,6 +136,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
+        self._validate_metadata()
         self._load_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
@@ -2085,6 +2100,42 @@ class InputManager:
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def _validate_metadata(self) -> None:
+        """Checks that top-level metadata has valid and required keys and values."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_metadata.__name__,
+        }
+        metadata_files = self.__metadata["files"]
+        required_keys = {"path", "type", "properties"}
+        optional_keys = {"title", "description"}
+        valid_keys = required_keys | optional_keys
+        for key, data in metadata_files.items():
+            if missing_keys := (required_keys - data.keys()):
+                om.add_error("Metadata Validation", f"Missing required keys '{missing_keys}' in '{key}'", info_map)
+                raise ValueError
+            if invalid_keys := (data.keys() - valid_keys):
+                om.add_error("Metadata Validation", f"Invalid keys '{invalid_keys}' in '{key}'", info_map)
+                raise ValueError
+
+            if data["type"] not in self.__valid_input_types:
+                om.add_error(
+                    "Metadata Validation",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected {self.__valid_input_types}",
+                    info_map,
+                )
+                raise ValueError
+
+            if not os.path.isfile(data["path"]):
+                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                raise ValueError
+
+            if data["properties"] is None or data["properties"] == "":
+                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
+                raise ValueError
+
+        om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
