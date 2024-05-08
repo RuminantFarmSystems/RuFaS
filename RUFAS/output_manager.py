@@ -270,14 +270,6 @@ class OutputManager(object):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
 
-        if self.add_var_call % 100 == 0:
-            # print(self.add_var_call)
-            pass
-        if self.manage_pool_size:
-            self.available_memory = psutil.virtual_memory().available
-            if self.available_memory < self.min_memory_threshold:
-                self._save_current_variable_pool()
-
     def _save_current_variable_pool(self) -> None:
         """
         Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
@@ -293,18 +285,10 @@ class OutputManager(object):
         self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
         self.add_log(
             "save_current_variable_pool",
-            "Saved the current variable pool due to pool size exceeding limit.\n"
-            f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
-            f"{self.min_memory_threshold} bytes.\n"
+            "Saved the current variable pool.\n"
+            f"Current free memory of {self.available_memory} bytes."
             f"The pool is saved to {saved_pool_file_path}",
             info_map,
-        )
-        print(
-            "save_current_variable_pool",
-            "Saved the current variable pool due to pool size exceeding limit.\n"
-            f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
-            f"{self.min_memory_threshold} bytes.\n"
-            f"The pool is saved to {saved_pool_file_path}",
         )
         self.variables_pool = {}
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
@@ -1072,7 +1056,25 @@ class OutputManager(object):
         return results
 
     def _filter_saved_pools(self, filter_content: Dict[str, Any]) -> Dict[str, OutputManager.pool_element_type]:
-        """ """
+        """
+        Filters saved pools of data by applying specific filter criteria.
+
+        This method iterates over JSON files in the saved pool directory, loading each and applying a filtering function
+        defined by `filter_content`. The results are aggregated into a single dictionary, combining entries under the same key
+        by extending lists of information maps and values.
+
+        Parameters
+        ----------
+        filter_content : (Dict[str, Any])
+            A dictionary specifying the criteria used to filter the variables pools.
+
+        Returns
+        -------
+        - Dict[str, OutputManager.pool_element_type]: A dictionary containing the filtered pool elements. Each key corresponds
+          to a unique identifier of a pool element, and the value is an instance of `OutputManager.pool_element_type` which
+          includes aggregated 'info_maps' and 'values' from various files if multiple entries exist.
+
+        """
         list_of_dumped_files: List[Path] = [
             file for file in self.saved_pool_path.iterdir() if file.is_file() and file.name.endswith(".json")
         ]
