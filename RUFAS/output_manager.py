@@ -265,7 +265,7 @@ class OutputManager(object):
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
-        
+
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
