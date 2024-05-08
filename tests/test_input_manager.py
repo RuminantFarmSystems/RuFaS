@@ -3730,8 +3730,13 @@ def test_object_type_validator(
 
     # Act
     result = input_manager._object_type_validator(
-        variable_path, variable_properties, input_data, eager_termination, properties_blob_key, mock_elements_counter,
-        True
+        variable_path,
+        variable_properties,
+        input_data,
+        eager_termination,
+        properties_blob_key,
+        mock_elements_counter,
+        True,
     )
 
     # Assert
@@ -3904,8 +3909,13 @@ def test_array_type_validator(
 
     # Act
     result = input_manager._array_type_validator(
-        variable_path, variable_properties, input_data, eager_termination, properties_blob_key, mock_elements_counter,
-        True
+        variable_path,
+        variable_properties,
+        input_data,
+        eager_termination,
+        properties_blob_key,
+        mock_elements_counter,
+        True,
     )
 
     # Assert
@@ -3974,8 +3984,7 @@ def test_validate_input_by_type(
 
     # Act
     result = input_manager._validate_input_by_type(
-        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter,
-        True
+        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter, True
     )
 
     # Assert
@@ -4009,8 +4018,13 @@ def test_validate_input_by_type_key_error() -> None:
     # Act and Assert
     with pytest.raises(KeyError):
         input_manager._validate_input_by_type(
-            variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter,
-            True
+            variable_properties,
+            variable_path,
+            input_data,
+            eager_termination,
+            properties_blob_key,
+            elements_counter,
+            True,
         )
 
 
@@ -4026,8 +4040,13 @@ def test_validate_input_by_type_value_error() -> None:
     # Act and Assert
     with pytest.raises(ValueError):
         input_manager._validate_input_by_type(
-            variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter,
-            True
+            variable_properties,
+            variable_path,
+            input_data,
+            eager_termination,
+            properties_blob_key,
+            elements_counter,
+            True,
         )
 
 
