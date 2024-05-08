@@ -39,8 +39,16 @@ class Time:
         return int(self.current_date.strftime('%j'))
 
     @property
+    def current_month(self) -> int:
+        return self.current_date.month
+
+    @property
     def current_simulation_year(self) -> int:
         return self.current_date.year - self.start_date.year + 1
+
+    @property
+    def current_calendar_year(self) -> int:
+        return self.current_date.year
 
     def end_year(self) -> bool:
         """
