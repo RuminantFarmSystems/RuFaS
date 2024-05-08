@@ -7,7 +7,6 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-import psutil
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
@@ -136,12 +135,8 @@ class OutputManager(object):
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
 
             self.manage_pool_size: bool = False
-            self.available_memory: int = 0
-            self.min_memory_threshold: int | None = None
             self.saved_pool_num: int = 0
             self.saved_pool_path: Path | None = None
-
-            self.add_var_call = 0
 
             self.add_log(
                 "init_log",
@@ -153,46 +148,6 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
-
-    def setup_pool_overflow_control(
-        self, max_memory_use_percentage: int, min_free_memory_threshold: int, output_dir: Path
-    ) -> None:
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.setup_pool_overflow_control.__name__,
-        }
-        self.manage_pool_size = True
-
-        self.available_memory = psutil.virtual_memory().available
-        available_memory_gb = self.available_memory / (1024**3)
-
-        self.min_memory_threshold = max(
-            min_free_memory_threshold,
-            (
-                ((100 - max_memory_use_percentage) / 100 * self.available_memory)
-                if max_memory_use_percentage > 0
-                else min_free_memory_threshold
-            ),
-        )
-
-        self.saved_pool_num = 0
-        self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
-        self.create_directory(self.saved_pool_path)
-        self.add_log(
-            "Pool Overflow Control Setup",
-            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
-            f"Current system available memory: {available_memory_gb:.2f} GB = "
-            f"{self.available_memory} Bytes.\n"
-            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
-            info_map,
-        )
-        print(
-            "Pool Overflow Control Setup",
-            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
-            f"Current system available memory: {available_memory_gb:.2f} GB = "
-            f"{self.available_memory} Bytes.\n"
-            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
-        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -257,7 +212,6 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        self.add_var_call += 1
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
@@ -285,9 +239,7 @@ class OutputManager(object):
         self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
         self.add_log(
             "save_current_variable_pool",
-            "Saved the current variable pool.\n"
-            f"Current free memory of {self.available_memory} bytes."
-            f"The pool is saved to {saved_pool_file_path}",
+            f"Saved the current variable pool to {saved_pool_file_path}",
             info_map,
         )
         self.variables_pool = {}
@@ -1645,10 +1597,7 @@ class OutputManager(object):
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
-        task_id: str,
-        pool_overflow_control: bool = False,
-        max_memory_use_percentage: int | None = None,
-        min_free_memory_threshold: int | None = None,
+        task_id: str
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1659,9 +1608,3 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
-        if pool_overflow_control:
-            self.setup_pool_overflow_control(
-                max_memory_use_percentage=max_memory_use_percentage,
-                min_free_memory_threshold=min_free_memory_threshold,
-                output_dir=output_directory,
-            )
