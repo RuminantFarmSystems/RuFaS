@@ -133,6 +133,11 @@ class OutputManager(object):
                 "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
+
+            self.manage_pool_size: bool = False
+            self.saved_pool_num: int = 0
+            self.saved_pool_path: Path | None = None
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -218,6 +223,28 @@ class OutputManager(object):
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+    def _save_current_variable_pool(self) -> None:
+        """
+        Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._save_current_variable_pool.__name__,
+        }
+
+        self.create_directory(self.saved_pool_path)
+        saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_num}", "json")
+        saved_pool_file_path = Path.joinpath(self.saved_pool_path, saved_pool_file_name)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
+        self.add_log(
+            "save_current_variable_pool",
+            f"Saved the current variable pool to {saved_pool_file_path}",
+            info_map,
+        )
+        self.variables_pool = {}
+        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self.saved_pool_num += 1
 
     def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
@@ -919,6 +946,7 @@ class OutputManager(object):
         Dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
         """
+        print(self.add_var_call)
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
@@ -979,6 +1007,44 @@ class OutputManager(object):
             counter += 1
         return results
 
+    def _filter_saved_pools(self, filter_content: Dict[str, Any]) -> Dict[str, OutputManager.pool_element_type]:
+        """
+        Filters saved pools of data by applying specific filter criteria.
+
+        This method iterates over JSON files in the saved pool directory and sort them according to their name to
+        preserve order. It then loads each file and applies the filter by calling the `filter_variables_pool()` method.
+        The results are aggregated into a single dictionary, combining entries under the same key by extending lists of
+        info_maps and values.
+
+        Parameters
+        ----------
+        filter_content : (Dict[str, Any])
+            A dictionary specifying the criteria used to filter the variables pools.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]:
+            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
+            under the saved_pool_path directory.
+        """
+        list_of_dumped_files: List[Path] = [
+            file for file in self.saved_pool_path.iterdir() if file.is_file() and file.name.endswith(".json")
+        ]
+        list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
+
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            temp_filtered_pool = self.filter_variables_pool(filter_content)
+            for key, value in temp_filtered_pool.items():
+                if key in filtered_pool.keys():
+                    filtered_pool[key]["info_maps"].extend(value["info_maps"])
+                    filtered_pool[key]["values"].extend(value["values"])
+                else:
+                    filtered_pool[key] = value
+
+        return filtered_pool
+
     def save_results(
         self,
         save_path: Path,
@@ -1026,6 +1092,8 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
+        if self.manage_pool_size:
+            self._save_current_variable_pool()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -1053,10 +1121,12 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self.filter_variables_pool(filter_content)
-                    # self._variables_usage_counter.update(filtered_pool.keys())
-                if exclude_info_maps:
-                    filtered_pool = self._exclude_info_maps(filtered_pool)
+                    filtered_pool = (
+                        self._filter_saved_pools(filter_content)
+                        if self.manage_pool_size
+                        else self.filter_variables_pool(filter_content)
+                    )
+                    filtered_pool = self._exclude_info_maps(filtered_pool) if exclude_info_maps else filtered_pool
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if filter_content.get("graph_details"):
@@ -1527,7 +1597,7 @@ class OutputManager(object):
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
-        task_id: str,
+        task_id: str
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
