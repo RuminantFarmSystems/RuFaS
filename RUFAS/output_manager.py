@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
+import psutil
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -138,6 +139,13 @@ class OutputManager(object):
             self.saved_pool_num: int = 0
             self.saved_pool_path: Path | None = None
 
+            self.available_memory: int = 0
+            self.average_add_variable_call_addition: int | None = None
+            self.add_variable_call = 0
+            self.save_pool_call_count: int | None = None
+            self.current_pool_size: int = 0
+            self.maximum_pool_size: int = 0
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -148,6 +156,30 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+
+    def setup_pool_overflow_control(
+            self, output_dir: Path, save_pool_call_count: int | None = None
+    ) -> None:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.setup_pool_overflow_control.__name__,
+        }
+        self.manage_pool_size = True
+        self.save_pool_call_count = save_pool_call_count
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / (1024 ** 3)
+
+        self.saved_pool_num = 0
+        self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
+        self.create_directory(self.saved_pool_path)
+        self.add_log(
+            "Pool Overflow Control Setup",
+            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n",
+            info_map,
+        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -212,6 +244,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
+        self.add_variable_call += 1
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
@@ -223,6 +256,16 @@ class OutputManager(object):
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+        if self.manage_pool_size:
+            self.current_pool_size += self.average_add_variable_call_addition
+            if (
+                    self.save_pool_call_count and self.add_variable_call % self.save_pool_call_count == 0
+            ) or (
+                    self.save_pool_call_count is None and self.current_pool_size >= self.maximum_pool_size
+            ):
+                self._save_current_variable_pool()
+
 
     def _save_current_variable_pool(self) -> None:
         """
