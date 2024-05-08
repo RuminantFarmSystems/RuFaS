@@ -660,12 +660,15 @@ def test_validate_units(
     output_manager_original_method_states: Dict[str, Callable],
     units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]] | MeasurementUnits | str,
     expected_result: Dict[str, str] | str | Exception,
+    mocker: MockerFixture,
 ) -> None:
     """Test for function _validate_units in file output_manager.py"""
     if isinstance(expected_result, Exception):
+        patch_for_add_error = mocker.patch.object(mock_output_manager, "add_error")
         with pytest.raises(type(expected_result)) as e:
             mock_output_manager._validate_units(units)
         assert str(expected_result) == str(e.value)
+        patch_for_add_error.assert_called_once()
     else:
         assert mock_output_manager._validate_units(units) == expected_result
 

@@ -248,6 +248,15 @@ class OutputManager(object):
             return {key: self._validate_units(unit) for key, unit in units.items()}
 
         if type(units) is not MeasurementUnits:
+            self.add_error(
+                "invalid_units_type",
+                f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)}).",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_units.__name__,
+                },
+            )
+
             raise TypeError(
                 f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)})."
             )
