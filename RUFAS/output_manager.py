@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import collections
 import json
 import os
 import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO
+from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
 
@@ -100,6 +101,10 @@ class OutputManager(object):
         A Time object used to track the simulation time
     _include_detailed_values : bool
         Set to True to include detailed values in the json output files after the simulation
+    _exclude_info_maps_flag : bool
+        Set to True to exclude info_maps when adding variables to the variables_pool
+    _variables_usage_counter : Counter[str]
+        A Counter object used to keep track of the number of times a variables in the variables_pool is used.
     """
 
     __instance = None
@@ -137,6 +142,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
+            self._variables_usage_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -208,6 +214,10 @@ class OutputManager(object):
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
+
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self._variables_usage_counter[f"{key}.{k}"] = 0
 
     def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
@@ -948,6 +958,7 @@ class OutputManager(object):
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
                 results[combined_key] = {"values": sliced_data}
+                self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -964,6 +975,7 @@ class OutputManager(object):
                         results[combined_key]["values"].extend(filtered_value)
                     else:
                         results[combined_key] = {"values": filtered_value}
+                    self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
@@ -1042,6 +1054,7 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
+                    # self._variables_usage_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1207,6 +1220,24 @@ class OutputManager(object):
         file_path = os.path.join(path, self.generate_file_name("errors", "json"))
         self.dict_to_file_json(self.errors_pool, file_path)
 
+    def report_variables_usage_counts(self, path: Path) -> None:
+        """
+        Reports the usage counts of variables in the variables pool to a CSV file in the given path to a directory.
+
+        Parameters
+        ----------
+        path : Path
+            The path to the directory where the file will be saved.
+        """
+
+        filename = self.generate_file_name("variables_usage_counts", "csv")
+        file_path_csv = os.path.join(path, filename)
+        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
+        usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
+        data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
+        self._dict_to_file_csv(data_dict, file_path_csv)
+
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
         path: Path,
@@ -1307,6 +1338,7 @@ class OutputManager(object):
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
+        self.report_variables_usage_counts(path)
 
     def flush_pools(self) -> None:
         """
