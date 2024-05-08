@@ -29,12 +29,12 @@ class MockDataclass:
     field1: int
     field2: str
 
-    field1_unit: str = "kg"
-    field2_unit: str = "unitless"
+    field1_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    field2_unit: MeasurementUnits = MeasurementUnits.UNITLESS
 
     @property
-    def units_dict(self) -> Dict[str, str]:
-        return {"field1_unit": "kg", "field2_unit": "unitless"}
+    def units_dict(self) -> Dict[str, MeasurementUnits]:
+        return {"field1_unit": MeasurementUnits.KILOGRAMS, "field2_unit": MeasurementUnits.UNITLESS}
 
 
 @pytest.mark.parametrize(

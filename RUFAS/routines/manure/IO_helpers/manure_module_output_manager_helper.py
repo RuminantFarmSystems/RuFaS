@@ -47,4 +47,4 @@ class ManureModuleOutputManagerHelper:
                 attribute = getattr(dataclass_object, field.name)
                 unit = getattr(dataclass_object, field.name + "_unit")
 
-                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": MeasurementUnits(unit)}))
+                cls._om.add_variable(field.name, attribute, dict(info_maps, **{"units": unit}))
