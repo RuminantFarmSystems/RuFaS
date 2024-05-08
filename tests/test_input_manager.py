@@ -256,12 +256,12 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 def test_start_data_processing(
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
+    patch_for_validate_metadata = mocker.patch.object(mock_input_manager, "_validate_metadata")
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
 
     eager_termination = True
@@ -272,6 +272,7 @@ def test_start_data_processing(
     patch_for_load_metadata.assert_called_once_with(mock_metadata_path)
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
+    patch_for_validate_metadata.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4248,6 +4249,40 @@ def test_create_record(
     """Tests _create_record() function in InputManager."""
     result = mock_input_manager._create_record(data_entry, name)
     assert result == expected_record
+
+
+@pytest.mark.parametrize("does_file_exist, metadata, expected_exception", [
+    (True, {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
+     False),
+    (False, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json",
+                                 "properties": "some properties"}}}, True),
+    (True, {"files": {"file1": {"path": "valid/path/to/file1.txt", "type": "invalid_type",
+                                "properties": "some properties"}}}, True),
+    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "properties": "some properties"}}}, True),
+    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties",
+                                "extra_key": "extra_value"}}}, True),
+])
+def test_validate_metadata(
+    mocker: MockerFixture,
+    does_file_exist: bool,
+    metadata: Dict[str, Any],
+    expected_exception: bool,
+) -> None:
+    mocker.patch('os.path.isfile', return_value=does_file_exist)
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    input_manager = InputManager()
+    input_manager.meta_data = metadata
+
+    if expected_exception:
+        with pytest.raises(ValueError):
+            input_manager._validate_metadata()
+        mock_add_log.assert_not_called()
+        mock_add_error.assert_called()
+    else:
+        input_manager._validate_metadata()
+        mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
 
 
 def test_increment_in_elements_counter() -> None:
