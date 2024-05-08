@@ -2199,8 +2199,7 @@ def test_calc_rqmts() -> None:
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
     AnimalBase.config["nutrient_standard"] = "NRC"
-    AnimalBase.config["ration"] = {}
-    AnimalBase.config["ration"]["phosphorus_requirement_buffer"] = 35
+    AnimalBase.config["ration"] = {"phosphorus_requirement_buffer": 35}
     actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     expected = {
         "NEmaint_requirement": 1,
@@ -2209,7 +2208,7 @@ def test_calc_rqmts() -> None:
         "NEl_requirement": 1,
         "MP_requirement": 1,
         "Ca_requirement": 1,
-        "P_requirement": 1 * (1 + (AnimalBase.config["ration"]["phosphorus_requirement_buffer"] / 100)),
+        "P_requirement": 1.35,
         "DMIest_requirement": 1,
     }
     assert actual == expected
