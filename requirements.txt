@@ -1,5 +1,4 @@
 flake8
-deprecated
 matplotlib
 mock
 numpy

@@ -2028,22 +2028,47 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def dump_metadata_properties(self, output_dir: Path) -> None:
+    def save_metadata_properties(self, output_dir: Path) -> None:
         """
-        Dumps metadata properties in CSV format.
+        Saves metadata properties in CSV format.
 
         Parameters
         ----------
         output_dir : Path
             The path to the output directory where the metadata properties CSV will be saved.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file cannot be saved at the specified path.
+        PermissionError
+            If the user does not have permission to save the file at the specified path.
+        OSError
+            For any other unexpected error that occurs while trying to save the CSV.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.save_metadata_properties.__name__,
+        }
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
         path_to_save = os.path.join(
             output_dir,
             om.generate_file_name("InputManager_metadata_properties", extension="csv"),
         )
-        df.to_csv(path_to_save, index=False)
+        om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        try:
+            df.to_csv(path_to_save, index=False)
+            om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
+        except FileNotFoundError as fnfe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
+            raise fnfe
+        except PermissionError as pe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
+            raise pe
+        except OSError as e:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
+            raise e
 
     def _parse_metadata_properties(
         self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
@@ -2101,7 +2126,8 @@ class InputManager:
 
         return records
 
-    def _check_property_type_primitive(self, property: dict) -> bool:
+    def _check_property_type_primitive(self, property: Dict[str, Any]) -> bool:
+        """Checks whether the property's "type" is primitive or an array of primitive types."""
         if property.get("type") in ["bool", "string", "number"]:
             return True
         elif property.get("type") == "array":
