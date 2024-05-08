@@ -430,7 +430,6 @@ def test_populate_pool_valid(
 
 def test_populate_pool_invalid(
     mock_metadata: Dict[str, Dict[str, Any]],
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
@@ -2718,7 +2717,6 @@ def test_get_variable_modifiability(
     variable_properties: Dict[str, Any],
     expected_modifiability: Modifiability,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(
@@ -2742,7 +2740,6 @@ def test_get_variable_modifiability_unknown_modifiability(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         mock_input_manager._get_variable_modifiability(
@@ -2765,7 +2762,6 @@ def test_log_missing_data_initialization_input_not_required(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2792,7 +2788,6 @@ def test_log_missing_data_initialization_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2820,7 +2815,6 @@ def test_log_missing_data_runtime_key_error(
     variable_name: str,
     variable_properties: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -2851,8 +2845,6 @@ def test_set_nested_value(
     value: Any,
     expected_result: Dict[str, Any],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture,
 ) -> None:
     actual_result = mock_input_manager._set_nested_value(
         nested_dict=nested_dict, element_hierarchy=element_hierarchy, value=value
@@ -3526,7 +3518,7 @@ def test_add_default_values_to_array_inputs(
 
 
 def test_dump_get_data_logs(
-    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable]
+    mock_input_manager: InputManager,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
