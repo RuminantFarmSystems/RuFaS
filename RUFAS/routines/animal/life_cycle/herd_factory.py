@@ -1,7 +1,7 @@
 import copy
 import datetime
-from pathlib import Path
 import random
+from pathlib import Path
 from typing import List, Dict, Any, Type
 
 from tqdm import tqdm
@@ -36,6 +36,11 @@ class HerdFactory:
         The initial number of animals in the simulation, retrieved from input data.
     simulation_days : int
         The number of days the simulation will run to generate herd, retrieved from input data.
+    male_calf_rate : float
+        The probability of a calf being male. For efficient herd initialization, this value is recommended to be set
+        at a low value. When this rate is low, newborn calves are more likely to be female and be kept in the herd.
+    heiferIII_conversion_rate_to_replacement : float
+        The probability of a heiferIII being converted to a replacement heiferIII.
     pre_animal_population : AnimalPopulation
         An instance of AnimalPopulation representing the animal population
         before random sampling with replacement.
@@ -71,6 +76,10 @@ class HerdFactory:
         self.CI = im.get_data("animal.animal_config.farm_level.repro.calving_interval")
         self.initial_animal_num = im.get_data("animal.herd_initialization.initial_animal_num")
         self.simulation_days = im.get_data("animal.herd_initialization.simulation_days")
+        self.male_calf_rate = im.get_data("animal.herd_initialization.male_calf_rate_for_herd_init_only")
+        self.heiferIII_conversion_rate_to_replacement = im.get_data(
+            "animal.herd_initialization.heiferIII_conversion_rate_to_replacement"
+        )
 
         self.pre_animal_population = AnimalPopulation(
             calves=[],
@@ -152,9 +161,7 @@ class HerdFactory:
                 cow = Cow(args)
                 self.pre_animal_population.cows.append(cow)
             else:
-                # Random 1% chance of becoming a replacement
-                # Because a replacement is taken out of the cohort, we don't want the probability to be too high
-                if random.random() < 0.01:
+                if random.random() < self.heiferIII_conversion_rate_to_replacement:
                     args = heiferIII.get_heiferIII_values()
                     args.update(id=self.pre_animal_population.next_id())
                     replacement_heiferIII = HeiferIII(args)
@@ -181,6 +188,7 @@ class HerdFactory:
                     days_born=0,
                     p_init=cow.p_gest_for_calf,
                     birth_weight=cow.calf_birth_weight,
+                    male_calf_rate_for_herd_init_only=self.male_calf_rate,
                 )
                 cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
                 cow.p_gest_for_calf = 0
@@ -201,6 +209,7 @@ class HerdFactory:
                 days_born=0,
                 p_init=0,
                 birth_weight=0,
+                male_calf_rate_for_herd_init_only=self.male_calf_rate,
             )
             calf = Calf(args)
             if not (calf.culled or calf.sold):
