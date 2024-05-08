@@ -4253,6 +4253,8 @@ def test_create_record(
     (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "properties": "some properties"}}}, True),
     (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties",
                                 "extra_key": "extra_value"}}}, True),
+    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "",
+                                }}}, True),
 ])
 def test_validate_metadata(
     mocker: MockerFixture,

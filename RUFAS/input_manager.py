@@ -2113,22 +2113,26 @@ class InputManager:
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error("Metadata Validation", f"Missing required keys '{missing_keys}' in {key}", info_map)
+                om.add_error("Metadata Validation", f"Missing required keys '{missing_keys}' in '{key}'", info_map)
                 raise ValueError
             if invalid_keys := (data.keys() - valid_keys):
-                om.add_error("Metadata Validation", f"Invalid keys '{invalid_keys}' in {key}", info_map)
+                om.add_error("Metadata Validation", f"Invalid keys '{invalid_keys}' in '{key}'", info_map)
                 raise ValueError
 
             if data["type"] not in self.__valid_input_types:
                 om.add_error(
                     "Metadata Validation",
-                    f"Invalid type '{data['type']}' in {key}. Expected {self.__valid_input_types}",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected {self.__valid_input_types}",
                     info_map,
                 )
                 raise ValueError
 
             if not os.path.isfile(data["path"]):
-                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in {key}", info_map)
+                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                raise ValueError
+
+            if data["properties"] is None or data["properties"] == "":
+                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
                 raise ValueError
 
         om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
