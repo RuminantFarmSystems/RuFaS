@@ -292,9 +292,6 @@ class TaskManager:
                 args["output_prefix"],
                 RUFAS_VERSION,
                 task_id,
-                pool_overflow_control=args["pool_overflow_control"],
-                max_memory_use_percentage=args["max_memory_use_percentage"],
-                min_free_memory_threshold=args["min_free_memory_threshold"],
             )
             input_manager = InputManager()
             if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
