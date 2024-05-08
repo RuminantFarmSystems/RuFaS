@@ -493,8 +493,8 @@ class RationOptimizer:
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
-        pseudocode. Note the calculated phosphorus requirement 'P_req' is in grams and x is in kg thus
-        the divide by 1000.
+        pseudocode. Note the calculated phosphorus requirement 'P_requirement' is in grams and the formualted ration is
+        reported in kg.
 
         Parameters
         ----------
