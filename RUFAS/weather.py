@@ -139,7 +139,7 @@ class Weather:
         om.add_variable(
             "average_annual_temperature",
             self.__mean_annual_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
@@ -256,39 +256,33 @@ class Weather:
         om.add_variable(
             "precipitation",
             current_weather.precipitation,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
-        om.add_variable(
-            "rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
-        )
-        om.add_variable(
-            "snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
-        )
-        om.add_variable(
-            "daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS.value})
-        )
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS}))
         om.add_variable(
             "maximum_temperature",
             current_weather.max_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "minimum_temperature",
             current_weather.min_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "average_temperature",
             current_weather.mean_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "radiation",
             current_weather.incoming_light,
-            dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER.value}),
+            dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
         om.add_variable(
-            "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+            "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
         )
 
     @staticmethod
