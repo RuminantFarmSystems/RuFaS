@@ -4243,26 +4243,69 @@ def test_create_record(
     assert result == expected_record
 
 
-@pytest.mark.parametrize("does_file_exist, metadata, expected_exception", [
-    (True, {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
-     False),
-    (False, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json",
-                                 "properties": "some properties"}}}, True),
-    (True, {"files": {"file1": {"path": "valid/path/to/file1.txt", "type": "invalid_type",
-                                "properties": "some properties"}}}, True),
-    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "properties": "some properties"}}}, True),
-    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties",
-                                "extra_key": "extra_value"}}}, True),
-    (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "",
-                                }}}, True),
-])
+@pytest.mark.parametrize(
+    "does_file_exist, metadata, expected_exception",
+    [
+        (
+            True,
+            {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
+            False,
+        ),
+        (
+            False,
+            {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "path": "valid/path/to/file1.txt",
+                        "type": "invalid_type",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "properties": "some properties"}}}, True),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "path": "valid/path/to/file1.json",
+                        "type": "json",
+                        "properties": "some properties",
+                        "extra_key": "extra_value",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "path": "valid/path/to/file1.json",
+                        "type": "json",
+                        "properties": "",
+                    }
+                }
+            },
+            True,
+        ),
+    ],
+)
 def test_validate_metadata(
     mocker: MockerFixture,
     does_file_exist: bool,
     metadata: Dict[str, Any],
     expected_exception: bool,
 ) -> None:
-    mocker.patch('os.path.isfile', return_value=does_file_exist)
+    mocker.patch("os.path.isfile", return_value=does_file_exist)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
     input_manager = InputManager()
