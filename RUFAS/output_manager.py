@@ -1169,8 +1169,11 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self._filter_saved_pools(filter_content) if self.manage_pool_size \
+                    filtered_pool = (
+                        self._filter_saved_pools(filter_content)
+                        if self.manage_pool_size
                         else self.filter_variables_pool(filter_content)
+                    )
                     filtered_pool = self._exclude_info_maps(filtered_pool) if exclude_info_maps else filtered_pool
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
