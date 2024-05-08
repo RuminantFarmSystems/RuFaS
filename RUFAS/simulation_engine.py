@@ -89,6 +89,7 @@ class SimulationEngine:
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+        print(total_simulation_time_log)
 
     def _run_simulation_main_loop(self) -> None:
         """

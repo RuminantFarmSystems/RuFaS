@@ -7,6 +7,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+import psutil
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import pandas as pd
@@ -133,6 +134,15 @@ class OutputManager(object):
                 "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
+
+            self.manage_pool_size: bool = False
+            self.available_memory: int = 0
+            self.min_memory_threshold: int | None = None
+            self.saved_pool_num: int = 0
+            self.saved_pool_path: Path | None = None
+
+            self.add_var_call = 0
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -143,6 +153,46 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+
+    def setup_pool_overflow_control(
+        self, max_memory_use_percentage: int, min_free_memory_threshold: int, output_dir: Path
+    ) -> None:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.setup_pool_overflow_control.__name__,
+        }
+        self.manage_pool_size = True
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / (1024**3)
+
+        self.min_memory_threshold = max(
+            min_free_memory_threshold,
+            (
+                ((100 - max_memory_use_percentage) / 100 * self.available_memory)
+                if max_memory_use_percentage > 0
+                else min_free_memory_threshold
+            ),
+        )
+
+        self.saved_pool_num = 0
+        self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
+        self.create_directory(self.saved_pool_path)
+        self.add_log(
+            "Pool Overflow Control Setup",
+            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n"
+            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
+            info_map,
+        )
+        print(
+            "Pool Overflow Control Setup",
+            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n"
+            f"Minimum free memory: {self.min_memory_threshold} Bytes.",
+        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -207,6 +257,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
+        self.add_var_call += 1
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
@@ -214,10 +265,50 @@ class OutputManager(object):
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
-
+        
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+        if self.add_var_call % 100 == 0:
+            # print(self.add_var_call)
+            pass
+        if self.manage_pool_size:
+            self.available_memory = psutil.virtual_memory().available
+            if self.available_memory < self.min_memory_threshold:
+                self._save_current_variable_pool()
+
+    def _save_current_variable_pool(self) -> None:
+        """
+        Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._save_current_variable_pool.__name__,
+        }
+
+        self.create_directory(self.saved_pool_path)
+        saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_num}", "json")
+        saved_pool_file_path = Path.joinpath(self.saved_pool_path, saved_pool_file_name)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
+        self.add_log(
+            "save_current_variable_pool",
+            "Saved the current variable pool due to pool size exceeding limit.\n"
+            f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
+            f"{self.min_memory_threshold} bytes.\n"
+            f"The pool is saved to {saved_pool_file_path}",
+            info_map,
+        )
+        print(
+            "save_current_variable_pool",
+            "Saved the current variable pool due to pool size exceeding limit.\n"
+            f"Current free memory of {self.available_memory} bytes exceeds the minimum free memory threshold of "
+            f"{self.min_memory_threshold} bytes.\n"
+            f"The pool is saved to {saved_pool_file_path}",
+        )
+        self.variables_pool = {}
+        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self.saved_pool_num += 1
 
     def _validate_units(self, units: Dict[str, Any] | str) -> None:
         """
@@ -919,6 +1010,7 @@ class OutputManager(object):
         Dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
         """
+        print(self.add_var_call)
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
         use_filter_name: bool = filter_content.get("use_name", False)
         filter_by_exclusion: bool = filter_content.get("filter_by_exclusion", False)
@@ -979,6 +1071,26 @@ class OutputManager(object):
             counter += 1
         return results
 
+    def _filter_saved_pools(self, filter_content: Dict[str, Any]) -> Dict[str, OutputManager.pool_element_type]:
+        """ """
+        list_of_dumped_files: List[Path] = [
+            file for file in self.saved_pool_path.iterdir() if file.is_file() and file.name.endswith(".json")
+        ]
+        list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
+
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            temp_filtered_pool = self.filter_variables_pool(filter_content)
+            for key, value in temp_filtered_pool.items():
+                if key in filtered_pool.keys():
+                    filtered_pool[key]["info_maps"].extend(value["info_maps"])
+                    filtered_pool[key]["values"].extend(value["values"])
+                else:
+                    filtered_pool[key] = value
+
+        return filtered_pool
+
     def save_results(
         self,
         save_path: Path,
@@ -1026,6 +1138,8 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
+        if self.manage_pool_size:
+            self._save_current_variable_pool()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
@@ -1053,8 +1167,11 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self.filter_variables_pool(filter_content)
-                    # self._variables_usage_counter.update(filtered_pool.keys())
+                    if self.manage_pool_size:
+                        filtered_pool = self._filter_saved_pools(filter_content)
+                    else:
+                        filtered_pool = self.filter_variables_pool(filter_content)
+
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1528,6 +1645,9 @@ class OutputManager(object):
         output_prefix: str,
         version_number: str,
         task_id: str,
+        pool_overflow_control: bool = False,
+        max_memory_use_percentage: int | None = None,
+        min_free_memory_threshold: int | None = None,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1538,3 +1658,9 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+        if pool_overflow_control:
+            self.setup_pool_overflow_control(
+                max_memory_use_percentage=max_memory_use_percentage,
+                min_free_memory_threshold=min_free_memory_threshold,
+                output_dir=output_directory,
+            )
