@@ -3,15 +3,15 @@
   "tasks": [
 {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/c1f2_wcrops_metadata_NPirrigation_fix.json",
-      "output_prefix": "c1f2-SoilWater-fix",
+      "metadata_file_path": "input/metadata/c1f1_wcrops_metadata.json",
+      "output_prefix": "c1f1",
       "log_verbosity": "errors",
       "exclude_info_maps": true
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/c1f2_wcrops_metadata.json",
-      "output_prefix": "c1f2-SoilWater",
+      "metadata_file_path": "input/metadata/c1f3_wcrops_metadata.json",
+      "output_prefix": "c1f3",
       "log_verbosity": "errors",
       "exclude_info_maps": true
     }
