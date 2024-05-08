@@ -291,7 +291,7 @@ class TaskManager:
                 Path(""),
                 args["output_prefix"],
                 RUFAS_VERSION,
-                task_id
+                task_id,
             )
             input_manager = InputManager()
             if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
