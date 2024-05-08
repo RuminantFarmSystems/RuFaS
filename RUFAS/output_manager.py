@@ -1597,7 +1597,7 @@ class OutputManager(object):
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
-        task_id: str
+        task_id: str,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
