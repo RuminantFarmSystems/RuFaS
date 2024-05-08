@@ -1059,9 +1059,10 @@ class OutputManager(object):
         """
         Filters saved pools of data by applying specific filter criteria.
 
-        This method iterates over JSON files in the saved pool directory, loading each and applying a filtering function
-        defined by `filter_content`. The results are aggregated into a single dictionary, combining entries under the same key
-        by extending lists of information maps and values.
+        This method iterates over JSON files in the saved pool directory and sort them according to their name to
+        preserve order. It then loads each file and applies the filter by calling the `filter_variables_pool()` method.
+        The results are aggregated into a single dictionary, combining entries under the same key by extending lists of
+        info_maps and values.
 
         Parameters
         ----------
@@ -1070,10 +1071,9 @@ class OutputManager(object):
 
         Returns
         -------
-        - Dict[str, OutputManager.pool_element_type]: A dictionary containing the filtered pool elements. Each key corresponds
-          to a unique identifier of a pool element, and the value is an instance of `OutputManager.pool_element_type` which
-          includes aggregated 'info_maps' and 'values' from various files if multiple entries exist.
-
+        Dict[str, OutputManager.pool_element_type]:
+            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
+            under the saved_pool_path directory.
         """
         list_of_dumped_files: List[Path] = [
             file for file in self.saved_pool_path.iterdir() if file.is_file() and file.name.endswith(".json")
@@ -1169,13 +1169,9 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    if self.manage_pool_size:
-                        filtered_pool = self._filter_saved_pools(filter_content)
-                    else:
-                        filtered_pool = self.filter_variables_pool(filter_content)
-
-                if exclude_info_maps:
-                    filtered_pool = self._exclude_info_maps(filtered_pool)
+                    filtered_pool = self._filter_saved_pools(filter_content) if self.manage_pool_size \
+                        else self.filter_variables_pool(filter_content)
+                    filtered_pool = self._exclude_info_maps(filtered_pool) if exclude_info_maps else filtered_pool
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if filter_content.get("graph_details"):
