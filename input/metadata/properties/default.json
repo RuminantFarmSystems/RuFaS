@@ -92,6 +92,20 @@
     "herd_initialization": {
       "type": "object",
       "description": "Animal generation related inputs",
+      "male_calf_rate_for_herd_init_only": {
+        "type": "number",
+        "description": "The probability of a new calf being male. This is only used for the initial herd generation and is not used for the rest of the simulation. A low value is recommended because male calves will get sold, whereas a female calf is much less likely to be removed from the herd. Two other variables that have mild effects on the count of female calves are keep_female_calf_rate and still_birth_rate.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.1
+      },
+      "heiferIII_conversion_rate_to_replacement": {
+        "type": "number",
+        "description": "The probability of a HeiferIII being converted to a replacement animal. This rate only applies to HeiferIIIs that have not become cows.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.01
+      },
       "initial_animal_num": {
         "type": "number",
         "description": "The initial number of animals for the simulation starting with to generate the herd",

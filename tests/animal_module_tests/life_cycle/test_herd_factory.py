@@ -74,7 +74,7 @@ def test_init(
     )
     HerdFactory()
 
-    assert mock_input_manager.get_data.call_count == 4
+    assert mock_input_manager.get_data.call_count == 6
     assert mock_animal_population_init.call_count == 2
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
@@ -455,6 +455,7 @@ def test_heiferIIIs_update(
         heiferIII.update.return_value = update_return
     factory.pre_animal_population.cows = []
     factory.pre_animal_population.replacement = []
+    factory.heiferIII_conversion_rate_to_replacement = 0.01
 
     mocker.patch("random.random", return_value=random_value)
     mocker.patch.object(HeiferIII, "get_heiferIII_values", return_value={"some_key": "some_value"})
@@ -512,6 +513,7 @@ def test_heiferIII_update_cow_stage_false(
     mock_pre_animal_population.replacement = []
 
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.heiferIII_conversion_rate_to_replacement = 0.01
 
     mock_herd_factory._heiferIIIs_update(simulation_day=0)
 
@@ -703,6 +705,7 @@ def test_cow_update_culled_false_new_born_true_calf_not_culled_or_sold(
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
     mock_herd_factory.breed = "HO"
     mock_herd_factory.CI = 0
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._cows_update(simulation_day=0)
 
@@ -747,6 +750,7 @@ def test_cow_update_culled_false_new_born_true_calf_culled(
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
     mock_herd_factory.breed = "HO"
     mock_herd_factory.CI = 0
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._cows_update(simulation_day=0)
 
@@ -791,6 +795,7 @@ def test_cow_update_culled_false_new_born_true_calf_sold(
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
     mock_herd_factory.breed = "HO"
     mock_herd_factory.CI = 0
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._cows_update(simulation_day=0)
 
@@ -834,6 +839,7 @@ def test_generate_animals(
     mock_herd_factory.initial_animal_num = initial_animal_num
     mock_herd_factory.simulation_days = simulation_days
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._calves_update = mock.MagicMock()
     mock_herd_factory._heiferIs_update = mock.MagicMock()
@@ -897,6 +903,7 @@ def test_generate_animals_calf_culled(
     mock_herd_factory.initial_animal_num = initial_animal_num
     mock_herd_factory.simulation_days = simulation_days
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._calves_update = mock.MagicMock()
     mock_herd_factory._heiferIs_update = mock.MagicMock()
@@ -960,6 +967,7 @@ def test_generate_animals_calf_sold(
     mock_herd_factory.initial_animal_num = initial_animal_num
     mock_herd_factory.simulation_days = simulation_days
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.male_calf_rate = 0.1
 
     mock_herd_factory._calves_update = mock.MagicMock()
     mock_herd_factory._heiferIs_update = mock.MagicMock()
