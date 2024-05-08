@@ -123,7 +123,6 @@ class Time:
         Returns:
             bool: True if the simulation has ended, false otherwise
         """
-
         # midyear end date adjusted
         if self.year > len(self.years):
             return True
