@@ -54,6 +54,24 @@
           "description": "Choose this flag if you want to save the generated herd data into a JSON file.",
           "default": false
         },
+        "pool_overflow_control": {
+          "type": "bool",
+          "description": "Choose this flag if you want to monitor the free memory during simulation, saving and clearing the OutputManager variable pool once it goes below the user-defined threshold.",
+          "default": false
+        },
+        "max_memory_use_percentage": {
+          "type": "number",
+          "description": "The maximum percent of available memory that can be used for simulation.",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 80
+        },
+        "min_free_memory_threshold": {
+          "type": "number",
+          "description": "The minimum free memory threshold in bytes throughout the simulation.",
+          "minimum": 0,
+          "default": 1073741824
+        },
         "save_animals_directory": {
           "type": "string",
           "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
