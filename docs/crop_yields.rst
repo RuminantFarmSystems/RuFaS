@@ -1,5 +1,5 @@
-Crop Yields
-~~~~~~~~~~~
+**Crop Yields**
+~~~~~~~~~~~~~~~
 
 Crop yields in ``RuFaS`` are calculated by the ``Yields`` class.
 ``Yields`` contains the methods that determine the amount and
