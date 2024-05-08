@@ -1,5 +1,5 @@
 Crop Yields
------------
+~~~~~~~~~~~
 
 Crop yields in ``RuFaS`` are calculated by the ``Yields`` class.
 ``Yields`` contains the methods that determine the amount and
@@ -9,7 +9,7 @@ time of harvest. As such, this function is only called once throughout a
 crop’s growing season. This is typically done at cut/harvest time.
 
 Reference
----------
+^^^^^^^^^
 
 The ``Yields`` class is primarily an implementation of the methods
 described in
@@ -17,7 +17,7 @@ described in
 5:2.4, with some minor modifications.
 
 Details
--------
+^^^^^^^
 
 This class utilizes and updates a number of attribute variables in the
 course of its routines. Details about these attributes and the methods
