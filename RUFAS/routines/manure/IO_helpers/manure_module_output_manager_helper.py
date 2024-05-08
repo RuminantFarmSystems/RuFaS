@@ -4,7 +4,6 @@ from dataclasses import fields, dataclass
 from typing import Dict, Any
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 
 
 class ManureModuleOutputManagerHelper:
