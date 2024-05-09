@@ -3482,7 +3482,7 @@
         "type": "number",
         "minimum": 0.87,
         "maximum": 1.04,
-        "default": 0
+        "default": 0.87
       }
     },
     "TDN": {
@@ -4878,7 +4878,6 @@
     "field_size": {
       "type": "number",
       "description": "Size of the field.",
-      "units": "ha",
       "minimum": 0.0
     },
     "absolute_latitude": {
