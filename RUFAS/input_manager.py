@@ -14,12 +14,17 @@ from RUFAS.util import Utility
 
 om = OutputManager()
 
-ADDRESS_TO_INPUTS = "files"
-
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
 """
 FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
+
+"""
+Set enumerating the input data formats the Input Manager can accept.
+"""
+VALID_INPUT_TYPES: Set[str] = {"json", "csv"}
+
+ADDRESS_TO_INPUTS = "files"
 
 
 class Modifiability(Enum):
@@ -67,19 +72,6 @@ class Modifiability(Enum):
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
-
-    Attributes
-    ----------
-    __metadata : Dict[str, Any]
-        The guidelines used to validate the input data.
-    __pool : Dict[str, Any]
-        The input data pool.
-    __get_data_logs_pool : Dict[str, str]
-        The logs for each instance of data being fetched from Input Manager.
-    __valid_input_types : Set[str]
-        The currently valid input types we expect in the top-level metadata.
-    elements_counter : ElementsCounter()
-        An instance of the class to keep track of the number of elements in each state during validation.
     """
 
     __instance = None
@@ -95,7 +87,6 @@ class InputManager:
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
-            self.__valid_input_types: Set[str] = {"json", "csv"}
             self.elements_counter = ElementsCounter()
 
     @property
@@ -2107,22 +2098,23 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._validate_metadata.__name__,
         }
-        metadata_files = self.__metadata["files"]
+        metadata_files = self.__metadata[ADDRESS_TO_INPUTS]
         required_keys = {"path", "type", "properties"}
         optional_keys = {"title", "description"}
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error("Metadata Validation", f"Missing required keys '{missing_keys}' in '{key}'", info_map)
+                om.add_error("Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'",
+                             info_map)
                 raise ValueError
             if invalid_keys := (data.keys() - valid_keys):
-                om.add_error("Metadata Validation", f"Invalid keys '{invalid_keys}' in '{key}'", info_map)
+                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
                 raise ValueError
 
-            if data["type"] not in self.__valid_input_types:
+            if data["type"] not in VALID_INPUT_TYPES:
                 om.add_error(
                     "Metadata Validation",
-                    f"Invalid type '{data['type']}' in '{key}'. Expected {self.__valid_input_types}",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {VALID_INPUT_TYPES}",
                     info_map,
                 )
                 raise ValueError
