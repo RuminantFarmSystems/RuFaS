@@ -4450,15 +4450,18 @@ def test_metadata_number_validator(
     """Tests metadata_number_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
     info_map = {"class": "InputManager", "function": "_metadata_number_validator"}
     if should_raise:
         with pytest.raises(ValueError):
             input_manager._metadata_number_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_number_validator(key_path, value)
         assert mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4493,6 +4496,7 @@ def test_metadata_string_validator(
     """Tests _metadata_string_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
     info_map = {"class": "InputManager", "function": "_metadata_string_validator"}
 
     if should_raise:
@@ -4500,9 +4504,11 @@ def test_metadata_string_validator(
             input_manager._metadata_string_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_string_validator(key_path, value)
         mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4537,6 +4543,7 @@ def test_metadata_bool_validator(
     """Tests _metadata_bool_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
     info_map = {"class": "InputManager", "function": "_metadata_bool_validator"}
 
     if should_raise:
@@ -4544,9 +4551,11 @@ def test_metadata_bool_validator(
             input_manager._metadata_bool_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_bool_validator(key_path, value)
         mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4610,6 +4619,7 @@ def test_metadata_array_validator(
     """Tests _metadata_array_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
     info_map = {"class": "InputManager", "function": "_metadata_array_validator"}
 
     if should_raise:
@@ -4617,31 +4627,34 @@ def test_metadata_array_validator(
             input_manager._metadata_array_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_array_validator(key_path, value)
         mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "valid_keys, properties, path, should_raise, expected_message",
+    "required_keys, valid_keys, properties, path, should_raise, expected_message",
     [
-        ({"id", "name"}, {"id": 123, "name": "example"}, ["root"], False, ""),
-        ({"id"}, {"id": 123, "name": "example"}, ["root"], True, "Invalid keys '{'name'}' in Unknown type for ['root']."
-         " Valid keys are {'id'}"),
-        (set(), {"name": "example"}, ["root"], True, "Invalid keys '{'name'}' in Unknown type for ['root']. Valid keys"
-         " are set()"),
-        ({"id"}, {"id": 123, "extra": "data"}, ["root", "child"], True, "Invalid keys '{'extra'}' in Unknown"
-         " type for ['root', 'child']. Valid keys are {'id'}"),
+        ({"id", "type"}, {"id", "name", "type"}, {"type": "num", "id": 123, "name": "example"}, ["root"], False, ""),
+        ({"type"}, {"type"}, {"type": "num", "id": 123}, ["root"], True,
+         "Invalid keys ['id'] in num for ['root']. Valid keys are ['type']."),
+        ({"id"}, set(), {"type": "num", "name": "example"}, ["root"], True,
+         "Missing required keys ['id'] for ['root']. Required keys are ['id']."),
+        ({"id", "type"}, {"id", "type"}, {"type": "num", "id": 123, "extra": "data"}, ["root", "child"], True,
+         "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type']."),
+        ({"id", "type"}, {"id", "type"}, {"name": "example"}, ["root"], True,
+         "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type']."),
     ],
 )
-def test_validate_metadata_properties_keys(mocker: MockerFixture, valid_keys: Set[str], properties: Dict[str, Any],
-                                           path: List[str], should_raise: bool, expected_message: str):
+def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys: Set[str], valid_keys: Set[str], properties: Dict[str, Any], path: List[str], should_raise: bool, expected_message: str):
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     if should_raise:
         with pytest.raises(ValueError):
-            input_manager._validate_metadata_properties_keys(valid_keys, properties, path)
+            input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         mock_add_error.assert_called_once_with(
             "Metadata Validation",
             expected_message,
@@ -4651,8 +4664,9 @@ def test_validate_metadata_properties_keys(mocker: MockerFixture, valid_keys: Se
             }
         )
     else:
-        input_manager._validate_metadata_properties_keys(valid_keys, properties, path)
+        input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         mock_add_error.assert_not_called()
+
 
 
 def test_increment_in_elements_counter() -> None:
