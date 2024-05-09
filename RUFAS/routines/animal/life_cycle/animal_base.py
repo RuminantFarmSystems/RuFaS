@@ -106,14 +106,14 @@ class AnimalBase:
         Parameters
         ----------
         p_intake : float
-            The phosphorus intake (grams).
+            The phosphorus intake (kilograms).
         p_conc_ration : float
             The concentration of P in the ration (% DM).
         """
         self.p_intake = p_intake * GeneralConstants.KG_TO_GRAMS
         self.p_conc_ration = p_conc_ration
 
-    def daily_p_update(self):
+    def daily_p_update(self) -> None:
         """
         Calculates this animal's daily phosphorus update.
         """
