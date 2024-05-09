@@ -2198,8 +2198,10 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._metadata_number_validator.__name__,
         }
+        required_number_property_keys = {"type"}
+        valid_number_property_keys = {"type", "description", "minimum", "maximum", "default"}
         self._validate_metadata_properties_keys(
-            {"type", "description", "minimum", "maximum", "default"}, value, key_path
+            required_number_property_keys, valid_number_property_keys, value, key_path
         )
         default = value.get("default")
         minimum = value.get("minimum")
@@ -2255,7 +2257,11 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._metadata_string_validator.__name__,
         }
-        self._validate_metadata_properties_keys({"type", "description", "pattern", "default"}, value, key_path)
+        required_str_property_keys = {"type"}
+        valid_str_property_keys = {"type", "description", "pattern", "default"}
+        self._validate_metadata_properties_keys(
+            required_str_property_keys, valid_str_property_keys, value, key_path
+        )
         default = value.get("default")
         pattern = value.get("pattern")
         if default is not None:
@@ -2282,7 +2288,11 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._metadata_bool_validator.__name__,
         }
-        self._validate_metadata_properties_keys({"type", "description", "default"}, value, key_path)
+        required_bool_property_keys = {"type"}
+        valid_bool_property_keys = {"type", "description", "default"}
+        self._validate_metadata_properties_keys(
+            required_bool_property_keys, valid_bool_property_keys, value, key_path
+        )
         default = value.get("default")
         if default is not None and not isinstance(default, bool):
             om.add_error(
@@ -2298,8 +2308,10 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._metadata_array_validator.__name__,
         }
+        required_array_property_keys = {"type"}
+        valid_array_property_keys = {"type", "properties", "description", "minimum_length", "maximum_length", "default"}
         self._validate_metadata_properties_keys(
-            {"type", "properties", "description", "minimum_length", "maximum_length", "default"}, value, key_path
+            required_array_property_keys, valid_array_property_keys, value, key_path
         )
         default = value.get("default")
         minimum_length = value.get("minimum_length")
@@ -2352,19 +2364,28 @@ class InputManager:
             raise ValueError
 
     def _validate_metadata_properties_keys(
-        self, valid_properties_keys: Set[str], properties: Dict[str, Any], path: List[str]
+        self, required_properties_keys: Set[str], valid_properties_keys: Set[str], properties: Dict[str, Any],
+        path: List[str]
     ):
         """Validates that keys in the metadata properties sections."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_metadata_properties_keys.__name__,
         }
+        if missing_required_keys := required_properties_keys - properties.keys():
+            om.add_error(
+                "Metadata Validation",
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}.",
+                info_map,
+            )
+            raise ValueError
         property_type = properties.get("type", "Unknown type")
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
-                f"Invalid keys '{invalid_keys}' in {property_type} for {path}. Valid"
-                f" keys are {valid_properties_keys}",
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}.",
                 info_map,
             )
             raise ValueError
