@@ -4648,7 +4648,9 @@ def test_metadata_array_validator(
          "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type']."),
     ],
 )
-def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys: Set[str], valid_keys: Set[str], properties: Dict[str, Any], path: List[str], should_raise: bool, expected_message: str):
+def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys: Set[str], valid_keys: Set[str],
+                                           properties: Dict[str, Any], path: List[str],
+                                           should_raise: bool, expected_message: str):
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
@@ -4666,7 +4668,6 @@ def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys:
     else:
         input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         mock_add_error.assert_not_called()
-
 
 
 def test_increment_in_elements_counter() -> None:
