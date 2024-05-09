@@ -2166,6 +2166,7 @@ class InputManager:
         }
         while stack:
             current_obj, depth, path = stack.pop()
+
             if depth > self.metadata_depth_limit:
                 om.add_error(
                     "Max metadata depth exceeded.",
@@ -2179,17 +2180,17 @@ class InputManager:
             if depth > current_max_depth:
                 current_max_depth = depth
                 deepest_path = path
-                if isinstance(current_obj, dict):
-                    for key, value in current_obj.items():
-                        if isinstance(value, dict):
-                            stack.append((value, depth + 1, path + [key]))
-                            value_type = value.get("type")
-                            if value_type in type_to_validator_map:
-                                type_to_validator_map[value_type](path + [key], value)
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    if isinstance(value, dict):
+                        stack.append((value, depth + 1, path + [key]))
+                        value_type = value.get("type")
+                        if value_type in type_to_validator_map:
+                            type_to_validator_map[value_type](path + [key], value)
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
-        print(f"Max depth of metadata properties is {current_max_depth} and Deepest path of metadata properties is {deepest_path}")
 
     def _metadata_number_validator(self, key_path: List[str], value: dict) -> None:
         """Validator function for array type properties in metadata."""

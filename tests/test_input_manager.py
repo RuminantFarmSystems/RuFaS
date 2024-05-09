@@ -4285,24 +4285,24 @@ def test_validate_metadata(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors",
     [
         ({"properties": {"a": {"type": "number_"}}}, 2, 1, ["a"], False, []),
-        # ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, []),
-        # (
-        #     {"properties": {"a": {"b": {"c": {"type": "bool_"}}}}},
-        #     2,
-        #     3,
-        #     ["a", "b", "c"],
-        #     True,
-        #     ["Max metadata depth exceeded."],
-        # ),
-        # ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, []),
-        # (
-        #     {"properties": {"a": {"b": {"type": "invalid_type"}}}},
-        #     3,
-        #     2,
-        #     ["a", "b"],
-        #     False,
-        #     ["Unrecognized metadata type."],
-        # ),
+        ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, []),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "bool_"}}}}},
+            2,
+            3,
+            ["a", "b", "c"],
+            True,
+            ["Max metadata depth exceeded."],
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, []),
+        (
+            {"properties": {"a": {"b": {"type": "invalid_type"}}}},
+            3,
+            2,
+            ["a", "b"],
+            False,
+            ["Unrecognized metadata type."],
+        ),
     ],
 )
 def test_validate_properties(
