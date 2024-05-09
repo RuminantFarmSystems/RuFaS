@@ -2360,8 +2360,7 @@ class InputManager:
             "function": self._validate_metadata_properties_keys.__name__,
         }
         property_type = properties.get("type", "Unknown type")
-        invalid_keys = set(properties.keys()) - valid_properties_keys
-        if invalid_keys:
+        if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
                 f"Invalid keys '{invalid_keys}' in {property_type} for {path}. Valid"

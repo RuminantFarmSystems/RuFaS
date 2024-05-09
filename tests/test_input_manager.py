@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Type, Union, Optional
+from typing import Any, Callable, Dict, List, Set, Type, Union, Optional
 from typing import Tuple
 from unittest.mock import ANY
 
@@ -4327,17 +4327,17 @@ def test_validate_metadata(
 @pytest.mark.parametrize(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors",
     [
-        ({"properties": {"a": {"type": "number_"}}}, 2, 1, ["a"], False, []),
-        ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, []),
+        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, []),
+        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, []),
         (
-            {"properties": {"a": {"b": {"c": {"type": "bool_"}}}}},
+            {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
             3,
             ["a", "b", "c"],
             True,
             ["Max metadata depth exceeded."],
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, []),
+        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, []),
         (
             {"properties": {"a": {"b": {"type": "invalid_type"}}}},
             3,
@@ -4389,6 +4389,270 @@ def test_validate_properties(
                 {"class": "InputManager", "function": "_validate_properties"},
             ),
         ]
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_number", "minimum": 3, "maximum": 7},
+            "Invalid metadata default number value.",
+            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": "not_a_number", "maximum": 7},
+            "Invalid metadata default minimum.",
+            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": 3, "maximum": "not_a_number"},
+            "Invalid metadata default maximum.",
+            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 2, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 8, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum": 5, "maximum": 3},
+            "Invalid metadata array length range.",
+            "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
+            True,
+        ),
+        (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
+    ],
+)
+def test_metadata_number_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests metadata_number_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_number_validator"}
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": 123, "pattern": None},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': Expected a string but got <class 'int'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": r"^[0-9]+$"},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
+            True,
+        ),
+        (["some_key"], {"default": "12345", "pattern": r"^[0-9]+$"}, "", "", False),
+        (["some_key"], {"default": "", "pattern": r"^[0-9]+$"}, "", "", False),
+    ],
+)
+def test_metadata_string_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_string_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_string_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_string_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_string_validator(key_path, value)
+        mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_bool"},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 1},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'int'>",
+            True,
+        ),
+        (["some_key"], {"default": True}, "", "", False),
+        (["some_key"], {"default": None}, "", "", False),
+    ],
+)
+def test_metadata_bool_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_bool_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_bool_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_bool_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_bool_validator(key_path, value)
+        mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_list"},
+            "Invalid metadata default array value.",
+            "Invalid 'default' for '['some_key']': Expected a list but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3], "minimum_length": "not_a_number"},
+            "Invalid metadata default array minimum length.",
+            "Invalid 'minimum_length' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3], "maximum_length": "not_a_number"},
+            "Invalid metadata default array maximum length.",
+            "Invalid 'maximum_length' for '['some_key']': Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2], "minimum_length": 3},
+            "Invalid metadata default array length.",
+            "Invalid 'default' for '['some_key']': 'default' length of [1, 2] is less than 'minimum_length' length 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": [1, 2, 3, 4], "maximum_length": 3},
+            "Invalid metadata default array length.",
+            "Invalid 'default' for '['some_key']': 'default' length of [1, 2, 3, 4] is greater than 'maximum' length 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum_length": 5, "maximum_length": 3},
+            "Invalid metadata array length range.",
+            "Invalid length 'range' for key '['some_key']': 'minimum_length'"
+            " value 5 is greater than 'maximum_length' value 3",
+            True,
+        ),
+        (["some_key"], {"default": [1, 2, 3], "minimum_length": 1, "maximum_length": 5}, "", "", False),
+        (["some_key"], {"default": None, "minimum_length": 1, "maximum_length": 5}, "", "", False),
+    ],
+)
+def test_metadata_array_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+):
+    """Tests _metadata_array_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    info_map = {"class": "InputManager", "function": "_metadata_array_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_array_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+    else:
+        input_manager._metadata_array_validator(key_path, value)
+        mock_add_error.assert_not_called
+
+
+@pytest.mark.parametrize(
+    "valid_keys, properties, path, should_raise, expected_message",
+    [
+        ({"id", "name"}, {"id": 123, "name": "example"}, ["root"], False, ""),
+        ({"id"}, {"id": 123, "name": "example"}, ["root"], True, "Invalid keys '{'name'}' in Unknown type for ['root']."
+         " Valid keys are {'id'}"),
+        (set(), {"name": "example"}, ["root"], True, "Invalid keys '{'name'}' in Unknown type for ['root']. Valid keys"
+         " are set()"),
+        ({"id"}, {"id": 123, "extra": "data"}, ["root", "child"], True, "Invalid keys '{'extra'}' in Unknown"
+         " type for ['root', 'child']. Valid keys are {'id'}"),
+    ],
+)
+def test_validate_metadata_properties_keys(mocker: MockerFixture, valid_keys: Set[str], properties: Dict[str, Any],
+                                           path: List[str], should_raise: bool, expected_message: str):
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._validate_metadata_properties_keys(valid_keys, properties, path)
+        mock_add_error.assert_called_once_with(
+            "Metadata Validation",
+            expected_message,
+            {
+                "class": "InputManager",
+                "function": "_validate_metadata_properties_keys",
+            }
+        )
+    else:
+        input_manager._validate_metadata_properties_keys(valid_keys, properties, path)
+        mock_add_error.assert_not_called()
 
 
 def test_increment_in_elements_counter() -> None:
