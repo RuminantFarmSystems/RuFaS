@@ -4638,19 +4638,49 @@ def test_metadata_array_validator(
     "required_keys, valid_keys, properties, path, should_raise, expected_message",
     [
         ({"id", "type"}, {"id", "name", "type"}, {"type": "num", "id": 123, "name": "example"}, ["root"], False, ""),
-        ({"type"}, {"type"}, {"type": "num", "id": 123}, ["root"], True,
-         "Invalid keys ['id'] in num for ['root']. Valid keys are ['type']."),
-        ({"id"}, set(), {"type": "num", "name": "example"}, ["root"], True,
-         "Missing required keys ['id'] for ['root']. Required keys are ['id']."),
-        ({"id", "type"}, {"id", "type"}, {"type": "num", "id": 123, "extra": "data"}, ["root", "child"], True,
-         "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type']."),
-        ({"id", "type"}, {"id", "type"}, {"name": "example"}, ["root"], True,
-         "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type']."),
+        (
+            {"type"},
+            {"type"},
+            {"type": "num", "id": 123},
+            ["root"],
+            True,
+            "Invalid keys ['id'] in num for ['root']. Valid keys are ['type'].",
+        ),
+        (
+            {"id"},
+            set(),
+            {"type": "num", "name": "example"},
+            ["root"],
+            True,
+            "Missing required keys ['id'] for ['root']. Required keys are ['id'].",
+        ),
+        (
+            {"id", "type"},
+            {"id", "type"},
+            {"type": "num", "id": 123, "extra": "data"},
+            ["root", "child"],
+            True,
+            "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type'].",
+        ),
+        (
+            {"id", "type"},
+            {"id", "type"},
+            {"name": "example"},
+            ["root"],
+            True,
+            "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type'].",
+        ),
     ],
 )
-def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys: Set[str], valid_keys: Set[str],
-                                           properties: Dict[str, Any], path: List[str],
-                                           should_raise: bool, expected_message: str):
+def test_validate_metadata_properties_keys(
+    mocker: MockerFixture,
+    required_keys: Set[str],
+    valid_keys: Set[str],
+    properties: Dict[str, Any],
+    path: List[str],
+    should_raise: bool,
+    expected_message: str,
+):
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
@@ -4663,7 +4693,7 @@ def test_validate_metadata_properties_keys(mocker: MockerFixture, required_keys:
             {
                 "class": "InputManager",
                 "function": "_validate_metadata_properties_keys",
-            }
+            },
         )
     else:
         input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)

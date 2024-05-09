@@ -2259,9 +2259,7 @@ class InputManager:
         }
         required_str_property_keys = {"type"}
         valid_str_property_keys = {"type", "description", "pattern", "default"}
-        self._validate_metadata_properties_keys(
-            required_str_property_keys, valid_str_property_keys, value, key_path
-        )
+        self._validate_metadata_properties_keys(required_str_property_keys, valid_str_property_keys, value, key_path)
         default = value.get("default")
         pattern = value.get("pattern")
         if default is not None:
@@ -2290,9 +2288,7 @@ class InputManager:
         }
         required_bool_property_keys = {"type"}
         valid_bool_property_keys = {"type", "description", "default"}
-        self._validate_metadata_properties_keys(
-            required_bool_property_keys, valid_bool_property_keys, value, key_path
-        )
+        self._validate_metadata_properties_keys(required_bool_property_keys, valid_bool_property_keys, value, key_path)
         default = value.get("default")
         if default is not None and not isinstance(default, bool):
             om.add_error(
@@ -2364,8 +2360,11 @@ class InputManager:
             raise ValueError
 
     def _validate_metadata_properties_keys(
-        self, required_properties_keys: Set[str], valid_properties_keys: Set[str], properties: Dict[str, Any],
-        path: List[str]
+        self,
+        required_properties_keys: Set[str],
+        valid_properties_keys: Set[str],
+        properties: Dict[str, Any],
+        path: List[str],
     ):
         """Validates that keys in the metadata properties sections."""
         info_map = {
