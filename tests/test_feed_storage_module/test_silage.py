@@ -84,6 +84,29 @@ def test_calculate_moisture_loss_to_effluent(silage: Silage, max_effluent: float
     assert pytest.approx(actual) == expected
 
 
+@pytest.mark.parametrize(
+    "npn,cp,loss_frac,expected",
+    [(4.0, 8.0, 0.02, 4.0092731), (2.5, 4.4, 0.05, 2.525287), (0.0, 3.6, 0.01, -0.000835654)],
+)
+def test_calculate_non_protein_nitrogen_loss_coefficient(
+    silage: Silage, npn: float, cp: float, loss_frac: float, expected: float
+) -> None:
+    """Tests calculate_non_protein_nitrogen_loss_coefficient in Silage."""
+    actual = silage.calculate_non_protein_nitrogen_loss_coefficient(npn, cp, loss_frac)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "cp,loss_frac,expected", [(5.6, 0.033, 5.78086866), (2.2, 0.04, 2.27916666), (0.0, 0.05, -0.015789473)]
+)
+def test_calculate_crude_protein_loss_coefficient(silage: Silage, cp: float, loss_frac: float, expected: float) -> None:
+    """Tests calculate_crude_protein_loss_coefficient in Silage."""
+    actual = silage.calculate_crude_protein_loss_coefficient(cp, loss_frac)
+
+    assert pytest.approx(actual) == expected
+
+
 @pytest.fixture
 def bunker() -> Bunker:
     return Bunker()

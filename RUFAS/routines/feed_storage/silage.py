@@ -124,8 +124,58 @@ class Silage(Storage):
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
-    
-    def calculate_non_protein_nitrogen+
+
+    def calculate_non_protein_nitrogen_loss_coefficient(
+        self, initial_non_protein_nitrogen: float, initial_crude_protein: float, loss_fraction: float
+    ) -> float:
+        """
+        Calculates the fractional loss coefficient for non-protein nitrogen after losing dry matter to effluent.
+
+        Parameters
+        ----------
+        initial_non_protein_nitrogen : float
+            Percentage of non-protein nitrogen in the crop before dry matter loss occurred.
+        initial_crude_protein : float
+            Percentage of crude protein in the crop before dry matter loss occurred.
+        loss_fraction : float
+            Fraction of dry matter that was lost to effluent.
+
+        Returns
+        -------
+        float
+            Fractional loss coefficient used to determine the remaining percentage of non-protein nitrogen in the crop.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
+
+        """
+        numerator = initial_non_protein_nitrogen * initial_crude_protein - 0.3 * loss_fraction
+        denominator = initial_crude_protein - loss_fraction
+        return numerator / denominator
+
+    def calculate_crude_protein_loss_coefficient(self, initial_crude_protein: float, loss_fraction: float) -> float:
+        """
+        Calculates the fractional loss coefficient for crude protein after losing dry matter to effluent.
+
+        Parameters
+        ----------
+        initial_crude_protein : float
+            Percentage of crude protein in the crop before dry matter loss occurred.
+        loss_fraction : float
+            Fraction of dry matter that was lost to effluent.
+
+        Returns
+        -------
+        float
+            Fractional loss coefficient used to determine the remaining percentage of crude protein in the crop.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
+
+        """
+        return (initial_crude_protein - 0.3 * loss_fraction) / (1 - loss_fraction)
 
 
 class Bunker(Silage):
