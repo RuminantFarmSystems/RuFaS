@@ -155,7 +155,10 @@ class TaskManager:
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
             input_task["CSV_directory"] = Path(input_task["CSV_directory"])
+            input_task["JSON_directory"] = Path(input_task["JSON_directory"])
+            input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
+            input_task["simulation_messages_directory"] = Path(input_task["simulation_messages_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)

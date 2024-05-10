@@ -987,6 +987,7 @@ class OutputManager(object):
         produce_graphics: bool,
         graphics_dir: Path,
         csv_dir: Path,
+        json_dir: Path,
     ) -> None:
         """
         Parses the filter files in the given directory and saves the results to the given path.
@@ -999,21 +1000,19 @@ class OutputManager(object):
         ----------
         save_path : Path
             Path to the directory where the file will be saved.
-
         filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
-
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
-
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
-
         graphics_dir : Path
             The directory for saving graphics.
-
         csv_dir : Path
             The directory for saving csvs.
+        json_dir : Path
+            The directory for saving JSONs containing filtered simulation output.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1069,10 +1068,10 @@ class OutputManager(object):
                 else:
                     self._route_save_functions(
                         filter_file,
-                        save_path,
                         filtered_pool,
                         produce_graphics,
                         filter_content,
+                        json_dir,
                         graphics_dir,
                         csv_dir,
                     )
@@ -1087,10 +1086,10 @@ class OutputManager(object):
     def _route_save_functions(
         self,
         filter_file: str,
-        save_path: Path,
         filtered_pool: Dict[str, pool_element_type],
         produce_graphics: bool,
         filter_content: Dict[str, str | int],
+        json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
     ) -> None:
@@ -1103,9 +1102,10 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
-                save_path,
+                json_dir,
                 filtered_pool,
                 filter_content,
             )
