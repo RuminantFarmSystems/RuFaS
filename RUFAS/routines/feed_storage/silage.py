@@ -4,7 +4,11 @@ from .enums import CropCategory
 from typing import Optional
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from ...units import MeasurementUnits
+from ...output_manager import OutputManager
 
+
+om = OutputManager()
 
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
@@ -52,7 +56,49 @@ class Silage(Storage):
         This method also records the total amount of gaseous dry matter loss happened from all stored crops.
 
         """
-        pass
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        total_effluent_dry_matter_loss = 0.0
+        total_effluent_moisture_loss = 0.0
+        for crop in self.stored:
+            days_of_effluent_to_process = self.calculate_days_of_effluent_loss_to_process(crop, time)
+            if days_of_effluent_to_process == 0:
+                continue
+
+            dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
+                crop.estimated_maximum_effluent, days_of_effluent_to_process
+            )
+            moisture_loss = self.calculate_moisture_loss_to_effluent(
+                crop.estimated_maximum_effluent, days_of_effluent_to_process
+            )
+
+            total_effluent_dry_matter_loss += dry_matter_loss
+            total_effluent_moisture_loss += moisture_loss
+
+            dry_matter_loss_frac = dry_matter_loss / crop.dry_matter_mass
+            non_protein_nitrogen_loss_frac = self.calculate_non_protein_nitrogen_loss_coefficient(
+                crop.non_protein_nitrogen, crop.crude_protein_percent, dry_matter_loss_frac
+            )
+            crop.non_protein_nitrogen = self.recalculate_nutrient_percentage(
+                crop.non_protein_nitrogen, non_protein_nitrogen_loss_frac, dry_matter_loss, crop.dry_matter_mass
+            )
+
+            crude_protein_loss_frac = self.calculate_crude_protein_loss_coefficient(
+                crop.crude_protein_percent, dry_matter_loss_frac
+            )
+            crop.crude_protein_percent = self.recalculate_nutrient_percentage(
+                crop.crude_protein_percent, crude_protein_loss_frac, dry_matter_loss, crop.dry_matter_mass
+            )
+
+            self.reset_mass_attributes_after_loss(crop, dry_matter_loss)
+
+        om.add_variable("total_effluent_dry_matter_loss", dry_matter_loss, info_map)
+        om.add_variable("total_effluent_moisture_loss", moisture_loss, info_map)
+
+        super().process_degradations(weather, time)
 
     def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
         """
