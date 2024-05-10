@@ -348,7 +348,7 @@ class InputManager:
                     eager_termination=eager_termination,
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
-                    called_during_initialization=False,
+                    called_during_initialization=True,
                 )
 
                 if is_element_acceptable:
@@ -538,7 +538,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool = False
+        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -807,7 +807,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -965,7 +965,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -993,7 +993,9 @@ class InputManager:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        array_value = self._extract_value_by_key_list(input_data, variable_path)
+        array_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
@@ -1023,7 +1025,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -1051,7 +1053,9 @@ class InputManager:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        object_value = self._extract_value_by_key_list(input_data, variable_path)
+        object_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
@@ -1091,10 +1095,12 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {
@@ -1145,10 +1151,12 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
@@ -1211,10 +1219,12 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
-        input_data_value = self._extract_value_by_key_list(input_data, variable_path)
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
@@ -1298,6 +1308,54 @@ class InputManager:
             else:
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
+
+    def _extract_input_data_by_key_list(
+        self,
+        input_data: List[Any] | Dict[str, Any],
+        variable_path: Sequence[str | int],
+        variable_properties: Dict[str, Any],
+        called_during_initialization: bool,
+    ) -> Any:
+        """
+        Extracts a value from the input data based on a specified path and handles missing data by calling
+        InputManager._log_missing_data().
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling InputManager._log_missing_data().
+        """
+        result = None
+        try:
+            result = self._extract_value_by_key_list(input_data, variable_path)
+        except KeyError:
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
+            self._log_missing_data(
+                variable_properties=variable_properties,
+                var_name=var_name,
+                called_during_initialization=called_during_initialization,
+            )
+        return result
 
     def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
         """
@@ -2028,22 +2086,47 @@ class InputManager:
         file_path = os.path.join(path, file_name)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
-    def dump_metadata_properties(self, output_dir: Path) -> None:
+    def save_metadata_properties(self, output_dir: Path) -> None:
         """
-        Dumps metadata properties in CSV format.
+        Saves metadata properties in CSV format.
 
         Parameters
         ----------
         output_dir : Path
             The path to the output directory where the metadata properties CSV will be saved.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file cannot be saved at the specified path.
+        PermissionError
+            If the user does not have permission to save the file at the specified path.
+        OSError
+            For any other unexpected error that occurs while trying to save the CSV.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.save_metadata_properties.__name__,
+        }
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
         path_to_save = os.path.join(
             output_dir,
             om.generate_file_name("InputManager_metadata_properties", extension="csv"),
         )
-        df.to_csv(path_to_save, index=False)
+        om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        try:
+            df.to_csv(path_to_save, index=False)
+            om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
+        except FileNotFoundError as fnfe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
+            raise fnfe
+        except PermissionError as pe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
+            raise pe
+        except OSError as e:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
+            raise e
 
     def _parse_metadata_properties(
         self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
@@ -2101,7 +2184,8 @@ class InputManager:
 
         return records
 
-    def _check_property_type_primitive(self, property: dict) -> bool:
+    def _check_property_type_primitive(self, property: Dict[str, Any]) -> bool:
+        """Checks whether the property's "type" is primitive or an array of primitive types."""
         if property.get("type") in ["bool", "string", "number"]:
             return True
         elif property.get("type") == "array":
