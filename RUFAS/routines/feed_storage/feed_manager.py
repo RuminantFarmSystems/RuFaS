@@ -7,14 +7,14 @@ from .enums import CropType, CropCategory
 from .baleage import Baleage
 from .grain import Grain, Dry, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .silage import Silage, Bag, Bunker, Pile
+from .sileage import Sileage, Bag, Bunker, Pile
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
-    CropCategory.ALFALFA: [Hay, Silage, Baleage],
-    CropCategory.CORN: [Grain, Silage],
-    CropCategory.GRASS: [Hay, Silage, Baleage],
-    CropCategory.SMALL_GRAIN: [Hay, Grain, Silage, Baleage],
+    CropCategory.ALFALFA: [Hay, Sileage, Baleage],
+    CropCategory.CORN: [Grain, Sileage],
+    CropCategory.GRASS: [Hay, Sileage, Baleage],
+    CropCategory.SMALL_GRAIN: [Hay, Grain, Sileage, Baleage],
     CropCategory.SOY: [Grain],
 }
 
