@@ -5,3 +5,4 @@ Scientific Documentation
    :maxdepth: 1
 
    crop_and_soil.rst
+   feed_storage.rst
