@@ -2104,8 +2104,9 @@ class InputManager:
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error("Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'",
-                             info_map)
+                om.add_error(
+                    "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
+                )
                 raise ValueError
             if invalid_keys := (data.keys() - valid_keys):
                 om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
