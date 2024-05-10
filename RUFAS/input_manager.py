@@ -14,12 +14,17 @@ from RUFAS.util import Utility
 
 om = OutputManager()
 
-ADDRESS_TO_INPUTS = "files"
-
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
 """
 FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
+
+"""
+Set enumerating the input data formats the Input Manager can accept.
+"""
+VALID_INPUT_TYPES: set[str] = {"json", "csv"}
+
+ADDRESS_TO_INPUTS = "files"
 
 
 class Modifiability(Enum):
@@ -2111,22 +2116,24 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._validate_metadata.__name__,
         }
-        metadata_files = self.__metadata["files"]
+        metadata_files = self.__metadata[ADDRESS_TO_INPUTS]
         required_keys = {"path", "type", "properties"}
         optional_keys = {"title", "description"}
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error("Metadata Validation", f"Missing required keys '{missing_keys}' in '{key}'", info_map)
+                om.add_error(
+                    "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
+                )
                 raise ValueError
             if invalid_keys := (data.keys() - valid_keys):
-                om.add_error("Metadata Validation", f"Invalid keys '{invalid_keys}' in '{key}'", info_map)
+                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
                 raise ValueError
 
-            if data["type"] not in self.__valid_input_types:
+            if data["type"] not in VALID_INPUT_TYPES:
                 om.add_error(
                     "Metadata Validation",
-                    f"Invalid type '{data['type']}' in '{key}'. Expected {self.__valid_input_types}",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {VALID_INPUT_TYPES}",
                     info_map,
                 )
                 raise ValueError
