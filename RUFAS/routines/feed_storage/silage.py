@@ -124,6 +124,8 @@ class Silage(Storage):
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
+    
+    def calculate_non_protein_nitrogen+
 
 
 class Bunker(Silage):
