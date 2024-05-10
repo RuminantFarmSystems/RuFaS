@@ -317,11 +317,6 @@ def cowlist():
     return cowlist
 
 
-def test_get_animal_config():
-    """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_init_pens(
     input_manager: InputManager,
     animal_manager: AnimalManager,
