@@ -5,7 +5,7 @@ from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Set, Union, Callable, Tuple, Sequence
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
 """
 Set enumerating the input data formats the Input Manager can accept.
 """
-VALID_INPUT_TYPES: Set[str] = {"json", "csv"}
+VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
 ADDRESS_TO_INPUTS = "files"
 
