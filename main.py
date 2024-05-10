@@ -95,10 +95,7 @@ def parse_gnu_args(args=None):
         default="output/",
     )
     parser.add_argument(
-        "-m",
-        "--metadata-depth-limit",
-        type=int,
-        help="Overrides the default metadata depth limit in the Input Manager"
+        "-m", "--metadata-depth-limit", type=int, help="Overrides the default metadata depth limit in the Input Manager"
     )
     return parser.parse_args(args)
 

@@ -32,7 +32,7 @@ def test_main_success(mock_task_manager, monkeypatch):
         output_directory=Path("output"),
         clear_output_directory=False,
         produce_graphics=True,
-        metadata_depth_limit=None
+        metadata_depth_limit=None,
     )
 
 
@@ -85,7 +85,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-m",
             "--metadata-depth-limit",
             type=int,
-            help="Overrides the default metadata depth limit in the Input Manager"
+            help="Overrides the default metadata depth limit in the Input Manager",
         ),
     ]
     mock_parse_args.assert_called_once()
