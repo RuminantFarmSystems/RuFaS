@@ -92,6 +92,15 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
     assert mock_input_manager.pool == test_data
 
 
+def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test for metadata override function for metadata depth limit"""
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    new_limit = 10
+    mock_input_manager.set_metadata_depth_limit(new_limit)
+    assert mock_input_manager.metadata_depth_limit == new_limit
+    mock_add_log.assert_called_once()
+
+
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
@@ -4327,17 +4336,17 @@ def test_validate_metadata(
 @pytest.mark.parametrize(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors",
     [
-        ({"properties": {"a": {"type": "number_"}}}, 2, 1, ["a"], False, []),
-        ({"properties": {"a": {"b": {"type": "array_"}}}}, 3, 2, ["a", "b"], False, []),
+        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, []),
+        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, []),
         (
-            {"properties": {"a": {"b": {"c": {"type": "bool_"}}}}},
+            {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
             3,
             ["a", "b", "c"],
             True,
             ["Max metadata depth exceeded."],
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "string_"}}}}}, 3, 3, ["a", "b", "c"], False, []),
+        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, []),
         (
             {"properties": {"a": {"b": {"type": "invalid_type"}}}},
             3,
