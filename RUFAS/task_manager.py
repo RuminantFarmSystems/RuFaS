@@ -63,6 +63,7 @@ class TaskManager:
         output_directory: Path,
         clear_output_directory: bool,
         produce_graphics: bool,
+        metadata_depth_limit: int,
     ) -> None:
         """
         Initializes and starts the task management process.
@@ -81,6 +82,8 @@ class TaskManager:
             Whether to clear the output directory.
         produce_graphics : bool
             Whether to produce graphics.
+        metadata_depth_limit : int
+            Override value for maximum metadata properties depth set in Input Manager.
         """
         self.output_manager.run_startup_sequence(
             verbosity,
@@ -98,6 +101,8 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
+        if metadata_depth_limit:
+            self.input_manager.set_metadata_depth_limit(metadata_depth_limit)
         is_data_valid = self.input_manager.start_data_processing(metadata_path.as_posix())
         if not is_data_valid:
             TaskManager.handle_post_processing(

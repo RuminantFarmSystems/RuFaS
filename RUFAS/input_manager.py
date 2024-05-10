@@ -5,7 +5,7 @@ from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Set, Union, Callable, Tuple, Sequence
+from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
 
 import pandas as pd
 
@@ -72,21 +72,6 @@ class Modifiability(Enum):
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
-
-    Attributes
-    ----------
-    __metadata : Dict[str, Any]
-        The guidelines used to validate the input data.
-    __pool : Dict[str, Any]
-        The input data pool.
-    __get_data_logs_pool : Dict[str, str]
-        The logs for each instance of data being fetched from Input Manager.
-    __valid_input_types : Set[str]
-        The currently valid input types we expect in the top-level metadata.
-    elements_counter : ElementsCounter()
-        An instance of the class to keep track of the number of elements in each state during validation.
-    metadata_depth_limit : int
-        The maximum depth allowed for a metadata properties structure.
     """
 
     __instance = None
@@ -102,7 +87,6 @@ class InputManager:
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
-            self.__valid_input_types: Set[str] = {"json", "csv"}
             self.elements_counter = ElementsCounter()
             self.metadata_depth_limit = 7
 
@@ -125,6 +109,16 @@ class InputManager:
     def pool(self, incoming_pool: Dict[str, Any]) -> None:
         """The setter method for __pool"""
         self.__pool = incoming_pool
+
+    def set_metadata_depth_limit(self, limit: int) -> None:
+        """Override for the default metadata_depth_limit."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.set_metadata_depth_limit.__name__,
+        }
+        self.metadata_depth_limit = limit
+        om.add_log("Override default metadata depth limit",
+                   f"Metadata depth limit set to {limit}.", info_map)
 
     def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
         """
