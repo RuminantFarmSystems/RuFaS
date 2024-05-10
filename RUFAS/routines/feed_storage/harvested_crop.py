@@ -58,7 +58,7 @@ class HarvestedCrop:
     type: CropType
     harvest_time: Time
     storage_time: Time
-    last_time_degraded : Time = field(init=False)
+    last_time_degraded: Time = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
     dry_matter_digestibility: float
