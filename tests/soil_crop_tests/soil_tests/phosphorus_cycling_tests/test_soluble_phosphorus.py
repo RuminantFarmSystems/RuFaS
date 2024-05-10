@@ -52,18 +52,18 @@ def test_determine_phosphorus_runoff_from_top_soil(
 
 
 @pytest.mark.parametrize(
-    "percent_clay",
+    "proportion_clay",
     [
-        99.1,
-        55.42,
-        9.13,
+        0.991,
+        0.5542,
+        0.0913,
         0.0,
     ],
 )
-def test_determine_isotherm_slope(percent_clay: float) -> None:
+def test_determine_isotherm_slope(proportion_clay: float) -> None:
     """Tests that the slope of the phosphorus sorption isotherm is calculated correctly."""
-    observed = SolublePhosphorus._determine_isotherm_slope(percent_clay)
-    expected = (173.51 * (percent_clay / 100)) + 8.48
+    observed = SolublePhosphorus._determine_isotherm_slope(proportion_clay)
+    expected = (173.51 * proportion_clay) + 8.48
     assert observed == expected
 
 
@@ -203,8 +203,8 @@ def test_daily_update_routine(runoff: float, field_size: float) -> None:
     if runoff > 0:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_called_once_with(runoff, field_size, 3.4, 1.4, 20)
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (3.4 - 0.9 - 1.2)
-        assert incorp.data.annual_soil_phosphorus_runoff == (0.9 * field_size)
-        assert incorp.data.soil_phosphorus_runoff == (0.9 * field_size)
+        assert incorp.data.annual_soil_phosphorus_runoff == 0.9
+        assert incorp.data.soil_phosphorus_runoff == 0.9
     else:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_not_called()
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.2

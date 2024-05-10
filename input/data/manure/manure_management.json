@@ -115,6 +115,7 @@
   ],
   "bedding_configs": [
     {
+      "name": "sawdust",
       "bedding_type": "sawdust",
       "bedding_mass_per_day": 1.97,
       "bedding_density": 250.0,
@@ -125,6 +126,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "CBPB sawdust",
       "bedding_type": "CBPB sawdust",
       "bedding_mass_per_day": 12,
       "bedding_density": 350.0,
@@ -135,6 +137,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "manure solids",
       "bedding_type": "manure solids",
       "bedding_mass_per_day": 2.50,
       "bedding_density": 400.0,
@@ -145,6 +148,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "straw",
       "bedding_type": "straw",
       "bedding_mass_per_day": 1.97,
       "bedding_density": 100.0,
@@ -155,6 +159,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "sand",
       "bedding_type": "sand",
       "bedding_mass_per_day": 25.0,
       "bedding_density": 1500.0,
@@ -165,6 +170,7 @@
       "sand_removal_efficiency": 1.0
     },
     {
+      "name": "none",
       "bedding_type": "none",
       "bedding_mass_per_day": 0.0,
       "bedding_density": 0.0,
@@ -224,6 +230,7 @@
   ],
   "manure_separator_configs": [
     {
+      "name": "rotary screen",
       "manure_separator_type": "rotary screen",
       "percent_dry_solids": 0.20,
       "total_solids_removal_efficiency_for_separator": 0.35,
@@ -234,6 +241,7 @@
       "potassium_removal_efficiency_for_separator": 0.15
     },
     {
+      "name": "screw press",
       "manure_separator_type": "screw press",
       "percent_dry_solids": 0.35,
       "total_solids_removal_efficiency_for_separator": 0.25,
@@ -254,7 +262,7 @@
       "phosphorus_removal_efficiency_for_treatment": 0.0,
       "potassium_removal_efficiency_for_treatment": 0.0,
       "storage_time_period": 120,
-      "manure_cover": "cover"
+      "manure_cover": "crust"
     },
     {
       "manure_treatment_type": "slurry storage outdoor",
@@ -266,7 +274,7 @@
       "potassium_removal_efficiency_for_treatment": 0.00,
       "storage_time_period": 120,
       "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "crust"
     },
     {
       "manure_treatment_type": "anaerobic lagoon",
