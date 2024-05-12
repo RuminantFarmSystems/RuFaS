@@ -99,8 +99,8 @@ def manure_calculations(
 
     # Nitrogen excretion in feces, kg [A.3B.B.2]
     fecal_nitrogen = (
-        0.345 
-        + 0.317 
+        0.345
+        + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
