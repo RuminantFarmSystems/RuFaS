@@ -51,8 +51,8 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / 100)
     ) * GeneralConstants.GRAMS_TO_KG
     fecal_nitrogen = (
-        0.345 
-        + 0.317 
+        0.345
+        + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
