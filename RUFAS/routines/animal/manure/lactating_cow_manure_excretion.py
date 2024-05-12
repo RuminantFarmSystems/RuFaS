@@ -175,17 +175,15 @@ def manure_calculations(
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (
-        12.0
-        + 0.333
-        * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+    # Fecal nitrogen, kg [A.3B.B.2]
+    fecal_nitrogen = (
+        - 18.5 
+        + 10.1
+        * dry_matter_intake
     ) * GeneralConstants.GRAMS_TO_KG
-
-    # Fecal nitrogen, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    
+    # Urine nitrogen, kg [A.3E.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ASH_diet_content
