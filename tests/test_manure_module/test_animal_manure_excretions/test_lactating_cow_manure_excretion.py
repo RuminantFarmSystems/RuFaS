@@ -99,14 +99,12 @@ def test_lactating_cow_manure_calculations(  # noqa
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (
-        12.0
-        + 0.333
-        * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+    fecal_nitrogen = (
+        - 18.5 
+        + 10.1
+        * dry_matter_intake
     ) * GeneralConstants.GRAMS_TO_KG
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     organic_matter_intake = dry_matter_intake - ASH_diet_content
     degradable_volatile_solids = (

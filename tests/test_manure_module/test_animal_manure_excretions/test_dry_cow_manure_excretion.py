@@ -69,13 +69,14 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (
-        14.3
-        + 0.510
+    fecal_nitrogen = (
+        0.345 
+        + 0.317 
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
     urine_urea_nitrogen_concentration_lower_bound = 2
