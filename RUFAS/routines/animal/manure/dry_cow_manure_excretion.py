@@ -127,17 +127,17 @@ def manure_calculations(
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in urine, kg [A.3B.B.2]
-    urine_nitrogen = (
-        14.3
-        + 0.510
+    # Nitrogen excretion in feces, kg [A.3B.B.2]
+    fecal_nitrogen = (
+        0.345 
+        + 0.317 
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
         / 100
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in feces, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # Nitrogen excretion in urine, kg [A.3B.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
