@@ -1954,7 +1954,13 @@ def test_route_save_functions_graph(
     graph_data = {"filters": ".*", "other keys": "other values"}
 
     mock_output_manager._route_save_functions(
-        "graph_file", {"key": [1, 2, 3, 4]}, False, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+        "graph_file",
+        {"key": [1, 2, 3, 4]},
+        False,
+        graph_data,
+        Path("jsons_dir"),
+        Path("graphics_dir"),
+        Path("csvs_dir"),
     )
 
     mock_generate_graph.assert_not_called()
