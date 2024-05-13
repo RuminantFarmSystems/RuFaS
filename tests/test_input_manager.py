@@ -3527,8 +3527,9 @@ def test_add_default_values_to_array_inputs(
 
 
 def test_dump_get_data_logs(
-    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable],
-        mocker: MockerFixture,
+    mock_input_manager: InputManager,
+    input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -3537,13 +3538,17 @@ def test_dump_get_data_logs(
     }
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
-    patch_for_generate_file_name = mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name)
+    patch_for_generate_file_name = mocker.patch(
+        "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
+    )
 
     with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
         mock_input_manager.dump_get_data_logs(path=mock_dir_path)
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
-    mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name))
+    mock_dict_to_file_json.assert_called_once_with(
+        mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+    )
 
 
 @pytest.mark.parametrize(
