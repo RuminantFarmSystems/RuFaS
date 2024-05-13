@@ -2,6 +2,7 @@ from dataclasses import dataclass, InitVar
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 
 
@@ -46,7 +47,7 @@ class SoilData:
     annual_runoff_grazing_manure_organic_phosphorus : float, default 0
         Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff (kg).
     annual_soil_phosphorus_runoff : float, default 0
-        Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg).
+        Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg / ha).
     annual_runoff_nitrates_total : float, default 0
         Cumulative total of nitrates that were removed from the top soil layer by runoff (kg).
     annual_runoff_ammonium_total : float, default 0
@@ -752,5 +753,7 @@ class SoilData:
             Average clay percent of the soil (unitless).
 
         """
-        clay_percentages = self.get_vectorized_layer_attribute("percent_clay_content")
+        clay_fractions = self.get_vectorized_layer_attribute("clay_fraction")
+        clay_percentages = [clay_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE for clay_fraction in clay_fractions]
+
         return sum(clay_percentages) / len(clay_percentages)
