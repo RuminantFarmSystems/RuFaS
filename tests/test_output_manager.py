@@ -1080,9 +1080,7 @@ def test_dump_variable_names_and_contexts(
     mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), exclude_info_maps, format_option)
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(
-        expected_result, Path("dummy_path", "dummy_name")
-    )
+    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
@@ -1113,9 +1111,7 @@ def test_dump_variable_names_and_contexts_no_values(
     mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), False, format_option="verbose")
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(
-        expected_output, Path("dummy_path", "dummy_name")
-    )
+    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
