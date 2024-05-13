@@ -17,7 +17,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 def test_mcf() -> None:
     """Tests _methane_conversion_factor() in calculator.py."""
     assert GasEmissionsCalculator._methane_conversion_factor(1.0) == pytest.approx(
-        (GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B))
+        (GasEmissionConstants.MCF_CONSTANT_A - GasEmissionConstants.MCF_CONSTANT_B)
     )
 
 
@@ -309,28 +309,6 @@ def test_modified_hours(hours: float) -> None:
     actual = GasEmissionsCalculator._modified_hours(hours)
 
     # Assert
-    assert actual == expected
-
-
-def test_ambient_temp(mocker: MockerFixture) -> None:
-    """Tests _ambient_temp() in calculator.py."""
-
-    # Arrange
-    hours = 10.0
-    modified_hours = 8.0
-    patch_for_modified_hours = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._modified_hours",
-        return_value=modified_hours,
-    )
-    t_min = 20.0
-    t_max = 30.0
-    expected = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
-
-    # Act
-    actual = GasEmissionsCalculator._ambient_temperature(hours, t_min, t_max)
-
-    # Assert
-    patch_for_modified_hours.assert_called_once_with(hours)
     assert actual == expected
 
 

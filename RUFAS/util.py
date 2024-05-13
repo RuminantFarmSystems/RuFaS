@@ -1,12 +1,10 @@
 import datetime
-import json
 import re
 import shutil
-import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
-from RUFAS import errors
+from .general_constants import GeneralConstants
 
 
 class Utility:
@@ -26,7 +24,7 @@ class Utility:
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result = {}
+        result: Dict[str, List[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
@@ -37,76 +35,87 @@ class Utility:
         return result
 
     @staticmethod
-    def get_base_dir():
+    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Gets the base directory as reference for all relative paths.
-
-        Unfrozen application - gets the project directory
-        Frozen application - gets the executable directory
-
-        Returns
-        -------
-        Path: The reference directory for all paths in the program.
-
-        """
-
-        # Frozen
-        if getattr(sys, "frozen", False):
-            #
-            # Get the executable file path
-            # Resolve to absolute path
-            # Take the parent base_dir/RUFAS_exe
-            #                 parent = base_dir/
-
-            return Path(sys.executable).resolve().parent
-
-        # Unfrozen
-        else:
-            #
-            # Get path of current file (util.py)
-            # Resolve to absolute path
-            # Get the 2nd parent  base_dir/RUFAS/util.py
-            #                     parent[0] = base_dir/RUFAS
-            #                     parent[1] = base_dir/
-            return Path(__file__).resolve().parents[1]
-
-    @staticmethod
-    def read_json_file(file_path: Path) -> Dict[Any, Any]:
-        """
-        Description:
-            Reads and interprets the JSON file at the given path. Compiles the
-            information into dictionaries used to instantiate simulation objects.
+        Convert a dictionary with flat, dot-separated keys into a nested structure composed of
+        dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
+        while non-numeric segments indicate dictionary keys.
 
         Parameters
         ----------
-        file_path (Path): Path to the input json file
-
-        Raises
-        ------
-        InvalidJSONFileError
-            If the json file at the given path does not conform with the format required.
+        input_dict : Dict[str, Any]
+            A dictionary where the keys are strings that may include dots to signify hierarchical
+            levels in the resulting nested structure. Numeric key segments result in list creations,
+            and non-numeric segments result in dictionary creations.
 
         Returns
         -------
-        Dict[Any, Any]
-            The data read from the json file.
-
+        Dict[str, Union[Dict, list]]
+            A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
         """
+        nested_structure: Dict[str, Any] = {}
+        for flat_key, value in input_dict.items():
+            keys = flat_key.split(".")
+            current: Dict[str, Any] | List[Any] = nested_structure
+            for i, key in enumerate(keys[:-1]):
+                next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
 
-        try:
-            if file_path.suffix == ".json":
-                if not file_path.is_file():
-                    raise errors.UserInput((str(file_path), "does not exist"))
+                if key.isdigit():
+                    key = int(key)
+                    while len(current) <= key:
+                        current.append([] if next_key_is_digit else {})
+                    current = current[key]
+                else:
+                    if isinstance(current, list):
+                        current = current[-1]
+                    if key not in current:
+                        current[key] = [] if next_key_is_digit else {}
+                    current = current[key]
+
+            last_key = keys[-1]
+            if last_key.isdigit():
+                last_key = int(last_key)
+                while len(current) <= last_key:
+                    current.append(None)
+                current[last_key] = value
             else:
-                raise errors.UserInput((str(file_path), "is not a JSON file"))
+                current[last_key] = value
 
-            with file_path.open("r") as f:
-                data = json.load(f)
+        return nested_structure
 
-            return data
+    @staticmethod
+    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
+        """
+        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
+        that contain dictionaries and dictionaries that contain lists.
 
-        except errors.UserInput as e:
-            print(e.msg)
+        Parameters
+        ----------
+        target : Dict[Any, Any]
+            The primary dictionary to be updated.
+        updates : Dict[Any, Any]
+            The dictionary containing updates to be merged into target.
+        """
+        for key, value in updates.items():
+            if key in target:
+                if isinstance(value, dict) and isinstance(target[key], dict):
+                    Utility.deep_merge(target[key], value)
+                elif isinstance(value, list) and isinstance(target[key], list):
+                    if len(target[key]) < len(value):
+                        target[key].extend([None] * (len(value) - len(target[key])))
+
+                    for i, item in enumerate(value):
+                        if i < len(target[key]):
+                            if isinstance(item, dict) and isinstance(target[key][i], dict):
+                                Utility.deep_merge(target[key][i], item)
+                            else:
+                                target[key][i] = item
+                        else:
+                            target[key].append(item)
+                else:
+                    target[key] = value
+            else:
+                target[key] = value
 
     @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
@@ -132,15 +141,17 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
+    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
         """
         Remove items from a list given a list of indices.
         The operation is done in-place.
 
         Parameters
         ----------
-        arr: a list of items
-        removed_idx: a list that contains indices of the items to be removed
+        data: List[Any] a list of items
+            The list to remove items from
+        indices_to_remove : List[Any]
+            The list that contains indices of the items to be removed
 
         Returns
         -------
@@ -148,9 +159,10 @@ class Utility:
 
         """
 
-        # Safer to remove elements from the back
-        for idx in sorted(removed_idx, reverse=True):
-            del arr[idx]
+        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
+        # to prevent the shifting of indices from affecting later removals.
+        for idx in sorted(indices_to_remove, reverse=True):
+            del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
@@ -174,7 +186,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -313,67 +325,6 @@ class Utility:
                     shutil.rmtree(file)
 
     @staticmethod
-    def day_to_month_conversion(day: int, calendar_year: int) -> int:
-        """
-        Converts the julian day into the corresponding month of the current calendar year.
-
-        Parameters
-        ----------
-        day : int
-            Current julian day of the simulation.
-        calendar_year : int
-            Current calendar year of the simulation.
-
-        Returns
-        -------
-        int
-            The corresponding month of the year (1 for January, 2 for February, etc.).
-
-        Notes
-        -----
-        The calendar year is specified so it can be determined if it is a leap year.
-
-        """
-        non_leap_cumulative_days_in_months = [
-            31,
-            59,
-            90,
-            120,
-            151,
-            181,
-            212,
-            243,
-            273,
-            304,
-            334,
-            365,
-        ]
-        leap_cumulative_days_in_months = [
-            31,
-            60,
-            91,
-            121,
-            152,
-            182,
-            213,
-            244,
-            274,
-            305,
-            335,
-            366,
-        ]
-
-        cumulative_days_in_months = (
-            leap_cumulative_days_in_months
-            if Utility.is_leap_year(calendar_year)
-            else non_leap_cumulative_days_in_months
-        )
-
-        for month, day_count in enumerate(cumulative_days_in_months):
-            if day <= day_count:
-                return month + 1
-
-    @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
         """
         Produces the current system time as a timestamp string.
@@ -435,6 +386,26 @@ class Utility:
         }
 
     @staticmethod
+    def remove_special_chars(input_string: str) -> str:
+        """Function to remove special characters from a string.
+
+        Parameters
+        ----------
+        input_string : str
+            The string from which the special characters should be removed.
+
+        Returns
+        -------
+        str
+            The input string with the special characters filtered out.
+        """
+        chars_to_remove = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
+
+        filtered_string = "".join(char for char in input_string if char not in chars_to_remove)
+
+        return filtered_string
+
+    @staticmethod
     def is_leap_year(year: int) -> bool:
         """
         Helper method determines if the given year is a leap year
@@ -457,3 +428,56 @@ class Utility:
             return True
         else:
             return False
+
+    @staticmethod
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
+        """
+        Generates a list of dates based on a given date and when the dates should start and end relative to the given
+        date.
+
+        Parameters
+        ----------
+        date : datetime.date
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Raises
+        ------
+        ValueError
+            If the starting_offset is greater than the ending_offset.
+
+        Examples
+        --------
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+        [datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+
+        """
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
+
+        return time_series
+
+    @staticmethod
+    def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        """Generates a datetime.date based on a year and ordinal day."""
+        maximum_day = (
+            GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+        )
+        if not 1 <= day <= maximum_day:
+            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+        return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
