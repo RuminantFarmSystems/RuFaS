@@ -53,7 +53,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
 
     Dry_DMI_Lower_Bound = 7.1  # kg, we can move this to a constants file later
     dry_matter_intake = max(dry_matter_intake, Dry_DMI_Lower_Bound)
-    organic_matter_intake = dry_matter_intake * (100 - ASH_concentration) / 100
+    organic_matter_intake = dry_matter_intake * (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration) / GeneralConstants.FRACTION_TO_PERCENTAGE
 
     total_volatile_solids = (
         -1.201 + 0.402 * organic_matter_intake + 0.036 * NDF_concentration - 0.024 * CP_concentration
@@ -67,15 +67,16 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         + 0.83
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (
-        14.3
-        + 0.510
+    fecal_nitrogen = (
+        0.345
+        + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
     urine_urea_nitrogen_concentration_lower_bound = 2
@@ -87,8 +88,8 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     else:
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / GeneralConstants.FRACTION_TO_PERCENTAGE) * urine_urea_nitrogen_concentration
+    potassium = dry_matter_intake * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE) * GeneralConstants.KG_TO_GRAMS
 
     methane_emission = 0.0
     if methane_model == "Mills":
@@ -100,7 +101,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
             )
         ) / 0.05565
     else:
-        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
         gross_energy_concentration = (
             0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
         )
