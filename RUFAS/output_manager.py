@@ -240,8 +240,6 @@ class OutputManager(object):
         ------
         TypeError
             If any unit or nested unit does not have the type MeasurementUnits.
-        ValueError
-            If any unit or nested unit is not a valid MeasurementUnits value.
 
         """
         if isinstance(units, dict):
