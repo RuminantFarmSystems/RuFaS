@@ -953,11 +953,16 @@ class OutputManager(object):
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
+            sliced_info_maps: List[Dict[str, Any]] = (
+                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
+            )
             sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = {"values": sliced_data}
+                results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                    "values": sliced_data
+                }
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
@@ -972,8 +977,12 @@ class OutputManager(object):
                 for filtered_key, filtered_value in filtered_data.items():
                     combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
+                        results[combined_key].get("info_maps", []).extend(sliced_info_maps)
                         results[combined_key]["values"].extend(filtered_value)
                     else:
+                        results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                            "values": filtered_value
+                        }
                         results[combined_key] = {"values": filtered_value}
                     self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
