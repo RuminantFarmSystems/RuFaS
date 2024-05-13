@@ -582,7 +582,7 @@ def test_add_variable(
 
     # Arrange
     output_manager = OutputManager()
-    mocker.patch.object(output_manager, "_validate_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
     mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
@@ -655,22 +655,22 @@ def test_add_variable(
         ),
     ],
 )
-def test_validate_units(
+def test_stringify_units(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]] | MeasurementUnits | str,
     expected_result: Dict[str, str] | str | Exception,
     mocker: MockerFixture,
 ) -> None:
-    """Test for function _validate_units in file output_manager.py"""
+    """Test for function _stringify_units in file output_manager.py"""
     if isinstance(expected_result, Exception):
         patch_for_add_error = mocker.patch.object(mock_output_manager, "add_error")
         with pytest.raises(type(expected_result)) as e:
-            mock_output_manager._validate_units(units)
+            mock_output_manager._stringify_units(units)
         assert str(expected_result) == str(e.value)
         patch_for_add_error.assert_called_once()
     else:
-        assert mock_output_manager._validate_units(units) == expected_result
+        assert mock_output_manager._stringify_units(units) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -852,7 +852,7 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
-        "_validate_units": mock_output_manager._validate_units,
+        "_stringify_units": mock_output_manager._stringify_units,
     }
 
 

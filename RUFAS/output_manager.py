@@ -210,7 +210,7 @@ class OutputManager(object):
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
-        units = self._validate_units(units)
+        units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units})
@@ -219,7 +219,7 @@ class OutputManager(object):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
 
-    def _validate_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
+    def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
         valid MeasurementUnits enum members (including nested dictionaries). Converts the MeasurementUnits
@@ -243,7 +243,7 @@ class OutputManager(object):
 
         """
         if isinstance(units, dict):
-            return {key: self._validate_units(unit) for key, unit in units.items()}
+            return {key: self._stringify_units(unit) for key, unit in units.items()}
 
         if type(units) is not MeasurementUnits:
             self.add_error(
@@ -251,7 +251,7 @@ class OutputManager(object):
                 f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)}).",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._validate_units.__name__,
+                    "function": self._stringify_units.__name__,
                 },
             )
 
