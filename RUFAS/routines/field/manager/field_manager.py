@@ -47,7 +47,7 @@ class FieldManager:
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
         self.fields: List[Field] = []
