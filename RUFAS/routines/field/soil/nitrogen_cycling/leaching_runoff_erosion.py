@@ -9,6 +9,10 @@ from RUFAS.routines.field.crop_and_soil_constants import (
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 
+"""
+The following are empirical coefficients with the units (kg / L).
+"""
+
 NITRATE_RUNOFF_COEFFICIENT = 0.01
 AMMONIUM_RUNOFF_COEFFICIENT = 0.2
 NITRATE_PERCOLATION_COEFFICIENT = 0.05
