@@ -252,7 +252,7 @@ class AnimalModuleReporter:
                 0,
                 simulation_day,
                 info_map,
-                MeasurementUnits.KILOGRAMS.value,
+                MeasurementUnits.KILOGRAMS,
             )
             om.add_variable(
                 f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
