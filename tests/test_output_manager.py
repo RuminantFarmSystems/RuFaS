@@ -2,7 +2,7 @@ import json
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, Type
 
 import pandas as pd
 import pytest
@@ -559,89 +559,118 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "info_map, exception, exception_message",
+    "name, value, info_map, expected_exception",
     [
-        ({"units": MeasurementUnits.ANIMALS.value}, None, None),
-        ({}, KeyError, "'units' was not found in info_map for call to 'add_variable()'"),
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
+        # Case 2: 'units' key missing, should raise KeyError
+        ("var2", 200, {"class": "TestClass", "function": "test_function"}, KeyError),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
     ],
 )
 def test_add_variable(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+    name: str,
+    value: Any,
     info_map: Dict[str, Any],
-    exception: KeyError | None,
-    exception_message: str,
+    expected_exception: Type[BaseException] | None,
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for function add_variable in file output_manager.py"""
-    key = "dummy_key"
-    name = "dummy_name"
-    value = "dummy_value"
-    mock_output_manager._generate_key = MagicMock(return_value=key)
-    mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._validate_units = MagicMock()
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
 
-    if exception:
-        with pytest.raises(KeyError) as e:
-            mock_output_manager.add_variable(name, value, info_map)
-        assert exception_message in str(e.value)
+    # Arrange
+    output_manager = OutputManager()
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            output_manager.add_variable(name, value, info_map)
     else:
-        mock_output_manager.add_variable(name, value, info_map)
-        mock_output_manager._generate_key.assert_called_once_with(name, info_map)
-        mock_output_manager._add_to_pool(mock_output_manager.variables_pool, key, value, info_map)
-
-    mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
-    mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
-    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+        # Act
+        output_manager.add_variable(name, value, info_map)
+        # Assert
+        patched_add_to_pool.assert_called_once_with(
+            output_manager.variables_pool, "key_with_prefix", value, {**info_map, "units": "validated_units"}
+        )
+        if isinstance(value, dict):
+            for k in value.keys():
+                assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
 
 
 @pytest.mark.parametrize(
-    "units, expected_exception, expected_message",
+    "units, expected_result",
     [
-        (MeasurementUnits.ANIMALS, None, None),
+        (MeasurementUnits.ANIMALS, MeasurementUnits.ANIMALS.value),
         (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "second": MeasurementUnits.ANIMALS,
+                "nested": {"third": MeasurementUnits.DAYS},
+            },
             {
                 "first": MeasurementUnits.ANIMALS.value,
                 "second": MeasurementUnits.ANIMALS.value,
                 "nested": {"third": MeasurementUnits.DAYS.value},
             },
-            None,
-            None,
         ),
-        ("invalid_unit", ValueError, "'invalid_unit' is not a valid MeasurementUnits value"),
+        (
+            "invalid_unit",
+            TypeError("The following unit does not have the type MeasurementUnits: invalid_unit (type <class 'str'>)."),
+        ),
         (
             {
-                "first": MeasurementUnits.ANIMALS.value,
+                "first": MeasurementUnits.ANIMALS,
                 "invalid": "not_a_unit",
             },
-            ValueError,
-            "'not_a_unit' is not a valid MeasurementUnits value",
+            TypeError("The following unit does not have the type MeasurementUnits: not_a_unit (type <class 'str'>)."),
         ),
         (
             {
                 "first": {"nested_invalid": "definitely_not_a_unit"},
-                "second": MeasurementUnits.ANIMALS.value,
+                "second": MeasurementUnits.ANIMALS,
             },
-            ValueError,
-            "'definitely_not_a_unit' is not a valid MeasurementUnits value",
+            TypeError(
+                "The following unit does not have the type MeasurementUnits: "
+                "definitely_not_a_unit (type <class 'str'>)."
+            ),
+        ),
+        (
+            {
+                "first": MeasurementUnits.ANIMALS,
+                "invalid_type": 123,
+            },
+            TypeError("The following unit does not have the type MeasurementUnits: 123 (type <class 'int'>)."),
+        ),
+        (
+            {
+                "first": {"nested_invalid_type": True},
+                "second": MeasurementUnits.ANIMALS,
+            },
+            TypeError("The following unit does not have the type MeasurementUnits: True (type <class 'bool'>)."),
         ),
     ],
 )
-def test_validate_units(
+def test_stringify_units(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]],
-    expected_exception: ValueError,
-    expected_message: str,
+    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]] | MeasurementUnits | str,
+    expected_result: Dict[str, str] | str | Exception,
+    mocker: MockerFixture,
 ) -> None:
-    """Test for function _validate_units in file output_manager.py"""
-    if expected_exception:
-        with pytest.raises(expected_exception) as e:
-            mock_output_manager._validate_units(units)
-        assert expected_message in str(e.value)
+    """Test for function _stringify_units in file output_manager.py"""
+    if isinstance(expected_result, Exception):
+        patch_for_add_error = mocker.patch.object(mock_output_manager, "add_error")
+        with pytest.raises(type(expected_result)) as e:
+            mock_output_manager._stringify_units(units)
+        assert str(expected_result) == str(e.value)
+        patch_for_add_error.assert_called_once()
     else:
-        mock_output_manager._validate_units(units)
-
-    mock_output_manager._validate_units = output_manager_original_method_states["_validate_units"]
+        assert mock_output_manager._stringify_units(units) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -732,7 +761,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
-        "units": MeasurementUnits.ANIMALS.value,
+        "units": MeasurementUnits.ANIMALS,
     }
     om1.add_variable("dummy_name", "dummy_value", info_map)
     assert om2.variables_pool[key] == {
@@ -775,7 +804,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS.value}
+    info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
     om.add_warning("dummy_name", "dummy_msg", info_map)
@@ -823,7 +852,7 @@ def output_manager_original_method_states(
         "create_directory": mock_output_manager.create_directory,
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
-        "_validate_units": mock_output_manager._validate_units,
+        "_stringify_units": mock_output_manager._stringify_units,
     }
 
 
