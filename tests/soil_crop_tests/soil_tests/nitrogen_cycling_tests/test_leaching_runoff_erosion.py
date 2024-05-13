@@ -79,9 +79,7 @@ def test_calculate_nitrogen_removed_by_water(
     """Tests that the correct amount of nitrogen is determined to be removed from a soil layer."""
     n_concentration = 12.0
 
-    with (
-        patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,
-    ):
+    with (patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,):
         actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
             nitrogen, water, coefficient, bulk_density, thickness, field_size
         )

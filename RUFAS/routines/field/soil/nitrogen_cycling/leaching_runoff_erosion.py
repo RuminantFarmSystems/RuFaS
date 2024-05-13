@@ -392,8 +392,9 @@ class LeachingRunoffErosion:
             nitrogen_content, bulk_density, layer_thickness, field_size
         )
 
-        nitrogen_leached_in_mg_per_ha = nitrogen_content_in_mg_per_kg * extraction_coefficient \
-            * water_amount_in_liters / field_size
+        nitrogen_leached_in_mg_per_ha = (
+            nitrogen_content_in_mg_per_kg * extraction_coefficient * water_amount_in_liters / field_size
+        )
 
         nitrogen_leached_in_kg_per_ha = nitrogen_leached_in_mg_per_ha * MILLIGRAMS_TO_KILOGRAMS
 
