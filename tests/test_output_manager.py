@@ -1842,26 +1842,26 @@ def test_save_results_report_generation(
 
 
 def test_route_save_functions_csv(
+    mocker: MockerFixture,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    mock_output_manager._dict_to_file_csv = MagicMock()
+    # mock_output_manager._dict_to_file_csv = MagicMock()
+    dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
+
     mock_output_manager._route_save_functions(
         "csv_file",
-        "save_path",
         {"key": {"var": "value"}},
         True,
         {"filters": "regex"},
+        "json_dir",
         "graphics_dir",
         Path("output/CSVs/"),
     )
+
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
-    mock_output_manager._dict_to_file_csv.assert_called_once_with(
+    dict_to_file_csv.assert_called_once_with(
         {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
-    # Restore original method
-    mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
-    mock_output_manager._route_save_functions = output_manager_original_method_states["_route_save_functions"]
 
 
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
@@ -1869,7 +1869,7 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     output_manager = OutputManager()
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "json_file"
-    save_path = Path("save_path")
+    jsons_dir = Path("json_dir")
     filtered_pool = {"key": {"var": "value"}}
     produce_graphics = True
     filter_content = {"filters": "regex"}
@@ -1878,11 +1878,11 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
 
     # Act
     output_manager._route_save_functions(
-        filter_file, save_path, filtered_pool, produce_graphics, filter_content, graphics_dir, csvs_dir
+        filter_file, filtered_pool, produce_graphics, filter_content, jsons_dir, graphics_dir, csvs_dir
     )
 
     # Assert
-    patch_for_save_to_json.assert_called_once_with(filter_file, save_path, filtered_pool, filter_content)
+    patch_for_save_to_json.assert_called_once_with(filter_file, jsons_dir, filtered_pool, filter_content)
 
 
 @pytest.mark.parametrize(
@@ -1933,57 +1933,52 @@ def test_save_to_json(
 
 
 def test_route_save_functions_graph(
+    mocker: MockerFixture,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    with (
-        patch("RUFAS.graph_generator.GraphGenerator.generate_graph") as mock_generate_graph,
-        patch.object(mock_output_manager, "create_directory") as mock_create_directory,
-    ):
-        dummy_log = ["dummy_log"]
-        mock_generate_graph.return_value = dummy_log
-        mock_output_manager.add_warning = MagicMock()
-        mock_output_manager.add_error = MagicMock()
-        mock_output_manager._route_logs = MagicMock(return_value=True)
-        graph_data = {"filters": ".*", "other keys": "other values"}
-        mock_output_manager._route_save_functions(
-            "graph_file", "save_path", {"key": [1, 2, 3, 4]}, False, graph_data, Path("graphics_dir"), Path("csvs_dir")
-        )
-        mock_generate_graph.assert_not_called()
-        mock_create_directory.assert_called_with(Path("graphics_dir"))
-        mock_output_manager.add_warning.assert_called_once_with(
-            "No Graphics",
-            "Graphic generation is disabled, skipping filter_file='graph_file'",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
+    mock_generate_graph = mocker.patch("RUFAS.graph_generator.GraphGenerator.generate_graph")
+    dummy_log = ["dummy_log"]
+    mock_generate_graph.return_value = dummy_log
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+    add_error = mocker.patch.object(mock_output_manager, "add_error")
+    mocker.patch.object(mock_output_manager, "_route_logs", return_value=True)
+    graph_data = {"filters": ".*", "other keys": "other values"}
 
-        mock_output_manager._route_save_functions(
-            "graph_file", "save_path", {"key": [1, 2, 3, 4]}, True, graph_data, Path("graphics_dir"), Path("csvs_dir")
-        )
-        mock_output_manager.add_warning.assert_called_once_with(
-            "No Graphics",
-            "Graphic generation is disabled, skipping filter_file='graph_file'",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
+    mock_output_manager._route_save_functions(
+        "graph_file", {"key": [1, 2, 3, 4]}, False, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+    )
 
-        mock_generate_graph.assert_called_once_with(
-            {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
-        )
+    mock_generate_graph.assert_not_called()
+    mock_create_directory.assert_called_with(Path("graphics_dir"))
+    add_warning.assert_called_once_with(
+        "No Graphics",
+        "Graphic generation is disabled, skipping filter_file='graph_file'",
+        {"class": "OutputManager", "function": "_route_save_functions"},
+    )
 
-        mock_generate_graph.side_effect = Exception("test exception")
-        mock_output_manager._route_save_functions(
-            "graph_file", "save_path", {"key": [1, 2, 3, 4]}, True, graph_data, Path("graphics_dir"), "csvs_dir"
-        )
-        mock_output_manager.add_error.assert_called_with(
-            "graph generation exception",
-            "test exception",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
+    mock_output_manager._route_save_functions(
+        "graph_file", {"key": [1, 2, 3, 4]}, True, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+    )
+    add_warning.assert_called_once_with(
+        "No Graphics",
+        "Graphic generation is disabled, skipping filter_file='graph_file'",
+        {"class": "OutputManager", "function": "_route_save_functions"},
+    )
 
-    mock_output_manager._route_save_functions = output_manager_original_method_states["_route_save_functions"]
-    mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-    mock_output_manager._route_logs = output_manager_original_method_states["_route_logs"]
+    mock_generate_graph.assert_called_once_with(
+        {"key": [1, 2, 3, 4]}, graph_data, "graph_file", Path("graphics_dir"), True
+    )
+
+    mock_generate_graph.side_effect = Exception("test exception")
+    mock_output_manager._route_save_functions(
+        "graph_file", {"key": [1, 2, 3, 4]}, True, graph_data, Path("jsons_dir"), Path("graphics_dir"), Path("csvs_dir")
+    )
+    add_error.assert_called_with(
+        "graph generation exception",
+        "test exception",
+        {"class": "OutputManager", "function": "_route_save_functions"},
+    )
 
 
 @pytest.mark.parametrize(
