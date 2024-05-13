@@ -153,7 +153,7 @@ class AnimalBase:
 
         return p_urine, p_feces_excrt
 
-    def set_p_purchased(self):
+    def set_p_purchased(self) -> None:
         """
         Sets this animal's phosphorus value as a purchased animal.
         """

@@ -10,6 +10,8 @@
 		"breed": "HO"
 	},
 	"herd_initialization": {
+		"male_calf_rate_for_herd_init_only": 0.1,
+    	"heiferIII_conversion_rate_to_replacement": 0.01,
 		"initial_animal_num": 10000,
 		"simulation_days": 5000
 	},

@@ -49,7 +49,9 @@ class Calf(AnimalBase):
         Determine stillbirth, gender, and birth weight
         """
         # gender determined with gender ratio relates to semen type
-        if AnimalBase.config["semen_type"] == "conventional":
+        if "male_calf_rate_for_herd_init_only" in args:
+            male_calf_rate = args["male_calf_rate_for_herd_init_only"]
+        elif AnimalBase.config["semen_type"] == "conventional":
             male_calf_rate = AnimalBase.config["male_calf_rate_conventional_semen"]
         else:
             male_calf_rate = AnimalBase.config["male_calf_rate_sexed_semen"]

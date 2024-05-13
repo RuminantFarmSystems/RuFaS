@@ -92,6 +92,20 @@
     "herd_initialization": {
       "type": "object",
       "description": "Animal generation related inputs",
+      "male_calf_rate_for_herd_init_only": {
+        "type": "number",
+        "description": "The probability of a new calf being male. This is only used for the initial herd generation and is not used for the rest of the simulation. A low value is recommended because male calves will get sold, whereas a female calf is much less likely to be removed from the herd. Two other variables that have mild effects on the count of female calves are keep_female_calf_rate and still_birth_rate.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.1
+      },
+      "heiferIII_conversion_rate_to_replacement": {
+        "type": "number",
+        "description": "The probability of a HeiferIII being converted to a replacement animal. This rate only applies to HeiferIIIs that have not become cows.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.01
+      },
       "initial_animal_num": {
         "type": "number",
         "description": "The initial number of animals for the simulation starting with to generate the herd",
@@ -1054,10 +1068,6 @@
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
-        },
         "estrus_count": {
           "type": "number",
           "description": "Estrus count.",
@@ -1066,26 +1076,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1180,10 +1170,6 @@
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
-        },
         "estrus_count": {
           "type": "number",
           "description": "Estrus count.",
@@ -1192,26 +1178,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1306,10 +1272,6 @@
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
-        },
         "estrus_count": {
           "type": "number",
           "description": "Estrus count.",
@@ -1318,26 +1280,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1376,21 +1318,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "presynch_method": {
-          "type": "string",
-          "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
-        },
-        "tai_method_c": {
-          "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-        },
-        "resynch_method": {
-          "type": "string",
-          "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
         },
         "days_in_milk": {
           "type": "number",
@@ -1462,10 +1389,6 @@
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
-        },
         "estrus_count": {
           "type": "number",
           "description": "Estrus count.",
@@ -1474,26 +1397,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1532,21 +1435,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "presynch_method": {
-          "type": "string",
-          "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
-        },
-        "tai_method_c": {
-          "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-        },
-        "resynch_method": {
-          "type": "string",
-          "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
         }
       }
     }

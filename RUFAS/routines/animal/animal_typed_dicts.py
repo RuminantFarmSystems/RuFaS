@@ -38,7 +38,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
 
     id: int
     breed: str
-    birth_date: str
+    birth_date: int
     days_born: int
     birth_weight: float
     p_init: int
@@ -46,6 +46,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
     pen_history: NotRequired[List]
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
+    male_calf_rate_for_herd_init_only: NotRequired[float]
 
 
 class CalfValuesTypedDict(TypedDict):

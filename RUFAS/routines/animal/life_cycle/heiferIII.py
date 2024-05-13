@@ -25,14 +25,6 @@ class HeiferIII(HeiferII):
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
-            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
-                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
-            args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
-            args.synch_ed_method_h: synch ed protocols used for
-                reproduction programs, two of them: 2P and CP
-            (optional: include the following to assign cow information)
             args.birth_weight: the birth weight of the cow
             args.body_weight: current body weight of the cow
             args.wean_weight: the wean weight of the cow
@@ -40,10 +32,6 @@ class HeiferIII(HeiferII):
             args.events: events of the cow
             args.estrus_count
             args.estrus_day
-            args.tai_program_start_day_h
-            args.synch_ed_program_start_day_h
-            args.synch_ed_estrus_day
-            args.stop_day
             args.conception_rate
             args.ai_day
             args.abortion_day
