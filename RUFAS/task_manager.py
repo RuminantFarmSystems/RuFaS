@@ -439,15 +439,15 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
-
         if save_results:
             output_manager.save_results(
-                args["output_directory"],
                 args["filters_directory"],
                 args["exclude_info_maps"],
                 produce_graphics,
+                args["report_directory"],
                 args["graphics_directory"],
                 args["CSV_directory"],
+                args["JSON_directory"],
             )
         output_manager.dump_all_nondata_pools(
             args["output_directory"], args["exclude_info_maps"], args["variable_name_style"]

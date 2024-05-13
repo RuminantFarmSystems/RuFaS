@@ -981,10 +981,10 @@ class OutputManager(object):
 
     def save_results(
         self,
-        save_path: Path,
         filters_dir_path: Path,
         exclude_info_maps: bool,
         produce_graphics: bool,
+        report_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
         json_dir: Path,
@@ -998,14 +998,14 @@ class OutputManager(object):
 
         Parameters
         ----------
-        save_path : Path
-            Path to the directory where the file will be saved.
         filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
+        report_dir : Path
+            The directory for saving reports to.
         graphics_dir : Path
             The directory for saving graphics.
         csv_dir : Path
@@ -1075,11 +1075,9 @@ class OutputManager(object):
                         graphics_dir,
                         csv_dir,
                     )
-            report_file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"report_{filter_file}", "csv"),
-            )
+            report_file_path = os.path.join(report_dir, self.generate_file_name(f"report_{filter_file}", "csv"))
             if report_generator.reports:
+                self.create_directory(report_dir)
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
 
