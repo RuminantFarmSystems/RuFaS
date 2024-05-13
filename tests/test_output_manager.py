@@ -1845,7 +1845,6 @@ def test_route_save_functions_csv(
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
 ) -> None:
-    # mock_output_manager._dict_to_file_csv = MagicMock()
     dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
 
     mock_output_manager._route_save_functions(
@@ -1867,6 +1866,7 @@ def test_route_save_functions_csv(
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
     # Arrange
     output_manager = OutputManager()
+    patch_create_directory = mocker.patch.object(output_manager, "create_directory")
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "json_file"
     jsons_dir = Path("json_dir")
@@ -1882,6 +1882,7 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     )
 
     # Assert
+    patch_create_directory.assert_called_once_with(jsons_dir)
     patch_for_save_to_json.assert_called_once_with(filter_file, jsons_dir, filtered_pool, filter_content)
 
 
