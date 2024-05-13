@@ -25,7 +25,7 @@ def test_get_prefix() -> None:
 
 
 @pytest.fixture
-def mock_output_manager(mocker) -> OutputManager:
+def mock_output_manager() -> OutputManager:
     output_manager = OutputManager()
     return output_manager
 
@@ -1714,6 +1714,7 @@ def test_filter_variables_pool_complex(
     ],
 )
 def test_save_results(
+    mocker: MockerFixture,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     exclude_info_maps: bool,
@@ -1723,67 +1724,49 @@ def test_save_results(
 ) -> None:
     # Arrange
     csvs_dir = "output/CSVs/"
+    jsons_dir = "output/JSONs/"
+    reports_dir = "output/reports/"
     mock_output_manager.variables_pool = {}
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._load_filter_file_content = MagicMock(return_value=filter_content)
-    mock_output_manager._list_filter_files_in_dir = MagicMock(
-        return_value=[
-            "csv_input_filepath1.txt",
-            "graph_input_filepath2.txt",
-        ]
-    )
+    mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
+    filter_files = ["csv_input_filepath1.txt", "graph_input_filepath2.txt", "json_input_filepath3.txt"]
+    mocker.patch.object(mock_output_manager, "_list_filter_files_in_dir", return_value=filter_files)
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
-    mock_output_manager._route_save_functions = MagicMock()
-    mock_output_manager.add_error = MagicMock()
+    route_save_functions = mocker.patch.object(mock_output_manager, "_route_save_functions")
+    add_error = mocker.patch.object(mock_output_manager, "add_error")
     mock_output_manager.time = MagicMock()
 
     # Act
     mock_output_manager.save_results(
-        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir", csvs_dir
+        "filters_path", exclude_info_maps, produce_graphics, reports_dir, "graphics_dir", csvs_dir, jsons_dir
     )
 
     # Assert
     if is_faulty:
         mock_output_manager._exclude_info_maps.assert_not_called()
-        mock_output_manager._route_save_functions.assert_not_called()
-        assert mock_output_manager.add_error.call_count == 2
+        route_save_functions.assert_not_called()
+        assert add_error.call_count == len(filter_files)
     else:
-        mock_output_manager.add_error.assert_not_called()
+        add_error.assert_not_called()
         if exclude_info_maps:
-            mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({})])
+            mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({}), call({})])
         else:
             mock_output_manager._exclude_info_maps.assert_not_called()
-        mock_output_manager._route_save_functions.assert_has_calls(
+        route_save_functions.assert_has_calls(
             [
                 call(
-                    "csv_input_filepath1.txt",
-                    "save_path",
+                    file_name,
                     {},
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
+                    jsons_dir,
                     "graphics_dir",
                     csvs_dir,
-                ),
-                call(
-                    "graph_input_filepath2.txt",
-                    "save_path",
-                    {},
-                    produce_graphics,
-                    {"filters": ".*", "title": "dummy_title"},
-                    "graphics_dir",
-                    csvs_dir,
-                ),
+                )
+                for file_name in filter_files
             ]
         )
-
-    # Restore original method
-    mock_output_manager.save_results = output_manager_original_method_states["save_results"]
-    mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
-    mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
-    mock_output_manager._route_save_functions = output_manager_original_method_states["_route_save_functions"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 @pytest.mark.parametrize(
@@ -1808,8 +1791,8 @@ def test_save_results_report_generation(
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._load_filter_file_content = MagicMock(return_value=filter_content)
+    mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
     mock_output_manager._list_filter_files_in_dir = MagicMock(
         return_value=[
             "report_input_filepath1.txt",
@@ -1829,7 +1812,7 @@ def test_save_results_report_generation(
 
         # Act
         mock_output_manager.save_results(
-            "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir", "csv_dir"
+            "filters_path", exclude_info_maps, produce_graphics, "reports_dir", "graphics_dir", "csv_dir", "json_dir"
         )
 
         # Assert
@@ -1852,8 +1835,6 @@ def test_save_results_report_generation(
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states["save_results"]
     mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
-    mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
     mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
@@ -1884,7 +1865,6 @@ def test_route_save_functions_csv(
 
 
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
-
     # Arrange
     output_manager = OutputManager()
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")

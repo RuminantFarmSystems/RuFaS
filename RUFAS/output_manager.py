@@ -1053,7 +1053,6 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
-                    # self._variables_usage_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
