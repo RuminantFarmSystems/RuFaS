@@ -42,21 +42,25 @@ class Percolation:
         -----
         RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
 
+        This routine calls the subroutine `_percolate_infiltrated_water` to handle percolating water from infiltration
+        into the soil profile. If that routine percolates water out of any soil layers (which is the case when there are
+        high or sustained amounts of infiltration), this routine will only percolate water out of the soil layers which
+        have not had water percolated out of them on the current day.
+
         References
         ----------
         SWAT sections 2:3.1 and 2
 
         """
-        if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
-            self._percolate_excess_water()
+        top_layer_to_percolate = self._percolate_infiltrated_water()
+
+        if top_layer_to_percolate is None:
             return
-        else:
-            self.data.soil_layers[0].water_content += self.data.infiltrated_water
 
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(layer_count)):
+        for layer_number in reversed(range(top_layer_to_percolate, layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
             if layer_number < deepest_layer:
@@ -75,9 +79,9 @@ class Percolation:
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
             else:
-                current_layer.percolated_water = 0
+                current_layer.percolated_water = 0.0
 
-        for layer_number in range(1, layer_count + 1):
+        for layer_number in range(top_layer_to_percolate + 1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
             percolated_water = layer_above.percolated_water
             if layer_number == deepest_layer + 1:
@@ -85,21 +89,28 @@ class Percolation:
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
 
-    def _percolate_excess_water(self) -> None:
+    def _percolate_infiltrated_water(self) -> int | None:
         """
-        Percolates large amounts of infiltrated water through the entire soil profile.
+        Percolates infiltrated water into the soil profile.
+
+        Returns
+        -------
+        int | None
+            The index of the topmost soil which has not had water percolated out of it, or None if all layers in the
+            soil profile have had water percolated out.
 
         Notes
         -----
         The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
         entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
-        infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
-        the entire soil profile.
+        infiltration in a row, this method fills soil layers to their saturation point going top-down, and records water
+        that is put below a layer as being percolated by it.
 
         """
         self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
-        for layer in self.data.soil_layers:
+        top_layer_to_percolate = None
+        for index, layer in enumerate(self.data.soil_layers):
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
@@ -108,9 +119,11 @@ class Percolation:
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0
+                top_layer_to_percolate = index
                 break
         if water_remaining_to_percolate > 0.0:
             self.data.vadose_zone_layer.water_content += water_remaining_to_percolate
+        return top_layer_to_percolate
 
     # --- Static methods ---
     @staticmethod
