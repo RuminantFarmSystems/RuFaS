@@ -2,11 +2,6 @@ import pytest
 from math import exp, log
 from unittest.mock import MagicMock, call, patch
 
-from RUFAS.routines.field.crop_and_soil_constants import (
-    CUBIC_MILLIMETERS_TO_LITERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
 from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
     LeachingRunoffErosion,
     NITRATE_RUNOFF_COEFFICIENT,
