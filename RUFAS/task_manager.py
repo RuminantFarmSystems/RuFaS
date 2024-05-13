@@ -370,14 +370,14 @@ class TaskManager:
     def handle_input_data_audit(
         args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
-        """Validates input data saves metadata properies to CSV."""
+        """Validates input data saves metadata properties to CSV."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_input_data_audit.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
-        is_data_valid = input_manager.start_data_processing(args["metadata_file_path"], eager_termination)
+        is_data_valid = input_manager.start_data_processing(Path(args["metadata_file_path"]), eager_termination)
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
