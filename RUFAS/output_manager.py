@@ -981,12 +981,13 @@ class OutputManager(object):
 
     def save_results(
         self,
-        save_path: Path,
         filters_dir_path: Path,
         exclude_info_maps: bool,
         produce_graphics: bool,
+        report_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
+        json_dir: Path,
     ) -> None:
         """
         Parses the filter files in the given directory and saves the results to the given path.
@@ -997,23 +998,21 @@ class OutputManager(object):
 
         Parameters
         ----------
-        save_path : Path
-            Path to the directory where the file will be saved.
-
         filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
-
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
-
         produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
-
+        report_dir : Path
+            The directory for saving reports to.
         graphics_dir : Path
             The directory for saving graphics.
-
         csv_dir : Path
             The directory for saving csvs.
+        json_dir : Path
+            The directory for saving JSONs containing filtered simulation output.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1054,7 +1053,6 @@ class OutputManager(object):
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
-                    # self._variables_usage_counter.update(filtered_pool.keys())
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1069,28 +1067,26 @@ class OutputManager(object):
                 else:
                     self._route_save_functions(
                         filter_file,
-                        save_path,
                         filtered_pool,
                         produce_graphics,
                         filter_content,
+                        json_dir,
                         graphics_dir,
                         csv_dir,
                     )
-            report_file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"report_{filter_file}", "csv"),
-            )
+            report_file_path = os.path.join(report_dir, self.generate_file_name(f"report_{filter_file}", "csv"))
             if report_generator.reports:
+                self.create_directory(report_dir)
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
 
     def _route_save_functions(
         self,
         filter_file: str,
-        save_path: Path,
         filtered_pool: Dict[str, pool_element_type],
         produce_graphics: bool,
         filter_content: Dict[str, str | int],
+        json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
     ) -> None:
@@ -1103,9 +1099,10 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
         if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
-                save_path,
+                json_dir,
                 filtered_pool,
                 filter_content,
             )
