@@ -2170,11 +2170,11 @@ class InputManager:
             if depth > self.metadata_depth_limit:
                 om.add_error(
                     "Max metadata depth exceeded.",
-                    "Metadata depth exceeds maximum allowed depth of " f"{self.metadata_depth_limit} at path {path}",
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}",
                     info_map,
                 )
                 raise ValueError(
-                    "Metadata depth exceeds maximum allowed depth of " f"{self.metadata_depth_limit} at path {path}"
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}"
                 )
 
             if depth > current_max_depth:
@@ -2188,6 +2188,10 @@ class InputManager:
                         value_type = value.get("type")
                         if value_type in type_to_validator_map:
                             type_to_validator_map[value_type](path + [key], value)
+                        else:
+                            if value_type != "object":
+                                print(value_type)
+                                print(key)
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
