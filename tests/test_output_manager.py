@@ -1723,9 +1723,11 @@ def test_save_results(
     is_faulty: bool,
 ) -> None:
     # Arrange
-    csvs_dir = "output/CSVs/"
-    jsons_dir = "output/JSONs/"
-    reports_dir = "output/reports/"
+    filters_path = Path("filters_path")
+    csvs_dir = Path("output/CSVs/")
+    jsons_dir = Path("output/JSONs/")
+    reports_dir = Path("output/reports/")
+    graphics_dir = Path("outputs/graphics_dir")
     mock_output_manager.variables_pool = {}
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
@@ -1738,7 +1740,7 @@ def test_save_results(
 
     # Act
     mock_output_manager.save_results(
-        "filters_path", exclude_info_maps, produce_graphics, reports_dir, "graphics_dir", csvs_dir, jsons_dir
+        filters_path, exclude_info_maps, produce_graphics, reports_dir, graphics_dir, csvs_dir, jsons_dir
     )
 
     # Assert
@@ -1760,7 +1762,7 @@ def test_save_results(
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
                     jsons_dir,
-                    "graphics_dir",
+                    graphics_dir,
                     csvs_dir,
                 )
                 for file_name in filter_files
@@ -1790,6 +1792,11 @@ def test_save_results_report_generation(
     mocker: MockerFixture,
 ) -> None:
     # Arrange
+    filters_path = Path("filters_path")
+    csvs_dir = Path("output/CSVs/")
+    jsons_dir = Path("output/JSONs/")
+    reports_dir = Path("output/reports/")
+    graphics_dir = Path("outputs/graphics_dir")
     mock_output_manager.variables_pool = {}
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
@@ -1812,7 +1819,7 @@ def test_save_results_report_generation(
 
         # Act
         mock_output_manager.save_results(
-            "filters_path", exclude_info_maps, produce_graphics, "reports_dir", "graphics_dir", "csv_dir", "json_dir"
+            filters_path, exclude_info_maps, produce_graphics, reports_dir, graphics_dir, csvs_dir, jsons_dir
         )
 
         # Assert
@@ -1829,7 +1836,7 @@ def test_save_results_report_generation(
             for content in filter_content:
                 if "graph_details" in content:
                     assert "graphics_dir" in content["graph_details"]
-                    assert content["graph_details"]["graphics_dir"] == "graphics_dir"
+                    assert content["graph_details"]["graphics_dir"] == graphics_dir
                     assert content["graph_details"]["metadata_prefix"] == "test_prefix"
 
     # Restore original method states
