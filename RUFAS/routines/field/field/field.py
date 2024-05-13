@@ -157,7 +157,7 @@ class Field:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
         if manure_supplier is None:

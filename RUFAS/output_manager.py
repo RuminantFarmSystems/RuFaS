@@ -138,7 +138,7 @@ class OutputManager(object):
                 "Output Manager instantiated.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
+                    "function": "__init__",
                 },
             )
             self.time = None
