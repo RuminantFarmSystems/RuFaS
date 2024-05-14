@@ -143,6 +143,8 @@ class Silage(Storage):
         """
         Calculates the moisture loss to effluent.
 
+        Parameters
+        ----------
         estimated_maximum_effluent : float
             The estimated maximum effluent.
         days_of_effluent_loss : int

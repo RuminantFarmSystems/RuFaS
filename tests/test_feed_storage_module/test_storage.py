@@ -147,13 +147,6 @@ def test_process_degradations(
     assert mock_first_crop.last_time_degraded == mock_second_crop.last_time_degraded == mock_time
 
 
-def test_give_feed(storage: Storage) -> None:
-    """
-    Test the give_feed method of the Storage class.
-    """
-    pass
-
-
 @pytest.mark.parametrize(
     "dry_loss,water_loss,fresh,percentage,expected_fresh,expected_percentage",
     [
