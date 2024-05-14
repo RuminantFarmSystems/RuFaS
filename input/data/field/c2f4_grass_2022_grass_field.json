@@ -1,0 +1,20 @@
+
+{
+  "soil_specification": "soil",
+  "crop_specification": "crop Alfalfa 2022",
+  "manure_management_specification": "manure_schedule Alfalfa 2022",
+  "tillage_management_specification": "tillage_schedule Alfalfa 2022",
+  "fertilizer_management_specification": "fertilizer_schedule Alfalfa 2022",
+  "field_size": 106,
+  "absolute_latitude": 45.5908,
+  "longitude": 95.3151,
+  "minimum_daylength": 9.0,
+  "seasonal_high_water_table": false,
+  "watering_amount_in_liters": 0.0,
+  "watering_interval": 0,
+  "supplement_manure_nutrient_deficiencies": false,
+  "simulate_water_stress": true,
+  "simulate_temp_stress": true,
+  "simulate_nitrogen_stress": true,
+  "simulate_phosphorus_stress": true
+}
