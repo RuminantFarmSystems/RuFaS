@@ -3,6 +3,8 @@ import os
 # import json
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from typing import List, Dict, Any
 
@@ -200,7 +202,10 @@ def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
     new_whole_output: List[Any] = []
     updated_names = []
     for item in whole_output[0]:
-        updated_names.append(item.replace(".", " "))
+        updated_name = item.replace(".", " ")
+        updated_name = updated_name.replace("'", "")
+        updated_name = updated_name.replace("*", " X ")
+        updated_names.append(updated_name)
     new_whole_output.append(updated_names)
     for line_num in range(1, len(whole_output)):
         reformatted_line = []
@@ -211,3 +216,24 @@ def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
             reformatted_line.append(item)
         new_whole_output.append(reformatted_line)
     return new_whole_output
+
+
+def plot_whole_new(output_path: str,
+                   output_prefix: str,
+                   ) -> None:
+    whole_new_output_report = pd.read_csv(
+        output_path + output_prefix + "_new whole analysis.csv",
+        index_col=0)
+    # ,
+    #     names=0, encoding='utf-8'
+    # )
+
+    df = pd.DataFrame(whole_new_output_report)
+    df_trimmed = df.select_dtypes(include=['float'])
+    # df_trimmed = df.drop(df.columns[99:], axis=1)
+
+    plt.figure()
+    sns.heatmap(df_trimmed, annot=True)
+    # plt.show(block=False)
+    plt.savefig(output_path + output_prefix + "whole_new_heatmap.jpg")
+    plt.close()

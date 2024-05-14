@@ -1,6 +1,16 @@
-{"analyses":[{
-        "input_path": "input/data/tasks/may6_ff.json",
-        "output_path": "output/",
-        "report_name": "report_SA"
-}]
+{
+    "analyses": [
+        {
+            "input_file": "input/data/tasks/may6_ff.json",
+            "output_path": "C:/Users/jw2574/SA_outputs/",
+            "report_name": "report_SA",
+            "plot_whole_new": true
+        },
+        {
+            "input_file": "input/data/tasks/may5b_tasks.json",
+            "output_path": "C:/Users/jw2574/OneDrive - Cornell University/RuFaS/Sensitivity Analyses/may5b_/",
+            "report_name": "report_SA",
+            "plot_whole_new": true
+        }
+    ]
 }
