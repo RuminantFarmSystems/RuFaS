@@ -134,6 +134,8 @@ class TaskManager:
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics)
+        TaskManager.handle_post_processing(args={}, input_manager=self.input_manager,
+                                           output_manager=self.output_manager, task_id="TASK_MANAGER")
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -381,7 +383,6 @@ class TaskManager:
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
-        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
 
         output_manager.add_log(
             "Saving metadata properties",
