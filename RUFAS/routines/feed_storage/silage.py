@@ -95,8 +95,8 @@ class Silage(Storage):
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
 
-        om.add_variable("total_effluent_dry_matter_loss", dry_matter_loss, info_map)
-        om.add_variable("total_effluent_moisture_loss", moisture_loss, info_map)
+        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
 
