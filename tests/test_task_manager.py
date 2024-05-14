@@ -1,30 +1,33 @@
-from typing import Any, Generator
 import pytest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
+from pytest_mock import MockerFixture
 
 from RUFAS.task_manager import TaskManager, TaskType
-from RUFAS.output_manager import LogVerbosity
+from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.input_manager import InputManager
 from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
-def mock_input_manager() -> Generator[Any, Any, Any]:
-    with patch("RUFAS.task_manager.InputManager") as mock:
-        yield mock
+def input_manager() -> InputManager:
+    InputManager.__instance = None
+    input_manager = InputManager()
+    return input_manager
 
 
 @pytest.fixture
-def mock_output_manager() -> Generator[Any, Any, Any]:
-    with patch("RUFAS.task_manager.OutputManager") as mock:
-        yield mock
+def output_manager() -> OutputManager:
+    OutputManager.__instance = None
+    output_manager = OutputManager()
+    return output_manager
 
 
 @pytest.fixture
-def task_manager(mock_input_manager: MagicMock, mock_output_manager: MagicMock) -> TaskManager:
+def task_manager(input_manager: InputManager, output_manager: OutputManager) -> TaskManager:
     tm = TaskManager()
-    tm.input_manager = mock_input_manager
-    tm.output_manager = mock_output_manager
+    tm.input_manager = input_manager
+    tm.output_manager = output_manager
     return tm
 
 
@@ -50,35 +53,35 @@ def test_invalid_task_type_from_string() -> None:
 
 
 def test_task_manager_init(
-    task_manager: TaskManager,
-    mock_input_manager: Generator[Any, Any, Any],
-    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager, input_manager: InputManager, output_manager: OutputManager
 ) -> None:
-    assert task_manager.input_manager is mock_input_manager
-    assert task_manager.output_manager is mock_output_manager
+    assert task_manager.input_manager is input_manager
+    assert task_manager.output_manager is output_manager
 
 
-def test_task_manager_start_exception(task_manager):
+def test_task_manager_start_exception(task_manager: TaskManager) -> None:
     task_manager.input_manager.start_data_processing = MagicMock(return_value=False)
     with pytest.raises(Exception) as exc_info:
         task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), True, False)
     assert "Task Manager's input data is invalid." in str(exc_info.value)
 
 
-def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
-    TaskManager.set_random_seed(1234, mock_output_manager)
-    mock_output_manager.add_log.assert_called_with(
+def test_set_random_seed(output_manager: OutputManager, mocker: MockerFixture) -> None:
+    patch_for_add_log = mocker.patch.object(output_manager, "add_log")
+    TaskManager.set_random_seed(1234, output_manager)
+    patch_for_add_log.assert_called_with(
         "Random seed used",
         "Seeded libaries with random_seed=1234",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
     )
 
 
-def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_set_random_seed_zero(output_manager: OutputManager, mocker: MockerFixture) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(0, mock_output_manager)
+        patch_for_add_log = mocker.patch.object(output_manager, "add_log")
+        TaskManager.set_random_seed(0, output_manager)
         mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
+        patch_for_add_log.assert_called_with(
             "Random seed used",
             "Seeded libaries with random_seed=4321",
             {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -87,20 +90,21 @@ def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> 
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
+    seed: int, expected: int, output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(seed, mock_output_manager)
+        patch_for_add_log = mocker.patch.object(output_manager, "add_log")
+        TaskManager.set_random_seed(seed, output_manager)
         if seed == 0:
             mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
+        patch_for_add_log.assert_called_with(
             "Random seed used",
             f"Seeded libaries with random_seed={expected}",
             {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
         )
 
 
-def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Generator[Any, Any, Any]) -> None:
+def test_parse_input_tasks(task_manager: TaskManager, input_manager: InputManager, mocker: MockerFixture) -> None:
     task_data = [
         {
             "task_type": "Herd Initialization",
@@ -123,7 +127,8 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "save_animals_directory": "/output/herd",
         },
     ]
-    mock_input_manager.get_data.return_value = task_data
+    patch_for_get_data = mocker.patch.object(input_manager, "get_data")
+    patch_for_get_data.return_value = task_data
     single, multi = task_manager._parse_input_tasks()
     assert len(single) == 1
     assert len(multi) == 1
@@ -139,7 +144,7 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 
 
 def test_handle_post_processing(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any]
+    input_manager: InputManager, output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     args = {
         "output_directory": Path("/fake/output"),
@@ -150,25 +155,26 @@ def test_handle_post_processing(
         "CSV_directory": Path("/fake/csv"),
         "output_pool_path": Path("/fake/pool"),
     }
-    TaskManager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
-    mock_output_manager.dump_all_nondata_pools.assert_called_with(
-        args["output_directory"], args["exclude_info_maps"], "verbose"
-    )
+    patch_for_dump_all_nondata_pools = mocker.patch.object(output_manager, "dump_all_nondata_pools")
+    TaskManager.handle_post_processing(args, input_manager, output_manager, "1/1")
+    patch_for_dump_all_nondata_pools.assert_called_with(args["output_directory"], args["exclude_info_maps"], "verbose")
 
 
-def test_input_data_audit(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any]
-) -> None:
+def test_input_data_audit(input_manager: InputManager, output_manager: OutputManager, mocker: MockerFixture) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
         "output_directory": Path("/fake/output"),
         "output_prefix": "test",
     }
-    mock_input_manager.start_data_processing.return_value = True
-    result = TaskManager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
+    patch_for_start_data_processing = mocker.patch.object(input_manager, "start_data_processing")
+    patch_for_start_data_processing.return_value = True
+    patch_for_save_metadata_properties = mocker.patch.object(input_manager, "save_metadata_properties")
+    patch_for_add_log = mocker.patch.object(output_manager, "add_log")
+    result = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
     assert result
-    mock_output_manager.add_log.assert_called_with(
+    patch_for_add_log.assert_called_with(
         "Saving metadata properties",
         f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
         {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
     )
+    patch_for_save_metadata_properties.assert_called_once_with(args["output_directory"])
