@@ -35,7 +35,7 @@ def task_manager(mock_input_manager: MagicMock, mock_output_manager: MagicMock) 
         ("simulation single run", TaskType.SIMULATION_SINGLE_RUN),
         ("simulation multi RUN", TaskType.SIMULATION_MULTI_RUN),
         ("sensitivity analysis", TaskType.SENSITIVITY_ANALYSIS),
-        ("input data Audition", TaskType.INPUT_DATA_AUDITION),
+        ("input data Audit", TaskType.INPUT_DATA_AUDIT),
         ("end to END testing", TaskType.END_TO_END_TESTING),
         ("post_processing", TaskType.POST_PROCESSING),
     ],
