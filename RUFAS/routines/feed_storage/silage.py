@@ -42,19 +42,8 @@ class Silage(Storage):
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
-        Processes the degradations and losses of nutrients and dry matter in the stored crops.
-
-        Parameters
-        ----------
-        weather : Weather
-            Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
-
-        Notes
-        -----
-        This method also records the total amount of gaseous dry matter loss happened from all stored crops.
-
+        Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
+        of `process_degradations` to handle the fermentative loss.
         """
         info_map = {
             "class": self.__class__.__name__,
