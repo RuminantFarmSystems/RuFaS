@@ -1,0 +1,15 @@
+{
+    "years": [2019, 2020, 2021, 2022],
+    "days": [105, 105, 105, 105],
+    "incorporation_fractions": [1, 1, 1, 1],
+    "mixing_fractions": [1, 1, 1, 1],
+    "tillage_depths": [150],
+    "implements": ["disk_harrow"],
+    "pattern_repeat": 1,
+    "pattern_skip": 0
+}
+
+
+
+
+
