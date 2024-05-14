@@ -10,11 +10,12 @@ with open(config_json_filename) as json_file:
     config_json = json.load(json_file)
 
 for analysis in config_json['analyses']:
-    input_path = analysis['input_path']
+    input_file = analysis["input_file"]
     output_path = analysis["output_path"]
     report_name = analysis["report_name"]
+    plot_whole_new = analysis["plot_whole_new"]
 
-    with open(input_path) as json_file:
+    with open(input_file) as json_file:
         input_config = json.load(json_file)
 
     task_to_analyze: Dict[str, Any] = input_config['tasks'][0]
@@ -50,4 +51,9 @@ for analysis in config_json['analyses']:
     with open(output_path + output_prefix + "_new whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(new_whole_output)
+
+    if plot_whole_new:
+        SA_helpers.plot_whole_new(output_path=output_path,
+                                  output_prefix=output_prefix)
+
 print('did all the stuff!')
