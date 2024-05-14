@@ -151,11 +151,11 @@ class TaskManager:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
-            input_task["nondata_output_directory"] = Path(input_task["nondata_output_directory"])
+            input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
-            input_task["CSV_directory"] = Path(input_task["CSV_directory"])
-            input_task["JSON_directory"] = Path(input_task["JSON_directory"])
+            input_task["csv_output_directory"] = Path(input_task["csv_output_directory"])
+            input_task["json_output_directory"] = Path(input_task["json_output_directory"])
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
@@ -288,7 +288,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                args["nondata_output_directory"],
+                args["logs_directory"],
                 False,
                 Path(""),
                 args["output_prefix"],
@@ -335,7 +335,7 @@ class TaskManager:
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
-            output_manager.dump_all_nondata_pools(args["nondata_output_directory"], args["exclude_info_maps"], "block")
+            output_manager.dump_all_nondata_pools(args["logs_directory"], args["exclude_info_maps"], "block")
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
@@ -387,10 +387,10 @@ class TaskManager:
 
         output_manager.add_log(
             "Saving metadata properties",
-            f"Saving metadata properties {args['metadata_file_path']} at {args['nondata_output_directory']}",
+            f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
             info_map,
         )
-        input_manager.save_metadata_properties(args["nondata_output_directory"])
+        input_manager.save_metadata_properties(args["logs_directory"])
 
         return is_data_valid
 
@@ -430,7 +430,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-        input_manager.dump_get_data_logs(args["nondata_output_directory"])
+        input_manager.dump_get_data_logs(args["logs_directory"])
 
         if load_pool_from_file:
             output_manager.flush_pools()
@@ -445,11 +445,11 @@ class TaskManager:
                 produce_graphics,
                 args["report_directory"],
                 args["graphics_directory"],
-                args["CSV_directory"],
-                args["JSON_directory"],
+                args["csv_output_directory"],
+                args["json_output_directory"],
             )
         output_manager.dump_all_nondata_pools(
-            args["nondata_output_directory"], args["exclude_info_maps"], args["variable_name_style"]
+            args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
         )
 
     @staticmethod
