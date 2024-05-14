@@ -1,0 +1,10 @@
+{
+    "years": [2015, 2015],
+    "days": [84, 288],
+    "incorporation_fractions": [0.95, 0.7],
+    "mixing_fractions": [0.95, 0.7],
+    "tillage_depths": [150, 50],
+    "implements": ["moldboard-plow", "disk-harrow"],
+    "pattern_repeat": 5,
+    "pattern_skip": 0
+}
