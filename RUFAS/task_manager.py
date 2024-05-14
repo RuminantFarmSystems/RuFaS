@@ -98,7 +98,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path.as_posix())
+        is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 {
