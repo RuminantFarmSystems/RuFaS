@@ -884,11 +884,11 @@ def test_dump_logs(
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
-    mock_output_manager.dump_logs("dummy_path")
+    mock_output_manager.dump_logs(Path("dummy_path"))
 
     mock_output_manager.generate_file_name.assert_called_once_with("logs", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
-        mock_output_manager.logs_pool, os.path.join("dummy_path", "dummy_name")
+        mock_output_manager.logs_pool, Path("dummy_path", "dummy_name")
     )
 
     # Restore original methods
@@ -904,11 +904,11 @@ def test_dump_warnings(
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
-    mock_output_manager.dump_warnings("dummy_path")
+    mock_output_manager.dump_warnings(Path("dummy_path"))
 
     mock_output_manager.generate_file_name.assert_called_once_with("warnings", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
-        mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name")
+        mock_output_manager.warnings_pool, Path("dummy_path", "dummy_name")
     )
 
     # Restore original methods
@@ -924,11 +924,11 @@ def test_dump_errors(
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager.dict_to_file_json = MagicMock()
 
-    mock_output_manager.dump_errors("dummy_path")
+    mock_output_manager.dump_errors(Path("dummy_path"))
 
     mock_output_manager.generate_file_name.assert_called_once_with("errors", "json")
     mock_output_manager.dict_to_file_json.assert_called_once_with(
-        mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name")
+        mock_output_manager.errors_pool, Path("dummy_path", "dummy_name")
     )
 
     # Restore original methods
@@ -942,12 +942,11 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     """
 
     # Arrange
-    path = "/fake/directory"
+    path = Path("/fake/directory")
     expected_file_name = "variables_usage_counts.csv"
-    expected_full_path = os.path.join(path, expected_file_name)
+    expected_full_path = Path(path, expected_file_name)
     output_manager = OutputManager()
 
-    patch_for_os_path_join = mocker.patch("os.path.join", return_value=expected_full_path)
     patch_for_generate_file_name = mocker.patch.object(
         output_manager, "generate_file_name", return_value=expected_file_name
     )
@@ -961,7 +960,6 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     output_manager.report_variables_usage_counts(path)
 
     # Assert
-    patch_for_os_path_join.assert_called_once_with(path, expected_file_name)
     patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
     patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
 
@@ -1079,12 +1077,10 @@ def test_dump_variable_names_and_contexts(
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps, format_option)
+    mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), exclude_info_maps, format_option)
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(
-        expected_result, os.path.join("dummy_path", "dummy_name")
-    )
+    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
@@ -1112,12 +1108,10 @@ def test_dump_variable_names_and_contexts_no_values(
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False, format_option="verbose")
+    mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), False, format_option="verbose")
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(
-        expected_output, os.path.join("dummy_path", "dummy_name")
-    )
+    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
@@ -1198,7 +1192,7 @@ def test_load_filter_file_content_txt(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
-    result = mock_output_manager._load_filter_file_content("path/to/file.txt")
+    result = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
 
     # Restore original method
@@ -1213,12 +1207,12 @@ def test_load_filter_file_content_json(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: List[Dict[str, Any]] = {
+    data: Dict[str, Any] = {
         "filters": ["filter1", "filter2"],
         "other_key": "value",
     }
     mock_file.return_value.read.return_value = json.dumps(data)
-    result = mock_output_manager._load_filter_file_content("some_file.json")
+    result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
 
     # Restore original method
@@ -1233,7 +1227,7 @@ def test_load_filter_file_content_json_multiple(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: List[Dict[str, Any]] = {
+    data: Dict[str, Any] = {
         "multiple": [
             {
                 "filters": ["filter1", "filter2"],
@@ -1246,7 +1240,7 @@ def test_load_filter_file_content_json_multiple(
         ]
     }
     mock_file.return_value.read.return_value = json.dumps(data)
-    result = mock_output_manager._load_filter_file_content("some_file.json")
+    result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
 
     # Restore original method
@@ -1261,23 +1255,23 @@ def test_load_filter_file_content_exception(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     with pytest.raises(Exception):
-        mock_output_manager._load_filter_file_content("invalid_extention.abc")
+        mock_output_manager._load_filter_file_content(Path("invalid_extention.abc"))
 
     mock_file.return_value.read.return_value = "this is not valid JSON"
     with pytest.raises(json.JSONDecodeError):
-        mock_output_manager._load_filter_file_content("some_file.json")
+        mock_output_manager._load_filter_file_content(Path("some_file.json"))
 
     mock_file.side_effect = FileNotFoundError
     with pytest.raises(FileNotFoundError):
-        mock_output_manager._load_filter_file_content("non_existent_file.txt")
+        mock_output_manager._load_filter_file_content(Path("non_existent_file.txt"))
 
     mock_file.side_effect = UnicodeDecodeError("encoding", b"", 1, 2, "Fake decode error")
     with pytest.raises(UnicodeDecodeError):
-        mock_output_manager._load_filter_file_content("corrupted_file.txt")
+        mock_output_manager._load_filter_file_content(Path("corrupted_file.txt"))
 
     mock_file.side_effect = Exception("Unexpected error")
     with pytest.raises(Exception):
-        mock_output_manager._load_filter_file_content("some_file.txt")
+        mock_output_manager._load_filter_file_content(Path("some_file.txt"))
 
     # Restore original method
     mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
@@ -1293,7 +1287,7 @@ def test_list_filter_files_in_dir(
     tmpdir.join("csv_file2.json").write("File 2 content")
     tmpdir.join("file3.txt").write("File 3 content")
 
-    filter_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
+    filter_files = mock_output_manager._list_filter_files_in_dir(Path(tmpdir))
 
     assert len(filter_files) == 2
     assert "json_file1.txt" in filter_files
@@ -1302,7 +1296,7 @@ def test_list_filter_files_in_dir(
     mock_output_manager.add_warning.assert_called_once()
 
     with pytest.raises(NotADirectoryError):
-        mock_output_manager._list_filter_files_in_dir("nonexistent_directory")
+        mock_output_manager._list_filter_files_in_dir(Path("nonexistent_directory"))
 
     # Restore original method
     mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
@@ -1739,7 +1733,7 @@ def test_save_results(
 
     # Act
     mock_output_manager.save_results(
-        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir", csvs_dir
+        Path("save_path"), Path("filters_path"), exclude_info_maps, produce_graphics, "graphics_dir", csvs_dir
     )
 
     # Assert
@@ -1757,7 +1751,7 @@ def test_save_results(
             [
                 call(
                     "csv_input_filepath1.txt",
-                    "save_path",
+                    Path("save_path"),
                     {},
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
@@ -1766,7 +1760,7 @@ def test_save_results(
                 ),
                 call(
                     "graph_input_filepath2.txt",
-                    "save_path",
+                    Path("save_path"),
                     {},
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
@@ -1829,7 +1823,7 @@ def test_save_results_report_generation(
 
         # Act
         mock_output_manager.save_results(
-            "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir", "csv_dir"
+            Path("save_path"), Path("filters_path"), exclude_info_maps, produce_graphics, "graphics_dir", "csv_dir"
         )
 
         # Assert
@@ -1867,16 +1861,16 @@ def test_route_save_functions_csv(
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager._route_save_functions(
         "csv_file",
-        "save_path",
+        Path("save_path"),
         {"key": {"var": "value"}},
         True,
         {"filters": "regex"},
-        "graphics_dir",
+        Path("graphics_dir"),
         Path("output/CSVs/"),
     )
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
+        {"key": {"var": "value"}}, Path("output", "CSVs", variable_csv_file_path)
     )
     # Restore original method
     mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
@@ -1949,7 +1943,7 @@ def test_save_to_json(
         f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
     )
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")
-    patch_for_dict_to_file_json.assert_called_once_with(filtered_pool, os.path.join(save_path, expected_filename))
+    patch_for_dict_to_file_json.assert_called_once_with(filtered_pool, save_path / expected_filename)
 
 
 def test_route_save_functions_graph(
