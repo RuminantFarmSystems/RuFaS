@@ -2144,6 +2144,7 @@ class InputManager:
     def _validate_properties(self) -> None:
         """Iteratively traverses the metadata properties to check the max depth and routes
         primitive properties to be validated by type.
+
         Raises
         ------
         ValueError
@@ -2163,6 +2164,7 @@ class InputManager:
             "array": self._metadata_array_validator,
             "bool": self._metadata_bool_validator,
             "string": self._metadata_string_validator,
+            "object": self._metadata_object_validator,
         }
         while stack:
             current_obj, depth, path = stack.pop()
@@ -2188,10 +2190,10 @@ class InputManager:
                         value_type = value.get("type")
                         if value_type in type_to_validator_map:
                             type_to_validator_map[value_type](path + [key], value)
-                        else:
-                            if value_type != "object":
-                                print(value_type)
-                                print(key)
+                        # else:
+                        #     if value_type != "object":
+                        #         print(value_type)
+                        #         print(key)
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
@@ -2210,6 +2212,10 @@ class InputManager:
 
     def _metadata_array_validator(self, key_path: List[str], value: dict) -> None:
         """Validator function for array type properties in metadata."""
+        pass
+
+    def _metadata_object_validator(self, key_path: List[str], value: dict) -> None:
+        """Validator function for object type properties in metadata."""
         pass
 
     def save_metadata_properties(self, output_dir: Path) -> None:
