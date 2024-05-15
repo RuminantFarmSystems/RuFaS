@@ -15,7 +15,7 @@ class PurchasedFeedEmissionsEstimator:
     def __init__(self):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
         try:
@@ -31,7 +31,7 @@ class PurchasedFeedEmissionsEstimator:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
         om.add_variable(
             "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
