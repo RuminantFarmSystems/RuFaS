@@ -30,7 +30,7 @@ class TaskType(Enum):
     SIMULATION_SINGLE_RUN = "A single simulation run"
     SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
-    INPUT_DATA_AUDITION = "Validates input data and saves metadata properties as CSV"
+    INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
 
@@ -304,7 +304,7 @@ class TaskManager:
                 task_id,
             )
             input_manager = InputManager()
-            if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
+            if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
                 return
