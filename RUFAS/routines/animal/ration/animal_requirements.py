@@ -165,10 +165,7 @@ class AnimalRequirements:
         for attribute_name, arg in attr_names_to_args_map.items():
             setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
 
-    def set_requirements(self,
-                         pen,
-                         animal_grouping_scenario,
-                         recalc: bool) -> None:
+    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -243,10 +240,9 @@ class AnimalRequirements:
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-    def recalculate_requirements(self,
-                                 pen,
-                                 animal_grouping_scenario,
-                                 requirements_lists: Dict[str, List[float]]) -> Dict[str, List[float]]:
+    def recalculate_requirements(
+        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -352,7 +348,9 @@ class AnimalRequirements:
             requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
-    def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]) -> Dict[str, List[float]]:
+    def use_existing_requirements(
+        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
