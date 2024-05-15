@@ -138,7 +138,7 @@ class OutputManager(object):
                 "Output Manager instantiated.",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
+                    "function": "__init__",
                 },
             )
             self.time = None
@@ -441,7 +441,7 @@ class OutputManager(object):
         """
         file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
+    def dict_to_file_json(self, data_dict: Dict[str, Any], path: Path, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -449,7 +449,7 @@ class OutputManager(object):
         data_dict : Dict[str, Any]
             The dictionary to be saved
 
-        path : str
+        path : Path
             The path to the file to be saved
 
         minify_output_file : bool
@@ -700,14 +700,14 @@ class OutputManager(object):
 
         return ""
 
-    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
+    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: Path) -> None:
         """Saves a dictionary to a csv file.
 
         Parameters
         ----------
         data_dict : Dict[str, Any]
             The dictionary to be saved.
-        path : str
+        path : Path
             The path to the file to be saved.
 
         """
@@ -739,7 +739,7 @@ class OutputManager(object):
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
-    def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
+    def _list_to_file_txt(self, data_list: List[str], path: Path) -> None:
         """Saves a list into a text file
 
         Parameters
@@ -789,7 +789,7 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_filter_files_in_dir(self, dir_path: str) -> List[str]:
+    def _list_filter_files_in_dir(self, dir_path: Path) -> List[str]:
         """Returns the list of supported filter files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
@@ -800,8 +800,7 @@ class OutputManager(object):
             f"Attempting to search in {dir_path}.",
             info_map,
         )
-        dir_path_check = Path(dir_path)
-        if dir_path_check.is_dir():
+        if dir_path.is_dir():
             filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
@@ -829,13 +828,13 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> List[Dict[str, str | int]]:
+    def _load_filter_file_content(self, path: Path) -> List[Dict[str, str | int]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
         Parameters
         ----------
-        path : str
+        path : Path
             The path to the filter file (either .json or .txt).
 
         Returns
@@ -876,13 +875,13 @@ class OutputManager(object):
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as filter_file:
-                if path.endswith(".json"):
+                if path.suffix == ".json":
                     json_content = json.load(filter_file)
                     if "multiple" in json_content.keys():
                         result = json_content["multiple"]
                     else:
                         result = [json_content]
-                elif path.endswith(".txt"):
+                elif path.suffix == ".txt":
                     list_of_elements = [element for element in filter_file.read().splitlines() if element]
                     filter_by_exclusion = list_of_elements[0] == "exclude"
                     if filter_by_exclusion:
@@ -1028,7 +1027,7 @@ class OutputManager(object):
         report_generator = ReportGenerator(self.time)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
-            input_path = os.path.join(filters_dir_path, filter_file)
+            input_path = filters_dir_path / filter_file
             filter_contents = self._load_filter_file_content(input_path)
             if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                 self.add_log(
@@ -1076,10 +1075,7 @@ class OutputManager(object):
                         graphics_dir,
                         csv_dir,
                     )
-            report_file_path = os.path.join(
-                save_path,
-                self.generate_file_name(f"report_{filter_file}", "csv"),
-            )
+            report_file_path = save_path / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
@@ -1112,10 +1108,7 @@ class OutputManager(object):
 
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
             self.create_directory(csv_dir)
-            variable_csv_file_path = os.path.join(
-                csv_dir,
-                self.generate_file_name(f"saved_variables_{filter_file}", "csv"),
-            )
+            variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             self.create_directory(graphics_dir)
@@ -1163,7 +1156,7 @@ class OutputManager(object):
             base_name = f"saved_variables_{filter_file}"
 
         file_name = self.generate_file_name(base_name, "json")
-        file_path = os.path.join(save_path, file_name)
+        file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 
     def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
@@ -1203,21 +1196,21 @@ class OutputManager(object):
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self.generate_file_name("logs", "json"))
+        file_path = path / self.generate_file_name("logs", "json")
         self.dict_to_file_json(self.logs_pool, file_path)
 
     def dump_warnings(self, path: Path) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self.generate_file_name("warnings", "json"))
+        file_path = path / self.generate_file_name("warnings", "json")
         self.dict_to_file_json(self.warnings_pool, file_path)
 
     def dump_errors(self, path: Path) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self.generate_file_name("errors", "json"))
+        file_path = path / self.generate_file_name("errors", "json")
         self.dict_to_file_json(self.errors_pool, file_path)
 
     def report_variables_usage_counts(self, path: Path) -> None:
@@ -1231,7 +1224,7 @@ class OutputManager(object):
         """
 
         filename = self.generate_file_name("variables_usage_counts", "csv")
-        file_path_csv = os.path.join(path, filename)
+        file_path_csv = path / filename
         sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
@@ -1322,7 +1315,7 @@ class OutputManager(object):
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
-        file_path = os.path.join(path, self.generate_file_name("variable_names", "txt"))
+        file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
