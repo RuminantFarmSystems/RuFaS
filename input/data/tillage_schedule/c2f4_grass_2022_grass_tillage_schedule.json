@@ -5,6 +5,6 @@
     "mixing_fractions": [0],
     "tillage_depths": [0.1],
     "implements": ["disk-harrow"],
-    "pattern_repeat": 5,
+    "pattern_repeat": 0,
     "pattern_skip": 0
 }
