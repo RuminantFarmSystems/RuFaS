@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import requests
 
 from RUFAS.units import MeasurementUnits
@@ -37,10 +39,21 @@ class PurchasedFeedEmissionsEstimator:
             "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
         )
 
-        self.feed_emissions: dict[str, float] = self._setup_feed_emissions()
+        self.purchased_feed_emissions: dict[str, float] = self._calculate_feed_emissions(
+            im.get_data("purchased_feeds_emissions")
+        )
         om.add_variable(
             "purchased_feed_emissions",
-            self.feed_emissions,
+            self.purchased_feed_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
+        )
+
+        self.purchased_feed_land_use_change_emissions = self._calculate_feed_emissions(
+            im.get_data("purchased_feed_land_use_change_emissions")
+        )
+        om.add_variable(
+            "purchased_feed_land_use_change_emissions",
+            self.purchased_feed_land_use_change_emissions,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
         )
 
@@ -75,7 +88,7 @@ class PurchasedFeedEmissionsEstimator:
                 continue
             if feed_id in self.missing_feed_ids:
                 continue
-            if feed_id not in self.feed_emissions.keys():
+            if feed_id not in self.purchased_feed_emissions.keys():
                 om.add_warning(
                     "Missing Purchased Feed Emissions",
                     f"Missing data for RuFaS feed {feed_id}, omitting from purchased feed emissions estimation.",
@@ -83,7 +96,7 @@ class PurchasedFeedEmissionsEstimator:
                 )
                 self.missing_feed_ids.append(feed_id)
                 continue
-            emissions = amount_fed * self.feed_emissions[feed_id]
+            emissions = amount_fed * self.purchased_feed_emissions[feed_id]
             emissions_per_feed_id["feed_emissions_total"] += emissions
             emissions_per_feed_id[feed_id] = emissions
         return emissions_per_feed_id
@@ -191,7 +204,7 @@ class PurchasedFeedEmissionsEstimator:
 
         return latitude, longitude
 
-    def _setup_feed_emissions(self) -> dict[str, float]:
+    def _calculate_feed_emissions(self, feed_emissions_data: Dict[str, List[float]]) -> dict[str, float]:
         """
         Setups up the table mapping CO2 emissions to purchased feeds types.
 
@@ -208,8 +221,6 @@ class PurchasedFeedEmissionsEstimator:
         - Grabbing the information for each available feed ID from the row found in the previous step.
 
         """
-        feed_emissions_data = im.get_data("purchased_feeds_emissions")
-
         county_codes = feed_emissions_data["county_code"]
         emissions_index = county_codes.index(self.FIPS_county_code)
 
