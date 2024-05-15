@@ -134,11 +134,16 @@ class TaskManager:
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics)
-        TaskManager.handle_post_processing(args={
-            "output_directory": output_directory,
-            "exclude_info_maps": exclude_info_maps,
-            "variable_name_style": "verbose",
-        }, input_manager=self.input_manager, output_manager=self.output_manager, task_id="TASK_MANAGER")
+        TaskManager.handle_post_processing(
+            args={
+                "output_directory": output_directory,
+                "exclude_info_maps": exclude_info_maps,
+                "variable_name_style": "verbose",
+            },
+            input_manager=self.input_manager,
+            output_manager=self.output_manager,
+            task_id="TASK_MANAGER",
+        )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
