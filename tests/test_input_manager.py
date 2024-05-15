@@ -94,7 +94,7 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
 
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     properties_data = {"key1": "value1", "key2": "value2"}
     mocker.patch("builtins.open", mock_open(read_data=json.dumps(properties_data)))
     mocker.patch(
@@ -124,6 +124,7 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
 def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling JSONDecodeError in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
 
     mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/invalid_json.json"}}}
@@ -137,6 +138,7 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
 def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling unexpected errors in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="valid_json"))
     mocker.patch(
         "RUFAS.input_manager.InputManager._load_data_from_json",
@@ -3519,19 +3521,26 @@ def test_add_default_values_to_array_inputs(
 
 def test_dump_get_data_logs(
     mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
         "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
         "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
     }
-    with patch("RUFAS.output_manager.OutputManager.generate_file_name") as mock_generate_file_name:
-        with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
-            with patch("os.path.join", return_value="dummy_path"):
-                mock_input_manager.dump_get_data_logs(path=MagicMock(auto_spec=Path))
+    mock_dir_path = Path("dummy_path")
+    mock_generated_file_name = "dummy_file_name.json"
+    patch_for_generate_file_name = mocker.patch(
+        "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
+    )
 
-    mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
-    mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")
+    with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
+        mock_input_manager.dump_get_data_logs(path=mock_dir_path)
+
+    patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    mock_dict_to_file_json.assert_called_once_with(
+        mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+    )
 
 
 @pytest.mark.parametrize(
@@ -4053,7 +4062,6 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     with (
         patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
         patch("pandas.DataFrame.to_csv") as mock_to_csv,
-        patch("os.path.join", return_value="output.csv") as mock_join,
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
@@ -4062,8 +4070,7 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
-        mock_join.assert_called_once_with(output_dir, "output.csv")
-        mock_to_csv.assert_called_once_with("output.csv", index=False)
+        mock_to_csv.assert_called_once_with(output_dir / "output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
 
@@ -4078,14 +4085,15 @@ def test_save_metadata_properties_errors(
     error_message: str,
 ) -> None:
     output_dir = Path("/example/dir")
-    expected_path = str(output_dir / "file.csv")
+    generated_filename = "file.csv"
+    expected_path = output_dir / generated_filename
     metadata = {"properties": "test_properties"}
     mock_input_manager.meta_data = metadata
     mock_records = [{"key": "value"}]
 
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
-    mocker.patch("os.path.join", return_value=expected_path)
+    mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     with pytest.raises(exception) as exc_info:
