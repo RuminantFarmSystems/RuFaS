@@ -3,6 +3,8 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.input_manager import InputManager
+from RUFAS.general_constants import GeneralConstants
+from typing import Tuple
 
 im = InputManager()
 
@@ -20,6 +22,7 @@ class AnimalBase:
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
+        AnimalBase.config["ration"] = im.get_data("animal.ration")
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
@@ -97,18 +100,21 @@ class AnimalBase:
         self.ration_formulation = ration
         self.dry_matter_intake = DMI
 
-    def set_p_intake(self, p_intake, p_conc_ration):
+    def set_p_intake(self, p_intake: float, p_conc_ration: float) -> None:
         """
         Sets this animal's phosphorus intake.
 
-        Args:
-            p_intake: the phosphorus intake
-            p_conc_ration: the concentration of P in the ration
+        Parameters
+        ----------
+        p_intake : float
+            The phosphorus intake (kilograms).
+        p_conc_ration : float
+            The concentration of P in the ration (% DM).
         """
-        self.p_intake = p_intake
+        self.p_intake = p_intake * GeneralConstants.KG_TO_GRAMS
         self.p_conc_ration = p_conc_ration
 
-    def daily_p_update(self):
+    def daily_p_update(self) -> None:
         """
         Calculates this animal's daily phosphorus update.
         """
@@ -128,17 +134,19 @@ class AnimalBase:
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
 
-    def calc_base_manure(self):
+    def calc_base_manure(self) -> Tuple[float, float]:
         """
         Calculates the values needed for animal class manure calculations.
 
-        Returns:
+        Returns
+        -------
+        Tuple[float, float]
             p_urine: amount of P required for urine production (g)
             p_feces_excrt: amount of P excreted by an animal (g)
         """
 
         # amount of P required for urine production (g) (A.1G.B.1)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
@@ -153,12 +161,12 @@ class AnimalBase:
 
         return p_urine, p_feces_excrt
 
-    def set_p_purchased(self):
+    def set_p_purchased(self) -> None:
         """
         Sets this animal's phosphorus value as a purchased animal.
         """
         # (A.1G.C.1) from P tracking
-        self.p_animal = 0.0072 * self.body_weight * 1000
+        self.p_animal = 0.0072 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """
