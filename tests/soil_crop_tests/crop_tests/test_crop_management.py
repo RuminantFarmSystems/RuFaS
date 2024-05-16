@@ -379,19 +379,19 @@ def test_record_yield(
     crop_manager.data.yield_phosphorus = phosphorus
 
     expected_units = {
-        "crop": MeasurementUnits.UNITLESS.value,
-        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
-        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "harvest_index": MeasurementUnits.UNITLESS.value,
+        "crop": MeasurementUnits.UNITLESS,
+        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
+        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "harvest_index": MeasurementUnits.UNITLESS,
         "planting_date": {
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
         },
-        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-        "field_size": MeasurementUnits.HECTARE.value,
+        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+        "field_size": MeasurementUnits.HECTARE,
     }
 
     expected_info_map = {
