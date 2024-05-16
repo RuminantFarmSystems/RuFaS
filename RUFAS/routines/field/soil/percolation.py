@@ -114,8 +114,8 @@ class Percolation:
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
-                water_remaining_to_percolate -= acceptable_percolation
                 layer.percolated_water = water_remaining_to_percolate
+                water_remaining_to_percolate -= acceptable_percolation
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0

@@ -1388,9 +1388,13 @@ class Field:
         self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
-
+        
         self.soil.infiltration.infiltrate(water_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+        
+        
+        
+        
         self.soil.soil_erosion.erode(
             self.field_data.field_size,
             0.02,
