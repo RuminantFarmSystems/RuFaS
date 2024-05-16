@@ -1,5 +1,7 @@
 from .storage import Storage
 from .enums import CropCategory
+from .harvested_crop import HarvestedCrop
+from ...time import Time
 
 
 class Hay(Storage):
@@ -28,18 +30,6 @@ class Hay(Storage):
         ]
 
     @property
-    def bale_density(self) -> float:
-        """
-        Calculate and return the density of the hay bale.
-
-        Returns
-        -------
-        float
-            The density of the hay bale.
-        """
-        pass
-
-    @property
     def bale_size(self) -> float:
         """
         Return the size (diameter) of the hay bale.
@@ -51,15 +41,29 @@ class Hay(Storage):
         """
         pass
 
-    def calculate_protein_loss(self):
+    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
-        Calculates the protein loss in the hay.
+        Calculates the base amount of gaseous dry matter lost in a hayed crop.
 
-        Returns
-        -------
-        None
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instances containing the time that loss should be processed up to.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
+
         """
-        pass
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        if days_stored == 0:
+            return 0.0
+        
+        
+
+        loss_in_first_30_days = 
 
 
 class ProtectedIndoors(Hay):
