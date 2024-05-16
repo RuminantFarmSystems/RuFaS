@@ -1332,6 +1332,85 @@ def test_list_filter_files_in_dir(
     mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
 
 
+@pytest.mark.parametrize(
+    "filter_content, initial_pool, expected_result",
+    [
+        (
+            {"filters": ["key1", "key2"]},
+            {
+                "key1": {"values": "value1", "info_maps": [{"units": MeasurementUnits.UNITLESS}]},
+                "key2": {"values": "value2"},
+                "key3": {"values": "value3"},
+            },
+            {
+                "key1": {"values": "value1", "info_maps": [{"units": MeasurementUnits.UNITLESS}]},
+                "key2": {"values": "value2"},
+            },
+        ),
+        (
+            {"filters": ["key1", "key2"], "filter_by_exclusion": True},
+            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
+            {"key3": {"values": "value3"}},
+        ),
+        (
+            {"filters": ["key1", "key4"]},
+            {
+                "key1": {"values": "value1", "info_maps": [{"data": "info", "units": MeasurementUnits.UNITLESS}]},
+                "key2": {"values": "value2"},
+                "key3": {"values": "value3"},
+            },
+            {"key1": {"values": "value1", "info_maps": [{"data": "info", "units": MeasurementUnits.UNITLESS}]}},
+        ),
+        (
+            {"filters": ["key1", "key4"], "filter_by_exclusion": True},
+            {
+                "key1": {"values": "value1", "info_maps": [{"units": MeasurementUnits.UNITLESS}]},
+                "key2": {"values": "value2"},
+                "key3": {"values": "value3"},
+            },
+            {"key2": {"values": "value2"}, "key3": {"values": "value3"}},
+        ),
+        (
+            {"filters": ["key1", "key1"]},
+            {
+                "key1": {"values": "value1", "info_maps": [{"data": "duplicate", "units": MeasurementUnits.UNITLESS}]},
+                "key2": {"values": "value2"},
+                "key3": {"values": "value3"},
+            },
+            {"key1": {"values": "value1", "info_maps": [{"data": "duplicate", "units": MeasurementUnits.UNITLESS}]}},
+        ),
+        (
+            {"filters": ["key1", "key1"], "filter_by_exclusion": True},
+            {
+                "key1": {"values": "value1"},
+                "key2": {"values": "value2", "info_maps": [{"units": MeasurementUnits.UNITLESS}]},
+                "key3": {"values": "value3"},
+            },
+            {
+                "key2": {"values": "value2", "info_maps": [{"units": MeasurementUnits.UNITLESS}]},
+                "key3": {"values": "value3"},
+            },
+        ),
+    ],
+)
+def test_filter_variables_pool(
+    filter_content: Dict[str, Any],
+    initial_pool: Dict[str, Dict[str, Any]],
+    expected_result: Dict[str, Dict[str, Any]],
+    mocker: MockerFixture,
+) -> None:
+    """Test case for function filter_variables_pool in output_manager.py"""
+    mock_output_manager = OutputManager()
+    mocker.patch.object(mock_output_manager, "variables_pool", initial_pool)
+    mocker.patch.object(mock_output_manager, "add_log")
+
+    # Act
+    result = mock_output_manager.filter_variables_pool(filter_content)
+
+    # Assert
+    assert result == expected_result
+
+
 def test_filter_variables_pool_include_empty_filter_pattern_pool(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
