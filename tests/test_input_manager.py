@@ -670,7 +670,8 @@ def test_number_type_validator(
             unused_bool_input,
         )
 
-    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input)
+    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path, dummy_variable_properties,
+                                          unused_bool_input)
     patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
