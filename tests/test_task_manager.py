@@ -107,20 +107,26 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "metadata_file_path": "/path/to/herd",
             "output_directory": "/output",
             "filters_directory": "/output/filters",
-            "CSV_directory": "/output/CSV",
+            "csv_output_directory": "/output/CSV",
+            "json_output_directory": "/output/JSON",
+            "report_directory": "/output/reports",
             "graphics_directory": "/output/graphics",
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
+            "logs_directory": "/output/logs",
         },
         {
             "task_type": "SIMULATION_MULTI_RUN",
             "metadata_file_path": "/path/to/sim",
             "output_directory": "/output",
             "filters_directory": "/output/filters",
-            "CSV_directory": "/output/CSV",
+            "csv_output_directory": "/output/CSV",
+            "json_output_directory": "/output/JSON",
+            "report_directory": "/output/reports",
             "graphics_directory": "/output/graphics",
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
+            "logs_directory": "/output/logs",
         },
     ]
     mock_input_manager.get_data.return_value = task_data
@@ -147,12 +153,15 @@ def test_handle_post_processing(
         "exclude_info_maps": False,
         "variable_name_style": "verbose",
         "graphics_directory": Path("/fake/graphics"),
-        "CSV_directory": Path("/fake/csv"),
+        "csv_output_directory": Path("/fake/CSV"),
+        "json_output_directory": Path("/fake/JSON"),
+        "report_directory": Path("/fake/reports"),
         "output_pool_path": Path("/fake/pool"),
+        "logs_directory": Path("/fake/logs"),
     }
     TaskManager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
     mock_output_manager.dump_all_nondata_pools.assert_called_with(
-        args["output_directory"], args["exclude_info_maps"], "verbose"
+        args["logs_directory"], args["exclude_info_maps"], "verbose"
     )
 
 
@@ -163,12 +172,13 @@ def test_input_data_audit(
         "metadata_file_path": Path("/fake/metadata"),
         "output_directory": Path("/fake/output"),
         "output_prefix": "test",
+        "logs_directory": Path("/fake/output/logs"),
     }
     mock_input_manager.start_data_processing.return_value = True
     result = TaskManager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
     mock_output_manager.add_log.assert_called_with(
         "Saving metadata properties",
-        f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
+        f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
         {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
     )
