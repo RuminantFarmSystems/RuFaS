@@ -1,0 +1,20 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "corn_grain",
+            "planting_years": [2021],
+            "pattern_repeat": 7,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [135],
+            "harvest_years": [2021],
+            "harvest_days": [288],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        }
+
+]
+}
