@@ -670,8 +670,9 @@ def test_number_type_validator(
             unused_bool_input,
         )
 
-    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path, dummy_variable_properties,
-                                          unused_bool_input)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
+    )
     patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1172,16 +1173,7 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             2,
             0,
         ),
-        (
-            {"type": "str",
-             "nullable": False,
-             "default": None},
-            ["element6"],
-            "muu",
-            False,
-            0,
-            1
-        ),
+        ({"type": "str", "nullable": False, "default": None}, ["element6"], "muu", False, 0, 1),
     ],
 )
 def test_fix_string_type_fixable_data(
@@ -1198,8 +1190,10 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning, \
-         patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+    with (
+        patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,
+        patch("RUFAS.output_manager.OutputManager.add_error") as add_error,
+    ):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
