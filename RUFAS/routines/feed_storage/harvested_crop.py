@@ -75,6 +75,7 @@ class HarvestedCrop:
     last_time_degraded: Time = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
+    initial_dry_matter_percentage: float = field(init=False)
     dry_matter_digestibility: float
     crude_protein_percent: float
     non_protein_nitrogen: float
@@ -128,6 +129,7 @@ class HarvestedCrop:
         self.estimated_maximum_effluent = self._estimate_maximum_effluent()
         self.bale_density = self._calculate_bale_density()
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
+        self.initial_dry_matter_percentage = self.dry_matter_percentage
         self.last_time_degraded = deepcopy(self.storage_time)
 
     @property

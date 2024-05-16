@@ -1,8 +1,15 @@
 from .storage import Storage
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
+from ...general_constants import GeneralConstants
 from ...time import Time
 
+
+"""
+This final moisture fraction that expected to be contained in a hay crop. Refernces Feed Storage Scientific
+Documentation equation 1.2.6.
+"""
+FINAL_MOISTURE_FRACTION = 0.12
 
 class Hay(Storage):
     """
@@ -50,7 +57,7 @@ class Hay(Storage):
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
         time : Time
-            Time instances containing the time that loss should be processed up to.
+            Time instance containing the time that loss should be processed up to.
 
         References
         ----------
@@ -61,8 +68,9 @@ class Hay(Storage):
         if days_stored == 0:
             return 0.0
         
-        
-
+        moisture_fraction = 1 - crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        days_in_initial_30_day_window = min(days_stored, 30)
+        numerator = moisture_fraction - 
         loss_in_first_30_days = 
 
 
