@@ -618,7 +618,8 @@ def test_bool_type_validator(
 
     # Assert
     patch_extract.assert_called_once_with(dummy_input_data, var_path, variable_properties, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
         patch_for_add_warning.assert_called_once()
     else:
@@ -673,7 +674,8 @@ def test_number_type_validator(
     patch_extract.assert_called_once_with(
         dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
     )
-    patch_path_to_str.assert_called_once_with(dummy_var_path)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -728,7 +730,8 @@ def test_string_type_validator(
     )
 
     patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -1115,8 +1118,7 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count,"
-    "expected_error_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
     [
         (
             {
@@ -1130,7 +1132,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             "cow",
             True,
             2,
-            0,
         ),
         (
             {
@@ -1143,7 +1144,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             "",
             True,
             2,
-            0,
         ),
         (
             {
@@ -1157,7 +1157,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             "cow",
             True,
             2,
-            0,
         ),
         (
             {
@@ -1171,9 +1170,7 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             "cow",
             True,
             2,
-            0,
         ),
-        ({"type": "str", "nullable": False, "default": None}, ["element6"], "muu", False, 0, 1),
     ],
 )
 def test_fix_string_type_fixable_data(
@@ -1182,7 +1179,6 @@ def test_fix_string_type_fixable_data(
     expected_value: str,
     expected_result: bool,
     expected_warning_call_count: int,
-    expected_error_call_count: int,
     mock_input_manager: InputManager,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
@@ -1192,7 +1188,6 @@ def test_fix_string_type_fixable_data(
 
     with (
         patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,
-        patch("RUFAS.output_manager.OutputManager.add_error") as add_error,
     ):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
@@ -1205,7 +1200,6 @@ def test_fix_string_type_fixable_data(
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
-    assert add_error.call_count == expected_error_call_count
 
 
 def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:

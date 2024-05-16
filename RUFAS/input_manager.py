@@ -1107,6 +1107,10 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {
@@ -1118,9 +1122,6 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-
-        if variable_properties.get("nullable", False) and input_data_value is None:
-            return True
 
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number"
@@ -1167,6 +1168,10 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
@@ -1175,8 +1180,6 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        if variable_properties.get("nullable", False) and input_data_value is None:
-            return True
 
         if type(input_data_value) is not str:
             warning_name = "Validation: string variable is not a string"
@@ -1238,14 +1241,16 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        if variable_properties.get("nullable", False) and input_data_value is None:
-            return True
 
         if type(input_data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
@@ -1452,13 +1457,6 @@ class InputManager:
             error_message = (
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
-            )
-            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
-            return False
-        if variable_properties.get("nullable", False) is False and variable_properties.get("default") is None:
-            error_message = (
-                f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
-                f". Its nullability is set to False and default value is null. {properties_violation_message}"
             )
             om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
             return False

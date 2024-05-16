@@ -2,7 +2,7 @@
   "parallel_workers": 4,
   "tasks": [
     {
-      "task_type": "SIMULATION_SINGLE_RUN",
+      "task_type": "INPUT_DATA_AUDIT",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "default",
       "log_verbosity": "errors",
