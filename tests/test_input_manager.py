@@ -570,20 +570,22 @@ def test_populate_pool_raises_keyerror(
 
 
 @pytest.mark.parametrize(
-    "input_data_value, expected_result",
+    "input_data_value, dummy_variable_properties, expected_result",
     [
-        (True, True),
-        (False, True),
-        ("hello", False),
-        (2, False),
-        (3.5, False),
-        ({}, False),
-        ([], False),
-        (None, False),
+        (True, {}, True),
+        (False, {}, True),
+        ("hello", {}, False),
+        (2, {}, False),
+        (3.5, {}, False),
+        ({}, {}, False),
+        ([], {}, False),
+        (None, {}, False),
+        (None, {"nullable": True}, True),
     ],
 )
 def test_bool_type_validator(
     input_data_value: bool,
+    dummy_variable_properties: Dict[str, Any],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -594,7 +596,7 @@ def test_bool_type_validator(
     # Arrange
     input_manager = InputManager()
     var_path: list[str | int] = ["dummy_var_path"]
-    variable_properties: Dict[str, Any] = {}
+    variable_properties: Dict[str, Any] = dummy_variable_properties
     dummy_properties_key = "dummy_variable_properties"
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
@@ -616,7 +618,8 @@ def test_bool_type_validator(
 
     # Assert
     patch_extract.assert_called_once_with(dummy_input_data, var_path, variable_properties, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
         patch_for_add_warning.assert_called_once()
     else:
@@ -625,7 +628,7 @@ def test_bool_type_validator(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count",
+    "dummy_value, dummy_variable_properties, expected_result, expected_warning_call_count",
     [
         (1, {"minimum": 3, "maximum": 7}, False, 1),
         (3, {"minimum": 3, "maximum": 7}, True, 0),
@@ -635,11 +638,12 @@ def test_bool_type_validator(
         (-1, {"minimum": 3, "maximum": 7}, False, 1),
         (None, {"maximum": 1, "minimum": 0}, False, 1),
         ("42", {"minimum": 4, "maximum": 32}, False, 1),
+        (None, {"nullable": True}, True, 0),
     ],
 )
 def test_number_type_validator(
     dummy_value: int,
-    dummy_variable_to_check: Dict[str, int],
+    dummy_variable_properties: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
     mocker: MockerFixture,
@@ -659,7 +663,7 @@ def test_number_type_validator(
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
         result = input_manager._number_type_validator(
             dummy_var_path,
-            dummy_variable_to_check,
+            dummy_variable_properties,
             dummy_input_data,
             unused_bool_input,
             dummy_properties_key,
@@ -667,14 +671,17 @@ def test_number_type_validator(
             unused_bool_input,
         )
 
-    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path, dummy_variable_to_check, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(dummy_var_path)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
+    )
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
-    "dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count",
+    "dummy_value, dummy_variable_properties, expected_result, expected_warning_call_count",
     [
         ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"pattern": r".{3}", "minimum_length": 1}, True, 0),
@@ -689,11 +696,12 @@ def test_number_type_validator(
         ("cow", {"maximum_length": 1}, False, 1),
         (None, {"pattern": r"cow", "minimum_length": 1}, False, 1),
         (42.0, {"pattern": r"cow", "maximum_length": 3}, False, 1),
+        (None, {"nullable": True}, True, 0),
     ],
 )
 def test_string_type_validator(
     dummy_value: int,
-    dummy_variable_to_check: Dict[str, int],
+    dummy_variable_properties: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
@@ -713,7 +721,7 @@ def test_string_type_validator(
 
     result = mock_input_manager._string_type_validator(
         var_path,
-        dummy_variable_to_check,
+        dummy_variable_properties,
         dummy_input_data,
         unused_bool_input,
         dummy_properties_key,
@@ -721,8 +729,9 @@ def test_string_type_validator(
         unused_bool_input,
     )
 
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_to_check, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -1177,7 +1186,9 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+    with (
+        patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,
+    ):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
