@@ -1,6 +1,7 @@
 from .storage import Storage
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
+from ...current_day_conditions import CurrentDayConditions
 from ...general_constants import GeneralConstants
 from ...time import Time
 
@@ -48,7 +49,7 @@ class Hay(Storage):
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, conditions: list[CurrentDayConditions], time: Time) -> float:
         """
         Calculates the base amount of gaseous dry matter lost in a hayed crop.
 
@@ -56,6 +57,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
+        conditions : list[CurrentDayConditions]
+            List of daily conditions over which dry matter loss will be calculated for.
         time : Time
             Time instance containing the time that loss should be processed up to.
 
