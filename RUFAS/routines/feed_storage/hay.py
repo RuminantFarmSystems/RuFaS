@@ -67,11 +67,66 @@ class Hay(Storage):
         days_stored = time.simulation_day - crop.storage_time.simulation_day
         if days_stored == 0:
             return 0.0
-        
-        moisture_fraction = 1 - crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        days_in_initial_30_day_window = min(days_stored, 30)
-        numerator = moisture_fraction - 
-        loss_in_first_30_days = 
+
+        initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
+        subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+
+        return initial_dry_matter_loss + subsequent_dry_matter_loss
+
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Gaseous dry matter loss from the hayed crop that occurred in the first 30 days of storage in kg.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.2.3
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_in_window = min(days_stored, 30)
+        dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        moisture_fraction = 1 - dry_fraction
+        numerator = moisture_fraction - FINAL_MOISTURE_FRACTION * dry_fraction * (1 - 0.004 * days_in_window)
+        denominator = dry_fraction * (14206 - 2433 * (0.004 * days_in_window) / (1 - 0.004 * days_in_window))
+        return crop.total_sensible_heat_generated + 2433 * numerator / denominator
+
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage in kg.       
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.2.7
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_past_30_day_window = max(0, days_stored - 30)
+
+        return 0.0001 * days_past_30_day_window
 
 
 class ProtectedIndoors(Hay):
