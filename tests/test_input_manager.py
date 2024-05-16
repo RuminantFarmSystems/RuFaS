@@ -1186,9 +1186,7 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with (
-        patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,
-    ):
+    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
