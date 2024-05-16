@@ -1888,9 +1888,7 @@ def test_route_save_functions_csv(
     )
 
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
-    dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": "value"}}, Path("output", "CSVs", variable_csv_file_path)
-    )
+    dict_to_file_csv.assert_called_once_with({"key": {"var": "value"}}, Path("output", "CSVs", variable_csv_file_path))
 
 
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
