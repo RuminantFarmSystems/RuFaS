@@ -66,7 +66,12 @@ def manure_calculations(
     EE_concentration = nutrient_concentrations["EE"]
     # Soluble residue
     # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
-    soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
+    soluble_residue = (
+        (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
+        - NDF_concentration
+        - CP_concentration
+        - EE_concentration
+    )
 
     # Total urine, kg [A.3B.A.1]
     urine = 9.0
@@ -94,20 +99,20 @@ def manure_calculations(
         + 0.83
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in urine, kg [A.3B.B.2]
-    urine_nitrogen = (
-        14.3
-        + 0.510
+    # Nitrogen excretion in feces, kg [A.3B.B.2]
+    fecal_nitrogen = (
+        0.345
+        + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in feces, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # Nitrogen excretion in urine, kg [A.3B.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
@@ -129,10 +134,16 @@ def manure_calculations(
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / GeneralConstants.FRACTION_TO_PERCENTAGE
+    ) * urine_urea_nitrogen_concentration
 
     # Amount of potassium excreted, g [A.3B.B.4]
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+    potassium = (
+        dry_matter_intake
+        * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
+        * GeneralConstants.KG_TO_GRAMS
+    )
 
     # Methane emissions, g/day
     methane_emission = 0.0
