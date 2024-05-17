@@ -9,6 +9,7 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calcula
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
+
 @pytest.mark.parametrize(
     "methane_model",
     [
