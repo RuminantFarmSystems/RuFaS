@@ -172,20 +172,15 @@ def manure_calculations(
         + 0.654
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (
-        12.0
-        + 0.333
-        * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
-    ) * GeneralConstants.GRAMS_TO_KG
+    # Fecal nitrogen, kg [A.3B.B.2]
+    dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
+    fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
-    # Fecal nitrogen, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # Urine nitrogen, kg [A.3E.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ASH_diet_content
@@ -223,10 +218,14 @@ def manure_calculations(
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / GeneralConstants.FRACTION_TO_PERCENTAGE
+    ) * urine_urea_nitrogen_concentration
 
     # Amount of potassium excreted, g [A.3E.B.3]
-    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
+    potassium = (
+        7.21 * dry_matter_intake + 15944 * potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE - 164.5
+    )
 
     # Methane Emissions
     methane_emission = 0.0
@@ -242,7 +241,13 @@ def manure_calculations(
 
     elif methane_model == "IPCC":  # IPCC
         # Calculating gross energy concentration (Moraes et al. 2014)
-        soluble_residue = 100 - ASH_concentration - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = (
+            GeneralConstants.FRACTION_TO_PERCENTAGE
+            - ASH_concentration
+            - NDF_concentration
+            - CP_concentration
+            - EE_concentration
+        )
         gross_energy_concentration = (
             0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
         )  # [A.3B.C.2]
@@ -261,7 +266,9 @@ def manure_calculations(
             methane_mitigation_additive_amount,
         )
 
-    methane_emission = methane_yield * (1 + methane_yield_reduction / 100) * dry_matter_intake
+    methane_emission = (
+        methane_yield * (1 + methane_yield_reduction / GeneralConstants.FRACTION_TO_PERCENTAGE) * dry_matter_intake
+    )
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
