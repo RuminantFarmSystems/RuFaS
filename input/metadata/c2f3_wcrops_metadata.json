@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/c2f3_config.json",
+      "path": "input/data/config/c2f3_wcrops_config.json",
       "type": "json",
       "properties": "config_properties"
     },
