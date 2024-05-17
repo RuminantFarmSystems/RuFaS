@@ -1395,6 +1395,7 @@ class Field:
         
         
         
+        
         self.soil.soil_erosion.erode(
             self.field_data.field_size,
             0.02,

@@ -52,15 +52,16 @@ class Percolation:
         SWAT sections 2:3.1 and 2
 
         """
-        top_layer_to_percolate = self._percolate_infiltrated_water()
+        #top_layer_to_percolate = self._percolate_infiltrated_water()
 
-        if top_layer_to_percolate is None:
-            return
+        #if top_layer_to_percolate is None:
+        #    return
 
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(top_layer_to_percolate, layer_count)):
+        #for layer_number in reversed(range(top_layer_to_percolate, layer_count)):
+        for layer_number in reversed(range(0, layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
             if layer_number < deepest_layer:
@@ -81,13 +82,16 @@ class Percolation:
             else:
                 current_layer.percolated_water = 0.0
 
-        for layer_number in range(top_layer_to_percolate + 1, layer_count + 1):
+        #for layer_number in range(top_layer_to_percolate + 1, layer_count + 1):
+        for layer_number in range(1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
             percolated_water = layer_above.percolated_water
             if layer_number == deepest_layer + 1:
                 self.data.vadose_zone_layer.water_content += percolated_water
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
+
+        self._percolate_infiltrated_water()
 
     def _percolate_infiltrated_water(self) -> int | None:
         """
@@ -114,12 +118,12 @@ class Percolation:
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
-                layer.percolated_water = water_remaining_to_percolate
                 water_remaining_to_percolate -= acceptable_percolation
+                layer.percolated_water += water_remaining_to_percolate
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0
-                top_layer_to_percolate = index
+                top_layer_to_percolate = index + 1
                 break
         if water_remaining_to_percolate > 0.0:
             self.data.vadose_zone_layer.water_content += water_remaining_to_percolate
