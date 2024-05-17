@@ -1578,7 +1578,7 @@ class AnimalManager:
             om.add_variable(
                 f"{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}",
                 animal.events,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS.value}),
+                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
 
     def _record_animal_counts(self) -> None:
@@ -1594,52 +1594,46 @@ class AnimalManager:
             "class": self.__class__.__name__,
             "function": self._record_animal_counts.__name__,
         }
-        om.add_variable(
-            "sim_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value})
-        )
+        om.add_variable("sim_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
             "num_animals",
             len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
-        om.add_variable("num_calves", len(self.calves), dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}))
-        om.add_variable("num_heiferIs", len(self.heiferIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}))
-        om.add_variable(
-            "num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS.value})
-        )
-        om.add_variable(
-            "num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS.value})
-        )
+        om.add_variable("num_calves", len(self.calves), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIs", len(self.heiferIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIIs", len(self.heiferIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
+        om.add_variable("num_heiferIIIs", len(self.heiferIIIs), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_lactating_cows",
             len([cow for cow in self.cows if cow.is_lactating]),
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_dry_cows",
             len([cow for cow in self.cows if not cow.is_lactating]),
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
-        om.add_variable("num_cows", len(self.cows), dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}))
+        om.add_variable("num_cows", len(self.cows), dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
             "num_cow_parity_1",
             self.life_cycle_manager.num_cow_for_parity["1"],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cow_parity_2",
             self.life_cycle_manager.num_cow_for_parity["2"],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cow_parity_3",
             self.life_cycle_manager.num_cow_for_parity["3"],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cow_parity_4+",
             self.life_cycle_manager.num_cow_for_parity["greater_than_3"],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
 
     def _record_heiferIIs_conception_rate(self) -> None:
@@ -1654,12 +1648,12 @@ class AnimalManager:
         om.add_variable(
             "heiferII_total_num_ai_performed",
             HeiferII.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
             "heiferII_total_num_successful_conceptions",
             HeiferII.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
         heiferII_overall_conception_rate = (
             (HeiferII.stats["num_successful_conceptions"] / HeiferII.stats["num_ai_performed"])
@@ -1669,18 +1663,18 @@ class AnimalManager:
         om.add_variable(
             "heiferII_overall_conception_rate",
             heiferII_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
         om.add_variable(
             "heiferII_num_ai_performed_in_ED",
             HeiferII.stats["num_ai_performed_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
             "heiferII_num_successful_conceptions_in_ED",
             HeiferII.stats["num_successful_conceptions_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
         ed_conception_rate = (
             (HeiferII.stats["num_successful_conceptions_in_ED"] / HeiferII.stats["num_ai_performed_in_ED"])
@@ -1690,18 +1684,18 @@ class AnimalManager:
         om.add_variable(
             "heiferII_ED_conception_rate",
             ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
         om.add_variable(
             "heiferII_num_ai_performed_in_TAI",
             HeiferII.stats["num_ai_performed_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
             "heiferII_num_successful_conceptions_in_TAI",
             HeiferII.stats["num_successful_conceptions_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
         tai_conception_rate = (
             (HeiferII.stats["num_successful_conceptions_in_TAI"] / HeiferII.stats["num_ai_performed_in_TAI"])
@@ -1711,18 +1705,18 @@ class AnimalManager:
         om.add_variable(
             "heiferII_TAI_conception_rate",
             tai_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
         om.add_variable(
             "heiferII_num_ai_performed_in_SynchED",
             HeiferII.stats["num_ai_performed_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
             "heiferII_num_successful_conceptions_in_SynchED",
             HeiferII.stats["num_successful_conceptions_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
         synch_ed_conception_rate = (
             (HeiferII.stats["num_successful_conceptions_in_SynchED"] / HeiferII.stats["num_ai_performed_in_SynchED"])
@@ -1732,7 +1726,7 @@ class AnimalManager:
         om.add_variable(
             "heiferII_SynchED_conception_rate",
             synch_ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
     def _record_cows_conception_rate(self) -> None:
@@ -1747,12 +1741,12 @@ class AnimalManager:
         om.add_variable(
             "cow_total_num_ai_performed",
             Cow.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
             "cow_total_num_successful_conceptions",
             Cow.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
         cow_overall_conception_rate = (
             (Cow.stats["num_successful_conceptions"] / Cow.stats["num_ai_performed"])
@@ -1762,7 +1756,7 @@ class AnimalManager:
         om.add_variable(
             "cow_overall_conception_rate",
             cow_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE.value}),
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
     def _record_culling_stats(self) -> None:
@@ -1777,45 +1771,45 @@ class AnimalManager:
         om.add_variable(
             "num_cows_by_death_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.DEATH_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_low_prod_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.LOW_PROD_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_lameness_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.LAMENESS_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_injury_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.INJURY_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_mastitis_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.MASTITIS_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_disease_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.DISEASE_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_udder_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.UDDER_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "num_cows_by_unknown_cull",
             self.life_cycle_manager.cull_reason_stats_range[animal_constants.UNKNOWN_CULL],
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "total_num_cows_culled",
             sum(self.life_cycle_manager.cull_reason_stats_range.values()),
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS.value}),
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
