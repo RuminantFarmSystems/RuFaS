@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calculations
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 @pytest.mark.parametrize(
     "methane_model",
@@ -51,8 +51,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     )
     total_solids = 0.178 * dry_matter_intake + 2.733
 
-    Dry_DMI_Lower_Bound = 7.1  # kg, we can move this to a constants file later
-    dry_matter_intake = max(dry_matter_intake, Dry_DMI_Lower_Bound)
+    dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
     organic_matter_intake = (
         dry_matter_intake
         * (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
