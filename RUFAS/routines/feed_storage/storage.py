@@ -6,6 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -153,7 +154,7 @@ class Storage:
         This method also records the total amount of gaseous dry matter loss happened from all stored crops.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": "kg"}
+        info_map = {"class": self.__class__.__name__, "function": self.process_degradations.__name__, "units": MeasurementUnits.KILOGRAMS}
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
             weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
