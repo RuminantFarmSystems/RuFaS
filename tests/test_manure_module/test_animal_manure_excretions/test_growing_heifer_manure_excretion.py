@@ -66,8 +66,7 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
     else:
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
     methane_emission = 0.0
     if methane_model:
@@ -115,8 +114,8 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
     assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
     assert manure_excretion_values["urea"] == approx(urine_urea_nitrogen_concentration)
     assert manure_excretion_values["urine"] == approx(urine)
-    assert manure_excretion_values["total_ammoniacal_nitrogen_concentration"] == approx(
-        total_ammoniacal_nitrogen_concentration
+    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(
+        manure_total_ammoniacal_nitrogen
     )
     assert manure_excretion_values["urine_nitrogen"] == approx(urine_nitrogen)
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
