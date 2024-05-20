@@ -4362,7 +4362,7 @@ def test_validate_metadata(
             ["a", "b", "c"],
             True,
             ["Max metadata depth exceeded."],
-            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']"
+            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']",
         ),
         ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
         (
@@ -4372,7 +4372,7 @@ def test_validate_metadata(
             ["a", "b"],
             True,
             ["Properties value type error"],
-            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']"
+            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
         ),
         ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
     ],

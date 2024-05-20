@@ -284,11 +284,13 @@ class TaskManager:
         """Placeholder for expanding end-to-end testing multi-run tasks."""
         return []
 
-    def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool,
-                   metadata_depth_limit: int) -> None:
+    def _run_tasks(
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+    ) -> None:
         """Runs the tasks based on the provided arguments."""
-        task_with_args = partial(self.task, produce_graphics=produce_graphics,
-                                 metadata_depth_limit=metadata_depth_limit)
+        task_with_args = partial(
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+        )
         results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
