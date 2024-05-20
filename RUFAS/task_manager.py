@@ -317,8 +317,9 @@ class TaskManager:
                 return
 
             if args["task_type"] == TaskType.COMPARE_METADATA_PROPERTIES:
-                input_manager.compare_metadata_properties(args["properties_file_path"],
-                                                          args["comparison_properties_file_path"])
+                input_manager.compare_metadata_properties(
+                    args["properties_file_path"], args["comparison_properties_file_path"]
+                )
                 return
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)

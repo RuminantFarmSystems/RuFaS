@@ -4340,13 +4340,19 @@ def test_validate_metadata(
         mock_add_error.assert_not_called()
 
 
-@pytest.mark.parametrize("file_exists, expected_exception, error", [
-    (True, False, None),
-    (False, True, OSError),
-    (False, True, PermissionError),
-])
+@pytest.mark.parametrize(
+    "file_exists, expected_exception, error",
+    [
+        (True, False, None),
+        (False, True, OSError),
+        (False, True, PermissionError),
+    ],
+)
 def test_compare_metadata_properties(
-    mocker: MockerFixture, file_exists: bool, expected_exception: bool, error: Type[PermissionError | OSError | None],
+    mocker: MockerFixture,
+    file_exists: bool,
+    expected_exception: bool,
+    error: Type[PermissionError | OSError | None],
 ) -> None:
     dummy_properties = {"key1": "value1", "key2": "value2"}
     dummy_properties_modified = {"key1": "value1_changed", "key3": "value3"}
@@ -4362,16 +4368,14 @@ def test_compare_metadata_properties(
     else:
         mocker.patch("builtins.open", side_effect=error)
 
-    mocker.patch.object(input_manager, '_load_metadata', side_effect=[
-        None,
-        None
-    ])
+    mocker.patch.object(input_manager, "_load_metadata", side_effect=[None, None])
 
     input_manager.meta_data = dummy_properties if not expected_exception else dummy_properties_modified
 
-    mocker.patch("deepdiff.DeepDiff", return_value={
-        "values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}
-    })
+    mocker.patch(
+        "deepdiff.DeepDiff",
+        return_value={"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+    )
 
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 

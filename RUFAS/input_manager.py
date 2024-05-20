@@ -2295,15 +2295,19 @@ class InputManager:
 
         diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
 
-        file_name = "diff_results_" + os.path.basename(str(properties_file_path)) + "_vs_"\
+        file_name = (
+            "diff_results_"
+            + os.path.basename(str(properties_file_path))
+            + "_vs_"
             + os.path.basename(str(comparison_properties_file_path))
+        )
         try:
-            om.add_log("Save metadata diff try",
-                       f"Attempting to save to {file_name}",
-                       info_map)
+            om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
             with open(f"output/{file_name}.txt", "w") as file:
-                file.write(f"Comparing changes going from '{properties_file_path}'"
-                           f" to '{comparison_properties_file_path}'\n\n")
+                file.write(
+                    f"Comparing changes going from '{properties_file_path}'"
+                    f" to '{comparison_properties_file_path}'\n\n"
+                )
 
                 sections = {
                     "dictionary_item_added": "Items added:\n",
@@ -2317,9 +2321,7 @@ class InputManager:
                         for sub_key, value in diff[key].items():
                             file.write(f"{sub_key}: {value}\n")
                         file.write("\n")
-            om.add_log("Save metadata diff successful",
-                       f"Successfully saved to {file_name}",
-                       info_map)
+            om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
         except PermissionError:
             om.add_error(
                 "Permission error in saving file",
