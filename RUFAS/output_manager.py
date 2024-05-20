@@ -156,7 +156,7 @@ class OutputManager(object):
         key: str,
         value: Any,
         info_map: Dict[str, Any],
-        record_all_info_maps: bool = True
+        record_all_info_maps: bool = True,
     ) -> None:
         """
         Adds value and info map at key in the given pool.

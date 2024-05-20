@@ -568,14 +568,20 @@ def test_add_log(
         # Case 2: 'units' key missing, should raise KeyError
         ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, KeyError),
         # Case 3: Value is a dict, should process sub-keys
-        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, None),
+        (
+            "var3",
+            {"sub1": 10, "sub2": 20},
+            {"class": "TestClass", "function": "test_function", "units": "kg"},
+            True,
+            None,
+        ),
     ],
 )
 def test_add_variable(
     name: str,
     value: Any,
     info_map: Dict[str, Any],
-    record_info_maps: bool, 
+    record_info_maps: bool,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -598,7 +604,11 @@ def test_add_variable(
         output_manager.add_variable(name, value, info_map, record_info_maps)
         # Assert
         patched_add_to_pool.assert_called_once_with(
-            output_manager.variables_pool, "key_with_prefix", value, {**info_map, "units": "validated_units"}, record_info_maps
+            output_manager.variables_pool,
+            "key_with_prefix",
+            value,
+            {**info_map, "units": "validated_units"},
+            record_info_maps,
         )
         if isinstance(value, dict):
             for k in value.keys():
