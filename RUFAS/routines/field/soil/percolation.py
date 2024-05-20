@@ -56,7 +56,7 @@ class Percolation:
 
         #if top_layer_to_percolate is None:
         #    return
-
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
@@ -110,7 +110,7 @@ class Percolation:
         that is put below a layer as being percolated by it.
 
         """
-        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
+        #self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
         top_layer_to_percolate = None
         for index, layer in enumerate(self.data.soil_layers):
