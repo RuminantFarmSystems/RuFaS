@@ -38,6 +38,7 @@ def task_manager(mock_input_manager: MagicMock, mock_output_manager: MagicMock) 
         ("input data Audit", TaskType.INPUT_DATA_AUDIT),
         ("end to END testing", TaskType.END_TO_END_TESTING),
         ("post_processing", TaskType.POST_PROCESSING),
+        ("Compare metadata properties", TaskType.COMPARE_METADATA_PROPERTIES),
     ],
 )
 def test_task_type_from_string(input_str: str, expected: TaskType) -> None:
@@ -114,6 +115,8 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
             "logs_directory": "/output/logs",
+            "properties_file_path": "path/to/properties",
+            "comparison_properties_file_path": "path/to/comparison/properties",
         },
         {
             "task_type": "SIMULATION_MULTI_RUN",
@@ -127,6 +130,8 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
             "logs_directory": "/output/logs",
+            "properties_file_path": "path/to/properties",
+            "comparison_properties_file_path": "path/to/comparison/properties",
         },
     ]
     mock_input_manager.get_data.return_value = task_data
