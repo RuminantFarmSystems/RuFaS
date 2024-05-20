@@ -4,13 +4,14 @@ import sys
 import pytest
 from mock import patch
 from pytest_mock import MockerFixture
+from typing import Any, Generator
 
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 from RUFAS.output_manager import LogVerbosity
 
 
 @pytest.fixture
-def mock_task_manager():
+def mock_task_manager() -> Generator[Any, Any, Any]:
     with patch("main.TaskManager") as mock:
         yield mock
 
