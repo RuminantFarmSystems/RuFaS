@@ -2288,10 +2288,10 @@ class InputManager:
             "function": self.compare_metadata_properties.__name__,
         }
         self._load_metadata(properties_file_path)
-        data1 = deepcopy(self.__metadata)
-        del self.__metadata
+        data1 = deepcopy(self.meta_data)
+        self.meta_data = {}
         self._load_metadata(comparison_properties_file_path)
-        data2 = deepcopy(self.__metadata)
+        data2 = deepcopy(self.meta_data)
 
         diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
 
@@ -2320,12 +2320,20 @@ class InputManager:
             om.add_log("Save metadata diff successful",
                        f"Successfully saved to {file_name}",
                        info_map)
-        except FileNotFoundError:
-            print(f"Error: The directory 'output' does not exist or {file_name}.txt cannot be accessed.")
         except PermissionError:
-            print(f"Error: Permission denied when trying to write to {file_name}.txt.")
+            om.add_error(
+                "Permission error in saving file",
+                f"Permission denied when trying to write to {file_name}.txt.",
+                info_map,
+            )
+            raise
         except OSError as e:
-            print(f"An unexpected OS error occurred: {e}")
+            om.add_error(
+                "Unexpected error in saving file",
+                f"An unexpected OS error occurred: {e}",
+                info_map,
+            )
+            raise
 
 
 class ElementState(Enum):
