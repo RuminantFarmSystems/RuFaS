@@ -337,20 +337,20 @@ class InputManager:
 
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
-            (
-                input_data,
-                missing_required_property_keys,
-                property_keys_with_default_values,
-            ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
-            self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
-            filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+            # (
+            #     input_data,
+            #     missing_required_property_keys,
+            #     property_keys_with_default_values,
+            # ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
+            # self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
+            # filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self._validate_input_by_type(
                     variable_path=[metadata_property],
                     variable_properties=variable_properties,
-                    input_data=filtered_input_data,
+                    input_data=input_data,
                     eager_termination=eager_termination,
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
@@ -358,7 +358,7 @@ class InputManager:
                 )
 
                 if is_element_acceptable:
-                    validated_data[metadata_property] = filtered_input_data[metadata_property]
+                    validated_data[metadata_property] = input_data[metadata_property]
                 elif eager_termination:
                     return False
 
@@ -574,11 +574,11 @@ class InputManager:
         if not called_during_initialization:
             om.add_error(
                 "Missing required data",
-                f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
+                f"Key {var_name} not found in data. A value is required for update variable during runtime.",
                 info_map,
             )
             raise KeyError(
-                f"Key {var_name} not found in data. A value is required for to update variable " "during runtime."
+                f"Key {var_name} not found in data. A value is required for update variable during runtime."
             )
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
@@ -1002,6 +1002,10 @@ class InputManager:
         array_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and array_value is None:
+            return True
+
         if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
@@ -1451,7 +1455,7 @@ class InputManager:
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section '{properties_blob_key}'."
         )
         if "default" not in variable_properties.keys():
             error_message = (
@@ -1461,9 +1465,13 @@ class InputManager:
             om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
             return False
 
-        original_invalid_value = variable_parent[element_hierarchy[-1]]
+        if type(variable_parent) is list:
+            original_invalid_value = variable_parent[element_hierarchy[-1]]
+        else:
+            original_invalid_value = variable_parent.get(element_hierarchy[-1])
+
         warning_message = (
-            f"Variable: '{element_path}' has value: {original_invalid_value}. " f"{properties_violation_message}"
+            f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
         om.add_warning("Validation: invalid data found", warning_message, info_map)
 
