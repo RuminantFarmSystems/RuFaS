@@ -9,6 +9,7 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 import argparse
 import traceback
 from pathlib import Path
+from typing import Any
 import sys
 
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -60,7 +61,7 @@ class CaseInsensitiveArgumentAction(argparse.Action):
             setattr(namespace, action, values)
 
 
-def parse_gnu_args(args=None):
+def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser(description="RuFaS: Whole dairy farm simulation")
     parser.register("action", "ci_action", CaseInsensitiveArgumentAction)

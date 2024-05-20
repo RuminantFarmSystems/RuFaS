@@ -58,8 +58,8 @@ def test_task_manager_init(
     assert task_manager.output_manager is mock_output_manager
 
 
-def test_task_manager_start_exception(task_manager):
-    task_manager.input_manager.start_data_processing = MagicMock(return_value=False)
+def test_task_manager_start_exception(task_manager: TaskManager) -> None:
+    patch.object(task_manager.input_manager, "start_data_processing", return_value=False)
     with pytest.raises(Exception) as exc_info:
         task_manager.start(
             Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), Path("fake/logs"), True, False, False
