@@ -4352,7 +4352,7 @@ def test_compare_metadata_properties(
     mocker: MockerFixture,
     file_exists: bool,
     expected_exception: bool,
-    error: Type[PermissionError | OSError | None],
+    error: Type[PermissionError | OSError],
 ) -> None:
     dummy_properties = {"key1": "value1", "key2": "value2"}
     dummy_properties_modified = {"key1": "value1_changed", "key3": "value3"}
