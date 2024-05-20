@@ -86,7 +86,7 @@ class TaskManager:
         produce_graphics : bool
             Whether to produce graphics.
         suppress_log_files : bool
-            Whether to write logs to output files.
+            Whether to write logs from the Task Manager to output files.
 
         """
         self.output_manager.run_startup_sequence(
