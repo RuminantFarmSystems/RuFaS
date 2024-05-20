@@ -2148,7 +2148,9 @@ class InputManager:
         Raises
         ------
         ValueError
-            If the depth of the metadata exceeds the metadata_depth_limit.
+            - If the depth of the metadata exceeds the metadata_depth_limit.
+            - If the properties' 'type' value is neither in the type_to_validator_map keys,
+            nor is None.
         """
         info_map = {
             "class": self.__class__.__name__,
