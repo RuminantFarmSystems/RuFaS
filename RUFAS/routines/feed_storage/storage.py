@@ -256,7 +256,7 @@ class Storage:
 
         dry_matter_loss_fraction = 0.0
 
-        for day in conditions:
+        for day in weather_conditions:
             outside_temp_range = not lower_temp_limit <= day.mean_air_temperature <= upper_temp_limit
             outside_dry_fraction_range = not lower_dry_matter_limit <= dry_matter_fraction <= upper_dry_matter_limit
             if outside_temp_range or outside_dry_fraction_range:
