@@ -4334,10 +4334,10 @@ def test_validate_metadata(
 
 
 @pytest.mark.parametrize(
-    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors",
+    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
     [
-        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, []),
-        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, []),
+        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
+        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, [], ""),
         (
             {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
@@ -4345,16 +4345,19 @@ def test_validate_metadata(
             ["a", "b", "c"],
             True,
             ["Max metadata depth exceeded."],
+            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']"
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, []),
+        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
         (
             {"properties": {"a": {"b": {"type": "invalid_type"}}}},
             3,
             2,
             ["a", "b"],
-            False,
-            ["Unrecognized metadata type."],
+            True,
+            ["Properties value type error"],
+            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']"
         ),
+        ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
     ],
 )
 def test_validate_properties(
@@ -4365,6 +4368,7 @@ def test_validate_properties(
     expected_path: List[str],
     should_raise: bool,
     expected_errors: List[str],
+    expected_err_msg: str,
 ) -> None:
     """Tests _validate_properties() function in InputManager."""
     input_manager = InputManager()
@@ -4377,7 +4381,7 @@ def test_validate_properties(
     if should_raise:
         with pytest.raises(ValueError) as exc_info:
             input_manager._validate_properties()
-        assert str(exc_info.value) == f"Metadata depth exceeds maximum allowed depth of {limit} at path {expected_path}"
+        assert str(exc_info.value) == expected_err_msg
         assert mock_add_error.call_count == len(expected_errors)
         for error_msg in expected_errors:
             mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
