@@ -19,6 +19,7 @@ def main() -> None:
     cmd_arguments = parse_gnu_args(sys.argv[1:])
     try:
         task_manager = TaskManager()
+        print(cmd_arguments.suppress_log_files)
         task_manager.start(
             Path("input/metadata/task_manager_metadata.json"),
             verbosity=LogVerbosity(cmd_arguments.verbose),
@@ -26,6 +27,7 @@ def main() -> None:
             output_directory=Path(cmd_arguments.output_dir),
             clear_output_directory=cmd_arguments.clear_output,
             produce_graphics=not cmd_arguments.no_graphics,
+            suppress_log_files=cmd_arguments.suppress_log_files,
         )
     except Exception as e:
         info_map = {
@@ -92,6 +94,12 @@ def parse_gnu_args(args=None):
         "--output-dir",
         help="The saving directory for output",
         default="output/",
+    )
+    parser.add_argument(
+        "-s",
+        "--suppress-log-files",
+        help="Prevents logs from the Task Manager being written to files",
+        action="store_true",
     )
     return parser.parse_args(args)
 
