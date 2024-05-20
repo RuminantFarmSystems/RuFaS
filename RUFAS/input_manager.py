@@ -119,13 +119,13 @@ class InputManager:
         self.metadata_depth_limit = limit
         om.add_log("Override default metadata depth limit", f"Metadata depth limit set to {limit}.", info_map)
 
-    def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
+    def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
         Parameters
         ----------
-        metadata_path : str
+        metadata_path : Path
             File path to the metadata.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
@@ -143,13 +143,13 @@ class InputManager:
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
-    def _load_metadata(self, metadata_path: str) -> None:
+    def _load_metadata(self, metadata_path: Path) -> None:
         """
         Loads metadata from json file to IM metadata dict.
 
         Parameters
         ----------
-        metadata_path : str
+        metadata_path : Path
             The path to the metadata file.
 
         Raises
@@ -200,13 +200,13 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_path = self.__metadata["files"]["properties"]["path"]
+            properties_path = Path(self.__metadata["files"]["properties"]["path"])
             om.add_log(
                 "load_properties_attempt",
                 f"Attempting to load properties from {properties_path}",
                 info_map,
             )
-            if not os.path.exists(properties_path):
+            if not properties_path.exists():
                 raise FileNotFoundError(f"Properties file not found at {properties_path}")
 
             del self.__metadata["files"]["properties"]
@@ -228,13 +228,13 @@ class InputManager:
             om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
             raise
 
-    def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
+    def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
         """
         Loads data from input json file.
 
         Parameters
         ----------
-        file_path : str
+        file_path : Path
             Path to the input file to load.
 
         Returns
@@ -265,13 +265,13 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
+    def _load_data_from_csv(self, file_path: Path) -> Dict[str, Any]:
         """
         Loads data from input csv file.
 
         Parameters
         ----------
-        file_path : str
+        file_path : Path
             Path to the input file to load.
 
         Returns
@@ -1118,6 +1118,10 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {
@@ -1129,6 +1133,7 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number"
             warning_message = (
@@ -1174,6 +1179,10 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
@@ -1182,6 +1191,7 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not str:
             warning_name = "Validation: string variable is not a string"
             warning_message = (
@@ -1242,12 +1252,17 @@ class InputManager:
         input_data_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
             warning_message = (
@@ -2100,7 +2115,7 @@ class InputManager:
 
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
-        file_path = os.path.join(path, file_name)
+        file_path = path / file_name
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
     def _validate_metadata(self) -> None:
@@ -2249,10 +2264,7 @@ class InputManager:
         }
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
-        path_to_save = os.path.join(
-            output_dir,
-            om.generate_file_name("InputManager_metadata_properties", extension="csv"),
-        )
+        path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
         om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
         try:
             df.to_csv(path_to_save, index=False)

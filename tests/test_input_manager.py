@@ -103,7 +103,7 @@ def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: Mock
 
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
-    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     properties_data = {"key1": "value1", "key2": "value2"}
     mocker.patch("builtins.open", mock_open(read_data=json.dumps(properties_data)))
     mocker.patch(
@@ -133,6 +133,7 @@ def test_load_properties_file_not_found(mock_input_manager: InputManager, mocker
 def test_load_properties_json_decode_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling JSONDecodeError in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="invalid_json"))
 
     mock_input_manager._InputManager__metadata = {"files": {"properties": {"path": "path/to/invalid_json.json"}}}
@@ -146,6 +147,7 @@ def test_load_properties_json_decode_error(mock_input_manager: InputManager, moc
 def test_load_properties_unexpected_error(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for handling unexpected errors in _load_properties method."""
     mocker.patch("os.path.exists", return_value=True)
+    mocker.patch.object(Path, "exists", return_value=True)
     mocker.patch("builtins.open", mock_open(read_data="valid_json"))
     mocker.patch(
         "RUFAS.input_manager.InputManager._load_data_from_json",
@@ -579,20 +581,22 @@ def test_populate_pool_raises_keyerror(
 
 
 @pytest.mark.parametrize(
-    "input_data_value, expected_result",
+    "input_data_value, dummy_variable_properties, expected_result",
     [
-        (True, True),
-        (False, True),
-        ("hello", False),
-        (2, False),
-        (3.5, False),
-        ({}, False),
-        ([], False),
-        (None, False),
+        (True, {}, True),
+        (False, {}, True),
+        ("hello", {}, False),
+        (2, {}, False),
+        (3.5, {}, False),
+        ({}, {}, False),
+        ([], {}, False),
+        (None, {}, False),
+        (None, {"nullable": True}, True),
     ],
 )
 def test_bool_type_validator(
     input_data_value: bool,
+    dummy_variable_properties: Dict[str, Any],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -603,7 +607,7 @@ def test_bool_type_validator(
     # Arrange
     input_manager = InputManager()
     var_path: list[str | int] = ["dummy_var_path"]
-    variable_properties: Dict[str, Any] = {}
+    variable_properties: Dict[str, Any] = dummy_variable_properties
     dummy_properties_key = "dummy_variable_properties"
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
@@ -625,7 +629,8 @@ def test_bool_type_validator(
 
     # Assert
     patch_extract.assert_called_once_with(dummy_input_data, var_path, variable_properties, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
         patch_for_add_warning.assert_called_once()
     else:
@@ -634,7 +639,7 @@ def test_bool_type_validator(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count",
+    "dummy_value, dummy_variable_properties, expected_result, expected_warning_call_count",
     [
         (1, {"minimum": 3, "maximum": 7}, False, 1),
         (3, {"minimum": 3, "maximum": 7}, True, 0),
@@ -644,11 +649,12 @@ def test_bool_type_validator(
         (-1, {"minimum": 3, "maximum": 7}, False, 1),
         (None, {"maximum": 1, "minimum": 0}, False, 1),
         ("42", {"minimum": 4, "maximum": 32}, False, 1),
+        (None, {"nullable": True}, True, 0),
     ],
 )
 def test_number_type_validator(
     dummy_value: int,
-    dummy_variable_to_check: Dict[str, int],
+    dummy_variable_properties: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
     mocker: MockerFixture,
@@ -668,7 +674,7 @@ def test_number_type_validator(
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
         result = input_manager._number_type_validator(
             dummy_var_path,
-            dummy_variable_to_check,
+            dummy_variable_properties,
             dummy_input_data,
             unused_bool_input,
             dummy_properties_key,
@@ -676,14 +682,17 @@ def test_number_type_validator(
             unused_bool_input,
         )
 
-    patch_extract.assert_called_once_with(dummy_input_data, dummy_var_path, dummy_variable_to_check, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(dummy_var_path)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
+    )
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(dummy_var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
-    "dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count",
+    "dummy_value, dummy_variable_properties, expected_result, expected_warning_call_count",
     [
         ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"pattern": r".{3}", "minimum_length": 1}, True, 0),
@@ -698,11 +707,12 @@ def test_number_type_validator(
         ("cow", {"maximum_length": 1}, False, 1),
         (None, {"pattern": r"cow", "minimum_length": 1}, False, 1),
         (42.0, {"pattern": r"cow", "maximum_length": 3}, False, 1),
+        (None, {"nullable": True}, True, 0),
     ],
 )
 def test_string_type_validator(
     dummy_value: int,
-    dummy_variable_to_check: Dict[str, int],
+    dummy_variable_properties: Dict[str, int],
     expected_result: bool,
     expected_warning_call_count: int,
     mock_input_manager: InputManager,
@@ -722,7 +732,7 @@ def test_string_type_validator(
 
     result = mock_input_manager._string_type_validator(
         var_path,
-        dummy_variable_to_check,
+        dummy_variable_properties,
         dummy_input_data,
         unused_bool_input,
         dummy_properties_key,
@@ -730,8 +740,9 @@ def test_string_type_validator(
         unused_bool_input,
     )
 
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_to_check, unused_bool_input)
-    patch_path_to_str.assert_called_once_with(var_path)
+    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
+    if dummy_variable_properties.get("nullable", False) is False:
+        patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
 
@@ -1186,7 +1197,7 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
@@ -3530,19 +3541,26 @@ def test_add_default_values_to_array_inputs(
 
 def test_dump_get_data_logs(
     mock_input_manager: InputManager,
+    mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
         "14-Feb-2024_Wed_06-15-56.693523": "InputManager.get_data() gets called for ['b'].",
         "14-Feb-2024_Wed_06-15-56.696526": "InputManager.get_data() gets called for ['c'].",
     }
-    with patch("RUFAS.output_manager.OutputManager.generate_file_name") as mock_generate_file_name:
-        with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
-            with patch("os.path.join", return_value="dummy_path"):
-                mock_input_manager.dump_get_data_logs(path=MagicMock(auto_spec=Path))
+    mock_dir_path = Path("dummy_path")
+    mock_generated_file_name = "dummy_file_name.json"
+    patch_for_generate_file_name = mocker.patch(
+        "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
+    )
 
-    mock_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
-    mock_dict_to_file_json.assert_called_once_with(mock_input_manager._InputManager__get_data_logs_pool, "dummy_path")
+    with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
+        mock_input_manager.dump_get_data_logs(path=mock_dir_path)
+
+    patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    mock_dict_to_file_json.assert_called_once_with(
+        mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
+    )
 
 
 @pytest.mark.parametrize(
@@ -4064,7 +4082,6 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     with (
         patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
         patch("pandas.DataFrame.to_csv") as mock_to_csv,
-        patch("os.path.join", return_value="output.csv") as mock_join,
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
@@ -4073,8 +4090,7 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
-        mock_join.assert_called_once_with(output_dir, "output.csv")
-        mock_to_csv.assert_called_once_with("output.csv", index=False)
+        mock_to_csv.assert_called_once_with(output_dir / "output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
 
@@ -4089,14 +4105,15 @@ def test_save_metadata_properties_errors(
     error_message: str,
 ) -> None:
     output_dir = Path("/example/dir")
-    expected_path = str(output_dir / "file.csv")
+    generated_filename = "file.csv"
+    expected_path = output_dir / generated_filename
     metadata = {"properties": "test_properties"}
     mock_input_manager.meta_data = metadata
     mock_records = [{"key": "value"}]
 
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
-    mocker.patch("os.path.join", return_value=expected_path)
+    mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     with pytest.raises(exception) as exc_info:
