@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from copy import deepcopy
+from dataclasses import dataclass, field
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
@@ -16,9 +17,12 @@ class HarvestedCrop:
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
     harvest_time : Time
-         The time at which the crop was harvested
+        The time at which the crop was harvested
     storage_time : Time
-         The time at which the crop was stored
+        The time at which the crop was stored
+    last_time_degraded : Time
+        The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
+        storage time of the crop.
     fresh_mass : float
         The fresh mass of the crop in kg.
     dry_matter_percentage : float
@@ -54,6 +58,7 @@ class HarvestedCrop:
     type: CropType
     harvest_time: Time
     storage_time: Time
+    last_time_degraded: Time = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
     dry_matter_digestibility: float
@@ -102,6 +107,8 @@ class HarvestedCrop:
 
         if self.type not in category_to_type[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
+
+        self.last_time_degraded = deepcopy(self.storage_time)
 
     @property
     def dry_matter_mass(self) -> float:
