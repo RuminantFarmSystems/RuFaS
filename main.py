@@ -43,8 +43,9 @@ def main() -> None:
             error_message,
             info_map,
         )
+        output_manager.create_directory(Path(cmd_arguments.logs_dir))
         output_manager.dump_all_nondata_pools(
-            cmd_arguments.output_dir,
+            Path(cmd_arguments.logs_dir),
             cmd_arguments.exclude_info_maps,
             "block",
         )
