@@ -214,7 +214,7 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, conditions: list[CurrentDayConditions]) -> float:
+    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
 
@@ -222,8 +222,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The stored crop that is losing dry matter.
-        conditions : list[CurrentDayConditions]
-            List of daily conditions over which dry matter loss will be calculated for.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which dry matter loss will be calculated.
 
         Returns
         -------
@@ -275,7 +275,7 @@ class Storage:
         Parameters
         ----------
         last_degradations_time : Time
-            Time instance recording the last day a crop's degradations were processed.
+            Time instance for the last day a crop's degradations were processed.
         time : Time
             Time instance containing the current time of the simulation.
         weather : Weather
