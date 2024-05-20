@@ -227,7 +227,7 @@ class OutputManager(object):
         units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units})
+        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, record_all_info_maps)
 
         if isinstance(value, dict):
             for k, v in value.items():
