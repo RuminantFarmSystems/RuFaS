@@ -2191,10 +2191,14 @@ class InputManager:
                         if value_type in type_to_validator_map:
                             type_to_validator_map[value_type](path + [key], value)
                         else:
-                            om.add_error("Properties value type error",
-                                         f"'type' value not in {type_to_validator_map.keys()}",
-                                         info_map)
-                            raise ValueError
+                            if value_type is not None:
+                                om.add_error("Properties value type error",
+                                             f"'type' value not in {type_to_validator_map.keys()}",
+                                             info_map)
+                                print(value_type)
+                                raise ValueError(
+                                    f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
+                                )
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)

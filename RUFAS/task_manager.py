@@ -138,7 +138,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -270,15 +270,17 @@ class TaskManager:
         """Placeholder for expanding end-to-end testing multi-run tasks."""
         return []
 
-    def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
+    def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool,
+                   metadata_depth_limit: int) -> None:
         """Runs the tasks based on the provided arguments."""
-        task_with_args = partial(self.task, produce_graphics=produce_graphics)
+        task_with_args = partial(self.task, produce_graphics=produce_graphics,
+                                 metadata_depth_limit=metadata_depth_limit)
         results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -299,6 +301,9 @@ class TaskManager:
                 task_id,
             )
             input_manager = InputManager()
+            if metadata_depth_limit:
+                input_manager.set_metadata_depth_limit(metadata_depth_limit)
+
             if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
