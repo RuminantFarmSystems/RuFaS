@@ -2,6 +2,7 @@ import json
 import os
 import re
 from copy import deepcopy
+from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
@@ -2277,6 +2278,54 @@ class InputManager:
             "maximum": data_entry.get("maximum", ""),
             "minimum": data_entry.get("minimum", ""),
         }
+
+    def compare_metadata_properties(self, metadata_file_path: Path, metadata_file_comparison_path: Path) -> None:
+        """
+        Compares two json files using the DeepDiff package and saves the results in a txt file.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.compare_metadata_properties.__name__,
+        }
+        self._load_metadata(metadata_file_path)
+        data1 = deepcopy(self.__metadata)
+        del self.__metadata
+        self._load_metadata(metadata_file_comparison_path)
+        data2 = deepcopy(self.__metadata)
+
+        diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
+
+        file_name = "diff_results_" + os.path.basename(str(metadata_file_path)) + "_vs_"\
+            + os.path.basename(str(metadata_file_comparison_path))
+        try:
+            om.add_log("Save metadata diff try",
+                       f"Attempting to save to {file_name}",
+                       info_map)
+            with open(f"output/{file_name}.txt", "w") as file:
+                file.write(f"Comparing changes going from '{metadata_file_path}'"
+                           f" to '{metadata_file_comparison_path}'\n\n")
+
+                sections = {
+                    "dictionary_item_added": "Items added:\n",
+                    "dictionary_item_removed": "Items removed:\n",
+                    "values_changed": "Values changed:\n",
+                }
+
+                for key, heading in sections.items():
+                    if key in diff:
+                        file.write(heading)
+                        for sub_key, value in diff[key].items():
+                            file.write(f"{sub_key}: {value}\n")
+                        file.write("\n")
+            om.add_log("Save metadata diff successful",
+                       f"Successfully saved to {file_name}",
+                       info_map)
+        except FileNotFoundError:
+            print(f"Error: The directory 'output' does not exist or {file_name}.txt cannot be accessed.")
+        except PermissionError:
+            print(f"Error: Permission denied when trying to write to {file_name}.txt.")
+        except OSError as e:
+            print(f"An unexpected OS error occurred: {e}")
 
 
 class ElementState(Enum):
