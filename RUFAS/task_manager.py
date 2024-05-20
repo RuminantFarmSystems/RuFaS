@@ -61,6 +61,7 @@ class TaskManager:
         verbosity: LogVerbosity,
         exclude_info_maps: bool,
         output_directory: Path,
+        logs_directory: Path,
         clear_output_directory: bool,
         produce_graphics: bool,
         suppress_log_files: bool,
@@ -78,6 +79,8 @@ class TaskManager:
             Flag to exclude information maps.
         output_directory : Path
             Path to the directory where outputs will be saved.
+        logs_directory : Path
+            Path to the directory where logs from the Task Manager will be saved.
         clear_output_directory : bool
             Whether to clear the output directory.
         produce_graphics : bool
@@ -106,10 +109,9 @@ class TaskManager:
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 {
-                    "output_directory": output_directory,
                     "exclude_info_maps": exclude_info_maps,
                     "variable_name_style": "verbose",
-                    "logs_directory": output_directory,
+                    "logs_directory": logs_directory,
                     "suppress_log_files": suppress_log_files,
                 },
                 self.input_manager,
@@ -142,10 +144,9 @@ class TaskManager:
         self._run_tasks(runnable_args, produce_graphics)
         TaskManager.handle_post_processing(
             args={
-                "output_directory": output_directory,
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
-                "logs_directory": output_directory,
+                "logs_directory": logs_directory,
                 "suppress_log_files": suppress_log_files,
             },
             input_manager=self.input_manager,

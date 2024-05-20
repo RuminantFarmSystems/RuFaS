@@ -61,7 +61,7 @@ def test_task_manager_init(
 def test_task_manager_start_exception(task_manager):
     task_manager.input_manager.start_data_processing = MagicMock(return_value=False)
     with pytest.raises(Exception) as exc_info:
-        task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), True, False, False)
+        task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), Path("fake/logs"), True, False, False)
     assert "Task Manager's input data is invalid." in str(exc_info.value)
 
 
@@ -151,7 +151,6 @@ def test_handle_post_processing(
     mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool
 ) -> None:
     args = {
-        "output_directory": Path("/fake/output"),
         "filters_directory": Path("/fake/filters"),
         "exclude_info_maps": False,
         "variable_name_style": "verbose",
@@ -182,7 +181,6 @@ def test_input_data_audit(
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
-        "output_directory": Path("/fake/output"),
         "output_prefix": "test",
         "logs_directory": Path("/fake/output/logs"),
         "suppress_log_files": suppress_logs,
