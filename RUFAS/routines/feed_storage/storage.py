@@ -275,7 +275,9 @@ class Storage:
         )
         return total_nutrient
 
-    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, conditions: list[CurrentDayConditions]) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]
+    ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
 
@@ -283,8 +285,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The stored crop that is losing dry matter.
-        conditions : list[CurrentDayConditions]
-            List of daily conditions over which dry matter loss will be calculated for.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which dry matter loss will be calculated.
 
         Returns
         -------
@@ -315,7 +317,7 @@ class Storage:
 
         dry_matter_loss_fraction = 0.0
 
-        for day in conditions:
+        for day in weather_conditions:
             outside_temp_range = not lower_temp_limit <= day.mean_air_temperature <= upper_temp_limit
             outside_dry_fraction_range = not lower_dry_matter_limit <= dry_matter_fraction <= upper_dry_matter_limit
             if outside_temp_range or outside_dry_fraction_range:
@@ -331,12 +333,13 @@ class Storage:
         self, last_degradations_time: Time, current_time: Time, weather: Weather
     ) -> list[CurrentDayConditions]:
         """
-        Gets a series of weather conditions for a time period which will have weather conditions calculated for it.
+        Gets the weather conditions for the days between the current time and the time that degradations were last
+        processed.
 
         Parameters
         ----------
         last_degradations_time : Time
-            Time instance recording the last day a crop's degradations were processed.
+            Time instance for the last day a crop's degradations were processed.
         time : Time
             Time instance containing the current time of the simulation.
         weather : Weather
