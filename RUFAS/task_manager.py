@@ -63,7 +63,7 @@ class TaskManager:
         output_directory: Path,
         clear_output_directory: bool,
         produce_graphics: bool,
-        write_log_files: bool = True,
+        suppress_log_files: bool,
     ) -> None:
         """
         Initializes and starts the task management process.
@@ -82,7 +82,7 @@ class TaskManager:
             Whether to clear the output directory.
         produce_graphics : bool
             Whether to produce graphics.
-        write_log_files : bool
+        suppress_log_files : bool
             Whether to write logs to output files.
 
         """
@@ -110,7 +110,7 @@ class TaskManager:
                     "exclude_info_maps": exclude_info_maps,
                     "variable_name_style": "verbose",
                     "logs_directory": output_directory,
-                    "write_log_files": write_log_files,
+                    "suppress_log_files": suppress_log_files,
                 },
                 self.input_manager,
                 self.output_manager,
@@ -146,7 +146,7 @@ class TaskManager:
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
                 "logs_directory": output_directory,
-                "write_log_files": write_log_files,
+                "suppress_log_files": suppress_log_files,
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -170,7 +170,7 @@ class TaskManager:
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
             input_task["logs_directory"] = Path(input_task["logs_directory"])
-            input_task["write_log_files"] = input_task["write_log_files"]
+            input_task["suppress_log_files"] = input_task["suppress_log_files"]
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
             input_task["csv_output_directory"] = Path(input_task["csv_output_directory"])
@@ -403,7 +403,7 @@ class TaskManager:
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
 
-        if args["write_log_files"]:
+        if not args["suppress_log_files"]:
             output_manager.add_log(
                 "Saving metadata properties",
                 f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
@@ -468,7 +468,7 @@ class TaskManager:
                 args["json_output_directory"],
             )
 
-        if args["write_log_files"]:
+        if not args["suppress_log_files"]:
             input_manager.dump_get_data_logs(args["logs_directory"])
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
