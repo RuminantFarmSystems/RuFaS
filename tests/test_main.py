@@ -93,7 +93,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--logs-dir",
             help="The directory for saving log files too",
             default="output/logs",
-        )
+        ),
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"
