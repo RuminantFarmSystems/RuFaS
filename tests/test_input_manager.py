@@ -92,6 +92,15 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
     assert mock_input_manager.pool == test_data
 
 
+def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test for metadata override function for metadata depth limit"""
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    new_limit = 10
+    mock_input_manager.set_metadata_depth_limit(new_limit)
+    assert mock_input_manager.metadata_depth_limit == new_limit
+    mock_add_log.assert_called_once()
+
+
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
     mocker.patch.object(Path, "exists", return_value=True)
@@ -265,6 +274,7 @@ def test_start_data_processing(
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
     patch_for_validate_metadata = mocker.patch.object(mock_input_manager, "_validate_metadata")
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
+    patch_for_validate_properties = mocker.patch.object(mock_input_manager, "_validate_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -275,6 +285,7 @@ def test_start_data_processing(
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
     patch_for_validate_metadata.assert_called_once()
+    patch_for_validate_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4337,6 +4348,77 @@ def test_validate_metadata(
         input_manager._validate_metadata()
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
+    [
+        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
+        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
+            2,
+            3,
+            ["a", "b", "c"],
+            True,
+            ["Max metadata depth exceeded."],
+            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']",
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"type": "invalid_type"}}}},
+            3,
+            2,
+            ["a", "b"],
+            True,
+            ["Properties value type error"],
+            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+    ],
+)
+def test_validate_properties(
+    mocker: MockerFixture,
+    metadata: Dict[str, Any],
+    limit: int,
+    expected_depth: int,
+    expected_path: List[str],
+    should_raise: bool,
+    expected_errors: List[str],
+    expected_err_msg: str,
+) -> None:
+    """Tests _validate_properties() function in InputManager."""
+    input_manager = InputManager()
+    input_manager.meta_data = metadata
+    input_manager.metadata_depth_limit = limit
+
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    if should_raise:
+        with pytest.raises(ValueError) as exc_info:
+            input_manager._validate_properties()
+        assert str(exc_info.value) == expected_err_msg
+        assert mock_add_error.call_count == len(expected_errors)
+        for error_msg in expected_errors:
+            mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
+        mock_add_log.assert_not_called()
+    else:
+        input_manager._validate_properties()
+        mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
+        assert mock_add_log.call_args_list == [
+            call(
+                "Metadata properties depth",
+                f"Max depth of metadata properties is {expected_depth}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+            call(
+                "Metadata properties path",
+                f"Deepest path of metadata properties is {expected_path}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+        ]
 
 
 def test_increment_in_elements_counter() -> None:
