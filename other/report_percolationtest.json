@@ -1,0 +1,42 @@
+{
+    "multiple": [
+        {
+            "name": "",
+            "filters": [
+                "Time.*", "Weather.*"
+            ]
+        },
+        {
+            "name": "",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.infiltrated_water.field='.*'"
+            ]
+        },
+        {
+            "name": "",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.water_content.field='.*',layer='.*'"
+            ]
+        },
+        {
+            "name": "",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.percolated_water.field='.*',layer='.*'"
+            ]
+        },
+        {
+            "name": "",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.water_content.field='.*',vadose_zone_layer"
+            ]
+        },
+      {
+            "name": "Soil N2O emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        }
+    ]
+}

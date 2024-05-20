@@ -1,0 +1,231 @@
+{
+    "multiple": [
+      {
+          "name": "Pen 3 number of milking cows",
+          "filters": ["ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+            "name": "Total number of milking cows",
+            "filters":[
+                "AnimalManager._record_animal_counts.num_lactating_cows"
+            ],
+            "vertical_aggregation": "average"
+      },
+      {
+          "name": "Whole herd daily milk production, kg",
+          "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      {
+          "name": "Daily milk production per cow, kg/cow",
+          "cross_references":[
+                "Whole herd daily milk production, kg_ver_agg",
+                "Total number of milking cows_ver_agg"
+            ],
+          "horizontal_aggregation": "division"
+      },
+
+
+
+      {
+          "name": "Pen 3 daily DMI per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_3_LAC_COW"],
+          "variables": ["dm"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      }, 
+      {
+          "name": "Pen 3 daily phosphorus intake per cow, kg/cow",
+          "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_3_LAC_COW"],
+          "variables": ["phosphorus"],
+          "vertical_aggregation": "average",
+          "slice_start": -365
+      },
+      
+{
+    "name": "Pen 3 daily phosphorus req per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_3_.*"],
+    "variables": ["^P_req"],
+    "constants": {
+        "g to kg": 1000
+    },
+    "vertical_aggregation": "average",
+    "horizontal_aggregation":"division",
+    "horizontal_order":["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_3_.*","g to kg" ],
+    "horizontal_first": false,
+        "slice_start": -365
+},
+      {
+        "name": "Pen 3 dietary phosphorus, %",
+        "cross_references":[
+            "Pen 3 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+            "Pen 3 daily DMI per cow, kg/cow_dm_ver_agg"
+        ],
+        "constants": {
+            "By 0.01": 0.01
+        },
+        "horizontal_aggregation": "division",
+        "horizontal_order": [
+            "Pen 3 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+            "Pen 3 daily DMI per cow, kg/cow_dm_ver_agg", 
+            "By 0.01"
+        ]
+  },
+
+
+
+  {
+    "name": "Pen 3 Excretion- manure phosphorus, kg/cow/d",
+    "filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_phosphorus",
+    "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals"],
+    "constants": {
+        "By 1000": 1000},
+    "horizontal_aggregation": "division",
+    "horizontal_order": ["AnimalModuleReporter.report_pen_manure_properties.pen_3_daily_phosphorus",
+    "ManureHandlerDailyOutput_Pen_3_LAC_COW.num_animals",
+    "By 1000"],
+    "vertical_aggregation": "average",
+    "horizontal_first": true,
+    "slice_start": -365
+},
+  
+
+{
+    "name": "Pen 2 number of milking cows",
+    "filters": ["ManureHandlerDailyOutput_Pen_2.*.num_animals"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+},
+
+{
+    "name": "Pen 2 daily DMI per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_2.*"],
+    "variables": ["dm"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+}, 
+{
+    "name": "Pen 2 daily phosphorus intake per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_2.*"],
+    "variables": ["phosphorus"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+},
+{
+    "name": "Pen 2 daily phosphorus req per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_2_.*"],
+    "variables": ["^P_req"],
+    "constants": {
+        "g to kg": 1000
+    },
+    "vertical_aggregation": "average",
+    "horizontal_aggregation":"division",
+    "horizontal_order":["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_3_.*","g to kg" ],
+    "horizontal_first": false,
+        "slice_start": -365
+},
+{
+  "name": "Pen 2 dietary phosphorus, %",
+  "cross_references":[
+      "Pen 2 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+      "Pen 2 daily DMI per cow, kg/cow_dm_ver_agg"
+  ],
+  "constants": {
+      "By 0.01": 0.01
+  },
+  "horizontal_aggregation": "division",
+  "horizontal_order": [
+      "Pen 2 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+      "Pen 2 daily DMI per cow, kg/cow_dm_ver_agg", 
+      "By 0.01"
+  ]
+},
+
+{
+"name": "Pen 2 Excretion- manure phosphorus, kg/cow/d",
+"filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_2_daily_phosphorus",
+"ManureHandlerDailyOutput_Pen_2_.*.num_animals"],
+"constants": {
+  "By 1000": 1000},
+"horizontal_aggregation": "division",
+"horizontal_order": ["AnimalModuleReporter.report_pen_manure_properties.pen_2_daily_phosphorus",
+"ManureHandlerDailyOutput_Pen_2_CLOSE_UP.num_animals",
+"By 1000"],
+"vertical_aggregation": "average",
+"horizontal_first": true,
+"slice_start": -365
+},
+
+{
+    "name": "Pen 1 number of cows",
+    "filters": ["ManureHandlerDailyOutput_Pen_1.*.num_animals"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+},
+
+{
+    "name": "Pen 1 daily DMI per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_1.*"],
+    "variables": ["dm"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+}, 
+{
+    "name": "Pen 1 daily phosphorus intake per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_1.*"],
+    "variables": ["phosphorus"],
+    "vertical_aggregation": "average",
+    "slice_start": -365
+},
+{
+    "name": "Pen 1 daily phosphorus req per cow, kg/cow",
+    "filters": ["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_1_.*"],
+    "variables": ["^P_req"],
+    "constants": {
+        "g to kg": 1000
+    },
+    "vertical_aggregation": "average",
+    "horizontal_aggregation":"division",
+    "horizontal_order":["AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_1_.*","g to kg" ],
+    "horizontal_first": false,
+    "slice_start": -365
+},
+
+{
+  "name": "Pen 1 dietary phosphorus, %",
+  "cross_references":[
+      "Pen 1 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+      "Pen 1 daily DMI per cow, kg/cow_dm_ver_agg"
+  ],
+  "constants": {
+      "By 0.01": 0.01
+  },
+  "horizontal_aggregation": "division",
+  "horizontal_order": [
+      "Pen 1 daily phosphorus intake per cow, kg/cow_phosphorus_ver_agg",
+      "Pen 1 daily DMI per cow, kg/cow_dm_ver_agg", 
+      "By 0.01"
+  ]
+},
+
+{
+"name": "Pen 1 Excretion- manure phosphorus, kg/cow/d",
+"filters": ["AnimalModuleReporter.report_pen_manure_properties.pen_1_daily_phosphorus",
+"ManureHandlerDailyOutput_Pen_1.*.num_animals"],
+"constants": {
+  "By 1000": 1000},
+"horizontal_aggregation": "division",
+"horizontal_order": ["AnimalModuleReporter.report_pen_manure_properties.pen_1_daily_phosphorus",
+"ManureHandlerDailyOutput_Pen_1_GROWING.num_animals",
+"By 1000"],
+"vertical_aggregation": "average",
+"horizontal_first": true,
+"slice_start": -365
+}
+    
+    ]
+  }
+  

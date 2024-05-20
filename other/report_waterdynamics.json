@@ -1,0 +1,33 @@
+{
+  "multiple": [
+    {
+      "name": "",
+      "filters": [
+        "Time\\..*"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "Weather\\..*"
+      ]
+    },
+    {
+      "name": "Water_Content",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.water_content\\.field='field',layer='.*'"
+      ],
+      "horizontal_aggregation": "sum"
+    },
+    { "name": "Accumulated Runoff",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.accumulated_runoff\\.field='.*'"
+      ]
+    },
+    { "name": "Eroded Sediment",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.eroded_sediment\\.field='.*'"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{"multiple": [
+{
+            "name": "",
+            "filters": [
+              ".*\\.nitrate_runoff",
+              ".*\\.ammonium_runoff",
+              ".*\\.eroded_fresh_organic_nitrogen",
+              ".*\\.eroded_stable_organic_nitrogen",
+              ".*\\.eroded_active_organic_nitrogen"
+            ]
+        },
+        {
+            "name": "",
+            "filters": [
+              ".*\\.annual_runoff_nitrates_total",
+              ".*\\.annual_runoff_ammonium_total",
+              ".*\\.annual_eroded_fresh_organic_nitrogen_total",
+              ".*\\.annual_eroded_stable_organic_nitrogen_total",
+              ".*\\.annual_eroded_active_organic_nitrogen_total"]
+        },
+          {
+            "name": "",
+            "filters": [
+              ".*\\.annual_runoff_phosphorus_total"]
+        },
+        {
+            "name": "fertilizer_application",
+            "filters": [".*\\.fertilizer_application"],
+            "variables": ["phosphorus", "nitrogen", "day", "year"]
+        }
+    ]
+}

@@ -1,0 +1,102 @@
+{
+  "multiple": [
+     {
+      "name": "",
+      "filters": ["Time\\..*"]
+    },
+    {
+      "name": "",
+      "filters": ["Weather\\..*"]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.full_available_phosphorus_pool\\.field='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.recalcitrant_phosphorus_pool\\.field='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.available_phosphorus_pool\\.field='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.ammonium_content\\.field='.*',layer='.*'$"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.nitrate_content\\.field='.*',layer='.*'$"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.profile_nitrates_total\\.field='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.active_organic_nitrogen_content\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.stable_organic_nitrogen_content\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.fresh_organic_nitrogen_content\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.nitrous_oxide_emissions\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "Nitrate Daily Percolated",
+      "filters": [
+        "FieldDataReporter.send_daily_variables.percolated_nitrates.field='.*',layer='3'"
+      ]
+    },
+    {
+      "name": "Phosphorus Daily Runoff",
+      "filters": [
+        "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.active_inorganic_phosphorus_content\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.labile_inorganic_phosphorus_content\\.field='.*',layer='.*'"
+      ]
+    },
+    {
+      "name": "",
+      "filters": [
+        "FieldDataReporter.send_daily_variables\\.stable_inorganic_phosphorus_content\\.field='.*',layer='.*'"
+      ]
+    }
+  ]
+}
