@@ -1,6 +1,7 @@
 from typing import Any, Generator
 import pytest
 from unittest.mock import patch, MagicMock
+from pytest_mock import MockerFixture
 from pathlib import Path
 
 from RUFAS.task_manager import TaskManager, TaskType
@@ -58,8 +59,8 @@ def test_task_manager_init(
     assert task_manager.output_manager is mock_output_manager
 
 
-def test_task_manager_start_exception(task_manager: TaskManager) -> None:
-    patch.object(task_manager.input_manager, "start_data_processing", return_value=False)
+def test_task_manager_start_exception(task_manager: TaskManager, mocker: MockerFixture) -> None:
+    mocker.patch.object(task_manager.input_manager, "start_data_processing", new_callable=MagicMock, return_value=False)
     with pytest.raises(Exception) as exc_info:
         task_manager.start(
             Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), Path("fake/logs"), True, False, False
