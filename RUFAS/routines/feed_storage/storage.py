@@ -270,7 +270,8 @@ class Storage:
         self, last_degradations_time: Time, current_time: Time, weather: Weather
     ) -> list[CurrentDayConditions]:
         """
-        Gets a series of weather conditions for a time period which will have weather conditions calculated for it.
+        Gets the weather conditions for the days between the current time and the time that degradations were last
+        processed.
 
         Parameters
         ----------
