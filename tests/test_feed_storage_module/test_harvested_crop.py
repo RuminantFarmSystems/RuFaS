@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockerFixture
 import copy
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
@@ -47,7 +48,8 @@ def test_invalid_category_type_combinations(category: CropCategory, crop_type: C
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
-def test_attributes() -> None:
+def test_attributes(mocker: MockerFixture) -> None:
+    mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.harvested_crop.deepcopy")
     crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
     )
@@ -62,6 +64,7 @@ def test_attributes() -> None:
     assert crop.lignin == sample_crop_data["lignin"]
     assert crop.sugar == sample_crop_data["sugar"]
     assert crop.ash == sample_crop_data["ash"]
+    mock_deepcopy.assert_called_once_with(crop.storage_time)
 
 
 @pytest.mark.parametrize(
