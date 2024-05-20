@@ -19,7 +19,6 @@ def main() -> None:
     cmd_arguments = parse_gnu_args(sys.argv[1:])
     try:
         task_manager = TaskManager()
-        print(cmd_arguments.suppress_log_files)
         task_manager.start(
             Path("input/metadata/task_manager_metadata.json"),
             verbosity=LogVerbosity(cmd_arguments.verbose),
