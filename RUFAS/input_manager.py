@@ -2279,31 +2279,31 @@ class InputManager:
             "minimum": data_entry.get("minimum", ""),
         }
 
-    def compare_metadata_properties(self, metadata_file_path: Path, metadata_file_comparison_path: Path) -> None:
+    def compare_metadata_properties(self, properties_file_path: Path, comparison_properties_file_path: Path) -> None:
         """
-        Compares two json files using the DeepDiff package and saves the results in a txt file.
+        Compares two metadataa properties json files using the DeepDiff package and saves the results in a txt file.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.compare_metadata_properties.__name__,
         }
-        self._load_metadata(metadata_file_path)
+        self._load_metadata(properties_file_path)
         data1 = deepcopy(self.__metadata)
         del self.__metadata
-        self._load_metadata(metadata_file_comparison_path)
+        self._load_metadata(comparison_properties_file_path)
         data2 = deepcopy(self.__metadata)
 
         diff = DeepDiff(data1, data2, ignore_order=True, verbose_level=2)
 
-        file_name = "diff_results_" + os.path.basename(str(metadata_file_path)) + "_vs_"\
-            + os.path.basename(str(metadata_file_comparison_path))
+        file_name = "diff_results_" + os.path.basename(str(properties_file_path)) + "_vs_"\
+            + os.path.basename(str(comparison_properties_file_path))
         try:
             om.add_log("Save metadata diff try",
                        f"Attempting to save to {file_name}",
                        info_map)
             with open(f"output/{file_name}.txt", "w") as file:
-                file.write(f"Comparing changes going from '{metadata_file_path}'"
-                           f" to '{metadata_file_comparison_path}'\n\n")
+                file.write(f"Comparing changes going from '{properties_file_path}'"
+                           f" to '{comparison_properties_file_path}'\n\n")
 
                 sections = {
                     "dictionary_item_added": "Items added:\n",
