@@ -2,11 +2,12 @@
   "parallel_workers": 4,
   "tasks": [
     {
-      "task_type": "SIMULATION_SINGLE_RUN",
+      "task_type": "COMPARE_METADATA_PROPERTIES",
       "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "default",
-      "log_verbosity": "errors",
-      "random_seed": 42
+      "properties_file_path": "input/metadata/properties/default.json",
+      "comparison_properties_file_path": "input/metadata/properties/default_copy.json",
+      "output_prefix": "compare",
+      "log_verbosity": "errors"
     }
   ]
 }

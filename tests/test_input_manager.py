@@ -4361,7 +4361,6 @@ def test_compare_metadata_properties(
     properties_file_path = Path("/fake/dir/original_properties.json")
     comparison_properties_file_path = Path("/fake/dir/comparison_properties.json")
 
-    mocker.patch("os.path.basename", side_effect=os.path.basename)
     if file_exists:
         mock_file = mock_open(read_data='{"key": "value"}')
         mocker.patch("builtins.open", mock_file)
