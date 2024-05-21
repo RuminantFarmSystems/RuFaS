@@ -11,6 +11,7 @@ crop that is presently growing in a field will be harvested.
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.time import Time
 
 
 class BaseFieldManagementEvent:
@@ -51,7 +52,7 @@ class BaseFieldManagementEvent:
         """Overrides the hash method for BaseFieldManagementEvent objects."""
         return hash((self.year, self.day))
 
-    def occurs_today(self, time) -> bool:
+    def occurs_today(self, time: Time) -> bool:
         """
         Checks if the event occurs on the current day in the current year..
 
@@ -66,7 +67,7 @@ class BaseFieldManagementEvent:
             True if event occurs on the current day and year, false if not.
 
         """
-        return self.year == time.calendar_year and self.day == time.day
+        return self.year == time.current_calendar_year and self.day == time.current_julian_day
 
 
 class PlantingEvent(BaseFieldManagementEvent):
