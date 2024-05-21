@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/c2f6_wcrops_config.json",
+      "path": "input/data/config/c2f27_wcrops_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/c2f6_animal_monensin.json",
+      "path": "input/data/animal/c2f27_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -45,7 +45,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/c2f6_feed.json",
+      "path": "input/data/feed/c2f27_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -66,14 +66,14 @@
     "manure_management": {
       "title": "Manure data",
       "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/c2f6_manure_management.json",
+      "path": "input/data/manure/c2f27_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/c2f6_weather.csv",
+      "path": "input/data/weather/c2f27_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -98,85 +98,154 @@
       "type": "json",
       "properties": "EEE_constants_properties"
     },
-    "crop Alfalfa 2022": {
-      "title": "Crop data Alfalfa 2022",
+    "Corn Silage 2022 Crop data": {
+      "title": "Corn Silage 2022 Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/c2f6_alfalfa_2022_corn_alf_rotation.json",
+      "path": "input/data/crop/c2f27_cornsilage2022.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
-    "fertilizer_schedule Alfalfa 2022": {
-      "title": "Fertilizer schedule Alfalfa 2022",
+    "Corn Silage 2022 Fertilizer schedule": {
+      "title": "Corn Silage 2022 Fertilizer schedule",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/c2f6_alfalfa_2022_corn_alf_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/c2f27_cornsilage2022_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule Alfalfa 2022": {
-      "title": "Manure schedule Alfalfa 2022",
+    "Corn Silage 2022 Manure schedule": {
+      "title": "Corn Silage 2022 Manure schedule",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/c2f6_alfalfa_2022_corn_alf_manure_schedule.json",
+      "path": "input/data/manure_schedule/c2f27_cornsilage2022_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule Alfalfa 2022": {
-      "title": "Tillage schedule Alfalfa 2022",
+    "Corn Silage Tillage schedule": {
+      "title": "Corn Silage Tillage schedule",
       "description": "Schedule of tillage applications for a field.",
-      "path": "input/data/tillage_schedule/c2f6_alfalfa_2022_corn_alf_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field Alfalfa 2022": {
-      "title": "Field specification Alfalfa 2022",
+    "Corn Silage 2022 Field": {
+      "title": "Corn Silage 2022 Field",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c2f6_alfalfa_2022_corn_alf_field.json",
+      "path": "input/data/field/c2f27_cornsilage2022_field.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "crop Corn 2022": {
-      "title": "Crop data Corn 2022",
+    "Cereal Rye 2022 Crop data": {
+      "title": "Cereal Rye 2022 Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/c2f6_corn_2022_alf_corn_rotation.json",
+      "path": "input/data/crop/c2f27_cerealrye2022.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
-    "fertilizer_schedule Corn 2022": {
-      "title": "Fertilizer schedule Corn 2022",
+    "Cereal Rye 2022 Fertilizer schedule": {
+      "title": "Cereal Rye 2022 Fertilizer schedule",
       "description": "Fertilizer types available, and their application schedule.",
-      "path": "input/data/fertilizer_schedule/c2f6_corn_2022_alf_corn_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule Corn 2022": {
-      "title": "Manure schedule Corn 2022",
+    "Cereal Rye 2022 Manure schedule": {
+      "title": "Cereal Rye 2022 Manure schedule",
       "description": "Specifies manure applications to a field.",
-      "path": "input/data/manure_schedule/c2f6_corn_2022_alf_corn_manure_schedule.json",
+      "path": "input/data/manure_schedule/c2f27_cerealrye2022_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule Corn 2022": {
-      "title": "Tillage schedule Corn 2022",
+    "Cereal Rye Tillage schedule": {
+      "title": "Cereal Rye Tillage schedule",
       "description": "Schedule of tillage applications for a field.",
-      "path": "input/data/tillage_schedule/c2f6_corn_2022_alf_corn_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field Corn 2022": {
-      "title": "Field specification Corn 2022",
+    "Cereal Rye 2022 Field": {
+      "title": "Corn Silage 2022 Field",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/c2f6_corn_2022_alf_corn_field.json",
+      "path": "input/data/field/c2f27_cerealrye2022_field.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "Wheat 2022 Crop data": {
+      "title": "Wheat 2022 Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c2f27_ww2022.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "Wheat 2022 Fertilizer schedule": {
+      "title": "Wheat 2022 Fertilizer schedule",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/c2f27_ww2022_fertilizer_schedule.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "Wheat 2022 Manure schedule": {
+      "title": "Wheat 2022 Manure schedule",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/c2f27_ww2022_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "Wheat Tillage schedule": {
+      "title": "Wheat Tillage schedule",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/no_till.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "Wheat 2022 Field": {
+      "title": "Wheat 2022 Field",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/c2f27_ww2022_field.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+
+    "Tall Fescue 2022 Crop data": {
+      "title": "Tall Fescue 2022 Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "input/data/crop/c2f27_tallfescue2022.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "Tall Fescue 2022 Fertilizer schedule": {
+      "title": "Tall Fescue 2022 Fertilizer schedule",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "Tall Fescue 2022 Manure schedule": {
+      "title": "Tall Fescue 2022 Manure schedule",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/c2f27_tallfescue2022_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "Tall Fescue Tillage schedule": {
+      "title": "Tall Fescue Tillage schedule",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/no_till.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "Tall Fescue 2022 Field": {
+      "title": "Tall Fescue 2022 Field",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/c2f27_tallfescue2022_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "soil": {
-      "title": "Soil data",
-      "description": "Characteristic soil information, including composition, slope, and layer details.",
-      "path": "input/data/soil/farm_6_cohort_2_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-
-
+    "title": "Soil data",
+    "description": "Characteristic soil information, including composition, slope, and layer details.",
+    "path": "input/data/soil/farm_27_cohort_2_soil.json",
+    "type": "json",
+    "properties": "soil_profile_properties"
+  },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",
