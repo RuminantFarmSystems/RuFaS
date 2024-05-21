@@ -65,3 +65,13 @@ def test_calculate_dry_matter_loss_to_gas(
     assert actual == expected_loss
     assert mock_initial_loss.call_count == expected_call_count
     assert mock_subsequent_loss.call_count == expected_call_count
+
+
+@pytest.mark.parametrize("days,expected")
+def test_calculate_initial_dry_matter_loss(hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float) -> None:
+    """Tests _calculate_initial_dry_matter_loss in Hay."""
+    harvested_crop.last_time_degraded = 1
+    harvested_crop.initial_dry_matter_percentage = 20.0
+    harvested_crop.total_sensible_heat_generated = 950.0
+    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time.simulation_day = days + 1
