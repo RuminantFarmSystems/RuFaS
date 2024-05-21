@@ -1,10 +1,11 @@
 import datetime
-from typing import Dict
+from typing import Dict, List
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 im = InputManager()
 om = OutputManager()
@@ -16,9 +17,9 @@ class Time:
         This object is responsible for creating and tracking time in the simulation.
         """
 
-        config_data: Dict[str, str | int | bool] = im.get_data("config")
-        self.start_date: datetime = datetime.datetime.strptime(config_data["start_date"], '%Y:%j')
-        self.end_date: datetime = datetime.datetime.strptime(config_data["end_date"], '%Y:%j')
+        self.config_data: Dict[str, str | int | bool] = im.get_data("config")
+        self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], '%Y:%j')
+        self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], '%Y:%j')
 
         self.leap_year_length: int = GeneralConstants.LEAP_YEAR_LENGTH
         self.year_length: int = GeneralConstants.YEAR_LENGTH
@@ -32,7 +33,48 @@ class Time:
         """
 
         self.simulation_day += 1
-        self.current_date += 1
+        self.current_date += datetime.timedelta(days=1)
+
+    @property
+    def years(self) -> List[List[int]]:
+        years: list[list[int]] = []
+
+        for year in range(self.start_year_int, self.end_year_int + 1):
+            year_length = self.year_length if not Utility.is_leap_year(year) else self.leap_year_length
+            if year == self.start_year_int == self.end_year_int:
+                days = [None for _ in range(1, self.start_day)]
+                days += [_ for _ in range(self.start_day, self.end_day + 1)]
+            elif year == self.start_year_int:
+                days = [None for _ in range(1, self.start_day)]
+                days += (_ for _ in range(self.start_day, year_length + 1))
+            elif year == self.end_year_int:
+                days = [_ for _ in range(1, self.end_day + 1)]
+            else:
+                days = [_ for _ in range(1, year_length + 1)]
+
+            years.append(days)
+
+        return years
+
+    @property
+    def start_year_int(self) -> int:
+        start_full_date: list[str] = self.config_data["start_date"].split(":")
+        return int(start_full_date[0])
+
+    @property
+    def start_day(self) -> int:
+        start_full_date: list[str] = self.config_data["start_date"].split(":")
+        return int(start_full_date[1])
+
+    @property
+    def end_year_int(self) -> int:
+        end_full_date: list[str] = self.config_data["end_date"].split(":")
+        return int(end_full_date[0])
+
+    @property
+    def end_day(self) -> int:
+        end_full_date: list[str] = self.config_data["end_date"].split(":")
+        return int(end_full_date[1])
 
     @property
     def current_julian_day(self) -> int:
@@ -66,7 +108,7 @@ class Time:
         the day is reset to 1 and the year is incremented by 1.
         """
 
-        return self.current_date.month == 12 and self.current_date.day == 31
+        return self.end_simulation or (self.current_date.month == 12 and self.current_date.day == 31)
 
     def end_simulation(self) -> bool:
         """
@@ -87,16 +129,14 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.current_date.day,
-                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value}))
+        om.add_variable("day", self.current_julian_day,
+                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable("year", self.current_simulation_year,
-                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR.value}))
-        om.add_variable(
-            "calendar_year", self.current_date.year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR.value})
-        )
-        om.add_variable(
-            "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
-        )
+                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR}))
+        om.add_variable("calendar_year", self.current_calendar_year,
+                        dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR}))
+        om.add_variable("simulation_day",
+                        self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
 
     @property
     def is_last_day_of_simulation(self) -> bool:
