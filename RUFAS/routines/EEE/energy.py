@@ -2,6 +2,7 @@ from math import sqrt
 from typing import Any, Dict, List
 
 from RUFAS.input_manager import InputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -22,7 +23,7 @@ class EnergyEstimator:
         base_info_map = {
             "class": EnergyEstimator.__name__,
             "function": EnergyEstimator.estimate_all.__name__,
-            "unit": "unitless",
+            "unit": MeasurementUnits.UNITLESS,
         }
         estimator = EnergyEstimator()
         diesel_conumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
@@ -77,7 +78,7 @@ class EnergyEstimator:
         om.add_variable(
             "total_diesel_consumption_tractor_implement",
             total_diesel_consumption_tractor_implement_liter_per_ton,
-            {**base_info_map, **{"unit": "liter/tone"}},
+            {**base_info_map, **{"unit": MeasurementUnits.LITERS_PER_TONS}},
         )
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> List[Dict[str, Any]]:
