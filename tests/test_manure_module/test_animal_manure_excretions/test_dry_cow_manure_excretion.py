@@ -145,9 +145,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
     assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
     assert manure_excretion_values["urea"] == approx(urine_urea_nitrogen_concentration)
     assert manure_excretion_values["urine"] == approx(urine)
-    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(
-        manure_total_ammoniacal_nitrogen
-    )
+    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert manure_excretion_values["urine_nitrogen"] == approx(urine_nitrogen)
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)
