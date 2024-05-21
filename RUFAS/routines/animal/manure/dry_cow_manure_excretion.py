@@ -155,11 +155,10 @@ def manure_calculations(
         ),
     )
 
-    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+
+    # Total ammoniacal nitrogen in the manure slurry, kg
+    # TODO update TAN estimation equation in Animal module documentation
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     # Amount of potassium excreted, g [A.3B.B.4]
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
@@ -200,7 +199,7 @@ def manure_calculations(
     manure_excretion_values = AnimalManureExcretions(
         urea=urine_urea_nitrogen_concentration,
         urine=urine,
-        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=total_manure_excreted,
