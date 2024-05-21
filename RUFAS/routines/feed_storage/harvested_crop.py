@@ -31,6 +31,8 @@ class HarvestedCrop:
         The fresh mass of the crop in kg.
     dry_matter_percentage : float
         Percent of mass that is not water.
+    initial_dry_matter_percentage : float
+        Percent of mass that is not water at the time this crop is stored.
     dry_matter_digestibility : float
         Percent of mass that is digestible.
     crude_protein_percent : float

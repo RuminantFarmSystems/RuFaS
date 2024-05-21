@@ -7,10 +7,11 @@ from ...time import Time
 
 
 """
-This final moisture fraction that expected to be contained in a hay crop. Refernces Feed Storage Scientific
+This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
 Documentation equation 1.2.6.
 """
 FINAL_MOISTURE_FRACTION = 0.12
+
 
 class Hay(Storage):
     """
