@@ -204,8 +204,7 @@ class Weather:
             Series of current day conditions in chronological order.
 
         """
-        current_date = Utility.convert_ordinal_date_to_month_date(time.current_calendar_year,
-                                                                  time.current_julian_day)
+        current_date = Utility.convert_ordinal_date_to_month_date(time.current_calendar_year, time.current_julian_day)
         date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
 
         starting_year_index = time.current_simulation_year - (current_date.year - date_series[0].year)

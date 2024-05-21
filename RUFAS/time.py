@@ -17,9 +17,8 @@ class Time:
         This object is responsible for creating and tracking time in the simulation.
         """
         self.config_data: Dict[str, str | int | bool] = im.get_data("config")
-        self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], '%Y:%j')
-        self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], '%Y:%j')
-
+        self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
+        self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], "%Y:%j")
 
         self.leap_year_length: int = GeneralConstants.LEAP_YEAR_LENGTH
         self.year_length: int = GeneralConstants.YEAR_LENGTH
@@ -129,14 +128,16 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.current_julian_day,
-                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
-        om.add_variable("year", self.current_simulation_year,
-                        dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR}))
-        om.add_variable("calendar_year", self.current_calendar_year,
-                        dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR}))
-        om.add_variable("simulation_day",
-                        self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
+        om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
+        om.add_variable(
+            "year", self.current_simulation_year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR})
+        )
+        om.add_variable(
+            "calendar_year", self.current_calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
+        )
+        om.add_variable(
+            "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+        )
 
     @property
     def is_last_day_of_simulation(self) -> bool:
