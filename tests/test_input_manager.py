@@ -4339,6 +4339,57 @@ def test_validate_metadata(
         mock_add_error.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "file_exists, expected_exception, error",
+    [
+        (True, False, None),
+        (False, True, OSError),
+        (False, True, PermissionError),
+    ],
+)
+def test_compare_metadata_properties(
+    mocker: MockerFixture,
+    file_exists: bool,
+    expected_exception: bool,
+    error: Type[PermissionError | OSError],
+) -> None:
+    dummy_properties = {"key1": "value1", "key2": "value2"}
+    dummy_properties_modified = {"key1": "value1_changed", "key3": "value3"}
+    input_manager = InputManager()
+
+    properties_file_path = Path("/fake/dir/original_properties.json")
+    comparison_properties_file_path = Path("/fake/dir/comparison_properties.json")
+    output_path = Path("path/to/output")
+
+    if file_exists:
+        mock_file = mock_open(read_data='{"key": "value"}')
+        mocker.patch("builtins.open", mock_file)
+    else:
+        mocker.patch("builtins.open", side_effect=error)
+
+    mocker.patch.object(input_manager, "_load_metadata", side_effect=[None, None])
+
+    input_manager.meta_data = dummy_properties if not expected_exception else dummy_properties_modified
+
+    mocker.patch(
+        "deepdiff.DeepDiff",
+        return_value={"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+    )
+
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    if file_exists:
+        input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path, output_path)
+        mock_file.assert_called()
+        mock_add_log.assert_called()
+    else:
+        with pytest.raises(error):
+            input_manager.compare_metadata_properties(
+                properties_file_path, comparison_properties_file_path, output_path
+            )
+        mock_add_log.assert_called()
+
+
 def test_increment_in_elements_counter() -> None:
     """
     Unit test for the increment() method of the ElementsCounter class.
