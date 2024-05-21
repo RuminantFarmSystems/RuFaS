@@ -515,7 +515,9 @@ class RationReporter:
         for nutr in nutrients:
             if nutr == "DM":
                 if nutrient_amount["as_fed"]:
-                    nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"]) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    nutrient_conc["dm"] = (
+                        (dm_amount / nutrient_amount["as_fed"]) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    )
                 else:
                     nutrient_conc["dm"] = 0.0
             else:
