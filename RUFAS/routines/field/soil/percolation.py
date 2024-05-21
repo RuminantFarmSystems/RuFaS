@@ -78,7 +78,7 @@ class Percolation:
             else:
                 current_layer.percolated_water = 0.0
 
-        for layer_number in range(0 + 1, layer_count + 1):
+        for layer_number in range(1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
             percolated_water = layer_above.percolated_water
             if layer_number == deepest_layer + 1:
