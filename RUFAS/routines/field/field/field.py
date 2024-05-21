@@ -1412,7 +1412,7 @@ class Field:
         )
         self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
-        weighted_transpiration_total = 0.0`
+        weighted_transpiration_total = 0.0
         weights_sum = 0.0
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
