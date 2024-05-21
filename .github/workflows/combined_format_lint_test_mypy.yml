@@ -45,7 +45,7 @@ jobs:
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
-            'RUFAS/scenario_manager.py'
+            'RUFAS/util.py'
           )
           unauthorized_changes=false
           unauthorized_paths=""
