@@ -162,6 +162,10 @@ class Weather:
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
+        year = time.current_simulation_year
+        day = time.current_julian_day
+        month = time.current_month
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
         year = time.year
         day = time.day
         daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.calendar_year)
