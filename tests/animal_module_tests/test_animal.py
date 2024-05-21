@@ -2609,7 +2609,7 @@ def test_report_ration() -> None:
             "EE": 0.16,
             "starch": 0.16,
             "TDN": 0.16,
-            "DE": 0.16,
+            "DE": 16.0,
             "calcium": 0.16,
         },
         {
@@ -2625,7 +2625,7 @@ def test_report_ration() -> None:
             "EE": 1.0,
             "starch": 1.0,
             "TDN": 1.0,
-            "DE": 1.0,
+            "DE": 100.0,
             "calcium": 1.0,
         },
     )
