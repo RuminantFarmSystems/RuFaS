@@ -9,6 +9,7 @@ from pytest_mock import MockFixture
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
     ManureModuleOutputManagerHelper,
 )
+from RUFAS.units import MeasurementUnits
 
 
 @dataclass
@@ -28,12 +29,12 @@ class MockDataclass:
     field1: int
     field2: str
 
-    field1_unit: str = "kg"
-    field2_unit: str = "unitless"
+    field1_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    field2_unit: MeasurementUnits = MeasurementUnits.UNITLESS
 
     @property
-    def units_dict(self) -> Dict[str, str]:
-        return {"field1_unit": "kg", "field2_unit": "unitless"}
+    def units_dict(self) -> Dict[str, MeasurementUnits]:
+        return {"field1_unit": MeasurementUnits.KILOGRAMS, "field2_unit": MeasurementUnits.UNITLESS}
 
 
 @pytest.mark.parametrize(
@@ -43,20 +44,20 @@ class MockDataclass:
             (10, "value"),
             None,
             [
-                ("field1", 10, {"info_map1": "value1", "units": "kg"}),
-                ("field2", "value", {"info_map1": "value1", "units": "unitless"}),
+                ("field1", 10, {"info_map1": "value1", "units": MeasurementUnits.KILOGRAMS}),
+                ("field2", "value", {"info_map1": "value1", "units": MeasurementUnits.UNITLESS}),
             ],
         ),
-        ((10, "value"), ["field2"], [("field1", 10, {"info_map1": "value1", "units": "kg"})]),
+        ((10, "value"), ["field2"], [("field1", 10, {"info_map1": "value1", "units": MeasurementUnits.KILOGRAMS})]),
         (
             (5, "other_value"),
             None,
             [
-                ("field1", 5, {"info_map1": "value1", "units": "kg"}),
-                ("field2", "other_value", {"info_map1": "value1", "units": "unitless"}),
+                ("field1", 5, {"info_map1": "value1", "units": MeasurementUnits.KILOGRAMS}),
+                ("field2", "other_value", {"info_map1": "value1", "units": MeasurementUnits.UNITLESS}),
             ],
         ),
-        ((5, "other_value"), ["field2"], [("field1", 5, {"info_map1": "value1", "units": "kg"})]),
+        ((5, "other_value"), ["field2"], [("field1", 5, {"info_map1": "value1", "units": MeasurementUnits.KILOGRAMS})]),
     ],
 )
 def test_add_dataclass_object(
