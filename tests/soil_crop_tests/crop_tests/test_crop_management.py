@@ -48,7 +48,7 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
         (0.326, 12.2),  # arbitrary
     ],
 )
-def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float):
+def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float) -> None:
     """ensure that the potential harvest index is properly calculated"""
     top = 100 * heatfrac
     bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
@@ -70,7 +70,7 @@ def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float
         (1.35, 0.83, 0.29),  # arbitrary
     ],
 )
-def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float):
+def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float) -> None:
     """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
     if min_index < 0:
         adj_min = 0
@@ -106,7 +106,7 @@ def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
 
 
 # ---- Test Member functions
-def test_kill():
+def test_kill() -> None:
     """tests that a crop is properly killed by kill()"""
     crop = CropManagement(crop_data=CropData(yield_residue=5.29, biomass=192.33))
     crop.kill()
@@ -340,6 +340,7 @@ def test_store_harvested_crop(
         lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
         ash=mock_alfalfa_silage_data.ash,
     )
+    expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
     with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
         crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
@@ -379,19 +380,19 @@ def test_record_yield(
     crop_manager.data.yield_phosphorus = phosphorus
 
     expected_units = {
-        "crop": MeasurementUnits.UNITLESS.value,
-        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
-        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "harvest_index": MeasurementUnits.UNITLESS.value,
+        "crop": MeasurementUnits.UNITLESS,
+        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
+        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "harvest_index": MeasurementUnits.UNITLESS,
         "planting_date": {
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
         },
-        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-        "field_size": MeasurementUnits.HECTARE.value,
+        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+        "field_size": MeasurementUnits.HECTARE,
     }
 
     expected_info_map = {

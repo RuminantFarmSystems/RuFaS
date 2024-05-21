@@ -50,10 +50,6 @@ def animal_manager_fixture(mocker: MockerFixture) -> AnimalManager:
     return animal_manager
 
 
-def test___init__() -> None:
-    pass
-
-
 def test_data_padder() -> None:
     """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
     reference_variable = "reference"
@@ -67,8 +63,8 @@ def test_data_padder() -> None:
         full_variable_to_add="full_variable",
         thing_to_add=0,
         simulation_day=100,
-        info_map={"class": "dummyclass", "function": "dummyfunction", "units": MeasurementUnits.ANIMALS.value},
-        units=MeasurementUnits.ANIMALS.value,
+        info_map={"class": "dummyclass", "function": "dummyfunction", "units": MeasurementUnits.ANIMALS},
+        units=MeasurementUnits.ANIMALS,
     )
 
     # Assert

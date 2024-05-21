@@ -95,7 +95,7 @@ class Time:
             "calendar_year", self.current_date.year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR.value})
         )
         om.add_variable(
-            "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY.value})
+            "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
 
     @property
