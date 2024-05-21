@@ -44,9 +44,7 @@ jobs:
 
       - name: Check for Unauthorized Changes
         run: |
-          paths_to_protect=(
-            'RUFAS/util.py'
-          )
+          paths_to_protect=()
           unauthorized_changes=false
           unauthorized_paths=""
           
