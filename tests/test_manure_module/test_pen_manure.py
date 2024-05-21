@@ -81,7 +81,7 @@ def test_pen_manure_init() -> None:
     # Arrange
     urea = 1.0
     urine = 2.0
-    total_ammoniacal_nitrogen_concentration = 3.0
+    manure_total_ammoniacal_nitrogen = 3.0
     urine_nitrogen = 4.0
     manure_nitrogen = 5.0
     manure_mass = 6.0
@@ -99,7 +99,7 @@ def test_pen_manure_init() -> None:
     animal_manure = AnimalManureExcretions(
         urea=urea,
         urine=urine,
-        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=manure_mass,
