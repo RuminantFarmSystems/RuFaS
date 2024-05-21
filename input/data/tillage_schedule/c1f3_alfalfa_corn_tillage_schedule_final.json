@@ -1,0 +1,10 @@
+{
+    "years": [2007, 2015],
+    "days": [274, 274],
+    "incorporation_fractions": [0.55, 0.55],
+    "mixing_fractions": [0.55, 0.55],
+    "tillage_depths": [150, 150],
+    "implements": ["disk-harrow"],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

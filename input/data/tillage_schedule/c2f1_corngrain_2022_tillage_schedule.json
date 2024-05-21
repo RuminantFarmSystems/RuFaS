@@ -1,0 +1,15 @@
+{
+    "years": [2018, 2019, 2021, 2022],
+    "days": [121, 121, 121, 121],
+    "incorporation_fractions": [0.95],
+    "mixing_fractions": [0.95],
+    "tillage_depths": [150],
+    "implements": ["coulter-chisel-plow"],
+    "pattern_repeat": 1,
+    "pattern_skip": 0
+}
+
+
+
+
+
