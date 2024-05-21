@@ -2279,8 +2279,9 @@ class InputManager:
             "minimum": data_entry.get("minimum", ""),
         }
 
-    def compare_metadata_properties(self, properties_file_path: Path, comparison_properties_file_path: Path,
-                                    output_directory: Path) -> None:
+    def compare_metadata_properties(
+        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+    ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
         """

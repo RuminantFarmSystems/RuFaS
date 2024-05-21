@@ -4384,8 +4384,9 @@ def test_compare_metadata_properties(
         mock_add_log.assert_called()
     else:
         with pytest.raises(error):
-            input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path,
-                                                      output_path)
+            input_manager.compare_metadata_properties(
+                properties_file_path, comparison_properties_file_path, output_path
+            )
         mock_add_log.assert_called()
 
 
