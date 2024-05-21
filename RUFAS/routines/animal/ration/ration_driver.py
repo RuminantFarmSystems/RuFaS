@@ -482,7 +482,7 @@ class RationReporter:
                 if nutr == "DM":
                     if available_feeds[key][nutr]:
                         nutrient_amount["as_fed"] += val / (
-                            available_feeds[key][nutr] / GeneralConstants.FRACTION_TO_PERCENTAGE
+                            available_feeds[key][nutr] * GeneralConstants.PERCENTAGE_TO_FRACTION
                         )
                 elif nutr == "N":
                     # [A.2.A.2]
