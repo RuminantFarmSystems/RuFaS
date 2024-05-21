@@ -121,8 +121,8 @@ def test_process_degradations(
         call(mock_second_crop.last_time_degraded, mock_time, mock_weather),
     ]
     expected_dry_mass_loss_calls = [
-        call(mock_first_crop, mock_conditions),
-        call(mock_second_crop, mock_conditions),
+        call(mock_first_crop, mock_conditions, mock_time),
+        call(mock_second_crop, mock_conditions, mock_time),
     ]
 
     storage.process_degradations(mock_weather, mock_time)
@@ -261,6 +261,7 @@ def test_calculate_dry_matter_loss_to_gas(
     )
     harvested_crop.dry_matter_percentage = percentage
     harvested_crop.category = category
+    mock_time = mocker.MagicMock()
 
     mock_conditions = []
     for temp in temps:
@@ -268,7 +269,7 @@ def test_calculate_dry_matter_loss_to_gas(
         condition.mean_air_temperature = temp
         mock_conditions.append(condition)
 
-    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions)
+    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions, mock_time)
 
     assert pytest.approx(actual) == expected
 
