@@ -60,6 +60,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     )
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
+    assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.dry_matter_digestibility == sample_crop_data["dry_matter_digestibility"]
     assert crop.crude_protein_percent == sample_crop_data["crude_protein_percent"]
     assert crop.non_protein_nitrogen == sample_crop_data["non_protein_nitrogen"]
