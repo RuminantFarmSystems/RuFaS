@@ -15,9 +15,6 @@ class ManureConstants:
     TAN_MOLAR_MASS = 17.0306
     """The molar mass of TAN (g/mol)."""
 
-    URINE_TAN_FACTOR = 0.45
-    """The factor to convert urine nitrogen to urine total ammoniacal nitrogen (unitless)."""
-
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
 
