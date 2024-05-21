@@ -318,7 +318,7 @@ class TaskManager:
 
             if args["task_type"] == TaskType.COMPARE_METADATA_PROPERTIES:
                 input_manager.compare_metadata_properties(
-                    args["properties_file_path"], args["comparison_properties_file_path"]
+                    args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
                 )
                 return
 

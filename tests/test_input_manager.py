@@ -4359,6 +4359,7 @@ def test_compare_metadata_properties(
 
     properties_file_path = Path("/fake/dir/original_properties.json")
     comparison_properties_file_path = Path("/fake/dir/comparison_properties.json")
+    output_path = Path("path/to/output")
 
     if file_exists:
         mock_file = mock_open(read_data='{"key": "value"}')
@@ -4378,12 +4379,13 @@ def test_compare_metadata_properties(
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
     if file_exists:
-        input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path)
+        input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path, output_path)
         mock_file.assert_called()
         mock_add_log.assert_called()
     else:
         with pytest.raises(error):
-            input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path)
+            input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path,
+                                                      output_path)
         mock_add_log.assert_called()
 
 
