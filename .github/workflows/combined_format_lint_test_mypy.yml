@@ -208,12 +208,11 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"
           add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
 
       - name: Check for Flake8 Errors
         if: ${{ steps.flake8.outcome == 'failure' }}
