@@ -16,10 +16,10 @@ class Time:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
-
         self.config_data: Dict[str, str | int | bool] = im.get_data("config")
         self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], '%Y:%j')
         self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], '%Y:%j')
+
 
         self.leap_year_length: int = GeneralConstants.LEAP_YEAR_LENGTH
         self.year_length: int = GeneralConstants.YEAR_LENGTH
@@ -78,7 +78,7 @@ class Time:
 
     @property
     def current_julian_day(self) -> int:
-        return int(self.current_date.strftime('%j'))
+        return int(self.current_date.strftime("%j"))
 
     @property
     def current_month(self) -> int:
@@ -166,5 +166,7 @@ class Time:
         return actual_date
 
     def __str__(self) -> str:
-        return f"Year: {self.current_simulation_year}, Day: {self.current_julian_day}. " \
-               f"Simulation Day: {self.simulation_day}"
+        return (
+            f"Year: {self.current_simulation_year}, Day: {self.current_julian_day}. "
+            f"Simulation Day: {self.simulation_day}"
+        )
