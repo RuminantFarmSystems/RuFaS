@@ -784,7 +784,14 @@ class InputManager:
         -------
         bool
             True if the input data element is valid or fixable, False otherwise.
+
+        Notes
+        -----
+        This method will look for and delete any keys in the input data that do not have properties specified for them
+        in the metadata properties.
+
         """
+        info_map = {"class": self.__class__.__name__, "function": self._object_type_validator.__name__}
 
         object_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
@@ -798,7 +805,6 @@ class InputManager:
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
-                {"class": self.__class__.__name__, "function": self._object_type_validator.__name__},
             )
             return False
 
@@ -818,6 +824,17 @@ class InputManager:
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
                 return False
+
+        extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
+        for key in extraneous_keys:
+            om.add_warning(
+                "Validation: object contains extraneous data",
+                f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
+                f"properties. {properties_violation_message}",
+                info_map,
+            )
+            del object_value[key]
+
         return is_whole_object_acceptable
 
     def _number_type_validator(
