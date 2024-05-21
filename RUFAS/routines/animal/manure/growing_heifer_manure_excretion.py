@@ -125,7 +125,6 @@ def manure_calculations(
         ),
     )
 
-   
     # Total ammoniacal nitrogen in the manure slurry, kg
     # TODO update TAN estimation equation in Animal module documentation
     manure_total_ammoniacal_nitrogen = urine_nitrogen

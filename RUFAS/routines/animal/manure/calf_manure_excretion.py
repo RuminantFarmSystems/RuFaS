@@ -86,8 +86,8 @@ def manure_calculations(
     # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
     urine_nitrogen = 0.45 * manure_nitrogen
 
-    #Total ammoniacal N in manure, kg
-    #TODO add equaiton to Animal module documentation
+    # Total ammoniacal N in manure, kg
+    # TODO add equaiton to Animal module documentation
     manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     # Methane emissions, g/day [A.3A.C.1]

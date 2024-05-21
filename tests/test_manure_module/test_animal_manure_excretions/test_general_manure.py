@@ -48,9 +48,7 @@ def test_animal_manure_excretion_typed_dict() -> None:
     # Assert
     assert animal_manure_excretions["urea"] == approx(urea)
     assert animal_manure_excretions["urine"] == approx(urine)
-    assert animal_manure_excretions["manure_total_ammoniacal_nitrogen"] == approx(
-        manure_total_ammoniacal_nitrogen
-    )
+    assert animal_manure_excretions["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert animal_manure_excretions["urine_nitrogen"] == approx(urine_nitrogen)
     assert animal_manure_excretions["manure_nitrogen"] == approx(manure_nitrogen)
     assert animal_manure_excretions["manure_mass"] == approx(manure_mass)
