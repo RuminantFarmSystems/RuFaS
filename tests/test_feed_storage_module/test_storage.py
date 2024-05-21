@@ -7,6 +7,7 @@ from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .sample_crop_data import sample_crop_data
 
@@ -100,7 +101,7 @@ def test_process_degradations(
     expected_info_map = {
         "class": storage.__class__.__name__,
         "function": storage.process_degradations.__name__,
-        "units": "kg",
+        "units": MeasurementUnits.KILOGRAMS,
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
