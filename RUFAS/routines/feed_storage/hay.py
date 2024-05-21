@@ -30,7 +30,7 @@ class Hay(Storage):
         Calculates the protein loss in the hay.
     """
 
-    def __init__(self, capacity: float = float("inf")):
+    def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
@@ -50,7 +50,9 @@ class Hay(Storage):
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, crop: HarvestedCrop, conditions: list[CurrentDayConditions], time: Time) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+    ) -> float:
         """
         Calculates the base amount of gaseous dry matter lost in a hayed crop.
 
@@ -58,8 +60,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        conditions : list[CurrentDayConditions]
-            List of daily conditions over which dry matter loss will be calculated for.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which dry matter loss will be calculated.
         time : Time
             Time instance containing the time that loss should be processed up to.
 
@@ -72,10 +74,19 @@ class Hay(Storage):
         if days_stored == 0:
             return 0.0
 
-        initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
-        subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+        processed_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(
+            crop, crop.last_time_degraded
+        )
+        processed_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
+            crop, crop.last_time_degraded
+        )
+        processed_loss = processed_initial_dry_matter_loss + processed_subsequent_dry_matter_loss
 
-        return initial_dry_matter_loss + subsequent_dry_matter_loss
+        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
+        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+        current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
+
+        return current_loss - processed_loss
 
     def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
@@ -120,7 +131,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage in kg.       
+            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage in kg.
 
         References
         ----------
