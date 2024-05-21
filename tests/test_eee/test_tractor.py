@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from RUFAS.routines.EEE.tractor import Tractor
-from RUFAS.routines.EEE.enums import TractorSize
+from RUFAS.routines.EEE.enums import TractorSize, FieldOperationEvent
 
 
 @pytest.mark.parametrize(
@@ -16,14 +16,14 @@ from RUFAS.routines.EEE.enums import TractorSize
 )
 @patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
 def test_herd_size_to_tractor_size(_, herd_size, expected_size):
-    specs = Tractor(None, herd_size)
+    specs = Tractor(FieldOperationEvent.TILLING, herd_size=herd_size)
     assert specs.tractor_size == expected_size
 
 
 @pytest.mark.parametrize("tractor_size", list(TractorSize))
 @patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
 def test_tractor_size_initialization(_, tractor_size):
-    specs = Tractor(tractor_size, None)
+    specs = Tractor(None, tractor_size=tractor_size)
     assert specs.tractor_size == tractor_size
 
 
@@ -53,7 +53,7 @@ def test_pto_kW(mock_get_data, tractor_size, expected_pto_kW):
         {"ID": 592, "Value": 208.42},
         {"ID": 595, "Value": 328.11},
     ]
-    specs = Tractor(tractor_size, None)
+    specs = Tractor(None, tractor_size=tractor_size)
     assert specs.PTO_kW == expected_pto_kW
 
 
@@ -72,7 +72,7 @@ def test_power_available_kW(mock_get_data, tractor_size, expected_power_availabl
         {"ID": 592, "Value": 208.42},
         {"ID": 595, "Value": 328.11},
     ]
-    specs = Tractor(tractor_size, None)
+    specs = Tractor(None, tractor_size=tractor_size)
     assert specs.power_available_kW == expected_power_available_kW
 
 
@@ -91,12 +91,12 @@ def test_mass_kg(mock_get_data, tractor_size, expected_mass_kg):
         {"ID": 594, "Value": 12700.0},
         {"ID": 597, "Value": 20856.0},
     ]
-    specs = Tractor(tractor_size, None)
+    specs = Tractor(None, tractor_size=tractor_size)
     assert specs.mass_kg == expected_mass_kg
 
 
 @patch("RUFAS.routines.EEE.tractor.InputManager.get_data")
 def test_speed_km_hr(mock_get_data):
     mock_get_data.return_value = [{"ID": 598, "Value": 10.0}]
-    specs = Tractor(TractorSize.SMALL, None)  # Any tractor size would do
+    specs = Tractor(None, tractor_size=TractorSize.SMALL)  # Any tractor size would do
     assert specs.speed_km_hr == 10.0
