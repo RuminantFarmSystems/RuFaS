@@ -400,6 +400,7 @@ class Utility:
             The input string with the special characters filtered out.
         """
         chars_to_remove = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
+        print("hocus pocus locus focus")
 
         filtered_string = "".join(char for char in input_string if char not in chars_to_remove)
 

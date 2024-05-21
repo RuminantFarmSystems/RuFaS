@@ -30,21 +30,17 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Set up dependency for getting changed files
-        id: files
-        uses: jitterbit/get-changed-files@v1
-
       - name: Get all added or modified files
-        id: get_files
         run: |
-          echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "\.py$" |
-            tr "\n" " ")" >> "$GITHUB_ENV"
-          echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "^(?!.*\.py$).*"  |
-            tr "\n" " ")" >> "$GITHUB_ENV"
+          git fetch origin ${{ github.base_ref }}
+          ALL_CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          echo "All Changed Files: $ALL_CHANGED_FILES"
+
+          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
         run: |
@@ -52,10 +48,11 @@ jobs:
             'RUFAS/scenario_manager.py'
           )
           unauthorized_changes=false
+          unauthorized_paths=""
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
@@ -103,7 +100,6 @@ jobs:
           LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-          echo "::set-output name=sha::$LATEST_SHA"
 
       - name: Checkout the latest commit
         uses: actions/checkout@v4
