@@ -365,24 +365,6 @@ class Storage:
 
         return conditions
 
-    def calculate_bale_density(self, initial_dry_matter: float) -> float:
-        """
-        Calculates the density of a bale.
-
-        Parameters
-        ----------
-        initial_dry_matter_percentage : float
-            The initial dry matter percentage of the bale.
-
-        Returns
-        -------
-        float
-            The density of the bale in kg dry matter per cubic meter.
-
-        """
-        moisture_fraction = 1 - (initial_dry_matter / 100)
-        return 100 + 440 * moisture_fraction
-
     def recalculate_nutrient_percentage(
         self,
         initial_nutrient_percentage: float,

@@ -299,16 +299,6 @@ def test_get_conditions(
         mock_weather.get_conditions_series.assert_called_once_with(mock_curr_time, expected_offset, 0)
 
 
-@pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])
-def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: float) -> None:
-    """
-    Test the calculate_bale_density method of the Storage class.
-    """
-    actual = storage.calculate_bale_density(dry_matter)
-
-    assert actual == expected
-
-
 @pytest.mark.parametrize(
     "nutrients,loss_coefficient,dry_matter_loss,dry_matter,expected,warned",
     [
