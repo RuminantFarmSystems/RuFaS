@@ -80,7 +80,6 @@ class EnergyEstimator:
             total_diesel_consumption_tractor_implement_liter_per_ton,
             {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_TONS}},
         )
-        print(f"{total_diesel_consumption_tractor_implement_liter_per_ton=}")
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> List[Dict[str, Any]]:
         crop_and_soil_filters = [
