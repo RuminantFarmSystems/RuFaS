@@ -23,7 +23,7 @@ class EnergyEstimator:
         base_info_map = {
             "class": EnergyEstimator.__name__,
             "function": EnergyEstimator.estimate_all.__name__,
-            "unit": MeasurementUnits.UNITLESS,
+            "units": MeasurementUnits.UNITLESS,
         }
         estimator = EnergyEstimator()
         diesel_conumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
@@ -44,7 +44,7 @@ class EnergyEstimator:
                 diesel_consumption_data_item.get("clay_percent", 0),
             )
             variable_info_map = {
-                "unit": "liter/tone",
+                "units": MeasurementUnits.LITERS_PER_TONS,
                 "tractor_size": tractor.tractor_size.value,
                 "operation_event": (
                     diesel_consumption_data_item["operation_event"].value
@@ -78,8 +78,9 @@ class EnergyEstimator:
         om.add_variable(
             "total_diesel_consumption_tractor_implement",
             total_diesel_consumption_tractor_implement_liter_per_ton,
-            {**base_info_map, **{"unit": MeasurementUnits.LITERS_PER_TONS}},
+            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_TONS}},
         )
+        print(f"{total_diesel_consumption_tractor_implement_liter_per_ton=}")
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> List[Dict[str, Any]]:
         crop_and_soil_filters = [
@@ -160,10 +161,10 @@ class EnergyEstimator:
                     for index in range(max_index + 1):
                         key_prefix = f"{event_type}_{index}"
                         _, first_om_key_in_the_map = next(iter(key_mappings.items()))
-                        length = len(filtered_pool[f"{key_prefix}.{first_om_key_in_the_map}"])
+                        length = len(filtered_pool[f"{key_prefix}.{first_om_key_in_the_map}"]["values"])
                         for i in range(length):
                             event_data = {
-                                eee_key: filtered_pool[f"{key_prefix}.{om_key_suffix}"][i]
+                                eee_key: filtered_pool[f"{key_prefix}.{om_key_suffix}"]["values"][i]
                                 for eee_key, om_key_suffix in key_mappings.items()
                             }
                             event_data["operation_event"] = event_type
