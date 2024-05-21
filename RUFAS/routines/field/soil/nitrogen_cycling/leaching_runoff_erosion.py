@@ -4,15 +4,20 @@ from math import exp, log
 from RUFAS.routines.field.crop_and_soil_constants import (
     HECTARES_TO_SQUARE_MILLIMETERS,
     CUBIC_MILLIMETERS_TO_LITERS,
+    MILLIGRAMS_TO_KILOGRAMS,
 )
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 
-NITRATE_RUNOFF_COEFFICIENT = 1e-8
-AMMONIUM_RUNOFF_COEFFICIENT = 8e-6
-NITRATE_PERCOLATION_COEFFICIENT = 6e-8
-AMMONIUM_PERCOLATION_COEFFICIENT = 4e-6
-ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 5e-8
+"""
+The following are empirical coefficients with the units (kg / L).
+"""
+
+NITRATE_RUNOFF_COEFFICIENT = 0.01
+AMMONIUM_RUNOFF_COEFFICIENT = 0.2
+NITRATE_PERCOLATION_COEFFICIENT = 0.05
+AMMONIUM_PERCOLATION_COEFFICIENT = 0.8
+ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 0.01
 
 
 class LeachingRunoffErosion:
@@ -358,7 +363,7 @@ class LeachingRunoffErosion:
         water_amount : float
             Amount of water that percolated out of the current soil layer on this day (mm).
         extraction_coefficient : float
-            Coefficient for adjusting the amount leached based on the pool leached from (L ^ -1).
+            Coefficient for adjusting the amount leached based on the pool leached from (kg/L).
         bulk_density : float
             Density of the soil layer containing the nitrogen (Megagram / cubic meter).
         layer_thickness : float
@@ -391,10 +396,10 @@ class LeachingRunoffErosion:
             nitrogen_content, bulk_density, layer_thickness, field_size
         )
 
-        nitrogen_leached_in_mg_per_kg = nitrogen_content_in_mg_per_kg * extraction_coefficient * water_amount_in_liters
-
-        nitrogen_leached_in_kg_per_ha = LayerData.determine_soil_nutrient_area_density(
-            nitrogen_leached_in_mg_per_kg, bulk_density, layer_thickness, field_size
+        nitrogen_leached_in_mg_per_ha = (
+            nitrogen_content_in_mg_per_kg * extraction_coefficient * water_amount_in_liters / field_size
         )
+
+        nitrogen_leached_in_kg_per_ha = nitrogen_leached_in_mg_per_ha * MILLIGRAMS_TO_KILOGRAMS
 
         return min(nitrogen_content, nitrogen_leached_in_kg_per_ha)

@@ -183,14 +183,14 @@ def test_record_tillage(
 
     expected_clay_percent = 25.0
     expected_units = {
-        "tillage_depth": MeasurementUnits.MILLIMETERS.value,
-        "incorporation_fraction": MeasurementUnits.UNITLESS.value,
-        "mixing_fraction": MeasurementUnits.UNITLESS.value,
-        "implement": MeasurementUnits.UNITLESS.value,
-        "year": MeasurementUnits.CALENDAR_YEAR.value,
-        "day": MeasurementUnits.ORDINAL_DAY.value,
-        "field_size": MeasurementUnits.HECTARE.value,
-        "average_clay_percent": MeasurementUnits.PERCENT.value,
+        "tillage_depth": MeasurementUnits.MILLIMETERS,
+        "incorporation_fraction": MeasurementUnits.UNITLESS,
+        "mixing_fraction": MeasurementUnits.UNITLESS,
+        "implement": MeasurementUnits.UNITLESS,
+        "year": MeasurementUnits.CALENDAR_YEAR,
+        "day": MeasurementUnits.ORDINAL_DAY,
+        "field_size": MeasurementUnits.HECTARE,
+        "average_clay_percent": MeasurementUnits.PERCENT,
     }
     expected_info_map = {
         "class": TillageApplication.__name__,

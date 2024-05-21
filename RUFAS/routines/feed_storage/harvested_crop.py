@@ -21,9 +21,9 @@ class HarvestedCrop:
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
     harvest_time : Time
-        The time at which the crop was harvested
+        The time at which the crop was harvested.
     storage_time : Time
-        The time at which the crop was stored
+        The time at which the crop was stored.
     last_time_degraded : Time
         The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
         storage time of the crop.
