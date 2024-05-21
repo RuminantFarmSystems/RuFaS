@@ -16,7 +16,7 @@
 
         },
         {
-            "crop_species": "",
+            "crop_species": "alfalfa_silage",
             "planting_years": [2015],
             "pattern_repeat": 6,
             "planting_skip": 0,
