@@ -70,6 +70,7 @@ def test_calculate_dry_matter_loss_to_gas(
 @pytest.mark.parametrize(
     "days,expected",
     [
+        (0, 0.0),
         (1, 950.665050408),
         (10, 950.670114831),
         (20, 950.676225724),

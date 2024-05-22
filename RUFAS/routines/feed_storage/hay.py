@@ -110,6 +110,8 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
+        if days_stored == 0:
+            return 0.0
         days_in_window = min(days_stored, 30)
         dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         moisture_fraction = 1 - dry_fraction
