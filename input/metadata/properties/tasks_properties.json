@@ -109,6 +109,26 @@
           "maximum": 4294967295,
           "default": 0
         },
+        "chunkification": {
+          "type": "bool",
+          "description": "Select this flag if you want to periodically dump the output variable pool.",
+          "default": false
+        },
+        "save_chunk_threshold_call_count": {
+          "type": "number",
+          "description": "The threshold add variable call count for saving the output variable pool chunk.",
+          "default": 0
+        },
+        "maximum_memory_usage": {
+          "type": "number",
+          "description": "The maximum memory usage in Bytes.",
+          "default": 0
+        },
+        "maximum_memory_usage_percent": {
+          "type": "number",
+          "description": "The maximum percentage of memory use.",
+          "default": 80
+        },
         "multi_run_counts": {
           "type": "number",
           "description": "If task type is multi_run, indicates how many single simulations should run.",
