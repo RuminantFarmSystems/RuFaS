@@ -559,7 +559,7 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "name, value, info_map, record_info_maps, expected_exception",
+    "name, value, info_map, first_map, expected_exception",
     [
         # Case 1: Everything correct, no exception should be raised
         ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, None),
@@ -581,7 +581,7 @@ def test_add_variable(
     name: str,
     value: Any,
     info_map: Dict[str, Any],
-    record_info_maps: bool,
+    first_map: bool,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -598,17 +598,17 @@ def test_add_variable(
 
     if expected_exception:
         with pytest.raises(expected_exception):
-            output_manager.add_variable(name, value, info_map, record_info_maps)
+            output_manager.add_variable(name, value, info_map, first_map)
     else:
         # Act
-        output_manager.add_variable(name, value, info_map, record_info_maps)
+        output_manager.add_variable(name, value, info_map, first_map)
         # Assert
         patched_add_to_pool.assert_called_once_with(
             output_manager.variables_pool,
             "key_with_prefix",
             value,
             {**info_map, "units": "validated_units"},
-            record_info_maps,
+            first_map,
         )
         if isinstance(value, dict):
             for k in value.keys():
