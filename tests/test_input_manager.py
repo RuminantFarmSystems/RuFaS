@@ -4412,17 +4412,20 @@ def test_compare_metadata_properties(
     mocker.patch("deepdiff.DeepDiff", return_value=expected_diff)
 
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     if file_exists:
         input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path, output_path)
         mock_file.assert_called()
         mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(error):
             input_manager.compare_metadata_properties(
                 properties_file_path, comparison_properties_file_path, output_path
             )
         mock_add_log.assert_called()
+        mock_add_error.assert_called()
 
 
 @pytest.mark.parametrize(
