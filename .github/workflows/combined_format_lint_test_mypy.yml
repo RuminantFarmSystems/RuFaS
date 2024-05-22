@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -30,32 +30,29 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Set up dependency for getting changed files
-        id: files
-        uses: jitterbit/get-changed-files@v1
-
       - name: Get all added or modified files
-        id: get_files
         run: |
-          echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "\.py$" |
-            tr "\n" " ")" >> "$GITHUB_ENV"
-          echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "^(?!.*\.py$).*"  |
-            tr "\n" " ")" >> "$GITHUB_ENV"
+          git fetch origin ${{ github.base_ref }}
+          ALL_CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          echo "All Changed Files: $ALL_CHANGED_FILES"
+
+          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
-            'RUFAS/scenario_manager.py'
+            "input/data/tasks/default_task.json"
           )
           unauthorized_changes=false
+          unauthorized_paths=""
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
@@ -103,7 +100,6 @@ jobs:
           LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-          echo "::set-output name=sha::$LATEST_SHA"
 
       - name: Checkout the latest commit
         uses: actions/checkout@v4
@@ -111,7 +107,7 @@ jobs:
           ref: ${{ steps.fetch-latest-sha.outputs.sha }}
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -212,12 +208,11 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"
           add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
 
       - name: Check for Flake8 Errors
         if: ${{ steps.flake8.outcome == 'failure' }}
