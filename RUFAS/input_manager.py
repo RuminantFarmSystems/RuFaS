@@ -2300,7 +2300,7 @@ class InputManager:
         first_file_path = os.path.basename(str(properties_file_path))
         second_file_path = os.path.basename(str(comparison_properties_file_path))
         file_name = f"diff_results_{first_file_path}_vs_{second_file_path}"
-        print(str(output_directory))
+
         try:
             om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
             with open(f"{str(output_directory)}/{file_name}.txt", "w") as file:
