@@ -1,10 +1,18 @@
 import pytest
+from unittest.mock import call
 from pytest_mock import MockerFixture
+import copy
 from .sample_crop_data import sample_crop_data
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.silage import Silage, Bunker, Pile, Bag
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
+from RUFAS.weather import Weather
+from RUFAS.output_manager import OutputManager
+
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -34,6 +42,52 @@ def test_acceptable_crops(silage: Silage):
         CropCategory.GRASS,
         CropCategory.SMALL_GRAIN,
     ]
+
+
+@pytest.mark.parametrize("days_of_loss", [(0), (10), (3)])
+def test_process_degradations(
+    mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop, days_of_loss: int
+) -> None:
+    """Tests the implementation of process_degradations in the Silage class."""
+    mock_weather = mocker.MagicMock(autospec=Weather)
+    mock_time = mocker.MagicMock(autospec=Time)
+    effluent_loss_days = mocker.patch.object(
+        silage, "calculate_days_of_effluent_loss_to_process", return_value=days_of_loss
+    )
+    dry_loss = mocker.patch.object(silage, "calculate_dry_matter_loss_to_effluent", return_value=10.0)
+    moisture_loss = mocker.patch.object(silage, "calculate_moisture_loss_to_effluent", return_value=20.0)
+    npn_coefficient = mocker.patch.object(silage, "calculate_non_protein_nitrogen_loss_coefficient", return_value=0.5)
+    cp_coeffient = mocker.patch.object(silage, "calculate_crude_protein_loss_coefficient", return_value=0.4)
+    nutrient_percentage = mocker.patch.object(silage, "recalculate_nutrient_percentage", return_value=3.0)
+    reset_attributes = mocker.patch.object(silage, "reset_mass_attributes_after_loss")
+    add_variable = mocker.patch.object(om, "add_variable")
+    super_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
+    second_crop = copy.deepcopy(harvested_crop)
+    silage.stored = [harvested_crop, second_crop]
+    expected_info_map = {
+        "class": silage.__class__.__name__,
+        "function": silage.process_degradations.__name__,
+        "units": MeasurementUnits.KILOGRAMS,
+    }
+    expected_dry_loss = 20.0 if days_of_loss else 0.0
+    expected_moisture_loss = 40.0 if days_of_loss else 0.0
+
+    silage.process_degradations(mock_weather, mock_time)
+
+    effluent_loss_days.assert_has_calls([call(harvested_crop, mock_time), call(second_crop, mock_time)])
+    assert dry_loss.call_count == (len(silage.stored) if days_of_loss else 0)
+    assert moisture_loss.call_count == (len(silage.stored) if days_of_loss else 0)
+    assert npn_coefficient.call_count == (len(silage.stored) if days_of_loss else 0)
+    assert cp_coeffient.call_count == (len(silage.stored) if days_of_loss else 0)
+    assert nutrient_percentage.call_count == (len(silage.stored) * 2 if days_of_loss else 0)
+    assert reset_attributes.call_count == (len(silage.stored) if days_of_loss else 0)
+    add_variable.assert_has_calls(
+        [
+            call("total_effluent_dry_matter_loss", expected_dry_loss, expected_info_map),
+            call("total_effluent_moisture_loss", expected_moisture_loss, expected_info_map),
+        ]
+    )
+    super_process_degradations.assert_called_once_with(mock_weather, mock_time)
 
 
 @pytest.mark.parametrize(
@@ -80,6 +134,29 @@ def test_calculate_dry_matter_loss_to_effluent(silage: Silage, max_effluent: flo
 def test_calculate_moisture_loss_to_effluent(silage: Silage, max_effluent: float, days: int, expected: float) -> None:
     """Tests calculate_moisture_loss_to_effluent in Silage."""
     actual = silage.calculate_moisture_loss_to_effluent(max_effluent, days)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "npn,cp,loss_frac,expected",
+    [(4.0, 8.0, 0.02, 4.0092731), (2.5, 4.4, 0.05, 2.525287), (0.0, 3.6, 0.01, -0.000835654)],
+)
+def test_calculate_non_protein_nitrogen_loss_coefficient(
+    silage: Silage, npn: float, cp: float, loss_frac: float, expected: float
+) -> None:
+    """Tests calculate_non_protein_nitrogen_loss_coefficient in Silage."""
+    actual = silage.calculate_non_protein_nitrogen_loss_coefficient(npn, cp, loss_frac)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "cp,loss_frac,expected", [(5.6, 0.033, 5.78086866), (2.2, 0.04, 2.27916666), (0.0, 0.05, -0.015789473)]
+)
+def test_calculate_crude_protein_loss_coefficient(silage: Silage, cp: float, loss_frac: float, expected: float) -> None:
+    """Tests calculate_crude_protein_loss_coefficient in Silage."""
+    actual = silage.calculate_crude_protein_loss_coefficient(cp, loss_frac)
 
     assert pytest.approx(actual) == expected
 
