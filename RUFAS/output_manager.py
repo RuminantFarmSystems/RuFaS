@@ -236,7 +236,7 @@ class OutputManager(object):
         self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
-        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=False)
         self.add_log(
             "save_current_variable_pool",
             f"Saved the current variable pool to {saved_pool_file_path}",
@@ -1029,7 +1029,7 @@ class OutputManager(object):
             counter += 1
         return results
 
-    def _saved_chunk_files(self) -> List[Path]:
+    def _sort_saved_chunk_files(self) -> List[Path]:
         """
         Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
         the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
