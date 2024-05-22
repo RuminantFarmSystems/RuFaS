@@ -4353,12 +4353,27 @@ def test_validate_metadata(
 @pytest.mark.parametrize(
     "file_exists, error, file_content, modified_properties, expected_diff",
     [
-        (True, None, '{"key1": "value1", "key3": "value3"}', {"key1": "value1_changed", "key3": "value3"},
-         {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}}),
-        (False, OSError, '{"key1": "value1", "key3": "value3"}', {"key1": "value1_changed", "key3": "value3"},
-         {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}}),
-        (False, PermissionError, '{"key1": "value1", "key3": "value3"}', {"key1": "value1_changed", "key3": "value3"},
-         {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}}),
+        (
+            True,
+            None,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
+        (
+            False,
+            OSError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
+        (
+            False,
+            PermissionError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
         (True, None, '{"key1": "value1", "key2": "value2"}', {"key1": "value1", "key2": "value2"}, {}),
     ],
 )
@@ -4384,12 +4399,15 @@ def test_compare_metadata_properties(
     else:
         mocker.patch("builtins.open", side_effect=error)
 
-    mocker.patch.object(input_manager,
-                        "_load_metadata",
-                        side_effect=lambda file: setattr(input_manager,
-                                                         'meta_data',
-                                                         dummy_properties_modified if file
-                                                         == comparison_properties_file_path else dummy_properties))
+    mocker.patch.object(
+        input_manager,
+        "_load_metadata",
+        side_effect=lambda file: setattr(
+            input_manager,
+            "meta_data",
+            dummy_properties_modified if file == comparison_properties_file_path else dummy_properties,
+        ),
+    )
 
     mocker.patch("deepdiff.DeepDiff", return_value=expected_diff)
 
