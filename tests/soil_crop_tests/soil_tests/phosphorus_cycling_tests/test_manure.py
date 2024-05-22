@@ -124,7 +124,7 @@ def test_determine_water_extractable_inorganic_phosphorus_leached(
     manure: float, rain_manure_ratio: float, is_cow: bool
 ) -> None:
     """Tests that the correct mass of water extractable inorganic phosphorus leached is calculated."""
-    observe = Manure._determine_water_extractable_inorganic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
+    observe = Manure._determine_water_extractable_phosphorus_leached(manure, rain_manure_ratio, is_cow, False)
     if is_cow:
         expect = min(1.0, (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)) * manure
     else:
@@ -144,12 +144,13 @@ def test_determine_water_extractable_organic_phosphorus_leached(
     manure: float, rain_manure_ratio: float, is_cow: bool
 ) -> None:
     """Tests that the correct mass of water extractable organic phosphorus leached is calculated."""
-    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=50)
-    observe = Manure._determine_water_extractable_organic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
-    expect = 50 / 0.6
-    Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(
-        manure, rain_manure_ratio, is_cow
-    )
+    observe = Manure._determine_water_extractable_phosphorus_leached(manure, rain_manure_ratio, is_cow, True)
+    if is_cow:
+        first_term = (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)
+    else:
+        first_term = (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)
+    first_term = min(1.0, first_term)
+    expect = max(0.0, first_term * manure) / 0.6
     assert observe == expect
 
 
@@ -215,7 +216,7 @@ def test_determine_phosphorus_leached_from_surface(
     """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
     Manure._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
     Manure._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
-    Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25.0)
+    Manure._determine_water_extractable_phosphorus_leached = MagicMock(return_value=25.0)
     Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25.0)
     Manure._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
 
@@ -234,14 +235,12 @@ def test_determine_phosphorus_leached_from_surface(
     Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, expected_covered_area)
     Manure._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
     if organic:
-        Manure._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(
-            phosphorus_mass, 0.4, True
+        Manure._determine_water_extractable_phosphorus_leached.assert_called_once_with(
+            phosphorus_mass, 0.4, True, True
         )
-        Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_not_called()
     else:
-        Manure._determine_water_extractable_organic_phosphorus_leached.assert_not_called()
-        Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(
-            phosphorus_mass, 0.4, True
+        Manure._determine_water_extractable_phosphorus_leached.assert_called_once_with(
+            phosphorus_mass, 0.4, True, False
         )
     Manure._determine_water_extractable_phosphorus_runoff_concentration.assert_called_once_with(
         expected_water_extractable_phosphorus_leached, rain, area, 1.2
