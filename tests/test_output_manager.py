@@ -1753,7 +1753,6 @@ def test_filter_variables_pool_complex(
         (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False),
-
         (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
         (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True),
         (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
@@ -1769,7 +1768,7 @@ def test_save_results(
     produce_graphics: bool,
     filter_content: List[Dict[str, str]],
     is_faulty: bool,
-    chunkification: bool
+    chunkification: bool,
 ) -> None:
     # Arrange
     filters_path = Path("filters_path")
@@ -2640,11 +2639,7 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     }
 
     dummy_saved_pool_chunks_num = 0
-    dummy_variable_pool = {
-        "a": 1,
-        "b": "B",
-        "c": True
-    }
+    dummy_variable_pool = {"a": 1, "b": "B", "c": True}
 
     output_manager.saved_pool_chunks_path = Path("dummy_path")
     output_manager.saved_pool_chunks_num = dummy_saved_pool_chunks_num
@@ -2662,8 +2657,9 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     mock_generate_file_name.assert_called_once_with(f"saved_pool_{dummy_saved_pool_chunks_num}", "json")
 
     dummy_file_path = Path.joinpath(output_manager.saved_pool_chunks_path, "dummy_file.json")
-    mock_dict_to_file_json.assert_called_once_with(data_dict=dummy_variable_pool,
-                                                   path=dummy_file_path, minify_output_file=False)
+    mock_dict_to_file_json.assert_called_once_with(
+        data_dict=dummy_variable_pool, path=dummy_file_path, minify_output_file=False
+    )
 
     log_message = f"Saved the current variable pool to {dummy_file_path}"
     mock_add_log.assert_called_once_with("save_current_variable_pool", log_message, info_map)
