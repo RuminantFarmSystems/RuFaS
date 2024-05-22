@@ -35,7 +35,7 @@ def harvested_crop() -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
-def test_acceptable_crops(hay: Hay):
+def test_acceptable_crops(hay: Hay) -> None:
     assert hay.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.GRASS,
@@ -76,9 +76,11 @@ def test_calculate_dry_matter_loss_to_gas(
         (30, 950.682926336),
         (40, 950.682926336),
         (100, 950.682926336),
-    ]                     
+    ],
 )
-def test_calculate_initial_dry_matter_loss(hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float) -> None:
+def test_calculate_initial_dry_matter_loss(
+    hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
+) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
     harvested_crop.storage_time.simulation_day = 1
@@ -89,4 +91,17 @@ def test_calculate_initial_dry_matter_loss(hay: Hay, mocker: MockerFixture, harv
 
     actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, mock_time)
 
-    assert pytest.approx(actual) == expected    
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("days,expected", [(15, 0.0), (30, 0.0), (1, 0.0001), (5, 0.0005), (100, 0.001)])
+def test_calculate_subsequent_dry_matter_loss(
+    hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
+) -> None:
+    """Tests _calculate_subsequent_dry_matter_loss in Hay."""
+    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
+    harvested_crop.storage_time.simulation_day = 1
+    harvested_crop.initial_dry_matter_percentage = 20.0
+    harvested_crop.total_sensible_heat_generated = 950.0
+    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time.simulation_day = days + 1
