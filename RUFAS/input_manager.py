@@ -2,6 +2,7 @@ import json
 import os
 import re
 from copy import deepcopy
+from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
@@ -2215,7 +2216,6 @@ class InputManager:
                                     f"'type' value not in {type_to_validator_map.keys()}",
                                     info_map,
                                 )
-                                print(value_type)
                                 raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
@@ -2374,6 +2374,69 @@ class InputManager:
             "maximum": data_entry.get("maximum", ""),
             "minimum": data_entry.get("minimum", ""),
         }
+
+    def compare_metadata_properties(
+        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+    ) -> None:
+        """
+        Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.compare_metadata_properties.__name__,
+        }
+        self._load_metadata(properties_file_path)
+        properties1 = deepcopy(self.meta_data)
+        self.meta_data = {}
+        self._load_metadata(comparison_properties_file_path)
+        properties2 = self.meta_data
+
+        diff = DeepDiff(properties1, properties2, ignore_order=True, verbose_level=2)
+
+        first_file_path = os.path.basename(str(properties_file_path))
+        second_file_path = os.path.basename(str(comparison_properties_file_path))
+        file_name = f"diff_results_{first_file_path}_vs_{second_file_path}"
+
+        try:
+            om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
+            with open(f"{str(output_directory)}/{file_name}.txt", "w") as file:
+                file.write(
+                    f"Comparing changes going from '{properties_file_path}'"
+                    f" to '{comparison_properties_file_path}'\n\n"
+                )
+
+                if diff == {}:
+                    file.write("There were no differences found between these two properties files.")
+
+                else:
+                    sections = {
+                        "dictionary_item_added": "Items added:\n",
+                        "dictionary_item_removed": "Items removed:\n",
+                        "values_changed": "Values changed:\n",
+                    }
+                    for key, heading in sections.items():
+                        if key in diff:
+                            file.write(heading)
+                            for sub_key, value in diff[key].items():
+                                file.write(f"{sub_key}: {value}\n")
+                            file.write("\n")
+
+            om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
+
+        except PermissionError:
+            om.add_error(
+                "Permission error in saving file",
+                f"Permission denied when trying to write to {file_name}.txt.",
+                info_map,
+            )
+            raise
+        except OSError as e:
+            om.add_error(
+                "Unexpected error in saving file",
+                f"An unexpected OS error occurred: {e}",
+                info_map,
+            )
+            raise
 
 
 class ElementState(Enum):
