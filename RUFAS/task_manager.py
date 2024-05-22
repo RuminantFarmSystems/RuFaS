@@ -90,6 +90,10 @@ class TaskManager:
             exclude_info_maps,
             output_directory,
             clear_output_directory,
+            False,
+            0,
+            0,
+            0,
             Path(""),
             "Task Manager",
             RUFAS_VERSION,
@@ -139,7 +143,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
         TaskManager.handle_post_processing(
             args={
                 "output_directory": output_directory,
@@ -285,18 +289,18 @@ class TaskManager:
         return []
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
         )
         results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int, workers: int) -> None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -311,6 +315,10 @@ class TaskManager:
                 args["exclude_info_maps"],
                 args["logs_directory"],
                 False,
+                args["chunkification"],
+                args["save_chunk_threshold_call_count"],
+                int(args["maximum_memory_usage"] / workers),
+                int(args["maximum_memory_usage_percent"] / workers),
                 Path(""),
                 args["output_prefix"],
                 RUFAS_VERSION,

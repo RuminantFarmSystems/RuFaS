@@ -142,7 +142,7 @@ class OutputManager(object):
             self.available_memory: int = 0
             self.average_add_variable_call_addition: int | None = None
             self.add_variable_call = 0
-            self.save_pool_call_count: int | None = None
+            self.save_chunk_threshold_call_count: int | None = None
             self.current_pool_size: int = 0
             self.maximum_pool_size: int = 0
 
@@ -158,26 +158,44 @@ class OutputManager(object):
             self._variables_usage_counter: Counter[str] = collections.Counter()
 
     def setup_pool_overflow_control(
-            self, output_dir: Path, save_pool_call_count: int | None = None
+            self, output_dir: Path, max_memory_usage_percent: int, max_memory_usage: int | None = None,
+            save_chunk_threshold_call_count: int | None = None,
     ) -> None:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.setup_pool_overflow_control.__name__,
         }
-        self.manage_pool_size = True
-        self.save_pool_call_count = save_pool_call_count
+        self.chunkification = True
 
         self.available_memory = psutil.virtual_memory().available
         available_memory_gb = self.available_memory / (1024 ** 3)
 
-        self.saved_pool_num = 0
-        self.saved_pool_path = Path.joinpath(output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}")
-        self.create_directory(self.saved_pool_path)
+        self.saved_pool_chunks_path = Path.joinpath(
+            output_dir,
+            f"saved_pool/{Utility.get_timestamp(include_millis=True)}"
+        )
+        self.create_directory(self.saved_pool_chunks_path)
+
+        log_message = f"Created {self.saved_pool_chunks_path} for saved pools during simulation.\n" \
+                      f"Current system available memory: {available_memory_gb:.2f} GB = " \
+                      f"{self.available_memory} Bytes.\n"
+
+        self.saved_pool_chunks_num = 0
+        if save_chunk_threshold_call_count:
+            self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
+            log_message += "The threshold add_variable_call count for saving pool chunk is set to " \
+                           f"{self.save_chunk_threshold_call_count}"
+        elif max_memory_usage:
+            self.maximum_pool_size = max_memory_usage
+            log_message += "The maximum output variable pool size is set to " \
+                           f"{self.maximum_pool_size} Bytes"
+        else:
+            self.maximum_pool_size = (max_memory_usage_percent / 100) * self.available_memory
+            log_message += "The maximum output variable pool size is set to " \
+                           f"{self.maximum_pool_size} Bytes"
         self.add_log(
             "Pool Overflow Control Setup",
-            f"Created {self.saved_pool_path} for saved pools during simulation.\n"
-            f"Current system available memory: {available_memory_gb:.2f} GB = "
-            f"{self.available_memory} Bytes.\n",
+            log_message,
             info_map,
         )
 
@@ -257,12 +275,13 @@ class OutputManager(object):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
 
-        if self.manage_pool_size:
+        if self.chunkification:
             self.current_pool_size += self.average_add_variable_call_addition
             if (
-                    self.save_pool_call_count and self.add_variable_call % self.save_pool_call_count == 0
+                    self.save_chunk_threshold_call_count and
+                    self.add_variable_call % self.save_chunk_threshold_call_count == 0
             ) or (
-                    self.save_pool_call_count is None and self.current_pool_size >= self.maximum_pool_size
+                    self.save_chunk_threshold_call_count is None and self.current_pool_size >= self.maximum_pool_size
             ):
                 self._save_current_variable_pool()
 
@@ -279,7 +298,7 @@ class OutputManager(object):
         self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
-        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=False)
         self.add_log(
             "save_current_variable_pool",
             f"Saved the current variable pool to {saved_pool_file_path}",
@@ -1665,6 +1684,10 @@ class OutputManager(object):
         exclude_info_maps: bool,
         output_directory: Path,
         clear_output_directory: bool,
+        chunkification: bool,
+        max_memory_usage_percent: int,
+        max_memory_usage: int,
+        save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
@@ -1679,3 +1702,7 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+
+        if chunkification:
+            self.setup_pool_overflow_control(output_directory, max_memory_usage_percent, max_memory_usage,
+            save_chunk_threshold_call_count)
