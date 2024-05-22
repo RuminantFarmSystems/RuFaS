@@ -2,9 +2,9 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ main ]
+    branches: [ test-main ]
   pull_request:
-    branches: [ main ]
+    branches: [ test-main ]
   workflow_dispatch:
 
 env:
