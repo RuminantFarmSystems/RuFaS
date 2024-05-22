@@ -2404,19 +2404,24 @@ class InputManager:
                     f" to '{comparison_properties_file_path}'\n\n"
                 )
 
-                sections = {
-                    "dictionary_item_added": "Items added:\n",
-                    "dictionary_item_removed": "Items removed:\n",
-                    "values_changed": "Values changed:\n",
-                }
+                if diff == {}:
+                    file.write("There were no differences found between these two properties files.")
 
-                for key, heading in sections.items():
-                    if key in diff:
-                        file.write(heading)
-                        for sub_key, value in diff[key].items():
-                            file.write(f"{sub_key}: {value}\n")
-                        file.write("\n")
+                else:
+                    sections = {
+                        "dictionary_item_added": "Items added:\n",
+                        "dictionary_item_removed": "Items removed:\n",
+                        "values_changed": "Values changed:\n",
+                    }
+                    for key, heading in sections.items():
+                        if key in diff:
+                            file.write(heading)
+                            for sub_key, value in diff[key].items():
+                                file.write(f"{sub_key}: {value}\n")
+                            file.write("\n")
+
             om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
+
         except PermissionError:
             om.add_error(
                 "Permission error in saving file",
