@@ -13,23 +13,20 @@ class LactationCurve:
         if int(self.year) > 2016:
             self.year = "2016"
 
-        self.FIPS_code = im.get_data("config.FIPS_county_code")
-        self.FIPS_state_code = None 
-        if self.FIPS_code != None: 
-            self.FIPS_state_code= int(self.FIPS_code /1000)
-        self.region = None
-        if self.FIPS_state_code != None:
-            for code_region in self.region_dict:
-                if code_region["code"] == self.FIPS_state_code:
+        region_dict = im.get_data("lactation.fips_region")
+        FIPS_code = im.get_data("config.FIPS_county_code")
+        FIPS_state_code = None
+        if FIPS_code != None:
+            FIPS_state_code = int(FIPS_code / 1000)
+        self.region= None
+        if FIPS_state_code != None:
+            for code_region in region_dict:
+                if code_region["code"] == FIPS_state_code:
                     self.region= code_region["region"]
-                    print(str(self.FIPS_state_code))
-                    print(self.region)
-                    print(code_region["code"])
-                    print(code_region["region"])
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
-        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * (305 / 365)
+        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * im.get_data("lactation.assumed_milking_cow_percentage")
 
         self.milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
         if self.milking_freq >= 2.5:
@@ -38,8 +35,8 @@ class LactationCurve:
             self.milking_freq = "2x/d"
 
         # Assuming Y = 1632 and Z = 2196 based on the given assumptions
-        self.P2_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P2_adjustment")
-        self.P3_MY305_adj = im.get_data("lactation.parity_milk_adjustments.MY305_P3_adjustment")
+        self.parity2_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity2_MilkYield305_adjustment")
+        self.parity3_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity3_MilkYield305_adjustment")
 
         self.adjustment_dict = im.get_data("lactation.adjustment_dict")
 
@@ -65,6 +62,8 @@ class LactationCurve:
         parameter_b = 24.7 * 1e-2
         parameter_c = 33.76 * 1e-4
 
+        adjustment_dict = im.get_data("lactation.adjustment_dict")
+        
         farm_specific = {}
         farm_specific["parity"] = lactation_group
         farm_specific["year"] = year
@@ -77,22 +76,22 @@ class LactationCurve:
                 print(category)
                 adjustment_applied = False
                 x = 0
-                while (x<len(self.adjustment_dict[category]) and (not adjustment_applied)):
-                    if self.adjustment_dict[category][x][category] == farm_specific[category]:
-                        parameter_a += self.adjustment_dict[category][x]["adjustments"][0]
-                        parameter_b += self.adjustment_dict[category][x]["adjustments"][1] * 1e-2
-                        parameter_c += self.adjustment_dict[category][x]["adjustments"][2] * 1e-4
+                while (x<len(adjustment_dict[category]) and (not adjustment_applied) and (farm_specific[category] != None)):
+                    if adjustment_dict[category][x][category] == farm_specific[category]:
+                        parameter_a += adjustment_dict[category][x]["adjustments"][0]
+                        parameter_b += adjustment_dict[category][x]["adjustments"][1] * 1e-2
+                        parameter_c += adjustment_dict[category][x]["adjustments"][2] * 1e-4
                         adjustment_applied = True
                         
-                        print(self.adjustment_dict[category][x][category])
+                        print(adjustment_dict[category][x][category])
                         print(farm_specific[category])
 
                     x = x+1
-        '''for category in [lactation_group, year, month, region, milking_frequency]:
-            if category:
-                parameter_a += self.adjustment_dict[category][0]
-                parameter_b += self.adjustment_dict[category][1] * 1e-2
-                parameter_c += self.adjustment_dict[category][2] * 1e-4'''
+        # for category in [lactation_group, year, month, region, milking_frequency]:
+        #     if category:
+        #         parameter_a += self.adjustment_dict[category][0]
+        #         parameter_b += self.adjustment_dict[category][1] * 1e-2
+        #         parameter_c += self.adjustment_dict[category][2] * 1e-4
 
         if MY_305d == None:
             MY_305d = self.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
@@ -113,27 +112,26 @@ class LactationCurve:
             return parameter_a_best_estimate, parameter_b, parameter_c, MY_305d_best_estimate
 
     def set_lactation_curve_parameters(self) -> tuple[tuple, tuple, tuple]:
-
         # calculate lactation group yield
 
         if self.annual_MY_lbs != None:
             total_avg_305 = self.annual_MY_lbs * 305 / (365 * self.num_milking_cows * 2.205)
 
             # Extracting percentage distribution for each lactation group
-            percent_P2 = self.parity_percentages[1] * 100
-            percent_P3 = self.parity_percentages[2] * 100
+            percent_parity2 = self.parity_percentages[1] * 100
+            percent_parity3 = self.parity_percentages[2] * 100
 
-            # Solving for P1-305 using the provided equation
-            P1_305 = total_avg_305 - percent_P2 * self.P2_MY305_adj / 100 - percent_P3 * self.P3_MY305_adj / 100
+            # Solving for parity1_305 using the provided equation
+            parity1_305 = total_avg_305 - percent_parity2 * self.parity2_MilkYield305_adj / 100 - percent_parity3 * self.parity3_MilkYield305_adj / 100
 
             # Calculating 305-day milk yield for each lactation group
-            P2_305 = P1_305 + self.P2_MY305_adj
-            P3_305 = P1_305 + self.P3_MY305_adj
+            parity2_305 = parity1_305 + self.parity2_MilkYield305_adj
+            parity3_305 = parity1_305 + self.parity3_MilkYield305_adj
 
         else:
-            P1_305 = None
-            P2_305 = None
-            P3_305 = None
+            parity1_305 = None
+            parity2_305 = None
+            parity3_305 = None
 
         return (
             self.get_wood_parameters(
@@ -141,20 +139,20 @@ class LactationCurve:
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P1_305,
+                MY_305d=parity1_305,
             ),
             self.get_wood_parameters(
                 lactation_group="2",
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P2_305,
+                MY_305d=parity2_305,
             ),
             self.get_wood_parameters(
                 lactation_group="3",
                 year=self.year,
                 region=self.region,
                 milking_frequency=self.milking_freq,
-                MY_305d=P3_305,
+                MY_305d=parity3_305,
             ),
         )

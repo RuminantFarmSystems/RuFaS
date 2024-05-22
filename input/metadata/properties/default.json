@@ -1599,14 +1599,18 @@
     "parity_milk_adjustments": {
       "type": "object",
       "description": "Parity 2 and 3 milk yield adjustment assumptions for use in calculations",
-      "MY305_P2_adjustment": {
+      "parity2_MilkYield305_adjustment": {
         "type": "number",
-        "description": "The P2 milk adjustment value"
+        "description": "The P2 milk adjustment value for the 305 day milk yield"
       },
-		  "MY305_P3_adjustment": {
+		  "parity3_MilkYield305_adjustment": {
         "type": "number",
-        "description": "The P3 milk adjustment value"
+        "description": "The P3 milk adjustment value for the 305 day milk yield"
       }
+    },
+    "assumed_milking_cow_percentage": {
+      "type": "number",
+      "description": "the number of cows within the total herd assumed to be in milk at any one time (305/365 is the assumed ratio)"
     }
   },
   "crop_schedule_properties": {
