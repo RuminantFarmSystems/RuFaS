@@ -2,9 +2,9 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ test-main ]
+    branches: [ main ]
   pull_request:
-    branches: [ test-main ]
+    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -32,11 +32,11 @@ jobs:
 
       - name: Get all added or modified files
         run: |
-          BASE_BRANCH=${{ github.base_ref }} || "test-main"
+          BASE_BRANCH=${{ github.base_ref }} || "main"
           git fetch origin $BASE_BRANCH
           if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
-            echo "Fallback to test-main branch because $BASE_BRANCH does not exist."
-            BASE_BRANCH="test-main"
+            echo "Fallback to main branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="main"
             git fetch origin $BASE_BRANCH
           fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
