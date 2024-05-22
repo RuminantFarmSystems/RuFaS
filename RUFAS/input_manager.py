@@ -89,6 +89,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+            self.metadata_depth_limit = 7
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -110,6 +111,15 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
+    def set_metadata_depth_limit(self, limit: int) -> None:
+        """Override for the default metadata_depth_limit."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.set_metadata_depth_limit.__name__,
+        }
+        self.metadata_depth_limit = limit
+        om.add_log("Override default metadata depth limit", f"Metadata depth limit set to {limit}.", info_map)
+
     def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
@@ -130,6 +140,7 @@ class InputManager:
         self._load_metadata(metadata_path)
         self._validate_metadata()
         self._load_properties()
+        self._validate_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -2145,6 +2156,90 @@ class InputManager:
                 raise ValueError
 
         om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+
+    def _validate_properties(self) -> None:
+        """Iteratively traverses the metadata properties to check the max depth and routes
+        properties to be validated by type.
+
+        Raises
+        ------
+        ValueError
+            - If the depth of the metadata exceeds the metadata_depth_limit.
+            - If the properties' 'type' value is neither in the type_to_validator_map keys,
+            nor is None.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_properties.__name__,
+        }
+
+        stack: list[tuple[dict[str, Any], int, list[str]]] = [(self.__metadata["properties"], 0, [])]
+        current_max_depth: int = 0
+        deepest_path: list[str] = []
+
+        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], None]] = {
+            "number": self._metadata_number_validator,
+            "array": self._metadata_array_validator,
+            "bool": self._metadata_bool_validator,
+            "string": self._metadata_string_validator,
+            "object": self._metadata_object_validator,
+        }
+        while stack:
+            current_obj, depth, path = stack.pop()
+
+            if depth > self.metadata_depth_limit:
+                om.add_error(
+                    "Max metadata depth exceeded.",
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}"
+                )
+
+            if depth > current_max_depth:
+                current_max_depth = depth
+                deepest_path = path
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    if isinstance(value, dict):
+                        stack.append((value, depth + 1, path + [key]))
+                        value_type = value.get("type")
+                        if value_type in type_to_validator_map:
+                            type_to_validator_map[value_type](path + [key], value)
+                        else:
+                            if value_type is not None:
+                                om.add_error(
+                                    "Properties value type error",
+                                    f"'type' value not in {type_to_validator_map.keys()}",
+                                    info_map,
+                                )
+                                print(value_type)
+                                raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
+
+        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
+        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+
+    def _metadata_number_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+        """Validator function for array type properties in metadata."""
+        pass
+
+    def _metadata_string_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+        """Validator function for string type properties in metadata."""
+        pass
+
+    def _metadata_bool_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+        """Validator function for bool type properties in metadata."""
+        pass
+
+    def _metadata_array_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+        """Validator function for array type properties in metadata."""
+        pass
+
+    def _metadata_object_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+        """Validator function for object type properties in metadata."""
+        pass
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """

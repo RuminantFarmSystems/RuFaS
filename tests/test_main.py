@@ -32,6 +32,7 @@ def test_main_success(mock_task_manager, monkeypatch):
         output_directory=Path("output"),
         clear_output_directory=False,
         produce_graphics=True,
+        metadata_depth_limit=None,
     )
 
 
@@ -47,7 +48,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 5
+    assert mock_add_argument.call_count == 6
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-g",
@@ -79,6 +80,12 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--output-dir",
             help="The saving directory for output",
             default="output/",
+        ),
+        mocker.call(
+            "-m",
+            "--metadata-depth-limit",
+            type=int,
+            help="Overrides the default metadata depth limit in the Input Manager",
         ),
     ]
     mock_parse_args.assert_called_once()
