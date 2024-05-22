@@ -1832,7 +1832,8 @@ def test_save_results(
 
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
     mock_output_manager._save_current_variable_pool = output_manager_original_method_states[
-        "_save_current_variable_pool"]
+        "_save_current_variable_pool"
+    ]
     mock_output_manager._sort_saved_chunk_files = output_manager_original_method_states["_sort_saved_chunk_files"]
     mock_output_manager.filter_saved_pools = output_manager_original_method_states["filter_saved_pools"]
 
@@ -2644,9 +2645,7 @@ def test_save_current_variable_pool(mocker: MockerFixture,
                                     output_manager_original_method_states: Dict[str, Callable]) -> None:
     output_manager = OutputManager()
 
-    info_map = {
-        'class': 'OutputManager', 'function': '_save_current_variable_pool'
-    }
+    info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
 
     dummy_saved_pool_chunks_num = 0
     dummy_variable_pool = {"a": 1, "b": "B", "c": True}
