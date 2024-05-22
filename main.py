@@ -26,6 +26,7 @@ def main() -> None:
             output_directory=Path(cmd_arguments.output_dir),
             clear_output_directory=cmd_arguments.clear_output,
             produce_graphics=not cmd_arguments.no_graphics,
+            metadata_depth_limit=cmd_arguments.metadata_depth_limit,
         )
     except Exception as e:
         info_map = {
@@ -92,6 +93,9 @@ def parse_gnu_args(args=None):
         "--output-dir",
         help="The saving directory for output",
         default="output/",
+    )
+    parser.add_argument(
+        "-m", "--metadata-depth-limit", help="Overrides the default metadata depth limit in the Input Manager", type=int
     )
     return parser.parse_args(args)
 
