@@ -133,6 +133,11 @@ class OutputManager(object):
                 "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
+
+            self.chunkification: bool = False
+            self.saved_pool_chunks_num: int = 0
+            self.saved_pool_chunks_path: Path | None = None
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -219,6 +224,28 @@ class OutputManager(object):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
 
+    def _save_current_variable_pool(self) -> None:
+        """
+        Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._save_current_variable_pool.__name__,
+        }
+
+        self.create_directory(self.saved_pool_chunks_path)
+        saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
+        saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=str(saved_pool_file_path), minify_output_file=False)
+        self.add_log(
+            "save_current_variable_pool",
+            f"Saved the current variable pool to {saved_pool_file_path}",
+            info_map,
+        )
+        self.variables_pool = {}
+        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self.saved_pool_chunks_num += 1
+    
     def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
@@ -1002,6 +1029,56 @@ class OutputManager(object):
             counter += 1
         return results
 
+    def _saved_chunk_files(self) -> List[Path]:
+        """
+        Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
+        the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
+        """
+        list_of_dumped_files: List[Path] = [
+            file for file in self.saved_pool_chunks_path.iterdir()
+            if file.is_file() and file.name.endswith(".json")
+        ]
+        list_of_dumped_files.sort(
+            key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0])
+        )
+        return list_of_dumped_files
+
+    def filter_saved_pools(self, filter_content: Dict[str, Any],
+                           list_of_dumped_files: List[Path]) -> Dict[str, OutputManager.pool_element_type]:
+        """
+        Filters saved pools of data by applying specific filter criteria.
+
+        This method iterates over JSON files in the saved pool directory. It then loads each file and applies the
+        filter by calling the `filter_variables_pool()` method. The results are aggregated into a single dictionary,
+        combining entries under the same key by extending lists of info_maps and values.
+
+        Parameters
+        ----------
+        filter_content : (Dict[str, Any])
+            A dictionary specifying the criteria used to filter the variables pools.
+
+        list_of_dumped_files: List[Path]
+            A list containing all chunks of the output variable pool to be filtered.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]:
+            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
+            under the saved_pool_chunks_path directory.
+        """
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            temp_filtered_pool = self.filter_variables_pool(filter_content)
+            for key, value in temp_filtered_pool.items():
+                if key in filtered_pool.keys():
+                    filtered_pool[key]["info_maps"].extend(value["info_maps"])
+                    filtered_pool[key]["values"].extend(value["values"])
+                else:
+                    filtered_pool[key] = value
+
+        return filtered_pool
+
     def save_results(
         self,
         filters_dir_path: Path,
@@ -1048,6 +1125,8 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
+        if self.chunkification:
+            self._save_current_variable_pool()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
@@ -1075,7 +1154,11 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self.filter_variables_pool(filter_content)
+                    filtered_pool = (
+                        self.filter_saved_pools(filter_content, self._sort_saved_chunk_files())
+                        if self.chunkification
+                        else self.filter_variables_pool(filter_content)
+                    )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
