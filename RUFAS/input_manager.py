@@ -2268,6 +2268,7 @@ class InputManager:
         path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
         om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
         try:
+            om.create_directory(output_dir)
             df.to_csv(path_to_save, index=False)
             om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
         except FileNotFoundError as fnfe:

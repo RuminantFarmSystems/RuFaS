@@ -4080,6 +4080,7 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     output_dir = Path("/fake/directory")
     metadata = {"properties": "test_properties"}
     mock_input_manager.meta_data = metadata
+    # mock_create_dir = patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock)
 
     with (
         patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
@@ -4087,11 +4088,13 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
+        patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock) as mock_create_dir,
     ):
 
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
+        mock_create_dir.assert_called_once_with(output_dir)
         mock_to_csv.assert_called_once_with(output_dir / "output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
@@ -4114,6 +4117,7 @@ def test_save_metadata_properties_errors(
     mock_records = [{"key": "value"}]
 
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
+    mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
     mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")

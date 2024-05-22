@@ -317,7 +317,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                args["logs_directory"],
+                Path(""),
                 False,
                 Path(""),
                 args["output_prefix"],
