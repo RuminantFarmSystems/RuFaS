@@ -114,9 +114,8 @@ class Hay(Storage):
         dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         moisture_fraction = 1 - dry_fraction
         numerator = moisture_fraction - FINAL_MOISTURE_FRACTION * dry_fraction * (1 - 0.004 * days_in_window)
-        denominator = dry_fraction
-        third_term = (14206 - 2433 * (0.004 * days_in_window) / (1 - 0.004 * days_in_window))
-        return crop.total_sensible_heat_generated + 2433 * numerator / denominator * third_term
+        denominator = dry_fraction * (14206 - 2433 * (0.004 * days_in_window) / (1 - 0.004 * days_in_window))
+        return crop.total_sensible_heat_generated + 2433 * numerator / denominator
 
     def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
