@@ -2215,7 +2215,6 @@ class InputManager:
                                     f"'type' value not in {type_to_validator_map.keys()}",
                                     info_map,
                                 )
-                                print(value_type)
                                 raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
