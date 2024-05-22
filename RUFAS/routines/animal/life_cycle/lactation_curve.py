@@ -7,17 +7,25 @@ im = InputManager()
 
 class LactationCurve:
     def __init__(self):
-        self.fips_region = im.get_data("lactation.fips_region")
+        self.region_dict = im.get_data("lactation.fips_region")
 
         self.year = im.get_data("config.end_date")[:4]
         if int(self.year) > 2016:
             self.year = "2016"
 
-        self.region = im.get_data("config.FIPS_county_code")
-        if self.region != None:
-            self.region = self.fips_region[int((self.region / 1000))]
-            if self.region == "":
-                self.region = None
+        self.FIPS_code = im.get_data("config.FIPS_county_code")
+        self.FIPS_state_code = None 
+        if self.FIPS_code != None: 
+            self.FIPS_state_code= int(self.FIPS_code /1000)
+        self.region = None
+        if self.FIPS_state_code != None:
+            for code_region in self.region_dict:
+                if code_region["code"] == self.FIPS_state_code:
+                    self.region= code_region["region"]
+                    print(str(self.FIPS_state_code))
+                    print(self.region)
+                    print(code_region["code"])
+                    print(code_region["region"])
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
@@ -57,11 +65,34 @@ class LactationCurve:
         parameter_b = 24.7 * 1e-2
         parameter_c = 33.76 * 1e-4
 
-        for category in [lactation_group, year, month, region, milking_frequency]:
+        farm_specific = {}
+        farm_specific["parity"] = lactation_group
+        farm_specific["year"] = year
+        farm_specific["month"] = month
+        farm_specific["region"] = region
+        farm_specific["milking_frequency"] = milking_frequency
+
+        for category in ["parity", "year", "month", "region", "milking_frequency"]:
+            if farm_specific[category]:
+                print(category)
+                adjustment_applied = False
+                x = 0
+                while (x<len(self.adjustment_dict[category]) and (not adjustment_applied)):
+                    if self.adjustment_dict[category][x][category] == farm_specific[category]:
+                        parameter_a += self.adjustment_dict[category][x]["adjustments"][0]
+                        parameter_b += self.adjustment_dict[category][x]["adjustments"][1] * 1e-2
+                        parameter_c += self.adjustment_dict[category][x]["adjustments"][2] * 1e-4
+                        adjustment_applied = True
+                        
+                        print(self.adjustment_dict[category][x][category])
+                        print(farm_specific[category])
+
+                    x = x+1
+        '''for category in [lactation_group, year, month, region, milking_frequency]:
             if category:
                 parameter_a += self.adjustment_dict[category][0]
                 parameter_b += self.adjustment_dict[category][1] * 1e-2
-                parameter_c += self.adjustment_dict[category][2] * 1e-4
+                parameter_c += self.adjustment_dict[category][2] * 1e-4'''
 
         if MY_305d == None:
             MY_305d = self.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
