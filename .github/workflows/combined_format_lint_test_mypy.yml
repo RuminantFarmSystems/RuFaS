@@ -223,7 +223,7 @@ jobs:
       - name: Check for Flake8 Errors
         if: ${{ steps.flake8.outcome == 'failure' }}
         run: |
-          echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
+          echo "Flake8 encountered errors. Please fix the linting error(s) in the Check for Flake8 Errors step and re-run the workflow."
           exit 1
 
       - name: Check for Pytest Errors
