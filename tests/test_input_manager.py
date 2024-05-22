@@ -1017,7 +1017,7 @@ def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]
 )
 def test_fix_array_type_fixable_data(
     dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str | int],
+    dummy_element_hierarchy: List[str],
     expected_value: List[Any],
     expected_result: bool,
     expected_warning_call_count: int,

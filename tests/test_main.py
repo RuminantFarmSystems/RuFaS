@@ -16,7 +16,7 @@ def mock_task_manager() -> Generator[Any, Any, Any]:
         yield mock
 
 
-def test_main_success(mock_task_manager, monkeypatch) -> None:
+def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     mock_instance = mock_task_manager.return_value
     mock_instance.start.return_value = None
 
@@ -31,10 +31,8 @@ def test_main_success(mock_task_manager, monkeypatch) -> None:
         verbosity=LogVerbosity.ERRORS,
         exclude_info_maps=False,
         output_directory=Path("output"),
-        logs_directory=Path("test_log_dir"),
         clear_output_directory=False,
         produce_graphics=True,
-        suppress_log_files=True,
         metadata_depth_limit=None,
     )
 
@@ -51,7 +49,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 8
+    assert mock_add_argument.call_count == 6
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-g",
@@ -83,18 +81,6 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--output-dir",
             help="The saving directory for output",
             default="output/",
-        ),
-        mocker.call(
-            "-s",
-            "--suppress-log-files",
-            help="Prevents logs from the Task Manager being written to files",
-            action="store_true",
-        ),
-        mocker.call(
-            "-l",
-            "--logs-dir",
-            help="The directory for saving log files too",
-            default="output/logs",
         ),
         mocker.call(
             "-m",
