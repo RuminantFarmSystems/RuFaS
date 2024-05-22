@@ -211,9 +211,11 @@ class OutputManager(object):
         key: str,
         value: Any,
         info_map: Dict[str, Any],
+        first_info_map_only: bool = False,
     ) -> None:
         """
         Adds value and info map at key in the given pool.
+
         Parameters
         ----------
         pool : Dict[str, Dict[str, List[Dict[str, Any]]]
@@ -224,12 +226,20 @@ class OutputManager(object):
             The value to be added to the pool.
         info_map : Dict[str, Any]
             The info map to be added to the pool.
+        first_info_map_only : bool, default False
+            If true, records only the first info map passed for that variable. If false, records all info maps passed
+            for that variable.
+
         """
+
+        discard_info_map = first_info_map_only
 
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        if not self._exclude_info_maps_flag:
+            discard_info_map = False
+
+        if not self._exclude_info_maps_flag and not discard_info_map:
             reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
             pool[key]["info_maps"].append(reduced_info_map)
 
@@ -238,7 +248,7 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
+    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any], first_info_map_only: bool = False) -> None:
         """
         Adds a variable to the pool.
 
@@ -261,6 +271,10 @@ class OutputManager(object):
             Has no effect on manual prefix overrides.
         info_map["suffix"] : str, optional
             If present, gets appended to the key
+        first_info_map_only : bool, default False
+            If true, records only the first info map passed for that variable. If false, records all info maps passed
+            for that variable.
+
         """
         self.add_variable_call += 1
         units = info_map.get("units")
@@ -269,7 +283,7 @@ class OutputManager(object):
         units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units})
+        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
 
         if isinstance(value, dict):
             for k, v in value.items():
@@ -1091,7 +1105,7 @@ class OutputManager(object):
             counter += 1
         return results
 
-    def _saved_chunk_files(self) -> List[Path]:
+    def _sort_saved_chunk_files(self) -> List[Path]:
         """
         Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
         the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
