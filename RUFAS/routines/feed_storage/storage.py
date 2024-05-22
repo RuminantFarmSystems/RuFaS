@@ -289,10 +289,7 @@ class Storage:
         return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
-        self,
-        crop: HarvestedCrop,
-        weather_conditions: list[CurrentDayConditions],
-        time: Time,
+        self, rop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
