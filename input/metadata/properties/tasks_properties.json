@@ -13,7 +13,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDITION|END_TO_END_TESTING|POST_PROCESSING",
+          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
@@ -56,33 +56,45 @@
         },
         "save_animals_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The saving directory for animals if save_animals is set to true",
-          "default": "output/"
-        },
-        "output_directory": {
-          "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
-          "description": "The saving directory for output",
           "default": "output/"
         },
         "filters_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The directory for the files containing the output filters",
           "default": "output/output_filters/"
         },
-        "CSV_directory": {
+        "csv_output_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The directory for the csv output files to be saved",
           "default": "output/CSVs/"
         },
+        "json_output_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "description": "The directory for the JSON output files to be saved.",
+          "default": "output/JSONs/"
+        },
+        "report_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "description": "The directory for reports to be saved to.",
+          "default": "output/reports/"
+        },
         "graphics_directory": {
           "type": "string",
-          "pattern": "^([a-zA-Z]:)?[\\\\/](?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
           "description": "The saving directory for graphics",
           "default": "output/graphics/"
+        },
+        "logs_directory": {
+          "type": "string",
+          "pattern": "^([a-zA-Z]:)?[\\\\/]?(?:[a-zA-Z0-9_\\-\\.]+[\\\\/])*[a-zA-Z0-9_\\-\\.]*$",
+          "description": "The directory for saving log message files, variable names, and other simulation outputs to.",
+          "default": "output/logs/"
         },
         "output_pool_path": {
           "type": "string",

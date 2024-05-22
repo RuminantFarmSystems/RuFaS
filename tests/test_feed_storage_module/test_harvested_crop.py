@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockerFixture
 import copy
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
@@ -47,7 +48,9 @@ def test_invalid_category_type_combinations(category: CropCategory, crop_type: C
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
-def test_attributes() -> None:
+def test_attributes(mocker: MockerFixture) -> None:
+    mock_effluent = mocker.patch.object(HarvestedCrop, "_estimate_maximum_effluent", return_value=10.0)
+    mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.harvested_crop.deepcopy")
     crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
     )
@@ -62,6 +65,9 @@ def test_attributes() -> None:
     assert crop.lignin == sample_crop_data["lignin"]
     assert crop.sugar == sample_crop_data["sugar"]
     assert crop.ash == sample_crop_data["ash"]
+    assert crop.estimated_maximum_effluent == 10.0
+    mock_effluent.assert_called_once()
+    mock_deepcopy.assert_called_once_with(crop.storage_time)
 
 
 @pytest.mark.parametrize(
@@ -84,3 +90,17 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     actual = crop.dry_matter_mass
 
     assert actual == expected
+
+
+@pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
+def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
+    """Tests _estimate_maximum_effluent in HarvestedCrop."""
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+    )
+    crop.dry_matter_percentage = dry_matter
+    crop.fresh_mass = mass
+
+    actual = crop._estimate_maximum_effluent()
+
+    assert pytest.approx(actual) == expected

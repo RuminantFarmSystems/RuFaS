@@ -2405,7 +2405,7 @@ def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name
                 "class": "Field",
                 "function": "_get_manure_water",
                 "suffix": f"field='{field_name}'",
-                "units": MeasurementUnits.MILLIMETERS.value,
+                "units": MeasurementUnits.MILLIMETERS,
             },
         )
 
