@@ -32,11 +32,11 @@ jobs:
 
       - name: Get all added or modified files
         run: |
-          BASE_BRANCH=${{ github.base_ref }} || "main"
+          BASE_BRANCH=${{ github.base_ref }} || "test-main"
           git fetch origin $BASE_BRANCH
           if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
-            echo "Fallback to main branch because $BASE_BRANCH does not exist."
-            BASE_BRANCH="main"
+            echo "Fallback to test-main branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="test-main"
             git fetch origin $BASE_BRANCH
           fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
