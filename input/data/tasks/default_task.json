@@ -6,7 +6,7 @@
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "default",
       "log_verbosity": "errors",
-      "random_seed": 40
+      "random_seed": 42
     }
   ]
 }
