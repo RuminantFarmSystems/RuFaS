@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -44,7 +44,9 @@ jobs:
 
       - name: Check for Unauthorized Changes
         run: |
-          paths_to_protect=()
+          paths_to_protect=(
+            "input/data/tasks/default_task.json"
+          )
           unauthorized_changes=false
           unauthorized_paths=""
           
@@ -105,7 +107,7 @@ jobs:
           ref: ${{ steps.fetch-latest-sha.outputs.sha }}
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
