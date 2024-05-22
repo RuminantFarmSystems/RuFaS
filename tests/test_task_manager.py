@@ -62,7 +62,7 @@ def test_task_manager_init(
 def test_task_manager_start_exception(task_manager):
     task_manager.input_manager.start_data_processing = MagicMock(return_value=False)
     with pytest.raises(Exception) as exc_info:
-        task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), True, False)
+        task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), True, False, None)
     assert "Task Manager's input data is invalid." in str(exc_info.value)
 
 
