@@ -1,6 +1,7 @@
 from typing import Any, Generator
 import pytest
 from unittest.mock import patch, MagicMock
+from pytest_mock import MockerFixture
 from pathlib import Path
 
 from RUFAS.task_manager import TaskManager, TaskType
@@ -58,10 +59,20 @@ def test_task_manager_init(
     assert task_manager.output_manager is mock_output_manager
 
 
-def test_task_manager_start_exception(task_manager):
-    task_manager.input_manager.start_data_processing = MagicMock(return_value=False)
+def test_task_manager_start_exception(task_manager: TaskManager, mocker: MockerFixture) -> None:
+    mocker.patch.object(task_manager.input_manager, "start_data_processing", new_callable=MagicMock, return_value=False)
     with pytest.raises(Exception) as exc_info:
-        task_manager.start(Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), True, False, None)
+        task_manager.start(
+            Path("/fake/path"),
+            LogVerbosity.LOGS,
+            False,
+            Path("/fake/output"),
+            Path("fake/logs"),
+            True,
+            False,
+            False,
+            None,
+        )
     assert "Task Manager's input data is invalid." in str(exc_info.value)
 
 
@@ -114,6 +125,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
             "logs_directory": "/output/logs",
+            "suppress_log_files": True,
         },
         {
             "task_type": "SIMULATION_MULTI_RUN",
@@ -127,6 +139,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "output_pool_path": "/output",
             "save_animals_directory": "/output/herd",
             "logs_directory": "/output/logs",
+            "suppress_log_files": False,
         },
     ]
     mock_input_manager.get_data.return_value = task_data
@@ -144,11 +157,11 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
     assert all(arg["task_type"] == TaskType.SIMULATION_SINGLE_RUN for arg in results)
 
 
+@pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any]
+    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool
 ) -> None:
     args = {
-        "output_directory": Path("/fake/output"),
         "filters_directory": Path("/fake/filters"),
         "exclude_info_maps": False,
         "variable_name_style": "verbose",
@@ -158,27 +171,40 @@ def test_handle_post_processing(
         "report_directory": Path("/fake/reports"),
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
+        "suppress_log_files": suppress_logs,
     }
+
     TaskManager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
-    mock_output_manager.dump_all_nondata_pools.assert_called_with(
-        args["logs_directory"], args["exclude_info_maps"], "verbose"
-    )
+
+    if not suppress_logs:
+        mock_input_manager.dump_get_data_logs.call_count == 1
+        mock_output_manager.dump_all_nondata_pools.assert_called_with(
+            args["logs_directory"], args["exclude_info_maps"], "verbose"
+        )
+    else:
+        mock_input_manager.dump_get_data_logs.assert_not_called()
+        mock_output_manager.dump_all_nondata_pools.assert_not_called()
 
 
+@pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any]
+    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
-        "output_directory": Path("/fake/output"),
         "output_prefix": "test",
         "logs_directory": Path("/fake/output/logs"),
+        "suppress_log_files": suppress_logs,
     }
     mock_input_manager.start_data_processing.return_value = True
     result = TaskManager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
-    mock_output_manager.add_log.assert_called_with(
-        "Saving metadata properties",
-        f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
-        {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
-    )
+    if not suppress_logs:
+        mock_output_manager.add_log.assert_called_with(
+            "Saving metadata properties",
+            f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
+            {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
+        )
+        mock_input_manager.save_metadata_properties.assert_called_once()
+    else:
+        mock_input_manager.save_metadata_properties.assert_not_called()
