@@ -61,8 +61,10 @@ class TaskManager:
         verbosity: LogVerbosity,
         exclude_info_maps: bool,
         output_directory: Path,
+        logs_directory: Path,
         clear_output_directory: bool,
         produce_graphics: bool,
+        suppress_log_files: bool,
     ) -> None:
         """
         Initializes and starts the task management process.
@@ -77,10 +79,15 @@ class TaskManager:
             Flag to exclude information maps.
         output_directory : Path
             Path to the directory where outputs will be saved.
+        logs_directory : Path
+            Path to the directory where logs from the Task Manager will be saved.
         clear_output_directory : bool
             Whether to clear the output directory.
         produce_graphics : bool
             Whether to produce graphics.
+        suppress_log_files : bool
+            Whether to write logs from the Task Manager to output files.
+
         """
         self.output_manager.run_startup_sequence(
             verbosity,
@@ -102,10 +109,10 @@ class TaskManager:
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 {
-                    "output_directory": output_directory,
                     "exclude_info_maps": exclude_info_maps,
                     "variable_name_style": "verbose",
-                    "logs_directory": output_directory,
+                    "logs_directory": logs_directory,
+                    "suppress_log_files": suppress_log_files,
                 },
                 self.input_manager,
                 self.output_manager,
@@ -137,10 +144,10 @@ class TaskManager:
         self._run_tasks(runnable_args, produce_graphics)
         TaskManager.handle_post_processing(
             args={
-                "output_directory": output_directory,
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
-                "logs_directory": output_directory,
+                "logs_directory": logs_directory,
+                "suppress_log_files": suppress_log_files,
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -164,6 +171,7 @@ class TaskManager:
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
             input_task["logs_directory"] = Path(input_task["logs_directory"])
+            input_task["suppress_log_files"] = input_task["suppress_log_files"]
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
             input_task["csv_output_directory"] = Path(input_task["csv_output_directory"])
@@ -396,12 +404,13 @@ class TaskManager:
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
 
-        output_manager.add_log(
-            "Saving metadata properties",
-            f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
-            info_map,
-        )
-        input_manager.save_metadata_properties(args["logs_directory"])
+        if not args["suppress_log_files"]:
+            output_manager.add_log(
+                "Saving metadata properties",
+                f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
+                info_map,
+            )
+            input_manager.save_metadata_properties(args["logs_directory"])
 
         return is_data_valid
 
@@ -434,6 +443,7 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
+
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -441,7 +451,6 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-        input_manager.dump_get_data_logs(args["logs_directory"])
 
         if load_pool_from_file:
             output_manager.flush_pools()
@@ -459,9 +468,12 @@ class TaskManager:
                 args["csv_output_directory"],
                 args["json_output_directory"],
             )
-        output_manager.dump_all_nondata_pools(
-            args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
-        )
+
+        if not args["suppress_log_files"]:
+            input_manager.dump_get_data_logs(args["logs_directory"])
+            output_manager.dump_all_nondata_pools(
+                args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
+            )
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
