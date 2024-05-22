@@ -687,27 +687,27 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag, record_info_maps",
+    "dummy_value, exclude_info_maps_flag, first_map_only",
     [
-        ("dummy_value", False, True),
-        (2, False, True),
-        (3.45, False, False),
-        (True, False, False),
-        ({"key": "value"}, False, False),
-        ([1, 2, 3], False, True),
-        ("dummy_value", True, True),
-        (2, True, True),
-        (3.45, True, False),
-        (True, True, False),
-        ({"key": "value"}, True, False),
-        ([1, 2, 3], True, False),
+        ("dummy_value", False, False),
+        (2, False, False),
+        (3.45, False, True),
+        (True, False, True),
+        ({"key": "value"}, False, True),
+        ([1, 2, 3], False, False),
+        ("dummy_value", True, False),
+        (2, True, False),
+        (3.45, True, True),
+        (True, True, True),
+        ({"key": "value"}, True, True),
+        ([1, 2, 3], True, True),
     ],
 )
 def test_add_to_pool(
     mock_output_manager: OutputManager,
     dummy_value: Any,
     exclude_info_maps_flag: bool,
-    record_info_maps: bool,
+    first_map_only: bool,
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -724,7 +724,7 @@ def test_add_to_pool(
     mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, record_info_maps)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only)
 
     # Assert
     assert pool[key]["values"][0] == dummy_value
@@ -744,7 +744,7 @@ def test_add_to_pool(
     info_map["more_context"] = "1234567890"
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, record_info_maps)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only)
 
     # Assert
     assert pool[key]["values"][1] == dummy_value
@@ -755,7 +755,7 @@ def test_add_to_pool(
 
     if exclude_info_maps_flag:
         assert pool[key]["info_maps"] == []
-    elif record_info_maps:
+    elif not first_map_only:
         assert pool[key]["info_maps"] == [
             {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
             {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
