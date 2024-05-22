@@ -559,20 +559,29 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "name, value, info_map, expected_exception",
+    "name, value, info_map, record_info_maps, expected_exception",
     [
         # Case 1: Everything correct, no exception should be raised
-        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, None),
+        # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False, None),
         # Case 2: 'units' key missing, should raise KeyError
-        ("var2", 200, {"class": "TestClass", "function": "test_function"}, KeyError),
+        ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, KeyError),
         # Case 3: Value is a dict, should process sub-keys
-        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, None),
+        (
+            "var3",
+            {"sub1": 10, "sub2": 20},
+            {"class": "TestClass", "function": "test_function", "units": "kg"},
+            True,
+            None,
+        ),
     ],
 )
 def test_add_variable(
     name: str,
     value: Any,
     info_map: Dict[str, Any],
+    record_info_maps: bool,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -589,13 +598,17 @@ def test_add_variable(
 
     if expected_exception:
         with pytest.raises(expected_exception):
-            output_manager.add_variable(name, value, info_map)
+            output_manager.add_variable(name, value, info_map, record_info_maps)
     else:
         # Act
-        output_manager.add_variable(name, value, info_map)
+        output_manager.add_variable(name, value, info_map, record_info_maps)
         # Assert
         patched_add_to_pool.assert_called_once_with(
-            output_manager.variables_pool, "key_with_prefix", value, {**info_map, "units": "validated_units"}
+            output_manager.variables_pool,
+            "key_with_prefix",
+            value,
+            {**info_map, "units": "validated_units"},
+            record_info_maps,
         )
         if isinstance(value, dict):
             for k in value.keys():
@@ -674,26 +687,27 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag",
+    "dummy_value, exclude_info_maps_flag, record_info_maps",
     [
-        ("dummy_value", False),
-        (2, False),
-        (3.45, False),
-        (True, False),
-        ({"key": "value"}, False),
-        ([1, 2, 3], False),
-        ("dummy_value", True),
-        (2, True),
-        (3.45, True),
-        (True, True),
-        ({"key": "value"}, True),
-        ([1, 2, 3], True),
+        ("dummy_value", False, True),
+        (2, False, True),
+        (3.45, False, False),
+        (True, False, False),
+        ({"key": "value"}, False, False),
+        ([1, 2, 3], False, True),
+        ("dummy_value", True, True),
+        (2, True, True),
+        (3.45, True, False),
+        (True, True, False),
+        ({"key": "value"}, True, False),
+        ([1, 2, 3], True, False),
     ],
 )
 def test_add_to_pool(
     mock_output_manager: OutputManager,
     dummy_value: Any,
     exclude_info_maps_flag: bool,
+    record_info_maps: bool,
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -710,7 +724,7 @@ def test_add_to_pool(
     mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, record_info_maps)
 
     # Assert
     assert pool[key]["values"][0] == dummy_value
@@ -730,7 +744,7 @@ def test_add_to_pool(
     info_map["more_context"] = "1234567890"
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, record_info_maps)
 
     # Assert
     assert pool[key]["values"][1] == dummy_value
@@ -741,10 +755,14 @@ def test_add_to_pool(
 
     if exclude_info_maps_flag:
         assert pool[key]["info_maps"] == []
-    else:
+    elif record_info_maps:
         assert pool[key]["info_maps"] == [
             {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
             {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+        ]
+    else:
+        assert pool[key]["info_maps"] == [
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
         ]
 
     # Cleanup
