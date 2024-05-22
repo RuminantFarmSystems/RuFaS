@@ -4080,7 +4080,6 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     output_dir = Path("/fake/directory")
     metadata = {"properties": "test_properties"}
     mock_input_manager.meta_data = metadata
-    # mock_create_dir = patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock)
 
     with (
         patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records) as mock_parse,
