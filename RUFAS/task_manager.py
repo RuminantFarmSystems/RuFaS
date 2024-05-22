@@ -33,6 +33,7 @@ class TaskType(Enum):
     INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
+    COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -172,6 +173,8 @@ class TaskManager:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
+            input_task["properties_file_path"] = Path(input_task["properties_file_path"])
+            input_task["comparison_properties_file_path"] = Path(input_task["comparison_properties_file_path"])
             input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
@@ -300,7 +303,8 @@ class TaskManager:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int, workers: int) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int, workers: int) -> None:  # noqa C901
+
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -331,6 +335,12 @@ class TaskManager:
             if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+                return
+
+            if args["task_type"] == TaskType.COMPARE_METADATA_PROPERTIES:
+                input_manager.compare_metadata_properties(
+                    args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
+                )
                 return
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
