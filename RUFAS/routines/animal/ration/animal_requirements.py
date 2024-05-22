@@ -619,6 +619,15 @@ class AnimalRequirements:
                 not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
+
+        if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
+            phosphorus_requirement = phosphorus_requirement * (
+                1
+                + (
+                    AnimalBase.config["ration"]["phosphorus_requirement_buffer"]
+                    * GeneralConstants.PERCENTAGE_TO_FRACTION
+                )
+            )
         # Requirements summary dictionary
         return {
             "NEmaint_requirement": net_energy_maintenance,
@@ -1640,11 +1649,16 @@ class AnimalRequirements:
             P_Growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
             P_Growth = 0.0
-        if day_of_pregnancy is None:
+        if day_of_pregnancy is None or day_of_pregnancy < 190:
             P_Preg: float = 0.0
         else:
-            P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
-                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
+            P_Preg = (
+                (
+                    0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy)
+                    - 0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+                )
+                * body_weight
+                / 715
             )
         if milk_true_protein is None or milk_production is None:
             P_Lact: float = 0.0

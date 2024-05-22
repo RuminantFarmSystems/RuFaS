@@ -188,8 +188,8 @@ class HerdFactory:
                     birth_weight=cow.calf_birth_weight,
                 )
                 cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
-                cow.p_gest_for_calf = 0
-                cow.calf_birth_weight = 0
+                cow.p_gest_for_calf = 0.0
+                cow.calf_birth_weight = 0.0
 
                 calf = Calf(args)
                 if not (calf.culled or calf.sold):

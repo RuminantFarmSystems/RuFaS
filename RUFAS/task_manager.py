@@ -30,7 +30,7 @@ class TaskType(Enum):
     SIMULATION_SINGLE_RUN = "A single simulation run"
     SIMULATION_MULTI_RUN = "Multiple simulation with different random seeds"
     SENSITIVITY_ANALYSIS = "Run sensitivity analysis"
-    INPUT_DATA_AUDITION = "Validates input data and saves metadata properties as CSV"
+    INPUT_DATA_AUDIT = "Validates input data and saves metadata properties as CSV"
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
 
@@ -63,6 +63,7 @@ class TaskManager:
         output_directory: Path,
         clear_output_directory: bool,
         produce_graphics: bool,
+        metadata_depth_limit: int,
     ) -> None:
         """
         Initializes and starts the task management process.
@@ -81,6 +82,8 @@ class TaskManager:
             Whether to clear the output directory.
         produce_graphics : bool
             Whether to produce graphics.
+        metadata_depth_limit : int
+            Override value for maximum metadata properties depth set in Input Manager.
         """
         self.output_manager.run_startup_sequence(
             verbosity,
@@ -98,13 +101,16 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        is_data_valid = self.input_manager.start_data_processing(metadata_path.as_posix())
+        if metadata_depth_limit:
+            self.input_manager.set_metadata_depth_limit(metadata_depth_limit)
+        is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
                 {
                     "output_directory": output_directory,
                     "exclude_info_maps": exclude_info_maps,
                     "variable_name_style": "verbose",
+                    "logs_directory": output_directory,
                 },
                 self.input_manager,
                 self.output_manager,
@@ -133,7 +139,18 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+        TaskManager.handle_post_processing(
+            args={
+                "output_directory": output_directory,
+                "exclude_info_maps": exclude_info_maps,
+                "variable_name_style": "verbose",
+                "logs_directory": output_directory,
+            },
+            input_manager=self.input_manager,
+            output_manager=self.output_manager,
+            task_id="TASK_MANAGER",
+        )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -151,10 +168,12 @@ class TaskManager:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
-            input_task["output_directory"] = Path(input_task["output_directory"])
+            input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
             input_task["filters_directory"] = Path(input_task["filters_directory"])
-            input_task["CSV_directory"] = Path(input_task["CSV_directory"])
+            input_task["csv_output_directory"] = Path(input_task["csv_output_directory"])
+            input_task["json_output_directory"] = Path(input_task["json_output_directory"])
+            input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
             if input_task["task_type"].is_multi_run():
@@ -265,15 +284,19 @@ class TaskManager:
         """Placeholder for expanding end-to-end testing multi-run tasks."""
         return []
 
-    def _run_tasks(self, single_run_args: List[Dict[str, Any]], produce_graphics: bool) -> None:
+    def _run_tasks(
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+    ) -> None:
         """Runs the tasks based on the provided arguments."""
-        task_with_args = partial(self.task, produce_graphics=produce_graphics)
+        task_with_args = partial(
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+        )
         results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -286,7 +309,7 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                args["output_directory"],
+                args["logs_directory"],
                 False,
                 Path(""),
                 args["output_prefix"],
@@ -294,7 +317,10 @@ class TaskManager:
                 task_id,
             )
             input_manager = InputManager()
-            if args["task_type"] == TaskType.INPUT_DATA_AUDITION:
+            if metadata_depth_limit:
+                input_manager.set_metadata_depth_limit(metadata_depth_limit)
+
+            if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
                 return
@@ -333,7 +359,7 @@ class TaskManager:
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
-            output_manager.dump_all_nondata_pools(args["output_directory"], args["exclude_info_maps"], "block")
+            output_manager.dump_all_nondata_pools(args["logs_directory"], args["exclude_info_maps"], "block")
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
@@ -370,25 +396,24 @@ class TaskManager:
     def handle_input_data_audit(
         args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
-        """Validates input data saves metadata properies to CSV."""
+        """Validates input data saves metadata properties to CSV."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_input_data_audit.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
-        is_data_valid = input_manager.start_data_processing(args["metadata_file_path"], eager_termination)
+        is_data_valid = input_manager.start_data_processing(Path(args["metadata_file_path"]), eager_termination)
         output_manager.add_log(
             "Validation complete", f"{args['output_prefix']} validation status: {is_data_valid}", info_map
         )
-        output_manager.add_log("Validation start", f"Validating data for {args['metadata_file_path']}...", info_map)
 
         output_manager.add_log(
             "Saving metadata properties",
-            f"Saving metadata properties {args['metadata_file_path']} at {args['output_directory']}",
+            f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
             info_map,
         )
-        input_manager.save_metadata_properties(args["output_directory"])
+        input_manager.save_metadata_properties(args["logs_directory"])
 
         return is_data_valid
 
@@ -428,7 +453,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-        input_manager.dump_get_data_logs(args["output_directory"])
+        input_manager.dump_get_data_logs(args["logs_directory"])
 
         if load_pool_from_file:
             output_manager.flush_pools()
@@ -436,18 +461,18 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
-
         if save_results:
             output_manager.save_results(
-                args["output_directory"],
                 args["filters_directory"],
                 args["exclude_info_maps"],
                 produce_graphics,
+                args["report_directory"],
                 args["graphics_directory"],
-                args["CSV_directory"],
+                args["csv_output_directory"],
+                args["json_output_directory"],
             )
         output_manager.dump_all_nondata_pools(
-            args["output_directory"], args["exclude_info_maps"], args["variable_name_style"]
+            args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
         )
 
     @staticmethod
