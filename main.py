@@ -29,6 +29,7 @@ def main() -> None:
             clear_output_directory=cmd_arguments.clear_output,
             produce_graphics=not cmd_arguments.no_graphics,
             suppress_log_files=cmd_arguments.suppress_log_files,
+            metadata_depth_limit=cmd_arguments.metadata_depth_limit,
         )
     except Exception as e:
         info_map = {
@@ -108,6 +109,9 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
         "--logs-dir",
         help="The directory for saving log files too",
         default="output/logs",
+    )
+    parser.add_argument(
+        "-m", "--metadata-depth-limit", help="Overrides the default metadata depth limit in the Input Manager", type=int
     )
     return parser.parse_args(args)
 

@@ -63,7 +63,7 @@ def test_task_manager_start_exception(task_manager: TaskManager, mocker: MockerF
     mocker.patch.object(task_manager.input_manager, "start_data_processing", new_callable=MagicMock, return_value=False)
     with pytest.raises(Exception) as exc_info:
         task_manager.start(
-            Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), Path("fake/logs"), True, False, False
+            Path("/fake/path"), LogVerbosity.LOGS, False, Path("/fake/output"), Path("fake/logs"), True, False, False, None
         )
     assert "Task Manager's input data is invalid." in str(exc_info.value)
 
