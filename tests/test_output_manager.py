@@ -854,6 +854,9 @@ def output_manager_original_method_states(
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
         "_stringify_units": mock_output_manager._stringify_units,
+        "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
+        "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
+        "filter_saved_pools": mock_output_manager.filter_saved_pools,
     }
 
 
@@ -1809,6 +1812,10 @@ def test_save_results(
             mock_output_manager.filter_saved_pools.assert_called()
 
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
+    mock_output_manager._save_current_variable_pool = output_manager_original_method_states[
+        "_save_current_variable_pool"]
+    mock_output_manager._sort_saved_chunk_files = output_manager_original_method_states["_sort_saved_chunk_files"]
+    mock_output_manager.filter_saved_pools = output_manager_original_method_states["filter_saved_pools"]
 
 
 @pytest.mark.parametrize(
@@ -1838,6 +1845,7 @@ def test_save_results_report_generation(
     reports_dir = Path("output/reports/")
     graphics_dir = Path("outputs/graphics_dir")
     mock_output_manager.variables_pool = {}
+    mock_output_manager.chunkification = False
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
     mock_output_manager._list_filter_files_in_dir = MagicMock(
@@ -2617,8 +2625,7 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     output_manager = OutputManager()
 
     info_map = {
-        "class": output_manager.__class__.__name__,
-        "function": output_manager._save_current_variable_pool.__name__,
+        'class': 'OutputManager', 'function': '_save_current_variable_pool'
     }
 
     dummy_saved_pool_chunks_num = 0
@@ -2639,6 +2646,7 @@ def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     mock_add_log = mocker.patch.object(output_manager, "add_log")
 
     output_manager._save_current_variable_pool()
+    print("11111111")
 
     mock_create_directory.assert_called_once_with(output_manager.saved_pool_chunks_path)
     mock_generate_file_name.assert_called_once_with(f"saved_pool_{dummy_saved_pool_chunks_num}", "json")
