@@ -245,7 +245,7 @@ class OutputManager(object):
         self.variables_pool = {}
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_chunks_num += 1
-    
+
     def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
@@ -1035,16 +1035,14 @@ class OutputManager(object):
         the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
         """
         list_of_dumped_files: List[Path] = [
-            file for file in self.saved_pool_chunks_path.iterdir()
-            if file.is_file() and file.name.endswith(".json")
+            file for file in self.saved_pool_chunks_path.iterdir() if file.is_file() and file.name.endswith(".json")
         ]
-        list_of_dumped_files.sort(
-            key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0])
-        )
+        list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
 
-    def filter_saved_pools(self, filter_content: Dict[str, Any],
-                           list_of_dumped_files: List[Path]) -> Dict[str, OutputManager.pool_element_type]:
+    def filter_saved_pools(
+        self, filter_content: Dict[str, Any], list_of_dumped_files: List[Path]
+    ) -> Dict[str, OutputManager.pool_element_type]:
         """
         Filters saved pools of data by applying specific filter criteria.
 
