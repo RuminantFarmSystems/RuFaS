@@ -106,8 +106,7 @@ class Time:
         As soon as the current day is greater than the number of days in the year,
         the day is reset to 1 and the year is incremented by 1.
         """
-
-        return self.end_simulation or (self.current_date.month == 12 and self.current_date.day == 31)
+        return self.end_simulation() or (self.current_date.month == 12 and self.current_date.day == 31)
 
     def end_simulation(self) -> bool:
         """
@@ -116,7 +115,6 @@ class Time:
         Returns:
             bool: True if the simulation has ended, false otherwise
         """
-
         return self.current_date > self.end_date
 
     def record_time(self) -> None:
