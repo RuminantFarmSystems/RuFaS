@@ -857,7 +857,7 @@ class Manure:
         manure_water_extractable_phosphorus: float,
         rainfall_to_dry_manure_ratio: float,
         is_from_cow: bool,
-        organic_phosphorus: bool
+        organic_phosphorus: bool,
     ) -> float:
         """
         Determines the amount of water extractable inorganic phosphorus leached by rainfall

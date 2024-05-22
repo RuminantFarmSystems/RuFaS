@@ -235,9 +235,7 @@ def test_determine_phosphorus_leached_from_surface(
     Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, expected_covered_area)
     Manure._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
     if organic:
-        Manure._determine_water_extractable_phosphorus_leached.assert_called_once_with(
-            phosphorus_mass, 0.4, True, True
-        )
+        Manure._determine_water_extractable_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4, True, True)
     else:
         Manure._determine_water_extractable_phosphorus_leached.assert_called_once_with(
             phosphorus_mass, 0.4, True, False
