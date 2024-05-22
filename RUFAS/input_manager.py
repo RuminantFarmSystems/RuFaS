@@ -2172,11 +2172,11 @@ class InputManager:
             "function": self._validate_properties.__name__,
         }
 
-        stack = [(self.__metadata["properties"], 0, [])]
-        current_max_depth = 0
-        deepest_path = []
+        stack: list[tuple[dict[str, Any], int, list[str]]] = [(self.__metadata["properties"], 0, [])]
+        current_max_depth: int = 0
+        deepest_path: list[str] = []
 
-        type_to_validator_map: Dict[str, Callable] = {
+        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], None]] = {
             "number": self._metadata_number_validator,
             "array": self._metadata_array_validator,
             "bool": self._metadata_bool_validator,
@@ -2220,23 +2220,23 @@ class InputManager:
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
-    def _metadata_number_validator(self, key_path: List[str], value: dict) -> None:
+    def _metadata_number_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
         """Validator function for array type properties in metadata."""
         pass
 
-    def _metadata_string_validator(self, key_path: List[str], value: dict) -> None:
+    def _metadata_string_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
         """Validator function for string type properties in metadata."""
         pass
 
-    def _metadata_bool_validator(self, key_path: List[str], value: dict) -> None:
+    def _metadata_bool_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
         """Validator function for bool type properties in metadata."""
         pass
 
-    def _metadata_array_validator(self, key_path: List[str], value: dict) -> None:
+    def _metadata_array_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
         """Validator function for array type properties in metadata."""
         pass
 
-    def _metadata_object_validator(self, key_path: List[str], value: dict) -> None:
+    def _metadata_object_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
         """Validator function for object type properties in metadata."""
         pass
 

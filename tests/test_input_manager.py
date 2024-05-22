@@ -3814,7 +3814,7 @@ def test_validate_array_container_properties(
     properties_blob_key: str,
     expected_result: bool,
     expected_warning: str,
-):
+) -> None:
     """
     Unit test for the _validate_array_container_properties() method of the InputManager class.
     """
@@ -3917,7 +3917,7 @@ def test_array_type_validator(
     patch_container_valid: bool,
     patch_element_valid: bool,
     expected_result: bool,
-):
+) -> None:
     """
     Unit test for the _array_type_validator() method of the InputManager class.
     """
@@ -4168,10 +4168,10 @@ def test_parse_metadata_properties(
     expected_primitive_call_counts: Dict[str, int],
     expected_create_record_call_count: int,
     expected_results: List[Dict[str, str]],
-):
+) -> None:
     """Tests _parse_metadata_properties() function in InputManager."""
 
-    def side_effect_check_property_type_primitive(value):
+    def side_effect_check_property_type_primitive(value) -> bool:
         """Function to mock check_property_type_primitive dynamically."""
         return value.get("type") in ["string", "number"]
 
@@ -4217,7 +4217,7 @@ def test_parse_metadata_properties(
 )
 def test_check_property_type_primitive(
     mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
-):
+) -> None:
     """Tests _check_property_type_primitive() function in InputManager."""
     result = mock_input_manager._check_property_type_primitive(property_dict)
     assert result == expected_result
@@ -4264,8 +4264,8 @@ def test_check_property_type_primitive(
     ],
 )
 def test_create_record(
-    mock_input_manager: InputManager, data_entry: Dict[str, str], name: str, expected_record: Dict[str, str]
-):
+    mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
+) -> None:
     """Tests _create_record() function in InputManager."""
     result = mock_input_manager._create_record(data_entry, name)
     assert result == expected_record
