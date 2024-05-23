@@ -4,15 +4,31 @@
             "input_file": "input/data/tasks/may6_ff.json",
             "output_path": "C:/Users/jw2574/SA_outputs/",
             "report_name": "report_SA",
-            "plot_whole_new": true,
-            "only_inputs": false
+            "only_inputs": false,
+            "plot_whole_new": false,
+            "inputs_to_collate": [
+                "animal animal_config management_decisions breeding_start_day_h"
+            ],
+            "plot_inputs": false,
+            "outputs_to_collate": [
+                "total herd enteric methane, kg_ver_hor_agg"
+            ],
+            "plot_outputs": false
         },
         {
             "input_file": "input/data/tasks/may5b_tasks.json",
             "output_path": "C:/Users/jw2574/OneDrive - Cornell University/RuFaS/Sensitivity Analyses/may5b_/",
             "report_name": "report_SA",
-            "plot_whole_new": true,
-            "only_inputs": false
+            "only_inputs": false,
+            "plot_whole_new": false,
+            "inputs_to_collate": [
+                "animal animal_config management_decisions breeding_start_day_h"
+            ],
+            "plot_inputs": false,
+            "outputs_to_collate": [
+                "total herd enteric methane, kg_ver_hor_agg"
+            ],
+            "plot_outputs": false
         }
     ]
 }

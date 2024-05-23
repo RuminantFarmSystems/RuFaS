@@ -14,7 +14,10 @@ from SALib.sample import sobol as sobol_sampler
 from SALib.analyze import sobol as sobol_analyzer
 from SALib.analyze import ff as ff_analyzer
 # from SALib.test_functions import Ishigami
-
+from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+import statsmodels.api as sm
+from scipy import stats
 
 def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     """
@@ -23,8 +26,8 @@ def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     This will place the main effects and interaction effects into grouped columns in a single dataframe
     """
     intnames = analysis["interaction_names"]
-    intnames = [str(x).replace("(", "") for x in intnames]
-    intnames = [str(x).replace(")", "") for x in intnames]
+    intnames = [str(x).replace('(', "") for x in intnames]
+    intnames = [str(x).replace(')', "") for x in intnames]
     intnames = [str(x).replace(",", "*") for x in intnames]
     intnames = [str(x).replace(" ", "") for x in intnames]
     colnames = ["ME:" + x for x in analysis["names"]] + ["IE:" + str(x) for x in intnames]
@@ -237,3 +240,57 @@ def plot_whole_new(output_path: str,
     # plt.show(block=False)
     plt.savefig(output_path + output_prefix + "whole_new_heatmap.jpg")
     plt.close()
+
+
+def regression_stuff(X: List[float], xname: str, Y: List[float], yname: str, plot_inputs: bool) -> Any:
+    # Create linear regression object
+    # regr = linear_model.LinearRegression()
+
+    # X = input_values
+    # Y = output_values
+
+    # # diabetes = datasets.load_diabetes()
+    # # X = diabetes.data
+    # y = diabetes.target
+
+    X2 = sm.add_constant(X)
+    est = sm.OLS(Y, X2)
+    est2 = est.fit()
+    print(est2.summary())
+    R2_etc = est2.summary2().tables[0]
+    r2_value = R2_etc[3][0]
+    p_etc = est2.summary2().tables[1]
+    intercept_value = p_etc["Coef."]["const"]
+    slope = p_etc["Coef."]["x1"]
+    p_value = p_etc["P>|t|"]["x1"]
+
+    # X = np.array(X).reshape(-1,1)
+    # Y = np.array(Y)
+    # # Train the model using the training sets
+    # regr.fit(X, Y)
+
+    # # Make predictions using the testing set
+    # y_pred = regr.predict(X)
+
+    # # The coefficients
+    # print("Coefficients: \n", regr.coef_)
+    # # The mean squared error
+    # print("Mean squared error: %.2f" % mean_squared_error(Y, y_pred))
+    # # The coefficient of determination: 1 is perfect prediction
+    # r2 = r2_score(Y, y_pred)
+    # print("Coefficient of determination: %.2f" % r2)
+
+    if plot_inputs:
+        # Plot outputs
+        fig, ax = plt.subplots()
+        plt.scatter(X, Y, color="black")
+        ax.axline((0, intercept_value), slope=slope)
+        ax.set_xlim(min(X) * 0.99, max(X) * 1.01)
+
+        # plt.xticks(())
+        # plt.yticks(())
+        plt.xlabel(xname)
+        plt.ylabel(yname)
+        plt.show()
+
+    return (slope, r2_value, p_value)
