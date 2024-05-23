@@ -45,7 +45,7 @@ def test_advance(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     for n in range(365):
         time.advance()
         assert time.simulation_day == n + 1
-        assert time.current_date == time.start_date + datetime.timedelta(days=n+1)
+        assert time.current_date == time.start_date + datetime.timedelta(days=n + 1)
 
 
 def test_current_julian_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
@@ -53,7 +53,7 @@ def test_current_julian_day(mock_config: Dict[str, Any], mocker: MockerFixture) 
     time = Time()
 
     for n in range(364):
-        assert time.current_julian_day == 2+n
+        assert time.current_julian_day == 2 + n
         time.advance()
 
     assert time.current_julian_day == 1
