@@ -1091,7 +1091,7 @@ class OutputManager(object):
 
         return filtered_pool
 
-    def save_results(
+    def save_results(   # noqa: C901
         self,
         filters_dir_path: Path,
         exclude_info_maps: bool,
