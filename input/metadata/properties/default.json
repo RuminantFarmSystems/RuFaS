@@ -833,6 +833,12 @@
         "type": "number",
         "minimum": 1,
         "default": 30
+      },
+      "phosphorus_requirement_buffer": {
+        "description": "Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50.",
+        "type": "number",
+        "minimum": 0,
+        "default": 75
       }
     },
     "pen_information": {

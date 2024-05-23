@@ -143,6 +143,7 @@
 	"methane_mitigation_method": "None",
 	"methane_mitigation_additive_amount": 0.0,
 	"ration": {
+		"phosphorus_requirement_buffer": 75,
 		"user_input": false,
 		"formulation_interval": 7
 	},
