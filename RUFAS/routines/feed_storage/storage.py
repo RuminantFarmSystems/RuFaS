@@ -6,6 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -67,7 +68,7 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
         Resets mass related attributes after loss of dry matter.
-    record_stored_crops(self, gaseous_dry_matter_loss: float)
+    record_stored_crops(self)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
@@ -148,7 +149,16 @@ class Storage:
         time : Time
             Time instance tracking the current time of the simulation.
 
+        Notes
+        -----
+        This method also records the total amount of gaseous dry matter loss happened from all stored crops.
+
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
             weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
@@ -172,7 +182,8 @@ class Storage:
 
             crop.last_time_degraded = copy.deepcopy(time)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
-        self.record_stored_crops(total_gaseous_dry_matter_loss)
+        om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        self.record_stored_crops()
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
@@ -190,7 +201,8 @@ class Storage:
 
     def reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
         """
-        Resets the mass attributes of a crop after dry matter loss.
+        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after a loss of dry
+        matter.
 
         Parameters
         ----------
@@ -200,19 +212,72 @@ class Storage:
             Amount of dry matter the crop lost on the current day in kg.
 
         """
-        pass
+        new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
+        crop.fresh_mass -= dry_matter_loss
+        if crop.fresh_mass == 0.0:
+            crop.dry_matter_percentage = 0.0
+            return
+        crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-    def record_stored_crops(self, gaseous_dry_matter_loss: float) -> None:
+    def record_stored_crops(self) -> None:
         """
         Records the total mass and nutrient amounts held in storage.
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
+        om.add_variable("total_fresh_mass", self.stored_mass, info_map)
+
+        total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
+        om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
+
+        total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
+        om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
+
+        total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
+        om.add_variable("total_crude_protein", total_crude_protein, info_map)
+
+        total_non_protein_nitrogen = self._get_total_nutritive_amount("non_protein_nitrogen")
+        om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
+
+        total_starch = self._get_total_nutritive_amount("starch")
+        om.add_variable("total_starch", total_starch, info_map)
+
+        total_adf = self._get_total_nutritive_amount("adf")
+        om.add_variable("total_adf", total_adf, info_map)
+
+        total_ndf = self._get_total_nutritive_amount("ndf")
+        om.add_variable("total_ndf", total_ndf, info_map)
+
+        total_lignin = self._get_total_nutritive_amount("lignin")
+        om.add_variable("total_lignin", total_lignin, info_map)
+
+        total_sugar = self._get_total_nutritive_amount("sugar")
+        om.add_variable("total_sugar", total_sugar, info_map)
+
+        total_ash = self._get_total_nutritive_amount("ash")
+        om.add_variable("total_ash", total_ash, info_map)
+
+    def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
+        """
+        Calculates the total amount of the specifed nutrient that is currently held in storage.
 
         Parameters
         ----------
-        gaseous_dry_matter_loss : float
-            Total amount of gaseous dry matter lost from storage in kg.
+        nutrient_name : str
+            The name of the target nutrient attribute in HarvestedCrop.
+
+        Returns
+        -------
+        float
+            Total amount of the target nutrient in the stored crops in kg.
 
         """
-        pass
+        total_nutrient: float = sum(
+            [
+                getattr(crop, nutrient_name) * GeneralConstants.PERCENTAGE_TO_FRACTION * crop.dry_matter_mass
+                for crop in self.stored
+            ]
+        )
+        return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]

@@ -11,6 +11,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
+from RUFAS.general_constants import GeneralConstants
 
 import scipy
 
@@ -481,7 +482,7 @@ class RationReporter:
                 if nutr == "DM":
                     if available_feeds[key][nutr]:
                         nutrient_amount["as_fed"] += val / (
-                            available_feeds[key][nutr] / 100
+                            available_feeds[key][nutr] * GeneralConstants.PERCENTAGE_TO_FRACTION
                         )
                 elif nutr == "N":
                     # [A.2.A.2]
@@ -491,21 +492,21 @@ class RationReporter:
                     else:
                         denom = 6.25
                     nutrient_amount[nutr] += (
-                        available_feeds[key]["CP"] / (denom * 100)
+                        available_feeds[key]["CP"] / (denom * GeneralConstants.FRACTION_TO_PERCENTAGE)
                     ) * val
                 else:
                     if nutr == "DE":
                         if available_feeds[key]["DE"] != -1:
                             nutrient_amount[nutr] += val * (
-                                available_feeds[key]["DE"] / 100
+                                available_feeds[key]["DE"]
                             )
                         else:
                             nutrient_amount[nutr] += val * (
-                                available_feeds[key]["DE_Base"] / 100
+                                available_feeds[key]["DE_Base"]
                             )
                     else:
                         nutrient_amount[nutr] += val * (
-                            available_feeds[key][nutr] / 100
+                            available_feeds[key][nutr] * GeneralConstants.PERCENTAGE_TO_FRACTION
                         )
 
         dm_amount = nutrient_amount["dm"]
@@ -514,12 +515,14 @@ class RationReporter:
         for nutr in nutrients:
             if nutr == "DM":
                 if nutrient_amount["as_fed"]:
-                    nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"]) * 100
+                    nutrient_conc["dm"] = (
+                        (dm_amount / nutrient_amount["as_fed"]) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    )
                 else:
                     nutrient_conc["dm"] = 0.0
             else:
                 # all values on a 100% dry matter basis
-                nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
+                nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * GeneralConstants.FRACTION_TO_PERCENTAGE
         return nutrient_amount, nutrient_conc
 
     @classmethod
@@ -1041,7 +1044,7 @@ class RationReporter:
         for item in ration:
             if available_feeds[item]["feed_type"] == "Conc":
                 is_conc.append(ration[item])
-        DMI_conc_percentage = sum(is_conc) / DMI_estimate * 100
+        DMI_conc_percentage = sum(is_conc) / DMI_estimate * GeneralConstants.FRACTION_TO_PERCENTAGE
         Kp = []
         RUP_list = []
         RDP_list = []
