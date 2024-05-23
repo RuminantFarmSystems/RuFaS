@@ -1718,5 +1718,9 @@ class OutputManager(object):
             self.clear_output_dir(variables_file_path, output_directory)
 
         if chunkification:
-            self.setup_pool_overflow_control(output_directory, max_memory_usage_percent, max_memory_usage,
-            save_chunk_threshold_call_count)
+            self.setup_pool_overflow_control(
+                output_directory,
+                max_memory_usage_percent,
+                max_memory_usage,
+                save_chunk_threshold_call_count
+            )
