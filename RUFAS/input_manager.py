@@ -2390,10 +2390,10 @@ class InputManager:
 
     def _validate_metadata_properties_keys(
         self,
-        required_properties_keys: Set[str],
-        valid_properties_keys: Set[str],
-        properties: Dict[str, Any],
-        path: List[str],
+        required_properties_keys: set[str],
+        valid_properties_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
     ):
         """Validates that keys in the metadata properties sections."""
         info_map = {
@@ -2418,7 +2418,7 @@ class InputManager:
             )
             raise ValueError
 
-    def _metadata_object_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
+    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
         """Validator function for object type properties in metadata."""
         pass
 
