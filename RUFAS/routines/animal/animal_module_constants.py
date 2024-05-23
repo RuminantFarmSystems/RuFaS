@@ -77,11 +77,11 @@ class AnimalModuleConstants:
     """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
 
     MINIMUM_DMI_LACT: float = 2.0
-    """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation, 
+    """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
     the mimimum DMI is 3.94 kg/day (Reed et al. 2015)"""
 
     MINIMUM_DMI_DRY: float = 2.0
-    """Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation, 
+    """Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation,
     the minimum DMI is 7.1 kg/day (Appuhamy 2018)"""
 
     MINIMUM_PHOSPHORUS: float = 0.0
