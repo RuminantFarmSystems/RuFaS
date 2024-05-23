@@ -162,9 +162,13 @@ class Weather:
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
-        year = time.year
-        day = time.day
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.calendar_year)
+        year = time.current_simulation_year
+        day = time.current_julian_day
+        month = time.current_month
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
+        year = time.current_simulation_year
+        day = time.current_julian_day
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.current_calendar_year)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -200,12 +204,12 @@ class Weather:
             Series of current day conditions in chronological order.
 
         """
-        current_date = Utility.convert_ordinal_date_to_month_date(time.calendar_year, time.day)
+        current_date = Utility.convert_ordinal_date_to_month_date(time.current_calendar_year, time.current_julian_day)
         date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
 
-        starting_year_index = time.year - (current_date.year - date_series[0].year)
+        starting_year_index = time.current_simulation_year - (current_date.year - date_series[0].year)
         starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
-        ending_year_index = time.year + (date_series[-1].year - current_date.year)
+        ending_year_index = time.current_simulation_year + (date_series[-1].year - current_date.year)
         ending_day_index = date_series[-1].toordinal() - date(date_series[-1].year, 1, 1).toordinal() + 1
         conditions_series = []
         for year in range(starting_year_index, ending_year_index + 1):
