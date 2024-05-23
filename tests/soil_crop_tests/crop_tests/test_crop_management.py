@@ -199,7 +199,8 @@ def test_manage_harvest(
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, mock_time.calendar_year, mock_time.day)
+        record_yield.assert_called_once_with(field_name, field_size, mock_time.current_calendar_year,
+                                             mock_time.current_julian_day)
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 
