@@ -495,14 +495,9 @@ class InputManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
-            om.add_error(
-                "Missing required data",
-                f"Key {var_name} not found in data. A value is required for update variable during runtime.",
-                info_map,
-            )
-            raise KeyError(
-                f"Key {var_name} not found in data. A value is required for update variable during runtime."
-            )
+            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime.",
+            om.add_error("Missing required data", error_msg, info_map)
+            raise KeyError(error_msg)
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
             om.add_error(
