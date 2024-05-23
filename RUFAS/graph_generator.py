@@ -65,10 +65,26 @@ TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter", "barbs", "hexbin", "
 # Unsupported Matplotlib functions don't work in our current setup of Graph Generator either as consecutive call
 # functions or TUPLE_BASED_FUNCTIONS. There are multiple reasons for each function not working documented here:
 # https://docs.google.com/spreadsheets/d/10fPdoS5YejYPidYvAmEBkMNq0X9nMqYdta-qduOk42s/edit#gid=0
-UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = ["area", "bar", "broken_barh", "contour", "filled-contour", "hist2d",
-                                          "horizontal_bar", "horizontal_line", "horizontal_lines", "imshow",
-                                          "pcolor", "pcolormesh", "quiver_key", "step", "streamplot", "tripcolor",
-                                          "vertical_line", "vertical_lines"]
+UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = [
+    "area",
+    "bar",
+    "broken_barh",
+    "contour",
+    "filled-contour",
+    "hist2d",
+    "horizontal_bar",
+    "horizontal_line",
+    "horizontal_lines",
+    "imshow",
+    "pcolor",
+    "pcolormesh",
+    "quiver_key",
+    "step",
+    "streamplot",
+    "tripcolor",
+    "vertical_line",
+    "vertical_lines",
+]
 
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
