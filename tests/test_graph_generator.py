@@ -109,12 +109,14 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             ],
             True,
         ),
-    ]
+    ],
 )
-def test_generate_graph_without_producing_graphics(graph_generator: GraphGenerator,
-                                                   graph_details: list[dict[str, str]],
-                                                   expected_output: dict[str, str | dict[str, Any]],
-                                                   produce_graphics: bool) -> None:
+def test_generate_graph_without_producing_graphics(
+    graph_generator: GraphGenerator,
+    graph_details: list[dict[str, str]],
+    expected_output: dict[str, str | dict[str, Any]],
+    produce_graphics: bool,
+) -> None:
     filtered_pool = {"dummy_key": {"dummy_data": [1, 2, 3]}}
     graph_details = graph_details
     filter_file_name = "dummy_filter"
