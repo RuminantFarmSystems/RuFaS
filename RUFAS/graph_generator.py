@@ -21,7 +21,7 @@ else:
     # Use the 'TkAgg' backend when a display is available
     matplotlib.use("TkAgg")
 
-FUNCTION_TYPE = Callable[..., None]
+FUNCTION_TYPE = Callable[..., Any]
 
 MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
     "area": plt.fill_between,
@@ -60,7 +60,15 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter"]
+TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter", "barbs", "hexbin", "quiver", "spy"]
+
+# Unsupported Matplotlib functions don't work in our current setup of Graph Generator either as consecutive call
+# functions or TUPLE_BASED_FUNCTIONS. There are multiple reasons for each function not working documented here:
+# https://docs.google.com/spreadsheets/d/10fPdoS5YejYPidYvAmEBkMNq0X9nMqYdta-qduOk42s/edit#gid=0
+UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = ["area", "bar", "broken_barh", "contour", "filled-contour", "hist2d",
+                                          "horizontal_bar", "horizontal_line", "horizontal_lines", "imshow",
+                                          "pcolor", "pcolormesh", "quiver_key", "step", "streamplot", "tripcolor",
+                                          "vertical_line", "vertical_lines"]
 
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
@@ -161,6 +169,15 @@ class GraphGenerator:
                 {
                     "error": f"Can't plot {graph_details.get('title')} data set",
                     "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": info_map,
+                }
+            ]
+            return all_logs
+        if graph_details.get("type") in UNSUPPORTED_GRAPH_FUNCTIONS:
+            all_logs = [
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": f"Graph type '{graph_details.get('type')}' not supported at this time.",
                     "info_map": info_map,
                 }
             ]
