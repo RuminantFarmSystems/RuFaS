@@ -63,8 +63,21 @@ def test_current_month(mock_config: Dict[str, Any], mocker: MockerFixture) -> No
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
     time = Time()
 
-    months = [1] * 30 + [2] * 28 + [3] * 31 + [4] * 30 + [5] * 31 + [6] * 30 + [7] * 31 + [8] * 31 + [9] * 30 + \
-             [10] * 31 + [11] * 30 + [12] * 31 + [1]
+    months = (
+        [1] * 30
+        + [2] * 28
+        + [3] * 31
+        + [4] * 30
+        + [5] * 31
+        + [6] * 30
+        + [7] * 31
+        + [8] * 31
+        + [9] * 30
+        + [10] * 31
+        + [11] * 30
+        + [12] * 31
+        + [1]
+    )
 
     for n in range(365):
         assert time.current_month == months[n]
