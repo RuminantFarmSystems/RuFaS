@@ -14,6 +14,7 @@ for analysis in config_json['analyses']:
     output_path = analysis["output_path"]
     report_name = analysis["report_name"]
     plot_whole_new = analysis["plot_whole_new"]
+    only_inputs = analysis["only_inputs"]
 
     with open(input_file) as json_file:
         input_config = json.load(json_file)
@@ -26,7 +27,16 @@ for analysis in config_json['analyses']:
     sampled_values = SA_helpers.get_sampled_values(task_to_analyze,
                                                    parsed_SA_input_variables)
     total_num_files = len(sampled_values)
-
+    if only_inputs:
+        print("true")
+        namesfornames = [name for name in parsed_SA_input_variables["names"]]
+        print(namesfornames)
+        with open(output_path + output_prefix + "_inputs.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(namesfornames)
+            writer.writerows(sampled_values)
+        break
+    print("didn't break")
     all_report_filenames = SA_helpers.get_all_output_files(
         basedirectory=output_path,
         output_prefix=output_prefix,
