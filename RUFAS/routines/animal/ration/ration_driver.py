@@ -506,7 +506,7 @@ class RationReporter:
                             )
                     else:
                         nutrient_amount[nutr] += val * (
-                            available_feeds[key][nutr]  * GeneralConstants.PERCENTAGE_TO_FRACTION
+                            available_feeds[key][nutr] * GeneralConstants.PERCENTAGE_TO_FRACTION
                         )
 
         dm_amount = nutrient_amount["dm"]
