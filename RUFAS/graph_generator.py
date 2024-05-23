@@ -21,7 +21,7 @@ else:
     # Use the 'TkAgg' backend when a display is available
     matplotlib.use("TkAgg")
 
-FUNCTION_TYPE = Callable[..., None]
+FUNCTION_TYPE = Callable[..., Any]
 
 MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
     "area": plt.fill_between,
@@ -169,6 +169,15 @@ class GraphGenerator:
                 {
                     "error": f"Can't plot {graph_details.get('title')} data set",
                     "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": info_map,
+                }
+            ]
+            return all_logs
+        if graph_details.get("type") in UNSUPPORTED_GRAPH_FUNCTIONS:
+            all_logs = [
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": f"Graph type '{graph_details.get('type')}' not supported at this time.",
                     "info_map": info_map,
                 }
             ]
