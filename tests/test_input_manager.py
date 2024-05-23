@@ -2,7 +2,6 @@ import json
 from functools import reduce
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Type, Union, Optional
-from typing import Tuple
 from unittest.mock import ANY
 
 import pandas as pd
@@ -49,8 +48,6 @@ def input_manager_original_method_states(
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
         "_populate_pool": mock_input_manager._populate_pool,
-        "_filter_input_array_data_by_metadata": mock_input_manager._filter_input_array_data_by_metadata,
-        "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
         "_log_missing_data": mock_input_manager._log_missing_data,
         "_validate_input_by_type": mock_input_manager._validate_input_by_type,
@@ -277,101 +274,6 @@ def test_start_data_processing(
     patch_for_validate_metadata.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_result",
-    [
-        (
-            {"key1": "value1", "key2": "value2"},
-            {"key1": {"default": "value3"}},
-            {"key1": "value1"},
-        ),
-        (
-            {"key1": {"nested_key1": "value1", "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"default": "value2"}}},
-            {"key1": {"nested_key1": "value1"}},
-        ),
-        (
-            {"key1": {"nested_key1": ["value1", "value2"], "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"type": "array", "properties": {"default": "value1"}}}},
-            {"key1": {"nested_key1": ["value1", "value2"]}},
-        ),
-        (
-            {"key1": {"nested_key1": [{"key3": 1, "key4": 2}, {"key3": 3, "key4": 4}], "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"type": "array", "properties": {"key3": {"default": 2}}}}},
-            {"key1": {"nested_key1": [{"key3": 1}, {"key3": 3}]}},
-        ),
-    ],
-)
-def test_filter_input_data_by_metadata(
-    mock_input_manager: InputManager,
-    input_data: Dict[str, Any],
-    metadata_properties: Dict[str, Any],
-    expected_result: Dict[str, Any],
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for function _filter_input_data_by_metadata() in file input_manager.py"""
-    filtered_input_data = mock_input_manager._filter_input_data_by_metadata(input_data, metadata_properties)
-    assert filtered_input_data == expected_result
-
-    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
-        "_filter_input_data_by_metadata"
-    ]
-
-
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_result",
-    [
-        (
-            [],
-            {"key1": {"default": "value3"}},
-            [],
-        ),
-        (
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {
-                "type": "array",
-                "properties": {
-                    "type": "object",
-                    "a": {"type": "number"},
-                    "b": {"type": "string"},
-                    "c": {"type": "bool"},
-                },
-            },
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-        ),
-        (
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {"type": "array", "properties": {"type": "object", "a": {"type": "number"}, "b": {"type": "string"}}},
-            [{"a": 1, "b": "A"}, {"a": 2, "b": "B"}, {"a": 3, "b": "C"}],
-        ),
-        (
-            [[1, 2, 3, 1.1, 2.2, 3.3]],
-            {"type": "array", "properties": {"type": "number"}},
-            [[1, 2, 3, 1.1, 2.2, 3.3]],
-        ),
-        (
-            [[1, 2, 3], [1.1, 2.2, 3.3]],
-            {"type": "array", "properties": {"type": "array", "properties": {"type": "number"}}},
-            [[1, 2, 3], [1.1, 2.2, 3.3]],
-        ),
-    ],
-)
-def test_filter_input_array_data_by_metadata(
-    mock_input_manager: InputManager,
-    input_data: List[Any],
-    metadata_properties: Dict[str, Any],
-    expected_result: List[Any],
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for function _filter_input_array_data_by_metadata() in file input_manager.py"""
-    filtered_input_data = mock_input_manager._filter_input_array_data_by_metadata(input_data, metadata_properties)
-    assert filtered_input_data == expected_result
-
-    mock_input_manager._filter_input_array_data_by_metadata = input_manager_original_method_states[
-        "_filter_input_array_data_by_metadata"
-    ]
-
-
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
@@ -410,12 +312,6 @@ def test_populate_pool_valid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: True)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -446,12 +342,6 @@ def test_populate_pool_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
     elements_counter = ElementsCounter()
@@ -483,12 +373,6 @@ def test_populate_pool_partial_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=[True, False, True, False])
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -496,7 +380,7 @@ def test_populate_pool_partial_invalid(
     result = input_manager._populate_pool(eager_termination=False)
 
     # Assert
-    assert result
+    assert result is False
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
     assert "element1" in input_manager.pool["file1"]
@@ -524,12 +408,6 @@ def test_populate_pool_eager_termination(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -3275,257 +3153,6 @@ def test_add_variable_to_pool_nested(
         assert result
         assert patch_for_add_warning.call_count == expected_add_warning_call_count
         assert input_manager.get_data(variable_name) == list(data.values())[0]
-
-
-@pytest.mark.parametrize(
-    "missing_keys, keys_with_defaults, expected_calls",
-    [
-        # Test case with missing keys and keys with default values
-        (
-            ["missingKey1", "missingKey2"],
-            [("keyWithDefault1", "value1"), ("keyWithDefault2", "value2")],
-            {
-                "error_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey2.",
-                    ),
-                ],
-                "warning_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: " "keyWithDefault1 => value1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: " "keyWithDefault2 => value2.",
-                    ),
-                ],
-            },
-        ),
-        # Test case with missing required keys only
-        (
-            ["missingKey1", "missingKey2"],
-            [],
-            {
-                "error_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey2.",
-                    ),
-                ],
-                "warning_calls": [],
-            },
-        ),
-        # Test case with only keys with default values
-        (
-            [],
-            [("keyWithDefault", "defaultValue")],
-            {
-                "error_calls": [],
-                "warning_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: "
-                        "keyWithDefault => defaultValue.",
-                    ),
-                ],
-            },
-        ),
-    ],
-)
-def test_log_missing_keys(
-    missing_keys: List[str],
-    keys_with_defaults: List[Tuple[str, Any]],
-    expected_calls: Dict[str, Tuple[str, str]],
-    mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for the _log_missing_keys method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-    mock_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
-    mock_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-
-    # Act
-    input_manager._log_missing_keys(missing_keys, keys_with_defaults)
-
-    # Assert
-    for call_args in expected_calls["error_calls"]:
-        mock_add_error.assert_any_call(*call_args, mocker.ANY)
-
-    for call_args in expected_calls["warning_calls"]:
-        mock_add_warning.assert_any_call(*call_args, mocker.ANY)
-
-    assert mock_add_error.call_count == len(expected_calls["error_calls"])
-    assert mock_add_warning.call_count == len(expected_calls["warning_calls"])
-
-
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_output",
-    [
-        ({}, {"prop": {"type": "number", "default": 10}}, ({"prop": 10}, [], [("prop", 10)])),
-        (
-            {},
-            {"prop": {"type": "string", "default": "defaultVal"}},
-            ({"prop": "defaultVal"}, [], [("prop", "defaultVal")]),
-        ),
-        ({}, {"prop": {"type": "bool", "default": True}}, ({"prop": True}, [], [("prop", True)])),
-        ({"prop": 5}, {"prop": {"type": "number", "default": 10}}, ({"prop": 5}, [], [])),
-        (
-            {},
-            {
-                "nested": {
-                    "type": "object",
-                    "nestedProp": {"type": "string", "default": "defaultVal"},
-                    "default": {"nestedProp": "defaultVal"},
-                }
-            },
-            ({"nested": {"nestedProp": "defaultVal"}}, [], [("nested", {"nestedProp": "defaultVal"})]),
-        ),
-        (
-            {"nested": {}},
-            {"nested": {"type": "object", "nestedProp": {"type": "string", "default": "defaultVal"}}},
-            ({"nested": {"nestedProp": "defaultVal"}}, [], [("nested.nestedProp", "defaultVal")]),
-        ),
-        (
-            {},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {
-                        "type": "object",
-                        "nestedProp": {"type": "number", "default": 42},
-                    },
-                    "default": [{"nestedProp": 42}],
-                },
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp", [{"nestedProp": 42}])]),
-        ),
-        (
-            {"arrayProp": []},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {
-                        "type": "object",
-                        "nestedProp": {"type": "number", "default": 42},
-                        "default": {"nestedProp": 42},
-                    },
-                },
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp[0]", {"nestedProp": 42})]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {"type": "object", "nestedProp": {"type": "number", "default": 42}},
-                }
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp[0].nestedProp", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {"type": "object", "nestedProp": {"type": "number"}},
-                }
-            },
-            ({"arrayProp": [{}]}, ["arrayProp[0].nestedProp"], []),
-        ),
-    ],
-)
-def test_add_default_values_to_missing_inputs(
-    input_data: Dict[str, Any],
-    metadata_properties: Dict[str, Any],
-    expected_output: Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]],
-) -> None:
-    """
-    Unit test for the _add_default_values_to_missing_inputs method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-
-    # Act
-    output = input_manager._add_default_values_to_missing_inputs(input_data, metadata_properties)
-
-    # Assert
-    assert output == expected_output
-
-
-@pytest.mark.parametrize(
-    "input_data, property_key, property_details, expected_output",
-    [
-        (
-            {"arrayProp": []},
-            "arrayProp",
-            {"properties": {"type": "number", "default": 42}},
-            ([42], [], [("arrayProp[0]", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            "arrayProp",
-            {"properties": {"type": "object", "nestedProp": {"type": "number", "default": 42}}},
-            ([{"nestedProp": 42}], [], [("arrayProp[0].nestedProp", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            "arrayProp",
-            {
-                "properties": {
-                    "type": "object",
-                    "nestedProp1": {"type": "number", "default": 42},
-                    "nestedProp2": {"type": "string", "default": "defaultVal"},
-                }
-            },
-            (
-                [{"nestedProp1": 42, "nestedProp2": "defaultVal"}],
-                [],
-                [("arrayProp[0].nestedProp1", 42), ("arrayProp[0].nestedProp2", "defaultVal")],
-            ),
-        ),
-        (
-            {"arrayProp": [[]]},
-            "arrayProp",
-            {"properties": {"type": "array", "properties": {"type": "number", "default": 99}}},
-            ([[99]], [], [("arrayProp[0][0]", 99)]),
-        ),
-        ({"arrayProp": [42]}, "arrayProp", {"properties": {"type": "number", "default": 99}}, ([42], [], [])),
-        ({"arrayProp": []}, "arrayProp", {"properties": {"type": "number"}}, ([], ["arrayProp[0]"], [])),
-    ],
-)
-def test_add_default_values_to_array_inputs(
-    input_data: Dict[str, Any],
-    property_key: str,
-    property_details: Dict[str, Any],
-    expected_output: Tuple[List[Any], List[str], List[Tuple[str, Any]]],
-) -> None:
-    """
-    Unit test for the _add_default_values_to_array_inputs method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-
-    # Act
-    output = input_manager._add_default_values_to_array_inputs(input_data, property_key, property_details)
-
-    # Assert
-    assert output == expected_output
 
 
 def test_dump_get_data_logs(
