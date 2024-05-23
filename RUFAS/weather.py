@@ -164,10 +164,6 @@ class Weather:
         """
         year = time.current_simulation_year
         day = time.current_julian_day
-        month = time.current_month
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
-        year = time.current_simulation_year
-        day = time.current_julian_day
         daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.current_calendar_year)
         try:
             current_conditions = CurrentDayConditions(
