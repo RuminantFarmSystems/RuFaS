@@ -62,6 +62,14 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
 TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter", "barbs", "hexbin", "quiver", "spy"]
 
+# Unsupported Matplotlib functions don't work in our current setup of Graph Generator either as consecutive call
+# functions or TUPLE_BASED_FUNCTIONS. There are multiple reasons for each function not working documented here:
+# https://docs.google.com/spreadsheets/d/10fPdoS5YejYPidYvAmEBkMNq0X9nMqYdta-qduOk42s/edit#gid=0
+UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = ["area", "bar", "broken_barh", "contour", "filled-contour", "hist2d",
+                                          "horizontal_bar", "horizontal_line", "horizontal_lines", "imshow",
+                                          "pcolor", "pcolormesh", "quiver_key", "step", "streamplot", "tripcolor",
+                                          "vertical_line", "vertical_lines"]
+
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
