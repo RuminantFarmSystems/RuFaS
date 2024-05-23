@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Union, Type
@@ -871,6 +872,11 @@ def output_manager_original_method_states(
         "_route_logs": mock_output_manager._route_logs,
         "print_credits": mock_output_manager.print_credits,
         "_stringify_units": mock_output_manager._stringify_units,
+        "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
+        "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
+        "filter_saved_pools": mock_output_manager.filter_saved_pools,
+        "flush_pools": mock_output_manager.flush_pools,
+        "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
     }
 
 
@@ -1745,13 +1751,18 @@ def test_filter_variables_pool_complex(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics, filter_content, is_faulty",
+    "exclude_info_maps, produce_graphics, filter_content, is_faulty, chunkification",
     [
-        (True, True, [{"filters": ".*", "title": "dummy_title"}], False),
-        (True, False, [{"filters": ".*", "title": "dummy_title"}], False),
-        (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
-        (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
-        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, True),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, True),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, True),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, True),
     ],
 )
 def test_save_results(
@@ -1762,6 +1773,7 @@ def test_save_results(
     produce_graphics: bool,
     filter_content: List[Dict[str, str]],
     is_faulty: bool,
+    chunkification: bool,
 ) -> None:
     # Arrange
     filters_path = Path("filters_path")
@@ -1778,6 +1790,10 @@ def test_save_results(
     route_save_functions = mocker.patch.object(mock_output_manager, "_route_save_functions")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
     mock_output_manager.time = MagicMock()
+    mock_output_manager.chunkification = chunkification
+    mock_output_manager._save_current_variable_pool = MagicMock()
+    mock_output_manager._sort_saved_chunk_files = MagicMock()
+    mock_output_manager.filter_saved_pools = MagicMock(return_value={})
 
     # Act
     mock_output_manager.save_results(
@@ -1809,7 +1825,17 @@ def test_save_results(
                 for file_name in filter_files
             ]
         )
+        if chunkification:
+            mock_output_manager._save_current_variable_pool.assert_called_once()
+            mock_output_manager._sort_saved_chunk_files.assert_called()
+            mock_output_manager.filter_saved_pools.assert_called()
+
     mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
+    mock_output_manager._save_current_variable_pool = output_manager_original_method_states[
+        "_save_current_variable_pool"
+    ]
+    mock_output_manager._sort_saved_chunk_files = output_manager_original_method_states["_sort_saved_chunk_files"]
+    mock_output_manager.filter_saved_pools = output_manager_original_method_states["filter_saved_pools"]
 
 
 @pytest.mark.parametrize(
@@ -1839,6 +1865,7 @@ def test_save_results_report_generation(
     reports_dir = Path("output/reports/")
     graphics_dir = Path("outputs/graphics_dir")
     mock_output_manager.variables_pool = {}
+    mock_output_manager.chunkification = False
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
     mock_output_manager._list_filter_files_in_dir = MagicMock(
@@ -2612,3 +2639,203 @@ def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
 
     # Cleanup
     output_manager._exclude_info_maps_flag = False
+
+
+def test_save_current_variable_pool(
+    mocker: MockerFixture, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    output_manager = OutputManager()
+
+    info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
+
+    dummy_saved_pool_chunks_num = 0
+    dummy_variable_pool = {"a": 1, "b": "B", "c": True}
+
+    output_manager.saved_pool_chunks_path = Path("dummy_path")
+    output_manager.saved_pool_chunks_num = dummy_saved_pool_chunks_num
+    output_manager.variables_pool = dummy_variable_pool
+    output_manager.current_pool_size = 1024
+
+    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
+    mock_generate_file_name = mocker.patch.object(output_manager, "generate_file_name", return_value="dummy_file.json")
+    mock_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
+    mock_add_log = mocker.patch.object(output_manager, "add_log")
+
+    output_manager._save_current_variable_pool()
+
+    mock_create_directory.assert_called_once_with(output_manager.saved_pool_chunks_path)
+    mock_generate_file_name.assert_called_once_with(f"saved_pool_{dummy_saved_pool_chunks_num}", "json")
+
+    dummy_file_path = Path.joinpath(output_manager.saved_pool_chunks_path, "dummy_file.json")
+    mock_dict_to_file_json.assert_called_once_with(
+        data_dict=dummy_variable_pool, path=dummy_file_path, minify_output_file=False
+    )
+
+    log_message = f"Saved the current variable pool to {dummy_file_path}"
+    mock_add_log.assert_called_once_with("save_current_variable_pool", log_message, info_map)
+
+    assert output_manager.variables_pool == {}
+    assert output_manager.current_pool_size == sys.getsizeof(output_manager.variables_pool.__repr__())
+    assert output_manager.saved_pool_chunks_num == 1
+
+    output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
+    output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
+    output_manager.add_log = output_manager_original_method_states["add_log"]
+
+
+def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> None:
+    tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content")
+    tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content")
+    tmpdir.join("saved_pool_3_dummy_timestamp.json").write("File 3 content")
+    tmpdir.join("saved_pool_2_dummy_timestamp.txt").write("File 2 content")
+
+    mock_output_manager.saved_pool_chunks_path = Path(tmpdir)
+
+    result = mock_output_manager._sort_saved_chunk_files()
+
+    assert result == [
+        tmpdir.join("saved_pool_0_dummy_timestamp.json"),
+        tmpdir.join("saved_pool_1_dummy_timestamp.json"),
+        tmpdir.join("saved_pool_3_dummy_timestamp.json"),
+    ]
+
+
+def test_filter_saved_pools(
+    mock_output_manager: OutputManager, tmpdir, output_manager_original_method_states: Dict[str, Callable]
+):
+    mock_output_manager.filter_variables_pool = MagicMock(
+        side_effect=[
+            {
+                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
+                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
+                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+            },
+            {
+                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
+                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
+                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+            },
+            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
+        ]
+    )
+
+    mock_output_manager.load_variables_pool_from_file = MagicMock()
+
+    list_of_dumped_files = [
+        tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content"),
+        tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content"),
+        tmpdir.join("saved_pool_3_dummy_timestamp.json").write("File 3 content"),
+    ]
+
+    result = mock_output_manager.filter_saved_pools(
+        filter_content={"dummy": "filter"}, list_of_dumped_files=list_of_dumped_files
+    )
+
+    expected = {
+        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
+        "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
+        "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+        "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+    }
+
+    assert result == expected
+
+    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
+    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
+        "load_variables_pool_from_file"
+    ]
+
+
+def test_run_startup_sequence_clear_output_directory(
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    mock_output_manager.print_credits = MagicMock()
+    mock_output_manager.flush_pools = MagicMock()
+    mock_output_manager.set_exclude_info_maps_flag = MagicMock()
+    mock_output_manager.set_log_verbose = MagicMock()
+    mock_output_manager.set_metadata_prefix = MagicMock()
+    mock_output_manager.create_directory = MagicMock()
+    mock_output_manager.clear_output_dir = MagicMock()
+
+    dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
+    dummy_exclude_info_maps: bool = False
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_variables_file_path: Path = Path("dummy/path")
+    dummy_output_prefix: str = "dummy_prefix"
+    dummy_version_number: str = "0.0"
+    dummy_task_id: str = "dummy_task"
+
+    mock_output_manager.run_startup_sequence(
+        dummy_verbosity,
+        dummy_exclude_info_maps,
+        dummy_output_directory,
+        True,
+        dummy_variables_file_path,
+        dummy_output_prefix,
+        dummy_version_number,
+        dummy_task_id,
+    )
+
+    mock_output_manager.print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_output_manager.flush_pools.assert_called_once()
+    mock_output_manager.set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
+    mock_output_manager.set_log_verbose.assert_called_once_with(dummy_verbosity)
+    mock_output_manager.set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
+    mock_output_manager.create_directory.assert_called_once_with(dummy_output_directory)
+    mock_output_manager.clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
+
+    mock_output_manager.print_credits = output_manager_original_method_states["print_credits"]
+    mock_output_manager.flush_pools = output_manager_original_method_states["flush_pools"]
+    mock_output_manager.set_exclude_info_maps_flag = output_manager_original_method_states["set_exclude_info_maps_flag"]
+    mock_output_manager.set_log_verbose = output_manager_original_method_states["set_log_verbose"]
+    mock_output_manager.set_metadata_prefix = output_manager_original_method_states["set_metadata_prefix"]
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+
+
+def test_run_startup_sequence_not_clear_output_directory(
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    mock_output_manager.print_credits = MagicMock()
+    mock_output_manager.flush_pools = MagicMock()
+    mock_output_manager.set_exclude_info_maps_flag = MagicMock()
+    mock_output_manager.set_log_verbose = MagicMock()
+    mock_output_manager.set_metadata_prefix = MagicMock()
+    mock_output_manager.create_directory = MagicMock()
+    mock_output_manager.clear_output_dir = MagicMock()
+
+    dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
+    dummy_exclude_info_maps: bool = False
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_variables_file_path: Path = Path("dummy/path")
+    dummy_output_prefix: str = "dummy_prefix"
+    dummy_version_number: str = "0.0"
+    dummy_task_id: str = "dummy_task"
+
+    mock_output_manager.run_startup_sequence(
+        dummy_verbosity,
+        dummy_exclude_info_maps,
+        dummy_output_directory,
+        False,
+        dummy_variables_file_path,
+        dummy_output_prefix,
+        dummy_version_number,
+        dummy_task_id,
+    )
+
+    mock_output_manager.print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_output_manager.flush_pools.assert_called_once()
+    mock_output_manager.set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
+    mock_output_manager.set_log_verbose.assert_called_once_with(dummy_verbosity)
+    mock_output_manager.set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
+    mock_output_manager.create_directory.assert_called_once_with(dummy_output_directory)
+    mock_output_manager.clear_output_dir.assert_not_called()
+
+    mock_output_manager.print_credits = output_manager_original_method_states["print_credits"]
+    mock_output_manager.flush_pools = output_manager_original_method_states["flush_pools"]
+    mock_output_manager.set_exclude_info_maps_flag = output_manager_original_method_states["set_exclude_info_maps_flag"]
+    mock_output_manager.set_log_verbose = output_manager_original_method_states["set_log_verbose"]
+    mock_output_manager.set_metadata_prefix = output_manager_original_method_states["set_metadata_prefix"]
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
