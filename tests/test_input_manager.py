@@ -3382,6 +3382,51 @@ def test_object_type_validator(
 
 
 @pytest.mark.parametrize(
+    "data,removed_keys",
+    [
+        ({"key1": {}, "key2": {}}, []),
+        ({"key1": {}, "key2": {}, "key3": {}}, ["key3"]),
+        ({"k1": {}, "k2": {}, "k3": {}}, ["k1", "k2", "k3"]),
+    ],
+)
+def test_object_type_validator_key_removal(
+    mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
+) -> None:
+    """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=data)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
+    mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy path")
+    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    mock_elements_counter = mocker.MagicMock()
+    variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
+    violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
+    info_map = {"class": "InputManager", "function": "_object_type_validator"}
+    expected_add_warning_calls = [
+        mocker.call(
+            "Validation: object contains extraneous data",
+            f"Variable: 'dummy path' contains data at key '{key}' that is not specified in the metadata properties. "
+            f"{violation_msg}",
+            info_map,
+        )
+        for key in removed_keys
+    ]
+
+    result = input_manager._object_type_validator(
+        ["path", "to", "var"],
+        variable_properties,
+        {"dummy": "data"},
+        False,
+        "properties blob",
+        mock_elements_counter,
+        True,
+    )
+
+    assert result is True
+    add_warning.assert_has_calls(expected_add_warning_calls)
+
+
+@pytest.mark.parametrize(
     "variable_path, variable_properties, input_data, properties_blob_key," "expected_result, expected_warning",
     [
         # Input data is not a list
@@ -3517,6 +3562,30 @@ def test_validate_array_container_properties(
             "blob_key",
             [1, "two", 3],
             True,
+            False,
+            False,
+        ),
+        # Nullable and null data passed
+        (
+            ["data", "array"],
+            {"nullable": True},
+            {"data": {"array": None}},
+            True,
+            "blob_key",
+            None,
+            False,
+            False,
+            True,
+        ),
+        # Not nullable and null data passed
+        (
+            ["data", "array"],
+            {},
+            {"data": {"array": None}},
+            True,
+            "blob_key",
+            None,
+            False,
             False,
             False,
         ),
@@ -3702,7 +3771,6 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
     ):
-
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
@@ -3797,7 +3865,6 @@ def test_parse_metadata_properties(
         ) as mock_primitive,
         patch.object(mock_input_manager, "_create_record", return_value={"mocked": "record"}) as mock_create_record,
     ):
-
         prefix = ""
         sep = "_"
 

@@ -593,12 +593,6 @@ class InputManager:
             called_during_initialization,
         )
 
-        # not_fixable = data_type not in FIXABLE_INPUT_DATA_TYPES
-        # if not_fixable and not is_valid:
-        #     elements_counter.increment(ElementState.INVALID)
-        #     return is_valid
-        # elif not_fixable:
-        #     return is_valid
         if data_type not in FIXABLE_INPUT_DATA_TYPES:
             return is_valid
 
