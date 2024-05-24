@@ -59,7 +59,7 @@ class Denitrification:
                 layer.nitrate_content,
                 layer.denitrification_rate_coefficient,
                 layer.nutrient_cycling_temp_factor,
-                layer.soil_overall_carbon_fraction * 100,
+                layer.soil_overall_carbon_fraction,
             )
             layer.nitrate_content -= nitrified_nitrates
             layer.nitrous_oxide_emissions = nitrified_nitrates
@@ -103,6 +103,7 @@ class Denitrification:
         is physically impossible to remove more nitrate than there is in the soil.
 
         """
+        print(organic_carbon_fraction)
         exponential_term = exp(
             -1
             * denitrification_rate_coefficient
