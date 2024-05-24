@@ -107,26 +107,26 @@ for analysis in config_json['analyses']:
                                threethings.columns[-1]: "total_effects"},
                                axis=1, inplace=True)
 
-            newcols = []
-            for rowname in row_names[1:]:
-                # get the list of inputs (X)
-                input_reformatted = input.replace(" ", ".")
-                input_index = parsed_SA_input_variables["names"].index(input_reformatted)
-                input_values = [value[input_index] for value in sampled_values]
-                # get the list of outputs (Y)
-                output_values = collated_outputs[rowname]
-                slope, r2_value, p_value = SA_helpers.regression_stuff(
-                    X=input_values, xname=input, Y=output_values, yname=rowname, plot_inputs=plot_inputs
-                )
-                newcols.append([slope, r2_value, p_value])
-            newcols_pd = pd.DataFrame(newcols)
-            newcols_pd.index = new_whole_output_pd.index
+        newcols = []
+        for rowname in row_names[1:]:
+            # get the list of inputs (X)
+            input_reformatted = input.replace(" ", ".")
+            input_index = parsed_SA_input_variables["names"].index(input_reformatted)
+            input_values = [value[input_index] for value in sampled_values]
+            # get the list of outputs (Y)
+            output_values = collated_outputs[rowname]
+            slope, r2_value, p_value = SA_helpers.regression_stuff(
+                X=input_values, xname=input, Y=output_values, yname=rowname, plot_inputs=plot_inputs
+            )
+            newcols.append([slope, r2_value, p_value])
+        newcols_pd = pd.DataFrame(newcols)
+        newcols_pd.index = new_whole_output_pd.index
 
-            output_pd = pd.concat([threethings, newcols_pd], axis=1)
-            output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
-            output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
-            filenameout = output_path + output_prefix + "_input_META_" + input + "_summarytable.csv"
-            output_pd.to_csv(filenameout)
+        output_pd = pd.concat([threethings, newcols_pd], axis=1)
+        output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
+        output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
+        filenameout = output_path + output_prefix + "_input_META_" + input + "_summarytable.csv"
+        output_pd.to_csv(filenameout)
 
     # here for a single output, we sort and explore all the inputs
     for output in outputs_to_collate:
@@ -182,7 +182,8 @@ for analysis in config_json['analyses']:
         output_pd = pd.concat([output_temp, newcols_pd], axis=1)
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
         output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
-        filenameout = output_path + output_prefix + "_output_META_" + output + "_summarytable.csv"
+        output_reformatted = output.replace('/', ' per ')
+        filenameout = output_path + output_prefix + "_output_META_" + output_reformatted + "_summarytable.csv"
         output_pd.to_csv(filenameout)
 
     if plot_whole_new:
