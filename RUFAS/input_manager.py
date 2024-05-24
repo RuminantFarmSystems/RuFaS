@@ -331,7 +331,7 @@ class InputManager:
 
         """
 
-        data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
+        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }

@@ -4567,7 +4567,7 @@ def test_metadata_number_validator(
     error_title: str,
     error_msg: str,
     should_raise: bool,
-):
+) -> None:
     """Tests metadata_number_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4581,7 +4581,6 @@ def test_metadata_number_validator(
         mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_number_validator(key_path, value)
-        assert mock_add_error.assert_not_called
         mock_validate_properties_keys.assert_called_once()
 
 
@@ -4613,7 +4612,7 @@ def test_metadata_string_validator(
     error_title: str,
     error_msg: str,
     should_raise: bool,
-):
+) -> None:
     """Tests _metadata_string_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4660,7 +4659,7 @@ def test_metadata_bool_validator(
     error_title: str,
     error_msg: str,
     should_raise: bool,
-):
+) -> None:
     """Tests _metadata_bool_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4736,7 +4735,7 @@ def test_metadata_array_validator(
     error_title: str,
     error_msg: str,
     should_raise: bool,
-):
+) -> None:
     """Tests _metadata_array_validator() method in InputManager"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4757,7 +4756,7 @@ def test_metadata_array_validator(
 
 def test_metadata_object_validator(
     mocker: MockerFixture,
-):
+) -> None:
     """Tests _metadata_object_validator() method in InputManager"""
     input_manager = InputManager()
     mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
@@ -4813,7 +4812,7 @@ def test_validate_metadata_properties_keys(
     path: List[str],
     should_raise: bool,
     expected_message: str,
-):
+) -> None:
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
