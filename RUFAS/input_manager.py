@@ -2221,14 +2221,14 @@ class InputManager:
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
-    def _metadata_number_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
-        """Validator function for array type properties in metadata."""
+    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates number type properties in metadata."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self._metadata_number_validator.__name__,
         }
         required_number_property_keys = {"type"}
-        valid_number_property_keys = {"type", "description", "minimum", "maximum", "default"}
+        valid_number_property_keys = {"type", "description", "minimum", "maximum", "default", "nullable"}
         self._validate_metadata_properties_keys(
             required_number_property_keys, valid_number_property_keys, value, key_path
         )
@@ -2280,14 +2280,14 @@ class InputManager:
             )
             raise ValueError
 
-    def _metadata_string_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
-        """Validator function for string type properties in metadata."""
+    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates string type properties in metadata."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self._metadata_string_validator.__name__,
         }
         required_str_property_keys = {"type"}
-        valid_str_property_keys = {"type", "description", "pattern", "default"}
+        valid_str_property_keys = {"type", "description", "pattern", "default", "nullable"}
         self._validate_metadata_properties_keys(required_str_property_keys, valid_str_property_keys, value, key_path)
         default = value.get("default")
         pattern = value.get("pattern")
@@ -2309,14 +2309,14 @@ class InputManager:
                     )
                     raise ValueError
 
-    def _metadata_bool_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
-        """Validator function for bool type properties in metadata."""
+    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates bool type properties in metadata."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self._metadata_bool_validator.__name__,
         }
         required_bool_property_keys = {"type"}
-        valid_bool_property_keys = {"type", "description", "default"}
+        valid_bool_property_keys = {"type", "description", "default", "nullable"}
         self._validate_metadata_properties_keys(required_bool_property_keys, valid_bool_property_keys, value, key_path)
         default = value.get("default")
         if default is not None and not isinstance(default, bool):
@@ -2327,13 +2327,13 @@ class InputManager:
             )
             raise ValueError(f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}")
 
-    def _metadata_array_validator(self, key_path: List[str], value: dict[str, Any]) -> None:
-        """Validator function for array type properties in metadata."""
+    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates array type properties in metadata."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self._metadata_array_validator.__name__,
         }
-        required_array_property_keys = {"type"}
+        required_array_property_keys = {"type", "properties"}
         valid_array_property_keys = {"type", "properties", "description", "minimum_length", "maximum_length", "default"}
         self._validate_metadata_properties_keys(
             required_array_property_keys, valid_array_property_keys, value, key_path
@@ -2388,13 +2388,21 @@ class InputManager:
             )
             raise ValueError
 
+    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates object type properties in metadata."""
+        required_object_property_keys = {"type"}
+        valid_object_property_keys = {"type", "description"}
+        self._validate_metadata_properties_keys(
+            required_object_property_keys, valid_object_property_keys, value, key_path
+        )
+
     def _validate_metadata_properties_keys(
         self,
         required_properties_keys: set[str],
         valid_properties_keys: set[str],
         properties: dict[str, Any],
         path: list[str],
-    ):
+    ) -> None:
         """Validates that keys in the metadata properties sections."""
         info_map = {
             "class": self.__class__.__name__,
@@ -2409,6 +2417,8 @@ class InputManager:
             )
             raise ValueError
         property_type = properties.get("type", "Unknown type")
+        if property_type == "object":
+            return
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
@@ -2417,10 +2427,6 @@ class InputManager:
                 info_map,
             )
             raise ValueError
-
-    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
-        """Validator function for object type properties in metadata."""
-        pass
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
