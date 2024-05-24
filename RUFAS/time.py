@@ -23,7 +23,8 @@ class Time:
         self.leap_year_length: int = GeneralConstants.LEAP_YEAR_LENGTH
         self.year_length: int = GeneralConstants.YEAR_LENGTH
         self.current_date: datetime = self.start_date
-        self.simulation_length: int = (self.end_date - self.start_date).days
+        self.simulation_length_days: int = (self.end_date - self.start_date).days
+        self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
         self.simulation_day: int = 0
 
     def advance(self) -> None:
@@ -74,6 +75,15 @@ class Time:
     def end_day(self) -> int:
         end_full_date: list[str] = self.config_data["end_date"].split(":")
         return int(end_full_date[1])
+
+    @property
+    def year_start_day(self) -> int:
+        return int(self.start_date.strftime("%j")) if self.current_date.year == self.start_date.year else 1
+
+    @property
+    def year_end_day(self) -> int:
+        days_in_year = self.leap_year_length if Utility.is_leap_year(self.current_date.year) else self.year_length
+        return int(self.end_date.strftime("%j")) if self.current_date.year == self.end_date.year else days_in_year
 
     @property
     def current_julian_day(self) -> int:
@@ -145,7 +155,7 @@ class Time:
             bool: True if the current day is the last day of the simulation, false otherwise
 
         """
-        return self.current_date == self.end_date
+        return self.current_date >= self.end_date
 
     def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.date:
         """

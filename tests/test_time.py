@@ -34,7 +34,7 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.year_length == 365
 
     assert time.current_date == time.start_date
-    assert time.simulation_length == (time.end_date - time.start_date).days
+    assert time.simulation_length_days == (time.end_date - time.start_date).days
     assert time.simulation_day == 0
 
 
@@ -49,6 +49,7 @@ def test_advance(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
 
 
 def test_current_julian_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the julian day of the current date."""
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
     time = Time()
 
@@ -60,6 +61,7 @@ def test_current_julian_day(mock_config: Dict[str, Any], mocker: MockerFixture) 
 
 
 def test_current_month(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the month of the current date."""
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
     time = Time()
 
@@ -72,6 +74,7 @@ def test_current_month(mock_config: Dict[str, Any], mocker: MockerFixture) -> No
 
 
 def test_current_simulation_year(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the simulation year of the current date."""
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
     time = Time()
 
@@ -83,6 +86,7 @@ def test_current_simulation_year(mock_config: Dict[str, Any], mocker: MockerFixt
 
 
 def test_current_calendar_year(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the calendar year of the current date."""
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
     time = Time()
 
@@ -93,27 +97,32 @@ def test_current_calendar_year(mock_config: Dict[str, Any], mocker: MockerFixtur
     assert time.current_calendar_year == 2000
 
 
-def test_end_year(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
-    """Tests that Time instances correctly determine if it is the end of a year."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
+def test_year_start_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the first julian day of the current year."""
+    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value={
+        "start_date": "1999:100",
+        "end_date": "2004:10",
+    })
     time = Time()
-    for n in range(363):
-        assert not time.end_year()
+
+    year_start_days = [100] * 266 + [1] * 1471
+    for start_day in year_start_days:
+        assert time.year_start_day == start_day
         time.advance()
-    assert time.end_year()
-    time.advance()
-    assert not time.end_year()
 
 
-def test_end_simulation(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
-    """Tests that Time instances correctly determine if the simulation has ended."""
-    # case when year is less than the length of years list
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
+def test_year_end_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+    """Tests that Time instances correctly determine the last julian day of the current year."""
+    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value={
+        "start_date": "1999:100",
+        "end_date": "2004:10",
+    })
     time = Time()
-    for _ in range(365):
-        assert not time.end_simulation()
+
+    year_end_days = [365] * 266 + [366] * 366 + [365] * 1095 + [10] * 10
+    for end_day in year_end_days:
+        assert time.year_end_day == end_day
         time.advance()
-    assert time.end_simulation()
 
 
 def test_record_time(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
