@@ -7,11 +7,22 @@
             "only_inputs": false,
             "plot_whole_new": false,
             "inputs_to_collate": [
-                "animal animal_config management_decisions breeding_start_day_h"
+                "animal animal_config management_decisions breeding_start_day_h",
+                "animal animal_config management_decisions days_in_preg_when_dry",
+                "animal animal_config management_decisions cull_milk_production",
+                "animal animal_config farm_level repro cows estrus_detection_rate",
+                "animal animal_config farm_level bodyweight mature_body_weight_avg",
+                "animal animal_config from_literature repro avg_estrus_cycle_cow",
+                "animal animal_config from_literature culling mastitis_cull probability",
+                "manure_management bedding_configs 0 bedding_mass_per_day"
             ],
             "plot_inputs": false,
             "outputs_to_collate": [
-                "total herd enteric methane, kg_ver_hor_agg"
+                "total herd enteric methane, kg_ver_hor_agg",
+                "Total milk, kg_ver_agg",
+                "adjusted herd enteric CH4 per FPCM, kg/kg_hor_agg",
+                "adjusted whole herd enteric methane, kg_hor_agg",
+                "Lact cow feed CO2 kg/cow/d_hor_agg"
             ],
             "plot_outputs": false
         },
@@ -22,11 +33,22 @@
             "only_inputs": false,
             "plot_whole_new": false,
             "inputs_to_collate": [
-                "animal animal_config management_decisions breeding_start_day_h"
+                "animal animal_config management_decisions breeding_start_day_h",
+                "animal animal_config management_decisions days_in_preg_when_dry",
+                "animal animal_config management_decisions cull_milk_production",
+                "animal animal_config farm_level repro cows estrus_detection_rate",
+                "animal animal_config farm_level bodyweight mature_body_weight_avg",
+                "animal animal_config from_literature repro avg_estrus_cycle_cow",
+                "animal animal_config from_literature culling mastitis_cull probability",
+                "manure_management bedding_configs 0 bedding_mass_per_day"
             ],
             "plot_inputs": false,
             "outputs_to_collate": [
-                "total herd enteric methane, kg_ver_hor_agg"
+                "total herd enteric methane, kg_ver_hor_agg",
+                "Total milk, kg_ver_agg",
+                "adjusted herd enteric CH4 per FPCM, kg/kg_hor_agg",
+                "adjusted whole herd enteric methane, kg_hor_agg",
+                "Lact cow feed CO2 kg/cow/d_hor_agg"
             ],
             "plot_outputs": false
         }
