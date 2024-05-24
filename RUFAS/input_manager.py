@@ -118,8 +118,9 @@ class InputManager:
             "function": self.set_metadata_depth_limit.__name__,
         }
         self.metadata_depth_limit = metadata_depth_limit if metadata_depth_limit else 7
-        om.add_log("Metadata properties depth limit set", f"Metadata depth limit set to {metadata_depth_limit}.",
-                   info_map)
+        om.add_log(
+            "Metadata properties depth limit set", f"Metadata depth limit set to {metadata_depth_limit}.", info_map
+        )
 
     def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
         """
