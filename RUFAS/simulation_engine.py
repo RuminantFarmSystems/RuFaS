@@ -15,6 +15,7 @@ from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, 
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+from .routines.EEE.emissions import Emissions
 
 om = OutputManager()
 im = InputManager()
