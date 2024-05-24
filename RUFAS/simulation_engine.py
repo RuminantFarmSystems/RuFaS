@@ -94,7 +94,7 @@ class SimulationEngine:
         """
         The main loop for simulation.
         """
-        while not self.time.end_simulation():
+        for simulation_year in range(self.time.simulation_length_years):
             self._annual_simulation()
 
     def _daily_simulation(self) -> None:
@@ -132,14 +132,13 @@ class SimulationEngine:
 
         self.annual_mass_balance(self.time)
         self.annual_reset()
-        self.time.advance()
 
     def _annual_simulation(self) -> None:
         """
         Executes the annual simulation routines.
         """
         self._run_pre_annual_routines()
-        while not self.time.end_year():
+        for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
             self._daily_simulation()
 
         self._run_post_annual_routines()

@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict, List
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
@@ -15,38 +16,28 @@ class Time:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
+        self.config_data: Dict[str, str | int | bool] = im.get_data("config")
+        self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
+        self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], "%Y:%j")
 
-        self._init_time_config()
-        self.calendar_year: int = self.start_year_int
-        self.year: int = 1  # current year
-        self.simulation_length = self._calc_sim_length()
+        self.leap_year_length: int = GeneralConstants.LEAP_YEAR_LENGTH
+        self.year_length: int = GeneralConstants.YEAR_LENGTH
+        self.current_date: datetime = self.start_date
+        self.simulation_length_days: int = (self.end_date - self.start_date).days
+        self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
+        self.simulation_day: int = 0
 
-        # finds the first non-null day of the first year
-        for i in range(0, len(self.years[0])):
-            if self.years[0][i] is None:
-                continue
-            else:
-                self.day = self.years[0][i]
-                break
-
-        self.simulation_day = 0
-
-    def _init_time_config(self) -> None:
+    def advance(self) -> None:
         """
-        Initializes the time configuration for the instance by parsing the config data from InputManager pool.
+        Advances the time in the simulation by 1 day and automatically detects end of years.
         """
-        config_data = im.get_data("config")
-        self.start_full_date: list[str] = config_data["start_date"].split(":")
-        self.end_full_date: list[str] = config_data["end_date"].split(":")
-        self.start_year_int: int = int(self.start_full_date[0])
-        self.end_year_int: int = int(self.end_full_date[0])
-        self.start_day: int = int(self.start_full_date[1])
-        self.end_day: int = int(self.end_full_date[1])
 
-        self.leap_year_length = GeneralConstants.LEAP_YEAR_LENGTH
-        self.year_length = GeneralConstants.YEAR_LENGTH
+        self.simulation_day += 1
+        self.current_date += datetime.timedelta(days=1)
 
-        self.years: list[list[int]] = []
+    @property
+    def years(self) -> List[List[int]]:
+        years: list[list[int]] = []
 
         for year in range(self.start_year_int, self.end_year_int + 1):
             year_length = self.year_length if not Utility.is_leap_year(year) else self.leap_year_length
@@ -61,42 +52,54 @@ class Time:
             else:
                 days = [_ for _ in range(1, year_length + 1)]
 
-            self.years.append(days)
+            years.append(days)
 
-    def _calc_sim_length(self) -> int:
-        """
-        Calculates and returns the length of the simulation in days.
+        return years
 
-        Returns
-        -------
-        int
-            The length of the simulation in days.
-        """
-        sim_length = 0
-        for i in range(len(self.years)):
-            if i == 0:
-                if Utility.is_leap_year(self.start_year_int):
-                    sim_length += self.leap_year_length - self.start_day
-                else:
-                    sim_length += self.year_length - self.start_day
-            else:
-                sim_length += len(self.years[i])
+    @property
+    def start_year_int(self) -> int:
+        start_full_date: list[str] = self.config_data["start_date"].split(":")
+        return int(start_full_date[0])
 
-        return sim_length + 1
+    @property
+    def start_day(self) -> int:
+        start_full_date: list[str] = self.config_data["start_date"].split(":")
+        return int(start_full_date[1])
 
-    def advance(self) -> None:
-        """
-        Advances the time in the simulation by 1 day and automatically detects end of years.
-        """
+    @property
+    def end_year_int(self) -> int:
+        end_full_date: list[str] = self.config_data["end_date"].split(":")
+        return int(end_full_date[0])
 
-        self.simulation_day += 1
+    @property
+    def end_day(self) -> int:
+        end_full_date: list[str] = self.config_data["end_date"].split(":")
+        return int(end_full_date[1])
 
-        if self.end_year():
-            self.day = 1
-            self.year += 1
-            self.calendar_year += 1
-        else:
-            self.day += 1
+    @property
+    def year_start_day(self) -> int:
+        return int(self.start_date.strftime("%j")) if self.current_date.year == self.start_date.year else 1
+
+    @property
+    def year_end_day(self) -> int:
+        days_in_year = self.leap_year_length if Utility.is_leap_year(self.current_date.year) else self.year_length
+        return int(self.end_date.strftime("%j")) if self.current_date.year == self.end_date.year else days_in_year
+
+    @property
+    def current_julian_day(self) -> int:
+        return int(self.current_date.strftime("%j"))
+
+    @property
+    def current_month(self) -> int:
+        return self.current_date.month
+
+    @property
+    def current_simulation_year(self) -> int:
+        return self.current_date.year - self.start_date.year + 1
+
+    @property
+    def current_calendar_year(self) -> int:
+        return self.current_date.year
 
     def end_year(self) -> bool:
         """
@@ -113,24 +116,16 @@ class Time:
         As soon as the current day is greater than the number of days in the year,
         the day is reset to 1 and the year is incremented by 1.
         """
+        return self.end_simulation() or (self.current_date.month == 12 and self.current_date.day == 31)
 
-        return self.day > len(self.years[self.year - 1])
-
-    def end_simulation(self):
+    def end_simulation(self) -> bool:
         """
         Description:
             Checks whether the simulation has ended
         Returns:
             bool: True if the simulation has ended, false otherwise
         """
-
-        # midyear end date adjusted
-        if self.year > len(self.years):
-            return True
-        elif self.year == len(self.years):
-            return self.day > len(self.years[self.year - 1])
-
-        return False
+        return self.current_date > self.end_date
 
     def record_time(self) -> None:
         """
@@ -141,27 +136,26 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
-        om.add_variable("year", self.year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR}))
+        om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
-            "calendar_year", self.calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
+            "year", self.current_simulation_year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR})
+        )
+        om.add_variable(
+            "calendar_year", self.current_calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
         )
         om.add_variable(
             "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
 
     @property
-    def is_last_day_of_simulation(self):
+    def is_last_day_of_simulation(self) -> bool:
         """Checks whether the current day is the last day of the simulation.
 
         Returns:
             bool: True if the current day is the last day of the simulation, false otherwise
 
         """
-        if self.year == len(self.years):
-            return self.day == len(self.years[self.year - 1])
-
-        return False
+        return self.current_date >= self.end_date
 
     def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.date:
         """
@@ -177,12 +171,11 @@ class Time:
         datetime.date
             The date object that corresponds to the simulation day.
         """
-
-        start_year = int(self.start_full_date[0])
-        start_day_of_year = int(self.start_full_date[1])
-        start_date = datetime.date(start_year, 1, 1) + datetime.timedelta(days=start_day_of_year - 1)
-        actual_date = start_date + datetime.timedelta(days=simulation_day - 1)
+        actual_date = self.start_date + datetime.timedelta(days=simulation_day - 1)
         return actual_date
 
     def __str__(self) -> str:
-        return f"Year: {self.year}, Day: {self.day}. Simulation Day: {self.simulation_day}"
+        return (
+            f"Year: {self.current_simulation_year}, Day: {self.current_julian_day}. "
+            f"Simulation Day: {self.simulation_day}"
+        )
