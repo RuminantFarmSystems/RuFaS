@@ -4437,7 +4437,8 @@ def test_compare_metadata_properties(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
     [
         ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
-        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, [], ""),
+        ({"properties": {"a": {"b": {"type": "array", "properties": {}}}}}, 3, 3, ["a", "b", "properties"], False, [],
+         ""),
         (
             {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
@@ -4745,6 +4746,18 @@ def test_metadata_array_validator(
         input_manager._metadata_array_validator(key_path, value)
         mock_add_error.assert_not_called
         mock_validate_properties_keys.assert_called_once()
+
+
+def test_metadata_object_validator(
+    mocker: MockerFixture,
+):
+    """Tests _metadata_object_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    key_path = ["path", "cow"]
+    value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
+    input_manager._metadata_object_validator(key_path, value)
+    mock_validate_properties_keys.assert_called_once()
 
 
 @pytest.mark.parametrize(
