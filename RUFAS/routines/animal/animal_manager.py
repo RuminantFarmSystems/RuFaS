@@ -117,7 +117,7 @@ class AnimalManager:
         config_data: Dict[str, Any] = im.get_data("config")
 
         # simulation length, days
-        self.sim_length = time.simulation_length
+        self.sim_length = time.simulation_length_days
 
         # day in the simulation
         self.simulation_day = 1
