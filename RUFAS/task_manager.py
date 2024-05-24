@@ -109,8 +109,7 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        if metadata_depth_limit:
-            self.input_manager.set_metadata_depth_limit(metadata_depth_limit)
+        self.input_manager.set_metadata_depth_limit(metadata_depth_limit)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
@@ -307,7 +306,7 @@ class TaskManager:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:  # noqa C901
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -328,8 +327,7 @@ class TaskManager:
                 task_id,
             )
             input_manager = InputManager()
-            if metadata_depth_limit:
-                input_manager.set_metadata_depth_limit(metadata_depth_limit)
+            input_manager.set_metadata_depth_limit(metadata_depth_limit)
 
             if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
