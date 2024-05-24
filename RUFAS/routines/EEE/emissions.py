@@ -1,6 +1,31 @@
+from ..field.crop.crop_enum import CropSpecies
 from ...output_manager import OutputManager
 from typing import Any
 
+CROP_SPECIES_TO_PURCHASED_FEED_ID = {
+    CropSpecies.ALFALFA_HAY: ["106", "107", "108"],
+    CropSpecies.ALFALFA_SILAGE: [],
+    CropSpecies.ALFALFA_BALEAGE: [],
+    CropSpecies.CEREAL_RYE_HAY: [],
+    CropSpecies.CEREAL_RYE_GRAIN: [],
+    CropSpecies.CEREAL_RYE_SILAGE: [],
+    CropSpecies.CEREAL_RYE_BALEAGE: [],
+    CropSpecies.CORN_GRAIN: ["40", "43", "44", "46", "47"],
+    CropSpecies.CORN_SILAGE: ["50", "50", "51"],
+    CropSpecies.SOYBEAN_HAY: [],
+    CropSpecies.SOYBEAN_GRAIN: [],
+    CropSpecies.TALL_FESCUE_HAY: [],
+    CropSpecies.TALL_FESCUE_SILAGE: [],
+    CropSpecies.TALL_FESCUE_BALEAGE: [],
+    CropSpecies.TRITICALE_HAY: [],
+    CropSpecies.TRITICALE_GRAIN: [],
+    CropSpecies.TRITICALE_SILAGE: [],
+    CropSpecies.TRITICALE_BALEAGE: [],
+    CropSpecies.WINTER_WHEAT_HAY: [],
+    CropSpecies.WINTER_WHEAT_GRAIN: [],
+    CropSpecies.WINTER_WHEAT_SILAGE: [],
+    CropSpecies.WINTER_WHEAT_BALEAGE: [],
+}
 
 om = OutputManager()
 
