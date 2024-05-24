@@ -112,10 +112,13 @@ def test_current_calendar_year(mock_config: Dict[str, Any], mocker: MockerFixtur
 
 def test_year_start_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     """Tests that Time instances correctly determine the first julian day of the current year."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value={
-        "start_date": "1999:100",
-        "end_date": "2004:10",
-    })
+    mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data",
+        return_value={
+            "start_date": "1999:100",
+            "end_date": "2004:10",
+        },
+    )
     time = Time()
 
     year_start_days = [100] * 266 + [1] * 1471
@@ -126,10 +129,13 @@ def test_year_start_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> N
 
 def test_year_end_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     """Tests that Time instances correctly determine the last julian day of the current year."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value={
-        "start_date": "1999:100",
-        "end_date": "2004:10",
-    })
+    mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data",
+        return_value={
+            "start_date": "1999:100",
+            "end_date": "2004:10",
+        },
+    )
     time = Time()
 
     year_end_days = [365] * 266 + [366] * 366 + [365] * 1095 + [10] * 10
