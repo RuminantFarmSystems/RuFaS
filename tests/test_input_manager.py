@@ -4437,8 +4437,15 @@ def test_compare_metadata_properties(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
     [
         ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
-        ({"properties": {"a": {"b": {"type": "array", "properties": {}}}}}, 3, 3, ["a", "b", "properties"], False, [],
-         ""),
+        (
+            {"properties": {"a": {"b": {"type": "array", "properties": {}}}}},
+            3,
+            3,
+            ["a", "b", "properties"],
+            False,
+            [],
+            "",
+        ),
         (
             {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
