@@ -17,7 +17,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/c1f1_animal.json",
+      "path": "input/data/animal/homegrown_feed_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/c1f1_feed.json",
+      "path": "input/data/feed/HomeGrownFeed_test_diet.json",
       "type": "json",
       "properties": "feed_properties"
     },
