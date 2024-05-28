@@ -39,8 +39,10 @@ class Emissions:
     def calculate_purchased_feed_emissions(self) -> None:
         homegrown_feeds = self._gather_homegrown_feeds()
         purchased_feeds = self._gather_ration_feed_totals()
+        actual_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
         print(f"\n\n{homegrown_feeds}\n\n")
-        print(f"\n\n{purchased_feeds}\n\n")
+        print(f"{purchased_feeds}\n\n")
+        print(f"{actual_feed_totals}\n\n")
 
     def _gather_homegrown_feeds(self) -> list[dict[str, Any]]:
         filter = {
@@ -73,7 +75,9 @@ class Emissions:
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
 
-    def _calculate_actual_purchased_feeds(self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]) -> dict[str, float]:
+    def _calculate_actual_purchased_feeds(
+        self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]
+    ) -> dict[str, float]:
         """Calculates the difference between the purchased feeds and feeds grown on the farm."""
         homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
         for feed in homegrown_totals:
@@ -82,7 +86,11 @@ class Emissions:
 
         actual_purchased_feeds = {}
         for feed_id, amount in purchased_feeds.items():
-            homegrown_alternatives = {key: homegrown_totals[key] for key in homegrown_totals if feed_id in key.value}
+            homegrown_alternatives = {
+                crop: crop_yield
+                for crop, crop_yield in homegrown_totals.items()
+                if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
+            }
             for key, value in homegrown_alternatives.items():
                 amount_used = min(amount, value)
                 amount -= amount_used
