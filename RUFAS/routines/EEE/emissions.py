@@ -108,9 +108,9 @@ class Emissions:
 
         """
         homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
-        for feed in homegrown_totals:
-            yields = filter(lambda crop: crop["crop"] == feed, homegrown_feeds)
-            homegrown_totals[feed] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
+        for crop_species in homegrown_totals:
+            yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
+            homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
 
         actual_purchased_feeds = {}
         for feed_id, amount in purchased_feeds.items():
