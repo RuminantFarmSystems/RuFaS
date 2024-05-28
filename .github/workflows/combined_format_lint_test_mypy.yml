@@ -2,9 +2,9 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ main ]
+    branches: [ test-main ]
   pull_request:
-    branches: [ main ]
+    branches: [ test-main ]
   workflow_dispatch:
 
 env:
@@ -32,11 +32,11 @@ jobs:
 
       - name: Get all added or modified files
         run: |
-          BASE_BRANCH=${{ github.base_ref }} || "main"
+          BASE_BRANCH=${{ github.base_ref }} || "test-main"
           git fetch origin $BASE_BRANCH
           if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
-            echo "Fallback to main branch because $BASE_BRANCH does not exist."
-            BASE_BRANCH="main"
+            echo "Fallback to test-main branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="test-main"
             git fetch origin $BASE_BRANCH
           fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
@@ -73,7 +73,7 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/test-main' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
@@ -147,27 +147,32 @@ jobs:
         id: set_current_branch_error_count
         run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
-      - name: Run mypy on the main branch
-        if: github.ref != 'refs/heads/main'
+      - name: Extract mypy error count from README
+        if: github.ref != 'refs/heads/test-main'
         run: |
-          git checkout main
-          python -m mypy . 2>&1 | tee mypy_main_branch_report.txt || true
-          grep -c "error:" mypy_main_branch_report.txt > mypy_main_branch_error_count.txt
-
-      - name: Set main branch error count as output
-        id: set_main_branch_error_count
-        if: github.ref != 'refs/heads/main'
-        run: echo "error_count=$(cat mypy_main_branch_error_count.txt)" >> $GITHUB_OUTPUT
+          git checkout test-main
+          # Use awk to match and extract only the first set of digits before any non-digit characters
+          error_count=$(awk -F'-' '/Mypy/{match($2, /[0-9]+/); print substr($2, RSTART, RLENGTH)}' README.md)
+          if [ -z "$error_count" ]; then
+            echo "Error count not found in README.md"
+            exit 1
+          fi
+          echo "Mypy error count on test-main branch: $error_count"
+          echo $error_count > mypy_test-main_branch_error_count.txt
+      - name: Set test-main branch error count as output
+        id: set_test-main_branch_error_count
+        if: github.ref != 'refs/heads/test-main'
+        run: echo "error_count=$(cat mypy_test-main_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
       - name: Compare mypy reports
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/test-main'
         run: |
           CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
+          MAIN_ERRORS=${{ steps.set_test-main_branch_error_count.outputs.error_count }}
           echo "Current branch mypy errors: $CURRENT_ERRORS"
           echo "Main branch mypy errors: $MAIN_ERRORS"
           if [ $CURRENT_ERRORS -gt $MAIN_ERRORS ]; then
-            echo "Mypy error count has increased from the main branch to the current branch ($MAIN_ERRORS -> $CURRENT_ERRORS)."
+            echo "Mypy error count has increased from the test-main branch to the current branch ($MAIN_ERRORS -> $CURRENT_ERRORS)."
             exit 1
           else
             echo "No increase in mypy errors found."
@@ -175,7 +180,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/test-main'
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -237,12 +242,12 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
           MY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
+          MAIN_ERRORS=${{ steps.set_test-main_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
             echo "$PYTEST_COVERAGE"
             MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
-            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
+            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on test-main branch: $MAIN_ERRORS"
             DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
             if [ $DIFF -gt 0 ]; then
               MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
