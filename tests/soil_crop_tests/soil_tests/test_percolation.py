@@ -70,10 +70,10 @@ def test_determine_percolation_to_next_layer(drainable_water, time_step, travel_
     ],
 )
 def test_determine_if_percolation_allowed(
-        water_content,
-        field_capacity_content,
-        saturated_capacity_content,
-        high_seasonal_water_table,
+    water_content,
+    field_capacity_content,
+    saturated_capacity_content,
+    high_seasonal_water_table,
 ):
     """tests _determine_if_percolation_allowed() in percolation.py"""
     observe = Percolation._determine_if_percolation_allowed(
@@ -85,7 +85,7 @@ def test_determine_if_percolation_allowed(
     if not high_seasonal_water_table:
         assert observe is True
     elif (
-            water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))
+        water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))
     ) and high_seasonal_water_table:
         assert observe is True
     else:
@@ -97,12 +97,12 @@ def test_determine_if_percolation_allowed(
     [(30, 3, 10, 10, 5, 0), (30, 3, 2, 3, 10, 3), (30, -5, 10, 10, 5, 0)],
 )
 def test_percolate_between_layers(
-        time_step: float,
-        water_content: float,
-        field_capacity_content: float,
-        amount_to_percolate: float,
-        acceptable_percolation_amount: float,
-        expected: float,
+    time_step: float,
+    water_content: float,
+    field_capacity_content: float,
+    amount_to_percolate: float,
+    acceptable_percolation_amount: float,
+    expected: float,
 ) -> None:
     """this function tests _percolate_between_layers() in Percolation.py"""
     upper_data = LayerData(top_depth=0, bottom_depth=20, field_size=1.33)
@@ -113,9 +113,8 @@ def test_percolate_between_layers(
         field_size=1.33,
     )
     with (
-        patch.object(upper_data, 'water_content', water_content),
-        patch.object(LayerData, 'field_capacity_content', new_callable=PropertyMock) as
-        mock_field_capacity_content,
+        patch.object(upper_data, "water_content", water_content),
+        patch.object(LayerData, "field_capacity_content", new_callable=PropertyMock) as mock_field_capacity_content,
         patch(
             "RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
             new_callable=PropertyMock,
@@ -175,12 +174,12 @@ def test_percolate_between_layers(
     ],
 )
 def test_percolate_infiltrated_water(
-        infiltration: float,
-        water_contents: list[float],
-        acceptable_percolation_amounts: list[float],
-        percolated_water: list[float],
-        expected_water: list[float],
-        expected_layer: int | None,
+    infiltration: float,
+    water_contents: list[float],
+    acceptable_percolation_amounts: list[float],
+    percolated_water: list[float],
+    expected_water: list[float],
+    expected_layer: int | None,
 ) -> None:
     """Tests that extreme levels of infiltration are handled correctly."""
     layers = []
@@ -197,9 +196,9 @@ def test_percolate_infiltrated_water(
     soil_data.infiltrated_water = infiltration
     percolation = Percolation(soil_data)
     with patch(
-            "RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
-            new_callable=PropertyMock,
-            side_effect=acceptable_percolation_amounts,
+        "RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
+        new_callable=PropertyMock,
+        side_effect=acceptable_percolation_amounts,
     ):
         actual = percolation.percolate_infiltrated_water()
 
@@ -234,14 +233,14 @@ def mock_soil_data() -> SoilData:
     ],
 )
 def test_percolate(
-        mocker: MockerFixture,
-        can_percolate: bool,
-        seasonal_high_water_table: bool,
-        infiltration: float,
-        top_layer_percolated: int | None,
-        expected_water: List[float],
-        expected_call_count: int,
-        mock_soil_data: SoilData,
+    mocker: MockerFixture,
+    can_percolate: bool,
+    seasonal_high_water_table: bool,
+    infiltration: float,
+    top_layer_percolated: int | None,
+    expected_water: List[float],
+    expected_call_count: int,
+    mock_soil_data: SoilData,
 ) -> None:
     """Tests the main routine of percolation.py and check that it updates all values correctly."""
     mock_soil_data.infiltrated_water = infiltration
@@ -265,7 +264,7 @@ def test_percolate(
     ):
         incorp.percolate(seasonal_high_water_table)
 
-    #mock_infiltrated_water.assert_called_once_with()
+    # mock_infiltrated_water.assert_called_once_with()
     assert percolation_allowed.call_count == expected_call_count
     actual_percolation = mock_soil_data.get_vectorized_layer_attribute("percolated_water")
     if can_percolate:
