@@ -139,36 +139,36 @@ def test_percolate_between_layers(
     "infiltration,water_contents,acceptable_percolation_amounts,percolated_water,expected_water,expected_layer",
     [
         (
-                10.0,
-                [5.0, 5.0, 5.0, 5.0],
-                [3.0] * 4,
-                [7.0, 4.0, 1.0, 0.0],
-                [8.0, 8.0, 8.0, 6.0, 0.0],
-                4,
+            10.0,
+            [5.0, 5.0, 5.0, 5.0],
+            [3.0] * 4,
+            [7.0, 4.0, 1.0, 0.0],
+            [8.0, 8.0, 8.0, 6.0, 0.0],
+            4,
         ),
         (
-                4.0,
-                [5.0, 5.0, 5.0, 5.0],
-                [3.0] * 4,
-                [1.0, 0.0, 0.0, 0.0],
-                [8.0, 6.0, 5.0, 5.0, 0.0],
-                2,
+            4.0,
+            [5.0, 5.0, 5.0, 5.0],
+            [3.0] * 4,
+            [1.0, 0.0, 0.0, 0.0],
+            [8.0, 6.0, 5.0, 5.0, 0.0],
+            2,
         ),
         (
-                8.5,
-                [6.0, 12.4, 19.3, 18.0],
-                [1.3, 2.4, 5.0, 4.7],
-                [7.2, 4.8, 0.0, 0.0],
-                [7.3, 14.8, 24.1, 18.0, 0.0],
-                3,
+            8.5,
+            [6.0, 12.4, 19.3, 18.0],
+            [1.3, 2.4, 5.0, 4.7],
+            [7.2, 4.8, 0.0, 0.0],
+            [7.3, 14.8, 24.1, 18.0, 0.0],
+            3,
         ),
         (
-                20.0,
-                [5.0, 5.0, 5.0, 5.0],
-                [3.0] * 4,
-                [17.0, 14.0, 11.0, 8.0],
-                [8.0, 8.0, 8.0, 8.0, 8.0],
-                None,
+            20.0,
+            [5.0, 5.0, 5.0, 5.0],
+            [3.0] * 4,
+            [17.0, 14.0, 11.0, 8.0],
+            [8.0, 8.0, 8.0, 8.0, 8.0],
+            None,
         ),
         (20.0, [8.0, 8.0, 8.0, 8.0], [0.0] * 4, [20.0] * 4, [8.0, 8.0, 8.0, 8.0, 20.0], None),
         (1.0, [5.0] * 4, [2.0] * 4, [0.0] * 4, [6.0, 5.0, 5.0, 5.0, 0.0], 1),
@@ -247,9 +247,6 @@ def test_percolate(
     mock_soil_data.infiltrated_water = infiltration
     incorp = Percolation(mock_soil_data)
 
-    #mock_infiltrated_water = mocker.patch.object(
-    #    incorp, "percolate_infiltrated_water", return_value=top_layer_percolated
-    #)
     with (
         patch(
             "RUFAS.routines.field.soil.percolation.Percolation._determine_if_percolation_allowed",
