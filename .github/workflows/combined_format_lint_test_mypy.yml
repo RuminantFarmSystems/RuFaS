@@ -151,9 +151,8 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: |
           git checkout main
-          # Print the relevant part of README for debugging
-          cat README.md
-          error_count=$(grep -oP 'Mypy-\K\d+(?= errors)' README.md)
+          # Use basic regex with grep and cut to extract the error count
+          error_count=$(grep 'Mypy' README.md | grep -o '[0-9]\+ errors' | cut -d ' ' -f 1)
           if [ -z "$error_count" ]; then
             echo "Error count not found in README.md"
             exit 1
