@@ -85,7 +85,7 @@ class SimulationEngine:
                 dict(info_map, **{"units": available_feeds_units}),
             )
         emissions = Emissions()
-        emissions.calculate_purchased_feed_emissions()
+        emissions.calculate_emissions()
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
