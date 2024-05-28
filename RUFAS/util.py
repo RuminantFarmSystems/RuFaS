@@ -354,7 +354,7 @@ class Utility:
     @staticmethod
     def filter_dictionary(
         dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
-    ) -> Dict[Any, Any]:
+    ):
         """
         Returns a filtered dictionary based on either inclusion or exclusion.
 
@@ -386,7 +386,7 @@ class Utility:
         }
 
     @staticmethod
-    def remove_special_chars(input_string: str) -> str:
+    def remove_special_chars(input_string: str):
         """Function to remove special characters from a string.
 
         Parameters
