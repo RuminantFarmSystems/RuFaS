@@ -92,6 +92,15 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
     assert mock_input_manager.pool == test_data
 
 
+def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Test for metadata override function for metadata depth limit"""
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    new_limit = 10
+    mock_input_manager.set_metadata_depth_limit(new_limit)
+    assert mock_input_manager.metadata_depth_limit == new_limit
+    mock_add_log.assert_called_once()
+
+
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
     mocker.patch.object(Path, "exists", return_value=True)
@@ -265,6 +274,7 @@ def test_start_data_processing(
     patch_for_populate_pool = mocker.patch.object(mock_input_manager, "_populate_pool", return_value=True)
     patch_for_validate_metadata = mocker.patch.object(mock_input_manager, "_validate_metadata")
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
+    patch_for_validate_properties = mocker.patch.object(mock_input_manager, "_validate_properties")
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -275,6 +285,7 @@ def test_start_data_processing(
     patch_for_populate_pool.assert_called_once_with(eager_termination)
     patch_for_load_properties.assert_called_once()
     patch_for_validate_metadata.assert_called_once()
+    patch_for_validate_properties.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -3542,11 +3553,13 @@ def test_dump_get_data_logs(
     patch_for_generate_file_name = mocker.patch(
         "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
     )
+    patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
     with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
         mock_input_manager.dump_get_data_logs(path=mock_dir_path)
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    patch_create_dir.assert_called_once_with(mock_dir_path)
     mock_dict_to_file_json.assert_called_once_with(
         mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
     )
@@ -3803,7 +3816,7 @@ def test_validate_array_container_properties(
     properties_blob_key: str,
     expected_result: bool,
     expected_warning: str,
-):
+) -> None:
     """
     Unit test for the _validate_array_container_properties() method of the InputManager class.
     """
@@ -3906,7 +3919,7 @@ def test_array_type_validator(
     patch_container_valid: bool,
     patch_element_valid: bool,
     expected_result: bool,
-):
+) -> None:
     """
     Unit test for the _array_type_validator() method of the InputManager class.
     """
@@ -4074,11 +4087,13 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
+        patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock) as mock_create_dir,
     ):
 
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
+        mock_create_dir.assert_called_once_with(output_dir)
         mock_to_csv.assert_called_once_with(output_dir / "output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
@@ -4101,6 +4116,7 @@ def test_save_metadata_properties_errors(
     mock_records = [{"key": "value"}]
 
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
+    mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
     mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4157,10 +4173,10 @@ def test_parse_metadata_properties(
     expected_primitive_call_counts: Dict[str, int],
     expected_create_record_call_count: int,
     expected_results: List[Dict[str, str]],
-):
+) -> None:
     """Tests _parse_metadata_properties() function in InputManager."""
 
-    def side_effect_check_property_type_primitive(value):
+    def side_effect_check_property_type_primitive(value) -> bool:
         """Function to mock check_property_type_primitive dynamically."""
         return value.get("type") in ["string", "number"]
 
@@ -4206,7 +4222,7 @@ def test_parse_metadata_properties(
 )
 def test_check_property_type_primitive(
     mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
-):
+) -> None:
     """Tests _check_property_type_primitive() function in InputManager."""
     result = mock_input_manager._check_property_type_primitive(property_dict)
     assert result == expected_result
@@ -4253,8 +4269,8 @@ def test_check_property_type_primitive(
     ],
 )
 def test_create_record(
-    mock_input_manager: InputManager, data_entry: Dict[str, str], name: str, expected_record: Dict[str, str]
-):
+    mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
+) -> None:
     """Tests _create_record() function in InputManager."""
     result = mock_input_manager._create_record(data_entry, name)
     assert result == expected_record
@@ -4337,6 +4353,155 @@ def test_validate_metadata(
         input_manager._validate_metadata()
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "file_exists, error, file_content, modified_properties, expected_diff",
+    [
+        (
+            True,
+            None,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
+        (
+            False,
+            OSError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
+        (
+            False,
+            PermissionError,
+            '{"key1": "value1", "key3": "value3"}',
+            {"key1": "value1_changed", "key3": "value3"},
+            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+        ),
+        (True, None, '{"key1": "value1", "key2": "value2"}', {"key1": "value1", "key2": "value2"}, {}),
+    ],
+)
+def test_compare_metadata_properties(
+    mocker: MockerFixture,
+    file_exists: bool,
+    error: Type[PermissionError | OSError],
+    file_content: str,
+    modified_properties: dict[str, str],
+    expected_diff: dict[str, dict[str, str]],
+) -> None:
+    dummy_properties = {"key1": "value1", "key2": "value2"}
+    dummy_properties_modified = modified_properties
+    input_manager = InputManager()
+
+    properties_file_path = Path("/fake/dir/original_properties.json")
+    comparison_properties_file_path = Path("/fake/dir/comparison_properties.json")
+    output_path = Path("path/to/output")
+
+    if file_exists:
+        mock_file = mock_open(read_data=file_content)
+        mocker.patch("builtins.open", mock_file)
+    else:
+        mocker.patch("builtins.open", side_effect=error)
+
+    mocker.patch.object(
+        input_manager,
+        "_load_metadata",
+        side_effect=lambda file: setattr(
+            input_manager,
+            "meta_data",
+            dummy_properties_modified if file == comparison_properties_file_path else dummy_properties,
+        ),
+    )
+
+    mocker.patch("deepdiff.DeepDiff", return_value=expected_diff)
+
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    if file_exists:
+        input_manager.compare_metadata_properties(properties_file_path, comparison_properties_file_path, output_path)
+        mock_file.assert_called()
+        mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
+    else:
+        with pytest.raises(error):
+            input_manager.compare_metadata_properties(
+                properties_file_path, comparison_properties_file_path, output_path
+            )
+        mock_add_log.assert_called()
+        mock_add_error.assert_called()
+
+
+@pytest.mark.parametrize(
+    "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
+    [
+        ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
+        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
+            2,
+            3,
+            ["a", "b", "c"],
+            True,
+            ["Max metadata depth exceeded."],
+            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']",
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"type": "invalid_type"}}}},
+            3,
+            2,
+            ["a", "b"],
+            True,
+            ["Properties value type error"],
+            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
+        ),
+        ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+    ],
+)
+def test_validate_properties(
+    mocker: MockerFixture,
+    metadata: Dict[str, Any],
+    limit: int,
+    expected_depth: int,
+    expected_path: List[str],
+    should_raise: bool,
+    expected_errors: List[str],
+    expected_err_msg: str,
+) -> None:
+    """Tests _validate_properties() function in InputManager."""
+    input_manager = InputManager()
+    input_manager.meta_data = metadata
+    input_manager.metadata_depth_limit = limit
+
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    if should_raise:
+        with pytest.raises(ValueError) as exc_info:
+            input_manager._validate_properties()
+        assert str(exc_info.value) == expected_err_msg
+        assert mock_add_error.call_count == len(expected_errors)
+        for error_msg in expected_errors:
+            mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
+        mock_add_log.assert_not_called()
+    else:
+        input_manager._validate_properties()
+        mock_add_log.assert_called()
+        mock_add_error.assert_not_called()
+        assert mock_add_log.call_args_list == [
+            call(
+                "Metadata properties depth",
+                f"Max depth of metadata properties is {expected_depth}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+            call(
+                "Metadata properties path",
+                f"Deepest path of metadata properties is {expected_path}",
+                {"class": "InputManager", "function": "_validate_properties"},
+            ),
+        ]
 
 
 def test_increment_in_elements_counter() -> None:
