@@ -265,7 +265,6 @@ def test_percolate(
     ):
         incorp.percolate(seasonal_high_water_table)
 
-    #mock_infiltrated_water.assert_called_once_with()
     assert percolation_allowed.call_count == expected_call_count
     actual_percolation = mock_soil_data.get_vectorized_layer_attribute("percolated_water")
     if can_percolate:
