@@ -151,15 +151,14 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: |
           git checkout main
-          # Use awk to extract the error count, ensuring only numbers are captured
-          error_count=$(awk -F'-' '/Mypy/{gsub(/[^0-9]/, "", $2); print $2}' README.md)
+          # Use awk to match and extract only the first set of digits before any non-digit characters
+          error_count=$(awk -F'-' '/Mypy/{match($2, /[0-9]+/); print substr($2, RSTART, RLENGTH)}' README.md)
           if [ -z "$error_count" ]; then
             echo "Error count not found in README.md"
             exit 1
           fi
           echo "Mypy error count on main branch: $error_count"
           echo $error_count > mypy_main_branch_error_count.txt
-
       - name: Set main branch error count as output
         id: set_main_branch_error_count
         if: github.ref != 'refs/heads/main'
