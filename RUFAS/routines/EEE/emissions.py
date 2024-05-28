@@ -55,6 +55,7 @@ class Emissions:
         return processed_yields
 
     def _gather_ration_feed_totals(self) -> dict[str, float]:
+        """Collects totals of feeds from rations given to animals and collapses them into single set of numbers."""
         filter = {
             "name": "Feed Ration Totals",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
@@ -71,3 +72,22 @@ class Emissions:
         values_list = [data[key]["values"] for key in keys]
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
+
+    def _calculate_actual_purchased_feeds(self, homegrown_feeds: list[dict[str, Any]], purchased_feeds: dict[str, float]) -> dict[str, float]:
+        """Calculates the difference between the purchased feeds and feeds grown on the farm."""
+        homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
+        for feed in homegrown_totals:
+            yields = filter(lambda crop: crop["crop"] == feed, homegrown_feeds)
+            homegrown_totals[feed] += sum([crop_yield["dry_yield"] for crop_yield in yields])
+
+        actual_purchased_feeds = {}
+        for feed_id, amount in purchased_feeds.items():
+            homegrown_alternatives = {key: homegrown_totals[key] for key in homegrown_totals if feed_id in key.value}
+            for key, value in homegrown_alternatives.items():
+                amount_used = min(amount, value)
+                amount -= amount_used
+                homegrown_alternatives[key] -= amount_used
+
+            actual_purchased_feeds[feed_id] = amount
+
+        return actual_purchased_feeds
