@@ -227,7 +227,7 @@ class LayerData:
     humus_mineralization_rate_factor : float, default 0.0003
         Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
         Reference: SWAT Input .BSN file, see "CMN" on page 101.
-    denitrification_rate_coefficient : float, default 1.4
+    denitrification_rate_coefficient : float, default 0.05
         Controls the rate of denitrification in this layer of soil (unitless).
         Note: acceptable values for this attribute are in the range [0.0, 3.0].
         Reference: SWAT Input .BSN file, see "CDN" on page 101.
@@ -405,7 +405,7 @@ class LayerData:
     annual_nitrous_oxide_emissions_total: float = 0.0
 
     humus_mineralization_rate_factor: float = 0.0003
-    denitrification_rate_coefficient: float = 1.4
+    denitrification_rate_coefficient: float = 0.05
     denitrification_threshold_water_content: float = 1.10
     residue_fresh_organic_mineralization_rate: float = 0.05
     ammonium_volatilization_cation_exchange_factor: float = 0.15
