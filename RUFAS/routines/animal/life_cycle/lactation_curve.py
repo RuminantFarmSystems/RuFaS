@@ -41,12 +41,12 @@ class LactationCurve:
         self.adjustment_dict = im.get_data("lactation.adjustment_dict")
 
     def get_y_values_wood_curve(
-        self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
+        self, t: float, parameter_l: float, parameter_m: float, parameter_n: float
     ) -> np.float64:
-        return parameter_a * np.power(t, parameter_b) * np.exp(-1 * parameter_c * t)
+        return parameter_l * np.power(t, parameter_m) * np.exp(-1 * parameter_n * t)
 
-    def calc_integral_wood_curve(self, parameter_a: float, parameter_b: float, parameter_c: float) -> float:
-        result, _ = quad(self.get_y_values_wood_curve, 1, 305, args=(parameter_a, parameter_b, parameter_c))
+    def calc_integral_wood_curve(self, parameter_l: float, parameter_m: float, parameter_n: float) -> float:
+        result, _ = quad(self.get_y_values_wood_curve, 1, 305, args=(parameter_l, parameter_m, parameter_n))
         return result
 
     def get_wood_parameters(
@@ -58,9 +58,9 @@ class LactationCurve:
         milking_frequency: str = None,
         MY_305d: str = None,
     ) -> tuple:
-        parameter_a = 19.9
-        parameter_b = 24.7 * 1e-2
-        parameter_c = 33.76 * 1e-4
+        parameter_l = 19.9
+        parameter_m = 24.7 * 1e-2
+        parameter_n = 33.76 * 1e-4
 
         adjustment_dict = im.get_data("lactation.adjustment_dict")
         
@@ -78,9 +78,9 @@ class LactationCurve:
                 x = 0
                 while (x<len(adjustment_dict[category]) and (not adjustment_applied) and (farm_specific[category] != None)):
                     if adjustment_dict[category][x][category] == farm_specific[category]:
-                        parameter_a += adjustment_dict[category][x]["adjustments"][0]
-                        parameter_b += adjustment_dict[category][x]["adjustments"][1] * 1e-2
-                        parameter_c += adjustment_dict[category][x]["adjustments"][2] * 1e-4
+                        parameter_l += adjustment_dict[category][x]["adjustments"][0]
+                        parameter_m += adjustment_dict[category][x]["adjustments"][1] * 1e-2
+                        parameter_n += adjustment_dict[category][x]["adjustments"][2] * 1e-4
                         adjustment_applied = True
                         
                         print(adjustment_dict[category][x][category])
@@ -89,27 +89,27 @@ class LactationCurve:
                     x = x+1
         # for category in [lactation_group, year, month, region, milking_frequency]:
         #     if category:
-        #         parameter_a += self.adjustment_dict[category][0]
-        #         parameter_b += self.adjustment_dict[category][1] * 1e-2
-        #         parameter_c += self.adjustment_dict[category][2] * 1e-4
+        #         parameter_l += self.adjustment_dict[category][0]
+        #         parameter_m += self.adjustment_dict[category][1] * 1e-2
+        #         parameter_n += self.adjustment_dict[category][2] * 1e-4
 
         if MY_305d == None:
-            MY_305d = self.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
-            return parameter_a, parameter_b, parameter_c, MY_305d
+            MY_305d = self.calc_integral_wood_curve(parameter_l, parameter_m, parameter_n)
+            return parameter_l, parameter_m, parameter_n, MY_305d
 
         else:
             min_diff = float("inf")
-            parameter_a_best_estimate = 0
+            parameter_l_best_estimate = 0
             MY_305d_best_estimate = 0
 
-            for parameter_a_error in np.arange(-10, 10, 0.01):
-                parameter_a_vary = parameter_a + parameter_a_error
-                MY_305d_vary = self.calc_integral_wood_curve(parameter_a_vary, parameter_b, parameter_c)
+            for parameter_l_error in np.arange(-10, 10, 0.01):
+                parameter_l_vary = parameter_l + parameter_l_error
+                MY_305d_vary = self.calc_integral_wood_curve(parameter_l_vary, parameter_m, parameter_n)
                 if abs(MY_305d_vary - MY_305d) < min_diff:
                     min_diff = abs(MY_305d_vary - MY_305d)
-                    parameter_a_best_estimate = parameter_a_vary
+                    parameter_l_best_estimate = parameter_l_vary
                     MY_305d_best_estimate = MY_305d_vary
-            return parameter_a_best_estimate, parameter_b, parameter_c, MY_305d_best_estimate
+            return parameter_l_best_estimate, parameter_m, parameter_n, MY_305d_best_estimate
 
     def set_lactation_curve_parameters(self) -> tuple[tuple, tuple, tuple]:
         # calculate lactation group yield
