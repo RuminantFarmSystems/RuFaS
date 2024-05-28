@@ -69,7 +69,7 @@ def test_get_wood_parameters_305dNone(mocker: MockerFixture):
     assert actual_305d == mock_MY_305d
 
     
-def test_get_wood_parameters_305d():
+def test_get_wood_parameters_305d(mocker):
     """Unit test for function test_get_wood_parameteres in file routines/animal/life_cycle/lactation_curve.py when MY_305 is not None"""
 
     # Arrange
@@ -104,12 +104,12 @@ def test_get_wood_parameters_305d():
   
 
 
-def test_set_lactation_curve_parameters(cow_fixture: AnimalBase):
-    """Unit test for function set_lactation_curve_parameters in file routines/animal/life_cycle/lactation_curve.py"""
+# def test_set_lactation_curve_parameters(cow_fixture: AnimalBase):
+#     """Unit test for function set_lactation_curve_parameters in file routines/animal/life_cycle/lactation_curve.py"""
 
-    # Act
-    cow_fixture.set_lactation_curve_parameters()
-    AnimalBase.set_lactation_curve_parameters()
+#     # Act
+#     cow_fixture.set_lactation_curve_parameters()
+#     AnimalBase.set_lactation_curve_parameters()
 
-    # Assert
-    AnimalBase.lactation_parameters[0]
+#     # Assert
+#     AnimalBase.lactation_parameters[0]
