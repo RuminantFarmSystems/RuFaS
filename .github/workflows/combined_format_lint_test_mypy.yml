@@ -147,12 +147,13 @@ jobs:
         id: set_current_branch_error_count
         run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
-      - name: Run mypy on the main branch
+      - name: Extract mypy error count from README
         if: github.ref != 'refs/heads/main'
         run: |
           git checkout main
-          python -m mypy . 2>&1 | tee mypy_main_branch_report.txt || true
-          grep -c "error:" mypy_main_branch_report.txt > mypy_main_branch_error_count.txt
+          error_count=$(grep -oP 'Mypy-\K\d+(?= errors)' README.md)
+          echo "Mypy error count on main branch: $error_count"
+          echo $error_count > mypy_main_branch_error_count.txt
 
       - name: Set main branch error count as output
         id: set_main_branch_error_count
