@@ -151,7 +151,13 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: |
           git checkout main
+          # Print the relevant part of README for debugging
+          cat README.md
           error_count=$(grep -oP 'Mypy-\K\d+(?= errors)' README.md)
+          if [ -z "$error_count" ]; then
+            echo "Error count not found in README.md"
+            exit 1
+          fi
           echo "Mypy error count on main branch: $error_count"
           echo $error_count > mypy_main_branch_error_count.txt
 
