@@ -64,6 +64,7 @@ class Emissions:
         print(f"{actual_purchased_feed_emissions}\n\n")
 
     def _gather_homegrown_feeds(self) -> list[dict[str, Any]]:
+        """Gathers the yields that were harvested in the last 365 days of the simulation."""
         filter = {
             "name": "Homegrown Feeds",
             "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
@@ -78,11 +79,15 @@ class Emissions:
         return processed_yields
 
     def _gather_ration_feed_totals(self) -> dict[str, float]:
-        """Collects totals of feeds from rations given to animals and collapses them into single set of numbers."""
+        """
+        Collects totals of feeds from rations given to animals in the last 365 days of the simulation and collapses them
+        into single set of numbers.
+        """
         filter = {
             "name": "Feed Ration Totals",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
             "variables": [r"^\d+$"],
+            "slice_start": -365,
         }
         feeds = om.filter_variables_pool(filter)
 
