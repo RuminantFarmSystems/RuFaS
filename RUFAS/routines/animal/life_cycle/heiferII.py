@@ -227,8 +227,6 @@ class HeiferII(HeiferI):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
