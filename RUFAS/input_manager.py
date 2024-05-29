@@ -1854,6 +1854,7 @@ class InputManager:
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = path / file_name
+        om.create_directory(path)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
     def _validate_metadata(self) -> None:
@@ -2004,6 +2005,7 @@ class InputManager:
         path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
         om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
         try:
+            om.create_directory(output_dir)
             df.to_csv(path_to_save, index=False)
             om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
         except FileNotFoundError as fnfe:
