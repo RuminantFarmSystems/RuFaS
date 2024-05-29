@@ -14,7 +14,6 @@
     "simulation_days": 5000
   },
   "animal_config": {
-	"not-here": "here",
     "management_decisions": {
       "breeding_start_day_h": 380,
       "heifer_repro_method": "ED",
