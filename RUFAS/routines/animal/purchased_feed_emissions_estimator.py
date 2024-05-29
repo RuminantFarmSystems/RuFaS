@@ -7,18 +7,11 @@ om = OutputManager()
 
 
 class PurchasedFeedEmissionsEstimator:
-    def __init__(self):
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": "__init__",
-        }
+    def __init__(self) -> None:
+        info_map = {"class": self.__class__.__name__, "function": "__init__"}
 
         self.FIPS_county_code = im.get_data("config.FIPS_county_code")
 
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": "__init__",
-        }
         om.add_variable(
             "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
@@ -52,7 +45,7 @@ class PurchasedFeedEmissionsEstimator:
             "function": self.create_daily_purchased_feed_emissions_report.__name__,
         }
 
-        emissions_per_feed_id = {"feed_emissions_total": 0}
+        emissions_per_feed_id = {"feed_emissions_total": 0.0}
 
         for feed_id, amount_fed in daily_feed_totals.items():
             if feed_id == "dry_matter_intake_total":
@@ -96,7 +89,7 @@ class PurchasedFeedEmissionsEstimator:
         county_codes = feed_emissions_data["county_code"]
         emissions_index = county_codes.index(self.FIPS_county_code)
 
-        feed_keys = [key for key in feed_emissions_data.keys() if key != "FIPS_county_code"]
+        feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict
