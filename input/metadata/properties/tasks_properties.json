@@ -155,6 +155,7 @@
           "type": "array",
           "description": "The input variables to perform Sensitivity Analysis on",
           "default": [{}],
+          "nullable": true,
           "properties": {
             "type": "object",
             "variable_name": {
