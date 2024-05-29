@@ -201,7 +201,7 @@ def test_percolate_infiltrated_water(
         side_effect=acceptable_percolation_amounts,
     ):
         percolation.percolate_infiltrated_water()
-        
+
     for index, layer in enumerate(percolation.data.soil_layers):
         assert pytest.approx(layer.water_content) == expected_water[index]
         assert pytest.approx(layer.percolated_water) == percolated_water[index]
