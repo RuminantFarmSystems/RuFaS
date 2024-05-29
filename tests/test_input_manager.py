@@ -3180,11 +3180,13 @@ def test_dump_get_data_logs(
     patch_for_generate_file_name = mocker.patch(
         "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
     )
+    patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
     with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
         mock_input_manager.dump_get_data_logs(path=mock_dir_path)
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
+    patch_create_dir.assert_called_once_with(mock_dir_path)
     mock_dict_to_file_json.assert_called_once_with(
         mock_input_manager._InputManager__get_data_logs_pool, Path("dummy_path", mock_generated_file_name)
     )
@@ -3781,10 +3783,12 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         patch(
             "RUFAS.output_manager.OutputManager.generate_file_name", return_value="output.csv"
         ) as mock_generate_file_name,
+        patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock) as mock_create_dir,
     ):
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
+        mock_create_dir.assert_called_once_with(output_dir)
         mock_to_csv.assert_called_once_with(output_dir / "output.csv", index=False)
         mock_generate_file_name.assert_called_once_with("InputManager_metadata_properties", extension="csv")
 
@@ -3807,6 +3811,7 @@ def test_save_metadata_properties_errors(
     mock_records = [{"key": "value"}]
 
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
+    mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
     mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
