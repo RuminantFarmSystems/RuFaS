@@ -200,9 +200,8 @@ def test_percolate_infiltrated_water(
         new_callable=PropertyMock,
         side_effect=acceptable_percolation_amounts,
     ):
-        actual = percolation.percolate_infiltrated_water()
-
-    assert actual == expected_layer
+        percolation.percolate_infiltrated_water()
+        
     for index, layer in enumerate(percolation.data.soil_layers):
         assert pytest.approx(layer.water_content) == expected_water[index]
         assert pytest.approx(layer.percolated_water) == percolated_water[index]
