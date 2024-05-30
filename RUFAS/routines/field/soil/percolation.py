@@ -90,12 +90,6 @@ class Percolation:
         """
         Percolates infiltrated water into the soil profile.
 
-        Returns
-        -------
-        int | None
-            The index of the topmost soil which has not had water percolated out of it, or None if all layers in the
-            soil profile have had water percolated out.
-
         Notes
         -----
         The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
