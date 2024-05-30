@@ -15,6 +15,7 @@ from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, 
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+from .routines.EEE.emissions import Emissions
 
 om = OutputManager()
 im = InputManager()
@@ -83,6 +84,8 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
+        emissions = Emissions()
+        emissions.calculate_emissions()
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
