@@ -63,10 +63,6 @@ class Emissions:
             actual_purchased_feed_emissions,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
-        print(f"\n\n{homegrown_feeds}\n\n")
-        print(f"{purchased_feeds}\n\n")
-        print(f"{actual_purchased_feed_totals}\n\n")
-        print(f"{actual_purchased_feed_emissions}\n\n")
 
     def _gather_homegrown_feeds(self) -> list[dict[str, Any]]:
         """Gathers the yields that were harvested in the last 365 days of the simulation."""
@@ -199,10 +195,18 @@ class Emissions:
                 grouped_feeds[field_name] = []
             grouped_feeds[field_name].append(feed)
 
-        _ = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
-        # import remote_pdb
-        # remote_pdb.RemotePdb("localhost", 4445).set_trace()
+        for field in grouped_feeds.keys():
+            crops_with_emissions = self._calculate_emissions_by_field(
+                grouped_feeds[field], grouped_soil_characteristics[field]
+            )
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._calculate_homegrown_feed_emissions.__name__,
+                "units": MeasurementUnits.KILOGRAMS,
+            }
+            om.add_variable("homegrown_feed_emissions", crops_with_emissions, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
@@ -251,3 +255,20 @@ class Emissions:
 
             soil_info[name] = soil_data
         return soil_info
+
+    def _calculate_emissions_by_field(
+        self, feeds_grown: list[dict[str, Any]], field_emissions: dict[str, float]
+    ) -> list[dict[str, Any]]:
+        """
+        Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
+        """
+        total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
+        # TODO: Check that total dry mass is not 0
+
+        for crop in feeds_grown:
+            fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
+            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown
+            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown
+            crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
+
+        return feeds_grown
