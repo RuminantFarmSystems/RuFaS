@@ -156,6 +156,7 @@ class Soil:
         """
         self.percolation.percolate(has_seasonal_high_water_table)
         self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
+        self.percolation.percolate_infiltrated_water()
         self.evaporation.evaporate(maximum_soil_evaporation)
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue, rainfall)
         self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)
