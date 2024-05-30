@@ -197,17 +197,21 @@ class Emissions:
 
         grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
+        crops_with_emissions = []
         for field in grouped_feeds.keys():
-            crops_with_emissions = self._calculate_emissions_by_field(
-                grouped_feeds[field], grouped_soil_characteristics[field]
-            )
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self._calculate_homegrown_feed_emissions.__name__,
-                "units": MeasurementUnits.KILOGRAMS,
-            }
-            for crop in crops_with_emissions:
-                om.add_variable("homegrown_feed_emissions", crop, info_map)
+            crops = self._calculate_emissions_by_field(grouped_feeds[field], grouped_soil_characteristics[field])
+            crops_with_emissions.extend(crops)
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._calculate_homegrown_feed_emissions.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        import remote_pdb
+        remote_pdb.RemotePdb("localhost", 4444).set_trace()
+        crop_types: set[str] = {crop["crop"] for crop in crops_with_emissions}
+        for crop in crop_types:
+            om.add_variable("homegrown_feed_emissions", crop, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
