@@ -119,6 +119,13 @@
       "type": "json",
       "properties": "field_properties"
     },
+    "field_2": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/default_field.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",

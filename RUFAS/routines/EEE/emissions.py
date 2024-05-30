@@ -31,6 +31,7 @@ CROP_SPECIES_TO_PURCHASED_FEED_ID = {
 
 SLICE_START = -365
 SLICE_END = -364
+FINAL_DAY_SLICE_START = -1
 
 im = InputManager()
 om = OutputManager()
@@ -45,6 +46,7 @@ class Emissions:
     def calculate_emissions(self) -> None:
         homegrown_feeds = self._gather_homegrown_feeds()
         self._calculate_purchased_feed_emissions(homegrown_feeds)
+        self._calculate_homegrown_feed_emissions(homegrown_feeds)
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
@@ -77,14 +79,21 @@ class Emissions:
 
         processed_yields = self._win_just_one_for_the_zipper(yields)
 
-        time_filter = {"name": "Time Filter", "filters": ["Time.(day|calendar_year)"], "slice_start": SLICE_START, "slice_end": SLICE_END}
+        time_filter = {
+            "name": "Time Filter",
+            "filters": ["Time.(day|calendar_year)"],
+            "slice_start": SLICE_START,
+            "slice_end": SLICE_END,
+        }
         date_cutoff = om.filter_variables_pool(time_filter)
         day_cutoff = date_cutoff["Time.day"]["values"][0]
         year_cutoff = date_cutoff["Time.calendar_year"]["values"][0]
 
-        filtered_yields = list(filter(
-            lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
-        ))
+        filtered_yields = list(
+            filter(
+                lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
+            )
+        )
 
         for crop in filtered_yields:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
@@ -180,3 +189,65 @@ class Emissions:
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict
+
+    def _calculate_homegrown_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
+        """Calculates the emissions associated with feeds grown on the farm."""
+        grouped_feeds = {}
+        for feed in homegrown_feeds:
+            field_name = feed["field_name"]
+            if field_name not in grouped_feeds.keys():
+                grouped_feeds[field_name] = []
+            grouped_feeds[field_name].append(feed)
+
+        _ = self._collect_target_soil_characteristics(grouped_feeds.keys())
+
+        # import remote_pdb
+        # remote_pdb.RemotePdb("localhost", 4445).set_trace()
+
+    def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
+        """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
+        soil_info = {}
+        for name in field_names:
+            soil_data = {}
+            ammonia_filter = {
+                "name": "Soil Ammonia emissions",
+                "filters": [
+                    f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{name}',layer=.*",
+                ],
+                "slice_start": SLICE_START,
+            }
+            ammonia_emissions = om.filter_variables_pool(ammonia_filter)
+            soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
+            nitrous_oxide_filter = {
+                "name": "Soil Nitrous Oxide emissions",
+                "filters": [f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{name}',layer=.*"],
+                "slice_start": SLICE_START,
+            }
+            nitrous_oxide_emissions = om.filter_variables_pool(nitrous_oxide_filter)
+            soil_data["nitrous_oxide"] = sum(
+                [sum(nitrous_oxide_emissions[key]["values"]) for key in nitrous_oxide_emissions.keys()]
+            )
+
+            starting_carbon_stock_filter = {
+                "name": "Starting soil profile carbon stock",
+                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{name}'"],
+                "slice_start": SLICE_START,
+                "slice_end": SLICE_END,
+            }
+            starting_carbon_stock = om.filter_variables_pool(starting_carbon_stock_filter)
+            total_starting_carbon = sum(
+                [starting_carbon_stock[key]["values"][0] for key in starting_carbon_stock.keys()]
+            )
+
+            ending_carbon_stock_filter = {
+                "name": "Ending soil profile carbon stock",
+                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{name}'"],
+                "slice_start": FINAL_DAY_SLICE_START,
+            }
+            ending_carbon_stock = om.filter_variables_pool(ending_carbon_stock_filter)
+            total_ending_carbon = sum([ending_carbon_stock[key]["values"][0] for key in ending_carbon_stock.keys()])
+
+            soil_data["carbon_stock_change"] = total_ending_carbon - total_starting_carbon
+
+            soil_info[name] = soil_data
+        return soil_info
