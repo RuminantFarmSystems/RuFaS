@@ -197,16 +197,21 @@ class Emissions:
 
         grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
+        crops_with_emissions = []
         for field in grouped_feeds.keys():
-            crops_with_emissions = self._calculate_emissions_by_field(
-                grouped_feeds[field], grouped_soil_characteristics[field]
-            )
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self._calculate_homegrown_feed_emissions.__name__,
-                "units": MeasurementUnits.KILOGRAMS,
-            }
-            om.add_variable("homegrown_feed_emissions", crops_with_emissions, info_map)
+            crops = self._calculate_emissions_by_field(grouped_feeds[field], grouped_soil_characteristics[field])
+            crops_with_emissions.extend(crops)
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._calculate_homegrown_feed_emissions.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        import remote_pdb
+        remote_pdb.RemotePdb("localhost", 4444).set_trace()
+        crop_types: set[str] = {crop["crop"] for crop in crops_with_emissions}
+        for crop in crop_types:
+            om.add_variable("homegrown_feed_emissions", crop, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
@@ -262,13 +267,14 @@ class Emissions:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
         """
+        field_size = feeds_grown[0]["field_size"]
         total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
         # TODO: Check that total dry mass is not 0
 
         for crop in feeds_grown:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown
-            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown
+            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
             crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
 
         return feeds_grown
