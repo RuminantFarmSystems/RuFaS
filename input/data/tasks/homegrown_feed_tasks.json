@@ -5,7 +5,7 @@
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/homegrown_feed_test_metadata.json",
       "output_prefix": "Task 1",
-      "log_verbosity": "errors"
+      "log_verbosity": "logs"
     }
   ]
 }

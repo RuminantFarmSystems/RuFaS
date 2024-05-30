@@ -195,9 +195,6 @@ class Emissions:
                 grouped_feeds[field_name] = []
             grouped_feeds[field_name].append(feed)
 
-        import remote_pdb
-        remote_pdb.RemotePdb("localhost", 4444).set_trace()
-
         grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
         for field in grouped_feeds.keys():
@@ -266,13 +263,14 @@ class Emissions:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
         """
+        field_size = feeds_grown[0]["field_size"]
         total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
         # TODO: Check that total dry mass is not 0
 
         for crop in feeds_grown:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown
-            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown
+            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
             crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
 
         return feeds_grown
