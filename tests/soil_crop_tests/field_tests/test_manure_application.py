@@ -93,7 +93,7 @@ def test_determine_weighted_manure_attributes(
             app_coverage,
         )
 
-        if(old_mass + app_mass) > 0:
+        if (old_mass + app_mass) > 0:
             patched_moisture_factor.assert_called_once_with(app_dry_fraction)
 
         assert pytest.approx(observe.get("new_dry_matter_mass"), rel=1e-4) == expected_mass
@@ -221,11 +221,11 @@ def test_apply_solid_machine_manure(
     assert incorp.data.machine_water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac * remainder
     assert incorp.data.machine_water_extractable_organic_phosphorus == phosphorus_mass * 0.05 * remainder
     assert (
-            incorp.data.machine_stable_inorganic_phosphorus == phosphorus_mass * expected_stable_inorganic_frac * remainder
+        incorp.data.machine_stable_inorganic_phosphorus == phosphorus_mass * expected_stable_inorganic_frac * remainder
     )
     assert (
-            pytest.approx(incorp.data.machine_stable_organic_phosphorus)
-            == phosphorus_mass * expected_stable_organic_frac * remainder
+        pytest.approx(incorp.data.machine_stable_organic_phosphorus)
+        == phosphorus_mass * expected_stable_organic_frac * remainder
     )
     assert incorp.data.machine_manure_dry_mass == 4000
     assert incorp.data.machine_manure_moisture_factor == 0.83
@@ -374,62 +374,62 @@ def test_apply_liquid_machine_manure(
     "expected_nitrogen_calls",
     [
         (
-                50.0,
-                0.5,
-                0.05,
-                0.33,
-                0.12,
-                100.0,
-                0.4,
-                0.5,
-                0.1,
-                65.0,
-                0.5,
-                1.5,
-                [
-                    call(approx(0.826875), 1.5),
-                    call(approx(5.788125), 1.5),
-                    call(approx(9.9225), 1.5),
-                ],
-                [
-                    call(approx(0.4125), 1.5),
-                    call(approx(2.8875), 1.5),
-                    call(approx(4.95), 1.5),
-                ],
-                [
-                    call(0, 2.5, 0.4, 0.5, 0.1, 1.5),
-                    call(1, 17.5, 0.4, 0.5, 0.1, 1.5),
-                    call(2, 30, 0.4, 0.5, 0.1, 1.5),
-                ],
+            50.0,
+            0.5,
+            0.05,
+            0.33,
+            0.12,
+            100.0,
+            0.4,
+            0.5,
+            0.1,
+            65.0,
+            0.5,
+            1.5,
+            [
+                call(approx(0.826875), 1.5),
+                call(approx(5.788125), 1.5),
+                call(approx(9.9225), 1.5),
+            ],
+            [
+                call(approx(0.4125), 1.5),
+                call(approx(2.8875), 1.5),
+                call(approx(4.95), 1.5),
+            ],
+            [
+                call(0, 2.5, 0.4, 0.5, 0.1, 1.5),
+                call(1, 17.5, 0.4, 0.5, 0.1, 1.5),
+                call(2, 30, 0.4, 0.5, 0.1, 1.5),
+            ],
         ),
         (
-                70.0,
-                0.6,
-                0.03,
-                0.28,
-                0.09,
-                125.0,
-                0.5,
-                0.3,
-                0.08,
-                100.0,
-                0.8,
-                2.1,
-                [
-                    call(approx(1.9992), 2.1),
-                    call(approx(13.9944), 2.1),
-                    call(approx(23.9904), 2.1),
-                ],
-                [
-                    call(approx(0.784), 2.1),
-                    call(approx(5.488), 2.1),
-                    call(approx(9.408), 2.1),
-                ],
-                [
-                    call(0, 5, 0.5, 0.3, 0.08, 2.1),
-                    call(1, 35, 0.5, 0.3, 0.08, 2.1),
-                    call(2, 60, 0.5, 0.3, 0.08, 2.1),
-                ],
+            70.0,
+            0.6,
+            0.03,
+            0.28,
+            0.09,
+            125.0,
+            0.5,
+            0.3,
+            0.08,
+            100.0,
+            0.8,
+            2.1,
+            [
+                call(approx(1.9992), 2.1),
+                call(approx(13.9944), 2.1),
+                call(approx(23.9904), 2.1),
+            ],
+            [
+                call(approx(0.784), 2.1),
+                call(approx(5.488), 2.1),
+                call(approx(9.408), 2.1),
+            ],
+            [
+                call(0, 5, 0.5, 0.3, 0.08, 2.1),
+                call(1, 35, 0.5, 0.3, 0.08, 2.1),
+                call(2, 60, 0.5, 0.3, 0.08, 2.1),
+            ],
         ),
     ],
 )
@@ -603,34 +603,34 @@ def test_apply_grazing_manure(
     [
         (1000, 0.75, 200, 0.85, 0.0, 1.0, 1.835, 0.11, 0.55, 0.01, 0.5, None, False),
         (
-                3000,
-                0.10,
-                150,
-                0.975,
-                150.0,
-                0.55,
-                2.2254,
-                0.2,
-                0.6,
-                0.03,
-                None,
-                "CATTLE",
-                False,
+            3000,
+            0.10,
+            150,
+            0.975,
+            150.0,
+            0.55,
+            2.2254,
+            0.2,
+            0.6,
+            0.03,
+            None,
+            "CATTLE",
+            False,
         ),
         (
-                2000,
-                0.44,
-                103.5,
-                0.88,
-                0.0,
-                1.0,
-                0.8898,
-                0.14,
-                0.44,
-                0.06,
-                0.25,
-                "SWINE",
-                False,
+            2000,
+            0.44,
+            103.5,
+            0.88,
+            0.0,
+            1.0,
+            0.8898,
+            0.14,
+            0.44,
+            0.06,
+            0.25,
+            "SWINE",
+            False,
         ),
         (2500, 0.08, 175, 0.79, 0.0, 1.0, 3.4453, 0.33, 0.39, 0.09, None, None, False),
         (2500, 0.08, 175, 0.79, 50.0, 0.92, 3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
@@ -672,8 +672,8 @@ def test_apply_machine_manure(
                 source_animal,
             )
         assert (
-                str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
-                                f" received '{weiP_frac}'."
+            str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
+                            f" received '{weiP_frac}'."
         )
     else:
         incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
