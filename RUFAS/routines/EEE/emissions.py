@@ -77,14 +77,21 @@ class Emissions:
 
         processed_yields = self._win_just_one_for_the_zipper(yields)
 
-        time_filter = {"name": "Time Filter", "filters": ["Time.(day|calendar_year)"], "slice_start": SLICE_START, "slice_end": SLICE_END}
+        time_filter = {
+            "name": "Time Filter",
+            "filters": ["Time.(day|calendar_year)"],
+            "slice_start": SLICE_START,
+            "slice_end": SLICE_END,
+        }
         date_cutoff = om.filter_variables_pool(time_filter)
         day_cutoff = date_cutoff["Time.day"]["values"][0]
         year_cutoff = date_cutoff["Time.calendar_year"]["values"][0]
 
-        filtered_yields = list(filter(
-            lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
-        ))
+        filtered_yields = list(
+            filter(
+                lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
+            )
+        )
 
         for crop in filtered_yields:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
