@@ -52,15 +52,12 @@ class Percolation:
         SWAT sections 2:3.1 and 2
 
         """
-        top_layer_to_percolate = self._percolate_infiltrated_water()
 
-        if top_layer_to_percolate is None:
-            return
-
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(top_layer_to_percolate, layer_count)):
+        for layer_number in reversed(range(0, layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
             if layer_number < deepest_layer:
@@ -77,11 +74,11 @@ class Percolation:
             if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
-                current_layer.percolated_water = percolated_water
+                current_layer.percolated_water += percolated_water
             else:
                 current_layer.percolated_water = 0.0
 
-        for layer_number in range(top_layer_to_percolate + 1, layer_count + 1):
+        for layer_number in range(1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
             percolated_water = layer_above.percolated_water
             if layer_number == deepest_layer + 1:
@@ -89,15 +86,9 @@ class Percolation:
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
 
-    def _percolate_infiltrated_water(self) -> int | None:
+    def percolate_infiltrated_water(self) -> None:
         """
         Percolates infiltrated water into the soil profile.
-
-        Returns
-        -------
-        int | None
-            The index of the topmost soil which has not had water percolated out of it, or None if all layers in the
-            soil profile have had water percolated out.
 
         Notes
         -----
@@ -107,23 +98,20 @@ class Percolation:
         that is put below a layer as being percolated by it.
 
         """
-        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
+
         water_remaining_to_percolate = self.data.infiltrated_water
-        top_layer_to_percolate = None
         for index, layer in enumerate(self.data.soil_layers):
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
                 water_remaining_to_percolate -= acceptable_percolation
-                layer.percolated_water = water_remaining_to_percolate
+                layer.percolated_water += water_remaining_to_percolate
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0
-                top_layer_to_percolate = index
                 break
         if water_remaining_to_percolate > 0.0:
             self.data.vadose_zone_layer.water_content += water_remaining_to_percolate
-        return top_layer_to_percolate
 
     # --- Static methods ---
     @staticmethod
@@ -251,7 +239,7 @@ class Percolation:
         SWAT Section 2:3.2
 
         """
-        if upper_layer.excess_water_available <= 0:
+        if upper_layer.water_content <= upper_layer.field_capacity_content:
             return 0
         else:
             percolation_time = Percolation._determine_percolation_travel_time(
@@ -259,10 +247,10 @@ class Percolation:
                 upper_layer.field_capacity_content,
                 upper_layer.saturated_hydraulic_conductivity,
             )
+            water_to_percolate = upper_layer.excess_water_available
             amount_to_percolate = Percolation._determine_percolation_to_next_layer(
-                upper_layer.excess_water_available, time_step, percolation_time
+                water_to_percolate, time_step, percolation_time
             )
-
             #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount
