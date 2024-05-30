@@ -205,13 +205,26 @@ class Emissions:
         info_map = {
             "class": self.__class__.__name__,
             "function": self._calculate_homegrown_feed_emissions.__name__,
-            "units": MeasurementUnits.KILOGRAMS,
+            "units": {
+                "crop_type": MeasurementUnits.UNITLESS,
+                "nitrous_oxide_emissions": MeasurementUnits.KILOGRAMS,
+                "ammonia_emisssions": MeasurementUnits.KILOGRAMS,
+                "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                "field_name": MeasurementUnits.UNITLESS,
+            },
         }
-        import remote_pdb
-        remote_pdb.RemotePdb("localhost", 4444).set_trace()
         crop_types: set[str] = {crop["crop"] for crop in crops_with_emissions}
-        for crop in crop_types:
-            om.add_variable("homegrown_feed_emissions", crop, info_map)
+        for crop_type in crop_types:
+            crops = list(filter(lambda crop: crop["crop"] == crop_type, crops_with_emissions))
+            for crop in crops:
+                emissions_info = {
+                    "crop_type": crop["crop"],
+                    "nitrous_oxide_emissions": crop["nitrous_oxide_emissions"],
+                    "ammonia_emissions": crop["ammonia_emissions"],
+                    "carbon_stock_change": crop["carbon_stock_change"],
+                    "field_name": crop["field_name"],
+                }
+                om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
@@ -273,7 +286,9 @@ class Emissions:
 
         for crop in feeds_grown:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            crop["nitrous_oxide_emissions"] = (
+                field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            )
             crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
             crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
 
