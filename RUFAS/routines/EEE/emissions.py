@@ -206,7 +206,8 @@ class Emissions:
                 "function": self._calculate_homegrown_feed_emissions.__name__,
                 "units": MeasurementUnits.KILOGRAMS,
             }
-            om.add_variable("homegrown_feed_emissions", crops_with_emissions, info_map)
+            for crop in crops_with_emissions:
+                om.add_variable("homegrown_feed_emissions", crop, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
