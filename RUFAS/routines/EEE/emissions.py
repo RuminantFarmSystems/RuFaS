@@ -195,6 +195,9 @@ class Emissions:
                 grouped_feeds[field_name] = []
             grouped_feeds[field_name].append(feed)
 
+        import remote_pdb
+        remote_pdb.RemotePdb("localhost", 4444).set_trace()
+
         grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
         for field in grouped_feeds.keys():
