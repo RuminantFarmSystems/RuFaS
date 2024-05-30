@@ -29,6 +29,9 @@ CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.WINTER_WHEAT_BALEAGE: [],
 }
 
+SLICE_START = -365
+SLICE_END = -364
+
 im = InputManager()
 om = OutputManager()
 
@@ -65,18 +68,28 @@ class Emissions:
 
     def _gather_homegrown_feeds(self) -> list[dict[str, Any]]:
         """Gathers the yields that were harvested in the last 365 days of the simulation."""
-        filter = {
+        crop_filter = {
             "name": "Homegrown Feeds",
             "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
             "variables": [".*"],
         }
-        yields = om.filter_variables_pool(filter)
+        yields = om.filter_variables_pool(crop_filter)
 
         processed_yields = self._win_just_one_for_the_zipper(yields)
-        for crop in processed_yields:
+
+        time_filter = {"name": "Time Filter", "filters": ["Time.(day|calendar_year)"], "slice_start": SLICE_START, "slice_end": SLICE_END}
+        date_cutoff = om.filter_variables_pool(time_filter)
+        day_cutoff = date_cutoff["Time.day"]["values"][0]
+        year_cutoff = date_cutoff["Time.calendar_year"]["values"][0]
+
+        filtered_yields = list(filter(
+            lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
+        ))
+
+        for crop in filtered_yields:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
-        return processed_yields
+        return filtered_yields
 
     def _gather_ration_feed_totals(self) -> dict[str, float]:
         """
@@ -87,7 +100,7 @@ class Emissions:
             "name": "Feed Ration Totals",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
             "variables": [r"^\d+$"],
-            "slice_start": -365,
+            "slice_start": SLICE_START,
         }
         feeds = om.filter_variables_pool(filter)
 
