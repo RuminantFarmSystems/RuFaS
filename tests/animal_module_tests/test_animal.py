@@ -1306,7 +1306,8 @@ def test_ration_optimizer_optimize_value_error(
 
     with pytest.raises(ValueError, match="Invalid animal combination: AnimalCombination.CALF"):
         ration_optimizer.optimize(animal_combination, mock_ration_config)
-        
+
+
 def test_growing_heifer_ration_optimize() -> None:
     """Unit test for function optimize in file routines/animal/ration/growing_heifer_ration.py"""
     pass

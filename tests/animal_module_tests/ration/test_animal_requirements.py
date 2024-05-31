@@ -588,9 +588,7 @@ def test_default_initialization() -> None:
         ),
     ],
 )
-def test_calc_pen_requirements(
-    argument_lists: List[List[float]], stat_method: str, expected: List[float]
-) -> None:
+def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: str, expected: List[float]) -> None:
     """
     Test the calc_pen_requirement() method across varying statistical methods within the AnimalRequirements class.
 
@@ -811,9 +809,7 @@ def test_use_existing_requirements() -> None:
         pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
 
     animal_grouping_scenario_mock = MagicMock()
-    animal_grouping_scenario_mock.get_animal_type = MagicMock(
-        side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW]
-    )
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW])
 
     requirements_lists_empty = {
         "NEmaint_requirement": [],
@@ -869,9 +865,7 @@ def test_use_existing_requirements() -> None:
         (lazy_fixture("heifer_b"), (6.81, 0, 43.92)),
     ],
 )
-def test_calculate_NRC_energy_maintenance_requirements(
-    animal_dict: dict, expected: tuple
-) -> None:
+def test_calculate_NRC_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -915,9 +909,7 @@ def test_calculate_NRC_energy_growth_requirements(
         animal_dict["calving_interval"],
         animal_dict["ADG_heifer"],
     )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx(
-        expectedvalues, rel=1e-2
-    )
+    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx(expectedvalues, rel=1e-2)
 
 
 @pytest.mark.parametrize(
@@ -930,13 +922,9 @@ def test_calculate_NRC_energy_growth_requirements(
         (lazy_fixture("heifer_b"), 40, 0),
     ],
 )
-def test_calculate_NRC_energy_pregnancy_requirements(
-    animal_dict: dict, calf_birth_weight: float, expected: float
-):
+def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float):
     req = AnimalRequirements()
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(
-        animal_dict["day_of_pregnancy"], calf_birth_weight
-    )
+    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(animal_dict["day_of_pregnancy"], calf_birth_weight)
     assert (result_NEpreg) == pytest.approx((expected), rel=1e-2)
 
 
@@ -949,9 +937,7 @@ def test_calculate_NRC_energy_pregnancy_requirements(
         (lazy_fixture("heifer_b"), 0.0),
     ],
 )
-def test_calculate_NRC_energy_lactation_requirements(
-    animal_dict: dict, expected: float
-) -> None:
+def test_calculate_NRC_energy_lactation_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -976,9 +962,7 @@ def test_calculate_NRC_energy_lactation_requirements(
         (lazy_fixture("heifer_b"), 0.5, 562.1),
     ],
 )
-def test_calculate_NRC_protein_requirements(
-    animal_dict: dict, TDNconc: float, expected: float
-) -> None:
+def test_calculate_NRC_protein_requirements(animal_dict: dict, TDNconc: float, expected: float) -> None:
     """Unit test for function calculate_NRC_protein_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1034,9 +1018,7 @@ def test_calculate_NRC_calcium_requirements(animal_dict: dict, expected: float) 
         (lazy_fixture("heifer_b"), 17.18),
     ],
 )
-def test_calculate_NRC_phosphorus_requirements(
-    animal_dict: dict, expected: float
-) -> None:
+def test_calculate_NRC_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_phosophorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1087,9 +1069,7 @@ def test_calculate_NRC_DMI(animal_dict: dict, expected: float) -> None:
         (lazy_fixture("heifer_b"), 0.0),
     ],
 )
-def test_calculate_NASEM_energy_lactation_requirements(
-    animal_dict: dict, expected: float
-) -> None:
+def test_calculate_NASEM_energy_lactation_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NASEM_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1113,9 +1093,7 @@ def test_calculate_NASEM_energy_lactation_requirements(
         (lazy_fixture("heifer_b"), False, 15, 11.5),
     ],
 )
-def test_calculate_NASEM_DMI(
-    animal_dict: dict, lactating: bool, net_energy_lactation: float, expected: float
-) -> None:
+def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lactation: float, expected: float) -> None:
     """Unit test for function calculate_NASEM_DMI in file routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
     result_DMIest = req.calculate_NASEM_DMI(
@@ -1140,9 +1118,7 @@ def test_calculate_NASEM_DMI(
         (lazy_fixture("heifer_b"), (6.3, 77.71, 10.05)),
     ],
 )
-def test_calculate_NASEM_energy_maintenance_requirements(
-    animal_dict: dict, expected: tuple
-) -> None:
+def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NASEM_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1156,9 +1132,7 @@ def test_calculate_NASEM_energy_maintenance_requirements(
         animal_dict["day_of_pregnancy"],
         animal_dict["DIM"],
     )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(
-        expected, rel=1e-2
-    )
+    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(expected, rel=1e-2)
 
 
 @pytest.mark.parametrize(
@@ -1172,9 +1146,7 @@ def test_calculate_NASEM_energy_maintenance_requirements(
         (lazy_fixture("heifer_b"), (4.1, 0.9, 0.35)),
     ],
 )
-def test_calculate_NASEM_energy_growth_requirements(
-    animal_dict: dict, expected: tuple
-) -> None:
+def test_calculate_NASEM_energy_growth_requirements(animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NASEM_energy_growth_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1190,9 +1162,7 @@ def test_calculate_NASEM_energy_growth_requirements(
         animal_dict["parity"],
         animal_dict["calving_interval"],
     )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(
-        expected, rel=1e-2
-    )
+    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(expected, rel=1e-2)
 
 
 @pytest.mark.parametrize(
@@ -1204,9 +1174,7 @@ def test_calculate_NASEM_energy_growth_requirements(
         (lazy_fixture("heifer_b"), (4.9, 1.2)),
     ],
 )
-def test_calculate_NASEM_energy_pregnancy_requirements(
-    animal_dict: dict, expected: tuple
-) -> None:
+def test_calculate_NASEM_energy_pregnancy_requirements(animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NASEM_energy_pregnancy_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1260,9 +1228,7 @@ def test_calculate_NASEM_protein_requirements(
         (lazy_fixture("heifer_b"), 11.45),
     ],
 )
-def test_calculate_NASEM_calcium_requirements(
-    animal_dict: dict, expected: float
-) -> None:
+def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NASEM_calcium_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1289,9 +1255,7 @@ def test_calculate_NASEM_calcium_requirements(
         (lazy_fixture("heifer_b"), 16.44),
     ],
 )
-def test_calculate_NASEM_phosphorus_requirements(
-    animal_dict: dict, expected: float
-) -> None:
+def test_calculate_NASEM_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NASEM_phosphorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1312,45 +1276,25 @@ def test_calculate_NASEM_phosphorus_requirements(
 def test_calc_rqmts():
     """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
     test_requirements = AnimalRequirements()
-    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(
-        return_value=(1, 2, 3)
-    )
-    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(
-        return_value=(1, 2, 3)
-    )
-    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(
-        return_value=1
-    )
-    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(
-        return_value=1
-    )
+    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(return_value=1)
     test_requirements.calculate_NRC_DMI = MagicMock(return_value=1)
     test_requirements.calculate_NRC_protein_requirements = MagicMock(return_value=1)
     test_requirements.calculate_NRC_calcium_requirements = MagicMock(return_value=1)
     test_requirements.calculate_NRC_phosphorus_requirements = MagicMock(return_value=1)
-    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(
-        return_value=(4, 5, 6)
-    )
-    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(
-        return_value=(4, 5, 6)
-    )
-    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(
-        return_value=(4, 5)
-    )
-    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(
-        return_value=2
-    )
+    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(return_value=(4, 5))
+    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_DMI = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_protein_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
-    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(
-        return_value=2
-    )
+    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
     AnimalBase.config["nutrient_standard"] = "NRC"
     test_requirements.AnimalBase = AnimalBase
-    actual = test_requirements.calc_rqmts(
-        MagicMock(), MagicMock(), MagicMock(), MagicMock()
-    )
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     expected = {
         "NEmaint_requirement": 1,
         "NEg_requirement": 1,
@@ -1382,9 +1326,7 @@ def test_calc_rqmts():
         "DMIest_requirement": 2,
     }
     AnimalBase.config["nutrient_standard"] = "NASEM"
-    actual = test_requirements.calc_rqmts(
-        MagicMock(), MagicMock(), MagicMock(), MagicMock()
-    )
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     test_requirements.calculate_NASEM_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NASEM_energy_growth_requirements.assert_called_once()
     test_requirements.calculate_NASEM_energy_pregnancy_requirements.assert_called_once()
@@ -1399,29 +1341,19 @@ def test_energy_activity_rqmts():
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
     AnimalBase.config["nutrient_standard"] = "NASEM"
     req = AnimalRequirements()
-    result_energy_activity = req.energy_activity_rqmts(
-        body_weight=400, housing="Grazing", distance=1
-    )
+    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
     assert (result_energy_activity) == pytest.approx((294), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(
-        body_weight=400, housing="Not_Grazing", distance=1
-    )
+    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Not_Grazing", distance=1)
     assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
 
     AnimalBase.config["nutrient_standard"] = "NRC"
 
-    result_energy_activity = req.energy_activity_rqmts(
-        body_weight=400, housing="Barn", distance=1
-    )
+    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Barn", distance=1)
     assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(
-        body_weight=400, housing="Grazing", distance=1
-    )
+    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
     assert (result_energy_activity) == pytest.approx((0.66), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(
-        body_weight=400, housing="n e i t h e r", distance=1
-    )
+    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="n e i t h e r", distance=1)
     assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
