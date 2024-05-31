@@ -117,32 +117,6 @@ class ManureManager:
         self._manure_nutrient_manager = ManureNutrientManager()
         self.configure_manure_manager_components(pen_list)
 
-    @property
-    def data(self) -> list[dict]:
-        """
-        Get all the daily output data for each animal pen.
-
-        Returns
-        -------
-        list[dict]
-            A list of dictionaries containing the daily output data for each animal pen.
-            The keys and their associated data types of each dictionary are as follows:
-            {
-                'simulation_day': int,
-                'pen': ManureManagerPen,
-                'animal_manure_excretions': PenManure,
-                'manure_handler_daily_output': ManureHandlerDailyOutput,
-                'reception_pit_daily_output': ReceptionPitDailyOutput,
-                'manure_separator_daily_output': ManureSeparatorDailyOutput,
-                'manure_separator_after_digestion_daily_output': ManureSeparatorDailyOutput,
-                'manure_treatment_daily_output': ManureTreatmentDailyOutput,
-                'manure_treatment_accumulated_output': ManureTreatmentDailyOutput,
-                'anaerobic_digestion_daily_output': ManureTreatmentDailyOutput
-            }
-
-        """
-        return self._daily_output_per_pen
-
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 
@@ -157,10 +131,10 @@ class ManureManager:
         for pen in pen_list:
             mm_pen = ManureManagerPen(pen)
 
-            custom_bedding_config = self.manure_manager_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
+            bedding_config = self.manure_manager_config_handler.get_bedding_config(mm_pen.bedding_type)
             self.beddings[mm_pen.id] = BeddingFactory.get_instance(
-                bedding_type_name=mm_pen.bedding_type,
-                custom_bedding_config=custom_bedding_config,  # type: ignore
+                bedding_name=mm_pen.bedding_type,
+                bedding_config=bedding_config,
             )
 
             manure_handler_config = self.manure_manager_config_handler.get_manure_handler_config(mm_pen.manure_handler)
@@ -173,27 +147,29 @@ class ManureManager:
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            if mm_pen.manure_separator.lower() == "none":
-                self.manure_separators[mm_pen.id] = None
-            else:
-                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
-                    mm_pen.manure_separator
+            separator_config = self.manure_manager_config_handler.get_manure_separator_config(mm_pen.manure_separator)
+            separator = (
+                None
+                if not separator_config
+                else ManureSeparatorFactory.get_instance(
+                    configuration_name=mm_pen.manure_separator,
+                    manure_separator_config=separator_config,
                 )
-                self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
-                    manure_separator_type_name=mm_pen.manure_separator,
-                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
-                )
+            )
+            self.manure_separators[mm_pen.id] = separator
 
-            if mm_pen.manure_separator_after_digestion.lower() == "none":
-                self.manure_separators_after_digestion[mm_pen.id] = None
-            else:
-                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
-                    mm_pen.manure_separator_after_digestion
+            separator_config_post_digester = self.manure_manager_config_handler.get_manure_separator_config(
+                mm_pen.manure_separator_after_digestion
+            )
+            separator_post_digester = (
+                None
+                if not separator_config_post_digester
+                else ManureSeparatorFactory.get_instance(
+                    configuration_name=mm_pen.manure_separator_after_digestion,
+                    manure_separator_config=separator_config_post_digester,
                 )
-                self.manure_separators_after_digestion[mm_pen.id] = ManureSeparatorFactory.get_instance(
-                    manure_separator_type_name=mm_pen.manure_separator_after_digestion,
-                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
-                )
+            )
+            self.manure_separators_after_digestion[mm_pen.id] = separator_post_digester
 
             custom_manure_treatment_config = self.manure_manager_config_handler.get_custom_manure_treatment_config(
                 mm_pen.manure_treatment

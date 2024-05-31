@@ -78,42 +78,6 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
     patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
 
 
-def test_data_property(mocker: MockFixture) -> None:
-    """
-    Unit test for `data` property of ManureManager in manure_manager.py
-
-    This test verifies that the 'data' property correctly returns the '_daily_output_per_pen' value attribute
-    of the ManureManager object.
-
-    """
-    # Arrange
-    mock_animal_manager = mocker.MagicMock()
-    mock_weather = mocker.MagicMock()
-    mock_time = mocker.MagicMock()
-    mock_manure_manager_config = mocker.MagicMock()
-
-    mocker.patch(
-        "RUFAS.routines.manure.manure_manager.ManureManager.__init__",
-        return_value=None,
-    )
-
-    manure_manager = ManureManager(
-        animal_manager=mock_animal_manager,
-        weather=mock_weather,
-        time=mock_time,
-        manure_manager_config=mock_manure_manager_config,
-    )
-
-    mock_daily_output_per_pen = mocker.MagicMock()
-    manure_manager._daily_output_per_pen = mock_daily_output_per_pen
-
-    # Act
-    actual_daily_output_per_pen = manure_manager.data
-
-    # Assert
-    assert mock_daily_output_per_pen == actual_daily_output_per_pen
-
-
 @pytest.mark.parametrize(
     "manure_separator",
     [
@@ -160,8 +124,8 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
 
     mock_manure_manager_config_handler = mocker.MagicMock()
 
-    mock_custom_bedding_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_custom_bedding_config.return_value = mock_custom_bedding_config
+    mock_bedding_config = mocker.MagicMock()
+    mock_manure_manager_config_handler.get_bedding_config.return_value = mock_bedding_config
     mock_bedding = mocker.MagicMock()
     patch_for_bedding_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.BeddingFactory.get_instance",
@@ -182,10 +146,8 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         return_value=mock_reception_pit,
     )
 
-    mock_custom_manure_separator_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_custom_manure_separator_config.return_value = (
-        mock_custom_manure_separator_config
-    )
+    mock_manure_separator_config = mocker.MagicMock() if not manure_separator == "none" else None
+    mock_manure_manager_config_handler.get_manure_separator_config.return_value = mock_manure_separator_config
     mock_manure_separator = mocker.MagicMock()
     patch_for_manure_separator_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureSeparatorFactory.get_instance",
@@ -218,10 +180,10 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     # Assert
     patch_for_manure_manager_pen_init.assert_called_once_with(mock_pen)
 
-    mock_manure_manager_config_handler.get_custom_bedding_config.assert_called_once_with(bedding_type)
+    mock_manure_manager_config_handler.get_bedding_config.assert_called_once_with(bedding_type)
     patch_for_bedding_factory_get_instance.assert_called_once_with(
-        bedding_type_name=bedding_type,
-        custom_bedding_config=mock_custom_bedding_config,
+        bedding_name=bedding_type,
+        bedding_config=mock_bedding_config,
     )
     assert manure_manager.beddings[pen_id] == mock_bedding
 
@@ -237,15 +199,14 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     patch_for_reception_pit_init.assert_called_once()
     assert manure_manager.reception_pits[pen_id] == mock_reception_pit
 
+    mock_manure_manager_config_handler.get_manure_separator_config.assert_called_with(manure_separator)
     if manure_separator == "none":
-        mock_manure_manager_config_handler.get_custom_manure_separator_config.assert_not_called()
         patch_for_manure_separator_factory_get_instance.assert_not_called()
         assert manure_manager.manure_separators[pen_id] is None
     else:
-        mock_manure_manager_config_handler.get_custom_manure_separator_config.assert_called_with(manure_separator)
         patch_for_manure_separator_factory_get_instance.assert_called_with(
-            manure_separator_type_name=manure_separator,
-            custom_manure_separator_config=mock_custom_manure_separator_config,
+            configuration_name=manure_separator,
+            manure_separator_config=mock_manure_separator_config,
         )
         assert manure_manager.manure_separators[pen_id] == mock_manure_separator
 
@@ -700,7 +661,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         manure_handler_daily_output=mock_manure_handler_daily_output,
         reception_pit_daily_output=mock_reception_pit_daily_output,
     )
-    assert manure_manager.data == [expected_daily_output_data]
+    assert manure_manager._daily_output_per_pen == [expected_daily_output_data]
     patch_for_add_manure_nutrients.assert_called_once_with(mock_manure_manager_pen, mock_manure_treatment_daily_output)
 
 

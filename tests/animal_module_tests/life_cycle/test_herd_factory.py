@@ -1276,7 +1276,6 @@ def test_random_sample_with_replacement(
 
     assert mock_herd_factory._random_sample_with_replacement_by_type.call_count == 6
     assert mock_animal_population_init.call_count == 1
-    mock_input_manager.get_data.assert_called_once_with("config.set_seed")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 

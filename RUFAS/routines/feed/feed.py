@@ -117,7 +117,7 @@ class Feed:
         user_defined_ration_percentage_sum_tolerance = 0.01
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
         udrm.calf_ration = {
             str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
@@ -206,13 +206,13 @@ class Feed:
                 "storage_type": storage,
             }
             nutrient_dict_units = {
-                "carbon": MeasurementUnits.KILOGRAMS.value,
-                "nitrogen": MeasurementUnits.KILOGRAMS.value,
-                "phosphorus": MeasurementUnits.KILOGRAMS.value,
-                "dry_matter": MeasurementUnits.KILOGRAMS.value,
-                "crude_protein": MeasurementUnits.KILOGRAMS.value,
-                "carbon_loss": MeasurementUnits.KILOGRAMS.value,
-                "crude_protein_loss": MeasurementUnits.KILOGRAMS.value,
+                "carbon": MeasurementUnits.KILOGRAMS,
+                "nitrogen": MeasurementUnits.KILOGRAMS,
+                "phosphorus": MeasurementUnits.KILOGRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "crude_protein": MeasurementUnits.KILOGRAMS,
+                "carbon_loss": MeasurementUnits.KILOGRAMS,
+                "crude_protein_loss": MeasurementUnits.KILOGRAMS,
             }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C

@@ -1,4 +1,6 @@
 from __future__ import annotations
+from typing import List
+import numpy as np
 
 
 class RationConfig:
@@ -89,7 +91,7 @@ class RationConfig:
 
     def __init__(
         self,
-        price__list: list[float] | None = None,
+        price__list: list[float] = [],
         NEmaint__requirement: float = 0,
         NEa__requirement: float = 0,
         NEpreg__requirement: float = 0,
@@ -98,24 +100,24 @@ class RationConfig:
         MP__requirement: float = 0,
         C__requirement: float = 0,
         P__requirement: float = 0,
-        TDN__list: list[float] | None = None,
-        DE__list: list[float] | None = None,
-        EE__list: list[float] | None = None,
-        is_fat__list: list[bool] | None = None,
+        TDN__list: list[float] = [],
+        DE__list: list[float] = [],
+        EE__list: list[float] = [],
+        is_fat__list: list[bool] = [],
         BW_: float = 0,
-        calcium__list: list[float] | None = None,
-        phosphorus__list: list[float] | None = None,
-        NDF__list: list[float] | None = None,
-        feed_type__list: list[str] | None = None,
-        is_wetforage__list: list[bool] | None = None,
-        Kd__list: list[float] | None = None,
-        N_A__list: list[float] | None = None,
-        N_B__list: list[float] | None = None,
-        CP__list: list[float] | None = None,
-        dRUP__list: list[float] | None = None,
-        feed_limit__list: list[float] | None = None,
+        calcium__list: list[float] = [],
+        phosphorus__list: list[float] = [],
+        NDF__list: list[float] = [],
+        feed_type__list: list[str] = [],
+        is_wetforage__list: list[bool] = [],
+        Kd__list: list[float] = [],
+        N_A__list: list[float] = [],
+        N_B__list: list[float] = [],
+        CP__list: list[float] = [],
+        dRUP__list: list[float] = [],
+        feed_limit__list: list[float] = [],
         lactating_: bool = False,
-        DMIest__requirement: float | None = None,
+        DMIest__requirement: float = 0.0,
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
@@ -184,8 +186,7 @@ class RationConfig:
         None
         """
 
-        self.price_list = price__list if price__list is not None else []
-        self.n = len(self.price_list)
+        self.price_list = price__list
         self.NEmaint_requirement = NEmaint__requirement
         self.NEa_requirement = NEa__requirement
         self.NEpreg_requirement = NEpreg__requirement
@@ -194,41 +195,44 @@ class RationConfig:
         self.MP_requirement = MP__requirement
         self.C_requirement = C__requirement
         self.P_requirement = P__requirement
-        self.TDN_list = TDN__list if TDN__list is not None else []
-        self.DE_list = DE__list if DE__list is not None else []
-        self.EE_list = EE__list if EE__list is not None else []
-        self.is_fat_list = is_fat__list if is_fat__list is not None else []
+        self.TDN_list = TDN__list
+        self.DE_list = DE__list
+        self.EE_list = EE__list
+        self.is_fat_list = is_fat__list
         self.BW = BW_
-        self.calcium_list = calcium__list if calcium__list is not None else []
-        self.phosphorus_list = phosphorus__list if phosphorus__list is not None else []
-        self.NDF_list = NDF__list if NDF__list is not None else []
-        self.feed_type_list = feed_type__list if feed_type__list is not None else []
-        self.is_wetforage_list = is_wetforage__list if is_wetforage__list is not None else []
-        self.Kd_list = Kd__list if Kd__list is not None else []
-        self.N_A_list = N_A__list if N_A__list is not None else []
-        self.N_B_list = N_B__list if N_B__list is not None else []
-        self.CP_list = CP__list if CP__list is not None else []
-        self.dRUP_list = dRUP__list if dRUP__list is not None else []
-        self.feed_limit_list = feed_limit__list if feed_limit__list is not None else []
+        self.calcium_list = calcium__list
+        self.phosphorus_list = phosphorus__list
+        self.NDF_list = NDF__list
+        self.feed_type_list = feed_type__list
+        self.is_wetforage_list = is_wetforage__list
+        self.Kd_list = Kd__list
+        self.N_A_list = N_A__list
+        self.N_B_list = N_B__list
+        self.CP_list = CP__list
+        self.dRUP_list = dRUP__list
+        self.feed_limit_list = feed_limit__list
         self.lactating = lactating_
         self.DMIest_requirement = DMIest__requirement
 
-        self.NElact_list = []
-        self.MEact_list = []
-        self.NEgact_list = []
-        self.NEm_act_list = []
-        self.is_forage_list = []
-        self.MPbact = None
-        self.RUP_diet = None
-        self.dP_list = []
-        self.TDNact_list = []
-        self.dCa_list = []
-        self.is_conc_list = []
-        self.RDP_list = []
-        self.RUP_list = []
-        self.TDNact_diet = None
-        self.RDP_diet = None
-        self.MPbact = None
-        self.MP_supply = None
-        self.DEact_list = []
-        self.Discount = None
+    Discount: float = 0
+    TDNact_diet: float = 0
+
+    TDNact_list: List[float] | np.ndarray = []
+    DEact_list: List[float] | np.ndarray = []
+    MEact_list: List[float] = []
+
+    NEm_act_list: List[float] | np.ndarray = []
+    NElact_list: List[float] | np.ndarray = []
+    NEgact_list: List[float] = []
+    is_forage_list: List[float] | np.ndarray = []
+
+    dP_list: List[float] = []
+    dCa_list: List[float] = []
+    is_conc_list: List[int] = []
+
+    RDP_list: List[float] | np.ndarray = []
+    RUP_list: List[float] | np.ndarray = []
+    MPbact: float = 0
+    RUP_diet: float = 0
+    RDP_diet: float = 0
+    MP_supply: float = 0

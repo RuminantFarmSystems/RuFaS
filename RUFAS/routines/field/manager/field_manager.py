@@ -1,3 +1,4 @@
+from .field_manure_supplier import FieldManureSupplier
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -46,7 +47,7 @@ class FieldManager:
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
         self.fields: List[Field] = []
@@ -54,8 +55,10 @@ class FieldManager:
         if not fields:
             om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
+        manure_supplier = self._get_manure_supplier(manure_manager)
+
         for field in fields:
-            new_field = self._setup_field(field, manure_manager, feed_manager)
+            new_field = self._setup_field(field, manure_supplier, feed_manager)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -90,16 +93,43 @@ class FieldManager:
         for field in self.fields:
             field.perform_annual_reset()
 
+    def _get_manure_supplier(self, manure_manager: ManureManager) -> ManureManager | FieldManureSupplier:
+        """
+        Determines whether manure used in field applications will be sourced from manure simulated in RuFaS or will be
+        created on the fly.
+
+        Returns
+        -------
+        ManureManager | FieldManureSupplier
+            The Manure Manager if animals are to be simulated, otherwise a Field Manure Supplier instance.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._get_manure_supplier.__name__}
+
+        animals_simulated = im.get_data("config.simulate_animals")
+
+        if animals_simulated:
+            return manure_manager
+
+        om.add_log(
+            "Animals not being simulated",
+            "Manure for field applications will be created by the FieldManureSupplier",
+            info_map,
+        )
+        return FieldManureSupplier()
+
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
+    def _setup_field(
+        field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
+    ) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager : ManureManager
-            Instance of the ManureManager class.
+        manure_supplier : ManureManager | FieldManureSupplier
+            Entity that will provide manure for field applications.
         feed_manager : FeedManager
             Instance of the FeedManager class which receives and manages harvested crops.
 
@@ -118,6 +148,10 @@ class FieldManager:
         watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
         watering_interval = field_configuration_data.get("watering_interval")
         supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
+        simulate_water_stress = field_configuration_data.get("simulate_water_stress")
+        simulate_temp_stress = field_configuration_data.get("simulate_temp_stress")
+        simulate_nitrogen_stress = field_configuration_data.get("simulate_nitrogen_stress")
+        simulate_phosphorus_stress = field_configuration_data.get("simulate_phosphorus_stress")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
         (
@@ -155,6 +189,10 @@ class FieldManager:
             watering_amount_in_liters=watering_amount_in_liters,
             watering_interval=watering_interval,
             supplement_manure_nutrient_deficiencies=supplement_manure,
+            simulate_water_stress=simulate_water_stress,
+            simulate_temp_stress=simulate_temp_stress,
+            simulate_nitrogen_stress=simulate_nitrogen_stress,
+            simulate_phosphorus_stress=simulate_phosphorus_stress,
         )
 
         return Field(
@@ -166,7 +204,7 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
-            manure_manager=manure_manager,
+            manure_supplier=manure_supplier,
             feed_manager=feed_manager,
         )
 
@@ -411,11 +449,11 @@ class FieldManager:
             "saturation_point_water_concentration",
             "saturated_hydraulic_conductivity",
             "bulk_density",
-            "percent_organic_carbon_content",
-            "percent_clay_content",
-            "percent_silt_content",
-            "percent_sand_content",
-            "percent_rock_content",
+            "organic_carbon_fraction",
+            "clay_fraction",
+            "silt_fraction",
+            "sand_fraction",
+            "rock_fraction",
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",

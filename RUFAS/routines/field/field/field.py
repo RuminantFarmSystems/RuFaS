@@ -16,6 +16,7 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
+from ..manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
@@ -62,8 +63,8 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_manager : ManureManager, default=None
-        ManureManager Object to be used during simulation
+    manure_supplier : ManureManager | FieldManureSupplier, default=None
+        Object that will to be used during simulation to get manure for field applications.
 
     Attributes
     ----------
@@ -96,8 +97,8 @@ class Field:
         List of ManureApplication objects
     manure_events: List[ManureEvent]
         List of all manure applications that will be applied to this field
-    manure_manager: ManureManager
-        ManureManager instance from which manure is requested for application to the field.
+    manure_supplier: ManureManager | FieldManureSupplier
+        Manure supplier from which manure is requested for application to the field.
     feed_manager: FeedManager
         FeedManager instance which receives harvested crops.
 
@@ -118,7 +119,7 @@ class Field:
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_manager: Optional[ManureManager] = None,
+        manure_supplier: Optional[ManureManager | FieldManureSupplier] = None,
         feed_manager: Optional[FeedManager] = None,
     ):
         # field-wide attributes
@@ -156,19 +157,19 @@ class Field:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
-        if manure_manager is None:
+        if manure_supplier is None:
             om.add_error(
                 "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no Manure Manager, failing to "
+                f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
                 f"initialize.",
                 info_map,
             )
-            raise ValueError("Manure manager cannot be None.")
+            raise ValueError("Manure supplier cannot be None.")
 
-        self.manure_manager: ManureManager = manure_manager
+        self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
 
         if feed_manager is None:
             om.add_error(
@@ -476,16 +477,16 @@ class Field:
 
         """
         units = {
-            "mass": MeasurementUnits.KILOGRAMS.value,
-            "nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "phosphorus": MeasurementUnits.KILOGRAMS.value,
-            "potassium": MeasurementUnits.KILOGRAMS.value,
-            "application_depth": MeasurementUnits.MILLIMETERS.value,
-            "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "mass": MeasurementUnits.KILOGRAMS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -571,7 +572,7 @@ class Field:
             manure_type=requested_manure_type,
         )
 
-        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
+        manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -706,18 +707,18 @@ class Field:
 
         """
         units = {
-            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS.value,
-            "dry_matter_fraction": MeasurementUnits.FRACTION.value,
-            "field_coverage": MeasurementUnits.UNITLESS.value,
-            "application_depth": MeasurementUnits.MILLIMETERS.value,
-            "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
-            "nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "phosphorus": MeasurementUnits.KILOGRAMS.value,
-            "potassium": MeasurementUnits.KILOGRAMS.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+            "dry_matter_fraction": MeasurementUnits.FRACTION,
+            "field_coverage": MeasurementUnits.UNITLESS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1076,11 +1077,11 @@ class Field:
 
         """
         units = {
-            "crop": MeasurementUnits.UNITLESS.value,
-            "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
-            "date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "crop": MeasurementUnits.UNITLESS,
+            "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
+            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1326,7 +1327,12 @@ class Field:
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
             crop.growth_constraints.constrain_growth(
-                crop.data.max_transpiration, current_conditions.mean_air_temperature
+                crop.data.max_transpiration,
+                current_conditions.mean_air_temperature,
+                self.field_data.simulate_water_stress,
+                self.field_data.simulate_temp_stress,
+                self.field_data.simulate_nitrogen_stress,
+                self.field_data.simulate_phosphorus_stress,
             )
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
@@ -1383,8 +1389,10 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        self.soil.infiltration.infiltrate(water_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+        self.soil.infiltration.infiltrate(water_reaching_soil)
+        self.soil.percolation.percolate_infiltrated_water()
+
         self.soil.soil_erosion.erode(
             self.field_data.field_size,
             0.02,
@@ -1525,7 +1533,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("manure_water", manure_water, info_map)
 
@@ -1815,7 +1823,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": year, "day": day},
             "field_size": self.field_data.field_size,
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("field_watering", watering_amount, info_map)
 

@@ -102,10 +102,6 @@ class Pen:
         Contains the average nutrient requirements of the animals in the pen.
         Used for ration formulation
 
-    avg_calf_nutrient_rqmts : dict
-         Contains the average nutrient requirements of the calves in the pen.
-         Used for ration formulation
-
     avg_milk : float
         The average milk production of the animals in the pen.
         Used for (lactating cow) ration formulation
@@ -232,33 +228,32 @@ class Pen:
         self.avg_DBW = 0.0
 
         self.avg_nutrient_rqmts = {}
-        self.avg_calf_nutrient_rqmts = {}
         self.avg_milk = 0.0
         self.avg_CP_milk = 0.0
 
         self.ration = {}
         self.ration_per_animal = {}
         self.ration_nutrient_amount = {
-            "dm": 0,
-            "CP": 0,
-            "ADF": 0,
-            "NDF": 0,
-            "lignin": 0,
-            "ash": 0,
-            "phosphorus": 0,
-            "potassium": 0,
-            "N": 0,
+            "dm": 0.0,
+            "CP": 0.0,
+            "ADF": 0.0,
+            "NDF": 0.0,
+            "lignin": 0.0,
+            "ash": 0.0,
+            "phosphorus": 0.0,
+            "potassium": 0.0,
+            "N": 0.0,
         }
         self.ration_nutrient_conc = {
-            "dm": 0,
-            "CP": 0,
-            "ADF": 0,
-            "NDF": 0,
-            "lignin": 0,
-            "ash": 0,
-            "phosphorus": 0,
-            "potassium": 0,
-            "N": 0,
+            "dm": 0.0,
+            "CP": 0.0,
+            "ADF": 0.0,
+            "NDF": 0.0,
+            "lignin": 0.0,
+            "ash": 0.0,
+            "phosphorus": 0.0,
+            "potassium": 0.0,
+            "N": 0.0,
         }
         self.dry_matter_intake = 0.0
 
@@ -812,8 +807,8 @@ class Pen:
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         if animal_type in [AnimalType.CALF]:
-            if self.avg_calf_nutrient_rqmts:
-                animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
+            if self.avg_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_nutrient_rqmts
             else:
                 animal.calc_nutrient_rqmts(feed, temp)
         elif animal_type in [

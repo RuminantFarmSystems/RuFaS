@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -63,7 +64,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
         # fmt: on
         methane_emission = max(methane_emission, 0.0)
-        accumulated_output.storage_methane += methane_emission
 
         return methane_emission, methane_emission_from_degradable_volatile_solids
 
@@ -87,7 +87,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         storage_ammonia_emission = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
-            manure_volume=daily_output.daily_final_manure_volume,
+            manure_volume=self._accumulated_output.liquid_manure_daily_volume,
             manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
             temp=self._get_current_day_average_temperature_celsius(),
         )
@@ -208,7 +208,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        return current_day_final_manure_volume + self.precipitation_volume
+        if self.config.manure_cover in [ManureCoverEnum.NO_COVER.value, ManureCoverEnum.CRUST.value]:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -227,7 +230,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             Flushing water volume, m^3
 
         """
-        return self._manure_handler_daily_output.cleaning_water_volume
+        if self._manure_handler_daily_output:
+            return self._manure_handler_daily_output.cleaning_water_volume
+        else:
+            return 0.0
 
     @property
     def volume_needed(self):
@@ -352,7 +358,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         Calculate and return the surface area of the lagoon in square meters (m^2).
 
-        The surface area is calculated as the product of the lagoon's width and length.
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
 
         Returns
         -------
@@ -360,7 +367,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             Lagoon surface area in square meters (:math:`m^2`).
 
         """
-        return self.lagoon_width * self.lagoon_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return self._current_pen.num_animals * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+        else:
+            return 0.0
 
     def _calc_modeled_lagoon_volume(self) -> float:
         """
@@ -414,55 +424,3 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         return self.freeboard_input * self.lagoon_surface_area
-
-    def _bound_sludge_accumulation_volume(
-        self,
-        calculated_sludge_accumulation_volume: float,
-        lower_bound: float,
-        upper_bound: float,
-    ) -> float:
-        """
-        Calculate a value for sludge accumulation volume bounded by the specified lower and upper bounds.
-
-        This method constrains the calculated sludge accumulation volume such that it does not exceed the specified
-        limits, given as a proportion of the current sludge accumulation volume.
-
-        Parameters
-        ----------
-        calculated_sludge_accumulation_volume : float
-            The value to be bounded, derived from a prior calculation.
-        lower_bound : float
-            The lower bound, given as a proportion of the current sludge accumulation volume.
-            Must be nonnegative, and less than or equal to the upper bound.
-        upper_bound : float
-            The upper bound, given as a proportion of the current sludge accumulation volume.
-            Must be nonnegative, and greater than or equal to the lower bound.
-
-        Returns
-        -------
-        float
-            The bounded value of sludge accumulation volume, ranging between the specified
-            lower and upper bounds.
-
-        Raises
-        ------
-        ValueError
-            If the calculated_sludge_accumulation_volume is negative.
-            If the lower_bound is negative.
-            If the upper_bound is less than the lower_bound.
-
-        """
-        if calculated_sludge_accumulation_volume < 0:
-            raise ValueError("The calculated sludge accumulation volume must be nonnegative.")
-        if lower_bound < 0:
-            raise ValueError("The lower bound must be nonnegative.")
-        if upper_bound < lower_bound:
-            raise ValueError("The upper bound must be greater than or equal to the lower bound.")
-
-        return min(
-            max(
-                self.sludge_accumulation_volume * lower_bound,
-                calculated_sludge_accumulation_volume,
-            ),
-            self.sludge_accumulation_volume * upper_bound,
-        )

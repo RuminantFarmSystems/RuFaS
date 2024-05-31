@@ -76,8 +76,8 @@ class SolublePhosphorus:
                 self.data.soil_layers[0].layer_thickness,
             )
             self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
-            self.data.soil_phosphorus_runoff = phosphorus_runoff * field_size
-            self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
+            self.data.soil_phosphorus_runoff = phosphorus_runoff
+            self.data.annual_soil_phosphorus_runoff += phosphorus_runoff
 
         for layer_index in range(len(self.data.soil_layers)):
             current_layer = self.data.soil_layers[layer_index]
@@ -92,7 +92,7 @@ class SolublePhosphorus:
                 current_layer.labile_inorganic_phosphorus_content,
                 current_layer.bulk_density,
                 current_layer.layer_thickness,
-                current_layer.percent_clay_content,
+                current_layer.clay_fraction,
                 current_layer.percolated_water,
                 field_size,
             )
@@ -154,14 +154,14 @@ class SolublePhosphorus:
         return adjusted_phosphorus_runoff
 
     @staticmethod
-    def _determine_isotherm_slope(percent_clay_content: float) -> float:
+    def _determine_isotherm_slope(clay_fraction: float) -> float:
         """
         Calculates the slope of the linear phosphorus sorption isotherm.
 
         Parameters
         ----------
-        percent_clay_content : float
-            Percent clay content of a soil layer, expressed in the range [0, 100] (unitless).
+        clay_fraction : float
+            Fraction clay content of a soil layer, expressed in the range [0, 1.0] (unitless).
 
         Returns
         -------
@@ -173,7 +173,7 @@ class SolublePhosphorus:
         APLE Theoretical Documentation eqn. [15]
 
         """
-        return 173.51 * (percent_clay_content / 100) + 8.48
+        return 173.51 * clay_fraction + 8.48
 
     @staticmethod
     def _determine_isotherm_intercept(isotherm_slope: float) -> float:
@@ -263,7 +263,7 @@ class SolublePhosphorus:
         labile_phosphorus: float,
         bulk_density: float,
         layer_thickness: float,
-        percent_clay_content: float,
+        clay_fraction: float,
         percolated_water: float,
         field_size: float,
     ) -> float:
@@ -278,8 +278,9 @@ class SolublePhosphorus:
             The density of this soil layer (megagrams / cubic meter).
         layer_thickness : float
             The thickness of this layer of soil (mm).
-        percent_clay_content : float
-            The clay content expressed of soil in this layer, expressed as a number in the range [0, 100] (unitless).
+        clay_fraction : float
+            The fraction of clay content expressed of soil in this layer,
+            expressed as a number in the range [0, 1.0] (unitless).
         percolated_water : float
             The amount of water that percolated from this soil layer on the current day (mm).
         field_size : float
@@ -295,7 +296,7 @@ class SolublePhosphorus:
             labile_phosphorus, bulk_density, layer_thickness, field_size
         )
 
-        isotherm_slope = SolublePhosphorus._determine_isotherm_slope(percent_clay_content)
+        isotherm_slope = SolublePhosphorus._determine_isotherm_slope(clay_fraction)
         isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(isotherm_slope)
 
         dissolved_reactive_phosphorus_leachate = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(

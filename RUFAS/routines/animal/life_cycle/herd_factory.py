@@ -188,8 +188,8 @@ class HerdFactory:
                     birth_weight=cow.calf_birth_weight,
                 )
                 cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
-                cow.p_gest_for_calf = 0
-                cow.calf_birth_weight = 0
+                cow.p_gest_for_calf = 0.0
+                cow.calf_birth_weight = 0.0
 
                 calf = Calf(args)
                 if not (calf.culled or calf.sold):
@@ -312,7 +312,7 @@ class HerdFactory:
             cows=post_cows,
             replacement=post_replacement,
             current_animal_id=self.post_animal_population.current_animal_id,
-            order_by_random=im.get_data("config.set_seed"),
+            order_by_random=True,
         )
 
     def _random_sample_with_replacement_by_type(

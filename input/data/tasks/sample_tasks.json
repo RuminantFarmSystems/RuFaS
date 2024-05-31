@@ -1,0 +1,53 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 1",
+      "log_verbosity": "errors"
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 2",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "Task 4",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "multi_run_counts": 1
+    },
+    {
+      "task_type": "SENSITIVITY_ANALYSIS",
+      "output_prefix": "Task 5",
+      "log_verbosity": "errors",
+      "sampler": "fractional_factorial",
+      "SA_load_balancing_start": 0,
+      "SA_load_balancing_stop": 1,
+      "SA_input_variables": [
+        {
+          "variable_name": "animal.herd_information.calf_num",
+          "lower_bound": 6,
+          "upper_bound": 10,
+          "data_type":"int"
+        },
+        {
+          "variable_name": "animal.herd_information.cow_num",
+          "lower_bound": 98,
+          "upper_bound": 102,
+          "data_type":"int"
+        },
+        {
+          "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+          "lower_bound": 378,
+          "upper_bound": 382,
+          "data_type":"int"
+        }
+      ]
+    }
+  ]
+}
