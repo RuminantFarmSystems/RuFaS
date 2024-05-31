@@ -2259,17 +2259,17 @@ class InputManager:
         if minimum is not None and not isinstance(minimum, (int, float)):
             om.add_error(
                 "Invalid metadata number properties minimum.",
-                f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}.",
+                f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
                 info_map,
             )
             raise ValueError(f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}.")
         if maximum is not None and not isinstance(maximum, (int, float)):
             om.add_error(
                 "Invalid metadata number properties maximum.",
-                f"Invalid 'maximum' for '{key_path}': " f"Expected a number but got {type(maximum)}.",
+                f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
                 info_map,
             )
-            raise ValueError(f"Invalid 'maximum' for '{key_path}': " f"Expected a number but got {type(maximum)}.")
+            raise ValueError(f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.")
         if maximum is not None and minimum is not None and maximum < minimum:
             om.add_error(
                 "Invalid range of acceptable numbers.",
@@ -2277,22 +2277,25 @@ class InputManager:
                 f"greater than 'maximum' value {maximum}",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
+                             f"greater than 'maximum' value {maximum}")
         if default is not None and not has_no_default:
             if minimum is not None and default < minimum:
                 om.add_error(
                     "Invalid metadata default.",
-                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
                     info_map,
                 )
-                raise ValueError
+                raise ValueError(f"Invalid 'default' for '{key_path}': 'default' {default} is "
+                                 f"less than 'minimum' {minimum}")
             if maximum is not None and default > maximum:
                 om.add_error(
                     "Invalid metadata default.",
-                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
                     info_map,
                 )
-                raise ValueError
+                raise ValueError(f"Invalid 'default' for '{key_path}': 'default' {default} is "
+                                 f"greater than 'maximum' {maximum}")
 
     def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
         """Validates string type properties in metadata."""
@@ -2312,7 +2315,7 @@ class InputManager:
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
         if default is not None and not has_no_default:
             if not isinstance(default, str):
                 om.add_error(
@@ -2320,7 +2323,7 @@ class InputManager:
                     f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
                     info_map,
                 )
-                raise ValueError
+                raise ValueError(f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}")
         pattern = value.get("pattern")
         if pattern is not None and not isinstance(pattern, str):
             om.add_error(
@@ -2328,7 +2331,7 @@ class InputManager:
                 f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}")
         try:
             if pattern is not None:
                 re.compile(pattern)
@@ -2339,7 +2342,8 @@ class InputManager:
                 "a valid regex pattern.",
                 info_map,
             )
-            raise ValueError("Invalid regex pattern provided.")
+            raise ValueError(f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not "
+                             "a valid regex pattern.")
         if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
                 om.add_error(
@@ -2348,7 +2352,8 @@ class InputManager:
                     f"match pattern {pattern}",
                     info_map,
                 )
-                raise ValueError
+                raise ValueError(f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
+                                 f"match pattern {pattern}")
 
     def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
         """Validates bool type properties in metadata."""
@@ -2369,7 +2374,7 @@ class InputManager:
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
         if default is not None and not isinstance(default, bool) and not has_no_default:
             om.add_error(
                 "Invalid metadata default bool value.",
@@ -2394,17 +2399,19 @@ class InputManager:
         if minimum_length is not None and not isinstance(minimum_length, (int, float)):
             om.add_error(
                 "Invalid metadata default array minimum length.",
-                f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}",
+                f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'minimum_length' for '{key_path}': "
+                             f"Expected a number but got {type(minimum_length)}")
         if maximum_length is not None and not isinstance(maximum_length, (int, float)):
             om.add_error(
                 "Invalid metadata default array maximum length.",
-                f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}",
+                f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid 'maximum_length' for '{key_path}': "
+                             f"Expected a number but got {type(maximum_length)}")
         if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
             om.add_error(
                 "Invalid metadata array length range.",
@@ -2412,7 +2419,8 @@ class InputManager:
                 f"greater than 'maximum_length' value {maximum_length}",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                             f"greater than 'maximum_length' value {maximum_length}")
 
     def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
         """Validates object type properties in metadata."""
@@ -2441,7 +2449,8 @@ class InputManager:
                 f" keys are {sorted(required_properties_keys)}.",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                             f" keys are {sorted(required_properties_keys)}.")
         property_type = properties.get("type", "Unknown type")
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
         if property_type == "object":
@@ -2451,7 +2460,7 @@ class InputManager:
                     f"No unique keys for {path}. At least one unique key is expected.",
                     info_map,
                 )
-                raise ValueError
+                raise ValueError(f"No unique keys for {path}. At least one unique key is expected.")
             return
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
@@ -2460,7 +2469,8 @@ class InputManager:
                 f" keys are {sorted(valid_properties_keys)}.",
                 info_map,
             )
-            raise ValueError
+            raise ValueError(f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                             f" keys are {sorted(valid_properties_keys)}.")
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
