@@ -325,7 +325,15 @@ class Emissions:
         """
         field_size = feeds_grown[0]["field_size"]
         total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
-        # TODO: Check that total dry mass is not 0
+
+        if total_dry_mass_per_ha_grown == 0.0:
+            for crop in feeds_grown:
+                crop["nitrous_oxide_emissions"] = 0.0
+                crop["ammonia_emissions"] = 0.0
+                crop["carbon_stock_change"] = 0.0
+                crop["nitrogen_fertilizer_used"] = 0.0
+                crop["phosphorus_fertilizer_used"] = 0.0
+            return feeds_grown
 
         for crop in feeds_grown:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
