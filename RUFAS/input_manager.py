@@ -2325,18 +2325,21 @@ class InputManager:
         if pattern is not None and not isinstance(pattern, str):
             om.add_error(
                 "Invalid metadata string properties pattern.",
-                f"Invalid 'pattern' for '{key_path}': " f"Expected a string but got {type(pattern)}",
+                f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
                 info_map,
             )
             raise ValueError
-        if pattern is not None and not re.compile(pattern):
+        try:
+            if pattern is not None:
+                re.compile(pattern)
+        except re.error:
             om.add_error(
                 "Invalid metadata string properties pattern.",
                 f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not "
-                f"a valid regex pattern.",
+                "a valid regex pattern.",
                 info_map,
             )
-            raise ValueError
+            raise ValueError("Invalid regex pattern provided.")
         if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
                 om.add_error(

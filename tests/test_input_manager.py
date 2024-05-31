@@ -3906,6 +3906,18 @@ def test_validate_array_container_properties(
             False,
             False,
         ),
+        # Nullable array that is None
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}, "nullable": True},
+            {"data": {"array": None}},
+            False,
+            "blob_key",
+            None,
+            True,
+            True,
+            True,
+        ),
     ],
 )
 def test_array_type_validator(
@@ -4519,21 +4531,21 @@ def test_validate_properties(
             ["some_key"],
             {"default": "not_a_number", "minimum": 3, "maximum": 7},
             "Invalid metadata default number value.",
-            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>",
+            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>.",
             True,
         ),
         (
             ["some_key"],
             {"default": 5, "minimum": "not_a_number", "maximum": 7},
-            "Invalid metadata default minimum.",
-            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>",
+            "Invalid metadata number properties minimum.",
+            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>.",
             True,
         ),
         (
             ["some_key"],
             {"default": 5, "minimum": 3, "maximum": "not_a_number"},
-            "Invalid metadata default maximum.",
-            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>",
+            "Invalid metadata number properties maximum.",
+            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>.",
             True,
         ),
         (
@@ -4553,11 +4565,13 @@ def test_validate_properties(
         (
             ["some_key"],
             {"minimum": 5, "maximum": 3},
-            "Invalid metadata array length range.",
+            "Invalid range of acceptable numbers.",
             "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
             True,
         ),
         (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
+        (["some_key"], {"default": None, "minimum": 3, "maximum": 8}, "Invalid metadata default number value.",
+         "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.", True),
     ],
 )
 def test_metadata_number_validator(
@@ -4601,8 +4615,29 @@ def test_metadata_number_validator(
             "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
             True,
         ),
+        (
+            ["some_key"],
+            {"default": None},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": 6789},
+            "Invalid metadata string properties pattern.",
+            "Invalid 'pattern' for '['some_key']': Expected a string but got <class 'int'>",
+            True,
+        ),
         (["some_key"], {"default": "12345", "pattern": r"^[0-9]+$"}, "", "", False),
         (["some_key"], {"default": "", "pattern": r"^[0-9]+$"}, "", "", False),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": r"["},
+            "Invalid metadata string properties pattern.",
+            "Invalid 'pattern' for '['some_key']': 'pattern' value '[' is not a valid regex pattern.",
+            True,
+        ),
     ],
 )
 def test_metadata_string_validator(
@@ -4649,7 +4684,8 @@ def test_metadata_string_validator(
             True,
         ),
         (["some_key"], {"default": True}, "", "", False),
-        (["some_key"], {"default": None}, "", "", False),
+        (["some_key"], {"default": None}, "Invalid metadata default bool value.",
+         "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'", True),
     ],
 )
 def test_metadata_bool_validator(
@@ -4683,49 +4719,29 @@ def test_metadata_bool_validator(
     [
         (
             ["some_key"],
-            {"default": "not_a_list"},
-            "Invalid metadata default array value.",
-            "Invalid 'default' for '['some_key']': Expected a list but got <class 'str'>",
-            True,
-        ),
-        (
-            ["some_key"],
-            {"default": [1, 2, 3], "minimum_length": "not_a_number"},
-            "Invalid metadata default array minimum length.",
-            "Invalid 'minimum_length' for '['some_key']': Expected a number but got <class 'str'>",
-            True,
-        ),
-        (
-            ["some_key"],
-            {"default": [1, 2, 3], "maximum_length": "not_a_number"},
-            "Invalid metadata default array maximum length.",
-            "Invalid 'maximum_length' for '['some_key']': Expected a number but got <class 'str'>",
-            True,
-        ),
-        (
-            ["some_key"],
-            {"default": [1, 2], "minimum_length": 3},
-            "Invalid metadata default array length.",
-            "Invalid 'default' for '['some_key']': 'default' length of [1, 2] is less than 'minimum_length' length 3",
-            True,
-        ),
-        (
-            ["some_key"],
-            {"default": [1, 2, 3, 4], "maximum_length": 3},
-            "Invalid metadata default array length.",
-            "Invalid 'default' for '['some_key']': 'default' length of [1, 2, 3, 4] is greater than 'maximum' length 3",
-            True,
-        ),
-        (
-            ["some_key"],
             {"minimum_length": 5, "maximum_length": 3},
             "Invalid metadata array length range.",
             "Invalid length 'range' for key '['some_key']': 'minimum_length'"
             " value 5 is greater than 'maximum_length' value 3",
             True,
         ),
-        (["some_key"], {"default": [1, 2, 3], "minimum_length": 1, "maximum_length": 5}, "", "", False),
-        (["some_key"], {"default": None, "minimum_length": 1, "maximum_length": 5}, "", "", False),
+        (
+            ["some_key"],
+            {"minimum_length": "five"},
+            "Invalid metadata default array minimum length.",
+            "Invalid 'minimum_length' for '['some_key']':"
+            " Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"maximum_length": "three"},
+            "Invalid metadata default array maximum length.",
+            "Invalid 'maximum_length' for '['some_key']':"
+            " Expected a number but got <class 'str'>",
+            True,
+        ),
+        (["some_key"], {"minimum_length": 1, "maximum_length": 5}, "", "", False),
     ],
 )
 def test_metadata_array_validator(
