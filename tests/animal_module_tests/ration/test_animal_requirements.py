@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import List
 
 import pytest
-from pytest import approx
 from mock import MagicMock
+from pytest import approx
+from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
-from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
@@ -264,14 +264,49 @@ def test_default_initialization() -> None:
                 [18, 27, 29, 39, 49, 64, 72, 72, 74, 84],
                 [27, 29, 37, 53, 65, 71, 72, 84, 89, 93],
                 [12, 17, 18, 19, 27, 34, 43, 54, 77, 81, 82, 83, 83, 91],
-                [24, 27, 28, 32, 34, 39, 54, 56, 57, 71, 74, 74, 75, 78, 79, 83, 88, 91, 91, 92],
+                [
+                    24,
+                    27,
+                    28,
+                    32,
+                    34,
+                    39,
+                    54,
+                    56,
+                    57,
+                    71,
+                    74,
+                    74,
+                    75,
+                    78,
+                    79,
+                    83,
+                    88,
+                    91,
+                    91,
+                    92,
+                ],
                 [17, 45, 71, 71, 72, 73, 73, 74, 74, 82, 83, 92, 92, 93, 98],
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 [1, 4, 4, 4, 4, 4, 4, 4],
             ],
             "mean",
-            [16.75, 46.75, 48.4, 60.625, 56.125, 52.8, 62.0, 51.5, 62.35, 74.0, 157.0, 1.0, 3.625],
+            [
+                16.75,
+                46.75,
+                48.4,
+                60.625,
+                56.125,
+                52.8,
+                62.0,
+                51.5,
+                62.35,
+                74.0,
+                157.0,
+                1.0,
+                3.625,
+            ],
         ),
         (
             [
@@ -283,7 +318,28 @@ def test_default_initialization() -> None:
                 [18, 27, 29, 39, 49, 64, 72, 72, 74, 84],
                 [27, 29, 37, 53, 65, 71, 72, 84, 89, 93],
                 [12, 17, 18, 19, 27, 34, 43, 54, 77, 81, 82, 83, 83, 91],
-                [24, 27, 28, 32, 34, 39, 54, 56, 57, 71, 74, 74, 75, 78, 79, 83, 88, 91, 91, 92],
+                [
+                    24,
+                    27,
+                    28,
+                    32,
+                    34,
+                    39,
+                    54,
+                    56,
+                    57,
+                    71,
+                    74,
+                    74,
+                    75,
+                    78,
+                    79,
+                    83,
+                    88,
+                    91,
+                    91,
+                    92,
+                ],
                 [17, 45, 71, 71, 72, 73, 73, 74, 74, 82, 83, 92, 92, 93, 98],
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -302,7 +358,28 @@ def test_default_initialization() -> None:
                 [18, 27, 29, 39, 49, 64, 72, 72, 74, 84],
                 [27, 29, 37, 53, 65, 71, 72, 84, 89, 93],
                 [12, 17, 18, 19, 27, 34, 43, 54, 77, 81, 82, 83, 83, 91],
-                [24, 27, 28, 32, 34, 39, 54, 56, 57, 71, 74, 74, 75, 78, 79, 83, 88, 91, 91, 92],
+                [
+                    24,
+                    27,
+                    28,
+                    32,
+                    34,
+                    39,
+                    54,
+                    56,
+                    57,
+                    71,
+                    74,
+                    74,
+                    75,
+                    78,
+                    79,
+                    83,
+                    88,
+                    91,
+                    91,
+                    92,
+                ],
                 [17, 45, 71, 71, 72, 73, 73, 74, 74, 82, 83, 92, 92, 93, 98],
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -328,7 +405,21 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
             ],
             "mean",
-            [69.846, 66.75, 47.214, 41.778, 59.0, 53.846, 50.769, 55.125, 58.125, 54.333, 49.588, 1.0, 8.5],
+            [
+                69.846,
+                66.75,
+                47.214,
+                41.778,
+                59.0,
+                53.846,
+                50.769,
+                55.125,
+                58.125,
+                54.333,
+                49.588,
+                1.0,
+                8.5,
+            ],
         ),
         (
             [
@@ -347,7 +438,21 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
             ],
             "median",
-            [73.0, 72.5, 49.5, 43.0, 74.0, 56.0, 47.0, 54.0, 64.5, 52.0, 45.0, 1.0, 5.0],
+            [
+                73.0,
+                72.5,
+                49.5,
+                43.0,
+                74.0,
+                56.0,
+                47.0,
+                54.0,
+                64.5,
+                52.0,
+                45.0,
+                1.0,
+                5.0,
+            ],
         ),
         (
             [
@@ -366,7 +471,21 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
             ],
             "percentile",
-            [82.8, 81.9, 81.7, 84.2, 82.8, 74.6, 74.6, 88.5, 89.0, 89.7, 80.6, 1.0, 19.0],
+            [
+                82.8,
+                81.9,
+                81.7,
+                84.2,
+                82.8,
+                74.6,
+                74.6,
+                88.5,
+                89.0,
+                89.7,
+                80.6,
+                1.0,
+                19.0,
+            ],
         ),
         (
             [
@@ -385,7 +504,21 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
             ],
             "mean",
-            [45.0, 47.583, 60.0, 44.182, 63.0, 55.133, 37.692, 42.714, 56.6, 44.294, 52.786, 5.5, 5.0],
+            [
+                45.0,
+                47.583,
+                60.0,
+                44.182,
+                63.0,
+                55.133,
+                37.692,
+                42.714,
+                56.6,
+                44.294,
+                52.786,
+                5.5,
+                5.0,
+            ],
         ),
         (
             [
@@ -404,7 +537,21 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
             ],
             "median",
-            [47.5, 44.0, 69.0, 45.0, 59.0, 65.0, 30.0, 36.5, 57.0, 42.0, 58.0, 5.5, 5.0],
+            [
+                47.5,
+                44.0,
+                69.0,
+                45.0,
+                59.0,
+                65.0,
+                30.0,
+                36.5,
+                57.0,
+                42.0,
+                58.0,
+                5.5,
+                5.0,
+            ],
         ),
         (
             [
@@ -423,11 +570,27 @@ def test_default_initialization() -> None:
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
             ],
             "percentile",
-            [73.2, 92.8, 92.4, 84.0, 95.6, 96.0, 68.4, 94.3, 75.4, 88.6, 76.7, 9.1, 5.0],
+            [
+                73.2,
+                92.8,
+                92.4,
+                84.0,
+                95.6,
+                96.0,
+                68.4,
+                94.3,
+                75.4,
+                88.6,
+                76.7,
+                9.1,
+                5.0,
+            ],
         ),
     ],
 )
-def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: str, expected: List[float]) -> None:
+def test_calc_pen_requirements(
+    argument_lists: List[List[float]], stat_method: str, expected: List[float]
+) -> None:
     """
     Test the calc_pen_requirement() method across varying statistical methods within the AnimalRequirements class.
 
@@ -458,7 +621,7 @@ def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: s
         assert getattr(animal_requirements, attr_name) == approx(statistic, abs=0.001)
 
 
-def test_set_requirements(mocker: MockerFixture):
+def test_set_requirements(mocker: MockerFixture) -> None:
     """Unit test for function set_requirements in file routines/animal/ration/animal_requirements.py"""
 
     pen = MagicMock()
@@ -499,7 +662,7 @@ def test_set_requirements(mocker: MockerFixture):
             "CP_milk": [
                 13,
             ],
-        }
+        },
     )
     test_obj.use_existing_requirements = MagicMock(
         return_value={
@@ -648,7 +811,9 @@ def test_use_existing_requirements() -> None:
         pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
 
     animal_grouping_scenario_mock = MagicMock()
-    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW])
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(
+        side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW]
+    )
 
     requirements_lists_empty = {
         "NEmaint_requirement": [],
@@ -704,7 +869,9 @@ def test_use_existing_requirements() -> None:
         (lazy_fixture("heifer_b"), (6.81, 0, 43.92)),
     ],
 )
-def test_calculate_NRC_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
+def test_calculate_NRC_energy_maintenance_requirements(
+    animal_dict: dict, expected: tuple
+) -> None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -748,7 +915,9 @@ def test_calculate_NRC_energy_growth_requirements(
         animal_dict["calving_interval"],
         animal_dict["ADG_heifer"],
     )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx(expectedvalues, rel=1e-2)
+    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx(
+        expectedvalues, rel=1e-2
+    )
 
 
 @pytest.mark.parametrize(
@@ -761,9 +930,13 @@ def test_calculate_NRC_energy_growth_requirements(
         (lazy_fixture("heifer_b"), 40, 0),
     ],
 )
-def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float):
+def test_calculate_NRC_energy_pregnancy_requirements(
+    animal_dict: dict, calf_birth_weight: float, expected: float
+):
     req = AnimalRequirements()
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(animal_dict["day_of_pregnancy"], calf_birth_weight)
+    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(
+        animal_dict["day_of_pregnancy"], calf_birth_weight
+    )
     assert (result_NEpreg) == pytest.approx((expected), rel=1e-2)
 
 
@@ -776,7 +949,9 @@ def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_bir
         (lazy_fixture("heifer_b"), 0.0),
     ],
 )
-def test_calculate_NRC_energy_lactation_requirements(animal_dict: dict, expected: float) -> None:
+def test_calculate_NRC_energy_lactation_requirements(
+    animal_dict: dict, expected: float
+) -> None:
     """Unit test for function calculate_NRC_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -801,7 +976,9 @@ def test_calculate_NRC_energy_lactation_requirements(animal_dict: dict, expected
         (lazy_fixture("heifer_b"), 0.5, 562.1),
     ],
 )
-def test_calculate_NRC_protein_requirements(animal_dict: dict, TDNconc: float, expected: float) -> None:
+def test_calculate_NRC_protein_requirements(
+    animal_dict: dict, TDNconc: float, expected: float
+) -> None:
     """Unit test for function calculate_NRC_protein_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -857,7 +1034,9 @@ def test_calculate_NRC_calcium_requirements(animal_dict: dict, expected: float) 
         (lazy_fixture("heifer_b"), 17.18),
     ],
 )
-def test_calculate_NRC_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
+def test_calculate_NRC_phosphorus_requirements(
+    animal_dict: dict, expected: float
+) -> None:
     """Unit test for function calculate_NRC_phosophorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -908,7 +1087,9 @@ def test_calculate_NRC_DMI(animal_dict: dict, expected: float) -> None:
         (lazy_fixture("heifer_b"), 0.0),
     ],
 )
-def test_calculate_NASEM_energy_lactation_requirements(animal_dict: dict, expected: float) -> None:
+def test_calculate_NASEM_energy_lactation_requirements(
+    animal_dict: dict, expected: float
+) -> None:
     """Unit test for function calculate_NASEM_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -932,7 +1113,9 @@ def test_calculate_NASEM_energy_lactation_requirements(animal_dict: dict, expect
         (lazy_fixture("heifer_b"), False, 15, 11.5),
     ],
 )
-def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lactation: float, expected: float) -> None:
+def test_calculate_NASEM_DMI(
+    animal_dict: dict, lactating: bool, net_energy_lactation: float, expected: float
+) -> None:
     """Unit test for function calculate_NASEM_DMI in file routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
     result_DMIest = req.calculate_NASEM_DMI(
@@ -957,7 +1140,9 @@ def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lact
         (lazy_fixture("heifer_b"), (6.3, 77.71, 10.05)),
     ],
 )
-def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
+def test_calculate_NASEM_energy_maintenance_requirements(
+    animal_dict: dict, expected: tuple
+) -> None:
     """Unit test for function calculate_NASEM_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -971,7 +1156,9 @@ def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expe
         animal_dict["day_of_pregnancy"],
         animal_dict["DIM"],
     )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(expected, rel=1e-2)
+    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(
+        expected, rel=1e-2
+    )
 
 
 @pytest.mark.parametrize(
@@ -985,7 +1172,9 @@ def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expe
         (lazy_fixture("heifer_b"), (4.1, 0.9, 0.35)),
     ],
 )
-def test_calculate_NASEM_energy_growth_requirements(animal_dict: dict, expected: tuple) -> None:
+def test_calculate_NASEM_energy_growth_requirements(
+    animal_dict: dict, expected: tuple
+) -> None:
     """Unit test for function calculate_NASEM_energy_growth_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1001,7 +1190,9 @@ def test_calculate_NASEM_energy_growth_requirements(animal_dict: dict, expected:
         animal_dict["parity"],
         animal_dict["calving_interval"],
     )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(expected, rel=1e-2)
+    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(
+        expected, rel=1e-2
+    )
 
 
 @pytest.mark.parametrize(
@@ -1013,7 +1204,9 @@ def test_calculate_NASEM_energy_growth_requirements(animal_dict: dict, expected:
         (lazy_fixture("heifer_b"), (4.9, 1.2)),
     ],
 )
-def test_calculate_NASEM_energy_pregnancy_requirements(animal_dict: dict, expected: tuple) -> None:
+def test_calculate_NASEM_energy_pregnancy_requirements(
+    animal_dict: dict, expected: tuple
+) -> None:
     """Unit test for function calculate_NASEM_energy_pregnancy_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1067,7 +1260,9 @@ def test_calculate_NASEM_protein_requirements(
         (lazy_fixture("heifer_b"), 11.45),
     ],
 )
-def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float) -> None:
+def test_calculate_NASEM_calcium_requirements(
+    animal_dict: dict, expected: float
+) -> None:
     """Unit test for function calculate_NASEM_calcium_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1094,7 +1289,9 @@ def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float
         (lazy_fixture("heifer_b"), 16.44),
     ],
 )
-def test_calculate_NASEM_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
+def test_calculate_NASEM_phosphorus_requirements(
+    animal_dict: dict, expected: float
+) -> None:
     """Unit test for function calculate_NASEM_phosphorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = AnimalRequirements()
@@ -1115,25 +1312,45 @@ def test_calculate_NASEM_phosphorus_requirements(animal_dict: dict, expected: fl
 def test_calc_rqmts():
     """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
     test_requirements = AnimalRequirements()
-    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(return_value=(1, 2, 3))
-    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(return_value=(1, 2, 3))
-    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(return_value=1)
-    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(
+        return_value=(1, 2, 3)
+    )
+    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(
+        return_value=(1, 2, 3)
+    )
+    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(
+        return_value=1
+    )
+    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(
+        return_value=1
+    )
     test_requirements.calculate_NRC_DMI = MagicMock(return_value=1)
     test_requirements.calculate_NRC_protein_requirements = MagicMock(return_value=1)
     test_requirements.calculate_NRC_calcium_requirements = MagicMock(return_value=1)
     test_requirements.calculate_NRC_phosphorus_requirements = MagicMock(return_value=1)
-    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(return_value=(4, 5, 6))
-    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(return_value=(4, 5, 6))
-    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(return_value=(4, 5))
-    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(
+        return_value=(4, 5, 6)
+    )
+    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(
+        return_value=(4, 5, 6)
+    )
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(
+        return_value=(4, 5)
+    )
+    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(
+        return_value=2
+    )
     test_requirements.calculate_NASEM_DMI = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_protein_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
-    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(
+        return_value=2
+    )
     AnimalBase.config["nutrient_standard"] = "NRC"
     test_requirements.AnimalBase = AnimalBase
-    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    actual = test_requirements.calc_rqmts(
+        MagicMock(), MagicMock(), MagicMock(), MagicMock()
+    )
     expected = {
         "NEmaint_requirement": 1,
         "NEg_requirement": 1,
@@ -1165,7 +1382,9 @@ def test_calc_rqmts():
         "DMIest_requirement": 2,
     }
     AnimalBase.config["nutrient_standard"] = "NASEM"
-    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    actual = test_requirements.calc_rqmts(
+        MagicMock(), MagicMock(), MagicMock(), MagicMock()
+    )
     test_requirements.calculate_NASEM_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NASEM_energy_growth_requirements.assert_called_once()
     test_requirements.calculate_NASEM_energy_pregnancy_requirements.assert_called_once()
@@ -1180,19 +1399,29 @@ def test_energy_activity_rqmts():
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
     AnimalBase.config["nutrient_standard"] = "NASEM"
     req = AnimalRequirements()
-    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400, housing="Grazing", distance=1
+    )
     assert (result_energy_activity) == pytest.approx((294), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Not_Grazing", distance=1)
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400, housing="Not_Grazing", distance=1
+    )
     assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
 
     AnimalBase.config["nutrient_standard"] = "NRC"
 
-    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Barn", distance=1)
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400, housing="Barn", distance=1
+    )
     assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400, housing="Grazing", distance=1
+    )
     assert (result_energy_activity) == pytest.approx((0.66), rel=1e-2)
 
-    result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="n e i t h e r", distance=1)
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400, housing="n e i t h e r", distance=1
+    )
     assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
