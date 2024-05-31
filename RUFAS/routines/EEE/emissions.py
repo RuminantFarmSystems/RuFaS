@@ -106,9 +106,7 @@ class Emissions:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         filtered_apps = list(
-            filter(
-                lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_apps
-            )
+            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_apps)
         )
 
         return filtered_yields, filtered_apps
@@ -204,7 +202,9 @@ class Emissions:
 
         return feed_emissions_dict
 
-    def _calculate_homegrown_feed_emissions(self, homegrown_feeds: list[dict[str, Any]], fertilizer_applications: list[dict[str, Any]]) -> None:
+    def _calculate_homegrown_feed_emissions(
+        self, homegrown_feeds: list[dict[str, Any]], fertilizer_applications: list[dict[str, Any]]
+    ) -> None:
         """Calculates the emissions associated with feeds grown on the farm."""
         grouped_feeds = {}
         for feed in homegrown_feeds:
@@ -226,7 +226,9 @@ class Emissions:
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
-            crops = self._calculate_emissions_by_field(grouped_feeds[field], grouped_soil_characteristics[field], aggregated_fertilizer_apps[field])
+            crops = self._calculate_emissions_by_field(
+                grouped_feeds[field], grouped_soil_characteristics[field], aggregated_fertilizer_apps[field]
+            )
             crops_with_emissions.extend(crops)
 
         info_map = {
@@ -274,7 +276,9 @@ class Emissions:
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
-                "filters": [f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"],
+                "filters": [
+                    f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
+                ],
                 "slice_start": SLICE_START,
             }
             nitrous_oxide_emissions = om.filter_variables_pool(nitrous_oxide_filter)
@@ -284,7 +288,9 @@ class Emissions:
 
             starting_carbon_stock_filter = {
                 "name": "Starting soil profile carbon stock",
-                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"],
+                "filters": [
+                    f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
+                ],
                 "slice_start": SLICE_START,
                 "slice_end": SLICE_END,
             }
@@ -295,7 +301,9 @@ class Emissions:
 
             ending_carbon_stock_filter = {
                 "name": "Ending soil profile carbon stock",
-                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"],
+                "filters": [
+                    f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
+                ],
                 "slice_start": FINAL_DAY_SLICE_START,
             }
             ending_carbon_stock = om.filter_variables_pool(ending_carbon_stock_filter)
@@ -307,7 +315,10 @@ class Emissions:
         return soil_info
 
     def _calculate_emissions_by_field(
-        self, feeds_grown: list[dict[str, Any]], field_emissions: dict[str, float], fertilizer_applications: dict[str, float]
+        self,
+        feeds_grown: list[dict[str, Any]],
+        field_emissions: dict[str, float],
+        fertilizer_applications: dict[str, float],
     ) -> list[dict[str, Any]]:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
