@@ -151,9 +151,7 @@ def test_calculate_non_protein_nitrogen_after_effluent_loss(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize(
-    "cp,loss_frac,expected", [(5.6, 0.033, 4.767322), (2.2, 0.04, 1.041667), (0.0, 0.05, 0.0)]
-)
+@pytest.mark.parametrize("cp,loss_frac,expected", [(5.6, 0.033, 4.767322), (2.2, 0.04, 1.041667), (0.0, 0.05, 0.0)])
 def test_calculate_crude_protein_after_effluent_loss(
     silage: Silage, cp: float, loss_frac: float, expected: float
 ) -> None:
