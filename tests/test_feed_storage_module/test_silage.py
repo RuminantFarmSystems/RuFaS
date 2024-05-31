@@ -152,7 +152,7 @@ def test_calculate_non_protein_nitrogen_after_effluent_loss(
 
 
 @pytest.mark.parametrize(
-    "cp,loss_frac,expected", [(5.6, 0.033, 5.78086866), (2.2, 0.04, 2.27916666), (0.0, 0.05, 0.0)]
+    "cp,loss_frac,expected", [(5.6, 0.033, 4.767322), (2.2, 0.04, 1.041667), (0.0, 0.05, 0.0)]
 )
 def test_calculate_crude_protein_after_effluent_loss(
     silage: Silage, cp: float, loss_frac: float, expected: float

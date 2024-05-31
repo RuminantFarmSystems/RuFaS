@@ -341,7 +341,7 @@ The percentage of crude protein (CP) is recalculated with the equation:
 .. math::
 
 
-   CP_{updated} = \frac{CP_{initial} - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \tag{2.2.1.1}
+   CP_{updated} = \frac{CP_{initial} \cdot 0.01 - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.2.1.1}
 
 Where :math:`CP_{initial}` is the percentage of dry matter mass that is
 crude protein in the ensiled crop before accounting for dry matter loss
@@ -367,9 +367,9 @@ at 0.
 .. math::
 
 
-   DL_{fraction} = \frac{DM_{updated}}{DM_{initial}} \tag{2.2.1.3}
+   DL_{fraction} = \frac{DM_{lost}}{DM_{initial}} \tag{2.2.1.3}
 
-Where :math:`DM_{updated}` is the amount of dry matter mass in the
+Where :math:`DM_{lost}` is the amount of dry matter mass in the
 ensiled crop after accounting for dry matter lost to effluent, and
 :math:`DM_{initial}` is the amount of dry matter mass in the ensiled
 crop before accounting for dry matter lost to effluent.
