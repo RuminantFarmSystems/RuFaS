@@ -3,6 +3,7 @@ from ...input_manager import InputManager
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 from typing import Any
+import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.ALFALFA_HAY: ["106", "107", "108"],
@@ -260,11 +261,12 @@ class Emissions:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
         soil_info = {}
         for name in field_names:
+            sanitized_name = re.escape(name)
             soil_data = {}
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
                 "filters": [
-                    f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{name}',layer=.*",
+                    f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
                 "slice_start": SLICE_START,
             }
@@ -272,7 +274,7 @@ class Emissions:
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
-                "filters": [f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{name}',layer=.*"],
+                "filters": [f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"],
                 "slice_start": SLICE_START,
             }
             nitrous_oxide_emissions = om.filter_variables_pool(nitrous_oxide_filter)
@@ -282,7 +284,7 @@ class Emissions:
 
             starting_carbon_stock_filter = {
                 "name": "Starting soil profile carbon stock",
-                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{name}'"],
+                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"],
                 "slice_start": SLICE_START,
                 "slice_end": SLICE_END,
             }
@@ -293,7 +295,7 @@ class Emissions:
 
             ending_carbon_stock_filter = {
                 "name": "Ending soil profile carbon stock",
-                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{name}'"],
+                "filters": [f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"],
                 "slice_start": FINAL_DAY_SLICE_START,
             }
             ending_carbon_stock = om.filter_variables_pool(ending_carbon_stock_filter)

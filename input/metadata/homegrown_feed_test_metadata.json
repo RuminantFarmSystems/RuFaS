@@ -133,7 +133,7 @@
       "type": "json",
       "properties": "crop_schedule_properties"
     },
-    "Corn Silage 2021 cs-ww Field": {
+    "Corn Silage 2021 (cs-ww) Field": {
       "title": "Corn Silage 2021 (cs-ww) Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f1_cornsilage_2021_cs_ww_field.json",
@@ -175,7 +175,7 @@
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "Alfalfa 2021 CG_Alf Field": {
+    "Alfalfa 2021 (CG_Alf) Field": {
       "title": "Alfalfa 2021 (CG_Alf) Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f1_alfalfa_2021_cg_alf_field.json",
@@ -245,7 +245,7 @@
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "Corn Silage 2021 cs-alf Field": {
+    "Corn Silage 2021 (cs-alf) Field": {
       "title": "Corn Silage 2021 (cs-alf) Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f1_cornsilage_2021_cs_alf_field.json",
@@ -280,7 +280,7 @@
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "Alfalfa Silage 2021 cs-alf Field": {
+    "Alfalfa Silage 2021 (cs-alf) Field": {
       "title": "Alfalfa Silage 2021 (cs-alf) Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c1f1_alfalfa_2021_cs_alf_field.json",
