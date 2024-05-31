@@ -76,7 +76,7 @@ class Emissions:
             "variables": [".*"],
         }
         yields = om.filter_variables_pool(crop_filter)
-        processed_yields = self._win_just_one_for_the_zipper(yields)
+        processed_yields = self._transform_outputs_to_list_of_dicts(yields)
 
         fertilizer_filter = {
             "name": "Fertilizer Applications",
@@ -84,7 +84,7 @@ class Emissions:
             "variables": [".*"],
         }
         fertilizer_apps = om.filter_variables_pool(fertilizer_filter)
-        processed_apps = self._win_just_one_for_the_zipper(fertilizer_apps)
+        processed_apps = self._transform_outputs_to_list_of_dicts(fertilizer_apps)
 
         time_filter = {
             "name": "Time Filter",
@@ -128,8 +128,17 @@ class Emissions:
 
         return processed_feeds
 
-    def _win_just_one_for_the_zipper(self, data: dict[str, OutputManager.pool_element_type]) -> list[dict[str, Any]]:
-        """TODO: change name unless everyone agrees it's funny enough to keep."""
+    def _transform_outputs_to_list_of_dicts(self, data: dict[str, OutputManager.pool_element_type]) -> list[dict[str, Any]]:
+        """
+        Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
+
+        Examples
+        --------
+        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}]}
+        >>> _transform_outputs_to_list_of_dicts(a)
+        [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
+
+        """
         keys = data.keys()
         values_list = [data[key]["values"] for key in keys]
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
