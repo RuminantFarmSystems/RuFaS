@@ -4,7 +4,11 @@ from .enums import CropCategory
 from typing import Optional
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from ...units import MeasurementUnits
+from ...output_manager import OutputManager
 
+
+om = OutputManager()
 
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
@@ -38,21 +42,46 @@ class Silage(Storage):
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
-        Processes the degradations and losses of nutrients and dry matter in the stored crops.
-
-        Parameters
-        ----------
-        weather : Weather
-            Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
-
-        Notes
-        -----
-        This method also records the total amount of gaseous dry matter loss happened from all stored crops.
-
+        Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
+        of `process_degradations` to handle the fermentative loss.
         """
-        pass
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        total_effluent_dry_matter_loss = 0.0
+        total_effluent_moisture_loss = 0.0
+        for crop in self.stored:
+            days_of_effluent_to_process = self.calculate_days_of_effluent_loss_to_process(crop, time)
+            if days_of_effluent_to_process == 0:
+                continue
+
+            dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
+                crop.estimated_maximum_effluent, days_of_effluent_to_process
+            )
+            moisture_loss = self.calculate_moisture_loss_to_effluent(
+                crop.estimated_maximum_effluent, days_of_effluent_to_process
+            )
+
+            total_effluent_dry_matter_loss += dry_matter_loss
+            total_effluent_moisture_loss += moisture_loss
+
+            dry_matter_loss_frac = dry_matter_loss / crop.dry_matter_mass
+            crop.non_protein_nitrogen = self.calculate_non_protein_nitrogen_after_effluent_loss(
+                crop.non_protein_nitrogen, crop.crude_protein_percent, dry_matter_loss_frac
+            )
+
+            crop.crude_protein_percent = self.calculate_crude_protein_after_effluent_loss(
+                crop.crude_protein_percent, dry_matter_loss_frac
+            )
+
+            self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
+
+        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
+
+        super().process_degradations(weather, time)
 
     def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
         """
@@ -126,6 +155,60 @@ class Silage(Storage):
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
+
+    def calculate_non_protein_nitrogen_after_effluent_loss(
+        self, initial_non_protein_nitrogen: float, initial_crude_protein: float, loss_fraction: float
+    ) -> float:
+        """
+        Calculates the percentage of non-protein nitrogen in a stored crop after losing dry matter to effluent.
+
+        Parameters
+        ----------
+        initial_non_protein_nitrogen : float
+            Percentage of non-protein nitrogen in the crop before dry matter loss occurred.
+        initial_crude_protein : float
+            Percentage of crude protein in the crop before dry matter loss occurred.
+        loss_fraction : float
+            Fraction of dry matter that was lost to effluent.
+
+        Returns
+        -------
+        float
+            Percentage of non-protein nitrogen remaining in the stored crop.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
+
+        """
+        numerator = initial_non_protein_nitrogen * initial_crude_protein - 0.3 * loss_fraction
+        denominator = initial_crude_protein - loss_fraction
+        new_percentage = numerator / denominator
+        return max(0.0, new_percentage)
+
+    def calculate_crude_protein_after_effluent_loss(self, initial_crude_protein: float, loss_fraction: float) -> float:
+        """
+        Calculates the percentage of crude protein in a stored crop after losing dry matter to effluent.
+
+        Parameters
+        ----------
+        initial_crude_protein : float
+            Percentage of crude protein in the crop before dry matter loss occurred.
+        loss_fraction : float
+            Fraction of dry matter that was lost to effluent.
+
+        Returns
+        -------
+        float
+            Percentage of crude protein remaining in the stored crop.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
+
+        """
+        new_percentage = (initial_crude_protein - 0.3 * loss_fraction) / (1 - loss_fraction)
+        return max(0.0, new_percentage)
 
 
 class Bunker(Silage):
