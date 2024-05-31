@@ -700,6 +700,8 @@ class InputManager:
                 if "default" in property_details:
                     input_data[property_key] = property_details["default"]
                     property_keys_with_default_values.append((property_key, property_details["default"]))
+                elif "nullable" in property_details:
+                    continue
                 else:
                     missing_required_property_keys.append(property_key)
                     continue
@@ -1014,6 +1016,8 @@ class InputManager:
         array_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
+        if variable_properties.get("nullable", False) and array_value is None:
+            return True
         if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
@@ -2232,7 +2236,8 @@ class InputManager:
         self._validate_metadata_properties_keys(
             required_number_property_keys, optional_number_property_keys, value, key_path
         )
-        default = value.get("default")
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
             om.add_error(
@@ -2242,7 +2247,7 @@ class InputManager:
             )
             raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.")
         if default is not None:
-            if not isinstance(default, (int, float)):
+            if not isinstance(default, (int, float)) and not has_no_default:
                 om.add_error(
                     "Invalid metadata default number value.",
                     f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
@@ -2273,7 +2278,7 @@ class InputManager:
                 info_map,
             )
             raise ValueError
-        if default is not None:
+        if default is not None and not has_no_default:
             if minimum is not None and default < minimum:
                 om.add_error(
                     "Invalid metadata default.",
@@ -2298,16 +2303,17 @@ class InputManager:
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
         self._validate_metadata_properties_keys(required_str_property_keys, optional_str_property_keys, value, key_path)
-        default = value.get("default")
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
         nullable = value.get("nullable", False)
-        if default is None or default == "" and not nullable:
+        if default is None and not nullable:
             om.add_error(
                 "Invalid metadata default string value.",
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
             raise ValueError
-        if default is not None:
+        if default is not None and not has_no_default:
             if not isinstance(default, str):
                 om.add_error(
                     "Invalid metadata default string value.",
@@ -2331,7 +2337,7 @@ class InputManager:
                 info_map,
             )
             raise ValueError
-        if default != "" and default is not None:
+        if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
                 om.add_error(
                     "Invalid metadata default string value.",
@@ -2351,7 +2357,8 @@ class InputManager:
         optional_bool_property_keys = {"description", "default", "nullable"}
         self._validate_metadata_properties_keys(required_bool_property_keys, optional_bool_property_keys, value,
                                                 key_path)
-        default = value.get("default")
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
             om.add_error(
@@ -2360,7 +2367,7 @@ class InputManager:
                 info_map,
             )
             raise ValueError
-        if default is not None and not isinstance(default, bool):
+        if default is not None and not isinstance(default, bool) and not has_no_default:
             om.add_error(
                 "Invalid metadata default bool value.",
                 f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
@@ -2375,7 +2382,7 @@ class InputManager:
             "function": self._metadata_array_validator.__name__,
         }
         required_array_property_keys = {"type", "properties"}
-        optional_array_property_keys = {"description", "minimum_length", "maximum_length"}
+        optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
         self._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )
