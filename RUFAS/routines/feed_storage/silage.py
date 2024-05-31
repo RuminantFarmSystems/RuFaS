@@ -4,6 +4,7 @@ from .enums import CropCategory
 from typing import Optional
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from ...general_constants import GeneralConstants
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 
@@ -207,7 +208,10 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
 
         """
-        new_percentage = (initial_crude_protein - 0.3 * loss_fraction) / (1 - loss_fraction)
+        new_fraction = (initial_crude_protein * GeneralConstants.PERCENTAGE_TO_FRACTION - 0.3 * loss_fraction) / (
+            1 - loss_fraction
+        )
+        new_percentage = new_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
         return max(0.0, new_percentage)
 
 
