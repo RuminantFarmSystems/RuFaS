@@ -4477,7 +4477,8 @@ def test_compare_metadata_properties(
             ["Properties value type error"],
             "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+        ({"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}}, 3, 3, ["a", "b", "c"],
+         False, [], ""),
     ],
 )
 def test_validate_properties(
@@ -4817,6 +4818,14 @@ def test_metadata_object_validator(
             ["root"],
             True,
             "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type'].",
+        ),
+        (
+            {"type"},
+            {"type"},
+            {"type": "object"},
+            ["root"],
+            True,
+            "No unique keys for ['root']. At least one unique key is expected.",
         ),
     ],
 )

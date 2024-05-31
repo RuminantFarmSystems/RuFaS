@@ -2443,9 +2443,16 @@ class InputManager:
             )
             raise ValueError
         property_type = properties.get("type", "Unknown type")
-        if property_type == "object":
-            return
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
+        if property_type == "object":
+            if not (set(properties.keys()) - valid_properties_keys):
+                om.add_error(
+                    "Metadata Validation",
+                    f"No unique keys for {path}. At least one unique key is expected.",
+                    info_map,
+                )
+                raise ValueError
+            return
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
