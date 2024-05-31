@@ -50,10 +50,6 @@ def animal_manager_fixture(mocker: MockerFixture) -> AnimalManager:
     return animal_manager
 
 
-def test___init__() -> None:
-    pass
-
-
 def test_data_padder() -> None:
     """Unit test for function data_padder in file routines/animal/animal_module_reporter.py"""
     reference_variable = "reference"
@@ -67,7 +63,8 @@ def test_data_padder() -> None:
         full_variable_to_add="full_variable",
         thing_to_add=0,
         simulation_day=100,
-        info_map={"class": "dummyclass", "function": "dummyfunction", "units": MeasurementUnits.ANIMALS.value},
+        info_map={"class": "dummyclass", "function": "dummyfunction", "units": MeasurementUnits.ANIMALS},
+        units=MeasurementUnits.ANIMALS,
     )
 
     # Assert
@@ -89,6 +86,7 @@ def test_data_padder_no_data_to_pad() -> None:
         thing_to_add=0,
         simulation_day=0,
         info_map={"class": "dummyclass", "function": "dummyfunction"},
+        units={"test": "dummy"},
     )
 
     # Assert
@@ -376,16 +374,18 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
 def test_report_animal_module_manure() -> None:
     test_output_dict = {
         "prefix": "dummy",
-        "manure": {"property1": 100, "property2": 200},
+        "manure": {"urea": 100, "urine": 200},
     }
     test_dict = {"example": test_output_dict}
 
     AnimalModuleReporter.report_animal_module_manure(test_dict)
 
-    for i in range(1, 2):
-        assert om.variables_pool[f"AnimalModuleReporter.report_animal_module_manure.dummy_property{i}"]["values"] == [
-            100 * i
-        ]
+    # for i in range(1, 2):
+    #     assert om.variables_pool[f"AnimalModuleReporter.report_animal_module_manure.dummy_property{i}"]["values"] == [
+    #         100 * i
+    #     ]
+    assert om.variables_pool["AnimalModuleReporter.report_animal_module_manure.dummy_urea"]["values"] == [100]
+    assert om.variables_pool["AnimalModuleReporter.report_animal_module_manure.dummy_urine"]["values"] == [200]
 
 
 def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
@@ -510,24 +510,32 @@ def test_report_sold_animal_information(
         "days_in_milk": days_in_milk,
         "calves": calves,
     }
-    none_str = "none"
+    none_str = "NA"
     for attr, value in optional_attrs_dict.items():
         if value is not None:
             setattr(mock_animal, attr, value)
         else:
             setattr(mock_animal, attr, none_str)
-
-    animal_manager = mocker.MagicMock()
-    animal_manager.life_cycle_manager.sold_calves = [mock_animal] if animal_type == "Calf" else []
-    animal_manager.life_cycle_manager.sold_heiferIIs = [mock_animal] if animal_type == "HeiferII" else []
-    animal_manager.life_cycle_manager.sold_heiferIIIs = [mock_animal] if animal_type == "HeiferIII" else []
-    animal_manager.life_cycle_manager.sold_and_died_cows = [mock_animal] if animal_type == "Cow" else []
+    mock_animal_sell_report = {
+        "id": mock_animal.id,
+        "animal_type": mock_animal.__class__.__name__,
+        "sold_at_day": mock_animal.sold_at_day,
+        "body_weight": mock_animal.body_weight,
+        "cull_reason": mock_animal.cull_reason,
+        "days_in_milk": mock_animal.days_in_milk,
+        "parity": mock_animal.calves,
+    }
+    life_cycle_manager = mocker.MagicMock()
+    life_cycle_manager.sold_calves_info = [mock_animal_sell_report] if animal_type == "Calf" else []
+    life_cycle_manager.sold_heiferIIs_info = [mock_animal_sell_report] if animal_type == "HeiferII" else []
+    life_cycle_manager.sold_heiferIIIs_info = [mock_animal_sell_report] if animal_type == "HeiferIII" else []
+    life_cycle_manager.sold_and_died_cows_info = [mock_animal_sell_report] if animal_type == "Cow" else []
 
     patch_for_add_variable = mocker.patch("RUFAS.routines.animal" ".animal_module_reporter.om.add_variable")
     assert patch_for_add_variable.call_count == 0
 
     # Act
-    AnimalModuleReporter.report_sold_animal_information(animal_manager)
+    AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
 
     # Assert
     if cull_reason == animal_constants.DEATH_CULL:

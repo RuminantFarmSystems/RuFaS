@@ -86,6 +86,10 @@ class Crop:
         mean_air_temperature: float,
         min_air_temperature: float,
         max_air_temperature: float,
+        simulate_water_stress: bool,
+        simulate_temp_stress: bool,
+        simulate_nitrogen_stress: bool,
+        simulate_phosphorus_stress: bool,
     ) -> None:
         """
         Main function for growing the crop on a daily basis.
@@ -102,6 +106,14 @@ class Crop:
             Minimum air temperature for the day (°C).
         max_air_temperature : float
             Maximum air temperature for the day (°C).
+        simulate_water_stress : bool
+            Whether water stress should affect crop growth.
+        simulate_temp_stress : bool
+            Whether temperature stress should affect crop growth.
+        simulate_nitrogen_stress : bool
+            Whether nitrogen stress should affect crop growth.
+        simulate_phosphorus_stress : bool
+            Whether phosphorus stress should affect crop growth.
 
         Notes
         -----
@@ -114,6 +126,13 @@ class Crop:
             self.root_development.develop_roots()
             self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
             self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-            self.growth_constraints.constrain_growth(self.data.max_transpiration, mean_air_temperature)
+            self.growth_constraints.constrain_growth(
+                self.data.max_transpiration,
+                mean_air_temperature,
+                simulate_water_stress,
+                simulate_temp_stress,
+                simulate_nitrogen_stress,
+                simulate_phosphorus_stress,
+            )
             self.leaf_area_index.grow_canopy()
             self.biomass_allocation.allocate_biomass(incoming_light)

@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Dict, Any
 
 import pytest
@@ -408,14 +409,9 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.leap_year_length == mock_config["leap_year_length"]
     assert time.year_length == mock_config["year_length"]
     assert time.day == 2
-    assert time.index == 0
+    assert time.simulation_day == 0
     assert time.year == 1
     assert time.years == mock_config["years"]
-
-
-def test_to_str(mock_time: Time) -> None:
-    """Tests that string representations are correctly created for Time instances."""
-    assert mock_time.to_str() == "Year: 1 Day: 2"
 
 
 def test_advance(mock_time: Time) -> None:
@@ -423,13 +419,13 @@ def test_advance(mock_time: Time) -> None:
     time = mock_time
     for n in range(364):
         time.advance()
-        assert time.index == 1 + n
+        assert time.simulation_day == n + 1
         assert time.day == 3 + n
         assert time.year == 1
         assert time.calendar_year == 1999
 
     time.advance()
-    assert time.index == 365
+    assert time.simulation_day == 365
     assert time.day == 1
     assert time.year == 2
     assert time.calendar_year == 2000
@@ -459,7 +455,7 @@ def test_record_time(mock_time: Time) -> None:
     time = mock_time
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         time.record_time()
-        assert add_var.call_count == 3
+        assert add_var.call_count == 4
 
 
 def test_is_last_day_of_simulation(mock_time: Time) -> None:
@@ -469,3 +465,35 @@ def test_is_last_day_of_simulation(mock_time: Time) -> None:
         assert not time.is_last_day_of_simulation
         time.advance()
     assert time.is_last_day_of_simulation
+
+
+@pytest.mark.parametrize(
+    "start_date_str, simulation_day, expected_date",
+    [
+        # Year 2023
+        ("2023:1", 1, date(2023, 1, 1)),
+        ("2023:1", 365, date(2023, 12, 31)),
+        # Year 2024 (Leap Year)
+        ("2024:1", 1, date(2024, 1, 1)),
+        ("2024:1", 366, date(2024, 12, 31)),
+        ("2024:15", 17, date(2024, 1, 31)),
+    ],
+)
+def test_convert_simulation_day_to_date(
+    mocker: MockerFixture, start_date_str: str, simulation_day: int, expected_date: date
+) -> None:
+    """
+    Unit test for the convert_simulation_day_to_date method of the Time class.
+    """
+
+    # Arrange
+    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    time = Time()
+    year, doy = start_date_str.split(":")
+    time.start_full_date = [year, doy]
+
+    # Act
+    actual_date = time.convert_simulation_day_to_date(simulation_day)
+
+    # Assert
+    assert actual_date == expected_date

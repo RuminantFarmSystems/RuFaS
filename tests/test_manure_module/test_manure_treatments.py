@@ -1,7 +1,8 @@
 import dataclasses
 import math
-from typing import Type, Tuple
+from typing import Any, Type, Tuple
 
+from mock import MagicMock
 import pytest
 from mock.mock import PropertyMock, call
 from pytest import approx
@@ -1311,8 +1312,14 @@ def test_slurry_storage_outdoor_wastewater_volume(mocker: MockFixture) -> None:
     assert actual_wastewater_volume == 0.0
 
 
-def test_slurry_storage_outdoor_treatment_volume(mocker: MockFixture) -> None:
-    """Unit test for _treatment_volume() in slurry_storage_outdoor.py."""
+@pytest.mark.parametrize(
+    "storage_time_period, expected_treatment_volume",
+    [(120, 100.0 * 120), (None, 0.0), (120.5, 0.0), ("one hundred twenty", 0.0)],
+)
+def test_slurry_storage_outdoor_treatment_volume(
+    mocker: MockFixture, storage_time_period: Any, expected_treatment_volume: float
+) -> None:
+    """Unit test for treatment_volume property in slurry_storage_outdoor.py."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
         weather=mocker.MagicMock(),
@@ -1325,14 +1332,15 @@ def test_slurry_storage_outdoor_treatment_volume(mocker: MockFixture) -> None:
         new_callable=PropertyMock,
         return_value=wastewater_volume,
     )
-    slurry_storage_outdoor.storage_time_period = storage_time_period = 120
+    slurry_storage_outdoor.storage_time_period = storage_time_period
 
     # Act
     actual_treatment_volume = slurry_storage_outdoor.treatment_volume
 
     # Assert
-    assert actual_treatment_volume == wastewater_volume * storage_time_period
-    patch_for_wastewater_volume.assert_called_once()
+    assert actual_treatment_volume == expected_treatment_volume
+    if isinstance(storage_time_period, int):
+        patch_for_wastewater_volume.assert_called_once()
 
 
 def test_slurry_storage_outdoor_total_pit_volume(mocker: MockFixture) -> None:
@@ -1544,27 +1552,21 @@ def test_slurry_storage_outdoor_pit_surface_area(mocker: MockFixture) -> None:
         time=mocker.MagicMock(),
         manure_treatment_config=mocker.MagicMock(),
     )
-    pit_width = 10.0
-    patch_for_pit_width = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width",
-        new_callable=PropertyMock,
-        return_value=pit_width,
+
+    current_pen = mocker.MagicMock(num_animals=100)
+    mocker.patch.object(
+        slurry_storage_outdoor, "_current_pen", new_callable=mocker.PropertyMock, return_value=current_pen
     )
-    pit_length = 30.0
-    patch_for_pit_length = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length",
-        new_callable=PropertyMock,
-        return_value=pit_length,
-    )
-    expected_pit_surface_area = pit_width * pit_length
+
+    expected_area_per_animal = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+    expected_pit_surface_area = 100 * expected_area_per_animal
 
     # Act
+    slurry_storage_outdoor._current_pen.num_animals = 100
     actual_pit_surface_area = slurry_storage_outdoor.pit_surface_area
 
     # Assert
     assert actual_pit_surface_area == expected_pit_surface_area
-    patch_for_pit_width.assert_called_once()
-    patch_for_pit_length.assert_called_once()
 
 
 def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
@@ -1616,8 +1618,16 @@ def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
     assert patch_for_pit_slope.call_count == 2
 
 
-def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> None:
-    """Unit test for precipitation_volume() in slurry_storage_outdoor.py."""
+@pytest.mark.parametrize(
+    "current_pen, num_animals, expected_volume",
+    [
+        (MagicMock(num_animals=100), 100, 1000.0 * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL),
+        (None, None, 0),
+        (MagicMock(num_animals=None), None, 0),
+    ],
+)
+def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_animals, expected_volume):
+    """Unit test for precipitation_volume() in slurry_storage_outdoor.py, with different pen and animal scenarios."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
         weather=mocker.MagicMock(),
@@ -1625,26 +1635,20 @@ def test_slurry_storage_outdoor_precipitation_volume(mocker: MockFixture) -> Non
         manure_treatment_config=mocker.MagicMock(),
     )
     rainfall = 10.0
-    patch_for_get_current_day_rainfall = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor"
-        "._get_current_day_rainfall",
+    mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor._get_current_day_rainfall",
         return_value=rainfall,
     )
-    pit_surface_area = 300.0
-    patch_for_pit_surface_area = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area",
-        new_callable=PropertyMock,
-        return_value=pit_surface_area,
-    )
-    expected_precipitation_volume = rainfall * pit_surface_area
+    slurry_storage_outdoor._current_pen = current_pen
+
+    if current_pen is not None:
+        current_pen.num_animals = num_animals
 
     # Act
     actual_precipitation_volume = slurry_storage_outdoor.precipitation_volume
 
     # Assert
-    assert actual_precipitation_volume == expected_precipitation_volume
-    patch_for_get_current_day_rainfall.assert_called_once()
-    patch_for_pit_surface_area.assert_called_once()
+    assert actual_precipitation_volume == expected_volume
 
 
 def test_slurry_storage_outdoor_freeboard_volume(mocker: MockFixture) -> None:
@@ -1732,7 +1736,9 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
 
     # Act
-    anaerobic_lagoon._update_methane_emission(mock_daily_output)
+    actual_methane_emission, actual_methane_emission_from_VSd = anaerobic_lagoon._update_methane_emission(
+        mock_daily_output
+    )
 
     # Assert
     # fmt: off
@@ -1745,15 +1751,15 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
     # fmt: on
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    assert mock_daily_output.storage_methane == expected_methane_emission
+    assert actual_methane_emission == expected_methane_emission
 
 
 @pytest.mark.parametrize(
     "num_animals, liquid_manure_total_ammoniacal_nitrogen, daily_final_manure_volume,"
-    "mock_storage_ammonia_emission_value",
+    "liquid_manure_daily_volume, mock_storage_ammonia_emission_value",
     [
-        (100, 1.0, 1000.0, 10.0),  # Normal case
-        (100, 0.0, 1000.0, 0.0),  # Zero ammoniacal nitrogen
+        (100, 1.0, 1000.0, 800.0, 10.0),
+        (100, 0.0, 1000.0, 800.0, 0.0),
     ],
 )
 def test_anaerobic_lagoon_update_ammonia_emission(
@@ -1761,6 +1767,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     num_animals: int,
     liquid_manure_total_ammoniacal_nitrogen: float,
     daily_final_manure_volume: float,
+    liquid_manure_daily_volume: float,
     mock_storage_ammonia_emission_value: float,
 ) -> None:
     # Arrange
@@ -1770,6 +1777,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     mock_current_pen.num_animals = num_animals
     mock_accumulated_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen
+    mock_accumulated_output.liquid_manure_daily_volume = liquid_manure_daily_volume
 
     patch_for_calc_storage_ammonia_emission = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon" ".GasEmissionsCalculator.storage_ammonia_emission",
@@ -1793,7 +1801,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     patch_for_calc_storage_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
         manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-        manure_volume=daily_final_manure_volume,
+        manure_volume=liquid_manure_daily_volume,
         manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
         temp=mock_temp_value,
     )
@@ -1877,49 +1885,70 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "simulation_day, storage_time_period",
+    "simulation_day, storage_time_period, manure_treatment, manure_cover",
     [
-        (1, 100),
-        (100, 100),
-        (101, 100),
+        (1, 100, AnaerobicLagoon, "cover"),
+        (100, 100, AnaerobicLagoon, "no cover"),
+        (100, 100, AnaerobicLagoon, "crust"),
+        (101, 100, AnaerobicLagoon, "cover"),
+        (1, 100, SlurryStorageOutdoor, "cover"),
+        (100, 100, SlurryStorageOutdoor, "no cover"),
+        (100, 100, SlurryStorageOutdoor, "crust"),
+        (101, 100, SlurryStorageOutdoor, "cover"),
     ],
 )
-def test_adjust_final_manure_volume(simulation_day: int, storage_time_period: int, mocker: MockFixture) -> None:
+def test_adjust_final_manure_volume(
+    simulation_day: int,
+    storage_time_period: int,
+    manure_treatment: Type[AnaerobicLagoon | SlurryStorageOutdoor],
+    manure_cover: str,
+    mocker: MockFixture,
+) -> None:
     """Unit test for _adjust_final_manure_volume() in anaerobic_lagoon.py."""
     # Arrange
-    anaerobic_lagoon = AnaerobicLagoon(
+    manure_treatment_config = mocker.MagicMock()
+    manure_treatment_config.__setattr__("manure_cover", manure_cover)
+    treatment = manure_treatment(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        manure_treatment_config=mocker.MagicMock(),
+        manure_treatment_config=manure_treatment_config,
     )
-    anaerobic_lagoon._sim_day = simulation_day
-    anaerobic_lagoon.storage_time_period = storage_time_period
+    treatment._sim_day = simulation_day
+    treatment.storage_time_period = storage_time_period
     current_day_final_manure_volume = 10.0
     precipitation_volume = 20.0
-    patch_for_precipitation_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.precipitation_volume",
-        new_callable=PropertyMock,
-        return_value=precipitation_volume,
-    )
-    flushing_volume = 30.0
-    patch_for_flushing_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.flushing_volume",
-        new_callable=PropertyMock,
-        return_value=flushing_volume,
-    )
+    if manure_treatment == AnaerobicLagoon:
+        patch_for_precipitation_volume_property = mocker.patch(
+            "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.precipitation_volume",
+            new_callable=PropertyMock,
+            return_value=precipitation_volume,
+        )
+    else:
+        patch_for_precipitation_volume_property = mocker.patch(
+            "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor."
+            "SlurryStorageOutdoor.precipitation_volume",
+            new_callable=PropertyMock,
+            return_value=precipitation_volume,
+        )
 
     # Act
-    actual_adjusted_final_manure_volume = anaerobic_lagoon._adjust_final_manure_volume(current_day_final_manure_volume)
+    actual_adjusted_final_manure_volume = treatment._adjust_final_manure_volume(current_day_final_manure_volume)
 
     # Assert
-    patch_for_precipitation_volume_property.assert_called_once()
+    if manure_cover == "no cover" or manure_cover == "crust":
+        patch_for_precipitation_volume_property.assert_called_once()
+    else:
+        patch_for_precipitation_volume_property.assert_not_called()
     if simulation_day % storage_time_period > 1:
-        patch_for_flushing_volume_property.assert_called_once()
-        expected_adjusted_final_manure_volume = current_day_final_manure_volume + precipitation_volume - flushing_volume
+        expected_adjusted_final_manure_volume = current_day_final_manure_volume + precipitation_volume
         assert actual_adjusted_final_manure_volume == expected_adjusted_final_manure_volume
     else:
-        patch_for_flushing_volume_property.assert_not_called()
-        assert actual_adjusted_final_manure_volume == current_day_final_manure_volume + precipitation_volume
+        if manure_cover == "no cover" or manure_cover == "crust":
+            patch_for_precipitation_volume_property.assert_called_once()
+            assert actual_adjusted_final_manure_volume == current_day_final_manure_volume + precipitation_volume
+        else:
+            patch_for_precipitation_volume_property.assert_not_called()
+            assert actual_adjusted_final_manure_volume == current_day_final_manure_volume
 
 
 def test_sludge_accumulation_volume_property(mocker: MockFixture) -> None:
@@ -1941,7 +1970,10 @@ def test_sludge_accumulation_volume_property(mocker: MockFixture) -> None:
     assert actual_sludge_accumulation_volume == expected_sludge_accumulation_volume
 
 
-def test_flushing_volume_property(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+    "daily_output, expected_flushing_volume", [(MagicMock(cleaning_water_volume=10.0), 10.0), (None, 0.0)]
+)
+def test_flushing_volume_property(mocker: MockFixture, daily_output, expected_flushing_volume: float) -> None:
     """Unit test for flushing_volume property in anaerobic_lagoon.py."""
     # Arrange
     anaerobic_lagoon = AnaerobicLagoon(
@@ -1949,9 +1981,7 @@ def test_flushing_volume_property(mocker: MockFixture) -> None:
         time=mocker.MagicMock(),
         manure_treatment_config=mocker.MagicMock(),
     )
-    expected_flushing_volume = 10.0
-    anaerobic_lagoon._manure_handler_daily_output = mocker.MagicMock()
-    anaerobic_lagoon._manure_handler_daily_output.cleaning_water_volume = expected_flushing_volume
+    anaerobic_lagoon._manure_handler_daily_output = daily_output
 
     # Act
     actual_flushing_volume = anaerobic_lagoon.flushing_volume
@@ -2206,23 +2236,13 @@ def test_anaerobic_lagoon_length(mocker: MockFixture, lagoon_width: float) -> No
     assert actual_anaerobic_lagoon_length == approx(expected_anaerobic_lagoon_length)
 
 
-@pytest.mark.parametrize(
-    "lagoon_width, lagoon_length",
-    [
-        (5.0, 15.0),  # Generic case
-        (10.0, 30.0),  # Generic case
-        (15.0, 45.0),  # Generic case
-        (0.0, 0.0),  # Zero width and length
-        (10.0, 0.0),  # Zero length
-        (0.0, 30.0),  # Zero width
-    ],
-)
-def test_anaerobic_lagoon_surface_area(mocker: MockFixture, lagoon_width: float, lagoon_length: float) -> None:
+def test_anaerobic_lagoon_surface_area(mocker: MockFixture) -> None:
     """
     Unit test for lagoon_surface_area property in anaerobic_lagoon.py.
 
     This test checks that the method correctly calculates the surface area
-    of the lagoon based on the given width and length.
+    of the lagoon based on the number of animals and the DEFAULT_STORAGE_AREA_PER_ANIMAL
+    constant.
 
     """
     # Arrange
@@ -2231,25 +2251,18 @@ def test_anaerobic_lagoon_surface_area(mocker: MockFixture, lagoon_width: float,
         time=mocker.MagicMock(),
         manure_treatment_config=mocker.MagicMock(),
     )
-    patch_for_lagoon_width_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.lagoon_width",
-        new_callable=PropertyMock,
-        return_value=lagoon_width,
-    )
-    patch_for_lagoon_length_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.lagoon_length",
-        new_callable=PropertyMock,
-        return_value=lagoon_length,
-    )
-    expected_anaerobic_lagoon_surface_area = lagoon_width * lagoon_length
+    current_pen = mocker.MagicMock(num_animals=100)
+    mocker.patch.object(anaerobic_lagoon, "_current_pen", new_callable=mocker.PropertyMock, return_value=current_pen)
+
+    expected_area_per_animal = GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+    expected_lagoon_surface_area = 100 * expected_area_per_animal
 
     # Act
-    actual_anaerobic_lagoon_surface_area = anaerobic_lagoon.lagoon_surface_area
+    anaerobic_lagoon._current_pen.num_animals = 100
+    actual_lagoon_surface_area = anaerobic_lagoon.lagoon_surface_area
 
     # Assert
-    patch_for_lagoon_width_property.assert_called_once()
-    patch_for_lagoon_length_property.assert_called_once()
-    assert actual_anaerobic_lagoon_surface_area == approx(expected_anaerobic_lagoon_surface_area)
+    assert actual_lagoon_surface_area == expected_lagoon_surface_area
 
 
 @pytest.mark.parametrize(
@@ -2403,74 +2416,6 @@ def test_anaerobic_lagoon_freeboard_volume(
 
     # Assert
     assert actual_freeboard_volume == approx(expected_freeboard_volume)
-
-
-@pytest.mark.parametrize(
-    "sludge_accumulation_volume, calculated_sludge_accumulation_volume, lower_bound, upper_bound, expected",
-    [
-        # Normal case, calculated value within bounds
-        (150.0, 100.0, 0.2, 0.8, 100.0),
-        # Calculated value below lower bound
-        (150.0, 50.0, 0.2, 0.8, 50.0),
-        # Calculated value above upper bound
-        (150.0, 200.0, 0.2, 0.8, 120.0),
-        # Lower and upper bounds are equal
-        (150.0, 100.0, 0.5, 0.5, 75.0),
-        # Lower and upper bounds are zero
-        (150.0, 100.0, 0.0, 0.0, 0.0),
-        # Error cases
-        # Calculated value is negative
-        (150.0, -10.0, 0.2, 0.8, ValueError),
-        # Lower bound is negative
-        (150.0, 100.0, -0.2, 0.8, ValueError),
-        # Upper bound is less than lower bound
-        (150.0, 100.0, 0.8, 0.2, ValueError),
-    ],
-)
-def test_bound_sludge_accumulation_volume(
-    mocker: MockFixture,
-    sludge_accumulation_volume: float,
-    calculated_sludge_accumulation_volume: float,
-    lower_bound: float,
-    upper_bound: float,
-    expected: float,
-) -> None:
-    """
-    Unit test for _bound_sludge_accumulation_volume() in anaerobic_lagoon.py.
-
-    This test checks that the _bound_sludge_accumulation_volume() method correctly bounds the calculated
-    sludge accumulation volume according to the specified lower and upper bounds, given as proportions
-    of the current sludge accumulation volume.
-
-    """
-    # Arrange
-    anaerobic_lagoon = AnaerobicLagoon(
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-        manure_treatment_config=mocker.MagicMock(),
-    )
-    patch_for_sludge_accumulation_volume_property = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon." "AnaerobicLagoon.sludge_accumulation_volume",
-        new_callable=PropertyMock,
-        return_value=sludge_accumulation_volume,
-    )
-
-    # Act & Assert
-    if expected == ValueError:
-        with pytest.raises(ValueError):
-            anaerobic_lagoon._bound_sludge_accumulation_volume(
-                calculated_sludge_accumulation_volume=calculated_sludge_accumulation_volume,
-                lower_bound=lower_bound,
-                upper_bound=upper_bound,
-            )
-    else:
-        actual_bound_sludge_accumulation_volume = anaerobic_lagoon._bound_sludge_accumulation_volume(
-            calculated_sludge_accumulation_volume=calculated_sludge_accumulation_volume,
-            lower_bound=lower_bound,
-            upper_bound=upper_bound,
-        )
-        assert patch_for_sludge_accumulation_volume_property.call_count == 2
-        assert actual_bound_sludge_accumulation_volume == approx(expected)
 
 
 # Test AnaerobicDigestion-specific methods

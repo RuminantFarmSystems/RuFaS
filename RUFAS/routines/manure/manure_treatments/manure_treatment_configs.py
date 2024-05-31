@@ -66,7 +66,7 @@ class ManureTreatmentConfig:
 
     manure_cover: str
         Indicates the presence or absence of a cover in the manure treatment or storage system.
-        When used in the case of a slurry storage system (underfloor or outdoors) the cover
+        When used in the case of a slurry storage system (underfloor or outdoors) the manure cover
         refers to the presence of a natural crust.
     """
 
@@ -105,7 +105,7 @@ class DefaultManureTreatmentConfigFactory:
         phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
-        manure_cover=ManureCoverEnum.NO_COVER.value,
+        manure_cover=ManureCoverEnum.CRUST.value,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
@@ -117,7 +117,7 @@ class DefaultManureTreatmentConfigFactory:
         potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
         storage_time_period=120,
         freeboard_input=0.3048,
-        manure_cover=ManureCoverEnum.NO_COVER.value,
+        manure_cover=ManureCoverEnum.CRUST.value,
     )
 
     ANAEROBIC_DIGESTION_CONFIG = ManureTreatmentConfig(

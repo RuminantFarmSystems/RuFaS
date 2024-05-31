@@ -5,13 +5,13 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
-   RUFAS.routines.manure.IO_helpers
    RUFAS.routines.manure.beddings
    RUFAS.routines.manure.constants_and_units
    RUFAS.routines.manure.default_enum
    RUFAS.routines.manure.gas_emissions
+   RUFAS.routines.manure.IO_helpers
    RUFAS.routines.manure.manure_handlers
    RUFAS.routines.manure.manure_nutrients
    RUFAS.routines.manure.manure_separators

@@ -2,19 +2,19 @@
 
 import time as timer
 from enum import Enum
-from typing import Optional
-from RUFAS.units import MeasurementUnits
+
 from RUFAS import routines
-from RUFAS.weather import Weather
-from RUFAS.time import Time
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, ManureManager
-from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, ManureManager
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 om = OutputManager()
 im = InputManager()
@@ -52,7 +52,8 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
-        self.day_counter: int = 0
+
+        self.time = Time()
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -66,32 +67,28 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager, self.day_counter)
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time.simulation_day)
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
         ]
         available_feeds_units = {
-            "category": MeasurementUnits.UNITLESS.value,
-            "type": MeasurementUnits.UNITLESS.value,
-            "amount": MeasurementUnits.KILOGRAMS.value,
+            "category": MeasurementUnits.UNITLESS,
+            "type": MeasurementUnits.UNITLESS,
+            "amount": MeasurementUnits.KILOGRAMS,
         }
-        om.add_variable(
-            "available_feeds_on_final_day",
-            available_feeds_on_final_day,
-            dict(info_map, **{"units": available_feeds_units}),
-        )
+        for available_feed in available_feeds_on_final_day:
+            om.add_variable(
+                "available_feeds_on_final_day",
+                available_feed,
+                dict(info_map, **{"units": available_feeds_units}),
+            )
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
-        om.add_variable(
-            "day_counter_final_value",
-            self.day_counter,
-            {"class": self.__class__.__name__, "function": self.simulate.__name__, "units": MeasurementUnits.DAYS},
-        )
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -102,7 +99,6 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        self.day_counter += 1
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         simulate_daily_manure_manager(
             self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
@@ -115,19 +111,11 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def _advance_time(self, print_day: Optional[bool] = False) -> None:
+    def _advance_time(self) -> None:
         """
         Advances time and increments simulation_day.
         """
 
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._advance_time.__name__,
-            "print_day": print_day,
-        }
-        if print_day:
-            simulating_day_log = f"simulating day: {self.time.to_str()}"
-            om.add_log("simulation_day", simulating_day_log, info_map)
         self.time.advance()
         self.animal_manager.simulation_day += 1
 
@@ -171,8 +159,7 @@ class SimulationEngine:
         """
 
         weather_data = im.get_data("weather")
-
-        self.time = Time()
+        om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
