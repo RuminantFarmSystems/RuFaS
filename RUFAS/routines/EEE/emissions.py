@@ -212,7 +212,10 @@ class Emissions:
                 grouped_feeds[field_name] = []
             grouped_feeds[field_name].append(feed)
 
-        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in grouped_feeds.keys()}
+        fields_with_crops = set(grouped_feeds.keys())
+        fields_with_fertilizer_apps = {app["field_name"] for app in fertilizer_applications}
+        all_fields = list(fields_with_fertilizer_apps | fields_with_crops)
+        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
         for app in fertilizer_applications:
             field_name = app["field_name"]
             aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
