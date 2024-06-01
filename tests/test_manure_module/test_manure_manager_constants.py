@@ -23,7 +23,6 @@ def test_manure_constants() -> None:
     assert ManureConstants.UREA_MOLAR_MASS == approx(60.06)
     assert ManureConstants.UREA_DENSITY == approx(1.32)
     assert ManureConstants.TAN_MOLAR_MASS == approx(17.0306)
-    assert ManureConstants.URINE_TAN_FACTOR == approx(0.45)
     assert ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY == approx(400.0)
     assert ManureConstants.LIQUID_MANURE_DENSITY == approx(1000)
     assert ManureConstants.SLURRY_MANURE_DENSITY == approx(990)

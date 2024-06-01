@@ -73,9 +73,9 @@ class SimulationEngine:
             for feed in self.feed_manager.query_available_feeds()
         ]
         available_feeds_units = {
-            "category": MeasurementUnits.UNITLESS.value,
-            "type": MeasurementUnits.UNITLESS.value,
-            "amount": MeasurementUnits.KILOGRAMS.value,
+            "category": MeasurementUnits.UNITLESS,
+            "type": MeasurementUnits.UNITLESS,
+            "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
             om.add_variable(
