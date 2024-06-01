@@ -34,14 +34,14 @@ class PurchasedFeedEmissionsEstimator:
             "function": "__init__",
         }
         om.add_variable(
-            "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS.value})
+            "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
 
         self.feed_emissions: dict[str, float] = self._setup_feed_emissions()
         om.add_variable(
             "purchased_feed_emissions",
             self.feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
 
         self.missing_feed_ids: list[str] = []

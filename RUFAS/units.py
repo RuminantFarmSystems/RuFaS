@@ -49,3 +49,10 @@ class MeasurementUnits(Enum):
     SIMULATION_YEAR = "simulation year"
     UNITLESS = "unitless"
     WET_KILOGRAMS_PER_HECTARE = "wet kg/ha"
+
+    def __str__(self) -> str:
+        """
+        Returns the value of the enum member as its string representation.
+        """
+
+        return self.value
