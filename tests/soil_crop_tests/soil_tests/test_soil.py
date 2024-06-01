@@ -66,6 +66,7 @@ def test_daily_soil_water_routine(
     soil = Soil(field_size=50)
     soil.infiltration.infiltrate = MagicMock()
     soil.percolation.percolate = MagicMock()
+    soil.percolation.percolate_infiltrated_water = MagicMock()
     soil.evaporation.evaporate = MagicMock()
     soil.soil_erosion.erode = MagicMock()
     soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
@@ -85,6 +86,7 @@ def test_daily_soil_water_routine(
 
     soil.infiltration.infiltrate.assert_called_once_with(rainfall, weighting_coefficient, potential_evapotranspiration)
     soil.percolation.percolate.assert_called_once_with(has_seasonal_high_water_table)
+    soil.percolation.percolate_infiltrated_water.assert_called_once()
     soil.evaporation.evaporate.assert_called_once_with(maximum_soil_evaporation)
     soil.soil_erosion.erode.assert_called_once_with(field_size, minimum_cover_management_factor, residue, rainfall)
     soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(
