@@ -101,7 +101,9 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
         simulation_engine.weather,
         simulation_engine.time,
     )
-    simulation_engine.manure_manager.daily_update.assert_called_once_with(simulation_engine.animal_manager.all_pens, simulation_engine.time.simulation_day)
+    simulation_engine.manure_manager.daily_update.assert_called_once_with(
+        simulation_engine.animal_manager.all_pens, simulation_engine.time.simulation_day
+    )
     simulation_engine.field_manager.daily_update_routine.assert_called_once_with(
         simulation_engine.weather, simulation_engine.time
     )
