@@ -352,7 +352,7 @@ The percentage of non-protein nitrogen (NPN) is calculated with the equation:
 
 .. math::
 
-   NPN_{updated} = \frac{NPN_{initial} \cdot CP_{initial} - 0.3 \cdot DL_{fraction}}{CP_{initial} - DL_{fraction}} \tag{2.2.1.2}
+   NPN_{updated} = \frac{(NPN_{initial} \cdot 0.01) \cdot (CP_{initial} \cdot 0.01) - 0.3 \cdot DL_{fraction}}{(CP_{initial} \cdot 0.01) - DL_{fraction}} \cdot 100 \tag{2.2.1.2}
 
 Where :math:`NPN_{initial}` is percentage of dry matter mass that is
 non-protein nitrogen in the ensiled crop before accouting for dry matter
