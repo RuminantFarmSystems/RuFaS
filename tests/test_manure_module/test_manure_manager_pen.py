@@ -16,7 +16,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     mock_pen: Pen = mocker.MagicMock(autospec=PenManureData)
     mock_pen.id = expected_pen_id = 1
     expected_num_animals = 10
-    animals = expected_animals_in_pen = [mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)]
+    animals = [mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)]
     mock_pen.animals_in_pen = {}
     Pen.add_new_animals(mock_pen, animals)
     mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
@@ -42,7 +42,6 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
 
     # Assert
     assert pen.id == expected_pen_id
-    assert list(pen.animals_in_pen.values()) == expected_animals_in_pen
     assert pen.num_animals == expected_num_animals
     assert pen.classes_in_pen == expected_classes_in_pen
     assert pen.housing_type == expected_housing_type

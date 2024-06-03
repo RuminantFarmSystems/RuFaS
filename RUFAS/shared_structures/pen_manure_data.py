@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Any
 from .animal_combinations import AnimalCombination
 from .animal_manure_excretions import AnimalManureExcretions
 
@@ -13,8 +12,6 @@ class PenManureData():
     ----------
     id : int
         Pen id.
-    animals_in_pen : Dict[int, AnimalBase]
-        A dictionary of animal ids as the key and animal objects as the value in this pen
     num_animals : int
         The number of animals in this pen.
     num_lactating_cows : int
@@ -46,7 +43,6 @@ class PenManureData():
 
     """
     id: int
-    animals_in_pen: dict[int, Any]
     num_animals: int
     classes_in_pen: set[str]
     animal_combination: AnimalCombination

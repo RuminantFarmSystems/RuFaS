@@ -924,7 +924,6 @@ class Pen:
         """Packages manure data from this pen."""
         return PenManureData(
             id=self.id,
-            animals_in_pen=self.animals_in_pen,
             num_animals=len(self.animals_in_pen),
             classes_in_pen=self.classes_in_pen,
             animal_combination=self.animal_combination,

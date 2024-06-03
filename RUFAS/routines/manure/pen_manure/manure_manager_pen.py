@@ -1,4 +1,4 @@
-from typing import NamedTuple, Any
+from typing import NamedTuple
 from typing import Set
 
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
@@ -60,7 +60,6 @@ class ManureManagerPen:
 
         """
         self.id: int = pen.id
-        self.animals_in_pen: dict[int, Any] = pen.animals_in_pen
         self.num_animals: int = pen.num_animals
         self.classes_in_pen: Set[str] = pen.classes_in_pen
         self.animal_combination: AnimalCombination = pen.animal_combination

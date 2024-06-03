@@ -1012,7 +1012,7 @@ class AnimalManager:
 
     def collect_pen_manure_data(self) -> list[PenManureData]:
         """Returns the manure information from all pens in PenManureData."""
-        return [pen.get_manure_data for pen in self.all_pens]
+        return [pen.get_manure_data() for pen in self.all_pens]
 
     def record_pen_history(self) -> None:
         """

@@ -87,7 +87,9 @@ class ManureManager:
         A dictionary that maps an animal pen's id to a Treatment object.
     """
 
-    def __init__(self, pen_list: List[PenManureData], weather: Weather, time: Time, manure_manager_config: Dict) -> None:
+    def __init__(
+        self, pen_list: List[PenManureData], weather: Weather, time: Time, manure_manager_config: Dict
+    ) -> None:
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
 
@@ -667,11 +669,7 @@ class ManureManager:
         pen: ManureManagerPen,
         manure_handler_daily_output: ManureHandlerDailyOutput,
         reception_pit_daily_output: ReceptionPitDailyOutput,
-    ) -> Tuple[
-        Optional[ManureSeparatorDailyOutput],
-        ManureTreatmentDailyOutput,
-        ManureTreatmentDailyOutput,
-    ]:
+    ) -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput,]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
