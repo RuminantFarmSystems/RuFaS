@@ -11,7 +11,7 @@ from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, ManureManager
+from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -100,9 +100,8 @@ class SimulationEngine:
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
-        simulate_daily_manure_manager(
-            self.manure_manager, self.animal_manager.all_pens, self.animal_manager.simulation_day
-        )
+        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
+        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
         self.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
@@ -171,6 +170,7 @@ class SimulationEngine:
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
-        self.manure_manager = ManureManager(self.animal_manager.all_pens, self.weather, self.time, manure_class_config)
+        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
+        self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
