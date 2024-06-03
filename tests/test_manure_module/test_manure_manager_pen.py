@@ -5,7 +5,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.animal_combinations import AnimalCombination
 
 
 def test_manure_manager_pen_init(mocker: MockerFixture) -> None:

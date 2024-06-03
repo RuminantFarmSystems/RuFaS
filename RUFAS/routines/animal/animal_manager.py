@@ -34,7 +34,7 @@ from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...shared_structures.animal_combinations import AnimalCombination
 
 im = InputManager()
 om = OutputManager()

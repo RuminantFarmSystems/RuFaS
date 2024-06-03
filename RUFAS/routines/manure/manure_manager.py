@@ -713,21 +713,3 @@ class ManureManager:
             manure_treatment_daily_output,
             manure_treatment_accumulated_output,
         )
-
-
-def simulate_daily_manure_manager(manure_manager: ManureManager, pen_list: list[Pen], simulation_day: int) -> None:
-    """A wrapper function for the daily_update method of the ManureManager class.
-
-    There is no strict reason why this function is needed. It is simply to make the code
-    in the SimulationEngine more readable. It is OK to remove this function and call the
-    daily_update method directly from the SimulationEngine.
-
-    Parameters
-    ----------
-    manure_manager : ManureManager
-        A reference to the ManureManager object stored in the SimulationEngine.
-    pen_list : List[Pen]
-        A list of Pens.
-
-    """
-    manure_manager.daily_update(pen_list, simulation_day)
