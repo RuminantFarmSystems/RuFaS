@@ -12,7 +12,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from ...shared_structures.animal_manure_excretions import AnimalManureExcretions
 from ...shared_structures.animal_combinations import AnimalCombination
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed import Feed
