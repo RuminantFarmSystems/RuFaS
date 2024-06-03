@@ -125,7 +125,7 @@ class Hay(Storage):
 
     def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
-        Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
+        Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
 
         Parameters
         ----------
