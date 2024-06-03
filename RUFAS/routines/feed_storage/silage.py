@@ -4,6 +4,7 @@ from .enums import CropCategory
 from typing import Optional
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from ...general_constants import GeneralConstants
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 
@@ -68,18 +69,12 @@ class Silage(Storage):
             total_effluent_moisture_loss += moisture_loss
 
             dry_matter_loss_frac = dry_matter_loss / crop.dry_matter_mass
-            non_protein_nitrogen_loss_frac = self.calculate_non_protein_nitrogen_loss_coefficient(
+            crop.non_protein_nitrogen = self.calculate_non_protein_nitrogen_after_effluent_loss(
                 crop.non_protein_nitrogen, crop.crude_protein_percent, dry_matter_loss_frac
             )
-            crop.non_protein_nitrogen = self.recalculate_nutrient_percentage(
-                crop.non_protein_nitrogen, non_protein_nitrogen_loss_frac, dry_matter_loss, crop.dry_matter_mass
-            )
 
-            crude_protein_loss_frac = self.calculate_crude_protein_loss_coefficient(
+            crop.crude_protein_percent = self.calculate_crude_protein_after_effluent_loss(
                 crop.crude_protein_percent, dry_matter_loss_frac
-            )
-            crop.crude_protein_percent = self.recalculate_nutrient_percentage(
-                crop.crude_protein_percent, crude_protein_loss_frac, dry_matter_loss, crop.dry_matter_mass
             )
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
@@ -162,11 +157,11 @@ class Silage(Storage):
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
 
-    def calculate_non_protein_nitrogen_loss_coefficient(
+    def calculate_non_protein_nitrogen_after_effluent_loss(
         self, initial_non_protein_nitrogen: float, initial_crude_protein: float, loss_fraction: float
     ) -> float:
         """
-        Calculates the fractional loss coefficient for non-protein nitrogen after losing dry matter to effluent.
+        Calculates the percentage of non-protein nitrogen in a stored crop after losing dry matter to effluent.
 
         Parameters
         ----------
@@ -180,7 +175,7 @@ class Silage(Storage):
         Returns
         -------
         float
-            Fractional loss coefficient used to determine the remaining percentage of non-protein nitrogen in the crop.
+            Percentage of non-protein nitrogen remaining in the stored crop.
 
         References
         ----------
@@ -189,11 +184,12 @@ class Silage(Storage):
         """
         numerator = initial_non_protein_nitrogen * initial_crude_protein - 0.3 * loss_fraction
         denominator = initial_crude_protein - loss_fraction
-        return numerator / denominator
+        new_percentage = numerator / denominator
+        return max(0.0, new_percentage)
 
-    def calculate_crude_protein_loss_coefficient(self, initial_crude_protein: float, loss_fraction: float) -> float:
+    def calculate_crude_protein_after_effluent_loss(self, initial_crude_protein: float, loss_fraction: float) -> float:
         """
-        Calculates the fractional loss coefficient for crude protein after losing dry matter to effluent.
+        Calculates the percentage of crude protein in a stored crop after losing dry matter to effluent.
 
         Parameters
         ----------
@@ -205,14 +201,18 @@ class Silage(Storage):
         Returns
         -------
         float
-            Fractional loss coefficient used to determine the remaining percentage of crude protein in the crop.
+            Percentage of crude protein remaining in the stored crop.
 
         References
         ----------
         .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
 
         """
-        return (initial_crude_protein - 0.3 * loss_fraction) / (1 - loss_fraction)
+        new_fraction = (initial_crude_protein * GeneralConstants.PERCENTAGE_TO_FRACTION - 0.3 * loss_fraction) / (
+            1 - loss_fraction
+        )
+        new_percentage = new_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+        return max(0.0, new_percentage)
 
 
 class Bunker(Silage):
