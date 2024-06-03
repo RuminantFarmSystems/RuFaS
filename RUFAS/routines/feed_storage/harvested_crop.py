@@ -33,6 +33,9 @@ class HarvestedCrop:
         Percent of mass that is not water.
     initial_dry_matter_percentage : float
         Percent of mass that is not water at the time this crop is stored.
+    initial_dry_matter_mass : float
+        Mass of dry matter initially stored (kg). Note that this value is only used if this crop is stored in a `Hay`
+        instance (or one of its child classes), and is only calculated at the time of storage.
     dry_matter_digestibility : float
         Percent of mass that is digestible.
     crude_protein_percent : float
@@ -78,6 +81,7 @@ class HarvestedCrop:
     fresh_mass: float
     dry_matter_percentage: float
     initial_dry_matter_percentage: float = field(init=False)
+    initial_dry_matter_mass: float = field(init=False)
     dry_matter_digestibility: float
     crude_protein_percent: float
     non_protein_nitrogen: float
@@ -132,6 +136,7 @@ class HarvestedCrop:
         self.bale_density = self._calculate_bale_density()
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
         self.initial_dry_matter_percentage = self.dry_matter_percentage
+        self.initial_dry_matter_mass = self.dry_matter_mass
         self.last_time_degraded = deepcopy(self.storage_time)
 
     @property

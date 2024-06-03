@@ -113,11 +113,15 @@ class Hay(Storage):
         if days_stored == 0:
             return 0.0
         days_in_window = min(days_stored, 30)
+        fraction_of_total_loss = days_in_window / 30
         dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         moisture_fraction = 1 - dry_fraction
-        numerator = moisture_fraction - FINAL_MOISTURE_FRACTION * dry_fraction * (1 - 0.004 * days_in_window)
-        denominator = dry_fraction * (14206 - 2433 * (0.004 * days_in_window) / (1 - 0.004 * days_in_window))
-        return crop.total_sensible_heat_generated + 2433 * numerator / denominator
+        numerator = crop.total_sensible_heat_generated + 2433 * (
+            moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
+        )
+        denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+        fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
+        return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
     def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
