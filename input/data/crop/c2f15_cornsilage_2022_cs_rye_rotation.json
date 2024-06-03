@@ -1,0 +1,35 @@
+{
+    "crop_schedules": [
+
+{
+            "crop_species": "corn_silage",
+            "planting_years": [2020, 2021, 2022],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [135],
+            "harvest_years": [2020, 2021, 2022],
+            "harvest_days": [258],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        {
+            "crop_species": "cereal_rye_silage",
+            "planting_years": [2020, 2021, 2022],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [274],
+            "harvest_years": [2021, 2022],
+            "harvest_days": [130],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        }
+]
+}
