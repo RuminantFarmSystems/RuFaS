@@ -486,6 +486,7 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
@@ -505,6 +506,7 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("fertilizer_application", value, info_map)
