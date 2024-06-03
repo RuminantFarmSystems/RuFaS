@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calculations
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.shared_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
