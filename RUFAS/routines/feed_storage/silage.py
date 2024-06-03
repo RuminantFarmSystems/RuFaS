@@ -182,10 +182,15 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
 
         """
-        numerator = initial_non_protein_nitrogen * initial_crude_protein - 0.3 * loss_fraction
-        denominator = initial_crude_protein - loss_fraction
-        new_percentage = numerator / denominator
-        return max(0.0, new_percentage)
+        npn_fraction = initial_non_protein_nitrogen * GeneralConstants.PERCENTAGE_TO_FRACTION
+        cp_fraction = initial_crude_protein * GeneralConstants.PERCENTAGE_TO_FRACTION
+
+        numerator = npn_fraction * cp_fraction - 0.3 * loss_fraction
+        denominator = cp_fraction - 0.3 * loss_fraction
+
+        new_npn_fraction = numerator / denominator
+        new_npn_percentage = new_npn_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
+        return max(0.0, new_npn_percentage)
 
     def calculate_crude_protein_after_effluent_loss(self, initial_crude_protein: float, loss_fraction: float) -> float:
         """
