@@ -44,6 +44,8 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     simulation_engine.manure_manager = mocker.MagicMock()
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.feed_manager = mocker.MagicMock()
+    simulation_engine.emissions = mocker.MagicMock()
+    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions, "calculate_emissions")
     patch_for_run_simulation_main_loop = mocker.patch.object(
         simulation_engine, "_run_simulation_main_loop", return_value=None
     )
@@ -57,17 +59,24 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
         "class": simulation_engine.__class__.__name__,
         "function": simulation_engine.simulate.__name__,
     }
+    expected_simulation_time = end_time - start_time
+    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
+    expected_add_log_calls = [
+        mocker.call("Simulation complete", "Simulation Completed.", info_map),
+        mocker.call("total_simulation_time", expected_log_message, info_map),
+        mocker.call("Starting processing of emissions", "", info_map),
+        mocker.call("Completed processing of emissions", "", info_map)
+    ]
 
     # Act
     simulation_engine.simulate()
 
     # Assert
     patch_for_run_simulation_main_loop.assert_called_once()
-    expected_simulation_time = end_time - start_time
-    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
-    patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
+    patch_for_output_manager.add_log.assert_has_calls(expected_add_log_calls)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
+    mock_calc_emissions.assert_called_once()
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:

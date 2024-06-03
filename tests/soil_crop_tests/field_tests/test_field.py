@@ -1387,6 +1387,7 @@ def test_record_fertilizer_application(
         "year": MeasurementUnits.CALENDAR_YEAR.value,
         "day": MeasurementUnits.ORDINAL_DAY.value,
         "field_size": MeasurementUnits.HECTARE.value,
+        "field_name": MeasurementUnits.UNITLESS.value,
         "average_clay_percent": MeasurementUnits.PERCENT.value,
     }
 
@@ -1401,6 +1402,7 @@ def test_record_fertilizer_application(
         "year": year,
         "day": day,
         "field_size": field_size,
+        "field_name": field_name,
         "average_clay_percent": 10.0,
     }
 
