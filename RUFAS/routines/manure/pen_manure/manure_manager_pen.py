@@ -1,11 +1,9 @@
-from typing import List, NamedTuple, Any
+from typing import NamedTuple, Any
 from typing import Set
 
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from ....shared_structures.animal_combinations import AnimalCombination
+from ....shared_structures.pen_manure_data import PenManureData
 
 
 class ManureManagerPen:
@@ -49,7 +47,7 @@ class ManureManagerPen:
 
     """
 
-    def __init__(self, pen: Pen):
+    def __init__(self, pen: PenManureData) -> None:
         """Initializes a pen object.
 
         The newly created object does not store any reference to the passed-in argument
@@ -57,13 +55,13 @@ class ManureManagerPen:
 
         Parameters
         ----------
-        pen : Pen
-            A Pen object from the animal module.
+        pen : PenManureData
+            A PenManureData instance containing all the manure information from a single pen.
 
         """
         self.id: int = pen.id
         self.animals_in_pen: dict[int, Any] = pen.animals_in_pen
-        self.num_animals: int = len(pen.animals_in_pen)
+        self.num_animals: int = pen.num_animals
         self.classes_in_pen: Set[str] = pen.classes_in_pen
         self.animal_combination: AnimalCombination = pen.animal_combination
 
@@ -71,38 +69,14 @@ class ManureManagerPen:
         self.pen_type: str = pen.pen_type
         self.bedding_type: str = pen.bedding_type
 
-        self.manure_handler: str = pen.manure_handling
+        self.manure_handler: str = pen.manure_handler
         self.manure_separator: str = pen.manure_separator
         self.manure_separator_after_digestion: str = pen.manure_separator_after_digestion
-        self.manure_treatment: str = pen.manure_storage
+        self.manure_treatment: str = pen.manure_treatment
 
         self.manure: PenManure = PenManure.get_instance(pen.manure, self.num_animals)
-        self.num_lactating_cows: int = self.count_lactating_cows(pen.animal_combination, pen.animals_in_pen)
+        self.num_lactating_cows: int = pen.num_lactating_cows
         self.num_stalls: int = pen.num_stalls
-
-    @classmethod
-    def count_lactating_cows(cls, animal_combination: AnimalCombination, animals_in_pen: List[AnimalBase]) -> int:
-        """Counts the number of lactating cows in the pen.
-
-        Parameters
-        ----------
-        animal_combination : AnimalCombination
-            An AnimalCombination enum that describes the current animal makeup in this pen.
-        animals_in_pen : List[AnimalBase]
-            A list of animal objects in this pen.
-
-        Returns
-        -------
-        int
-            The number of lactating cows in the pen.
-
-        """
-        num_lac_cows = 0
-        if animal_combination is AnimalCombination.LAC_COW:
-            for animal in animals_in_pen:
-                if type(animal) is Cow:
-                    num_lac_cows += 1
-        return num_lac_cows
 
     @property
     def barn_area_from_pen_type(self) -> float:

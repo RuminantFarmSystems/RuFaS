@@ -6,13 +6,14 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.shared_structures.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.pen_manure_data import PenManureData
 
 
 def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     """Unit test for function __init__ in file manure_manager_pen.py"""
 
     # Arrange
-    mock_pen: Pen = mocker.MagicMock(autospec=Pen)
+    mock_pen: Pen = mocker.MagicMock(autospec=PenManureData)
     mock_pen.id = expected_pen_id = 1
     expected_num_animals = 10
     animals = expected_animals_in_pen = [mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)]
@@ -35,10 +36,6 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
         "RUFAS.routines.manure.pen_manure.manure_manager_pen.PenManure.get_instance",
         return_value=expected_pen_manure,
     )
-    patch_for_count_lactating_cows = mocker.patch(
-        "RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows",
-        return_value=expected_num_animals,
-    )
 
     # Act
     pen = ManureManagerPen(mock_pen)
@@ -56,35 +53,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     assert pen.manure_treatment == expected_manure_treatment
     patch_for_pen_manure_get_instance.assert_called_once_with(mock_pen.manure, expected_num_animals)
     assert pen.manure == expected_pen_manure
-    patch_for_count_lactating_cows.assert_called_once_with(mock_pen.animal_combination, mock_pen.animals_in_pen)
     assert pen.num_lactating_cows == expected_num_animals
-
-
-# TODO: Fill in the remaining combinations
-@pytest.mark.parametrize(
-    "animal_combination, expected_num_lactating_cows",
-    [
-        (AnimalCombination.LAC_COW, 10),
-        (AnimalCombination.CALF, 0),
-        (AnimalCombination.GROWING, 0),
-    ],
-)
-def test_count_lactating_cows(
-    mocker: MockerFixture,
-    animal_combination: AnimalCombination,
-    expected_num_lactating_cows: int,
-) -> None:
-    """Unit test for function count_lactating_cows in file manure_manager_pen.py"""
-
-    # Arrange
-    mocker.patch("RUFAS.routines.animal.life_cycle.cow.Cow.__init__", return_value=None)
-    mock_cows = [Cow(args=mocker.MagicMock()) for _ in range(10)]
-
-    # Act
-    actual_num_lactating_cows = ManureManagerPen.count_lactating_cows(animal_combination, mock_cows)
-
-    # Assert
-    assert actual_num_lactating_cows == expected_num_lactating_cows
 
 
 @pytest.mark.parametrize(
