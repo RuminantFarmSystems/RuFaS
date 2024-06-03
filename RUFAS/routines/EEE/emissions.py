@@ -6,28 +6,28 @@ from typing import Any
 import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
-    CropSpecies.ALFALFA_HAY: ["106", "107", "108"],
-    CropSpecies.ALFALFA_SILAGE: [],
+    CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],
+    CropSpecies.ALFALFA_SILAGE: ["104", "109", "110"],
     CropSpecies.ALFALFA_BALEAGE: [],
     CropSpecies.CEREAL_RYE_HAY: [],
     CropSpecies.CEREAL_RYE_GRAIN: [],
-    CropSpecies.CEREAL_RYE_SILAGE: [],
+    CropSpecies.CEREAL_RYE_SILAGE: ["144"],
     CropSpecies.CEREAL_RYE_BALEAGE: [],
     CropSpecies.CORN_GRAIN: ["40", "43", "44", "46", "47"],
-    CropSpecies.CORN_SILAGE: ["50", "50", "51"],
+    CropSpecies.CORN_SILAGE: ["50", "51", "52"],
     CropSpecies.SOYBEAN_HAY: [],
-    CropSpecies.SOYBEAN_GRAIN: [],
-    CropSpecies.TALL_FESCUE_HAY: [],
-    CropSpecies.TALL_FESCUE_SILAGE: [],
+    CropSpecies.SOYBEAN_GRAIN: ["169", "170"],
+    CropSpecies.TALL_FESCUE_HAY: ["18", "88", "89", "94", "95", "99"],
+    CropSpecies.TALL_FESCUE_SILAGE: ["91", "97", "100"],
     CropSpecies.TALL_FESCUE_BALEAGE: [],
     CropSpecies.TRITICALE_HAY: [],
     CropSpecies.TRITICALE_GRAIN: [],
-    CropSpecies.TRITICALE_SILAGE: [],
+    CropSpecies.TRITICALE_SILAGE: ["187"],
     CropSpecies.TRITICALE_BALEAGE: [],
-    CropSpecies.WINTER_WHEAT_HAY: [],
-    CropSpecies.WINTER_WHEAT_GRAIN: [],
-    CropSpecies.WINTER_WHEAT_SILAGE: [],
-    CropSpecies.WINTER_WHEAT_BALEAGE: [],
+    CropSpecies.WINTER_WHEAT_HAY: ["200"],
+    CropSpecies.WINTER_WHEAT_GRAIN: ["194"],
+    CropSpecies.WINTER_WHEAT_SILAGE: ["198"],
+    CropSpecies.WINTER_WHEAT_BALEAGE: ["195"],
 }
 
 SLICE_START = -365
@@ -39,7 +39,7 @@ om = OutputManager()
 
 
 class Emissions:
-    """"""
+    """Performs post-processing on RuFaS outputs to compute and record emissions outcomes."""
 
     def __init__(self) -> None:
         pass
