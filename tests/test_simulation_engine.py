@@ -65,7 +65,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
         mocker.call("Simulation complete", "Simulation Completed.", info_map),
         mocker.call("total_simulation_time", expected_log_message, info_map),
         mocker.call("Starting processing of emissions", "", info_map),
-        mocker.call("Completed processing of emissions", "", info_map)
+        mocker.call("Completed processing of emissions", "", info_map),
     ]
 
     # Act
