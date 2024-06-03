@@ -49,6 +49,9 @@ def test_invalid_category_type_combinations(category: CropCategory, crop_type: C
 
 
 def test_attributes(mocker: MockerFixture) -> None:
+    mock_dry_mass = mocker.patch.object(
+        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
+    )
     mock_effluent = mocker.patch.object(HarvestedCrop, "_estimate_maximum_effluent", return_value=10.0)
     mock_bale_density = mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
     mock_heat_generated = mocker.patch.object(
@@ -61,6 +64,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
+    assert crop.initial_dry_matter_mass == 100.0
     assert crop.dry_matter_digestibility == sample_crop_data["dry_matter_digestibility"]
     assert crop.crude_protein_percent == sample_crop_data["crude_protein_percent"]
     assert crop.non_protein_nitrogen == sample_crop_data["non_protein_nitrogen"]
@@ -77,6 +81,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_effluent.assert_called_once()
     mock_bale_density.assert_called_once()
     mock_heat_generated.assert_called_once()
+    mock_dry_mass.assert_called_once()
     mock_deepcopy.assert_called_once_with(crop.storage_time)
 
 

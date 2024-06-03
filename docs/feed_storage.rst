@@ -70,7 +70,7 @@ that occurred after the first 30 days of storage (kg).
 .. math::
 
 
-   L_{first 30 days} = \frac{Q + 2433 \cdot [moisture - MF(1 - moisture)]}{(1-moisture)(14206-2433)} \cdot \frac{min(30, d)}{30} \tag{1.2.3}
+   L_{first 30 days} = \frac{Q + 2433 \cdot [moisture - \frac{MF(1 - moisture)}{1 - MF}]}{(1 - moisture)(14206 - \frac{2433 \cdot MF}{1 - MF})} \cdot \frac{min(30, d)}{30} \tag{1.2.3}
 
 Where :math:`L_{first 30 days}` is the fraction of gaseous dry matter loss
 that occurred in the hay in the first 30 days of storage (:math:`kg`),

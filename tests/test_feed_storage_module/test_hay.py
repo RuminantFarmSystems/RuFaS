@@ -71,12 +71,12 @@ def test_calculate_dry_matter_loss_to_gas(
     "days,expected",
     [
         (0, 0.0),
-        (1, 950.665050408),
-        (10, 950.670114831),
-        (20, 950.676225724),
-        (30, 950.682926336),
-        (40, 950.682926336),
-        (100, 950.682926336),
+        (1, 28.5907268),
+        (10, 285.9072686),
+        (20, 571.814537),
+        (30, 857.7218059),
+        (40, 857.7218059),
+        (100, 857.7218059),
     ],
 )
 def test_calculate_initial_dry_matter_loss(
@@ -86,7 +86,8 @@ def test_calculate_initial_dry_matter_loss(
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
     harvested_crop.storage_time.simulation_day = 1
     harvested_crop.initial_dry_matter_percentage = 20.0
-    harvested_crop.total_sensible_heat_generated = 950.0
+    harvested_crop.initial_dry_matter_mass = 1_000.0
+    harvested_crop.total_sensible_heat_generated = 500.0
     mock_time = mocker.MagicMock(autospec=Time)
     mock_time.simulation_day = days + 1
 
