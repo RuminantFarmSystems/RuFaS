@@ -4,7 +4,7 @@ from .animal_manure_excretions import AnimalManureExcretions
 
 
 @dataclass
-class PenManureData():
+class PenManureData:
     """
     Packages manure data for a single pen.
 
@@ -42,6 +42,7 @@ class PenManureData():
         The number of stalls in this pen.
 
     """
+
     id: int
     num_animals: int
     classes_in_pen: set[str]

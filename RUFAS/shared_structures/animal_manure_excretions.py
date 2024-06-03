@@ -43,6 +43,7 @@ class AnimalManureExcretions(TypedDict):
         Amount of methane emissions (g/day).
 
     """
+
     urea: float
     urine: float
     total_ammoniacal_nitrogen_concentration: float

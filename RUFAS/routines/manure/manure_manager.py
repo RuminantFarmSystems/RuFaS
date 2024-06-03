@@ -669,7 +669,11 @@ class ManureManager:
         pen: ManureManagerPen,
         manure_handler_daily_output: ManureHandlerDailyOutput,
         reception_pit_daily_output: ReceptionPitDailyOutput,
-    ) -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput,]:
+    ) -> Tuple[
+        Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput,
+        ManureTreatmentDailyOutput,
+    ]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
