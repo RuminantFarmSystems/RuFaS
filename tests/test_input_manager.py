@@ -3515,7 +3515,7 @@ def test_validate_array_container_properties(
 
 
 @pytest.mark.parametrize(
-    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key, "
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
     "patch_extract_return, patch_container_valid, patch_element_valid, expected_result",
     [
         # Array extraction returns a non-list
@@ -3589,6 +3589,7 @@ def test_validate_array_container_properties(
             True,
             True,
             True,
+        ),
         # Nullable and null data passed
         (
             ["data", "array"],
@@ -4539,10 +4540,10 @@ def test_metadata_object_validator(
 )
 def test_validate_metadata_properties_keys(
     mocker: MockerFixture,
-    required_keys: Set[str],
-    valid_keys: Set[str],
-    properties: Dict[str, Any],
-    path: List[str],
+    required_keys: set[str],
+    valid_keys: set[str],
+    properties: dict[str, Any],
+    path: list[str],
     should_raise: bool,
     expected_message: str,
 ) -> None:
