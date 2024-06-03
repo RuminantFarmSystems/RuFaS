@@ -15,10 +15,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     # Arrange
     mock_pen: Pen = mocker.MagicMock(autospec=PenManureData)
     mock_pen.id = expected_pen_id = 1
-    expected_num_animals = 10
-    animals = [mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)]
-    mock_pen.animals_in_pen = {}
-    Pen.add_new_animals(mock_pen, animals)
+    mock_pen.num_animals = expected_num_animals = 10
     mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
     mock_pen.animal_combination = AnimalCombination.LAC_COW
 
@@ -26,9 +23,9 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     mock_pen.pen_type = expected_pen_type = "tiestall"
     mock_pen.bedding_type = expected_bedding_type = "sawdust"
 
-    mock_pen.manure_handling = expected_manure_handler = "manual scraping"
+    mock_pen.manure_handler = expected_manure_handler = "manual scraping"
     mock_pen.manure_separator = expected_manure_separator = "screw press"
-    mock_pen.manure_storage = expected_manure_treatment = "slurry storage outdoor"
+    mock_pen.manure_treatment = expected_manure_treatment = "slurry storage outdoor"
 
     mock_pen.manure = mocker.MagicMock(autospec=True)
     expected_pen_manure = mocker.MagicMock(autospec=PenManure)
@@ -36,6 +33,8 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
         "RUFAS.routines.manure.pen_manure.manure_manager_pen.PenManure.get_instance",
         return_value=expected_pen_manure,
     )
+    mock_pen.num_lactating_cows = expected_num_lactating_cows = 4
+    mock_pen.num_stalls = expected_num_stalls = 100
 
     # Act
     pen = ManureManagerPen(mock_pen)
@@ -52,7 +51,8 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     assert pen.manure_treatment == expected_manure_treatment
     patch_for_pen_manure_get_instance.assert_called_once_with(mock_pen.manure, expected_num_animals)
     assert pen.manure == expected_pen_manure
-    assert pen.num_lactating_cows == expected_num_animals
+    assert pen.num_lactating_cows == expected_num_lactating_cows
+    assert pen.num_stalls == expected_num_stalls
 
 
 @pytest.mark.parametrize(
