@@ -4477,8 +4477,15 @@ def test_compare_metadata_properties(
             ["Properties value type error"],
             "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}}, 3, 3, ["a", "b", "c"],
-         False, [], ""),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}},
+            3,
+            3,
+            ["a", "b", "c"],
+            False,
+            [],
+            "",
+        ),
     ],
 )
 def test_validate_properties(
@@ -4571,8 +4578,13 @@ def test_validate_properties(
             True,
         ),
         (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
-        (["some_key"], {"default": None, "minimum": 3, "maximum": 8}, "Invalid metadata default number value.",
-         "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.", True),
+        (
+            ["some_key"],
+            {"default": None, "minimum": 3, "maximum": 8},
+            "Invalid metadata default number value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.",
+            True,
+        ),
     ],
 )
 def test_metadata_number_validator(
@@ -4685,8 +4697,13 @@ def test_metadata_string_validator(
             True,
         ),
         (["some_key"], {"default": True}, "", "", False),
-        (["some_key"], {"default": None}, "Invalid metadata default bool value.",
-         "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'", True),
+        (
+            ["some_key"],
+            {"default": None},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+            True,
+        ),
     ],
 )
 def test_metadata_bool_validator(
@@ -4730,16 +4747,14 @@ def test_metadata_bool_validator(
             ["some_key"],
             {"minimum_length": "five"},
             "Invalid metadata default array minimum length.",
-            "Invalid 'minimum_length' for '['some_key']':"
-            " Expected a number but got <class 'str'>",
+            "Invalid 'minimum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
             True,
         ),
         (
             ["some_key"],
             {"maximum_length": "three"},
             "Invalid metadata default array maximum length.",
-            "Invalid 'maximum_length' for '['some_key']':"
-            " Expected a number but got <class 'str'>",
+            "Invalid 'maximum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
             True,
         ),
         (["some_key"], {"minimum_length": 1, "maximum_length": 5}, "", "", False),
