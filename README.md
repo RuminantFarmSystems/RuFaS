@@ -4,7 +4,6 @@
 [![Mypy](https://img.shields.io/badge/Mypy-3593%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 
-
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 

@@ -925,7 +925,7 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        if previous_ration and not udrm.is_udr:
+        if previous_ration and not udrm.use_user_defined_ration:
             x0 = []
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
@@ -937,7 +937,7 @@ class RationOptimizer:
             n = len(ration_config.price_list)
             x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
-        if udrm.is_udr:
+        if udrm.use_user_defined_ration:
             bnds = self.make_user_bounds(
                 UserDefinedRationManager.ration_to_use(animal_combination),
                 ration_config.DMIest_requirement,
