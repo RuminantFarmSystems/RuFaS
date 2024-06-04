@@ -65,24 +65,24 @@ def test_error_determine_moisture_factor(mass: float, dry_fraction: float) -> No
         (1100, 0.4, 0.7, 900, 0.8, 0.88, 2000, 0.5125, 0.781),
         (400, 0.71, 0.93, 3500, 0.85, 0.95, 3900, 0.65615, 0.94794871),
         (2500, 0.888, 0.9113, 700, 0.75, 0.855, 3200, 0.8359375, 0.898984),
-        (0, 0, 0, 0, 0, 0, 0, 0, 0)
+        (0, 0, 0, 0, 0, 0, 0, 0, 0),
     ],
 )
 def test_determine_weighted_manure_attributes(
-        old_mass: float,
-        old_moisture: float,
-        old_coverage: float,
-        app_mass: float,
-        app_dry_fraction: float,
-        app_coverage: float,
-        expected_mass: float,
-        expected_moisture: float,
-        expected_coverage: float
+    old_mass: float,
+    old_moisture: float,
+    old_coverage: float,
+    app_mass: float,
+    app_dry_fraction: float,
+    app_coverage: float,
+    expected_mass: float,
+    expected_moisture: float,
+    expected_coverage: float,
 ) -> None:
     """Tests that the new, weighted values for the manure phosphorus pools are calculated correctly."""
     with patch(
-            "RUFAS.routines.field.field.manure_application.ManureApplication._determine_moisture_factor",
-            new=MagicMock(return_value=0.65),
+        "RUFAS.routines.field.field.manure_application.ManureApplication._determine_moisture_factor",
+        new=MagicMock(return_value=0.65),
     ) as patched_moisture_factor:
         observe = ManureApplication._determine_weighted_manure_attributes(
             old_mass,
@@ -145,7 +145,7 @@ def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(ani
 
 @pytest.mark.parametrize("animal_type", ["CaTTLE", "PORK", "fish"])
 def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-        animal_type: str,
+    animal_type: str,
 ) -> None:
     """Tests that errors caused by unsupported animal types are handled appropriately."""
     with pytest.raises(ValueError) as e:
@@ -164,17 +164,17 @@ def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_anim
     ],
 )
 def test_apply_solid_machine_manure(
-        dry_mass: float,
-        dry_fraction: float,
-        phosphorus_mass: float,
-        field_coverage: float,
-        depth: float,
-        remainder: float,
-        weiP_frac: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        subsurface_app: bool,
+    dry_mass: float,
+    dry_fraction: float,
+    phosphorus_mass: float,
+    field_coverage: float,
+    depth: float,
+    remainder: float,
+    weiP_frac: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    subsurface_app: bool,
 ) -> None:
     """Tests that manure with greater than 15% solid matter content is added to the field correctly."""
     data = SoilData(
@@ -260,18 +260,18 @@ def test_apply_solid_machine_manure(
     ],
 )
 def test_apply_liquid_machine_manure(
-        dry_mass: float,
-        dry_frac: float,
-        phosphorus_mass: float,
-        coverage: float,
-        depth: float,
-        remainder: float,
-        area: float,
-        weiP_frac: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        subsurface_app: bool,
+    dry_mass: float,
+    dry_frac: float,
+    phosphorus_mass: float,
+    coverage: float,
+    depth: float,
+    remainder: float,
+    area: float,
+    weiP_frac: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    subsurface_app: bool,
 ) -> None:
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
     sets surface pool characteristics.
@@ -434,21 +434,21 @@ def test_apply_liquid_machine_manure(
     ],
 )
 def test_apply_subsurface_manure(
-        total_phosphorus: float,
-        wip_frac: float,
-        wop_frap: float,
-        sip_frac: float,
-        sop_frac: float,
-        dry_matter: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        depth: float,
-        subsurface_frac: float,
-        area: float,
-        expected_labile_calls: list,
-        expected_active_calls: list,
-        expected_nitrogen_calls: list,
+    total_phosphorus: float,
+    wip_frac: float,
+    wop_frap: float,
+    sip_frac: float,
+    sop_frac: float,
+    dry_matter: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    depth: float,
+    subsurface_frac: float,
+    area: float,
+    expected_labile_calls: list,
+    expected_active_calls: list,
+    expected_nitrogen_calls: list,
 ) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
     manure_app = ManureApplication(field_size=area)
@@ -507,13 +507,13 @@ def test_apply_subsurface_manure(
     ],
 )
 def test_add_nitrogen_to_soil_layer(
-        index: int,
-        mass: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        field_size: float,
-        expected: List[float],
+    index: int,
+    mass: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    field_size: float,
+    expected: List[float],
 ) -> None:
     """Tests that nitrogen is added to the top soil layer correctly."""
     man_app = ManureApplication(field_size=field_size)
@@ -546,13 +546,13 @@ def test_add_nitrogen_to_soil_layer(
     ],
 )
 def test_apply_grazing_manure(
-        dry_mass: float,
-        dry_fraction: float,
-        phosphorus_mass: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        field_size: float,
+    dry_mass: float,
+    dry_fraction: float,
+    phosphorus_mass: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    field_size: float,
 ) -> None:
     """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
     data = SoilData(
@@ -637,19 +637,19 @@ def test_apply_grazing_manure(
     ],
 )
 def test_apply_machine_manure(
-        dry_mass: float,
-        dry_fraction: float,
-        total_phosphorus_mass: float,
-        coverage: float,
-        depth: float,
-        remainder: float,
-        area: float,
-        inorganic_frac: float,
-        ammonium_frac: float,
-        organic_frac: float,
-        weiP_frac: float,
-        source_animal: str,
-        should_fail: bool,
+    dry_mass: float,
+    dry_fraction: float,
+    total_phosphorus_mass: float,
+    coverage: float,
+    depth: float,
+    remainder: float,
+    area: float,
+    inorganic_frac: float,
+    ammonium_frac: float,
+    organic_frac: float,
+    weiP_frac: float,
+    source_animal: str,
+    should_fail: bool,
 ) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
     data = SoilData(field_size=area)
@@ -673,7 +673,7 @@ def test_apply_machine_manure(
             )
         assert (
             str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
-                            f" received '{weiP_frac}'."
+            f" received '{weiP_frac}'."
         )
     else:
         incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
