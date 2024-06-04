@@ -117,7 +117,7 @@ class RationManager:
         solution: scipy.optimize.OptimizeResult,
         ration_optimizer: RationOptimizer,
         ration_config: RationConfig,
-        pen: PenTypedDict,
+        pen,
         available_feeds: AvailableFeedsTypedDict,
         info_map: Dict[str, Any],
     ) -> None:
