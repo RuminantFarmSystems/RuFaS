@@ -24,7 +24,7 @@ class CalfRationManager:
         return {"202": 1, "216": 2, "status": "Optimal", "objective": 4.5}
 
     @classmethod
-    def optimize(cls):
+    def optimize(cls) -> Dict[str, float | str]:
         """ "
         Returns "optimized" calf ration.
 
