@@ -7,7 +7,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...shared_structures.animal_combinations import AnimalCombination
 
 
 class AnimalGroupingScenario(Enum):
