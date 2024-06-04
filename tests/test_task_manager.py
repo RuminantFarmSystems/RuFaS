@@ -11,12 +11,6 @@ from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
-def mock_input_manager() -> Generator[Any, Any, Any]:
-    with patch("RUFAS.task_manager.InputManager") as mock:
-        yield mock
-
-
-@pytest.fixture
 def mock_output_manager() -> Generator[Any, Any, Any]:
     with patch("RUFAS.task_manager.OutputManager") as mock:
         yield mock
@@ -116,7 +110,7 @@ def test_set_random_seed_with_parameters(
         )
 
 
-def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Generator[Any, Any, Any]) -> None:
+def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
     task_data = [
         {
             "task_type": "Herd Initialization",
@@ -151,12 +145,15 @@ def test_parse_input_tasks(task_manager: TaskManager, mock_input_manager: Genera
             "comparison_properties_file_path": "path/to/comparison/properties",
         },
     ]
-    mock_input_manager.get_data.return_value = task_data
+    mock_input_manager = InputManager()
+    task_manager.input_manager = mock_input_manager
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
     single, multi = task_manager._parse_input_tasks()
     assert len(single) == 1
     assert len(multi) == 1
     assert single[0]["task_type"] == TaskType.HERD_INITIALIZATION
     assert multi[0]["task_type"] == TaskType.SIMULATION_MULTI_RUN
+    mock_get_data.assert_called_once()
 
 
 def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
@@ -168,7 +165,8 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool
+    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool,
+    mocker: MockerFixture,
 ) -> None:
     args = {
         "filters_directory": Path("/fake/filters"),
@@ -182,22 +180,24 @@ def test_handle_post_processing(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": suppress_logs,
     }
-
-    TaskManager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
-
+    mock_input_manager = InputManager()
+    mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
+    mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
     if not suppress_logs:
-        mock_input_manager.dump_get_data_logs.call_count == 1
+        mock_dump_data_logs.call_count == 1
         mock_output_manager.dump_all_nondata_pools.assert_called_with(
             args["logs_directory"], args["exclude_info_maps"], "verbose"
         )
     else:
-        mock_input_manager.dump_get_data_logs.assert_not_called()
+        mock_dump_data_logs.assert_not_called()
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
 
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
-    mock_input_manager: Generator[Any, Any, Any], mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool,
+    mocker: MockerFixture
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
@@ -205,8 +205,12 @@ def test_input_data_audit(
         "logs_directory": Path("/fake/output/logs"),
         "suppress_log_files": suppress_logs,
     }
-    mock_input_manager.start_data_processing.return_value = True
-    result = TaskManager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
+    mock_input_manager = InputManager()
+    task_manager.input_manager = mock_input_manager
+    mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
+    mock_save_metadata_properties = mocker.patch.object(mock_input_manager, "save_metadata_properties", return_value=None)
+
+    result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
     if not suppress_logs:
         mock_output_manager.add_log.assert_called_with(
@@ -214,6 +218,6 @@ def test_input_data_audit(
             f"Saving metadata properties {args['metadata_file_path']} at {args['logs_directory']}",
             {"class": "TaskManager", "function": "handle_input_data_audit", "units": MeasurementUnits.UNITLESS},
         )
-        mock_input_manager.save_metadata_properties.assert_called_once()
+        mock_save_metadata_properties.assert_called_once()
     else:
-        mock_input_manager.save_metadata_properties.assert_not_called()
+        mock_save_metadata_properties.assert_not_called()
