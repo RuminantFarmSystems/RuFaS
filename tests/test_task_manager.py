@@ -208,7 +208,8 @@ def test_input_data_audit(
     mock_input_manager = InputManager()
     task_manager.input_manager = mock_input_manager
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_save_metadata_properties = mocker.patch.object(mock_input_manager, "save_metadata_properties", return_value=None)
+    mock_save_metadata_properties = mocker.patch.object(mock_input_manager, "save_metadata_properties",
+                                                        return_value=None)
 
     result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
