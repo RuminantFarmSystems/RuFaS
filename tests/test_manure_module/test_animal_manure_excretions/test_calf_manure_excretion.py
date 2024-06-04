@@ -4,7 +4,7 @@ from pytest_mock import MockFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.shared_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 @pytest.mark.parametrize("methane_model", [None, "dummy"])
