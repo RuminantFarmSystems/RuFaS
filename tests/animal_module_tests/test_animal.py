@@ -2718,6 +2718,7 @@ def test_calc_pen_requirements() -> None:
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
+        [1, 2, 3],
         "mean",
     )
     attributelist = [
@@ -2738,6 +2739,7 @@ def test_calc_pen_requirements() -> None:
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
     req.calc_pen_requirements(
+        [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
