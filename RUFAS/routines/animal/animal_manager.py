@@ -1461,7 +1461,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:  # noqa: C901
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1548,9 +1548,9 @@ class AnimalManager:
                         for animal in list(pen.animals_in_pen.values()):
                             animal.update_milk_production_history(self.simulation_day)
             else:
-                for pen in self.all_pens:
-                    if not pen.ration and pen.is_populated:
-                        self.reformulate_ration_single_pen(pen=pen, current_temperature=current_temperature, feed=feed)
+                self.reformulate_pens_as_needed(current_temperature=current_temperature,
+                                                feed=feed,
+                                                )
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1878,3 +1878,18 @@ class AnimalManager:
         if pen.animal_combination.name == "LAC_COW":
             for animal in list(pen.animals_in_pen.values()):
                 animal.update_milk_production_history(self.simulation_day)
+
+    def reformulate_pens_as_needed(self, current_temperature: float, feed: Feed) -> None:
+        """
+        Calls reformulate ration method on all pens if the pen was recently populated.
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen that requires ration reformulation.
+        current_temperature : float
+            Current temperature.
+        """
+        for pen in self.all_pens:
+            if not pen.ration and pen.is_populated:
+                self.reformulate_ration_single_pen(pen=pen, current_temperature=current_temperature, feed=feed)
