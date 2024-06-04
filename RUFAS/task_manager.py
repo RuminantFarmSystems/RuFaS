@@ -53,7 +53,6 @@ class TaskManager:
     """Manager class for handling tasks related to simulations and analyses."""
 
     def __init__(self) -> None:
-        self.input_manager = InputManager()
         self.output_manager = OutputManager()
 
     def start(
@@ -93,6 +92,7 @@ class TaskManager:
             Override value for maximum metadata properties depth set in Input Manager.
 
         """
+        self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
             verbosity,
             exclude_info_maps,
@@ -109,7 +109,6 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
-        self.input_manager.set_metadata_depth_limit(metadata_depth_limit)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
         if not is_data_valid:
             TaskManager.handle_post_processing(
@@ -326,8 +325,7 @@ class TaskManager:
                 RUFAS_VERSION,
                 task_id,
             )
-            input_manager = InputManager()
-            input_manager.set_metadata_depth_limit(metadata_depth_limit)
+            input_manager = InputManager(metadata_depth_limit)
 
             if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
                 TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
