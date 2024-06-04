@@ -107,3 +107,8 @@ def test_calculate_subsequent_dry_matter_loss(
     harvested_crop.total_sensible_heat_generated = 950.0
     mock_time = mocker.MagicMock(autospec=Time)
     mock_time.simulation_day = days + 1
+
+
+@pytest.mark.parametrize(
+    ""
+)
