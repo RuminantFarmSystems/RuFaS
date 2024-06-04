@@ -470,36 +470,39 @@ def test_validate_graph_filter(
         assert expected_message in result[0]["message"]
 
 
-@pytest.mark.parametrize("filtered_pool, expected_output, expected_logs", [
-    (
-        {
-            "temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
-            "pressure": {"values": [1, 2], "info_maps": [{"units": "Bar"}]}
-        },
-        {
-            "temperature ('Celsius')": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
-            "pressure ('Bar')": {"values": [1, 2], "info_maps": [{"units": "Bar"}]}
-        },
-        []
-    ),
-    (
-        {"temperature": {"values": [20, 21]}},
-        {"temperature": {"values": [20, 21]}},
-        [
+@pytest.mark.parametrize(
+    "filtered_pool, expected_output, expected_logs",
+    [
+        (
             {
-                "error": "Can't add units to variables for graphing",
-                "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
-                "info_map": {
-                    "class": "GraphGenerator",
-                    "function": "_add_var_units"
-                },
-            }
-        ]
-    )
-])
-def test_add_var_units(graph_generator: GraphGenerator, filtered_pool: dict[str, dict[str, list[Any]]],
-                       expected_output: dict[str, dict[str, list[Any]]],
-                       expected_logs: list[dict[str, str | dict[str, str]]]):
+                "temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
+                "pressure": {"values": [1, 2], "info_maps": [{"units": "Bar"}]},
+            },
+            {
+                "temperature ('Celsius')": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
+                "pressure ('Bar')": {"values": [1, 2], "info_maps": [{"units": "Bar"}]},
+            },
+            [],
+        ),
+        (
+            {"temperature": {"values": [20, 21]}},
+            {"temperature": {"values": [20, 21]}},
+            [
+                {
+                    "error": "Can't add units to variables for graphing",
+                    "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
+                    "info_map": {"class": "GraphGenerator", "function": "_add_var_units"},
+                }
+            ],
+        ),
+    ],
+)
+def test_add_var_units(
+    graph_generator: GraphGenerator,
+    filtered_pool: dict[str, dict[str, list[Any]]],
+    expected_output: dict[str, dict[str, list[Any]]],
+    expected_logs: list[dict[str, str | dict[str, str]]],
+):
     updated_pool, logs = graph_generator._add_var_units(filtered_pool)
     assert updated_pool == expected_output
     assert logs == expected_logs

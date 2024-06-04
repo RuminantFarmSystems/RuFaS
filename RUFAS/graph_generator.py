@@ -218,8 +218,9 @@ class GraphGenerator:
 
         return all_logs
 
-    def _add_var_units(self, filtered_pool: dict[str, List[Any]]) -> Tuple[dict[str, List[Any]],
-                                                                           list[dict[str, str | dict[str, str]]]] :
+    def _add_var_units(
+        self, filtered_pool: dict[str, List[Any]]
+    ) -> Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]:
         """Adds variable units to variable name for graphing.
 
         Parameters
@@ -342,8 +343,9 @@ class GraphGenerator:
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = (
-            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "omit_legend_prefix",
-                                                                       "omit_legend_suffix", "display_units"]
+            list(FIGURE_SETTERS.keys())
+            + list(AXES_SETTERS.keys())
+            + ["variables", "omit_legend_prefix", "omit_legend_suffix", "display_units"]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
