@@ -168,6 +168,7 @@ class GraphGenerator:
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
+            updated_pool = filtered_pool
             if graph_details.get("display_units", False):
                 updated_pool, var_units_logs = self._add_var_units(filtered_pool)
             prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
