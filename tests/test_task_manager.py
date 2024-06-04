@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from pytest_mock import MockerFixture
 from pathlib import Path
 
+from RUFAS.input_manager import InputManager
 from RUFAS.task_manager import TaskManager, TaskType
 from RUFAS.output_manager import LogVerbosity
 from RUFAS.units import MeasurementUnits
@@ -53,17 +54,19 @@ def test_invalid_task_type_from_string() -> None:
 
 def test_task_manager_init(
     task_manager: TaskManager,
-    mock_input_manager: Generator[Any, Any, Any],
     mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
-    assert task_manager.input_manager is mock_input_manager
     assert task_manager.output_manager is mock_output_manager
 
 
-def test_task_manager_start_exception(task_manager: TaskManager, mocker: MockerFixture) -> None:
-    mocker.patch.object(task_manager.input_manager, "start_data_processing", new_callable=MagicMock, return_value=False)
+def test_task_manager_start_exception(mocker: MockerFixture) -> None:
+    mock_task_manager = TaskManager()
+    mock_input_manager = InputManager()
+    mock_start_data = mocker.patch.object(mock_input_manager, 'start_data_processing', return_value=False)
+    mocker.patch.object(mock_task_manager.output_manager, 'run_startup_sequence')
+    mocker.patch.object(mock_task_manager.output_manager, 'add_log')
     with pytest.raises(Exception) as exc_info:
-        task_manager.start(
+        mock_task_manager.start(
             Path("/fake/path"),
             LogVerbosity.LOGS,
             False,
@@ -75,6 +78,7 @@ def test_task_manager_start_exception(task_manager: TaskManager, mocker: MockerF
             None,
         )
     assert "Task Manager's input data is invalid." in str(exc_info.value)
+    mock_start_data.assert_called_once_with(Path("/fake/path"))
 
 
 def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
