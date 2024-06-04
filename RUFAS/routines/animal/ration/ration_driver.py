@@ -274,7 +274,7 @@ class RationManager:
         req: animal_requirements.AnimalRequirements,
         pen,
         available_feeds: AvailableFeedsTypedDict,
-        animal_grouping_scenario: Any,
+        animal_grouping_scenario,
     ) -> tuple[Dict[str, str | float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
