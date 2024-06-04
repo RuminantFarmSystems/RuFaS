@@ -724,6 +724,7 @@ class ManureApplication:
 
         """
         new_dry_matter_mass = old_total_dry_mass + application_dry_mass
+
         if new_dry_matter_mass > 0:
             application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_fraction)
             new_moisture_factor = (
@@ -737,6 +738,7 @@ class ManureApplication:
                 "new_moisture_factor": new_moisture_factor,
                 "new_field_coverage": new_field_coverage,
             }
+
         else:
             return {
                 "new_dry_matter_mass": 0,
