@@ -520,12 +520,7 @@ class RationOptimizer:
             else:
                 ration_config.dP_list.append(0.0)
 
-        if ration_config.P_requirement_process > 0:
-            # print(f'ration_config.P_requirement = {ration_config.P_requirement}')
-            # print(f'ration_config.P_requirement_process = {ration_config.P_requirement_process}')
-            requirement_to_use = ration_config.P_requirement_process
-        else:
-            requirement_to_use = ration_config.P_requirement
+        requirement_to_use = max(ration_config.P_requirement_process, ration_config.P_requirement)
 
         return float(sum(
             np.multiply(
