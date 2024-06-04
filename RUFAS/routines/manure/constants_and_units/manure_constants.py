@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 class ManureConstants:
     """
     A class to store constants for manure management.
@@ -71,3 +73,16 @@ class ManureConstants:
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
+    
+    BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
+    freestall = BarnArea(has_cows=3.5, no_cows=2.5)
+    tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
+    bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
+    open_lot = BarnArea(has_cows=5.0, no_cows=3.0)
+
+    barn_area_by_pen_type = {
+        "freestall": freestall,
+        "tiestall": tiestall,
+        "compost bedded pack barn": bedded_pack,
+        "open lot": open_lot,
+    }

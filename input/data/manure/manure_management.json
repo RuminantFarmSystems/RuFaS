@@ -113,6 +113,16 @@
       "manure_treatment": "composting"
     }
   ],
+  "barn_area_configs": {
+    "freestall, has cows": 3.5,
+    "freestall, no cows": 2.5,
+    "tiestall, has cows": 1.2,
+    "tiestall, no cows": 1.0,
+    "compost bedded pack barn, has cows": 5.0,
+    "compost bedded pack barn, no cows": 3.0,
+    "open lot, has cows": 5.0,
+    "open lot, no cows": 3.0
+  },
   "bedding_configs": [
     {
       "name": "sawdust",
