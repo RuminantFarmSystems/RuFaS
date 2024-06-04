@@ -27,8 +27,6 @@
       "type": "number",
       "minimum": 1000,
       "maximum": 56045,
-      "default": null,
-      "nullable": true,
       "description": "Unique 5-digit code that represents a specific U.S. county."
     },
     "include_detailed_values": {
