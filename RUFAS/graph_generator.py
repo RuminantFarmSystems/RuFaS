@@ -2,7 +2,7 @@ import datetime
 import re
 import os
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Collection
+from typing import Dict, List, Any, Callable, Optional, Collection, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -167,9 +167,13 @@ class GraphGenerator:
             return all_logs
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
-            prepared_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
-            non_numeric_data_logs = self._log_non_numerical_data(filtered_pool, graph_details)
-            all_logs = non_numeric_data_logs + graph_filter_validation_logs
+            var_units_logs: list[dict[str, str | dict[str, str]]] = []
+            updated_pool = filtered_pool
+            if graph_details.get("display_units", False):
+                updated_pool, var_units_logs = self._add_var_units(filtered_pool)
+            prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
+            non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
+            all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
 
             found_errors = any("error" in log for log in all_logs)
             if found_errors:
@@ -190,9 +194,9 @@ class GraphGenerator:
                 omit_legend_suffix = graph_details.get("omit_legend_suffix", False)
 
                 if selected_variables := graph_details.get("variables"):
-                    graph_details["legend"]: List[str] = selected_variables
+                    graph_details["legend"] = selected_variables
                 elif omit_legend_prefix or omit_legend_suffix:
-                    graph_details["legend"]: List[str] = list(
+                    graph_details["legend"] = list(
                         self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix)
                         for key in prepared_data.keys()
                     )
@@ -213,6 +217,41 @@ class GraphGenerator:
             ]
 
         return all_logs
+
+    def _add_var_units(self, filtered_pool: dict[str, List[Any]]) -> Tuple[dict[str, List[Any]],
+                                                                           list[dict[str, str | dict[str, str]]]] :
+        """Adds variable units to variable name for graphing.
+
+        Parameters
+        ----------
+        filtered_pool : dict[str, List[Any]]
+            The data to be graphed.
+
+        Returns
+        -------
+        Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]
+            The updated data with units added and logs if info_maps aren't found to get units.
+        """
+        updated_data = {}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._add_var_units.__name__,
+        }
+        for var_name, details in filtered_pool.items():
+            if "info_maps" in details and details["info_maps"]:
+                unit = details["info_maps"][0]["units"]
+                new_var_name = f"{var_name} ('{unit}')"
+                updated_data[new_var_name] = details
+            else:
+                all_logs: List[Dict[str, Collection[str]]] = [
+                    {
+                        "error": "Can't add units to variables for graphing",
+                        "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
+                        "info_map": info_map,
+                    }
+                ]
+                return filtered_pool, all_logs
+        return updated_data, []
 
     def _generate_legend_keys(
         self, combined_var_name: str, omit_legend_prefix: bool = False, omit_legend_suffix: bool = False
@@ -277,10 +316,14 @@ class GraphGenerator:
             if omit_legend_prefix:
                 slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
 
+            units = re.search(r"\(.*\)", combined_var_name)
             if omit_legend_suffix:
                 slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
 
-            return ".".join(combined_var_name_list[slice_start:slice_end])
+            updated_var_name = ".".join(combined_var_name_list[slice_start:slice_end])
+            if units:
+                return f"{updated_var_name} {units.group()}"
+            return updated_var_name
 
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]
@@ -299,7 +342,8 @@ class GraphGenerator:
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = (
-            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "omit_legend_prefix"]
+            list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables", "omit_legend_prefix",
+                                                                       "omit_legend_suffix", "display_units"]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
