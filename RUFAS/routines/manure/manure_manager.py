@@ -66,7 +66,9 @@ from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
     ReceptionPitDailyOutput,
 )
-im = InputManager() 
+
+im = InputManager()
+
 
 class ManureManager:
     """
@@ -120,7 +122,7 @@ class ManureManager:
         self.barn_area = ()
 
     barn_area = im.get_data("manure_management.barn_area_configs")
-    
+
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 
