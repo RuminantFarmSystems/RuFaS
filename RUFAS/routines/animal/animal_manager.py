@@ -1551,9 +1551,7 @@ class AnimalManager:
             else:
                 for pen in self.all_pens:
                     if not pen.ration and pen.is_populated:
-                        self.reformulate_ration_single_pen(pen=pen,
-                                                           current_temperature=current_temperature,
-                                                           feed=feed)
+                        self.reformulate_ration_single_pen(pen=pen, current_temperature=current_temperature, feed=feed)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1869,7 +1867,6 @@ class AnimalManager:
 
         pen.ration = ration_per_pen
         pen.ration_per_animal = ration_per_animal  # Important
-
 
         pen.calc_avg_growth()
         if pen.animal_combination.name == "LAC_COW":
