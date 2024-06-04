@@ -1443,7 +1443,6 @@ class AnimalManager:
             self.pens_by_animal_combination[animal_combination],
             key=lambda p: p.current_stocking_density,
         )
-
         pen_with_min_stocking_density.add_animal(
             animal,
             self.ANIMAL_GROUPING_SCENARIO,
@@ -1819,7 +1818,7 @@ class AnimalManager:
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float | None, feed: Feed) -> None:
+    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
         """
         Reformulates ration for a single pen
         """
@@ -1830,7 +1829,7 @@ class AnimalManager:
         pen.subset_class_feeds(feed)
         pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-        ration_per_animal = {}
+        ration_per_animal: Dict[str, Any] = {}
         ration_vals = {}
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
@@ -1866,7 +1865,7 @@ class AnimalManager:
                 ration_per_pen[key] = ration_per_animal[key] * num_animals
 
         pen.ration = ration_per_pen
-        pen.ration_per_animal = ration_per_animal  # Important
+        pen.ration_per_animal = ration_per_animal
 
         pen.calc_avg_growth()
         if pen.animal_combination.name == "LAC_COW":
