@@ -4,7 +4,14 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "default",
+      "output_prefix": "default_41",
+      "log_verbosity": "errors",
+      "random_seed": 41
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "default_42",
       "log_verbosity": "logs",
       "random_seed": 42
     }

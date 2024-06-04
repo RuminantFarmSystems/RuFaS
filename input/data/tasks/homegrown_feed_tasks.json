@@ -4,7 +4,13 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/homegrown_feed_test_metadata.json",
-      "output_prefix": "Task 1",
+      "output_prefix": "MoreFeed",
+      "log_verbosity": "logs"
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/homegrown_feed_test_metadata_LessHGFeed.json",
+      "output_prefix": "LessFeed",
       "log_verbosity": "logs"
     }
   ]

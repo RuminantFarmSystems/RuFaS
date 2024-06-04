@@ -172,7 +172,7 @@ class Emissions:
             for key, value in homegrown_alternatives.items():
                 amount_used = min(amount, value)
                 amount -= amount_used
-                homegrown_alternatives[key] -= amount_used
+                homegrown_totals[key] -= amount_used
 
             actual_purchased_feeds[feed_id] = amount
 
