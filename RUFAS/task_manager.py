@@ -305,7 +305,7 @@ class TaskManager:
             pass
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
