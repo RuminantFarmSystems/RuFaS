@@ -1,6 +1,6 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Dict, List
+from typing import Any, Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
@@ -189,11 +189,14 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
+    updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
+    var_units_logs = []
+    graph_generator._add_var_units = MagicMock(return_value=(updated_pool, var_units_logs))
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
-    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
-    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title"}
+    graph_generator._log_non_numerical_data = MagicMock(return_value=[{"log": "mock_log_message"}])
+    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title", "display_units": True}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
@@ -203,6 +206,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
     mock_remove_special_chars.assert_called_once()
+    graph_generator._add_var_units.assert_called_once_with(filtered_pool)
 
 
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -464,3 +468,38 @@ def test_validate_graph_filter(
 
     if expected_length > 0:
         assert expected_message in result[0]["message"]
+
+
+@pytest.mark.parametrize("filtered_pool, expected_output, expected_logs", [
+    (
+        {
+            "temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
+            "pressure": {"values": [1, 2], "info_maps": [{"units": "Bar"}]}
+        },
+        {
+            "temperature ('Celsius')": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
+            "pressure ('Bar')": {"values": [1, 2], "info_maps": [{"units": "Bar"}]}
+        },
+        []
+    ),
+    (
+        {"temperature": {"values": [20, 21]}},
+        {"temperature": {"values": [20, 21]}},
+        [
+            {
+                "error": "Can't add units to variables for graphing",
+                "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
+                "info_map": {
+                    "class": "GraphGenerator",
+                    "function": "_add_var_units"
+                },
+            }
+        ]
+    )
+])
+def test_add_var_units(graph_generator: GraphGenerator, filtered_pool: dict[str, dict[str, list[Any]]],
+                       expected_output: dict[str, dict[str, list[Any]]],
+                       expected_logs: list[dict[str, str | dict[str, str]]]):
+    updated_pool, logs = graph_generator._add_var_units(filtered_pool)
+    assert updated_pool == expected_output
+    assert logs == expected_logs
