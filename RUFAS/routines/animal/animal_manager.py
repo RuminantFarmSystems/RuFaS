@@ -1461,7 +1461,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None: # noqa: C901
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
