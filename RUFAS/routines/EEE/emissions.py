@@ -6,7 +6,7 @@ from typing import Any
 import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
-    CropSpecies.ALFALFA_HAY: ["100","103", "106", "107", "108"],
+    CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],
     CropSpecies.ALFALFA_SILAGE: ["104", "109", "110"],
     CropSpecies.ALFALFA_BALEAGE: [],
     CropSpecies.CEREAL_RYE_HAY: [],
@@ -17,7 +17,7 @@ CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.CORN_SILAGE: ["50", "51", "52"],
     CropSpecies.SOYBEAN_HAY: [],
     CropSpecies.SOYBEAN_GRAIN: ["169", "170"],
-    CropSpecies.TALL_FESCUE_HAY: ["18","88","89","94", "95","99"],
+    CropSpecies.TALL_FESCUE_HAY: ["18", "88", "89", "94", "95", "99"],
     CropSpecies.TALL_FESCUE_SILAGE: ["91", "97", "100"],
     CropSpecies.TALL_FESCUE_BALEAGE: [],
     CropSpecies.TRITICALE_HAY: [],
@@ -151,11 +151,6 @@ class Emissions:
     ) -> dict[str, float]:
         """
         Calculates the difference between the purchased feeds and feeds grown on the farm.
-
-        Notes
-        -----
-        This method assumes that there will be a one-to-many mapping between Crop Species and RuFaS Feed IDs.
-
         """
         homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
         for crop_species in homegrown_totals:
@@ -164,15 +159,14 @@ class Emissions:
 
         actual_purchased_feeds = {}
         for feed_id, amount in purchased_feeds.items():
-            homegrown_alternatives = {
-                crop: crop_yield
-                for crop, crop_yield in homegrown_totals.items()
-                if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
-            }
-            for key, value in homegrown_alternatives.items():
-                amount_used = min(amount, value)
+            homegrown_alternatives = [
+                crop for crop in homegrown_totals.keys() if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
+            ]
+            for homegrown_alternative in homegrown_alternatives:
+                alternative_amount_available = homegrown_totals[homegrown_alternative]
+                amount_used = min(amount, alternative_amount_available)
                 amount -= amount_used
-                homegrown_totals[key] -= amount_used
+                homegrown_totals[homegrown_alternative] -= amount_used
 
             actual_purchased_feeds[feed_id] = amount
 

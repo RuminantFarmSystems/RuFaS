@@ -5,7 +5,7 @@
   "manure_management_specification": "Corn Silage 2021 (cs-alf) Manure schedule",
   "tillage_management_specification": "Corn Silage 2021 (cs-alf) Tillage schedule",
   "fertilizer_management_specification": "Corn Silage 2021 (cs-alf) Fertilizer schedule",
-  "field_size": 50,
+  "field_size": 0.5,
   "absolute_latitude": 44.4489,
   "longitude": 88.0604,
   "minimum_daylength": 9.0,
