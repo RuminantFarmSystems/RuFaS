@@ -66,8 +66,8 @@ class Storage:
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
-    reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float)
-        Resets mass related attributes after loss of dry matter.
+    reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
+        Resets mass related attributes after loss of dry matter and/or moisture.
     record_stored_crops(self)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
@@ -162,7 +162,7 @@ class Storage:
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
             weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions)
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent,
@@ -181,7 +181,7 @@ class Storage:
             )
 
             crop.last_time_degraded = copy.deepcopy(time)
-            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss)
+            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, 0.0)
         om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
@@ -199,10 +199,12 @@ class Storage:
         """
         pass
 
-    def reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float) -> None:
+    def reset_mass_attributes_after_loss(
+        self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float
+    ) -> None:
         """
-        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after a loss of dry
-        matter.
+        Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after loss of both dry
+        matter and moisture.
 
         Parameters
         ----------
@@ -210,10 +212,17 @@ class Storage:
             The stored crop that has lost dry matter.
         dry_matter_loss : float
             Amount of dry matter the crop lost on the current day in kg.
+        moisture_loss : float
+            Amount of moisture (water) the crop lost on the current day in kg.
+
+        Notes
+        -----
+        The amount of dry matter mass remaining is calculating first, then the remaining amount of fresh mass. After
+        these two attributes have been set, the dry matter percentage is recalculated and set.
 
         """
         new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
-        crop.fresh_mass -= dry_matter_loss
+        crop.fresh_mass -= dry_matter_loss + moisture_loss
         if crop.fresh_mass == 0.0:
             crop.dry_matter_percentage = 0.0
             return
@@ -280,7 +289,7 @@ class Storage:
         return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
@@ -291,6 +300,8 @@ class Storage:
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -306,6 +317,9 @@ class Storage:
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
         no dry matter loss occurs. Alfalfa uses different parameters and limits for calculating dry matter loss,
         but the structure of the loss equation remains the same.
+
+        Note that the current time is not needed for calculating the dry matter loss to fermentation, but it allows the
+        interface to remain uniform across all implementations of `calculate_dry_matter_loss_to_gas`.
 
         """
         dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
@@ -363,24 +377,6 @@ class Storage:
         conditions = weather.get_conditions_series(current_time, starting_day_offset + 1, 0)
 
         return conditions
-
-    def calculate_bale_density(self, initial_dry_matter: float) -> float:
-        """
-        Calculates the density of a bale.
-
-        Parameters
-        ----------
-        initial_dry_matter_percentage : float
-            The initial dry matter percentage of the bale.
-
-        Returns
-        -------
-        float
-            The density of the bale in kg dry matter per cubic meter.
-
-        """
-        moisture_fraction = 1 - (initial_dry_matter / 100)
-        return 100 + 440 * moisture_fraction
 
     def recalculate_nutrient_percentage(
         self,

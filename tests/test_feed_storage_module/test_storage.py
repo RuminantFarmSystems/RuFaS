@@ -121,14 +121,14 @@ def test_process_degradations(
         call(mock_second_crop.last_time_degraded, mock_time, mock_weather),
     ]
     expected_dry_mass_loss_calls = [
-        call(mock_first_crop, mock_conditions),
-        call(mock_second_crop, mock_conditions),
+        call(mock_first_crop, mock_conditions, mock_time),
+        call(mock_second_crop, mock_conditions, mock_time),
     ]
 
     storage.process_degradations(mock_weather, mock_time)
 
     expected_recalculate_percentage_call_count = len(storage.stored) * 4
-    expected_reset_mass_calls = [call(mock_first_crop, loss), call(mock_second_crop, loss)]
+    expected_reset_mass_calls = [call(mock_first_crop, loss, 0.0), call(mock_second_crop, loss, 0.0)]
 
     mock_get_conditions.assert_has_calls(expected_get_conditions_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
@@ -149,18 +149,20 @@ def test_process_degradations(
 
 
 @pytest.mark.parametrize(
-    "loss,fresh,percentage,expected_fresh,expected_percentage",
+    "dry_loss,water_loss,fresh,percentage,expected_fresh,expected_percentage",
     [
-        (50.0, 1000.0, 15.0, 950.0, 10.526316),
-        (200.0, 500.0, 50.0, 300.0, 16.666667),
-        (150.0, 150.0, 100.0, 0.0, 0.0),
-        (0.0, 200.0, 10.0, 200.0, 10.0),
+        (50.0, 0.0, 1000.0, 15.0, 950.0, 10.526316),
+        (200.0, 50.0, 500.0, 50.0, 250.0, 20.0),
+        (150.0, 0.0, 150.0, 100.0, 0.0, 0.0),
+        (0.0, 0.0, 200.0, 10.0, 200.0, 10.0),
+        (0.0, 100.0, 1000.0, 10.0, 900.0, 11.11111),
     ],
 )
 def test_reset_mass_attributes(
     storage: Storage,
     harvested_crop: HarvestedCrop,
-    loss: float,
+    dry_loss: float,
+    water_loss: float,
     fresh: float,
     percentage: float,
     expected_fresh: float,
@@ -170,7 +172,7 @@ def test_reset_mass_attributes(
     harvested_crop.fresh_mass = fresh
     harvested_crop.dry_matter_percentage = percentage
 
-    storage.reset_mass_attributes_after_loss(harvested_crop, loss)
+    storage.reset_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
 
     assert harvested_crop.fresh_mass == expected_fresh
     assert pytest.approx(harvested_crop.dry_matter_percentage) == expected_percentage
@@ -259,6 +261,7 @@ def test_calculate_dry_matter_loss_to_gas(
     )
     harvested_crop.dry_matter_percentage = percentage
     harvested_crop.category = category
+    mock_time = mocker.MagicMock()
 
     mock_conditions = []
     for temp in temps:
@@ -266,7 +269,7 @@ def test_calculate_dry_matter_loss_to_gas(
         condition.mean_air_temperature = temp
         mock_conditions.append(condition)
 
-    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions)
+    actual = storage.calculate_dry_matter_loss_to_gas(harvested_crop, mock_conditions, mock_time)
 
     assert pytest.approx(actual) == expected
 
@@ -296,16 +299,6 @@ def test_get_conditions(
     else:
         assert actual == returned_conditions
         mock_weather.get_conditions_series.assert_called_once_with(mock_curr_time, expected_offset, 0)
-
-
-@pytest.mark.parametrize("dry_matter,expected", [(0.0, 540.0), (90.0, 144.0), (75.0, 210.0)])
-def test_calculate_bale_density(storage: Storage, dry_matter: float, expected: float) -> None:
-    """
-    Test the calculate_bale_density method of the Storage class.
-    """
-    actual = storage.calculate_bale_density(dry_matter)
-
-    assert actual == expected
 
 
 @pytest.mark.parametrize(
