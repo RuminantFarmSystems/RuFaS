@@ -165,7 +165,9 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
-    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], suppress_logs: bool,
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    suppress_logs: bool,
     mocker: MockerFixture,
 ) -> None:
     args = {
@@ -196,8 +198,7 @@ def test_handle_post_processing(
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
-    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool,
-    mocker: MockerFixture
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool, mocker: MockerFixture
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
@@ -208,8 +209,9 @@ def test_input_data_audit(
     mock_input_manager = InputManager()
     task_manager.input_manager = mock_input_manager
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_save_metadata_properties = mocker.patch.object(mock_input_manager, "save_metadata_properties",
-                                                        return_value=None)
+    mock_save_metadata_properties = mocker.patch.object(
+        mock_input_manager, "save_metadata_properties", return_value=None
+    )
 
     result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
