@@ -1,5 +1,5 @@
 import collections
-from typing import Set, Dict, List, Any, Tuple, Literal
+from typing import Set, Dict, List, Tuple, Literal
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
