@@ -265,6 +265,9 @@ def test_set_requirements(mocker: MockerFixture) -> None:
             "P_requirement": [
                 8,
             ],
+            "P_requirement_process": [
+                8,
+            ],
             "DMIest_requirement": [
                 9,
             ],
