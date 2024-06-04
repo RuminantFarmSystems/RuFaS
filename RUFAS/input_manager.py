@@ -77,12 +77,12 @@ class InputManager:
 
     __instance = None
 
-    def __new__(cls, metadata_depth_limit: int = None) -> "InputManager":
+    def __new__(cls, metadata_depth_limit: int | None = None) -> "InputManager":
         if not hasattr(cls, "instance"):
             cls.instance = super(InputManager, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self, metadata_depth_limit: int = None) -> None:
+    def __init__(self, metadata_depth_limit: int | None = None) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
