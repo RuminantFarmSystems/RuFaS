@@ -1821,6 +1821,13 @@ class AnimalManager:
     def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
         """
         Reformulates ration for a single pen
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen that requires ration reformulation.
+        current_temperature : float
+            Current temperature.
         """
         self.reset_milk_production_reduction()
         self.calc_nutrient_rqmts(feed, current_temperature)
@@ -1829,7 +1836,7 @@ class AnimalManager:
         pen.subset_class_feeds(feed)
         pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-        ration_per_animal: Dict[str, Any] = {}
+        ration_per_animal: Dict[str, float | str] = {}
         ration_vals = {}
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
