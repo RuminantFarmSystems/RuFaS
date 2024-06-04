@@ -195,145 +195,146 @@ class AnimalModuleReporter:
         """
 
         for pen in pen_list:
-            nutrient_amount = pen.ration_nutrient_amount
-            nutrient_conc = pen.ration_nutrient_conc
-            ration_per_animal = pen.ration_per_animal.copy()
-            for non_numeric_key in ["status", "objective"]:
-                if non_numeric_key in ration_per_animal:
-                    del ration_per_animal[non_numeric_key]
-            ration_per_animal["dry_matter_intake_total"] = sum(
-                [ration_per_animal[key] for key in ration_per_animal.keys()]
-            )
-            ration_report = {}
-            ration_report["nutrient_amount"] = nutrient_amount
-            ration_report["nutrient_conc"] = nutrient_conc
+            if pen.is_populated:
+                nutrient_amount = pen.ration_nutrient_amount
+                nutrient_conc = pen.ration_nutrient_conc
+                ration_per_animal = pen.ration_per_animal.copy()
+                for non_numeric_key in ["status", "objective"]:
+                    if non_numeric_key in ration_per_animal:
+                        del ration_per_animal[non_numeric_key]
+                ration_per_animal["dry_matter_intake_total"] = sum(
+                    [ration_per_animal[key] for key in ration_per_animal.keys()]
+                )
+                ration_report = {}
+                ration_report["nutrient_amount"] = nutrient_amount
+                ration_report["nutrient_conc"] = nutrient_conc
 
-            info_map = {
-                "class": AnimalModuleReporter.__name__,
-                "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-                "data_origin": [("AnimalManager", "_calc_ration_at_interval")],
-                "number_animals_in_pen": len(pen.animals_in_pen),
-                "simulation_day": simulation_day,
-            }
-            nutrient_amount_units = {
-                "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "DE": MeasurementUnits.MEGACALORIES,
-                "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            }
-            classname = AnimalModuleReporter.__name__
-            funcname = AnimalModuleReporter.report_ration_interval_data.__name__
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.ration_nutrient_amount_pen_0_CALF",
-                f"{classname}.{funcname}.ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
-                {},
-                simulation_day,
-                info_map,
-                nutrient_amount_units,
-            )
-            om.add_variable(
-                f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
-                nutrient_amount,
-                dict(info_map, **{"units": nutrient_amount_units}),
-            )
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.MEdiet_pen_0_CALF",
-                f"{classname}.{funcname}.MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
-                0,
-                simulation_day,
-                info_map,
-                MeasurementUnits.KILOGRAMS,
-            )
-            om.add_variable(
-                f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
-                pen.MEdiet,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            avg_nutrient_rqmts_units = {
-                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
-                "NEa_requirement": MeasurementUnits.MEGACALORIES,
-                "NEg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEl_requirement": MeasurementUnits.MEGACALORIES,
-                "MP_requirement": MeasurementUnits.GRAMS,
-                "Ca_requirement": MeasurementUnits.GRAMS,
-                "P_req": MeasurementUnits.GRAMS,
-                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
-                "avg_BW": MeasurementUnits.KILOGRAMS,
-                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            }
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
-                f"{classname}.{funcname}.avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
-                {},
-                simulation_day,
-                info_map,
-                avg_nutrient_rqmts_units,
-            )
-            om.add_variable(
-                f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
-                pen.avg_nutrient_rqmts,
-                dict(info_map, **{"units": avg_nutrient_rqmts_units}),
-            )
-            ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_animal.keys()}
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.ration_per_animal_for_pen_0_CALF",
-                f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
-                {},
-                simulation_day,
-                info_map,
-                ration_per_animal_units,
-            )
-            om.add_variable(
-                f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
-                ration_per_animal,
-                dict(info_map, **{"units": ration_per_animal_units}),
-            )
-            if pen.animal_combination != AnimalCombination.CALF:
-                ration_supply_report_units = {
-                    "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-                    "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-                    "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-                    "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                    "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                    "fat": MeasurementUnits.GRAMS,
-                    "fat_percentage": MeasurementUnits.PERCENT,
-                    "forage_NDF": MeasurementUnits.PERCENT,
-                    "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                    "metabolizable_protein": MeasurementUnits.GRAMS,
+                info_map = {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+                    "data_origin": [("AnimalManager", "_calc_ration_at_interval")],
+                    "number_animals_in_pen": len(pen.animals_in_pen),
+                    "simulation_day": simulation_day,
                 }
-                if pen.ration_per_animal:
-                    ration_supply_report = RationReporter.report_ration_supply(
-                        pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
-                    )
-                else:
-                    ration_supply_report = {}
+                nutrient_amount_units = {
+                    "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                    "DE": MeasurementUnits.MEGACALORIES,
+                    "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                }
+                classname = AnimalModuleReporter.__name__
+                funcname = AnimalModuleReporter.report_ration_interval_data.__name__
                 AnimalModuleReporter.data_padder(
-                    f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
-                    f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
+                    f"{classname}.{funcname}.ration_nutrient_amount_pen_0_CALF",
+                    f"{classname}.{funcname}.ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
                     {},
                     simulation_day,
                     info_map,
-                    ration_supply_report_units,
+                    nutrient_amount_units,
                 )
                 om.add_variable(
-                    f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
-                    ration_supply_report,
-                    dict(info_map, **{"units": ration_supply_report_units}),
+                    f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
+                    nutrient_amount,
+                    dict(info_map, **{"units": nutrient_amount_units}),
                 )
+                AnimalModuleReporter.data_padder(
+                    f"{classname}.{funcname}.MEdiet_pen_0_CALF",
+                    f"{classname}.{funcname}.MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
+                    0,
+                    simulation_day,
+                    info_map,
+                    MeasurementUnits.KILOGRAMS,
+                )
+                om.add_variable(
+                    f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
+                    pen.MEdiet,
+                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+                )
+                avg_nutrient_rqmts_units = {
+                    "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+                    "NEa_requirement": MeasurementUnits.MEGACALORIES,
+                    "NEg_requirement": MeasurementUnits.MEGACALORIES,
+                    "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+                    "NEl_requirement": MeasurementUnits.MEGACALORIES,
+                    "MP_requirement": MeasurementUnits.GRAMS,
+                    "Ca_requirement": MeasurementUnits.GRAMS,
+                    "P_req": MeasurementUnits.GRAMS,
+                    "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+                    "avg_BW": MeasurementUnits.KILOGRAMS,
+                    "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                }
+                AnimalModuleReporter.data_padder(
+                    f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
+                    f"{classname}.{funcname}.avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
+                    {},
+                    simulation_day,
+                    info_map,
+                    avg_nutrient_rqmts_units,
+                )
+                om.add_variable(
+                    f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
+                    pen.avg_nutrient_rqmts,
+                    dict(info_map, **{"units": avg_nutrient_rqmts_units}),
+                )
+                ration_per_animal_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_animal.keys()}
+                AnimalModuleReporter.data_padder(
+                    f"{classname}.{funcname}.ration_per_animal_for_pen_0_CALF",
+                    f"{classname}.{funcname}.ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
+                    {},
+                    simulation_day,
+                    info_map,
+                    ration_per_animal_units,
+                )
+                om.add_variable(
+                    f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
+                    ration_per_animal,
+                    dict(info_map, **{"units": ration_per_animal_units}),
+                )
+                if pen.animal_combination != AnimalCombination.CALF:
+                    ration_supply_report_units = {
+                        "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                        "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                        "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                        "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                        "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+                        "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                        "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                        "fat": MeasurementUnits.GRAMS,
+                        "fat_percentage": MeasurementUnits.PERCENT,
+                        "forage_NDF": MeasurementUnits.PERCENT,
+                        "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                        "metabolizable_protein": MeasurementUnits.GRAMS,
+                    }
+                    if pen.ration_per_animal:
+                        ration_supply_report = RationReporter.report_ration_supply(
+                            pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
+                        )
+                    else:
+                        ration_supply_report = {}
+                    AnimalModuleReporter.data_padder(
+                        f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
+                        f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
+                        {},
+                        simulation_day,
+                        info_map,
+                        ration_supply_report_units,
+                    )
+                    om.add_variable(
+                        f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
+                        ration_supply_report,
+                        dict(info_map, **{"units": ration_supply_report_units}),
+                    )
 
     @classmethod
     def report_daily_ration(cls, animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
