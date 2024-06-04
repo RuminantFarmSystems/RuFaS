@@ -55,6 +55,7 @@ class AnimalManager:
         AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
         AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
+    ANIMAL_GROUPING_SCENARIO: AnimalGroupingScenario
 
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
@@ -1887,10 +1888,10 @@ class AnimalManager:
 
         Parameters
         ----------
-        pen : Pen
-            Pen that requires ration reformulation.
         current_temperature : float
             Current temperature.
+        feed : Feed
+            Feed object used in ration formulation.
         """
         for pen in self.all_pens:
             if not pen.ration and pen.is_populated:
