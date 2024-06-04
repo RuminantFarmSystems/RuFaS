@@ -1461,7 +1461,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None: # noqa: C901
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1547,6 +1547,10 @@ class AnimalManager:
                     if pen.animal_combination.name == "LAC_COW":
                         for animal in list(pen.animals_in_pen.values()):
                             animal.update_milk_production_history(self.simulation_day)
+            else:
+                for pen in self.all_pens:
+                    if not pen.ration and pen.is_populated:
+                        self.reformulate_ration_single_pen(pen=pen, current_temperature=current_temperature, feed=feed)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1813,3 +1817,64 @@ class AnimalManager:
             sum(self.life_cycle_manager.cull_reason_stats_range.values()),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
+
+    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
+        """
+        Reformulates ration for a single pen
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen that requires ration reformulation.
+        current_temperature : float
+            Current temperature.
+        """
+        self.reset_milk_production_reduction()
+        self.calc_nutrient_rqmts(feed, current_temperature)
+        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds.feed_nutrients(feed)
+        pen.subset_class_feeds(feed)
+        pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+
+        ration_per_animal: Dict[str, float | str] = {}
+        ration_vals = {}
+
+        while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+            if pen.animal_combination == AnimalCombination.CALF:
+                ration_per_animal = CalfRationManager.optimize()
+                ration_vals = {"ME_total": 0}
+            else:
+                ration_per_animal, ration_vals = RationManager.formulate_ration(
+                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
+                )
+
+        # recording ration nutrition information in pen
+        nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
+        pen.ration_nutrient_amount = nutrient_amount
+        pen.ration_nutrient_conc = nutrient_conc
+        pen.MEdiet = ration_vals["ME_total"]
+        pen.dry_matter_intake = nutrient_amount["dm"]
+
+        ration_report = {}
+        ration_report["nutrient_amount"] = nutrient_amount
+        ration_report["nutrient_conc"] = nutrient_conc
+
+        for animal in list(pen.animals_in_pen.values()):
+            animal.set_ration(ration_per_animal, nutrient_amount["dm"])
+            animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
+
+        ration_per_pen = {}
+        num_animals = len(pen.animals_in_pen)
+        for key in ration_per_animal:
+            if key == "status":
+                ration_per_pen[key] = ration_per_animal[key]
+            else:  # feeds and price
+                ration_per_pen[key] = ration_per_animal[key] * num_animals
+
+        pen.ration = ration_per_pen
+        pen.ration_per_animal = ration_per_animal
+
+        pen.calc_avg_growth()
+        if pen.animal_combination.name == "LAC_COW":
+            for animal in list(pen.animals_in_pen.values()):
+                animal.update_milk_production_history(self.simulation_day)
