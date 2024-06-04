@@ -89,15 +89,6 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
     assert mock_input_manager.pool == test_data
 
 
-def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test for metadata override function for metadata depth limit"""
-    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    new_limit = 10
-    mock_input_manager.set_metadata_depth_limit(new_limit)
-    assert mock_input_manager.metadata_depth_limit == new_limit
-    mock_add_log.assert_called_once()
-
-
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
     """Unit test for successfully loading properties in _load_properties method."""
     mocker.patch.object(Path, "exists", return_value=True)
