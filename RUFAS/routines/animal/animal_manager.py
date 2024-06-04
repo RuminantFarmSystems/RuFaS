@@ -1820,7 +1820,7 @@ class AnimalManager:
 
     def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
         """
-        Reformulates ration for a single pen
+        Reformulates ration for a single pen.
 
         Parameters
         ----------
@@ -1881,7 +1881,8 @@ class AnimalManager:
 
     def reformulate_pens_as_needed(self, current_temperature: float, feed: Feed) -> None:
         """
-        Calls reformulate ration method on all pens if the pen was recently populated.
+        Calls reformulate ration method on pens that were  populated for the first time in a ration
+        formulation interval.
 
         Parameters
         ----------
