@@ -497,6 +497,7 @@ def mock_ration_config() -> MagicMock:
     ration_config.MP_requirement = 6.0
     ration_config.C_requirement = 7.0
     ration_config.P_requirement = 8.0
+    ration_config.P_requirement_process = 8.0
     ration_config.TDN_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.DEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -549,6 +550,7 @@ def mock_random_ration_config() -> MagicMock:
     ration_config.MP_requirement = 2.207
     ration_config.C_requirement = 3.205
     ration_config.P_requirement = 1.17
+    ration_config.P_requirement_process = 1.17
     ration_config.TDN_list = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
     ration_config.DE_list = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
     ration_config.EE_list = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
