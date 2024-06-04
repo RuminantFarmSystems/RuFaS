@@ -1571,6 +1571,7 @@ def test_attempt_optimization(
     requirements.MP_requirement = 6.0
     requirements.Ca_requirement = 7.0
     requirements.P_requirement = 8.0
+    requirements.P_requirement_process = 8.5
     requirements.avg_BW = 9.0
     requirements.DMIest_requirement = 10.0
 
@@ -1588,6 +1589,7 @@ def test_attempt_optimization(
         6.0,
         7.0,
         8.0,
+        8.5,
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -1628,6 +1630,7 @@ def test_attempt_optimization(
         6.0,
         7.0,
         8.0,
+        8.5,
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
