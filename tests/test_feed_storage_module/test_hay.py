@@ -66,7 +66,8 @@ def test_calculate_dry_matter_loss_to_gas(
     mock_subsequent_loss = mocker.patch.object(
         hay, "_calculate_subsequent_dry_matter_loss_to_gas", side_effect=[5.0, 10.0]
     )
-    expected_loss = 15.0 if expect_loss else 0.0
+    mock_additional_loss = mocker.patch.object(hay, "_calculate_additional_dry_matter_loss", return_value=3.0)
+    expected_loss = 18.0 if expect_loss else 0.0
     expected_call_count = 2 if expect_loss else 0
 
     actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], mock_current_time)
@@ -74,6 +75,7 @@ def test_calculate_dry_matter_loss_to_gas(
     assert actual == expected_loss
     assert mock_initial_loss.call_count == expected_call_count
     assert mock_subsequent_loss.call_count == expected_call_count
+    assert mock_additional_loss.call_count == (1 if expect_loss else 0)
 
 
 @pytest.mark.parametrize(
