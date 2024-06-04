@@ -198,8 +198,9 @@ class AnimalModuleReporter:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal["status"]
-            del ration_per_animal["objective"]
+            for non_numeric_key in ["status", "objective"]:
+                if non_numeric_key in ration_per_animal:
+                    del ration_per_animal[non_numeric_key]
             ration_per_animal["dry_matter_intake_total"] = sum(
                 [ration_per_animal[key] for key in ration_per_animal.keys()]
             )
@@ -314,9 +315,12 @@ class AnimalModuleReporter:
                     "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
                     "metabolizable_protein": MeasurementUnits.GRAMS,
                 }
-                ration_supply_report = RationReporter.report_ration_supply(
-                    pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
-                )
+                if pen.ration_per_animal:
+                    ration_supply_report = RationReporter.report_ration_supply(
+                        pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
+                    )
+                else:
+                    ration_supply_report = {}
                 AnimalModuleReporter.data_padder(
                     f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
                     f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -350,8 +354,9 @@ class AnimalModuleReporter:
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal["status"]
-            del ration_per_animal["objective"]
+            for non_numeric_key in ["status", "objective"]:
+                if non_numeric_key in ration_per_animal:
+                    del ration_per_animal[non_numeric_key]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0.0
             ration_total["byproducts_total"] = 0.0
