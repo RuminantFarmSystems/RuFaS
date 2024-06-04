@@ -913,11 +913,12 @@ class Pen:
 
     def _count_lactating_cows(self) -> int:
         """Returns the count of lactating cows currently held in this pen."""
+        if self.animal_combination is not AnimalCombination.LAC_COW:
+            return 0
         num_lac_cows = 0
-        if self.animal_combination is AnimalCombination.LAC_COW:
-            for animal in self.animals_in_pen:
-                if type(animal) is Cow:
-                    num_lac_cows += 1
+        for animal in self.animals_in_pen.values():
+            if type(animal) is Cow:
+                num_lac_cows += 1
         return num_lac_cows
 
     def get_manure_data(self) -> PenManureData:
