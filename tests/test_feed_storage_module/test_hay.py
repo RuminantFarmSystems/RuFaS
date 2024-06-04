@@ -96,14 +96,16 @@ def test_calculate_initial_dry_matter_loss(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("days,expected", [(15, 0.0), (30, 0.0), (1, 0.0001), (5, 0.0005), (100, 0.001)])
+@pytest.mark.parametrize("days,expected", [(15, 0.0), (30, 0.0), (31, 0.0001), (35, 0.0005), (130, 0.01)])
 def test_calculate_subsequent_dry_matter_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_subsequent_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
     harvested_crop.storage_time.simulation_day = 1
-    harvested_crop.initial_dry_matter_percentage = 20.0
-    harvested_crop.total_sensible_heat_generated = 950.0
     mock_time = mocker.MagicMock(autospec=Time)
     mock_time.simulation_day = days + 1
+
+    actual = hay._calculate_subsequent_dry_matter_loss_to_gas(harvested_crop, mock_time)
+
+    assert actual == expected
