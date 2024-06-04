@@ -8,6 +8,7 @@ from typing import Tuple
 from RUFAS.weather import Weather
 from RUFAS.time import Time
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.input_manager import InputManager
 
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
@@ -65,7 +66,7 @@ from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
     ReceptionPitDailyOutput,
 )
-
+im = InputManager() 
 
 class ManureManager:
     """
@@ -116,7 +117,10 @@ class ManureManager:
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self.configure_manure_manager_components(pen_list)
+        self.barn_area = ()
 
+    barn_area = im.get_data("manure_management.barn_area_configs")
+    
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 
