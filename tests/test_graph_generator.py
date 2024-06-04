@@ -117,13 +117,10 @@ def test_generate_graph_without_producing_graphics(
     expected_output: dict[str, str | dict[str, Any]],
     produce_graphics: bool,
 ) -> None:
+    """Tests function generate_graph when it doesn't produce graphics."""
     filtered_pool = {"dummy_key": {"dummy_data": [1, 2, 3]}}
-    graph_details = graph_details
     filter_file_name = "dummy_filter"
     graphics_dir = Path("/tmp")
-    produce_graphics = produce_graphics
-
-    expected_output = expected_output
 
     result = graph_generator.generate_graph(
         filtered_pool=filtered_pool,
