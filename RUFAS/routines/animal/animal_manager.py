@@ -1548,9 +1548,10 @@ class AnimalManager:
                         for animal in list(pen.animals_in_pen.values()):
                             animal.update_milk_production_history(self.simulation_day)
             else:
-                self.reformulate_pens_as_needed(current_temperature=current_temperature,
-                                                feed=feed,
-                                                )
+                self.reformulate_pens_as_needed(
+                    current_temperature=current_temperature,
+                    feed=feed,
+                )
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
