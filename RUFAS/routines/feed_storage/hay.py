@@ -37,6 +37,7 @@ class Hay(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.additional_dry_matter_loss_coefficient = 0.0
 
     @property
     def bale_size(self) -> float:
@@ -86,7 +87,9 @@ class Hay(Storage):
         current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
         current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
 
-        return current_loss - processed_loss
+        additional_loss = self._calculate_additional_dry_matter_loss(crop, weather_conditions)
+
+        return current_loss - processed_loss + additional_loss
 
     def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
         """
@@ -149,6 +152,44 @@ class Hay(Storage):
 
         return 0.0001 * days_past_30_day_window
 
+    def _calculate_additional_dry_matter_loss(
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]
+    ) -> float:
+        """
+        Calculates additional dry matter loss in hayed crops.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which additional dry matter loss will be calculated.
+
+        Returns
+        -------
+        float
+            Loss of dry matter that occurred over the specified period of weather conditions in kg.
+
+        References
+        ----------
+        .. [1] Feed Storage Scienitific Documentation, equation 1.2.8
+
+        """
+        if self.additional_dry_matter_loss_coefficient == 0.0:
+            return 0.0
+        additional_loss = sum(
+            [
+                self.additional_dry_matter_loss_coefficient
+                * weather.rainfall
+                * GeneralConstants.MM_TO_CM
+                * max(0.0, (weather.max_air_temperature + weather.min_air_temperature) / 2)
+                / crop.bale_density
+                * self.bale_size**3
+                for weather in weather_conditions
+            ]
+        )
+        return additional_loss
+
 
 class ProtectedIndoors(Hay):
     """
@@ -163,7 +204,9 @@ class ProtectedWrapped(Hay):
     Represents protected wrapped hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = 0.000_021_6
 
 
 class ProtectedTarped(Hay):
@@ -171,7 +214,9 @@ class ProtectedTarped(Hay):
     Represents protected tarped hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = 0.000_010_8
 
 
 class Unprotected(Hay):
@@ -179,4 +224,8 @@ class Unprotected(Hay):
     Represents unprotected hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = 0.000_06
+        self.ndf_loss_coefficient = 0.17
+        self.crude_protein_loss_coefficient = 0.4
