@@ -494,7 +494,7 @@ class Pen:
         self.dry_total = self._copy_manure_template()
         self.lactating_total = self._copy_manure_template()
 
-    def calc_avg_growth(self):
+    def calc_avg_growth(self) -> None:
         """
         Calculates the average growth of the animals in the pen.
         """
@@ -577,7 +577,7 @@ class Pen:
         self.animals_in_pen = {}
         self.avg_p_animal = 0
 
-    def subset_class_feeds(self, feed):
+    def subset_class_feeds(self, feed) -> None:
         """
         Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.

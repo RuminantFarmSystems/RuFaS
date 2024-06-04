@@ -33,7 +33,7 @@ class RationManager:
     @classmethod
     def formulate_ration(
         cls, pen, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
-    ) -> Tuple[Dict[str, float], Dict[str, float]]:
+    ) -> Tuple[Dict[str, float | str], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
