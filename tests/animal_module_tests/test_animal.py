@@ -295,6 +295,7 @@ def test_set_requirements(mocker: MockerFixture) -> None:
             "MP_requirement": [7, 7],
             "Ca_requirement": [8, 8],
             "P_requirement": [9, 9],
+            "P_requirement_process": [9, 9],
             "DMIest_requirement": [10, 10],
             "BW": [11, 11],
             "milk": [12, 12],
@@ -334,6 +335,7 @@ def test_recalculate_requirements() -> None:
         animal_list[i].MP_requirement = i
         animal_list[i].Ca_requirement = i
         animal_list[i].P_requirement = i
+        animal_list[i].p_req = 1
         animal_list[i].DMIest_requirement = i
         animal_list[i].body_weight = i
         animal_list[i].estimated_daily_milk_produced = i
@@ -361,6 +363,7 @@ def test_recalculate_requirements() -> None:
         "MP_requirement": [],
         "Ca_requirement": [],
         "P_requirement": [],
+        "P_requirement_process": [],
         "DMIest_requirement": [],
         "BW": [],
         "milk": [],
@@ -376,6 +379,7 @@ def test_recalculate_requirements() -> None:
         "MP_requirement": [1, 1, 1, 1, 1],
         "Ca_requirement": [1, 1, 1, 1, 1],
         "P_requirement": [1, 1, 1, 1, 1],
+        "P_requirement_process": [1, 1, 1, 1, 1],
         "DMIest_requirement": [1, 1, 1, 1, 1],
         "BW": [0, 1, 2, 3, 4],
         "milk": [4],
@@ -424,6 +428,7 @@ def test_use_existing_requirements() -> None:
         animal_list[i].MP_requirement = i
         animal_list[i].Ca_requirement = i
         animal_list[i].P_requirement = i
+        animal_list[i].p_req = i
         animal_list[i].DMIest_requirement = i
         animal_list[i].body_weight = i
         animal_list[i].estimated_daily_milk_produced = i
@@ -443,6 +448,7 @@ def test_use_existing_requirements() -> None:
         "MP_requirement": [],
         "Ca_requirement": [],
         "P_requirement": [],
+        "P_requirement_process": [],
         "DMIest_requirement": [],
         "BW": [],
         "milk": [],
@@ -458,6 +464,7 @@ def test_use_existing_requirements() -> None:
         "MP_requirement": [0, 1],
         "Ca_requirement": [0, 1],
         "P_requirement": [0, 1],
+        "P_requirement_process": [0, 1],
         "DMIest_requirement": [0, 1],
         "BW": [0, 1],
         "milk": [1],
