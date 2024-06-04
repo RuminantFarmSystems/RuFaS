@@ -12,6 +12,17 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
+    "random_seed": {
+      "type": "number",
+      "description": "The random seed",
+      "minimum": 0,
+      "default": 42
+    },
+    "set_seed": {
+      "type": "bool",
+      "description": "Whether or not to set random seed",
+      "default": true
+    },
     "simulate_animals": {
       "type": "bool",
       "description": "Whether or not to simulate animals during the simulation",
@@ -27,12 +38,8 @@
       "type": "number",
       "minimum": 1000,
       "maximum": 56045,
+      "default": null,
       "description": "Unique 5-digit code that represents a specific U.S. county."
-    },
-    "include_detailed_values": {
-      "type": "bool",
-      "description": "Whether or not to add detailed_values property to the json output",
-      "default": false
     }
   },
   "animal_properties": {
@@ -594,128 +601,6 @@
         "culling": {
           "type": "object",
           "description": "Probabilities for removal from the herd for specific reason",
-          "cull_day_count": {
-            "type": "array",
-            "description": "Culling day count",
-            "properties": {
-              "type": "number",
-              "minimum": 0
-            }
-          },
-          "feet_leg_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to feet-and-leg-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to feet-and-leg-related health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for feet-and-leg-related health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "injury_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to injury-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to injury-related health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for injury-related health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "mastitis_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to mastitis-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to mastitis-related health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for mastitis-related health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "disease_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to disease-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to disease-related health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for disease-related health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "udder_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to udder-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to udder-related health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for udder-related health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "unknown_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to other health issues.",
-            "probability": {
-              "type": "number",
-              "description": "The probability of culling due to other health issues.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Culling probability on the cull day for unknown health issues.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
           "parity_death_prob": {
             "type": "array",
             "description": "Death Probability, by Parity",
@@ -736,13 +621,75 @@
               "maximum": 1
             }
           },
-          "death_day_prob": {
+          "mastitis_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for mastitis",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "udder_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for udder reasons",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "feet_leg_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for feet and leg reasons",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "unknown_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for unknown reasons",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "disease_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for disease",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "injury_cull_prob": {
+            "type": "array",
+            "description": "Culling probability for injury",
+            "properties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "death_cull_prob": {
             "type": "array",
             "description": "Culling probability for death",
             "properties": {
               "type": "number",
               "minimum": 0,
               "maximum": 1
+            }
+          },
+          "cull_day_count": {
+            "type": "array",
+            "description": "Culling day count",
+            "properties": {
+              "type": "number",
+              "minimum": 0
             }
           }
         },
@@ -766,7 +713,7 @@
         "type": "string",
         "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
         "default": "None",
-        "pattern": "^(None|3-NOP|Monensin|Essential Oils|Seaweed)$"
+        "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
       },
       "methane_mitigation_additive_amount": {
         "type": "number",
@@ -832,12 +779,6 @@
         "type": "number",
         "minimum": 1,
         "default": 30
-      },
-      "phosphorus_requirement_buffer": {
-        "description": "Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50.",
-        "type": "number",
-        "minimum": 0,
-        "default": 75
       }
     },
     "pen_information": {
@@ -885,14 +826,14 @@
         "pen_type": {
           "type": "string",
           "description": "Pen Type -- The type of pen (freestall, tiestall, open lot, compost bedded pack barn)",
-          "pattern": "^(freestall|tiestall|open lot|compost bedded pack barn)$",
+          "pattern": "^{freestall|tiestall|open lot|compost bedded pack barn}$",
           "default": "freestall"
         },
         "max_stocking_density": {
           "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
           "type": "number",
           "minimum": 0.5,
-          "maximum": 3,
+          "maximum": 2,
           "default": 1.2
         },
         "manure_management_scenario_id": {
@@ -1057,11 +998,17 @@
         "repro_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED|SynchED)$"
+          "pattern": "^(TAI|ED)$"
         },
-        "repro_sub_protocol": {
+        "tai_method_h": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "description": "Reproduction Program",
+          "pattern": "^(md5CG2P|md5CGP)$"
+        },
+        "synch_ed_method_h": {
+          "type": "string",
+          "description": "Heifer SynchED Program",
+          "pattern": "^(2P|CP)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1107,8 +1054,7 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0,
-          "default": 0
+          "minimum": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1183,11 +1129,17 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|SynchED)$"
+          "pattern": "^(TAI|ED)$"
         },
-        "repro_sub_protocol": {
+        "tai_method_h": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(md5CG2P|md5CGP)$"
+        },
+        "synch_ed_method_h": {
+          "type": "string",
+          "description": "Heifer SynchED Program",
+          "pattern": "^(2P|CP)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1233,8 +1185,7 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0,
-          "default": 0
+          "minimum": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1309,11 +1260,17 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "pattern": "^(TAI|ED)$"
         },
-        "repro_sub_protocol": {
+        "tai_method_h": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(md5CG2P|md5CGP)$"
+        },
+        "synch_ed_method_h": {
+          "type": "string",
+          "description": "Heifer SynchED Program",
+          "pattern": "^(2P|CP)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1359,8 +1316,7 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0,
-          "default": 0
+          "minimum": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1465,11 +1421,17 @@
         "repro_program": {
           "type": "string",
           "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "pattern": "^(TAI|ED)$"
         },
-        "repro_sub_protocol": {
+        "tai_method_h": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(md5CG2P|md5CGP)$"
+        },
+        "synch_ed_method_h": {
+          "type": "string",
+          "description": "Heifer SynchED Program",
+          "pattern": "^(2P|CP)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1515,8 +1477,7 @@
         "abortion_day": {
           "type": "number",
           "description": "Abortion Day",
-          "minimum": 0,
-          "default": 0
+          "minimum": 0
         },
         "days_in_preg": {
           "type": "number",
@@ -1573,9 +1534,9 @@
           "type": "array",
           "description": "Julian day(s) of year to harvest",
           "minimum_length": 0,
+          "default": [],
           "properties": {
             "type": "number",
-            "description": "Julian day of year to harvest",
             "minimum": 1,
             "maximum": 366
           }
@@ -1584,6 +1545,7 @@
           "type": "array",
           "description": "Calendar years in which the harvesting occurs",
           "minimum_length": 0,
+          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1
@@ -1593,6 +1555,7 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
+          "default": ["harvest_kill"],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
@@ -1608,6 +1571,7 @@
         "planting_days": {
           "type": "array",
           "description": "Julian day(s) of year to plant",
+          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1,
@@ -1617,6 +1581,7 @@
         "planting_years": {
           "type": "array",
           "description": "Calendar years in which the planting occurs",
+          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1
@@ -1648,6 +1613,7 @@
       "type": "array",
       "description": "All the available fertilizer mixes that are available besides the default ones.",
       "minimum_length": 0,
+      "default": [],
       "properties": {
         "type": "object",
         "description": "The name and nutrient breakdown of a single fertilizer mix.",
@@ -1678,6 +1644,7 @@
     "mix_names": {
       "type": "array",
       "description": "List of the mix names that will be used for the corresponding fertilizer application.",
+      "default": [],
       "properties": {
         "type": "string"
       }
@@ -1685,6 +1652,7 @@
     "years": {
       "type": "array",
       "description": "List of years in which fertilizer will be applied.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1693,6 +1661,7 @@
     "days": {
       "type": "array",
       "description": "List of days on which fertilizer will be applied.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1702,6 +1671,7 @@
     "nitrogen_masses": {
       "type": "array",
       "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1710,6 +1680,7 @@
     "phosphorus_masses": {
       "type": "array",
       "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1718,6 +1689,7 @@
     "potassium_masses": {
       "type": "array",
       "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1726,6 +1698,7 @@
     "application_depths": {
       "type": "array",
       "description": "List of depths at which the fertilizer is injected into the soil.\nUnits: mm.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1734,6 +1707,7 @@
     "surface_remainder_fractions": {
       "type": "array",
       "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1757,6 +1731,7 @@
     "years": {
       "type": "array",
       "description": "List of years in which manure will be applied.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1765,6 +1740,7 @@
     "days": {
       "type": "array",
       "description": "List of days on which manure will be applied.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1774,6 +1750,7 @@
     "nitrogen_masses": {
       "type": "array",
       "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1782,6 +1759,7 @@
     "phosphorus_masses": {
       "type": "array",
       "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1790,6 +1768,7 @@
     "potassium_masses": {
       "type": "array",
       "description": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1798,6 +1777,7 @@
     "coverage_fractions": {
       "type": "array",
       "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.01,
@@ -1807,6 +1787,7 @@
     "application_depths": {
       "type": "array",
       "description": "List of depths at which the manure is injected into the soil.\nUnits: mm.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1815,6 +1796,7 @@
     "surface_remainder_fractions": {
       "type": "array",
       "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1824,6 +1806,7 @@
     "manure_types": {
       "type": "array",
       "description": "The type of manure which will be requested for the application.",
+      "default": [],
       "properties": {
         "type": "string",
         "pattern": "^(liquid|solid)$"
@@ -1846,6 +1829,7 @@
     "years": {
       "type": "array",
       "description": "List of years in which tillage will occur.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1854,6 +1838,7 @@
     "days": {
       "type": "array",
       "description": "List of days on which tilling will occur.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1863,6 +1848,7 @@
     "tillage_depths": {
       "type": "array",
       "description": "List of depths that the corresponding tillage applications reach.\nUnits: mm.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.1
@@ -1871,6 +1857,7 @@
     "incorporation_fractions": {
       "type": "array",
       "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1880,6 +1867,7 @@
     "mixing_fractions": {
       "type": "array",
       "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
+      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1889,6 +1877,7 @@
     "implements": {
       "type": "array",
       "description": "List of tillage implements which will be used to execute the tillage operations.",
+      "default": [],
       "properties": {
         "type": "string",
         "pattern": "^(subsoiler|moldboard-plow|coulter-chisel-plow|disk-harrow|cultivator|seedbed-conditioner)$"
@@ -1913,7 +1902,6 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "description": "cost of diesel per gallon",
         "minimum": 0,
         "default": 5.0
       }
@@ -1923,7 +1911,6 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "description": "cost of electricity per kwh",
         "minimum": 0,
         "default": 0.15
       }
@@ -1933,7 +1920,6 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "description": "cost of natural gas per kwh",
         "minimum": 0,
         "default": 0.053
       }
@@ -1943,7 +1929,6 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "description": "cost of water per gallon",
         "minimum": 0,
         "default": 0.008
       }
@@ -3117,6 +3102,7 @@
         "type": "object",
         "purchased_feed": {
           "type": "number",
+          "description": "Purchased Feed",
           "minimum": 1,
           "maximum": 300
         },
@@ -3159,24 +3145,18 @@
           "pattern": "^(preservative|nutrient additive|absorbant)$",
           "default": "preservative"
         },
-        "packing_density": {
+        "package_density": {
           "type": "number",
-          "description": "Packing Density -- The density of ensiled feed material, kg DM /m3",
+          "description": "Package Density -- The density of ensiled feed material, kg DM /m3",
           "minimum": 200,
           "maximum": 800,
-          "default": 200
+          "default": 14
         },
         "inoculation": {
           "type": "string",
           "description": "Inoculation",
           "pattern": "^(None|heterofermentative|homofermentative)$",
           "default": "None"
-        },
-        "bunk_type": {
-          "type": "string",
-          "description": "Bunk Type -- The type of bunk used to store the feed.",
-          "pattern": "^(open_floor)$",
-          "default": "open_floor"
         },
         "ventilation": {
           "type": "bool",
@@ -3458,7 +3438,7 @@
         "type": "number",
         "minimum": 0.87,
         "maximum": 1.04,
-        "default": 0.87
+        "default": 0
       }
     },
     "TDN": {
@@ -4371,7 +4351,8 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
+          "description": "Bedding Type -- The material used for bedding pack.",
+          "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
         },
         "manure_handler": {
           "type": "string",
@@ -4379,16 +4360,13 @@
         },
         "manure_separator": {
           "type": "string",
-          "description": "Name of the manure separator used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
-        },
-        "manure_separator_after_digestion": {
-          "type": "string",
-          "description": "Name of the manure separator used after digestion in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+          "pattern": "^(screw press|rotary screen|none)$"
         },
         "manure_treatment": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
         }
       }
     },
@@ -4396,14 +4374,10 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Unique identifier for this bedding configuration."
-        },
         "bedding_type": {
           "type": "string",
           "description": "Bedding Type -- The material used for bedding pack.",
-          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+          "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
         },
         "bedding_mass_per_day": {
           "type": "number"
@@ -4452,11 +4426,6 @@
           "type": "number",
           "minimum": 0
         },
-        "daily_tillage_frequency": {
-          "type": "number",
-          "description": "Daily Tillage Frequency -- The number of times per day that tillage is performed.",
-          "minimum": 0
-        },
         "cleaning_water_recycle_fraction": {
           "type": "number",
           "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
@@ -4469,15 +4438,10 @@
       "type": "array",
       "properties": {
         "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Name of the unique manure separator config. This can be any string besides 'none'.",
-          "pattern": "^(?!none$)(.*)$"
-        },
         "manure_separator_type": {
           "type": "string",
-          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand. ",
-          "pattern": "^(screw press|rotary screen)$"
+          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+          "pattern": "^(screw press|rotary screen|none)$"
         },
         "percent_dry_solids": {
           "type": "number"
@@ -4509,7 +4473,7 @@
         "manure_treatment_type": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting|anaerobic digestion)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
           "type": "number",
@@ -4577,54 +4541,9 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|crust|no cover|N/A)",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. When used in the case of a slurry storage system (underfloor or outdoors) the cover refers to the presence of a natural crust. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|no cover|N/A)",
           "default": "no cover"
-        },
-        "hydraulic_retention_time": {
-          "type": "number",
-          "description": "Hydraulic Retention Time -- The average time that manure is retained in the treatment system (day).",
-          "default": 0,
-          "minimum": 0
-        },
-        "sludge_accumulation_period": {
-          "type": "number",
-          "description": "Sludge Accumulation Period -- The number of days that sludge is accumulated in the treatment system (day).",
-          "default": 0,
-          "minimum": 0
-        },
-        "sludge_accumulation_volume_fraction": {
-          "type": "number",
-          "description": "Sludge Accumulation Volume Fraction -- Based on the manure solids entering the treatment system.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
-        },
-        "top_cover_volume_fraction": {
-          "type": "number",
-          "description": "Top Cover Volume Fraction -- Fraction of the total volume of the treatment system that is assumed to be the top cover volume.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
-        },
-        "evaporation_fraction": {
-          "type": "number",
-          "description": "Evaporation Fraction -- The fraction of the liquid portion evaporated from the treatment system.",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 1
-        },
-        "anaerobic_digestion_temperature_set_point": {
-          "type": "number",
-          "description": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius).",
-          "default": 0,
-          "minimum": 0
-        },
-        "anaerobic_digestion_temperature_celsius": {
-          "type": "number",
-          "description": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius).",
-          "default": 0,
-          "minimum": 0
         }
       }
     }
@@ -4737,47 +4656,46 @@
           "maximum": 1.9,
           "default": 1.4
         },
-        "organic_carbon_fraction": {
+        "percent_organic_carbon_content": {
           "type": "number",
-          "description": "Fraction of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
+          "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
           "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.012
+          "maximum": 100.0,
+          "default": 1.2
         },
-        "clay_fraction": {
+        "percent_clay_content": {
           "type": "number",
-          "description": "Fraction of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
+          "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
           "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.225
+          "maximum": 100.0,
+          "default": 22.5
         },
-        "silt_fraction": {
+        "percent_silt_content": {
           "type": "number",
-          "description": "Fraction of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
+          "description": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
           "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.625
+          "maximum": 100.0,
+          "default": 62.5
         },
-        "sand_fraction": {
+        "percent_sand_content": {
           "type": "number",
-          "description": "Fraction of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
+          "description": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
           "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.125
+          "maximum": 100.0,
+          "default": 12.5
         },
-        "rock_fraction": {
+        "percent_rock_content": {
           "type": "number",
-          "description": "Fraction of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
+          "description": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
           "minimum": 0.0,
-          "maximum": 1.0,
-          "default": 0.013
+          "maximum": 100.0,
+          "default": 1.3
         },
         "initial_labile_inorganic_phosphorus_concentration": {
           "type": "number",
           "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null,
-          "nullable": true
+          "default": null
         },
         "initial_fresh_organic_phosphorus_concentration": {
           "type": "number",
@@ -4789,15 +4707,13 @@
           "type": "number",
           "description": "Concentration of nitrate in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null,
-          "nullable": true
+          "default": null
         },
         "initial_soil_ammonium_concentration": {
           "type": "number",
           "description": "Concentration of ammonium in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null,
-          "nullable": true
+          "default": null
         },
         "humus_mineralization_rate_factor": {
           "type": "number",
@@ -4857,6 +4773,7 @@
     "field_size": {
       "type": "number",
       "description": "Size of the field.",
+      "units": "ha",
       "minimum": 0.0
     },
     "absolute_latitude": {
@@ -4901,26 +4818,6 @@
       "type": "bool",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "default": false
-    },
-    "simulate_water_stress": {
-      "type": "bool",
-      "description": "Whether water stress affects crops grown in this field.",
-      "default": true
-    },
-    "simulate_temp_stress": {
-      "type": "bool",
-      "description": "Whether temperature stress affects crops grown in this field.",
-      "default": true
-    },
-    "simulate_nitrogen_stress": {
-      "type": "bool",
-      "description": "Whether nitrogen stress affects crops grown in this field.",
-      "default": true
-    },
-    "simulate_phosphorus_stress": {
-      "type": "bool",
-      "description": "Whether phosphrorus stress affects crops grown in this field.",
-      "default": true
     }
   },
   "weather_properties": {
@@ -4986,7 +4883,6 @@
       "description": "Irrigation (mm H2O).",
       "type": "array",
       "properties": {
-        "description": "Irrigation (mm H2O).",
         "type": "number",
         "default": 0
       }
