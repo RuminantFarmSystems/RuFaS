@@ -12,6 +12,14 @@ Documentation equation 1.2.6.
 """
 FINAL_MOISTURE_FRACTION = 0.12
 
+"""
+These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
+References Feed Storage Scientific Documentation table 1.2.9.
+"""
+PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_021_6
+PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
+UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
+
 
 class Hay(Storage):
     """
@@ -185,8 +193,6 @@ class Hay(Storage):
             for weather in weather_conditions
         ]
         additional_loss = sum(conditions)
-        # import pdb
-        # pdb.set_trace()
         return additional_loss * constant_factor
 
 
@@ -205,7 +211,7 @@ class ProtectedWrapped(Hay):
 
     def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
-        self.additional_dry_matter_loss_coefficient = 0.000_021_6
+        self.additional_dry_matter_loss_coefficient = PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class ProtectedTarped(Hay):
@@ -215,16 +221,21 @@ class ProtectedTarped(Hay):
 
     def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
-        self.additional_dry_matter_loss_coefficient = 0.000_010_8
+        self.additional_dry_matter_loss_coefficient = PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class Unprotected(Hay):
     """
     Represents unprotected hay storage, a subclass of Hay.
+
+    Notes
+    -----
+    The nutrient-specific loss coefficients are listed in table 2.1.1 of the Feed Storage Scientific Documentation.
+
     """
 
     def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
-        self.additional_dry_matter_loss_coefficient = 0.000_06
+        self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
         self.crude_protein_loss_coefficient = 0.4

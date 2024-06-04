@@ -3,7 +3,15 @@ from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.feed_storage.hay import Hay
+from RUFAS.routines.feed_storage.hay import (
+    Hay,
+    ProtectedWrapped,
+    ProtectedTarped,
+    Unprotected,
+    PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
+    PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT,
+    UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT,
+)
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from .sample_crop_data import sample_crop_data
 
@@ -146,3 +154,21 @@ def test_calculate_additional_dry_matter_loss(
     actual = hay._calculate_additional_dry_matter_loss(harvested_crop, mock_conditions)
 
     assert pytest.approx(actual) == expected
+
+
+def test_protected_wrapped_init() -> None:
+    """Tests that ProtectedWrapped hay instances are initialized correctly."""
+    protected_wrapped = ProtectedWrapped()
+    assert protected_wrapped.additional_dry_matter_loss_coefficient == PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
+
+
+def test_protected_tarped_init() -> None:
+    """Tests that ProtectedTarped hay instances are initialized correctly."""
+    protected_tarped = ProtectedTarped()
+    assert protected_tarped.additional_dry_matter_loss_coefficient == PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
+
+
+def test_outdoor_unprotected_init() -> None:
+    """Tests that Unprotected hay instances are initialized correctly."""
+    unprotected = Unprotected()
+    assert unprotected.additional_dry_matter_loss_coefficient == UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
