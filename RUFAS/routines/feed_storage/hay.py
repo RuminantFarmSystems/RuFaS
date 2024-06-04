@@ -177,18 +177,17 @@ class Hay(Storage):
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
             return 0.0
-        additional_loss = sum(
-            [
-                self.additional_dry_matter_loss_coefficient
-                * weather.rainfall
-                * GeneralConstants.MM_TO_CM
-                * max(0.0, (weather.max_air_temperature + weather.min_air_temperature) / 2)
-                / crop.bale_density
-                * self.bale_size**3
-                for weather in weather_conditions
-            ]
-        )
-        return additional_loss
+        constant_factor = self.additional_dry_matter_loss_coefficient / crop.bale_density * self.bale_size**3
+        conditions = [
+            weather.rainfall
+            * GeneralConstants.MM_TO_CM
+            * max(0.0, (weather.max_air_temperature + weather.min_air_temperature) / 2)
+            for weather in weather_conditions
+        ]
+        additional_loss = sum(conditions)
+        # import pdb
+        # pdb.set_trace()
+        return additional_loss * constant_factor
 
 
 class ProtectedIndoors(Hay):

@@ -1,5 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.hay import Hay
@@ -112,9 +113,36 @@ def test_calculate_subsequent_dry_matter_loss(
 
 
 @pytest.mark.parametrize(
-    ""
+    "loss_coeff,rain,max_temp,min_temp,density,size,expected",
+    [
+        (0.0, [], [], [], 200.0, 1.2, 0.0),
+        (0.000_01, [0.0, 10.0, 4.5], [18.0, 17.0, 18.0], [15.0, 11.0, 12.0], 215.0, 1.5, 0.000_003_257_267),
+        (0.000_02, [0.0, 0.0, 3.2], [6.0, 3.0, 1.0], [2.0, -10.0, -3.0], 300.0, 1.9, 0.0),
+    ],
 )
 def test_calculate_additional_dry_matter_loss(
-    
-)
+    hay: Hay,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    loss_coeff: float,
+    rain: list[float],
+    max_temp: list[float],
+    min_temp: list[float],
+    density: float,
+    size: float,
+    expected: float,
+) -> None:
+    """Tests _calculate_additional_dry_matter_loss in Hay."""
+    mock_conditions = []
+    for i in range(len(rain)):
+        mock_conditions.append(mocker.MagicMock(autospec=CurrentDayConditions))
+        mock_conditions[i].rainfall = rain[i]
+        mock_conditions[i].max_air_temperature = max_temp[i]
+        mock_conditions[i].min_air_temperature = min_temp[i]
+    hay.additional_dry_matter_loss_coefficient = loss_coeff
+    mocker.patch.object(Hay, "bale_size", new_callable=mocker.PropertyMock, return_value=size)
+    harvested_crop.bale_density = density
 
+    actual = hay._calculate_additional_dry_matter_loss(harvested_crop, mock_conditions)
+
+    assert pytest.approx(actual) == expected
