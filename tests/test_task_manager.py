@@ -62,7 +62,7 @@ def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager
     mock_task_manager = TaskManager()
     mock_input_manager = InputManager()
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
-    mock_dump_get_data = mocker.patch.object(mock_input_manager, 'dump_get_data_logs', return_value=None)
+    mock_dump_get_data = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     mock_task_manager.output_manager = mock_output_manager
     with pytest.raises(Exception) as exc_info:
         mock_task_manager.start(
