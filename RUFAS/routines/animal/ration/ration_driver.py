@@ -334,9 +334,11 @@ class RationManager:
             if pen.ration:
                 return pen.ration, ration_vals
             else:
-                om.add_error("First ration formulation error",
-                             "Unable to formulate ration, and there is no previous ration to use.",
-                             info_map)
+                om.add_error(
+                    "First ration formulation error",
+                    "Unable to formulate ration, and there is no previous ration to use.",
+                    info_map,
+                )
                 raise
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
