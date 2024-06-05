@@ -378,13 +378,16 @@ class AnimalManager:
             pen.horizontal_dist_to_parlor for pen in self.all_pens
         )
 
-    def calc_nutrient_rqmts(self,
-                            calves: List[Calf],
-                            heiferIs: List[HeiferI],
-                            heiferIIs: List[HeiferII],
-                            heiferIIIs: List[HeiferIII],
-                            cows: List[Cow],
-                            feed: Feed, current_temperature: float) -> None:
+    def calc_nutrient_rqmts(
+        self,
+        calves: List[Calf],
+        heiferIs: List[HeiferI],
+        heiferIIs: List[HeiferII],
+        heiferIIIs: List[HeiferIII],
+        cows: List[Cow],
+        feed: Feed,
+        current_temperature: float,
+    ) -> None:
         """
         Calls each animal's method to calculate its nutrient requirements.
 
@@ -1564,12 +1567,15 @@ class AnimalManager:
                 self.allocate_animals_to_pens()
                 for pen in self.all_pens:
                     self.reset_milk_production_reduction(pen)
-                    self.calc_nutrient_rqmts(self.calves,
-                                             self.heiferIs,
-                                             self.heiferIIs,
-                                             self.heiferIIIs,
-                                             self.cows,
-                                             feed, current_temperature)
+                    self.calc_nutrient_rqmts(
+                        self.calves,
+                        self.heiferIs,
+                        self.heiferIIs,
+                        self.heiferIIIs,
+                        self.cows,
+                        feed,
+                        current_temperature,
+                    )
                     self._calc_ration_at_interval(feed, pen)
                     AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
                     pen.calc_avg_growth()
@@ -1865,12 +1871,7 @@ class AnimalManager:
         heiferIIIs = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "HeiferIII"]
         cows = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "Cow"]
         self.reset_milk_production_reduction(pen)
-        self.calc_nutrient_rqmts(calves,
-                                 heiferIs,
-                                 heiferIIs,
-                                 heiferIIIs,
-                                 cows,
-                                 feed, current_temperature)
+        self.calc_nutrient_rqmts(calves, heiferIs, heiferIIs, heiferIIIs, cows, feed, current_temperature)
         self._calc_ration_at_interval(feed, pen)
         AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
         pen.calc_avg_growth()

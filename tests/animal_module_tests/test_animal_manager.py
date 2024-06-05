@@ -497,12 +497,15 @@ def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     mock_feed = MagicMock()
 
     # act
-    mock_animal_manager.calc_nutrient_rqmts(mock_animal_manager.calves,
-                                            mock_animal_manager.heiferIs,
-                                            mock_animal_manager.heiferIIs,
-                                            mock_animal_manager.heiferIIIs,
-                                            mock_animal_manager.cows,
-                                            mock_feed, current_temperature=27)
+    mock_animal_manager.calc_nutrient_rqmts(
+        mock_animal_manager.calves,
+        mock_animal_manager.heiferIs,
+        mock_animal_manager.heiferIIs,
+        mock_animal_manager.heiferIIIs,
+        mock_animal_manager.cows,
+        mock_feed,
+        current_temperature=27,
+    )
 
     # assert
     assert 1 == animal.calc_nutrient_rqmts.call_count
