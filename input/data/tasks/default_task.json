@@ -4,8 +4,8 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "default",
-      "log_verbosity": "errors",
+      "output_prefix": "disentangle",
+      "log_verbosity": "logs",
       "random_seed": 42
     }
   ]
