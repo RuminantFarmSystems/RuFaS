@@ -15,7 +15,7 @@ from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager, 
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from .routines.EEE.emissions import Emissions
+from .routines.EEE.EEE_manager import EEEManager
 
 om = OutputManager()
 im = InputManager()
@@ -84,15 +84,13 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
-        om.add_log("Starting processing of emissions", "", info_map)
-        self.emissions.calculate_emissions()
-        om.add_log("Completed processing of emissions", "", info_map)
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -178,4 +176,3 @@ class SimulationEngine:
         self.manure_manager = ManureManager(self.animal_manager.all_pens, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
-        self.emissions = Emissions()

@@ -43,7 +43,7 @@ class EmissionsEstimator:
     def __init__(self) -> None:
         pass
 
-    def calculate_emissions(self) -> None:
+    def estimate_emissions(self) -> None:
         homegrown_feeds, fertilizer_applications = self._gather_homegrown_feeds_and_fertilizer_apps()
         self._calculate_purchased_feed_emissions(homegrown_feeds)
         self._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_applications)
