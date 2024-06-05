@@ -424,18 +424,18 @@ class AnimalModuleReporter:
             {},
             animal_manager.simulation_day,
             info_map,
-            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
+            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
         )
         om.add_variable(
-            f"pen_{pen_id}_animal_{pen_animal_name}_purchased_feed_emissions",
+            f"purchased_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
             daily_purchased_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
         )
         info_map["data_origin"] = [("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")]
         om.add_variable(
-            f"pen_{pen_id}_animal_{pen_animal_name}_land_use_change_feed_emissions",
+            f"land_use_change_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
             daily_land_use_change_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
         )
 
     @classmethod
