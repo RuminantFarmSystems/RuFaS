@@ -101,7 +101,7 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
         self.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
