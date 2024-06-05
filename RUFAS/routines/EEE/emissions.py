@@ -38,7 +38,7 @@ im = InputManager()
 om = OutputManager()
 
 
-class Emissions:
+class EmissionsEstimator:
 
     def __init__(self) -> None:
         pass
