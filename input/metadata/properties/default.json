@@ -4394,6 +4394,33 @@
         }
       }
     },
+    "barn_area_configs":{
+      "type": "object", 
+      "freestall, has cows": {
+        "type": "number"
+      },
+      "freestall, no cows": {
+        "type": "number"
+      },
+      "tiestall, has cows": {
+        "type": "number"
+      },
+      "tiestall, no cows": {
+        "type": "number"
+      },
+      "compost bedded pack barn, has cows": {
+        "type": "number"
+      },
+      "compost bedded pack barn, no cows": {
+        "type": "number"
+      },
+      "open lot, has cows": {
+        "type": "number"
+      },
+      "open lot, no cows": {
+        "type": "number"
+      }
+    },
     "bedding_configs": {
       "type": "array",
       "properties": {
