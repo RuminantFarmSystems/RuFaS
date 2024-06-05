@@ -108,6 +108,7 @@ class ManureManager:
 
         """
         self.set_barn_area_constants(manure_manager_config["barn_area_configs"])
+
         self.beddings: Dict[int, BaseBedding] = {}
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, ReceptionPit] = {}
@@ -122,11 +123,18 @@ class ManureManager:
         self.configure_manure_manager_components(pen_list)
 
     def set_barn_area_constants(self, barn_area_configs):
-        ManureConstants.freestall = BarnArea(barn_area_configs["freestall, has cows"], barn_area_configs["freestall, no cows"])
-        ManureConstants.tiestall = BarnArea(barn_area_configs["tiestall, has cows"], barn_area_configs["tiestall, no cows"])
-        ManureConstants.tiestall = BarnArea(barn_area_configs["compost bedded pack barn, has cows"], barn_area_configs["compost bedded pack barn, no cows"])
-        ManureConstants.tiestall = BarnArea(barn_area_configs["open lot, has cows"], barn_area_configs["open lot, no cows"])
-
+        print("freestall, has cows", barn_area_configs["freestall, has cows"])
+        ManureConstants.freestall = BarnArea(has_cows=barn_area_configs["freestall, has cows"], no_cows=barn_area_configs["freestall, no cows"])
+        ManureConstants.tiestall = BarnArea(has_cows= barn_area_configs["tiestall, has cows"], no_cows= barn_area_configs["tiestall, no cows"])
+        ManureConstants.bedded_pack = BarnArea(has_cows= barn_area_configs["compost bedded pack barn, has cows"], no_cows= barn_area_configs["compost bedded pack barn, no cows"])
+        ManureConstants.open_lot = BarnArea(has_cows= barn_area_configs["open lot, has cows"], no_cows= barn_area_configs["open lot, no cows"])
+        ManureConstants.barn_area_by_pen_type = {
+        "freestall": ManureConstants.freestall,
+        "tiestall": ManureConstants.tiestall,
+        "compost bedded pack barn": ManureConstants.bedded_pack,
+        "open lot": ManureConstants.open_lot,
+    }
+    
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 
