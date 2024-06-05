@@ -1,8 +1,8 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/may6_ff.json",
-            "output_path": "C:/Users/jw2574/SA_outputs/",
+            "input_file": "input/data/tasks/sobol1k_tasks.json",
+            "output_path": "D:/RUFAS/sobol_1k/",
             "report_name": "report_SA",
             "only_inputs": false,
             "plot_whole_new": false,
@@ -25,10 +25,9 @@
                 "Lact cow feed CO2 kg/cow/d_hor_agg"
             ],
             "plot_outputs": false
-        },
-        {
-            "input_file": "input/data/tasks/may5b_tasks.json",
-            "output_path": "C:/Users/jw2574/OneDrive - Cornell University/RuFaS/Sensitivity Analyses/may5b_/",
+        },{
+            "input_file": "input/data/tasks/may6_ff.json",
+            "output_path": "C:/Users/jw2574/SA_outputs/",
             "report_name": "report_SA",
             "only_inputs": false,
             "plot_whole_new": false,

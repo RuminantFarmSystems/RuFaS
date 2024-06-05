@@ -6,14 +6,11 @@ from typing import Dict, Any
 from model_evaluation.sensitivity_analysis import SA_helpers
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-
 config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
 with open(config_json_filename) as json_file:
     config_json = json.load(json_file)
 
-for analysis in config_json['analyses']:
+for analysis in config_json['analyses']: # noqa
     print(analysis)
     input_file = analysis["input_file"]
     output_path = analysis["output_path"]
@@ -111,6 +108,8 @@ for analysis in config_json['analyses']:
         for rowname in row_names[1:]:
             # get the list of inputs (X)
             input_reformatted = input.replace(" ", ".")
+            input_reformatted2 = input.replace(" ", ".").replace("ME:", "").replace("S1:", "")
+
             input_index = parsed_SA_input_variables["names"].index(input_reformatted)
             input_values = [value[input_index] for value in sampled_values]
             # get the list of outputs (Y)
@@ -122,10 +121,15 @@ for analysis in config_json['analyses']:
         newcols_pd = pd.DataFrame(newcols)
         newcols_pd.index = new_whole_output_pd.index
 
+        minmax = pd.DataFrame([(name['lower_bound'], name['upper_bound'])
+                               for name in task_to_analyze['SA_input_variables']
+                               if name['variable_name'] == input_reformatted2])
         output_pd = pd.concat([threethings, newcols_pd], axis=1)
+        output_pd.rename({output_pd.columns[0]: output_pd.columns[0] + str(minmax.iloc[0].values)},
+                         axis=1, inplace=True)
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
         output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
-        filenameout = output_path + output_prefix + "_input_META_" + input + "_summarytable.csv"
+        filenameout = output_path + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
         output_pd.to_csv(filenameout)
 
     # here for a single output, we sort and explore all the inputs
@@ -162,12 +166,22 @@ for analysis in config_json['analyses']:
         toteffs = pd.DataFrame(total_effects)
         toteffs.index = temp_output.index
         toteffs.rename({0: "total_effects"}, axis=1, inplace=True)
+
+        # get ranges
+        variable_names = [name['variable_name'] for name in task_to_analyze['SA_input_variables']]
+        bounds = [(name['lower_bound'], name['upper_bound'])
+                  for name in task_to_analyze['SA_input_variables']]
+
         output_temp = pd.concat([temp_output, inteffs, toteffs], axis=1)
 
         input_names = [name for name in output_temp.index]
+        bounds2 = []
         newcols = []
         for input_name in input_names:
             input_reformatted = input_name.replace(" ", ".").replace("ME:", "").replace("S1:", "")
+            if input_reformatted in variable_names:
+                idx = variable_names.index(input_reformatted)
+                bounds2.append(bounds[idx])
             # Append the output for that input to the single_output
             input_index = parsed_SA_input_variables["names"].index(input_reformatted)
             input_values = [value[input_index] for value in sampled_values]
@@ -177,13 +191,15 @@ for analysis in config_json['analyses']:
                 X=input_values, xname=input, Y=output_values, yname=output, plot_inputs=plot_inputs)
             newcols.append([slope, r2_value, p_value])
         newcols_pd = pd.DataFrame(newcols)
-
+        bounds2_pd = pd.DataFrame(bounds2)
+        bounds2_pd.rename({0: "input_min", 1: "input_max"}, axis=1, inplace=True)
+        bounds2_pd.index = output_temp.index
         newcols_pd.index = output_temp.index
-        output_pd = pd.concat([output_temp, newcols_pd], axis=1)
+        output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd], axis=1)
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
         output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
         output_reformatted = output.replace('/', ' per ')
-        filenameout = output_path + output_prefix + "_output_META_" + output_reformatted + "_summarytable.csv"
+        filenameout = output_path + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
         output_pd.to_csv(filenameout)
 
     if plot_whole_new:
