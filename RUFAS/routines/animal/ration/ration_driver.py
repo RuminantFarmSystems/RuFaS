@@ -65,7 +65,6 @@ class RationManager:
         req = animal_requirements.AnimalRequirements()
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
-
         if udrm.use_user_defined_ration:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
@@ -74,7 +73,6 @@ class RationManager:
             previous_ration = pen.ration_per_animal
         else:
             previous_ration = None
-
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
@@ -336,7 +334,9 @@ class RationManager:
             if pen.ration:
                 return pen.ration, ration_vals
             else:
-                om.add_error()
+                om.add_error("First ration formulation error",
+                             "Unable to formulate ration, and there is no previous ration to use.",
+                             info_map)
                 raise
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
