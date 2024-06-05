@@ -3,6 +3,7 @@ from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
 from RUFAS.routines import Feed
+from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.time import Time
 
@@ -44,8 +45,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     simulation_engine.manure_manager = mocker.MagicMock()
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.feed_manager = mocker.MagicMock()
-    simulation_engine.emissions = mocker.MagicMock()
-    mock_calc_emissions = mocker.patch.object(simulation_engine.emissions, "calculate_emissions")
+    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     patch_for_run_simulation_main_loop = mocker.patch.object(
         simulation_engine, "_run_simulation_main_loop", return_value=None
     )
@@ -64,8 +64,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     expected_add_log_calls = [
         mocker.call("Simulation complete", "Simulation Completed.", info_map),
         mocker.call("total_simulation_time", expected_log_message, info_map),
-        mocker.call("Starting processing of emissions", "", info_map),
-        mocker.call("Completed processing of emissions", "", info_map),
     ]
 
     # Act
@@ -76,7 +74,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     patch_for_output_manager.add_log.assert_has_calls(expected_add_log_calls)
     patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager, 100)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
-    mock_calc_emissions.assert_called_once()
+    mock_estimate_emissions.assert_called_once()
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:
