@@ -6,8 +6,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
-from RUFAS.routines.manure.constants_and_units.manure_constants import barn_area_by_pen_type
-
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 class ManureManagerPen:
     """
@@ -106,7 +105,7 @@ class ManureManagerPen:
         return num_lac_cows
 
     @property
-    def barn_area_from_pen_type(self, barn_area_by_pen_type) -> float:
+    def barn_area_from_pen_type(self) -> float:
         """
         Get the barn area based on the pen type and whether there are cows in the pen.
 
@@ -137,6 +136,8 @@ class ManureManagerPen:
             If the pen type is not one of the following: "freestall", "tiestall",
             "compost bedded pack barn", or "open lot".
         """
+
+        barn_area_by_pen_type = ManureConstants.barn_area_by_pen_type
 
         if self.pen_type not in barn_area_by_pen_type:
             raise ValueError(f"Invalid pen type: {self.pen_type}")
