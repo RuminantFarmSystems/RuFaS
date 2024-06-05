@@ -26,7 +26,7 @@ class PurchasedFeedEmissionsEstimator:
         om.add_variable(
             "purchased_feed_emissions",
             self.purchased_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
 
         self.purchased_feed_land_use_change_emissions = self._calculate_feed_emissions(
@@ -35,7 +35,7 @@ class PurchasedFeedEmissionsEstimator:
         om.add_variable(
             "purchased_feed_land_use_change_emissions",
             self.purchased_feed_land_use_change_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER.value}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
 
         self.missing_feed_ids: list[str] = []
@@ -82,7 +82,6 @@ class PurchasedFeedEmissionsEstimator:
             emissions_per_feed_id[feed_id] = emissions
         return emissions_per_feed_id
 
-    def _setup_feed_emissions(self) -> dict[str, float]:
     def _get_county_code(self) -> int:
         """Gets the FIPS county code.
 
