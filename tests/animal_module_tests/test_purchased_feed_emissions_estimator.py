@@ -12,7 +12,7 @@ def test_purchased_feed_emissions_estimator(mocker: MockerFixture) -> None:
     expected_get_data_calls = [
         mocker.call("config.FIPS_county_code"),
         mocker.call("purchased_feeds_emissions"),
-        mocker.call("purchased_feed_land_use_change_emissions")
+        mocker.call("purchased_feed_land_use_change_emissions"),
     ]
 
     estimator = PurchasedFeedEmissionsEstimator()
