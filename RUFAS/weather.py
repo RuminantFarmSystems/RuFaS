@@ -1,3 +1,4 @@
+from datetime import date
 import numpy as np
 
 from RUFAS.units import MeasurementUnits
@@ -132,13 +133,13 @@ class Weather:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
             "prefix": "Weather",
         }
         om.add_variable(
             "average_annual_temperature",
             self.__mean_annual_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
@@ -163,8 +164,7 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = Utility.day_to_month_conversion(day, time.calendar_year)
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.calendar_year)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -180,6 +180,62 @@ class Weather:
             raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
 
         return current_conditions
+
+    def get_conditions_series(self, time: Time, starting_offset: int, ending_offset: int) -> list[CurrentDayConditions]:
+        """
+        Generates a series of CurrentDayConditions.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance containing the current time information of the simulation.
+        starting_offset : int
+            Number of days before or after the given date to start the weather conditions series.
+        ending_offset : int
+            Number of days before or after the given date to end the weather conditions series.
+
+        Returns
+        -------
+        list[CurrentDayConditions]
+            Series of current day conditions in chronological order.
+
+        """
+        current_date = Utility.convert_ordinal_date_to_month_date(time.calendar_year, time.day)
+        date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
+
+        starting_year_index = time.year - (current_date.year - date_series[0].year)
+        starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
+        ending_year_index = time.year + (date_series[-1].year - current_date.year)
+        ending_day_index = date_series[-1].toordinal() - date(date_series[-1].year, 1, 1).toordinal() + 1
+        conditions_series = []
+        for year in range(starting_year_index, ending_year_index + 1):
+            if starting_year_index == ending_year_index:
+                start_day = starting_day_index
+                end_day = ending_day_index
+            elif year == starting_year_index:
+                start_day = starting_day_index
+                end_day = len(self.__mean_daily_temperature[year]) - 1
+            elif year == ending_year_index:
+                start_day = 0
+                end_day = ending_day_index
+            else:
+                start_day = 0
+                end_day = len(self.__mean_daily_temperature[year]) - 1
+
+            for day in range(start_day, end_day + 1):
+                daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.start_year_int + year)
+                conditions = CurrentDayConditions(
+                    incoming_light=self.__radiation[year - 1][day - 1],
+                    min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
+                    mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
+                    max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
+                    annual_mean_air_temperature=self.__mean_annual_temperature,
+                    precipitation=self.__precipitation[year - 1][day - 1],
+                    irrigation=self.__irrigation[year - 1][day - 1],
+                    daylength=daylength,
+                )
+                conditions_series.append(conditions)
+        return conditions_series
 
     def record_weather(self, time: Time) -> None:
         """
@@ -200,39 +256,33 @@ class Weather:
         om.add_variable(
             "precipitation",
             current_weather.precipitation,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value}),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
-        om.add_variable(
-            "rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
-        )
-        om.add_variable(
-            "snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
-        )
-        om.add_variable(
-            "daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS.value})
-        )
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS}))
         om.add_variable(
             "maximum_temperature",
             current_weather.max_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "minimum_temperature",
             current_weather.min_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "average_temperature",
             current_weather.mean_air_temperature,
-            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS.value}),
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
         om.add_variable(
             "radiation",
             current_weather.incoming_light,
-            dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER.value}),
+            dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
         om.add_variable(
-            "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS.value})
+            "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
         )
 
     @staticmethod

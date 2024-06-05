@@ -28,6 +28,7 @@
       "minimum": 1000,
       "maximum": 56045,
       "default": null,
+      "nullable": true,
       "description": "Unique 5-digit code that represents a specific U.S. county."
     },
     "include_detailed_values": {
@@ -833,6 +834,12 @@
         "type": "number",
         "minimum": 1,
         "default": 30
+      },
+      "phosphorus_requirement_buffer": {
+        "description": "Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50.",
+        "type": "number",
+        "minimum": 0,
+        "default": 75
       }
     },
     "pen_information": {
@@ -1568,7 +1575,6 @@
           "type": "array",
           "description": "Julian day(s) of year to harvest",
           "minimum_length": 0,
-          "default": [],
           "properties": {
             "type": "number",
             "description": "Julian day of year to harvest",
@@ -1580,7 +1586,6 @@
           "type": "array",
           "description": "Calendar years in which the harvesting occurs",
           "minimum_length": 0,
-          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1
@@ -1590,7 +1595,6 @@
           "type": "array",
           "description": "Operation(s) with which this crop will be harvested.",
           "minimum_length": 1,
-          "default": ["harvest_kill"],
           "properties": {
             "type": "string",
             "pattern": "^(harvest_kill|harvest_only|kill_only)$",
@@ -1606,7 +1610,6 @@
         "planting_days": {
           "type": "array",
           "description": "Julian day(s) of year to plant",
-          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1,
@@ -1616,7 +1619,6 @@
         "planting_years": {
           "type": "array",
           "description": "Calendar years in which the planting occurs",
-          "default": [],
           "properties": {
             "type": "number",
             "minimum": 1
@@ -1648,7 +1650,6 @@
       "type": "array",
       "description": "All the available fertilizer mixes that are available besides the default ones.",
       "minimum_length": 0,
-      "default": [],
       "properties": {
         "type": "object",
         "description": "The name and nutrient breakdown of a single fertilizer mix.",
@@ -1679,7 +1680,6 @@
     "mix_names": {
       "type": "array",
       "description": "List of the mix names that will be used for the corresponding fertilizer application.",
-      "default": [],
       "properties": {
         "type": "string"
       }
@@ -1687,7 +1687,6 @@
     "years": {
       "type": "array",
       "description": "List of years in which fertilizer will be applied.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1696,7 +1695,6 @@
     "days": {
       "type": "array",
       "description": "List of days on which fertilizer will be applied.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1706,7 +1704,6 @@
     "nitrogen_masses": {
       "type": "array",
       "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1715,7 +1712,6 @@
     "phosphorus_masses": {
       "type": "array",
       "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1724,7 +1720,6 @@
     "potassium_masses": {
       "type": "array",
       "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1733,7 +1728,6 @@
     "application_depths": {
       "type": "array",
       "description": "List of depths at which the fertilizer is injected into the soil.\nUnits: mm.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1742,7 +1736,6 @@
     "surface_remainder_fractions": {
       "type": "array",
       "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1766,7 +1759,6 @@
     "years": {
       "type": "array",
       "description": "List of years in which manure will be applied.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1775,7 +1767,6 @@
     "days": {
       "type": "array",
       "description": "List of days on which manure will be applied.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1785,7 +1776,6 @@
     "nitrogen_masses": {
       "type": "array",
       "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1794,7 +1784,6 @@
     "phosphorus_masses": {
       "type": "array",
       "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1803,7 +1792,6 @@
     "potassium_masses": {
       "type": "array",
       "description": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1812,7 +1800,6 @@
     "coverage_fractions": {
       "type": "array",
       "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.01,
@@ -1822,7 +1809,6 @@
     "application_depths": {
       "type": "array",
       "description": "List of depths at which the manure is injected into the soil.\nUnits: mm.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0
@@ -1831,7 +1817,6 @@
     "surface_remainder_fractions": {
       "type": "array",
       "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1841,7 +1826,6 @@
     "manure_types": {
       "type": "array",
       "description": "The type of manure which will be requested for the application.",
-      "default": [],
       "properties": {
         "type": "string",
         "pattern": "^(liquid|solid)$"
@@ -1864,7 +1848,6 @@
     "years": {
       "type": "array",
       "description": "List of years in which tillage will occur.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1
@@ -1873,7 +1856,6 @@
     "days": {
       "type": "array",
       "description": "List of days on which tilling will occur.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 1,
@@ -1883,7 +1865,6 @@
     "tillage_depths": {
       "type": "array",
       "description": "List of depths that the corresponding tillage applications reach.\nUnits: mm.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.1
@@ -1892,7 +1873,6 @@
     "incorporation_fractions": {
       "type": "array",
       "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1902,7 +1882,6 @@
     "mixing_fractions": {
       "type": "array",
       "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
-      "default": [],
       "properties": {
         "type": "number",
         "minimum": 0.0,
@@ -1912,7 +1891,6 @@
     "implements": {
       "type": "array",
       "description": "List of tillage implements which will be used to execute the tillage operations.",
-      "default": [],
       "properties": {
         "type": "string",
         "pattern": "^(subsoiler|moldboard-plow|coulter-chisel-plow|disk-harrow|cultivator|seedbed-conditioner)$"
@@ -3482,7 +3460,7 @@
         "type": "number",
         "minimum": 0.87,
         "maximum": 1.04,
-        "default": 0
+        "default": 0.87
       }
     },
     "TDN": {
@@ -4416,6 +4394,33 @@
         }
       }
     },
+    "barn_area_configs":{
+      "type": "object", 
+      "freestall, has cows": {
+        "type": "number"
+      },
+      "freestall, no cows": {
+        "type": "number"
+      },
+      "tiestall, has cows": {
+        "type": "number"
+      },
+      "tiestall, no cows": {
+        "type": "number"
+      },
+      "compost bedded pack barn, has cows": {
+        "type": "number"
+      },
+      "compost bedded pack barn, no cows": {
+        "type": "number"
+      },
+      "open lot, has cows": {
+        "type": "number"
+      },
+      "open lot, no cows": {
+        "type": "number"
+      }
+    },
     "bedding_configs": {
       "type": "array",
       "properties": {
@@ -4800,7 +4805,8 @@
           "type": "number",
           "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null
+          "default": null,
+          "nullable": true
         },
         "initial_fresh_organic_phosphorus_concentration": {
           "type": "number",
@@ -4812,13 +4818,15 @@
           "type": "number",
           "description": "Concentration of nitrate in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null
+          "default": null,
+          "nullable": true
         },
         "initial_soil_ammonium_concentration": {
           "type": "number",
           "description": "Concentration of ammonium in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
-          "default": null
+          "default": null,
+          "nullable": true
         },
         "humus_mineralization_rate_factor": {
           "type": "number",
@@ -4878,7 +4886,6 @@
     "field_size": {
       "type": "number",
       "description": "Size of the field.",
-      "units": "ha",
       "minimum": 0.0
     },
     "absolute_latitude": {

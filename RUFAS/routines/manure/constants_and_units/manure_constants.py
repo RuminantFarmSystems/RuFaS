@@ -1,3 +1,6 @@
+from typing import NamedTuple
+
+BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
 class ManureConstants:
     """
     A class to store constants for manure management.
@@ -14,9 +17,6 @@ class ManureConstants:
 
     TAN_MOLAR_MASS = 17.0306
     """The molar mass of TAN (g/mol)."""
-
-    URINE_TAN_FACTOR = 0.45
-    """The factor to convert urine nitrogen to urine total ammoniacal nitrogen (unitless)."""
 
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
@@ -74,3 +74,15 @@ class ManureConstants:
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
+
+    freestall = None
+    tiestall = None
+    bedded_pack = None
+    open_lot = None
+
+    barn_area_by_pen_type = {
+        "freestall": freestall,
+        "tiestall": tiestall,
+        "compost bedded pack barn": bedded_pack,
+        "open lot": open_lot,
+    }

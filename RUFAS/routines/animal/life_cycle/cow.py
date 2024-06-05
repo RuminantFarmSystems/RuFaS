@@ -11,6 +11,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
@@ -184,8 +185,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -220,8 +219,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -592,11 +589,10 @@ class Cow(HeiferIII):
         Parameters
         ----------
         DMI : float
-            The Dry Matter Intake (kg).
-
+            Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1EF.E.1)
-        self.p_maint_feces = 0.001 * DMI * 1000
+        self.p_maint_feces = 0.001 * DMI * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for growth (g) (A.1EF.E.3)
         if self.body_weight < self.mature_body_weight:
@@ -604,26 +600,26 @@ class Cow(HeiferIII):
                 (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
                 * self.daily_growth
                 / 0.96
-                * 1000
+                * GeneralConstants.KG_TO_GRAMS
             )
         else:
             self.p_growth = 0
 
         # amount pf P required for urine production (g) (A.1EF.E.2)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for fetal growth (g) (A.1EF.E.4)
         if self.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * (self.days_in_preg - 1)
-            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * 1000
+            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * GeneralConstants.KG_TO_GRAMS
             self.p_gest_for_calf += self.p_gest
         else:
             self.p_gest = 0
 
         # amount of P in milk per animal (g) (A.1E.E.5)
         if self.milking:
-            p_milk = 0.0009 * self.estimated_daily_milk_produced * 1000
+            p_milk = 0.0009 * self.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
         else:
             p_milk = 0
 

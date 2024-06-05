@@ -8,6 +8,7 @@ from typing import Tuple
 from RUFAS.weather import Weather
 from RUFAS.time import Time
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.input_manager import InputManager
 
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
@@ -17,7 +18,7 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 )
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants, BarnArea
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
 )
@@ -66,6 +67,8 @@ from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
     ReceptionPitDailyOutput,
 )
 
+im = InputManager()
+
 
 class ManureManager:
     """
@@ -104,6 +107,8 @@ class ManureManager:
             different manure management scenarios.
 
         """
+        self.set_barn_area_constants(manure_manager_config["barn_area_configs"])
+
         self.beddings: Dict[int, BaseBedding] = {}
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, ReceptionPit] = {}
@@ -117,6 +122,19 @@ class ManureManager:
         self._manure_nutrient_manager = ManureNutrientManager()
         self.configure_manure_manager_components(pen_list)
 
+    def set_barn_area_constants(self, barn_area_configs):
+        print("freestall, has cows", barn_area_configs["freestall, has cows"])
+        ManureConstants.freestall = BarnArea(has_cows=barn_area_configs["freestall, has cows"], no_cows=barn_area_configs["freestall, no cows"])
+        ManureConstants.tiestall = BarnArea(has_cows= barn_area_configs["tiestall, has cows"], no_cows= barn_area_configs["tiestall, no cows"])
+        ManureConstants.bedded_pack = BarnArea(has_cows= barn_area_configs["compost bedded pack barn, has cows"], no_cows= barn_area_configs["compost bedded pack barn, no cows"])
+        ManureConstants.open_lot = BarnArea(has_cows= barn_area_configs["open lot, has cows"], no_cows= barn_area_configs["open lot, no cows"])
+        ManureConstants.barn_area_by_pen_type = {
+        "freestall": ManureConstants.freestall,
+        "tiestall": ManureConstants.tiestall,
+        "compost bedded pack barn": ManureConstants.bedded_pack,
+        "open lot": ManureConstants.open_lot,
+    }
+    
     def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
         """Configures the manure manager components for each animal pen.
 

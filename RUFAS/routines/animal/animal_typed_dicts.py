@@ -102,7 +102,7 @@ class HeiferIIValuesTypedDict(TypedDict):
     abortion_day: int
     days_in_preg: int
     gestation_length: int
-    p_gest_for_calf: int
+    p_gest_for_calf: float
     calf_birth_weight: float
 
 

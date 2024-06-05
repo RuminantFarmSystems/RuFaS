@@ -157,7 +157,7 @@ class Field:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
 
         if manure_supplier is None:
@@ -477,16 +477,16 @@ class Field:
 
         """
         units = {
-            "mass": MeasurementUnits.KILOGRAMS.value,
-            "nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "phosphorus": MeasurementUnits.KILOGRAMS.value,
-            "potassium": MeasurementUnits.KILOGRAMS.value,
-            "application_depth": MeasurementUnits.MILLIMETERS.value,
-            "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "mass": MeasurementUnits.KILOGRAMS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -707,18 +707,18 @@ class Field:
 
         """
         units = {
-            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS.value,
-            "dry_matter_fraction": MeasurementUnits.FRACTION.value,
-            "field_coverage": MeasurementUnits.UNITLESS.value,
-            "application_depth": MeasurementUnits.MILLIMETERS.value,
-            "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
-            "nitrogen": MeasurementUnits.KILOGRAMS.value,
-            "phosphorus": MeasurementUnits.KILOGRAMS.value,
-            "potassium": MeasurementUnits.KILOGRAMS.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+            "dry_matter_fraction": MeasurementUnits.FRACTION,
+            "field_coverage": MeasurementUnits.UNITLESS,
+            "application_depth": MeasurementUnits.MILLIMETERS,
+            "surface_remainder_fraction": MeasurementUnits.UNITLESS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1077,11 +1077,11 @@ class Field:
 
         """
         units = {
-            "crop": MeasurementUnits.UNITLESS.value,
-            "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
-            "date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-            "field_size": MeasurementUnits.HECTARE.value,
-            "average_clay_percent": MeasurementUnits.PERCENT.value,
+            "crop": MeasurementUnits.UNITLESS,
+            "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
+            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1389,8 +1389,10 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        self.soil.infiltration.infiltrate(water_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+        self.soil.infiltration.infiltrate(water_reaching_soil)
+        self.soil.percolation.percolate_infiltrated_water()
+
         self.soil.soil_erosion.erode(
             self.field_data.field_size,
             0.02,
@@ -1531,7 +1533,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._get_manure_water.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("manure_water", manure_water, info_map)
 
@@ -1821,7 +1823,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": year, "day": day},
             "field_size": self.field_data.field_size,
-            "units": MeasurementUnits.MILLIMETERS.value,
+            "units": MeasurementUnits.MILLIMETERS,
         }
         om.add_variable("field_watering", watering_amount, info_map)
 

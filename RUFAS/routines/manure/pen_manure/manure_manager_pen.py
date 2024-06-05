@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List
 from typing import Set
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -6,7 +6,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
-
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 class ManureManagerPen:
     """
@@ -137,18 +137,7 @@ class ManureManagerPen:
             "compost bedded pack barn", or "open lot".
         """
 
-        BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
-        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
-        tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
-        bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
-        open_lot = BarnArea(has_cows=5.0, no_cows=3.0)
-
-        barn_area_by_pen_type = {
-            "freestall": freestall,
-            "tiestall": tiestall,
-            "compost bedded pack barn": bedded_pack,
-            "open lot": open_lot,
-        }
+        barn_area_by_pen_type = ManureConstants.barn_area_by_pen_type
 
         if self.pen_type not in barn_area_by_pen_type:
             raise ValueError(f"Invalid pen type: {self.pen_type}")
