@@ -71,6 +71,7 @@ class EmissionsEstimator:
         """
         crop_filter = {
             "name": "Homegrown Feeds",
+            "description": "Collects all crop harvests that occurred in the simulation.",
             "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
             "variables": [".*"],
         }
@@ -79,6 +80,7 @@ class EmissionsEstimator:
 
         fertilizer_filter = {
             "name": "Fertilizer Applications",
+            "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
             "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
             "variables": [".*"],
         }
@@ -87,6 +89,7 @@ class EmissionsEstimator:
 
         time_filter = {
             "name": "Time Filter",
+            "description": "Collects the date a year before the simulation ended.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
@@ -271,6 +274,7 @@ class EmissionsEstimator:
             soil_data = {}
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
+                "description": "Collects the ammonia emissions from all soil layers in the field in the last year of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
@@ -280,6 +284,7 @@ class EmissionsEstimator:
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
+                "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
                 ],
@@ -292,6 +297,7 @@ class EmissionsEstimator:
 
             starting_carbon_stock_filter = {
                 "name": "Starting soil profile carbon stock",
+                "description": "Collects the soil carbon stock level 365 days before the simulation ended.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
                 ],
@@ -305,6 +311,7 @@ class EmissionsEstimator:
 
             ending_carbon_stock_filter = {
                 "name": "Ending soil profile carbon stock",
+                "description": "Collects the soil carbon stock level on the last day of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
                 ],
