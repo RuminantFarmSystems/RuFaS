@@ -1,6 +1,6 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Dict, List
+from typing import Any, Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
@@ -78,23 +78,49 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
         assert result == Path(r"graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png")
 
 
-def test_generate_graph_without_producing_graphics(graph_generator: GraphGenerator) -> None:
+@pytest.mark.parametrize(
+    ["graph_details", "expected_output", "produce_graphics"],
+    [
+        (
+            {"title": "Example Graph"},
+            [
+                {
+                    "error": "Can't plot Example Graph data set",
+                    "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "generate_graph",
+                    },
+                }
+            ],
+            False,
+        ),
+        (
+            {"title": "Quiver Fail Graph", "type": "quiver_key"},
+            [
+                {
+                    "error": "Can't plot Quiver Fail Graph data set",
+                    "message": "Graph type 'quiver_key' not supported at this time.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "generate_graph",
+                    },
+                }
+            ],
+            True,
+        ),
+    ],
+)
+def test_generate_graph_without_producing_graphics(
+    graph_generator: GraphGenerator,
+    graph_details: list[dict[str, str]],
+    expected_output: dict[str, str | dict[str, Any]],
+    produce_graphics: bool,
+) -> None:
+    """Tests function generate_graph when it doesn't produce graphics."""
     filtered_pool = {"dummy_key": {"dummy_data": [1, 2, 3]}}
-    graph_details = {"title": "Example Graph"}
     filter_file_name = "dummy_filter"
     graphics_dir = Path("/tmp")
-    produce_graphics = False
-
-    expected_output = [
-        {
-            "error": "Can't plot Example Graph data set",
-            "message": "'produce_graphics' set to False, no graphs will be produced.",
-            "info_map": {
-                "class": graph_generator.__class__.__name__,
-                "function": "generate_graph",
-            },
-        }
-    ]
 
     result = graph_generator.generate_graph(
         filtered_pool=filtered_pool,
