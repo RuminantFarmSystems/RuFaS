@@ -17,6 +17,36 @@
 
         },
         {
+            "crop_species": "cereal_rye_grain",
+            "planting_years": [2020, 2021],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [274],
+            "harvest_years": [2020, 2021, 2022],
+            "harvest_days": [105],
+            "harvest_operations": ["kill_only"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        },
+        {
+            "crop_species": "winter_wheat_silage",
+            "planting_years": [2020, 2021],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [260],
+            "harvest_years": [2020, 2021, 2022],
+            "harvest_days": [105],
+            "harvest_operations": ["kill_only"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        },
+        {
             "crop_species": "alfalfa_silage",
             "planting_years": [2015],
             "pattern_repeat": 0,
