@@ -39,14 +39,17 @@ om = OutputManager()
 
 
 class EmissionsEstimator:
-
     def __init__(self) -> None:
         pass
 
     def estimate_emissions(self) -> None:
-        homegrown_feeds, fertilizer_applications = self._gather_homegrown_feeds_and_fertilizer_apps()
+        (
+            homegrown_feeds,
+            fertilizer_applications,
+            manure_applications,
+        ) = self._gather_homegrown_feeds_and_fertilizer_apps()
         self._calculate_purchased_feed_emissions(homegrown_feeds)
-        self._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_applications)
+        self._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_applications, manure_applications)
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
@@ -85,7 +88,16 @@ class EmissionsEstimator:
             "variables": [".*"],
         }
         fertilizer_apps = om.filter_variables_pool(fertilizer_filter)
-        processed_apps = self._transform_outputs_to_list_of_dicts(fertilizer_apps)
+        processed_fert_apps = self._transform_outputs_to_list_of_dicts(fertilizer_apps)
+
+        manure_filter = {
+            "name": "Manure Applications",
+            "descriptions": "Collects all manure applications that occurred in the simulation.",
+            "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
+            "variables": [".*"],
+        }
+        manure_apps = om.filter_variables_pool(manure_filter)
+        processed_manure_apps = self._transform_outputs_to_list_of_dicts(manure_apps)
 
         time_filter = {
             "name": "Time Filter",
@@ -107,11 +119,15 @@ class EmissionsEstimator:
         for crop in filtered_yields:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
-        filtered_apps = list(
-            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_apps)
+        filtered_fert_apps = list(
+            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_fert_apps)
         )
 
-        return filtered_yields, filtered_apps
+        filtered_manure_apps = list(
+            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_manure_apps)
+        )
+
+        return filtered_yields, filtered_fert_apps, filtered_manure_apps
 
     def _gather_ration_feed_totals(self) -> dict[str, float]:
         """
@@ -210,7 +226,7 @@ class EmissionsEstimator:
         return feed_emissions_dict
 
     def _calculate_homegrown_feed_emissions(
-        self, homegrown_feeds: list[dict[str, Any]], fertilizer_applications: list[dict[str, Any]]
+        self, homegrown_feeds: list[dict[str, Any]], fertilizer_applications: list[dict[str, Any]], manure_applications: list[dict[str, Any]]
     ) -> None:
         """Calculates the emissions associated with feeds grown on the farm."""
         grouped_feeds = {}
@@ -229,12 +245,20 @@ class EmissionsEstimator:
             aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_fertilizer_apps[field_name]["phosphorus"] += app["phosphorus"]
 
+        fields_with_manure_apps = {app["field_name"] for app in manure_applications}
+        all_fields = list(fields_with_manure_apps | fields_with_crops)
+        aggregated_manure_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
+        for app in manure_applications:
+            field_name = app["field_name"]
+            aggregated_manure_apps[field_name]["nitrogen"] += app["nitrogen"]
+            aggregated_manure_apps[field_name]["phosphorus"] += app["phosphorus"]
+
         grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
             crops = self._calculate_emissions_by_field(
-                grouped_feeds[field], grouped_soil_characteristics[field], aggregated_fertilizer_apps[field]
+                grouped_feeds[field], grouped_soil_characteristics[field], aggregated_fertilizer_apps[field], aggregated_manure_apps[field]
             )
             crops_with_emissions.extend(crops)
 
@@ -248,6 +272,7 @@ class EmissionsEstimator:
                 "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                 "nitrogen_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
+                "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
                 "field_name": MeasurementUnits.UNITLESS,
             },
         }
@@ -262,9 +287,12 @@ class EmissionsEstimator:
                     "carbon_stock_change": crop["carbon_stock_change"],
                     "nitrogen_fertilizer_used": crop["nitrogen_fertilizer_used"],
                     "phosphorus_fertilizer_used": crop["phosphorus_fertilizer_used"],
+                    "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
                 }
                 om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
+
+    # def _aggregate_nutrient_applications_by_field TODO implement this
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
@@ -330,6 +358,7 @@ class EmissionsEstimator:
         feeds_grown: list[dict[str, Any]],
         field_emissions: dict[str, float],
         fertilizer_applications: dict[str, float],
+        manure_applications: dict[str, float],
     ) -> list[dict[str, Any]]:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
@@ -344,6 +373,7 @@ class EmissionsEstimator:
                 crop["carbon_stock_change"] = 0.0
                 crop["nitrogen_fertilizer_used"] = 0.0
                 crop["phosphorus_fertilizer_used"] = 0.0
+                crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
         for crop in feeds_grown:
@@ -355,5 +385,6 @@ class EmissionsEstimator:
             crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
             crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
             crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
+            crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
         return feeds_grown
