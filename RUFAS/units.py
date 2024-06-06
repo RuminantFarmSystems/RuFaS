@@ -49,6 +49,7 @@ class MeasurementUnits(Enum):
     SIMULATION_YEAR = "simulation year"
     UNITLESS = "unitless"
     WET_KILOGRAMS_PER_HECTARE = "wet kg/ha"
+    KILOGRAMS_CARBON_DIOXIDE_EQ = "kg CO2-eq"
 
     def __str__(self) -> str:
         """
