@@ -114,14 +114,14 @@
     }
   ],
   "barn_area_configs": {
-    "freestall, has cows": 3.5,
-    "freestall, no cows": 2.5,
-    "tiestall, has cows": 1.2,
-    "tiestall, no cows": 1.0,
-    "compost bedded pack barn, has cows": 5.0,
-    "compost bedded pack barn, no cows": 3.0,
-    "open lot, has cows": 5.0,
-    "open lot, no cows": 3.0
+    "freestall_has_cows": 3.5,
+    "freestall_no_cows": 2.5,
+    "tiestall_has_cows": 1.2,
+    "tiestall_no_cows": 1.0,
+    "compost_bedded_pack_barn_has_cows": 5.0,
+    "compost_bedded_pack_barn_no_cows": 3.0,
+    "open_lot_has_cows": 5.0,
+    "open_lot_no_cows": 3.0
   },
   "bedding_configs": [
     {

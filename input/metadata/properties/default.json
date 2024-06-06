@@ -4396,28 +4396,28 @@
     },
     "barn_area_configs":{
       "type": "object", 
-      "freestall, has cows": {
+      "freestall_has_cows": {
         "type": "number"
       },
-      "freestall, no cows": {
+      "freestall_no_cows": {
         "type": "number"
       },
-      "tiestall, has cows": {
+      "tiestall_has_cows": {
         "type": "number"
       },
-      "tiestall, no cows": {
+      "tiestall_no_cows": {
         "type": "number"
       },
-      "compost bedded pack barn, has cows": {
+      "compost_bedded_pack_barn_has_cows": {
         "type": "number"
       },
-      "compost bedded pack barn, no cows": {
+      "compost_bedded_pack_barn_no_cows": {
         "type": "number"
       },
-      "open lot, has cows": {
+      "open_lot_has_cows": {
         "type": "number"
       },
-      "open lot, no cows": {
+      "open_lot_no_cows": {
         "type": "number"
       }
     },

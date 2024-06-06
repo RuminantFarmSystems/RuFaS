@@ -3,23 +3,23 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "manure_sobol_2",
+        "output_prefix": "manure_sobol_3",
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 32,
         "saltelli_skip": 128,
-        "SA_load_balancing_start": 0.5,
+        "SA_load_balancing_start": 0,
         "SA_load_balancing_stop": 1,
         "random_seed": 42,
         "SA_input_variables": [
           {
-            "variable_name": "manure_management.barn_area_configs.freestall, has cows",
+            "variable_name": "manure_management.barn_area_configs.freestall_has_cows",
             "lower_bound": 1,
             "upper_bound": 6,
             "data_type":"float"
           },
           {
-            "variable_name": "manure_management.barn_area_configs.freestall, no cows",
+            "variable_name": "manure_management.barn_area_configs.freestall_no_cows",
             "lower_bound": 0.1,
             "upper_bound": 5,
             "data_type":"float"
