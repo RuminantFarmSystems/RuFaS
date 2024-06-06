@@ -2,19 +2,19 @@
     "analyses": [
         {
             "input_file": "input/data/tasks/manure_sobol_tasks.json",
-            "output_path": "/Users/haowenhu/Documents/Manure SA",
-            "report_name": "manure_SA",
+            "output_path": "output/reports/",
+            "report_name": "report_Manure_SA",
             "only_inputs": false,
             "plot_whole_new": true,
             "inputs_to_collate": [
-                "manure_management.barn_area_configs_freestall, has cows",
-                "manure_management.barn_area_configs_freestall, no cows",
-                "manure_management.barn_area_configs_tiestall, has cows",
-                "manure_management.barn_area_configs_tiestall, no cows",
-                "manure_management.barn_area_configs_compost bedded pack barn, has cows",
-                "manure_management.barn_area_configs_compost bedded pack barn, no cows",
-                "manure_management.barn_area_configs_open lot, has cows",
-                "manure_management.barn_area_configs_open lot, no cows"
+                "manure_management.barn_area_configs.freestall, has cows",
+                "manure_management.barn_area_configs.freestall, no cows",
+                "manure_management.barn_area_configs.tiestall, has cows",
+                "manure_management.barn_area_configs.tiestall, no cows",
+                "manure_management.barn_area_configs.compost bedded pack barn, has cows",
+                "manure_management.barn_area_configs.compost bedded pack barn, no cows",
+                "manure_management.barn_area_configs.open lot, has cows",
+                "manure_management.barn_area_configs.open lot, no cows"
             ],
             "plot_inputs": false,
             "outputs_to_collate": [
