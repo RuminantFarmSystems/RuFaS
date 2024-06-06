@@ -1387,6 +1387,7 @@ def test_record_fertilizer_application(
         "year": MeasurementUnits.CALENDAR_YEAR.value,
         "day": MeasurementUnits.ORDINAL_DAY.value,
         "field_size": MeasurementUnits.HECTARE.value,
+        "field_name": MeasurementUnits.UNITLESS.value,
         "average_clay_percent": MeasurementUnits.PERCENT.value,
     }
 
@@ -1401,6 +1402,7 @@ def test_record_fertilizer_application(
         "year": year,
         "day": day,
         "field_size": field_size,
+        "field_name": field_name,
         "average_clay_percent": 10.0,
     }
 
@@ -2250,6 +2252,7 @@ def test_cycle_water(
 
         incorp.soil.infiltration.infiltrate = MagicMock()
         incorp.soil.percolation.percolate = MagicMock()
+        incorp.soil.percolation.percolate_infiltrated_water = MagicMock()
         incorp.soil.soil_erosion.erode = MagicMock()
         incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
         incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
@@ -2291,6 +2294,7 @@ def test_cycle_water(
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
+        incorp.soil.percolation.percolate_infiltrated_water.assert_called_once()
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, expected_total_water)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
