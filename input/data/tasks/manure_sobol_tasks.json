@@ -3,7 +3,7 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "manure_sobol",
+        "output_prefix": "manure_sobol_2",
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 32,
@@ -13,51 +13,15 @@
         "random_seed": 42,
         "SA_input_variables": [
           {
-            "variable_name": "manure_management.barn_area_configs_freestall, has cows",
+            "variable_name": "manure_management.barn_area_configs.freestall, has cows",
             "lower_bound": 1,
             "upper_bound": 6,
             "data_type":"float"
           },
           {
-            "variable_name": "manure_management.barn_area_configs_freestall, no cows",
+            "variable_name": "manure_management.barn_area_configs.freestall, no cows",
             "lower_bound": 0.1,
             "upper_bound": 5,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_tiestall, has cows",
-            "lower_bound": 0.1,
-            "upper_bound": 3.7,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_tiestall, no cows",
-            "lower_bound": 0.1,
-            "upper_bound": 3.5,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_compost bedded pack barn, has cows",
-            "lower_bound": 2.5,
-            "upper_bound": 7.5,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_compost bedded pack barn, no cows",
-            "lower_bound": 0.5,
-            "upper_bound": 5.5,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_open lot, has cows",
-            "lower_bound": 2.5,
-            "upper_bound": 7.5,
-            "data_type":"float"
-          },
-          {
-            "variable_name": "manure_management.barn_area_configs_open lot, no cows",
-            "lower_bound": 0.5,
-            "upper_bound": 5.5,
             "data_type":"float"
           }
         ]
