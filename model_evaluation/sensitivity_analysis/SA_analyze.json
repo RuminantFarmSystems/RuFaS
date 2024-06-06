@@ -1,53 +1,35 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/sobol1k_tasks.json",
-            "output_path": "D:/RUFAS/sobol_1k/",
-            "report_name": "report_SA",
+            "input_file": "input/data/tasks/manure_sobol_tasks.json",
+            "output_path": "/Users/haowenhu/Documents/Manure SA",
+            "report_name": "manure_SA",
             "only_inputs": false,
-            "plot_whole_new": false,
+            "plot_whole_new": true,
             "inputs_to_collate": [
-                "animal animal_config management_decisions breeding_start_day_h",
-                "animal animal_config management_decisions days_in_preg_when_dry",
-                "animal animal_config management_decisions cull_milk_production",
-                "animal animal_config farm_level repro cows estrus_detection_rate",
-                "animal animal_config farm_level bodyweight mature_body_weight_avg",
-                "animal animal_config from_literature repro avg_estrus_cycle_cow",
-                "animal animal_config from_literature culling mastitis_cull probability",
-                "manure_management bedding_configs 0 bedding_mass_per_day"
+                "manure_management.barn_area_configs_freestall, has cows",
+                "manure_management.barn_area_configs_freestall, no cows",
+                "manure_management.barn_area_configs_tiestall, has cows",
+                "manure_management.barn_area_configs_tiestall, no cows",
+                "manure_management.barn_area_configs_compost bedded pack barn, has cows",
+                "manure_management.barn_area_configs_compost bedded pack barn, no cows",
+                "manure_management.barn_area_configs_open lot, has cows",
+                "manure_management.barn_area_configs_open lot, no cows"
             ],
             "plot_inputs": false,
             "outputs_to_collate": [
-                "total herd enteric methane, kg_ver_hor_agg",
-                "Total milk, kg_ver_agg",
-                "adjusted herd enteric CH4 per FPCM, kg/kg_hor_agg",
-                "adjusted whole herd enteric methane, kg_hor_agg",
-                "Lact cow feed CO2 kg/cow/d_hor_agg"
-            ],
-            "plot_outputs": false
-        },{
-            "input_file": "input/data/tasks/may6_ff.json",
-            "output_path": "C:/Users/jw2574/SA_outputs/",
-            "report_name": "report_SA",
-            "only_inputs": false,
-            "plot_whole_new": false,
-            "inputs_to_collate": [
-                "animal animal_config management_decisions breeding_start_day_h",
-                "animal animal_config management_decisions days_in_preg_when_dry",
-                "animal animal_config management_decisions cull_milk_production",
-                "animal animal_config farm_level repro cows estrus_detection_rate",
-                "animal animal_config farm_level bodyweight mature_body_weight_avg",
-                "animal animal_config from_literature repro avg_estrus_cycle_cow",
-                "animal animal_config from_literature culling mastitis_cull probability",
-                "manure_management bedding_configs 0 bedding_mass_per_day"
-            ],
-            "plot_inputs": false,
-            "outputs_to_collate": [
-                "total herd enteric methane, kg_ver_hor_agg",
-                "Total milk, kg_ver_agg",
-                "adjusted herd enteric CH4 per FPCM, kg/kg_hor_agg",
-                "adjusted whole herd enteric methane, kg_hor_agg",
-                "Lact cow feed CO2 kg/cow/d_hor_agg"
+                "Housing NH3 pen 0_ver_agg",
+                "Housing NH3 pen 1_ver_agg",
+                "Housing NH3 pen 2_ver_agg",
+                "Housing NH3 pen 3_ver_agg",
+                "Storage NH3 pen 0_ver_agg",
+                "Storage NH3 pen 1_ver_agg",
+                "Storage NH3 pen 2_ver_agg",
+                "Storage NH3 pen 3_ver_agg",
+                "Storage N2O pen 0_ver_agg",
+                "Storage N2O pen 1_ver_agg",
+                "Storage N2O pen 2_ver_agg",
+                "Storage N2O pen 3_ver_agg"
             ],
             "plot_outputs": false
         }
