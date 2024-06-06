@@ -109,7 +109,7 @@ class EmissionsEstimator:
         manure_filter = {
             "name": "Manure Applications",
             "descriptions": "Collects all manure applications that occurred in the simulation.",
-            "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
+            "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
             "variables": [".*"],
         }
         manure_apps = om.filter_variables_pool(manure_filter)
@@ -325,8 +325,6 @@ class EmissionsEstimator:
                     "field_name": crop["field_name"],
                 }
                 om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
-
-    # def _aggregate_nutrient_applications_by_field TODO implement this
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
