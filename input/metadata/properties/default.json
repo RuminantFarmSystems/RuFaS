@@ -76,7 +76,6 @@
         "default": 5000,
         "minimum": 50
       },
-      
       "herd_num": {
         "type": "number",
         "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
