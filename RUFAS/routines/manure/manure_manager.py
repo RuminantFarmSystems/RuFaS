@@ -123,7 +123,6 @@ class ManureManager:
         self.configure_manure_manager_components(pen_list)
 
     def set_barn_area_constants(self, barn_area_configs):
-        print("freestall, has cows", barn_area_configs["freestall, has cows"])
         ManureConstants.freestall = BarnArea(has_cows=barn_area_configs["freestall, has cows"], no_cows=barn_area_configs["freestall, no cows"])
         ManureConstants.tiestall = BarnArea(has_cows= barn_area_configs["tiestall, has cows"], no_cows= barn_area_configs["tiestall, no cows"])
         ManureConstants.bedded_pack = BarnArea(has_cows= barn_area_configs["compost bedded pack barn, has cows"], no_cows= barn_area_configs["compost bedded pack barn, no cows"])
