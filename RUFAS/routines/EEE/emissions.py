@@ -38,6 +38,22 @@ im = InputManager()
 om = OutputManager()
 
 
+"""
+These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
+are in kg CO2e / kg N and kg CO2e / kg P, respectively. Reference IPCC 2021, GWP 100.
+"""
+EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 5.32
+EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 3.07
+
+
+"""
+These are constants for calculating the upstream emissions of synthetic nitrogen and phosphorus fertilizer. Their units
+are in kg CO2e / kg N and kg CO2e / kg P, respectively.
+"""
+UPSTREAM_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 3.11
+UPSTREAM_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 1.84
+
+
 class EmissionsEstimator:
     def __init__(self) -> None:
         pass
@@ -277,7 +293,11 @@ class EmissionsEstimator:
                 "ammonia_emisssions": MeasurementUnits.KILOGRAMS,
                 "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                 "nitrogen_fertilizer_used": MeasurementUnits.KILOGRAMS,
+                "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
+                "nitrogen_fertilizer_upstream_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
+                "phosphorus_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
+                "phosphorus_fertilizer_upstream_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
                 "field_name": MeasurementUnits.UNITLESS,
             },
@@ -292,7 +312,15 @@ class EmissionsEstimator:
                     "ammonia_emissions": crop["ammonia_emissions"],
                     "carbon_stock_change": crop["carbon_stock_change"],
                     "nitrogen_fertilizer_used": crop["nitrogen_fertilizer_used"],
+                    "nitrogen_fertilizer_embedded_CO2_emissions": crop["nitrogen_fertilizer_embedded_CO2_emissions"],
+                    "nitrogen_fertilizer_upstream_CO2_emissions": crop["nitrogen_fertilizer_upstream_CO2_emissions"],
                     "phosphorus_fertilizer_used": crop["phosphorus_fertilizer_used"],
+                    "phosphorus_fertilizer_embedded_CO2_emissions": crop[
+                        "phosphorus_fertilizer_embedded_CO2_emissions"
+                    ],
+                    "phosphorus_fertilizer_upstream_CO2_emissions": crop[
+                        "phosphorus_fertilizer_upstream_CO2_emissions"
+                    ],
                     "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
                 }
@@ -308,7 +336,8 @@ class EmissionsEstimator:
             soil_data = {}
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
-                "description": "Collects the ammonia emissions from all soil layers in the field in the last year of the simulation.",
+                "description": "Collects the ammonia emissions from all soil layers in the field in the last year of "
+                "the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
@@ -318,7 +347,8 @@ class EmissionsEstimator:
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
-                "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year of the simulation.",
+                "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
+                " of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
                 ],
@@ -378,7 +408,11 @@ class EmissionsEstimator:
                 crop["ammonia_emissions"] = 0.0
                 crop["carbon_stock_change"] = 0.0
                 crop["nitrogen_fertilizer_used"] = 0.0
+                crop["nitrogen_fertilizer_embedded_CO2_emissions"] = 0.0
+                crop["nitrogen_fertilizer_upstream_CO2_emissions"] = 0.0
                 crop["phosphorus_fertilizer_used"] = 0.0
+                crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
+                crop["phosphorus_fertilizer_upstream_CO2_emissions"] = 0.0
                 crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
@@ -390,7 +424,27 @@ class EmissionsEstimator:
             crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
             crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown
             crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
+            crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["nitrogen"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["nitrogen_fertilizer_upstream_CO2_emissions"] = (
+                fertilizer_applications["nitrogen"]
+                * fraction_of_total_mass_grown
+                * UPSTREAM_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+            )
             crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
+            crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["phosphorus"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["phosphorus_fertilizer_upstream_CO2_emissions"] = (
+                fertilizer_applications["phosphorus"]
+                * fraction_of_total_mass_grown
+                * UPSTREAM_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
         return feeds_grown
