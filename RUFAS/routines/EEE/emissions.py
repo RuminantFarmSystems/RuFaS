@@ -226,7 +226,10 @@ class EmissionsEstimator:
         return feed_emissions_dict
 
     def _calculate_homegrown_feed_emissions(
-        self, homegrown_feeds: list[dict[str, Any]], fertilizer_applications: list[dict[str, Any]], manure_applications: list[dict[str, Any]]
+        self,
+        homegrown_feeds: list[dict[str, Any]],
+        fertilizer_applications: list[dict[str, Any]],
+        manure_applications: list[dict[str, Any]],
     ) -> None:
         """Calculates the emissions associated with feeds grown on the farm."""
         grouped_feeds = {}
@@ -258,7 +261,10 @@ class EmissionsEstimator:
         crops_with_emissions = []
         for field in grouped_feeds.keys():
             crops = self._calculate_emissions_by_field(
-                grouped_feeds[field], grouped_soil_characteristics[field], aggregated_fertilizer_apps[field], aggregated_manure_apps[field]
+                grouped_feeds[field],
+                grouped_soil_characteristics[field],
+                aggregated_fertilizer_apps[field],
+                aggregated_manure_apps[field],
             )
             crops_with_emissions.extend(crops)
 
