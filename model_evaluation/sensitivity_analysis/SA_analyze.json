@@ -1,20 +1,14 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/manure_sobol_tasks_full.json",
+            "input_file": "input/data/tasks/manure_sobol_tasks.json",
             "output_path": "output/reports/",
             "report_name": "report_Manure_SA",
             "only_inputs": false,
             "plot_whole_new": true,
             "inputs_to_collate": [
                 "manure_management barn_area_configs freestall_has_cows",
-                "manure_management barn_area_configs freestall_no_cows",
-                "manure_management barn_area_configs tiestall_has_cows",
-                "manure_management barn_area_configs tiestall_no_cows",
-                "manure_management barn_area_configs compost_bedded_pack_barn_has_cows",
-                "manure_management barn_area_configs compost_bedded_pack_barn_no_cows",
-                "manure_management barn_area_configs open_lot_has_cows",
-                "manure_management barn_area_configs open_lot_no_cows"
+                "manure_management barn_area_configs freestall_no_cows"
             ],
             "plot_inputs": false,
             "outputs_to_collate": [
