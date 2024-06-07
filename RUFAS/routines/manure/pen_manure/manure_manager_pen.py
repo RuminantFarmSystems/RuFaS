@@ -143,7 +143,6 @@ class ManureManagerPen:
             raise ValueError(f"Invalid pen type: {self.pen_type}")
 
         barn_area = barn_area_by_pen_type[self.pen_type]
-
-        if "Cow" in self.classes_in_pen:
+        if "LacCow" in self.classes_in_pen:
             return barn_area.has_cows * self.num_stalls
         return barn_area.no_cows * self.num_stalls
