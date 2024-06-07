@@ -177,6 +177,14 @@ class EmissionsEstimator:
         """
         keys = data.keys()
         values_list = [data[key]["values"] for key in keys]
+        missing_data = not all(len(values_list[index]) == len(values_list[0]) for index in range(len(values_list)))
+        if missing_data:
+            info_map = {"class": self.__class__.__name__, "function": self._transform_outputs_to_list_of_dicts.__name__}
+            om.add_error(
+                "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
+                "Ignoring extraneous data.",
+                info_map
+            )
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
 
