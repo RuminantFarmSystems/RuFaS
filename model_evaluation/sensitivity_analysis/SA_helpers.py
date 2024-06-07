@@ -60,7 +60,7 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
         + list(analysis["S2_conf"])
     )
     len(rowvalues)
-    rowvalues[21]
+    rowvalues[7]
 
     analysis_out = [colnames, rowvalues]
     return analysis_out
