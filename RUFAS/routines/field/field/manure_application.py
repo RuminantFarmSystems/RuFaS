@@ -526,7 +526,7 @@ class ManureApplication:
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
         self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
-        self.data.soil_layers[layer_index].active_organic_nitrogen_content += active_organic_nitrogen_added
+        self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += active_organic_nitrogen_added
 
     def _apply_subsurface_manure(
         self,
