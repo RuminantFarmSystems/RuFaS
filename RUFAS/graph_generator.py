@@ -203,8 +203,9 @@ class GraphGenerator:
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
             updated_pool = filtered_pool
             if graph_details.get("display_units", True):
-                updated_pool, var_units_logs = self._add_var_units(filtered_pool,
-                                                                   graph_details.get("title", "Untitled graph"))
+                updated_pool, var_units_logs = self._add_var_units(
+                    filtered_pool, graph_details.get("title", "Untitled graph")
+                )
                 graph_details["variables"] = list(updated_pool.keys())
             prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
