@@ -305,10 +305,8 @@ class EmissionsEstimator:
                 "carbon_stock_change": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                 "nitrogen_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
-                "nitrogen_fertilizer_upstream_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
-                "phosphorus_fertilizer_upstream_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
                 "field_name": MeasurementUnits.UNITLESS,
             },
@@ -324,13 +322,9 @@ class EmissionsEstimator:
                     "carbon_stock_change": crop["carbon_stock_change"],
                     "nitrogen_fertilizer_used": crop["nitrogen_fertilizer_used"],
                     "nitrogen_fertilizer_embedded_CO2_emissions": crop["nitrogen_fertilizer_embedded_CO2_emissions"],
-                    "nitrogen_fertilizer_upstream_CO2_emissions": crop["nitrogen_fertilizer_upstream_CO2_emissions"],
                     "phosphorus_fertilizer_used": crop["phosphorus_fertilizer_used"],
                     "phosphorus_fertilizer_embedded_CO2_emissions": crop[
                         "phosphorus_fertilizer_embedded_CO2_emissions"
-                    ],
-                    "phosphorus_fertilizer_upstream_CO2_emissions": crop[
-                        "phosphorus_fertilizer_upstream_CO2_emissions"
                     ],
                     "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
@@ -418,10 +412,8 @@ class EmissionsEstimator:
                 crop["carbon_stock_change"] = 0.0
                 crop["nitrogen_fertilizer_used"] = 0.0
                 crop["nitrogen_fertilizer_embedded_CO2_emissions"] = 0.0
-                crop["nitrogen_fertilizer_upstream_CO2_emissions"] = 0.0
                 crop["phosphorus_fertilizer_used"] = 0.0
                 crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
-                crop["phosphorus_fertilizer_upstream_CO2_emissions"] = 0.0
                 crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
