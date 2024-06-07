@@ -153,6 +153,7 @@ class EmissionsEstimator:
         """
         filter = {
             "name": "Feed Ration Totals",
+            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
             "variables": [r"^\d+$"],
             "slice_start": SLICE_START,
