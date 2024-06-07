@@ -46,14 +46,6 @@ EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 5.32
 EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 3.07
 
 
-"""
-These are constants for calculating the upstream emissions of synthetic nitrogen and phosphorus fertilizer. Their units
-are in kg CO2e / kg N and kg CO2e / kg P, respectively.
-"""
-UPSTREAM_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 3.11
-UPSTREAM_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 1.84
-
-
 class EmissionsEstimator:
     def __init__(self) -> None:
         pass
@@ -83,7 +75,9 @@ class EmissionsEstimator:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
         )
 
-    def _gather_homegrown_feeds_and_fertilizer_apps(self) -> tuple[list[dict[str, Any]]]:
+    def _gather_homegrown_feeds_and_fertilizer_apps(
+        self
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
         simulation.
@@ -265,7 +259,7 @@ class EmissionsEstimator:
         manure_applications: list[dict[str, Any]],
     ) -> None:
         """Calculates the emissions associated with feeds grown on the farm."""
-        grouped_feeds = {}
+        grouped_feeds: dict[str, list[dict[str, Any]]] = {}
         for feed in homegrown_feeds:
             field_name = feed["field_name"]
             if field_name not in grouped_feeds.keys():
@@ -289,7 +283,7 @@ class EmissionsEstimator:
             aggregated_manure_apps[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_manure_apps[field_name]["phosphorus"] += app["phosphorus"]
 
-        grouped_soil_characteristics = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
@@ -444,21 +438,11 @@ class EmissionsEstimator:
                 * fraction_of_total_mass_grown
                 * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
             )
-            crop["nitrogen_fertilizer_upstream_CO2_emissions"] = (
-                fertilizer_applications["nitrogen"]
-                * fraction_of_total_mass_grown
-                * UPSTREAM_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
-            )
             crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
             crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
                 fertilizer_applications["phosphorus"]
                 * fraction_of_total_mass_grown
                 * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["phosphorus_fertilizer_upstream_CO2_emissions"] = (
-                fertilizer_applications["phosphorus"]
-                * fraction_of_total_mass_grown
-                * UPSTREAM_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
