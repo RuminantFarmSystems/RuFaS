@@ -86,6 +86,10 @@ def manure_calculations(
     # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
     urine_nitrogen = 0.45 * manure_nitrogen
 
+    # Total ammoniacal N in manure, kg
+    # TODO add equaiton to Animal module documentation
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
+
     # Methane emissions, g/day [A.3A.C.1]
     methane_emission = 0.0
     if methane_model:
@@ -110,7 +114,7 @@ def manure_calculations(
         urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation GitHub Issue # 1216
         urine=urine,
         # TODO: Implement with correct equation GitHub Issue # 1216
-        total_ammoniacal_nitrogen_concentration=0.14,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=total_manure_excreted,
