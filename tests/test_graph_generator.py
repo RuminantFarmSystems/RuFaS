@@ -533,6 +533,6 @@ def test_add_var_units(
     expected_logs: list[dict[str, str | dict[str, str]]],
 ):
     """Test for the _add_var_units() method in graph_generator.py"""
-    updated_pool, logs = graph_generator._add_var_units(filtered_pool, 'dummy_title')
+    updated_pool, logs = graph_generator._add_var_units(filtered_pool, "dummy_title")
     assert updated_pool == expected_output
     assert logs == expected_logs
