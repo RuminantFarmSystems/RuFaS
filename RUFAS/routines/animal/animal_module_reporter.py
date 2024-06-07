@@ -216,20 +216,20 @@ class AnimalModuleReporter:
             }
             nutrient_amount_units = {
                 "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-                "CP": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "ADF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "NDF": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "lignin": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "ash": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "potassium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "N": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "as_fed": MeasurementUnits.PERCENT,
-                "EE": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "starch": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "TDN": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "DE": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-                "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+                "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "DE": MeasurementUnits.MEGACALORIES,
+                "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             }
             classname = AnimalModuleReporter.__name__
             funcname = AnimalModuleReporter.report_ration_interval_data.__name__
@@ -410,8 +410,11 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
             "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
         }
-        daily_feed_emissions = animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(
-            ration_total
+        daily_purchased_feed_emissions = (
+            animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(ration_total)
+        )
+        daily_land_use_change_feed_emissions = (
+            animal_manager.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(ration_total)
         )
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_feed_emissions.__name__
@@ -421,12 +424,18 @@ class AnimalModuleReporter:
             {},
             animal_manager.simulation_day,
             info_map,
-            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
+            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
         )
         om.add_variable(
-            f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
-            daily_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            f"purchased_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
+            daily_purchased_feed_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
+        )
+        info_map["data_origin"] = [("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")]
+        om.add_variable(
+            f"land_use_change_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
+            daily_land_use_change_feed_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
         )
 
     @classmethod
