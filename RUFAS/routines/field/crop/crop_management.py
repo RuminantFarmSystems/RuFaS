@@ -178,6 +178,7 @@ class CropManagement:
                 self.data.biomass, self.data.harvest_index
             )
         fraction_cut = self.data.cut_biomass / self.data.biomass
+        self.data.yield_residue = self.data.biomass - self.data.cut_biomass
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
@@ -187,7 +188,7 @@ class CropManagement:
         self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
         self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
 
-        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
+        # * (1 - collected_fraction)
 
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
