@@ -203,8 +203,9 @@ class GraphGenerator:
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
             updated_pool = filtered_pool
             if graph_details.get("display_units", True):
-                updated_pool, var_units_logs = self._add_var_units(filtered_pool,
-                                                                   graph_details.get("title", "Untitled graph"))
+                updated_pool, var_units_logs = self._add_var_units(
+                    filtered_pool, graph_details.get("title", "Untitled graph")
+                )
             prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
             all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
@@ -241,9 +242,11 @@ class GraphGenerator:
 
         return all_logs
 
-    def _set_graph_legend(self, graph_details: dict[str, str],
-                          prepared_data: dict[str, list[Any]],
-                          ) -> dict[str, str]:
+    def _set_graph_legend(
+        self,
+        graph_details: dict[str, str],
+        prepared_data: dict[str, list[Any]],
+    ) -> dict[str, str]:
         """Sets the graph legend if there is no legend present in the graph details.
 
         Parameters
@@ -265,8 +268,7 @@ class GraphGenerator:
             graph_details["legend"] = selected_variables
         elif omit_legend_prefix or omit_legend_suffix:
             graph_details["legend"] = list(
-                self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix)
-                for key in prepared_data.keys()
+                self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix) for key in prepared_data.keys()
             )
         else:
             graph_details["legend"] = list(prepared_data.keys())
@@ -274,7 +276,9 @@ class GraphGenerator:
         return graph_details
 
     def _add_var_units(
-        self, filtered_pool: dict[str, List[Any]], graph_title: str,
+        self,
+        filtered_pool: dict[str, List[Any]],
+        graph_title: str,
     ) -> Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]:
         """Adds variable units to variable name for graphing.
 
