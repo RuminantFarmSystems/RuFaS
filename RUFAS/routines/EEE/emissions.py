@@ -117,7 +117,8 @@ class EmissionsEstimator:
 
         time_filter = {
             "name": "Time Filter",
-            "description": "Collects the date a year before the simulation ended.",
+            "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
+            "which crop yields and nutrient applications to estimate emissions for.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
