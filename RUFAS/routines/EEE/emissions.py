@@ -117,7 +117,8 @@ class EmissionsEstimator:
 
         time_filter = {
             "name": "Time Filter",
-            "description": "Collects the date a year before the simulation ended.",
+            "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
+            "which crop yields and nutrient applications to estimate emissions for.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
@@ -152,6 +153,7 @@ class EmissionsEstimator:
         """
         filter = {
             "name": "Feed Ration Totals",
+            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
             "variables": [r"^\d+$"],
             "slice_start": SLICE_START,
@@ -177,6 +179,14 @@ class EmissionsEstimator:
         """
         keys = data.keys()
         values_list = [data[key]["values"] for key in keys]
+        missing_data = not all(len(values_list[index]) == len(values_list[0]) for index in range(len(values_list)))
+        if missing_data:
+            info_map = {"class": self.__class__.__name__, "function": self._transform_outputs_to_list_of_dicts.__name__}
+            om.add_error(
+                "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
+                "Ignoring extraneous data.",
+                info_map
+            )
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
 
@@ -186,10 +196,7 @@ class EmissionsEstimator:
         """
         Calculates the difference between the purchased feeds and feeds grown on the farm.
         """
-        homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
-        for crop_species in homegrown_totals:
-            yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
-            homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
+        homegrown_totals = self._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
 
         actual_purchased_feeds = {}
         for feed_id, amount in purchased_feeds.items():
@@ -205,6 +212,16 @@ class EmissionsEstimator:
             actual_purchased_feeds[feed_id] = amount
 
         return actual_purchased_feeds
+
+    def _calculate_total_homegrown_feed_amounts_by_crop_type(
+        self, homegrown_feeds: list[dict[str, Any]]
+    ) -> dict[CropSpecies, float]:
+        """Calculates the total amount of each crop species grown on the farm."""
+        homegrown_totals = {key: 0.0 for key in list(CROP_SPECIES_TO_PURCHASED_FEED_ID)}
+        for crop_species in homegrown_totals:
+            yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
+            homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
+        return homegrown_totals
 
     def _calculate_actual_purchased_feed_emissions(self, actual_purchased_feeds: dict[str, float]) -> dict[str, float]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
