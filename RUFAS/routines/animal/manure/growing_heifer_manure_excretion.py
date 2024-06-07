@@ -130,10 +130,8 @@ def manure_calculations(
         ),
     )
 
-
     # Total ammoniacal nitrogen in the manure slurry, kg
     manure_total_ammoniacal_nitrogen = urine_nitrogen
-
 
     # Amount of potassium excreted, g [A.3B.B.4]
     potassium = (

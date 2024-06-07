@@ -93,7 +93,7 @@ def test_dry_cow_manure_calculations(methane_model: str, mocker: MockerFixture) 
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
 
     manure_total_ammoniacal_nitrogen = urine_nitrogen
-  
+
     potassium = (
         dry_matter_intake
         * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)

@@ -214,11 +214,9 @@ def manure_calculations(
         ),
     )
 
-
     # Total ammoniacal nitrogen in the manure slurry, kg
     # TODO update TAN estimation equation in Animal module documentation
     manure_total_ammoniacal_nitrogen = urine_nitrogen
-
 
     # Amount of potassium excreted, g [A.3E.B.3]
     potassium = (
