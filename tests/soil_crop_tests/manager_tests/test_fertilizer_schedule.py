@@ -190,12 +190,12 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
             0,
             2,
             [
-                FertilizerEvent("mix_3", 1995, 100, 10.0, 25.0, 8.0,0.0, 1.0),
-                FertilizerEvent("mix_4", 1996, 100, 20.0, 10.0, 8.0,0.0, 1.0),
-                FertilizerEvent("mix_3", 1997, 100, 10.0, 25.0, 8.0,0.0, 1.0),
-                FertilizerEvent("mix_4", 1998, 100, 20.0, 10.0, 8.0,0.0, 1.0),
-                FertilizerEvent("mix_3", 1999, 100, 10.0, 25.0, 8.0,0.0, 1.0),
-                FertilizerEvent("mix_4", 2000, 100, 20.0, 10.0, 8.0,0.0, 1.0),
+                FertilizerEvent("mix_3", 1995, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_4", 1996, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_3", 1997, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_4", 1998, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_3", 1999, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_4", 2000, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
             ],
         ),
         (
