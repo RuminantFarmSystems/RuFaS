@@ -330,6 +330,12 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
             True,
             "dummy_prefix.dummy_var.dummy_var2.dummy_var3",
         ),
+        (
+            "dummy_prefix.dummy_method.dummy_var=dummy_value (units)",
+            True,
+            True,
+            "dummy_method (units)",
+        ),
     ],
 )
 def test_generate_legend_keys(
@@ -341,6 +347,31 @@ def test_generate_legend_keys(
 ) -> None:
     actual_output = graph_generator._generate_legend_keys(combined_var_input, omit_legend_prefix, omit_legend_suffix)
     assert actual_output == expected_output
+
+
+@pytest.mark.parametrize(
+    "graph_details, prepared_data, expected_legend",
+    [
+        ({"variables": ["Temperature"]},
+         {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]},
+         ["Temperature"]),
+
+        ({"omit_legend_prefix": True, "omit_legend_suffix": True},
+         {"prefix.temp.suffix=suffix": [20, 22, 21]},
+         ["temp"]),
+
+        ({},
+         {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]},
+         ["Temperature", "Humidity"]),
+
+        ({},
+         {},
+         [])
+    ]
+)
+def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend):
+    result = graph_generator._set_graph_legend(graph_details, prepared_data)
+    assert result["legend"] == expected_legend
 
 
 def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -500,39 +531,54 @@ def test_validate_graph_filter(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, expected_output, expected_logs",
+    "filtered_pool, graph_title, expected_output, expected_logs",
     [
         (
-            {
-                "temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
-                "pressure": {"values": [1, 2], "info_maps": [{"units": "Bar"}]},
-            },
-            {
-                "temperature (Celsius)": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]},
-                "pressure (Bar)": {"values": [1, 2], "info_maps": [{"units": "Bar"}]},
-            },
+            {"wind_speed": {"values": [5, 6], "info_maps": [{"units": {"wind_speed": "m/s"}}]}},
+            "Wind Test",
+            {"wind_speed (m/s)": {"values": [5, 6], "info_maps": [{"units": {"wind_speed": "m/s"}}]}},
             [],
         ),
         (
+            {"wind_speed": {"values": [5, 6], "info_maps": [{"units": {"speed": "m/s"}}]}},
+            "Wind Test",
+            {"wind_speed (not available)": {"values": [5, 6], "info_maps": [{"units": {"speed": "m/s"}}]}},
+            [
+                {
+                    "warning": "Missing unit information",
+                    "message": "Unit for 'wind_speed' not found in units dictionary. Using default 'not available'.",
+                    "info_map": {"class": "GraphGenerator", "function": "_add_var_units"},
+                }
+            ],
+        ),
+        (
             {"temperature": {"values": [20, 21]}},
+            "Temperature Test",
             {"temperature": {"values": [20, 21]}},
             [
                 {
-                    "warning": "Can't add units to variables for graphing dummy_title",
+                    "warning": "Can't add units to variables for graphing Temperature Test",
                     "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
                     "info_map": {"class": "GraphGenerator", "function": "_add_var_units"},
                 }
             ],
+        ),
+        (
+            {"temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
+            "Temperature Test",
+            {"temperature (Celsius)": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
+            []
         ),
     ],
 )
 def test_add_var_units(
     graph_generator: GraphGenerator,
     filtered_pool: dict[str, dict[str, list[Any]]],
+    graph_title: str,
     expected_output: dict[str, dict[str, list[Any]]],
     expected_logs: list[dict[str, str | dict[str, str]]],
 ):
     """Test for the _add_var_units() method in graph_generator.py"""
-    updated_pool, logs = graph_generator._add_var_units(filtered_pool, "dummy_title")
+    updated_pool, logs = graph_generator._add_var_units(filtered_pool, graph_title)
     assert updated_pool == expected_output
     assert logs == expected_logs

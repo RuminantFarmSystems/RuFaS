@@ -265,15 +265,16 @@ class GraphGenerator:
         omit_legend_prefix = graph_details.get("omit_legend_prefix", False)
         omit_legend_suffix = graph_details.get("omit_legend_suffix", False)
 
-        if selected_variables := graph_details.get("variables"):
-            graph_details["legend"] = selected_variables
-        elif omit_legend_prefix or omit_legend_suffix:
+        if omit_legend_prefix or omit_legend_suffix:
             graph_details["legend"] = list(
                 self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix) for key in prepared_data.keys()
             )
+        elif selected_variables := graph_details.get("variables"):
+            graph_details["legend"] = selected_variables
         else:
             graph_details["legend"] = list(prepared_data.keys())
 
+        graph_details["legend"] = [s.replace('.', '.\n') for s in graph_details["legend"]]
         return graph_details
 
     def _add_var_units(
@@ -298,26 +299,35 @@ class GraphGenerator:
             "class": self.__class__.__name__,
             "function": self._add_var_units.__name__,
         }
+        logs: list[dict[str, Collection[str]]] = []
         if not any("info_maps" in details for details in filtered_pool.values()):
-            all_logs: List[Dict[str, Collection[str]]] = [
+            logs.append(
                 {
                     "warning": f"Can't add units to variables for graphing {graph_title}",
                     "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
                     "info_map": info_map,
                 }
-            ]
-            return filtered_pool, all_logs
+            )
+            return filtered_pool, logs
         else:
             for var_name, details in filtered_pool.items():
-                unit = details["info_maps"][0]["units"]
-                if isinstance(unit, dict):
-                    extracted_unit = unit[var_name]
-                    unit = extracted_unit
+                unit_info = details["info_maps"][0]["units"]
+                if isinstance(unit_info, dict):
+                    unit = unit_info.get(var_name, "not available")
+                    if unit == "not available":
+                        logs.append({
+                            "warning": "Missing unit information",
+                            "message": f"Unit for '{var_name}' not found in units dictionary. "
+                            "Using default 'not available'.",
+                            "info_map": info_map,
+                        })
+                else:
+                    unit = unit_info
+
                 new_var_name = f"{var_name} ({unit})"
-                print(new_var_name)
                 updated_data[new_var_name] = details
 
-        return updated_data, []
+        return updated_data, logs
 
     def _generate_legend_keys(
         self, combined_var_name: str, omit_legend_prefix: bool = False, omit_legend_suffix: bool = False
@@ -369,7 +379,8 @@ class GraphGenerator:
                     check if the variable name has suffix.
         """
         combined_var_name_list: List[str] = combined_var_name.split(".")
-
+        print(combined_var_name)
+        print(combined_var_name_list)
         slice_start: int = 0
         slice_end: int = len(combined_var_name_list)
 
@@ -386,7 +397,7 @@ class GraphGenerator:
                 slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
 
             updated_var_name = ".".join(combined_var_name_list[slice_start:slice_end])
-            units = re.search(r"\(.*\)", combined_var_name)
+            units = re.search(r"\(.*\)", combined_var_name_list[-1])
             if units and omit_legend_suffix:
                 return f"{updated_var_name} {units.group()}"
             return updated_var_name
