@@ -294,7 +294,7 @@ class EmissionsEstimator:
         fields_with_crops = set(grouped_feeds.keys())
         fields_with_fertilizer_apps = {app["field_name"] for app in fertilizer_applications}
         all_fields = list(fields_with_fertilizer_apps | fields_with_crops)
-        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
+        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0, "potassium": 0.0} for key in all_fields}
         for app in fertilizer_applications:
             field_name = app["field_name"]
             aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
@@ -355,7 +355,7 @@ class EmissionsEstimator:
                         "phosphorus_fertilizer_embedded_CO2_emissions"
                     ],
                     "potassium_fertilizer_used": crop["potassium_fertilizer_used"],
-                    "potassium_fertilizer_embedded_CO2_emissions": crop["potassium_fertilizer_embdded_CO2_emissions"],
+                    "potassium_fertilizer_embedded_CO2_emissions": crop["potassium_fertilizer_embedded_CO2_emissions"],
                     "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
                 }
@@ -470,8 +470,9 @@ class EmissionsEstimator:
             )
             crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
             crop["potassium_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_applications["potassium"],
-                *fraction_of_total_mass_grown * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR,
+                fertilizer_applications["potassium"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR,
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
