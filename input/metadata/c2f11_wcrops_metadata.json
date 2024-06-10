@@ -150,35 +150,35 @@
     },
 
     "Alfalfa 2022 (cs_alf) Crop data": {
-      "title": "cornsilage 2022 crop data",
+      "title": "alfalfa 2022 crop data",
       "description": "Crop selection and detailed rotation schedules.",
       "path": "input/data/crop/c2f11_alfalfa_2022_cs_alf_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "Alfalfa 2022 (cs_alf) Fertilizer schedule": {
-      "title": "Fertilizer schedule cornsilage 2022",
+      "title": "Fertilizer schedule alfalfa 2022",
       "description": "Fertilizer types available, and their application schedule.",
       "path": "input/data/fertilizer_schedule/c2f11_alfalfa_2022_corn_alf_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "Alfalfa 2022 (cs_alf) Manure schedule": {
-      "title": "Manure schedule cornsilage 2022",
+      "title": "Manure schedule alfalfa 2022",
       "description": "Specifies manure applications to a field.",
       "path": "input/data/manure_schedule/c2f11_alfalfa_2022_corn_alf_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "Alfalfa 2022 (cs_alf) Tillage schedule": {
-      "title": "Tillage schedule cornsilage 2022",
+      "title": "Tillage schedule alfalfa 2022",
       "description": "Schedule of tillage applications for a field.",
       "path": "input/data/tillage_schedule/c2f11_alfalfa_2022_corn_alf_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field Alfalfa 2022": {
-      "title": "Field specification cornsilage 2022",
+      "title": "Field specification alfalfa 2022",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/c2f11_alfalfa_2022_corn_alf_field.json",
       "type": "json",
