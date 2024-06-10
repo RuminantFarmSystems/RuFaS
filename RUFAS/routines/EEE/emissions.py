@@ -70,15 +70,18 @@ class EmissionsEstimator:
             actual_purchased_feed_totals,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
-        actual_purchased_feed_emissions = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
-        om.add_variable(
-            "actual_purchased_feed_emissions",
+        (
             actual_purchased_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            actual_land_use_change_emissions,
+        ) = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
+        emissions_info_map = dict(
+            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
         )
+        om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
+        om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
-        self
+        self,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
@@ -181,7 +184,7 @@ class EmissionsEstimator:
             om.add_error(
                 "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
                 "Ignoring extraneous data.",
-                info_map
+                info_map,
             )
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
@@ -221,13 +224,20 @@ class EmissionsEstimator:
 
     def _calculate_actual_purchased_feed_emissions(self, actual_purchased_feeds: dict[str, float]) -> dict[str, float]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
-        feed_emissions = self._get_feed_emissions_data()
+        county_code = im.get_data("config.FIPS_county_code")
+
+        purchased_feed_emissions_data = im.get_data("purchased_feeds_emissions")
+        purchased_feed_emissions = self._get_feed_emissions_data(county_code, purchased_feed_emissions_data)
+
+        land_use_change_emissions_data = im.get_data("purchased_feed_land_use_change_emissions")
+        land_use_change_emissions = self._get_feed_emissions_data(county_code, land_use_change_emissions_data)
 
         actual_purchased_feed_emissions = {}
+        actual_land_use_change_emissions = {}
         for id, amount_fed in actual_purchased_feeds.items():
             try:
-                emissions = amount_fed * feed_emissions[id]
-                actual_purchased_feed_emissions[id] = emissions
+                purchased_emissions = amount_fed * purchased_feed_emissions[id]
+                actual_purchased_feed_emissions[id] = purchased_emissions
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
@@ -238,18 +248,31 @@ class EmissionsEstimator:
                     f"Missing data for RuFaS feed {id}, omitting from purchased feed emissions estimation.",
                     info_map,
                 )
+            try:
+                land_use_emissions = amount_fed * land_use_change_emissions[id]
+                actual_land_use_change_emissions[id] = land_use_emissions
+            except KeyError:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_actual_purchased_feed_emissions.__name__,
+                }
+                om.add_warning(
+                    "Missing Land Use Change Purchased Feed Emissions",
+                    f"Missing data for RuFaS feed {id}, omitting from land use change purchased feed emissions "
+                    "estimation.",
+                    info_map,
+                )
 
-        return actual_purchased_feed_emissions
+        return actual_purchased_feed_emissions, actual_land_use_change_emissions
 
-    def _get_feed_emissions_data(self) -> dict[str, float]:
+    def _get_feed_emissions_data(
+        self, county_code: int, feed_emissions_data: dict[str, list[float]]
+    ) -> dict[str, float]:
         """Grabs the appropriate list of emissions for purchased feeds for the location of the simulation."""
-        county_code = im.get_data("config.FIPS_county_code")
-        feed_emissions_data = im.get_data("purchased_feeds_emissions")
-
         county_codes = feed_emissions_data["county_code"]
         emissions_index = county_codes.index(county_code)
 
-        feed_keys = [key for key in feed_emissions_data.keys() if key != "FIPS_county_code"]
+        feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict
@@ -448,8 +471,7 @@ class EmissionsEstimator:
             crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
             crop["potassium_fertilizer_embedded_CO2_emissions"] = (
                 fertilizer_applications["potassium"],
-                * fraction_of_total_mass_grown
-                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+                *fraction_of_total_mass_grown * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR,
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
