@@ -301,7 +301,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
         day: int,
         nitrogen_mass: float,
         phosphorus_mass: float,
-        potassium_mass : float,
+        potassium_mass: float,
         depth: float,
         surface_remainder_fraction: float,
     ):
