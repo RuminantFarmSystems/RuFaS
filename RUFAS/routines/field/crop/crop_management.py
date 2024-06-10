@@ -294,12 +294,12 @@ class CropManagement:
             "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
             "harvest_index": MeasurementUnits.UNITLESS,
-            "planting_date": {
-                "year": MeasurementUnits.CALENDAR_YEAR,
-                "day": MeasurementUnits.ORDINAL_DAY,
-            },
-            "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "planting_year": MeasurementUnits.CALENDAR_YEAR,
+            "planting_day": MeasurementUnits.ORDINAL_DAY,
+            "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+            "harvest_day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
         }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
@@ -319,12 +319,12 @@ class CropManagement:
             "phosphorus": phosphorus_harvested,
             "yield_residue": self.data.yield_residue,
             "harvest_index": self.data.harvest_index,
-            "planting_date": {
-                "year": self.data.planting_year,
-                "day": self.data.planting_day,
-            },
-            "harvest_date": {"year": year, "day": day},
+            "planting_year": self.data.planting_year,
+            "planting_day": self.data.planting_day,
+            "harvest_year": year,
+            "harvest_day": day,
             "field_size": field_size,
+            "field_name": field_name,
         }
         om.add_variable("harvest_yield", value, info_map)
 

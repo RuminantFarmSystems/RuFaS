@@ -1387,6 +1387,7 @@ def test_record_fertilizer_application(
         "year": MeasurementUnits.CALENDAR_YEAR.value,
         "day": MeasurementUnits.ORDINAL_DAY.value,
         "field_size": MeasurementUnits.HECTARE.value,
+        "field_name": MeasurementUnits.UNITLESS.value,
         "average_clay_percent": MeasurementUnits.PERCENT.value,
     }
 
@@ -1401,6 +1402,7 @@ def test_record_fertilizer_application(
         "year": year,
         "day": day,
         "field_size": field_size,
+        "field_name": field_name,
         "average_clay_percent": 10.0,
     }
 
@@ -1831,6 +1833,7 @@ def test_execute_manure_application_with_invalid_args(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
@@ -1846,6 +1849,7 @@ def test_execute_manure_application_with_invalid_args(
                 "year": 1991,
                 "day": 75,
                 "field_size": 1.3,
+                "field_name": "test_1",
                 "average_clay_percent": 10.0,
             },
             12.5,
@@ -1876,6 +1880,7 @@ def test_execute_manure_application_with_invalid_args(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
@@ -1891,6 +1896,7 @@ def test_execute_manure_application_with_invalid_args(
                 "year": 1994,
                 "day": 200,
                 "field_size": 2.4,
+                "field_name": "test_2",
                 "average_clay_percent": 10.0,
             },
             14.55,
@@ -1921,6 +1927,7 @@ def test_execute_manure_application_with_invalid_args(
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
+                    "field_name": MeasurementUnits.UNITLESS.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
             },
@@ -1936,6 +1943,7 @@ def test_execute_manure_application_with_invalid_args(
                 "phosphorus": 78.0,
                 "potassium": None,
                 "field_size": 0.66,
+                "field_name": "test_3",
                 "average_clay_percent": 10.0,
             },
             None,
