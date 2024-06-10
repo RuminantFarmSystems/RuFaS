@@ -274,7 +274,7 @@ class GraphGenerator:
         else:
             graph_details["legend"] = list(prepared_data.keys())
 
-        graph_details["legend"] = [s.replace('.', '.\n') for s in graph_details["legend"]]
+        graph_details["legend"] = [s.replace(".", ".\n") for s in graph_details["legend"]]
         return graph_details
 
     def _add_var_units(
@@ -315,12 +315,14 @@ class GraphGenerator:
                 if isinstance(unit_info, dict):
                     unit = unit_info.get(var_name, "not available")
                     if unit == "not available":
-                        logs.append({
-                            "warning": "Missing unit information",
-                            "message": f"Unit for '{var_name}' not found in units dictionary. "
-                            "Using default 'not available'.",
-                            "info_map": info_map,
-                        })
+                        logs.append(
+                            {
+                                "warning": "Missing unit information",
+                                "message": f"Unit for '{var_name}' not found in units dictionary. "
+                                "Using default 'not available'.",
+                                "info_map": info_map,
+                            }
+                        )
                 else:
                     unit = unit_info
 

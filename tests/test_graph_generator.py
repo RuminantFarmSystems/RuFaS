@@ -352,22 +352,15 @@ def test_generate_legend_keys(
 @pytest.mark.parametrize(
     "graph_details, prepared_data, expected_legend",
     [
-        ({"variables": ["Temperature"]},
-         {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]},
-         ["Temperature"]),
-
-        ({"omit_legend_prefix": True, "omit_legend_suffix": True},
-         {"prefix.temp.suffix=suffix": [20, 22, 21]},
-         ["temp"]),
-
-        ({},
-         {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]},
-         ["Temperature", "Humidity"]),
-
-        ({},
-         {},
-         [])
-    ]
+        ({"variables": ["Temperature"]}, {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]}, ["Temperature"]),
+        (
+            {"omit_legend_prefix": True, "omit_legend_suffix": True},
+            {"prefix.temp.suffix=suffix": [20, 22, 21]},
+            ["temp"],
+        ),
+        ({}, {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]}, ["Temperature", "Humidity"]),
+        ({}, {}, []),
+    ],
 )
 def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend):
     result = graph_generator._set_graph_legend(graph_details, prepared_data)
@@ -567,7 +560,7 @@ def test_validate_graph_filter(
             {"temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
             "Temperature Test",
             {"temperature (Celsius)": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
-            []
+            [],
         ),
     ],
 )
