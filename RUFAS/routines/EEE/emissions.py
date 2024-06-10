@@ -40,10 +40,12 @@ om = OutputManager()
 
 """
 These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
-are in kg CO2e / kg N and kg CO2e / kg P, respectively. Reference IPCC 2021, GWP 100.
+are in kg CO2e / kg N and kg CO2e / kg P, respectively. The nitrogen and phosphorus constants reference IPCC 2021, GWP
+100, the potassium constant references BASF's Eco-efficiency analysis tool.
 """
 EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 5.32
 EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 3.07
+EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 
 
 class EmissionsEstimator:
@@ -274,6 +276,7 @@ class EmissionsEstimator:
             field_name = app["field_name"]
             aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_fertilizer_apps[field_name]["phosphorus"] += app["phosphorus"]
+            aggregated_fertilizer_apps[field_name]["potassium"] += app["potassium"]
 
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
@@ -307,6 +310,8 @@ class EmissionsEstimator:
                 "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
+                "potassium_fertilizer_used": MeasurementUnits.KILOGRAMS,
+                "potassium_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
                 "field_name": MeasurementUnits.UNITLESS,
             },
@@ -326,6 +331,8 @@ class EmissionsEstimator:
                     "phosphorus_fertilizer_embedded_CO2_emissions": crop[
                         "phosphorus_fertilizer_embedded_CO2_emissions"
                     ],
+                    "potassium_fertilizer_used": crop["potassium_fertilizer_used"],
+                    "potassium_fertilizer_embedded_CO2_emissions": crop["potassium_fertilizer_embdded_CO2_emissions"],
                     "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
                 }
@@ -414,6 +421,8 @@ class EmissionsEstimator:
                 crop["nitrogen_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["phosphorus_fertilizer_used"] = 0.0
                 crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
+                crop["potassium_fertilizer_used"] = 0.0
+                crop["potassum_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
@@ -435,6 +444,12 @@ class EmissionsEstimator:
                 fertilizer_applications["phosphorus"]
                 * fraction_of_total_mass_grown
                 * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
+            crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["potassium"],
+                * fraction_of_total_mass_grown
+                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
