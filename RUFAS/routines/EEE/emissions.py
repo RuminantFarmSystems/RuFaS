@@ -76,7 +76,7 @@ class EmissionsEstimator:
         )
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
-        self
+        self,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
@@ -179,7 +179,7 @@ class EmissionsEstimator:
             om.add_error(
                 "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
                 "Ignoring extraneous data.",
-                info_map
+                info_map,
             )
         processed_data = [dict(zip(keys, values)) for values in zip(*values_list)]
         return processed_data
