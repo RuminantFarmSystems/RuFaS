@@ -146,7 +146,7 @@ class GraphGenerator:
         filter_file_name: str,
         graphics_dir: Path,
         produce_graphics: bool,
-    ) -> List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]:
+    ) -> List[Dict[str, str | Dict[str, str]]] | list[dict[str, str | dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
@@ -167,7 +167,7 @@ class GraphGenerator:
 
         Returns
         -------
-        log_pool : List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]
+        log_pool : List[Dict[str, str | Dict[str, str]]] | list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
 
@@ -181,7 +181,7 @@ class GraphGenerator:
             "function": self.generate_graph.__name__,
         }
         if not produce_graphics:
-            all_logs: List[Dict[str, Collection[str]]] = [
+            all_logs: list[dict[str, str | dict[str, str]]] = [
                 {
                     "error": f"Can't plot {graph_details.get('title')} data set",
                     "message": "'produce_graphics' set to False, no graphs will be produced.",
@@ -245,9 +245,9 @@ class GraphGenerator:
 
     def _set_graph_legend(
         self,
-        graph_details: dict[str, str],
+        graph_details: dict[str, str | list[str]],
         prepared_data: dict[str, list[Any]],
-    ) -> dict[str, str]:
+    ) -> dict[str, str | list[str]]:
         """Sets the graph legend if there is no legend present in the graph details.
 
         Parameters
@@ -279,9 +279,9 @@ class GraphGenerator:
 
     def _add_var_units(
         self,
-        filtered_pool: dict[str, List[Any]],
-        graph_title: str,
-    ) -> Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]:
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_title: str | list[str],
+    ) -> Tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """Adds variable units to variable name for graphing.
 
         Parameters
@@ -299,7 +299,7 @@ class GraphGenerator:
             "class": self.__class__.__name__,
             "function": self._add_var_units.__name__,
         }
-        logs: list[dict[str, Collection[str]]] = []
+        logs: list[dict[str, str | dict[str, str]]] = []
         if not any("info_maps" in details for details in filtered_pool.values()):
             logs.append(
                 {
@@ -332,7 +332,8 @@ class GraphGenerator:
         return updated_data, logs
 
     def _generate_legend_keys(
-        self, combined_var_name: str, omit_legend_prefix: bool = False, omit_legend_suffix: bool = False
+        self, combined_var_name: str, omit_legend_prefix: str | list[str] | bool = False,
+        omit_legend_suffix: str | list[str] | bool = False
     ) -> str:
         """
         Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
@@ -393,16 +394,17 @@ class GraphGenerator:
 
         elif len(combined_var_name_list) >= 3:
             if omit_legend_prefix:
-                slice_start: int = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
+                slice_start = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
 
             if omit_legend_suffix:
-                slice_end: int = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
+                slice_end = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
 
             updated_var_name = ".".join(combined_var_name_list[slice_start:slice_end])
             units = re.search(r"\(.*\)", combined_var_name_list[-1])
             if units and omit_legend_suffix:
                 return f"{updated_var_name} {units.group()}"
             return updated_var_name
+        return combined_var_name
 
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]
@@ -512,7 +514,7 @@ class GraphGenerator:
 
     def _draw_graph(
         self,
-        graph_type: str,
+        graph_type: str | list[str],
         data: Dict[str, List[int | float]],
         selected_variables: Optional[List[str]] = None,
     ) -> None:
@@ -569,7 +571,7 @@ class GraphGenerator:
 
     def _save_graph(
         self,
-        graph_details: Dict[str, str],
+        graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
     ) -> str:
