@@ -2,7 +2,7 @@ import datetime
 import re
 import os
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Collection, Tuple
+from typing import Dict, List, Any, Callable, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -382,8 +382,6 @@ class GraphGenerator:
                     check if the variable name has suffix.
         """
         combined_var_name_list: List[str] = combined_var_name.split(".")
-        print(combined_var_name)
-        print(combined_var_name_list)
         slice_start: int = 0
         slice_end: int = len(combined_var_name_list)
 
@@ -392,7 +390,7 @@ class GraphGenerator:
         elif len(combined_var_name_list) == 2:
             return combined_var_name_list[1]
 
-        elif len(combined_var_name_list) >= 3:
+        else:
             if omit_legend_prefix:
                 slice_start = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
 
@@ -404,7 +402,6 @@ class GraphGenerator:
             if units and omit_legend_suffix:
                 return f"{updated_var_name} {units.group()}"
             return updated_var_name
-        return combined_var_name
 
     def _validate_graph_filter(
         self, graph_details: Dict[str, str | List[str]]

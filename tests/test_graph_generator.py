@@ -336,6 +336,12 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
             True,
             "dummy_method (units)",
         ),
+        (
+            "",
+            False,
+            False,
+            "",
+        ),
     ],
 )
 def test_generate_legend_keys(
