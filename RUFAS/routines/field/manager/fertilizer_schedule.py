@@ -176,7 +176,7 @@ class FertilizerSchedule(Schedule):
                 f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
                 f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
                 f"phosphorus masses, '{self.potassium_masses}' potassium masses, '{self.application_depths}' "
-                "application depths, and '{self.surface_remainder_fractions}' surface remainder fractions."
+                f"application depths, and '{self.surface_remainder_fractions}' surface remainder fractions."
             )
 
     def generate_fertilizer_events(self) -> List[FertilizerEvent]:
