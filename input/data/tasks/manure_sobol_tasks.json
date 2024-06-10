@@ -3,7 +3,7 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "manure_sobol_3",
+        "output_prefix": "manure_sobol_4",
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 32,
