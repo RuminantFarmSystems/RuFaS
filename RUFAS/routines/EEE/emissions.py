@@ -472,7 +472,7 @@ class EmissionsEstimator:
             crop["potassium_fertilizer_embedded_CO2_emissions"] = (
                 fertilizer_applications["potassium"]
                 * fraction_of_total_mass_grown
-                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR,
+                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
