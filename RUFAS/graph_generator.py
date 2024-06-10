@@ -332,8 +332,10 @@ class GraphGenerator:
         return updated_data, logs
 
     def _generate_legend_keys(
-        self, combined_var_name: str, omit_legend_prefix: str | list[str] | bool = False,
-        omit_legend_suffix: str | list[str] | bool = False
+        self,
+        combined_var_name: str,
+        omit_legend_prefix: str | list[str] | bool = False,
+        omit_legend_suffix: str | list[str] | bool = False,
     ) -> str:
         """
         Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
