@@ -860,7 +860,7 @@ class Manure:
         organic_phosphorus: bool,
     ) -> float:
         """
-        Determines the amount of water extractable inorganic phosphorus leached by rainfall
+        Determines the amount of water extractable organic or inorganic phosphorus leached by rainfall.
 
         Parameters
         ----------
