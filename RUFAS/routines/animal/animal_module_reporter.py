@@ -460,7 +460,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
@@ -507,7 +507,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
