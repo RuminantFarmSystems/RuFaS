@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from typing import List, Dict, Union, Any, Tuple
 
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -919,6 +920,16 @@ class Pen:
         for animal in self.animals_in_pen.values():
             if type(animal) is Cow:
                 num_lac_cows += 1
+        om.add_variable(
+            # TODO: remove me
+            "count_lactating_cows",
+            num_lac_cows,
+            {
+                "class": self.__class__.__name__,
+                "function": self._count_lactating_cows.__name__,
+                "units": MeasurementUnits.ANIMALS,
+            },
+        )
         return num_lac_cows
 
     def get_manure_data(self) -> PenManureData:
