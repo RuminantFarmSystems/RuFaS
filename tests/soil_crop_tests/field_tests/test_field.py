@@ -1068,9 +1068,7 @@ def test_execute_fertilizer_application(
         "_formulate_fertilizer_required",
         return_value={"total_mass": 100, "nitrogen_mass": 20, "phosphorus_mass": 15, "potassium_mass": 10},
     )
-    # field.fertilizer_applicator.apply_fertilizer = MagicMock()
     apply = mocker.patch.object(field.fertilizer_applicator, "apply_fertilizer")
-    # field._record_fertilizer_application = MagicMock()
     record = mocker.patch.object(field, "_record_fertilizer_application")
 
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mocked_timestamp:

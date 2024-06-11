@@ -445,7 +445,7 @@ class EmissionsEstimator:
                 crop["phosphorus_fertilizer_used"] = 0.0
                 crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["potassium_fertilizer_used"] = 0.0
-                crop["potassum_fertilizer_embedded_CO2_emissions"] = 0.0
+                crop["potassium_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
