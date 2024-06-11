@@ -3,7 +3,6 @@ from __future__ import annotations
 import copy
 from typing import List, Dict, Union, Any, Tuple
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
