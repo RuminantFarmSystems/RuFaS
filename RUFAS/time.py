@@ -68,8 +68,7 @@ class Time:
         -----
         This method will be removed once the Weather class refactor is completed.
         """
-        start_full_date: list[str] = self.config_data["start_date"].split(":")
-        return int(start_full_date[0])
+        return self.start_date.year
 
     @property
     def start_day(self) -> int:
