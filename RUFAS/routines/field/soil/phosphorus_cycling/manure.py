@@ -876,8 +876,8 @@ class Manure:
         Returns
         -------
         float
-            The amount of water extractable inorganic phosphorus leached from manure on the soil surface by rain on the
-            given day (kg).
+            The amount of water extractable phosphorus leached from manure on the soil surface by rain on the given
+            day (kg).
 
         References
         ----------
