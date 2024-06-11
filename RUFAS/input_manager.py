@@ -77,19 +77,19 @@ class InputManager:
 
     __instance = None
 
-    def __new__(cls) -> "InputManager":
+    def __new__(cls, metadata_depth_limit: int | None = None) -> "InputManager":
         if not hasattr(cls, "instance"):
             cls.instance = super(InputManager, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self) -> None:
+    def __init__(self, metadata_depth_limit: int | None = None) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
-            self.metadata_depth_limit = 7
+        self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -110,15 +110,6 @@ class InputManager:
     def pool(self, incoming_pool: Dict[str, Any]) -> None:
         """The setter method for __pool"""
         self.__pool = incoming_pool
-
-    def set_metadata_depth_limit(self, limit: int) -> None:
-        """Override for the default metadata_depth_limit."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.set_metadata_depth_limit.__name__,
-        }
-        self.metadata_depth_limit = limit
-        om.add_log("Override default metadata depth limit", f"Metadata depth limit set to {limit}.", info_map)
 
     def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
         """
