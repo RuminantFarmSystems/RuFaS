@@ -49,6 +49,7 @@ def test_invalid_category_type_combinations(category: CropCategory, crop_type: C
 
 
 def test_attributes(mocker: MockerFixture) -> None:
+    """Tests that HarvestedCrop's are initialized correctly."""
     mock_dry_mass = mocker.patch.object(
         HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
     )
