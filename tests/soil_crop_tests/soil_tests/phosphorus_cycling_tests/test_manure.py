@@ -127,10 +127,7 @@ def test_determine_water_extractable_phosphorus_leached(
 ) -> None:
     """Tests that the correct mass of water extractable inorganic phosphorus leached is calculated."""
     observe = Manure._determine_water_extractable_phosphorus_leached(
-        manure,
-        rain_manure_ratio,
-        is_cow,
-        organic_phosphorus
+        manure, rain_manure_ratio, is_cow, organic_phosphorus
     )
 
     if is_cow:
