@@ -128,7 +128,10 @@ def test_process_degradations(
     storage.process_degradations(mock_weather, mock_time)
 
     expected_recalculate_percentage_call_count = len(storage.stored) * 4
-    expected_reset_mass_calls = [call(mock_first_crop, loss, 0.0), call(mock_second_crop, loss, 0.0)]
+    expected_reset_mass_calls = [
+        call(mock_first_crop, loss, moisture_loss=0.0),
+        call(mock_second_crop, loss, moisture_loss=0.0),
+    ]
 
     mock_get_conditions.assert_has_calls(expected_get_conditions_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
