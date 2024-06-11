@@ -89,15 +89,14 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     simulation_engine.day_counter = 100
     simulation_engine.feed = mocker.MagicMock()
     simulation_engine.animal_manager = mocker.MagicMock()
+    simulation_engine.animal_manager.simulation_day = expected_animal_manager_sim_day = 10
     simulation_engine.manure_manager = mocker.MagicMock()
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.weather = mocker.MagicMock()
     simulation_engine.time = mocker.MagicMock()
-    simulation_engine.time.simulation_day = 10
     simulation_engine.animal_manager.all_pens = mocker.MagicMock()
     mock_pen_manure_data = [mocker.MagicMock(autospec=PenManureData)]
     mocker.patch.object(simulation_engine.animal_manager, "collect_pen_manure_data", return_value=mock_pen_manure_data)
-    simulation_engine.animal_manager.simulation_day = mocker.MagicMock()
 
     patch_for_daily_feed_routine = mocker.patch("RUFAS.simulation_engine.routines.daily_feed_routine")
     patch_for_advance_time = mocker.patch.object(simulation_engine, "_advance_time")
@@ -112,7 +111,7 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
         simulation_engine.time,
     )
     simulation_engine.manure_manager.daily_update.assert_called_once_with(
-        mock_pen_manure_data, simulation_engine.time.simulation_day
+        mock_pen_manure_data, expected_animal_manager_sim_day
     )
     simulation_engine.field_manager.daily_update_routine.assert_called_once_with(
         simulation_engine.weather, simulation_engine.time
