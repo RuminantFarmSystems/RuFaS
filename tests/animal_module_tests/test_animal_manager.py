@@ -2560,8 +2560,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, "allocate_animals_to_pens", return_value=None
     )
     mock_pen.calc_avg_growth = MagicMock()
-    patch_for_calc_ration_at_interval = mocker.patch.object(
-        AnimalManager, "_calc_ration_at_interval", return_value=None
+    patch_for_calc_and_update_ration = mocker.patch.object(
+        AnimalManager, "_calc_and_update_ration", return_value=None
     )
     patch_for_calc_avg_growth = mocker.patch.object(AnimalManager, "calc_avg_growth", return_value=None)
     mock_manure_excretions_output_data = {}
@@ -2631,15 +2631,14 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_record_pen_history.assert_called_once()
 
     if is_end_ration_interval:
-        for mock_pen in mock_all_pens:
-            patch_for_reset_milk_production_reduction.assert_called()
-            # TODO FIX THIS TEST patch_for_calc_nutrient_rqmts.assert_called_with(mock_feed, temp)
-            patch_for_clear_pens.assert_called_once()
-            patch_for_allocate_animals_to_pens.assert_called_once()
-            # TODO FIX THIS TEST patch_for_calc_ration_at_interval.assert_called_with(mock_feed, mock_pen)
-            mock_pen.calc_avg_growth.assert_called_once()
-            for mock_animal in list(mock_pen.animals_in_pen.values()):
-                mock_animal.update_milk_production_history.assert_called_once_with(mock_animal_manager.simulation_day)
+        patch_for_clear_pens.assert_called_once()
+        patch_for_allocate_animals_to_pens.assert_called_once()
+        patch_for_reset_milk_production_reduction.assert_called()
+        assert patch_for_calc_nutrient_rqmts.call_count == 5
+        patch_for_calc_and_update_ration.assert_called_with(mock_feed, mock_pen)
+        mock_pen.calc_avg_growth.assert_called_once()
+        for mock_animal in list(mock_pen.animals_in_pen.values()):
+            mock_animal.update_milk_production_history.assert_called_once_with(mock_animal_manager.simulation_day)
 
     patch_for_sum_daily_milk.assert_called_once_with(mock_cows)
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk

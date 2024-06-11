@@ -462,10 +462,9 @@ class AnimalManager:
             Pen object.
 
         """
-        for pen in self.all_pens:
-            if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
-                for animal in list(pen.animals_in_pen.values()):
-                    animal.milk_production_reduction = 0.0
+        if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
+            for animal in list(pen.animals_in_pen.values()):
+                animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -1118,7 +1117,7 @@ class AnimalManager:
             animals = self.animals_by_type[animal_type]
             self.phosphorus_concentration_by_animal_class[animal_type] = self._calc_phosphorus_concentration(animals)
 
-    def _calc_ration_at_interval(self, feed: Feed, pen: Pen) -> None:
+    def _calc_and_update_ration(self, feed: Feed, pen: Pen) -> None:
         """
         Calculate the ration for each pen at the given interval and update the
         ration for each animal in the pen.
@@ -1142,7 +1141,7 @@ class AnimalManager:
             pen.subset_class_feeds(feed)
             pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-            ration_per_animal = {}
+            ration_per_animal: Dict[str, float | str] = {}
             ration_vals = {}
 
             while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
@@ -1565,28 +1564,10 @@ class AnimalManager:
             if self.end_ration_interval():
                 self.clear_pens()
                 self.allocate_animals_to_pens()
-                for pen in self.all_pens:
-                    self.reset_milk_production_reduction(pen)
-                    self.calc_nutrient_rqmts(
-                        self.calves,
-                        self.heiferIs,
-                        self.heiferIIs,
-                        self.heiferIIIs,
-                        self.cows,
-                        feed,
-                        current_temperature,
-                    )
-                    self._calc_ration_at_interval(feed, pen)
-                    AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
-                    pen.calc_avg_growth()
-                    if pen.animal_combination.name == "LAC_COW":
-                        for animal in list(pen.animals_in_pen.values()):
-                            animal.update_milk_production_history(self.simulation_day)
-            else:
-                self.reformulate_pens_as_needed(
-                    current_temperature=current_temperature,
-                    feed=feed,
-                )
+
+            for pen in self.all_pens:
+                if pen.needs_ration_formulation or self.end_ration_interval():
+                    self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1872,25 +1853,9 @@ class AnimalManager:
         cows = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "Cow"]
         self.reset_milk_production_reduction(pen)
         self.calc_nutrient_rqmts(calves, heiferIs, heiferIIs, heiferIIIs, cows, feed, current_temperature)
-        self._calc_ration_at_interval(feed, pen)
+        self._calc_and_update_ration(feed, pen)
         AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
         pen.calc_avg_growth()
         if pen.animal_combination.name == "LAC_COW":
             for animal in list(pen.animals_in_pen.values()):
                 animal.update_milk_production_history(self.simulation_day)
-
-    def reformulate_pens_as_needed(self, current_temperature: float, feed: Feed) -> None:
-        """
-        Calls reformulate ration method on pens that were  populated for the first time in a ration
-        formulation interval.
-
-        Parameters
-        ----------
-        current_temperature : float
-            Current temperature.
-        feed : Feed
-            Feed object used in ration formulation.
-        """
-        for pen in self.all_pens:
-            if not pen.ration and pen.is_populated:
-                self.reformulate_ration_single_pen(pen=pen, current_temperature=current_temperature, feed=feed)

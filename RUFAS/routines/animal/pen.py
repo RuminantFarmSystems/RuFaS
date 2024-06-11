@@ -325,6 +325,21 @@ class Pen:
         """
         return len(self.animals_in_pen) > 0
 
+    @property
+    def needs_ration_formulation(self) -> bool:
+        """
+        Returns whether pen needs a ration formulated.
+
+        This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
+         and on subsequent days is populated.
+
+        Returns
+        -------
+        bool
+            True if pen needs ration formulation.
+        """
+        return not self.ration and self.is_populated
+
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements
