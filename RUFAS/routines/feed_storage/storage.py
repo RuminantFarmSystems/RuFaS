@@ -162,7 +162,7 @@ class Storage:
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
             weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions)
+            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
             total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
             crop.crude_protein_percent = self.recalculate_nutrient_percentage(
                 crop.crude_protein_percent,
@@ -289,7 +289,7 @@ class Storage:
         return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
@@ -300,6 +300,8 @@ class Storage:
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -315,6 +317,9 @@ class Storage:
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
         no dry matter loss occurs. Alfalfa uses different parameters and limits for calculating dry matter loss,
         but the structure of the loss equation remains the same.
+
+        Note that the current time is not needed for calculating the dry matter loss to fermentation, but it allows the
+        interface to remain uniform across all implementations of `calculate_dry_matter_loss_to_gas`.
 
         """
         dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
@@ -372,24 +377,6 @@ class Storage:
         conditions = weather.get_conditions_series(current_time, starting_day_offset + 1, 0)
 
         return conditions
-
-    def calculate_bale_density(self, initial_dry_matter: float) -> float:
-        """
-        Calculates the density of a bale.
-
-        Parameters
-        ----------
-        initial_dry_matter_percentage : float
-            The initial dry matter percentage of the bale.
-
-        Returns
-        -------
-        float
-            The density of the bale in kg dry matter per cubic meter.
-
-        """
-        moisture_fraction = 1 - (initial_dry_matter / 100)
-        return 100 + 440 * moisture_fraction
 
     def recalculate_nutrient_percentage(
         self,
