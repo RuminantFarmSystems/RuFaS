@@ -40,10 +40,12 @@ om = OutputManager()
 
 """
 These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
-are in kg CO2e / kg N and kg CO2e / kg P, respectively. Reference IPCC 2021, GWP 100.
+are in kg CO2e / kg N and kg CO2e / kg P, respectively. The nitrogen and phosphorus constants reference IPCC 2021, GWP
+100, the potassium constant references BASF's Eco-efficiency analysis tool.
 """
 EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 5.32
 EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 3.07
+EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 
 
 class EmissionsEstimator:
@@ -68,12 +70,15 @@ class EmissionsEstimator:
             actual_purchased_feed_totals,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
-        actual_purchased_feed_emissions = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
-        om.add_variable(
-            "actual_purchased_feed_emissions",
+        (
             actual_purchased_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            actual_land_use_change_emissions,
+        ) = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
+        emissions_info_map = dict(
+            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
         )
+        om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
+        om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
@@ -219,13 +224,20 @@ class EmissionsEstimator:
 
     def _calculate_actual_purchased_feed_emissions(self, actual_purchased_feeds: dict[str, float]) -> dict[str, float]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
-        feed_emissions = self._get_feed_emissions_data()
+        county_code = im.get_data("config.FIPS_county_code")
+
+        purchased_feed_emissions_data = im.get_data("purchased_feeds_emissions")
+        purchased_feed_emissions = self._get_feed_emissions_data(county_code, purchased_feed_emissions_data)
+
+        land_use_change_emissions_data = im.get_data("purchased_feed_land_use_change_emissions")
+        land_use_change_emissions = self._get_feed_emissions_data(county_code, land_use_change_emissions_data)
 
         actual_purchased_feed_emissions = {}
+        actual_land_use_change_emissions = {}
         for id, amount_fed in actual_purchased_feeds.items():
             try:
-                emissions = amount_fed * feed_emissions[id]
-                actual_purchased_feed_emissions[id] = emissions
+                purchased_emissions = amount_fed * purchased_feed_emissions[id]
+                actual_purchased_feed_emissions[id] = purchased_emissions
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
@@ -236,18 +248,31 @@ class EmissionsEstimator:
                     f"Missing data for RuFaS feed {id}, omitting from purchased feed emissions estimation.",
                     info_map,
                 )
+            try:
+                land_use_emissions = amount_fed * land_use_change_emissions[id]
+                actual_land_use_change_emissions[id] = land_use_emissions
+            except KeyError:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_actual_purchased_feed_emissions.__name__,
+                }
+                om.add_warning(
+                    "Missing Land Use Change Purchased Feed Emissions",
+                    f"Missing data for RuFaS feed {id}, omitting from land use change purchased feed emissions "
+                    "estimation.",
+                    info_map,
+                )
 
-        return actual_purchased_feed_emissions
+        return actual_purchased_feed_emissions, actual_land_use_change_emissions
 
-    def _get_feed_emissions_data(self) -> dict[str, float]:
+    def _get_feed_emissions_data(
+        self, county_code: int, feed_emissions_data: dict[str, list[float]]
+    ) -> dict[str, float]:
         """Grabs the appropriate list of emissions for purchased feeds for the location of the simulation."""
-        county_code = im.get_data("config.FIPS_county_code")
-        feed_emissions_data = im.get_data("purchased_feeds_emissions")
-
         county_codes = feed_emissions_data["county_code"]
         emissions_index = county_codes.index(county_code)
 
-        feed_keys = [key for key in feed_emissions_data.keys() if key != "FIPS_county_code"]
+        feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict
@@ -269,11 +294,12 @@ class EmissionsEstimator:
         fields_with_crops = set(grouped_feeds.keys())
         fields_with_fertilizer_apps = {app["field_name"] for app in fertilizer_applications}
         all_fields = list(fields_with_fertilizer_apps | fields_with_crops)
-        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
+        aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0, "potassium": 0.0} for key in all_fields}
         for app in fertilizer_applications:
             field_name = app["field_name"]
             aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_fertilizer_apps[field_name]["phosphorus"] += app["phosphorus"]
+            aggregated_fertilizer_apps[field_name]["potassium"] += app["potassium"]
 
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
@@ -307,6 +333,8 @@ class EmissionsEstimator:
                 "nitrogen_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_used": MeasurementUnits.KILOGRAMS,
                 "phosphorus_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
+                "potassium_fertilizer_used": MeasurementUnits.KILOGRAMS,
+                "potassium_fertilizer_embedded_CO2_emissions": MeasurementUnits.KILOGRAMS,
                 "manure_nitrogen_used": MeasurementUnits.KILOGRAMS,
                 "field_name": MeasurementUnits.UNITLESS,
             },
@@ -326,6 +354,8 @@ class EmissionsEstimator:
                     "phosphorus_fertilizer_embedded_CO2_emissions": crop[
                         "phosphorus_fertilizer_embedded_CO2_emissions"
                     ],
+                    "potassium_fertilizer_used": crop["potassium_fertilizer_used"],
+                    "potassium_fertilizer_embedded_CO2_emissions": crop["potassium_fertilizer_embedded_CO2_emissions"],
                     "manure_nitrogen_used": crop["manure_nitrogen_used"],
                     "field_name": crop["field_name"],
                 }
@@ -414,6 +444,8 @@ class EmissionsEstimator:
                 crop["nitrogen_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["phosphorus_fertilizer_used"] = 0.0
                 crop["phosphorus_fertilizer_embedded_CO2_emissions"] = 0.0
+                crop["potassium_fertilizer_used"] = 0.0
+                crop["potassium_fertilizer_embedded_CO2_emissions"] = 0.0
                 crop["manure_nitrogen_used"] = 0.0
             return feeds_grown
 
@@ -435,6 +467,12 @@ class EmissionsEstimator:
                 fertilizer_applications["phosphorus"]
                 * fraction_of_total_mass_grown
                 * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
+            crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["potassium"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
 
