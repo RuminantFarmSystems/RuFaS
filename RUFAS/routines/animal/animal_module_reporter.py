@@ -415,8 +415,11 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
             "data_origin": [("FeedEmissionsEstimator", "create_daily_purchased_feed_emissions_report")],
         }
-        daily_feed_emissions = animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(
-            ration_total
+        daily_purchased_feed_emissions = (
+            animal_manager.feeds_emissions_estimator.create_daily_purchased_feed_emissions_report(ration_total)
+        )
+        daily_land_use_change_feed_emissions = (
+            animal_manager.feeds_emissions_estimator.create_daily_land_use_change_feed_emissions_report(ration_total)
         )
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_feed_emissions.__name__
@@ -426,12 +429,18 @@ class AnimalModuleReporter:
             {},
             animal_manager.simulation_day,
             info_map,
-            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER,
+            MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
         )
         om.add_variable(
-            f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
-            daily_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            f"purchased_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
+            daily_purchased_feed_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
+        )
+        info_map["data_origin"] = [("FeedEmissionsEstimator", "create_daily_land_use_change_feed_emissions_report")]
+        om.add_variable(
+            f"land_use_change_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
+            daily_land_use_change_feed_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
         )
 
     @classmethod
@@ -451,7 +460,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
@@ -498,7 +507,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,

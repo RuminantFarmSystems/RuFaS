@@ -228,6 +228,7 @@ class Field:
         mix_name: str,
         requested_nitrogen: float,
         requested_phosphorus: float,
+        requested_potassium: float,
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
@@ -244,6 +245,8 @@ class Field:
             Minimum amount of nitrogen to be included in this fertilizer application (kg).
         requested_phosphorus : float
             Minimum amount of phosphorus to be included in this fertilizer application (kg).
+        requested_potassium : float
+            Minimum amount of potassium to be included in this fertilizer application (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -267,14 +270,14 @@ class Field:
         without applying any fertilizer.
 
         """
-        if requested_nitrogen == requested_phosphorus == 0.0:
+        if requested_nitrogen == requested_phosphorus == requested_potassium == 0.0:
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._execute_fertilizer_application.__name__,
                 "suffix": f"field='{self.field_data.name}'",
                 "date": {"year": year, "day": day},
             }
-            log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
             om.add_log("fertilizer_application_log", log_message, info_map)
             return
 
@@ -310,6 +313,7 @@ class Field:
             potassium_fraction,
             requested_nitrogen,
             requested_phosphorus,
+            requested_potassium,
         )
         total_mass_applied = fertilizer_applied.get("total_mass")
         phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
@@ -386,6 +390,7 @@ class Field:
                 mix_values["K"],
                 requested_nitrogen,
                 requested_phosphorus,
+                0.0,
             )
             total_mass = fertilizer_application["total_mass"]
             if total_mass == 0.0:
@@ -402,6 +407,7 @@ class Field:
         potassium_fraction: float,
         requested_nitrogen: float,
         requested_phosphorus: float,
+        requested_potassium: float,
     ) -> Dict[str, float]:
         """
         Determines the total mass of a specific fertilizer mix needed to meet the specified nutrient requirements.
@@ -418,6 +424,8 @@ class Field:
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
             Minimum mass of phosphorus to be included in fertilizer application (kg)
+        reqested_potassium : float
+            Minimum mass of potassium to be included in fertilizer application (kg)
 
         Returns
         -------
@@ -427,8 +435,9 @@ class Field:
         """
         minimum_mass_for_nitrogen = 0 if nitrogen_fraction == 0 else (requested_nitrogen / nitrogen_fraction)
         minimum_mass_for_phosphorus = 0 if phosphorus_fraction == 0 else (requested_phosphorus / phosphorus_fraction)
+        minimum_mass_for_potassium = 0 if potassium_fraction == 0 else (requested_potassium / potassium_fraction)
 
-        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus)
+        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus, minimum_mass_for_potassium)
         nitrogen_mass = total_mass * nitrogen_fraction
         phosphorus_mass = total_mass * phosphorus_fraction
         potassium_mass = total_mass * potassium_fraction
@@ -486,6 +495,7 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
@@ -505,6 +515,7 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("fertilizer_application", value, info_map)
@@ -718,6 +729,7 @@ class Field:
             "day": MeasurementUnits.ORDINAL_DAY,
             "year": MeasurementUnits.CALENDAR_YEAR,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
@@ -738,6 +750,7 @@ class Field:
             "day": day,
             "year": year,
             "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("manure_application", value, info_map)
@@ -853,6 +866,7 @@ class Field:
                 event.mix_name,
                 event.nitrogen_mass,
                 event.phosphorus_mass,
+                event.potassium_mass,
                 event.depth,
                 event.surface_remainder_fraction,
                 event.year,
