@@ -548,11 +548,10 @@ def test_cow_update_culled_false_new_born_false(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [0] * cow_num))
+    for cow in mock_cows:
+        cow.culled = False
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, False, False),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=False)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = False
@@ -590,11 +589,10 @@ def test_cow_update_culled_true(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [0] * cow_num))
+    for cow in mock_cows:
+        cow.culled = True
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, True, False),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=False)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = False
@@ -632,11 +630,10 @@ def test_cow_update_culled_false_more_than_4_calves(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [5] * cow_num))
+    for cow in mock_cows:
+        cow.culled = False
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, False, False),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=False)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = False
@@ -674,11 +671,10 @@ def test_cow_update_culled_false_new_born_true_calf_not_culled_or_sold(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [0] * cow_num))
+    for cow in mock_cows:
+        cow.culled = False
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, False, True),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=True)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = False
@@ -716,11 +712,10 @@ def test_cow_update_culled_false_new_born_true_calf_culled(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [0] * cow_num))
+    for cow in mock_cows:
+        cow.culled = False
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, False, True),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=True)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = True
@@ -758,11 +753,10 @@ def test_cow_update_culled_false_new_born_true_calf_sold(
     )
     mock_cows = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(cow_num)]
     mock_cows = list(map(patch_cow_attributes_for_cows_update, mock_cows, [0] * cow_num))
+    for cow in mock_cows:
+        cow.culled = False
 
-    mock_cow_update = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.Cow.update",
-        return_value=(None, None, None, False, True),
-    )
+    mock_cow_update = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Cow.update", return_value=True)
 
     mock_calf = mock.MagicMock(auto_spec=Calf)
     mock_calf.culled = False
