@@ -65,10 +65,6 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     }
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
-    expected_add_log_calls = [
-        mocker.call("Simulation complete", "Simulation Completed.", info_map),
-        mocker.call("total_simulation_time", expected_log_message, info_map),
-    ]
 
     # Act
     simulation_engine.simulate()

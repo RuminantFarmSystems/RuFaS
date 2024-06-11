@@ -26,7 +26,7 @@ class Time:
 
     def advance(self) -> None:
         """
-        Advances the time in the simulation by 1 day and automatically detects end of years.
+        Advances the time in the simulation by 1 day.
         """
         self.current_date += datetime.timedelta(days=1)
 
