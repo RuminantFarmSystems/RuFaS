@@ -59,11 +59,13 @@ def test_error_determine_moisture_factor(mass: float, dry_fraction: float) -> No
 
 
 @pytest.mark.parametrize(
-    "old_mass,old_moisture,old_coverage,app_mass,app_dry_fraction,app_coverage",
+    "old_mass,old_moisture,old_coverage,app_mass,app_dry_fraction,app_coverage,expected_mass,expected_moisture,"
+    "expected_coverage",
     [
-        (1100, 0.4, 0.7, 900, 0.8, 0.88),
-        (400, 0.71, 0.93, 3500, 0.85, 0.95),
-        (2500, 0.888, 0.9113, 700, 0.75, 0.855),
+        (1100, 0.4, 0.7, 900, 0.8, 0.88, 2000, 0.5125, 0.781),
+        (400, 0.71, 0.93, 3500, 0.85, 0.95, 3900, 0.65615, 0.94794871),
+        (2500, 0.888, 0.9113, 700, 0.75, 0.855, 3200, 0.8359375, 0.898984),
+        (0, 0, 0, 0, 0, 0, 0, 0, 0),
     ],
 )
 def test_determine_weighted_manure_attributes(
@@ -73,6 +75,9 @@ def test_determine_weighted_manure_attributes(
     app_mass: float,
     app_dry_fraction: float,
     app_coverage: float,
+    expected_mass: float,
+    expected_moisture: float,
+    expected_coverage: float,
 ) -> None:
     """Tests that the new, weighted values for the manure phosphorus pools are calculated correctly."""
     with patch(
@@ -87,14 +92,13 @@ def test_determine_weighted_manure_attributes(
             app_dry_fraction,
             app_coverage,
         )
-        new_mass = old_mass + app_mass
-        new_moisture = (old_moisture * old_mass) / new_mass + (0.65 * app_mass) / new_mass
-        new_coverage = (old_coverage * old_mass) / new_mass + (app_coverage * app_mass) / new_mass
 
-        patched_moisture_factor.assert_called_once_with(app_dry_fraction)
-        assert observe.get("new_dry_matter_mass") == new_mass
-        assert observe.get("new_moisture_factor") == new_moisture
-        assert observe.get("new_field_coverage") == new_coverage
+        if (old_mass + app_mass) > 0:
+            patched_moisture_factor.assert_called_once_with(app_dry_fraction)
+
+        assert pytest.approx(observe.get("new_dry_matter_mass"), rel=1e-4) == expected_mass
+        assert pytest.approx(observe.get("new_moisture_factor"), rel=1e-4) == expected_moisture
+        assert pytest.approx(observe.get("new_field_coverage"), rel=1e-4) == expected_coverage
 
 
 @pytest.mark.parametrize(

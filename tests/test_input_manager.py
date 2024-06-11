@@ -2,7 +2,6 @@ import json
 from functools import reduce
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Type, Union, Optional
-from typing import Tuple
 from unittest.mock import ANY
 
 import pandas as pd
@@ -49,8 +48,6 @@ def input_manager_original_method_states(
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
         "_populate_pool": mock_input_manager._populate_pool,
-        "_filter_input_array_data_by_metadata": mock_input_manager._filter_input_array_data_by_metadata,
-        "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_get_variable_modifiability": mock_input_manager._get_variable_modifiability,
         "_log_missing_data": mock_input_manager._log_missing_data,
         "_validate_input_by_type": mock_input_manager._validate_input_by_type,
@@ -90,15 +87,6 @@ def test_pool_setter_getter(mock_input_manager: InputManager) -> None:
     test_data = {"foo": "bar", "integer": 1}
     mock_input_manager.pool = test_data
     assert mock_input_manager.pool == test_data
-
-
-def test_set_metadata_depth_limit(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test for metadata override function for metadata depth limit"""
-    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    new_limit = 10
-    mock_input_manager.set_metadata_depth_limit(new_limit)
-    assert mock_input_manager.metadata_depth_limit == new_limit
-    mock_add_log.assert_called_once()
 
 
 def test_load_properties_success(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
@@ -288,101 +276,6 @@ def test_start_data_processing(
     patch_for_validate_properties.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_result",
-    [
-        (
-            {"key1": "value1", "key2": "value2"},
-            {"key1": {"default": "value3"}},
-            {"key1": "value1"},
-        ),
-        (
-            {"key1": {"nested_key1": "value1", "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"default": "value2"}}},
-            {"key1": {"nested_key1": "value1"}},
-        ),
-        (
-            {"key1": {"nested_key1": ["value1", "value2"], "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"type": "array", "properties": {"default": "value1"}}}},
-            {"key1": {"nested_key1": ["value1", "value2"]}},
-        ),
-        (
-            {"key1": {"nested_key1": [{"key3": 1, "key4": 2}, {"key3": 3, "key4": 4}], "nested_key2": "value2"}},
-            {"key1": {"nested_key1": {"type": "array", "properties": {"key3": {"default": 2}}}}},
-            {"key1": {"nested_key1": [{"key3": 1}, {"key3": 3}]}},
-        ),
-    ],
-)
-def test_filter_input_data_by_metadata(
-    mock_input_manager: InputManager,
-    input_data: Dict[str, Any],
-    metadata_properties: Dict[str, Any],
-    expected_result: Dict[str, Any],
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for function _filter_input_data_by_metadata() in file input_manager.py"""
-    filtered_input_data = mock_input_manager._filter_input_data_by_metadata(input_data, metadata_properties)
-    assert filtered_input_data == expected_result
-
-    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
-        "_filter_input_data_by_metadata"
-    ]
-
-
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_result",
-    [
-        (
-            [],
-            {"key1": {"default": "value3"}},
-            [],
-        ),
-        (
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {
-                "type": "array",
-                "properties": {
-                    "type": "object",
-                    "a": {"type": "number"},
-                    "b": {"type": "string"},
-                    "c": {"type": "bool"},
-                },
-            },
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-        ),
-        (
-            [{"a": 1, "b": "A", "c": True}, {"a": 2, "b": "B", "c": False}, {"a": 3, "b": "C", "c": True}],
-            {"type": "array", "properties": {"type": "object", "a": {"type": "number"}, "b": {"type": "string"}}},
-            [{"a": 1, "b": "A"}, {"a": 2, "b": "B"}, {"a": 3, "b": "C"}],
-        ),
-        (
-            [[1, 2, 3, 1.1, 2.2, 3.3]],
-            {"type": "array", "properties": {"type": "number"}},
-            [[1, 2, 3, 1.1, 2.2, 3.3]],
-        ),
-        (
-            [[1, 2, 3], [1.1, 2.2, 3.3]],
-            {"type": "array", "properties": {"type": "array", "properties": {"type": "number"}}},
-            [[1, 2, 3], [1.1, 2.2, 3.3]],
-        ),
-    ],
-)
-def test_filter_input_array_data_by_metadata(
-    mock_input_manager: InputManager,
-    input_data: List[Any],
-    metadata_properties: Dict[str, Any],
-    expected_result: List[Any],
-    input_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Unit test for function _filter_input_array_data_by_metadata() in file input_manager.py"""
-    filtered_input_data = mock_input_manager._filter_input_array_data_by_metadata(input_data, metadata_properties)
-    assert filtered_input_data == expected_result
-
-    mock_input_manager._filter_input_array_data_by_metadata = input_manager_original_method_states[
-        "_filter_input_array_data_by_metadata"
-    ]
-
-
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
@@ -421,12 +314,6 @@ def test_populate_pool_valid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: True)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -457,12 +344,6 @@ def test_populate_pool_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
     elements_counter = ElementsCounter()
@@ -494,12 +375,6 @@ def test_populate_pool_partial_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=[True, False, True, False])
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -507,7 +382,7 @@ def test_populate_pool_partial_invalid(
     result = input_manager._populate_pool(eager_termination=False)
 
     # Assert
-    assert result
+    assert result is False
     assert "file1" in input_manager.pool
     assert "file2" in input_manager.pool
     assert "element1" in input_manager.pool["file1"]
@@ -535,12 +410,6 @@ def test_populate_pool_eager_termination(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch.object(
-        input_manager,
-        "_add_default_values_to_missing_inputs",
-        side_effect=lambda input_data, _: (input_data, None, None),
-    )
-    mocker.patch.object(input_manager, "_log_missing_keys")
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -3288,257 +3157,6 @@ def test_add_variable_to_pool_nested(
         assert input_manager.get_data(variable_name) == list(data.values())[0]
 
 
-@pytest.mark.parametrize(
-    "missing_keys, keys_with_defaults, expected_calls",
-    [
-        # Test case with missing keys and keys with default values
-        (
-            ["missingKey1", "missingKey2"],
-            [("keyWithDefault1", "value1"), ("keyWithDefault2", "value2")],
-            {
-                "error_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey2.",
-                    ),
-                ],
-                "warning_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: " "keyWithDefault1 => value1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: " "keyWithDefault2 => value2.",
-                    ),
-                ],
-            },
-        ),
-        # Test case with missing required keys only
-        (
-            ["missingKey1", "missingKey2"],
-            [],
-            {
-                "error_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey1.",
-                    ),
-                    (
-                        "Validation: missing required property keys",
-                        "Missing required property key: missingKey2.",
-                    ),
-                ],
-                "warning_calls": [],
-            },
-        ),
-        # Test case with only keys with default values
-        (
-            [],
-            [("keyWithDefault", "defaultValue")],
-            {
-                "error_calls": [],
-                "warning_calls": [
-                    (
-                        "Validation: missing required property keys",
-                        "Default value used for required property key that was missing: "
-                        "keyWithDefault => defaultValue.",
-                    ),
-                ],
-            },
-        ),
-    ],
-)
-def test_log_missing_keys(
-    missing_keys: List[str],
-    keys_with_defaults: List[Tuple[str, Any]],
-    expected_calls: Dict[str, Tuple[str, str]],
-    mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for the _log_missing_keys method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-    mock_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
-    mock_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-
-    # Act
-    input_manager._log_missing_keys(missing_keys, keys_with_defaults)
-
-    # Assert
-    for call_args in expected_calls["error_calls"]:
-        mock_add_error.assert_any_call(*call_args, mocker.ANY)
-
-    for call_args in expected_calls["warning_calls"]:
-        mock_add_warning.assert_any_call(*call_args, mocker.ANY)
-
-    assert mock_add_error.call_count == len(expected_calls["error_calls"])
-    assert mock_add_warning.call_count == len(expected_calls["warning_calls"])
-
-
-@pytest.mark.parametrize(
-    "input_data, metadata_properties, expected_output",
-    [
-        ({}, {"prop": {"type": "number", "default": 10}}, ({"prop": 10}, [], [("prop", 10)])),
-        (
-            {},
-            {"prop": {"type": "string", "default": "defaultVal"}},
-            ({"prop": "defaultVal"}, [], [("prop", "defaultVal")]),
-        ),
-        ({}, {"prop": {"type": "bool", "default": True}}, ({"prop": True}, [], [("prop", True)])),
-        ({"prop": 5}, {"prop": {"type": "number", "default": 10}}, ({"prop": 5}, [], [])),
-        (
-            {},
-            {
-                "nested": {
-                    "type": "object",
-                    "nestedProp": {"type": "string", "default": "defaultVal"},
-                    "default": {"nestedProp": "defaultVal"},
-                }
-            },
-            ({"nested": {"nestedProp": "defaultVal"}}, [], [("nested", {"nestedProp": "defaultVal"})]),
-        ),
-        (
-            {"nested": {}},
-            {"nested": {"type": "object", "nestedProp": {"type": "string", "default": "defaultVal"}}},
-            ({"nested": {"nestedProp": "defaultVal"}}, [], [("nested.nestedProp", "defaultVal")]),
-        ),
-        (
-            {},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {
-                        "type": "object",
-                        "nestedProp": {"type": "number", "default": 42},
-                    },
-                    "default": [{"nestedProp": 42}],
-                },
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp", [{"nestedProp": 42}])]),
-        ),
-        (
-            {"arrayProp": []},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {
-                        "type": "object",
-                        "nestedProp": {"type": "number", "default": 42},
-                        "default": {"nestedProp": 42},
-                    },
-                },
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp[0]", {"nestedProp": 42})]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {"type": "object", "nestedProp": {"type": "number", "default": 42}},
-                }
-            },
-            ({"arrayProp": [{"nestedProp": 42}]}, [], [("arrayProp[0].nestedProp", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            {
-                "arrayProp": {
-                    "type": "array",
-                    "properties": {"type": "object", "nestedProp": {"type": "number"}},
-                }
-            },
-            ({"arrayProp": [{}]}, ["arrayProp[0].nestedProp"], []),
-        ),
-    ],
-)
-def test_add_default_values_to_missing_inputs(
-    input_data: Dict[str, Any],
-    metadata_properties: Dict[str, Any],
-    expected_output: Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]],
-) -> None:
-    """
-    Unit test for the _add_default_values_to_missing_inputs method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-
-    # Act
-    output = input_manager._add_default_values_to_missing_inputs(input_data, metadata_properties)
-
-    # Assert
-    assert output == expected_output
-
-
-@pytest.mark.parametrize(
-    "input_data, property_key, property_details, expected_output",
-    [
-        (
-            {"arrayProp": []},
-            "arrayProp",
-            {"properties": {"type": "number", "default": 42}},
-            ([42], [], [("arrayProp[0]", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            "arrayProp",
-            {"properties": {"type": "object", "nestedProp": {"type": "number", "default": 42}}},
-            ([{"nestedProp": 42}], [], [("arrayProp[0].nestedProp", 42)]),
-        ),
-        (
-            {"arrayProp": [{}]},
-            "arrayProp",
-            {
-                "properties": {
-                    "type": "object",
-                    "nestedProp1": {"type": "number", "default": 42},
-                    "nestedProp2": {"type": "string", "default": "defaultVal"},
-                }
-            },
-            (
-                [{"nestedProp1": 42, "nestedProp2": "defaultVal"}],
-                [],
-                [("arrayProp[0].nestedProp1", 42), ("arrayProp[0].nestedProp2", "defaultVal")],
-            ),
-        ),
-        (
-            {"arrayProp": [[]]},
-            "arrayProp",
-            {"properties": {"type": "array", "properties": {"type": "number", "default": 99}}},
-            ([[99]], [], [("arrayProp[0][0]", 99)]),
-        ),
-        ({"arrayProp": [42]}, "arrayProp", {"properties": {"type": "number", "default": 99}}, ([42], [], [])),
-        ({"arrayProp": []}, "arrayProp", {"properties": {"type": "number"}}, ([], ["arrayProp[0]"], [])),
-    ],
-)
-def test_add_default_values_to_array_inputs(
-    input_data: Dict[str, Any],
-    property_key: str,
-    property_details: Dict[str, Any],
-    expected_output: Tuple[List[Any], List[str], List[Tuple[str, Any]]],
-) -> None:
-    """
-    Unit test for the _add_default_values_to_array_inputs method of the InputManager class.
-    """
-
-    # Arrange
-    input_manager = InputManager()
-
-    # Act
-    output = input_manager._add_default_values_to_array_inputs(input_data, property_key, property_details)
-
-    # Assert
-    assert output == expected_output
-
-
 def test_dump_get_data_logs(
     mock_input_manager: InputManager,
     mocker: MockerFixture,
@@ -3768,6 +3386,51 @@ def test_object_type_validator(
 
 
 @pytest.mark.parametrize(
+    "data,removed_keys",
+    [
+        ({"key1": {}, "key2": {}}, []),
+        ({"key1": {}, "key2": {}, "key3": {}}, ["key3"]),
+        ({"k1": {}, "k2": {}, "k3": {}}, ["k1", "k2", "k3"]),
+    ],
+)
+def test_object_type_validator_key_removal(
+    mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
+) -> None:
+    """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=data)
+    mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
+    mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy path")
+    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    mock_elements_counter = mocker.MagicMock()
+    variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
+    violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
+    info_map = {"class": "InputManager", "function": "_object_type_validator"}
+    expected_add_warning_calls = [
+        mocker.call(
+            "Validation: object contains extraneous data",
+            f"Variable: 'dummy path' contains data at key '{key}' that is not specified in the metadata properties. "
+            f"{violation_msg}",
+            info_map,
+        )
+        for key in removed_keys
+    ]
+
+    result = input_manager._object_type_validator(
+        ["path", "to", "var"],
+        variable_properties,
+        {"dummy": "data"},
+        False,
+        "properties blob",
+        mock_elements_counter,
+        True,
+    )
+
+    assert result is True
+    add_warning.assert_has_calls(expected_add_warning_calls)
+
+
+@pytest.mark.parametrize(
     "variable_path, variable_properties, input_data, properties_blob_key," "expected_result, expected_warning",
     [
         # Input data is not a list
@@ -3843,7 +3506,7 @@ def test_validate_array_container_properties(
 
 
 @pytest.mark.parametrize(
-    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key, "
+    "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
     "patch_extract_return, patch_container_valid, patch_element_valid, expected_result",
     [
         # Array extraction returns a non-list
@@ -3903,6 +3566,42 @@ def test_validate_array_container_properties(
             "blob_key",
             [1, "two", 3],
             True,
+            False,
+            False,
+        ),
+        # Nullable array that is None
+        (
+            ["data", "array"],
+            {"properties": {"type": "integer"}, "nullable": True},
+            {"data": {"array": None}},
+            False,
+            "blob_key",
+            None,
+            True,
+            True,
+            True,
+        ),
+        # Nullable and null data passed
+        (
+            ["data", "array"],
+            {"nullable": True},
+            {"data": {"array": None}},
+            True,
+            "blob_key",
+            None,
+            False,
+            False,
+            True,
+        ),
+        # Not nullable and null data passed
+        (
+            ["data", "array"],
+            {},
+            {"data": {"array": None}},
+            True,
+            "blob_key",
+            None,
+            False,
             False,
             False,
         ),
@@ -4089,7 +3788,6 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
         ) as mock_generate_file_name,
         patch("RUFAS.output_manager.OutputManager.create_directory", new_callable=MagicMock) as mock_create_dir,
     ):
-
         mock_input_manager.save_metadata_properties(output_dir)
 
         mock_parse.assert_called_once_with("test_properties")
@@ -4186,7 +3884,6 @@ def test_parse_metadata_properties(
         ) as mock_primitive,
         patch.object(mock_input_manager, "_create_record", return_value={"mocked": "record"}) as mock_create_record,
     ):
-
         prefix = ""
         sep = "_"
 
@@ -4437,7 +4134,15 @@ def test_compare_metadata_properties(
     "metadata, limit, expected_depth, expected_path, should_raise, expected_errors, expected_err_msg",
     [
         ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
-        ({"properties": {"a": {"b": {"type": "array"}}}}, 3, 2, ["a", "b"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"type": "array", "properties": {}}}}},
+            3,
+            3,
+            ["a", "b", "properties"],
+            False,
+            [],
+            "",
+        ),
         (
             {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
             2,
@@ -4457,7 +4162,15 @@ def test_compare_metadata_properties(
             ["Properties value type error"],
             "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
         ),
-        ({"properties": {"a": {"b": {"c": {"type": "object"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
+        (
+            {"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}},
+            3,
+            3,
+            ["a", "b", "c"],
+            False,
+            [],
+            "",
+        ),
     ],
 )
 def test_validate_properties(
@@ -4502,6 +4215,346 @@ def test_validate_properties(
                 {"class": "InputManager", "function": "_validate_properties"},
             ),
         ]
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_number", "minimum": 3, "maximum": 7},
+            "Invalid metadata default number value.",
+            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>.",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": "not_a_number", "maximum": 7},
+            "Invalid metadata number properties minimum.",
+            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>.",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 5, "minimum": 3, "maximum": "not_a_number"},
+            "Invalid metadata number properties maximum.",
+            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>.",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 2, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 8, "minimum": 3, "maximum": 7},
+            "Invalid metadata default.",
+            "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum": 5, "maximum": 3},
+            "Invalid range of acceptable numbers.",
+            "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
+            True,
+        ),
+        (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
+        (
+            ["some_key"],
+            {"default": None, "minimum": 3, "maximum": 8},
+            "Invalid metadata default number value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.",
+            True,
+        ),
+    ],
+)
+def test_metadata_number_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+) -> None:
+    """Tests metadata_number_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    info_map = {"class": "InputManager", "function": "_metadata_number_validator"}
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_number_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
+    else:
+        input_manager._metadata_number_validator(key_path, value)
+        mock_validate_properties_keys.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": 123, "pattern": None},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': Expected a string but got <class 'int'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": r"^[0-9]+$"},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": None},
+            "Invalid metadata default string value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": 6789},
+            "Invalid metadata string properties pattern.",
+            "Invalid 'pattern' for '['some_key']': Expected a string but got <class 'int'>",
+            True,
+        ),
+        (["some_key"], {"default": "12345", "pattern": r"^[0-9]+$"}, "", "", False),
+        (["some_key"], {"default": "", "pattern": r"^[0-9]+$"}, "", "", False),
+        (
+            ["some_key"],
+            {"default": "abcdef", "pattern": r"["},
+            "Invalid metadata string properties pattern.",
+            "Invalid 'pattern' for '['some_key']': 'pattern' value '[' is not a valid regex pattern.",
+            True,
+        ),
+    ],
+)
+def test_metadata_string_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+) -> None:
+    """Tests _metadata_string_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    info_map = {"class": "InputManager", "function": "_metadata_string_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_string_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
+    else:
+        input_manager._metadata_string_validator(key_path, value)
+        mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"default": "not_a_bool"},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"default": 1},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'int'>",
+            True,
+        ),
+        (["some_key"], {"default": True}, "", "", False),
+        (
+            ["some_key"],
+            {"default": None},
+            "Invalid metadata default bool value.",
+            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+            True,
+        ),
+    ],
+)
+def test_metadata_bool_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+) -> None:
+    """Tests _metadata_bool_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    info_map = {"class": "InputManager", "function": "_metadata_bool_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_bool_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
+    else:
+        input_manager._metadata_bool_validator(key_path, value)
+        mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "key_path,value,error_title,error_msg,should_raise",
+    [
+        (
+            ["some_key"],
+            {"minimum_length": 5, "maximum_length": 3},
+            "Invalid metadata array length range.",
+            "Invalid length 'range' for key '['some_key']': 'minimum_length'"
+            " value 5 is greater than 'maximum_length' value 3",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"minimum_length": "five"},
+            "Invalid metadata default array minimum length.",
+            "Invalid 'minimum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
+            True,
+        ),
+        (
+            ["some_key"],
+            {"maximum_length": "three"},
+            "Invalid metadata default array maximum length.",
+            "Invalid 'maximum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
+            True,
+        ),
+        (["some_key"], {"minimum_length": 1, "maximum_length": 5}, "", "", False),
+    ],
+)
+def test_metadata_array_validator(
+    mocker: MockerFixture,
+    key_path: List[str],
+    value: Dict[str, Any],
+    error_title: str,
+    error_msg: str,
+    should_raise: bool,
+) -> None:
+    """Tests _metadata_array_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    info_map = {"class": "InputManager", "function": "_metadata_array_validator"}
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._metadata_array_validator(key_path, value)
+        assert mock_add_error.called
+        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        mock_validate_properties_keys.assert_called_once()
+    else:
+        input_manager._metadata_array_validator(key_path, value)
+        mock_add_error.assert_not_called
+        mock_validate_properties_keys.assert_called_once()
+
+
+def test_metadata_object_validator(
+    mocker: MockerFixture,
+) -> None:
+    """Tests _metadata_object_validator() method in InputManager"""
+    input_manager = InputManager()
+    mock_validate_properties_keys = mocker.patch("RUFAS.input_manager.InputManager._validate_metadata_properties_keys")
+    key_path = ["path", "cow"]
+    value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
+    input_manager._metadata_object_validator(key_path, value)
+    mock_validate_properties_keys.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "required_keys, valid_keys, properties, path, should_raise, expected_message",
+    [
+        ({"id", "type"}, {"id", "name", "type"}, {"type": "num", "id": 123, "name": "example"}, ["root"], False, ""),
+        (
+            {"type"},
+            {"type"},
+            {"type": "num", "id": 123},
+            ["root"],
+            True,
+            "Invalid keys ['id'] in num for ['root']. Valid keys are ['type'].",
+        ),
+        (
+            {"id"},
+            set(),
+            {"type": "num", "name": "example"},
+            ["root"],
+            True,
+            "Missing required keys ['id'] for ['root']. Required keys are ['id'].",
+        ),
+        (
+            {"id", "type"},
+            {"id", "type"},
+            {"type": "num", "id": 123, "extra": "data"},
+            ["root", "child"],
+            True,
+            "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type'].",
+        ),
+        (
+            {"id", "type"},
+            {"id", "type"},
+            {"name": "example"},
+            ["root"],
+            True,
+            "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type'].",
+        ),
+        (
+            {"type"},
+            {"type"},
+            {"type": "object"},
+            ["root"],
+            True,
+            "No unique keys for ['root']. At least one unique key is expected.",
+        ),
+    ],
+)
+def test_validate_metadata_properties_keys(
+    mocker: MockerFixture,
+    required_keys: set[str],
+    valid_keys: set[str],
+    properties: dict[str, Any],
+    path: list[str],
+    should_raise: bool,
+    expected_message: str,
+) -> None:
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    if should_raise:
+        with pytest.raises(ValueError):
+            input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        mock_add_error.assert_called_once_with(
+            "Metadata Validation",
+            expected_message,
+            {
+                "class": "InputManager",
+                "function": "_validate_metadata_properties_keys",
+            },
+        )
+    else:
+        input_manager._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        mock_add_error.assert_not_called()
 
 
 def test_increment_in_elements_counter() -> None:
