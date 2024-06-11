@@ -2681,7 +2681,6 @@ def test_save_current_variable_pool(
     assert output_manager.saved_pool_chunks_num == 1
 
 
-
 def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> None:
     tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content")
     tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content")
