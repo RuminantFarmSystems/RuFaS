@@ -3,6 +3,7 @@ from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
 from RUFAS.routines import Feed
+from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.time import Time
 
@@ -48,6 +49,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     simulation_engine.manure_manager = mocker.MagicMock()
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.feed_manager = mocker.MagicMock()
+    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     patch_for_run_simulation_main_loop = mocker.patch.object(
         simulation_engine, "_run_simulation_main_loop", return_value=None
     )
@@ -61,6 +63,12 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
         "class": simulation_engine.__class__.__name__,
         "function": simulation_engine.simulate.__name__,
     }
+    expected_simulation_time = end_time - start_time
+    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
+    expected_add_log_calls = [
+        mocker.call("Simulation complete", "Simulation Completed.", info_map),
+        mocker.call("total_simulation_time", expected_log_message, info_map),
+    ]
 
     # Act
     simulation_engine.simulate()
@@ -75,6 +83,7 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
                                                              simulation_engine.animal_manager.heiferIIs,
                                                              simulation_engine.animal_manager.cows)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
+    mock_estimate_emissions.assert_called_once()
 
 
 def test_daily_simulation(mocker: MockerFixture) -> None:
