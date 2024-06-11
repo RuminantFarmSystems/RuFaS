@@ -114,43 +114,30 @@ def test_determine_rain_manure_dry_matter_ratio(rain: float, manure_mass: float,
 
 
 @pytest.mark.parametrize(
-    "manure,rain_manure_ratio,is_cow",
+    "manure,rain_manure_ratio,is_cow, organic_phosphorus",
     [
-        (300, 1300, True),
-        (255, 1234, False),
+        (300, 1300, True, False),
+        (255, 1234, False, False),
+        (300, 1300, True, True),
+        (255, 1234, False, True),
     ],
 )
-def test_determine_water_extractable_inorganic_phosphorus_leached(
-    manure: float, rain_manure_ratio: float, is_cow: bool
+def test_determine_water_extractable_phosphorus_leached(
+    manure: float, rain_manure_ratio: float, is_cow: bool, organic_phosphorus: bool
 ) -> None:
     """Tests that the correct mass of water extractable inorganic phosphorus leached is calculated."""
-    observe = Manure._determine_water_extractable_phosphorus_leached(manure, rain_manure_ratio, is_cow, False)
+    observe = Manure._determine_water_extractable_phosphorus_leached(
+        manure,
+        rain_manure_ratio,
+        is_cow,
+        organic_phosphorus
+    )
+
     if is_cow:
         expect = min(1.0, (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)) * manure
     else:
         expect = min(1.0, (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)) * manure
-    expect = max(0, expect)
-    assert observe == expect
-
-
-@pytest.mark.parametrize(
-    "manure,rain_manure_ratio,is_cow",
-    [
-        (300, 1300, True),
-        (255, 1234, False),
-    ],
-)
-def test_determine_water_extractable_organic_phosphorus_leached(
-    manure: float, rain_manure_ratio: float, is_cow: bool
-) -> None:
-    """Tests that the correct mass of water extractable organic phosphorus leached is calculated."""
-    observe = Manure._determine_water_extractable_phosphorus_leached(manure, rain_manure_ratio, is_cow, True)
-    if is_cow:
-        first_term = (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)
-    else:
-        first_term = (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)
-    first_term = min(1.0, first_term)
-    expect = max(0.0, first_term * manure) / 0.6
+    expect = max(0.0, expect) / 0.6 if organic_phosphorus else max(0.0, expect)
     assert observe == expect
 
 
