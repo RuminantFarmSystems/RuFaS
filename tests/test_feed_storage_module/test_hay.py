@@ -45,6 +45,7 @@ def harvested_crop() -> HarvestedCrop:
 
 
 def test_acceptable_crops(hay: Hay) -> None:
+    """Tests that Hay's acceptable crops are initialized correctly."""
     assert hay.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.GRASS,

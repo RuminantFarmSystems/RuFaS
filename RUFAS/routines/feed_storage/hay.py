@@ -55,7 +55,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            The diameter of the hay bale in meters.
+            The diameter of the hay bale (meters).
         """
         pass
 
@@ -113,7 +113,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            Gaseous dry matter loss from the hayed crop that occurred in the first 30 days of storage in kg.
+            Gaseous dry matter loss from the hayed crop that occurred in the first 30 days of storage (kg).
 
         References
         ----------
@@ -125,12 +125,15 @@ class Hay(Storage):
             return 0.0
         days_in_window = min(days_stored, 30)
         fraction_of_total_loss = days_in_window / 30
+
         dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         moisture_fraction = 1 - dry_fraction
+
         numerator = crop.total_sensible_heat_generated + 2433 * (
             moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
         )
         denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
@@ -148,7 +151,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage in kg.
+            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage (kg).
 
         References
         ----------
