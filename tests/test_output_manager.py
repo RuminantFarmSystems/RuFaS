@@ -1700,7 +1700,8 @@ def test_filter_variables_pool_complex(
             call(
                 "Unpacking Pool Error",
                 "Unable to unpack key='DummyClass1.dummy_fun1.dummy_var2' in the data pool, "
-                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a', "
+                "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
                     "function": "filter_variables_pool",
@@ -1713,7 +1714,8 @@ def test_filter_variables_pool_complex(
             call(
                 "Unpacking Pool Error",
                 "Unable to unpack key='DummyClass1.dummy_fun2.dummy_var3' in the data pool, "
-                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a', "
+                "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
                     "function": "filter_variables_pool",
