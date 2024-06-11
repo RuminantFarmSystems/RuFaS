@@ -922,7 +922,7 @@ class Pen:
                 num_lac_cows += 1
         om.add_variable(
             # TODO: remove me
-            "count_lactating_cows",
+            f"{self.id}_count_lactating_cows",
             num_lac_cows,
             {
                 "class": self.__class__.__name__,
