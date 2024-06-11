@@ -1,8 +1,10 @@
 class GeneralConstants:
-    """Contains general constants used in the manure treatment module.
+    """Contains general constants used in RuFaS.
 
     Attributes:
         MM_TO_M: The conversion factor from millimeters to meters.
+        CM_TO_MM: The conversion factor from centimeters to millimeters.
+        MM_TO_CM: The conversion factor from millimeters to centimeters.
 
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
@@ -25,6 +27,8 @@ class GeneralConstants:
 
     # Length-related
     MM_TO_M = 0.001
+    CM_TO_MM = 10.0
+    MM_TO_CM = 0.1
 
     # Mass-related
     GRAMS_TO_KG = 0.001
