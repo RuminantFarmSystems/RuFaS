@@ -151,19 +151,7 @@ def manure_calculations(
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
-    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
-    urine_urea_nitrogen_concentration = max(
-        urine_urea_nitrogen_concentration_lower_bound,
-        min(
-            urine_urea_nitrogen_concentration,
-            urine_urea_nitrogen_concentration_upper_bound,
-        ),
-    )
-
     # Total ammoniacal nitrogen in the manure slurry, kg
-    # TODO update TAN estimation equation in Animal module documentation
     manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     # Amount of potassium excreted, g [A.3B.B.4]
