@@ -107,7 +107,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--path-to-metadata",
             help="Path to the task manager metadata that will determine the tasks run",
             default="input/metadata/task_manager_metadata.json",
-        )
+        ),
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"
