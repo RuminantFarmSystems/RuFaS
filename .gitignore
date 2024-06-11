@@ -23,7 +23,7 @@
 build
 others
 
-RUFAS/scenario_manager.py
+input/data/tasks/default_task.json
 
 # Ignore contents of output directories, except for .keep files
 # This is because we want to keep the output directories, and git

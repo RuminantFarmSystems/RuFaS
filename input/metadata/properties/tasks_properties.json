@@ -108,6 +108,11 @@
           "description": "The directory for saving log message files, variable names, and other simulation outputs to.",
           "default": "output/logs/"
         },
+        "suppress_log_files": {
+          "type": "bool",
+          "description": "If true, logs will not be written as output files.",
+          "default": false
+        },
         "output_pool_path": {
           "type": "string",
           "pattern": "^(?:[a-zA-Z]:[\\/])?(?:[a-zA-Z0-9._-]+[\\/])*(?:[a-zA-Z0-9._-]+\\.json)$",
@@ -149,7 +154,7 @@
         "SA_input_variables": {
           "type": "array",
           "description": "The input variables to perform Sensitivity Analysis on",
-          "default": [{}],
+          "nullable": true,
           "properties": {
             "type": "object",
             "variable_name": {
