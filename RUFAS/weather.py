@@ -1,6 +1,7 @@
 from datetime import date
 import numpy as np
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
@@ -75,8 +76,8 @@ class Weather:
         self.__mean_annual_temperature: float = None
         self.__latitude: float = self._get_latitude()
 
-        year_length = time.year_length
-        leap_year_length = time.leap_year_length
+        year_length = GeneralConstants.YEAR_LENGTH
+        leap_year_length = GeneralConstants.LEAP_YEAR_LENGTH
 
         # calculate the number of days between the beginning of
         # the weather file and the next year

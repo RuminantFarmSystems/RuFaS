@@ -40,7 +40,11 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     simulation_engine.time = mocker.MagicMock()
     simulation_engine.time.simulation_day = 100
     simulation_engine.feed = mocker.MagicMock()
+
     simulation_engine.animal_manager = mocker.MagicMock()
+    simulation_engine.animal_manager.heiferIIs = mocker.MagicMock()
+    simulation_engine.animal_manager.cows = mocker.MagicMock()
+
     simulation_engine.manure_manager = mocker.MagicMock()
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.feed_manager = mocker.MagicMock()
@@ -66,7 +70,10 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
-    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager, 100)
+    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager,
+                                                             simulation_engine.time,
+                                                             simulation_engine.animal_manager.heiferIIs,
+                                                             simulation_engine.animal_manager.cows)
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
 
 
@@ -181,17 +188,17 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "end_year_side_effect, expected_day_count",
+    "year_start_day, year_end_day, expected_day_count",
     [
         # Simulate 1 year end
-        ([False, True], 1),
+        (0, 0, 1),
         # Simulate 2 years end
-        ([False, False, True], 2),
+        (2, 3, 2),
         # Simulate 4 years end
-        ([False] * 4 + [True], 4),
+        (362, 365, 4),
     ],
 )
-def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, expected_day_count: int) -> None:
+def test_annual_simulation(mocker: MockerFixture, year_start_day: int, year_end_day: int, expected_day_count: int) -> None:
     """
     Unit test for function _annual_simulation in file RUFAS/simulation_engine.py
     """
@@ -205,7 +212,8 @@ def test_annual_simulation(mocker: MockerFixture, end_year_side_effect: list, ex
     patch_for_daily_simulation = mocker.patch.object(simulation_engine, "_daily_simulation")
 
     simulation_engine.time = mocker.MagicMock()
-    simulation_engine.time.end_year.side_effect = end_year_side_effect
+    simulation_engine.time.year_start_day = year_start_day
+    simulation_engine.time.year_end_day = year_end_day
 
     # Act
     simulation_engine._annual_simulation()
@@ -223,7 +231,6 @@ def test_run_post_annual_routines(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_time = mocker.MagicMock(auto_spec=Time)
-    mock_time.advance = MagicMock()
 
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
@@ -237,7 +244,6 @@ def test_run_post_annual_routines(mocker: MockerFixture) -> None:
     # Assert
     simulation_engine.annual_mass_balance.assert_called_once_with(simulation_engine.time)
     simulation_engine.annual_reset.assert_called_once()
-    simulation_engine.time.advance.assert_called_once()
 
 
 def test_run_pre_annual_routines(mocker: MockerFixture) -> None:
@@ -295,18 +301,18 @@ def test_advance_time(
 
 
 @pytest.mark.parametrize(
-    "end_simulation_side_effect, expected_iterations",
+    "expected_iterations",
     [
         # Simulate a loop that runs once
-        ([False, True], 1),
+        1,
         # Simulate a loop that runs twice
-        ([False, False, True], 2),
+        2,
         # Simulate a loop that runs three times
-        ([False, False, False, True], 3),
+        3,
     ],
 )
 def test_run_simulation_main_loop(
-    mocker: MockerFixture, end_simulation_side_effect: list, expected_iterations: int
+    mocker: MockerFixture, expected_iterations: int
 ) -> None:
     """
     Unit test for function _run_simulation_main_loop in file RUFAS/simulation_engine.py
@@ -317,7 +323,7 @@ def test_run_simulation_main_loop(
     simulation_engine = SimulationEngine()
 
     simulation_engine.time = mocker.MagicMock()
-    simulation_engine.time.end_simulation.side_effect = end_simulation_side_effect
+    simulation_engine.time.simulation_length_years = expected_iterations
 
     patch_for_annual_simulation = mocker.patch.object(simulation_engine, "_annual_simulation")
 
