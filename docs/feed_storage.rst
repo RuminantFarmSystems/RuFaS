@@ -333,47 +333,43 @@ Table :math:`2.2.1`
 2.2.1 Nutrient Loss to Effluent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When recalculating nutrient percentages after the loss of dry matter to
-effluent, the fractional loss coefficients used in equation :math:`2.1`
-must be calculated based on initial amounts of nutrients and the amount
-of dry matter lost.
+When dry matter is lost to effluent from an ensiled crop, the percentages
+of crude protein and non-protein nitrogen must be recalculated for that crop.
 
-The fractional loss coefficient for crude protein (CP) is calculated
-with the equation:
+The percentage of crude protein (CP) is recalculated with the equation:
 
 .. math::
 
 
-   C_{CP} = \frac{CP_{initial} - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \tag{2.2.1.1}
+   CP_{updated} = \frac{CP_{initial} \cdot 0.01 - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.2.1.1}
 
 Where :math:`CP_{initial}` is the percentage of dry matter mass that is
 crude protein in the ensiled crop before accounting for dry matter loss
 to effluent and :math:`DL_{fraction}` is the fraction of dry matter mass
-lost to effluent.
+lost to effluent. The percentage of crude protein is lower-bounded at 0.
 
-The fractional loss coefficient for non-protein nitrogen (NPN) is
-calculated with the equation:
+The percentage of non-protein nitrogen (NPN) is calculated with the equation:
 
 .. math::
 
-
-   C_{NPN} = \frac{NPN_{initial} \cdot CP_{initial} - 0.3 \cdot DL_{fraction}}{CP_{initial} - DL_{fraction}} \tag{2.2.1.2}
+   NPN_{updated} = \frac{(NPN_{initial} \cdot 0.01) \cdot (CP_{initial} \cdot 0.01) - 0.3 \cdot DL_{fraction}}{(CP_{initial} \cdot 0.01) - DL_{fraction}} \cdot 100 \tag{2.2.1.2}
 
 Where :math:`NPN_{initial}` is percentage of dry matter mass that is
 non-protein nitrogen in the ensiled crop before accouting for dry matter
 loss to effluent, :math:`CP_{initial}` is the percentage of dry matter
 mass that is crude protein before accounting for dry matter loss to
 effluent, and :math:`DL_{fraction}` is the fraction of dry matter mass
-lost to effluent.
+lost to effluent. The percentage of non-protein nitrogen is lower-bounded
+at 0.
 
 :math:`DL_{fraction}` is calculated with the equation:
 
 .. math::
 
 
-   DL_{fraction} = \frac{DM_{updated}}{DM_{initial}} \tag{2.2.1.3}
+   DL_{fraction} = \frac{DM_{lost}}{DM_{initial}} \tag{2.2.1.3}
 
-Where :math:`DM_{updated}` is the amount of dry matter mass in the
+Where :math:`DM_{lost}` is the amount of dry matter mass in the
 ensiled crop after accounting for dry matter lost to effluent, and
 :math:`DM_{initial}` is the amount of dry matter mass in the ensiled
 crop before accounting for dry matter lost to effluent.
