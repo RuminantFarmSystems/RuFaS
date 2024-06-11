@@ -30,7 +30,6 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.start_date == datetime.datetime(year=1999, month=1, day=2)
     assert time.end_date == datetime.datetime(year=2000, month=1, day=1)
 
-
     assert time.current_date == time.start_date
     assert time.simulation_length_days == (time.end_date - time.start_date).days
     assert time.simulation_day == 0

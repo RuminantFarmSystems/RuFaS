@@ -42,8 +42,9 @@ class Time:
         years: list[list[int]] = []
 
         for year in range(self.start_year_int, self.end_year_int + 1):
-            year_length = GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) \
-                else GeneralConstants.LEAP_YEAR_LENGTH
+            year_length = (
+                GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+            )
             if year == self.start_year_int == self.end_year_int:
                 days = [None for _ in range(1, self.start_day)]
                 days += [_ for _ in range(self.start_day, self.end_day + 1)]
@@ -118,8 +119,11 @@ class Time:
         """
         Returns the last Julian day of the current year in integer.
         """
-        days_in_year = GeneralConstants.LEAP_YEAR_LENGTH if Utility.is_leap_year(self.current_date.year) \
+        days_in_year = (
+            GeneralConstants.LEAP_YEAR_LENGTH
+            if Utility.is_leap_year(self.current_date.year)
             else GeneralConstants.YEAR_LENGTH
+        )
         return int(self.end_date.strftime("%j")) if self.current_date.year == self.end_date.year else days_in_year
 
     @property

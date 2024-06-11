@@ -957,8 +957,9 @@ class AnimalModuleReporter:
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
     @classmethod
-    def report_end_of_simulation(cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII],
-                                 cows: List[Cow]) -> None:
+    def report_end_of_simulation(
+        cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+    ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
 
@@ -1006,8 +1007,9 @@ class AnimalModuleReporter:
         AnimalModuleReporter._record_cows_conception_rate()
 
     @classmethod
-    def _record_animal_events(cls, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow],
-                              simulation_day: int) -> None:
+    def _record_animal_events(
+        cls, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow], simulation_day: int
+    ) -> None:
         """
         Record the events of the animals.
 

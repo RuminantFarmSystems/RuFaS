@@ -78,10 +78,12 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     expected_simulation_time = end_time - start_time
     expected_log_message = f"Total simulation time is: {expected_simulation_time}"
     patch_for_output_manager.add_log.assert_called_with("total_simulation_time", expected_log_message, info_map)
-    patch_for_animal_module_reporter.assert_called_once_with(simulation_engine.animal_manager.life_cycle_manager,
-                                                             simulation_engine.time,
-                                                             simulation_engine.animal_manager.heiferIIs,
-                                                             simulation_engine.animal_manager.cows)
+    patch_for_animal_module_reporter.assert_called_once_with(
+        simulation_engine.animal_manager.life_cycle_manager,
+        simulation_engine.time,
+        simulation_engine.animal_manager.heiferIIs,
+        simulation_engine.animal_manager.cows,
+    )
     simulation_engine.feed_manager.query_available_feeds.assert_called_once()
     mock_estimate_emissions.assert_called_once()
 
@@ -207,7 +209,9 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         (362, 365, 4),
     ],
 )
-def test_annual_simulation(mocker: MockerFixture, year_start_day: int, year_end_day: int, expected_day_count: int) -> None:
+def test_annual_simulation(
+    mocker: MockerFixture, year_start_day: int, year_end_day: int, expected_day_count: int
+) -> None:
     """
     Unit test for function _annual_simulation in file RUFAS/simulation_engine.py
     """
@@ -320,9 +324,7 @@ def test_advance_time(
         3,
     ],
 )
-def test_run_simulation_main_loop(
-    mocker: MockerFixture, expected_iterations: int
-) -> None:
+def test_run_simulation_main_loop(mocker: MockerFixture, expected_iterations: int) -> None:
     """
     Unit test for function _run_simulation_main_loop in file RUFAS/simulation_engine.py
     """
