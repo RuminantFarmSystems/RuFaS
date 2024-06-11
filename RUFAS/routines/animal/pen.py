@@ -920,16 +920,6 @@ class Pen:
         for animal in self.animals_in_pen.values():
             if type(animal) is Cow:
                 num_lac_cows += 1
-        om.add_variable(
-            # TODO: remove me
-            f"{self.id}_count_lactating_cows",
-            num_lac_cows,
-            {
-                "class": self.__class__.__name__,
-                "function": self._count_lactating_cows.__name__,
-                "units": MeasurementUnits.ANIMALS,
-            },
-        )
         return num_lac_cows
 
     def get_manure_data(self) -> PenManureData:
