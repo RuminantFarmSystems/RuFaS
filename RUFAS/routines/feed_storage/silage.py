@@ -45,6 +45,14 @@ class Silage(Storage):
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
         of `process_degradations` to handle the fermentative loss.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -182,6 +190,9 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
 
         """
+        if loss_fraction == 0.0:
+            return initial_non_protein_nitrogen
+
         npn_fraction = initial_non_protein_nitrogen * GeneralConstants.PERCENTAGE_TO_FRACTION
         cp_fraction = initial_crude_protein * GeneralConstants.PERCENTAGE_TO_FRACTION
 
@@ -213,6 +224,9 @@ class Silage(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
 
         """
+        if loss_fraction == 0.0:
+            return initial_crude_protein
+
         new_fraction = (initial_crude_protein * GeneralConstants.PERCENTAGE_TO_FRACTION - 0.3 * loss_fraction) / (
             1 - loss_fraction
         )
