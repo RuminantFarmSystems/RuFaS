@@ -20,6 +20,7 @@ from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
     PurchasedFeedEmissionsEstimator,
 )
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 
 om = OutputManager()
 
@@ -2689,3 +2690,73 @@ def test_calc_animal_space_shortage(num_animals: int, max_spaces: int, expected:
     mock_animal_manager.all_pens[0].max_stocking_density = 1
     actual = mock_animal_manager._calc_animal_space_shortage(num_animals, mock_animal_manager.all_pens)
     assert actual == expected
+
+
+def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
+    mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.simulation_day = 1
+
+    patch_for_reset_milk_production_reduction = \
+        mocker.patch.object(AnimalManager, "reset_milk_production_reduction", return_value=None)
+    patch_for_calc_nutrient_rqmts = \
+        mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
+    patch_for_calc_and_update_ration = \
+        mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
+    patch_for_report_ration_interval_data = \
+        mocker.patch.object(AnimalModuleReporter, "report_ration_interval_data", return_value=None)
+
+    pen = mocker.MagicMock()
+    pen.animal_combination.name = "NOT_LAC_COW"
+    pen.calc_avg_growth = mocker.MagicMock()
+
+    mock_calf = mocker.MagicMock()
+    mock_calf.__class__.__name__ = "Calf"
+    mock_calf.update_milk_production_history = mocker.MagicMock()
+    mock_heiferI = mocker.MagicMock()
+    mock_heiferI.__class__.__name__ = "HeiferI"
+    mock_heiferII = mocker.MagicMock()
+    mock_heiferII.__class__.__name__ = "HeiferII"
+    mock_heiferIII = mocker.MagicMock()
+    mock_heiferIII.__class__.__name__ = "HeiferIII"
+    mock_cow = mocker.MagicMock()
+    mock_cow.__class__.__name__ = "Cow"
+    mock_cow.update_milk_production_history = mocker.MagicMock()
+
+    pen.animals_in_pen = {'0': mock_calf, '1': mock_heiferI, '2': mock_heiferII, '3': mock_heiferIII, '4': mock_cow}
+
+    mock_feed = mocker.MagicMock()
+    mock_current_temperature = mocker.MagicMock()
+
+    mock_animal_manager.reformulate_ration_single_pen(pen, mock_current_temperature, mock_feed)
+
+    patch_for_reset_milk_production_reduction.assert_called_once()
+    patch_for_calc_nutrient_rqmts.assert_called_once()
+    patch_for_calc_nutrient_rqmts.assert_called_once_with([mock_calf],
+                                                          [mock_heiferI],
+                                                          [mock_heiferII],
+                                                          [mock_heiferIII],
+                                                          [mock_cow],
+                                                          mock_feed,
+                                                          mock_current_temperature)
+    patch_for_calc_and_update_ration.assert_called_once()
+    patch_for_report_ration_interval_data.assert_called_once()
+    pen.calc_avg_growth.assert_called_once()
+
+    mock_calf.update_milk_production_history.assert_not_called()
+    mock_cow.update_milk_production_history.assert_not_called()
+
+    pen_lac_cow = mocker.MagicMock()
+    pen_lac_cow.animal_combination.name = "LAC_COW"
+    pen_lac_cow.calc_avg_growth = mocker.MagicMock()
+    pen_lac_cow.animals_in_pen = {'4': mock_cow}
+
+    mock_animal_manager.reformulate_ration_single_pen(pen_lac_cow, mock_current_temperature, mock_feed)
+    patch_for_calc_nutrient_rqmts.assert_called_with([],
+                                                     [],
+                                                     [],
+                                                     [],
+                                                     [mock_cow],
+                                                     mock_feed,
+                                                     mock_current_temperature)
+    mock_cow.update_milk_production_history.assert_called()
