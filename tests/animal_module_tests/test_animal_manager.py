@@ -2561,9 +2561,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, "allocate_animals_to_pens", return_value=None
     )
     mock_pen.calc_avg_growth = MagicMock()
-    patch_for_calc_and_update_ration = mocker.patch.object(
-        AnimalManager, "_calc_and_update_ration", return_value=None
-    )
+    patch_for_calc_and_update_ration = mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
     patch_for_calc_avg_growth = mocker.patch.object(AnimalManager, "calc_avg_growth", return_value=None)
     mock_manure_excretions_output_data = {}
     patch_for_report_ration_supply = mocker.patch.object(RationReporter, "report_ration_supply", return_value=None)
@@ -2697,14 +2695,14 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     mock_animal_manager = AnimalManager()
     mock_animal_manager.simulation_day = 1
 
-    patch_for_reset_milk_production_reduction = \
-        mocker.patch.object(AnimalManager, "reset_milk_production_reduction", return_value=None)
-    patch_for_calc_nutrient_rqmts = \
-        mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
-    patch_for_calc_and_update_ration = \
-        mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
-    patch_for_report_ration_interval_data = \
-        mocker.patch.object(AnimalModuleReporter, "report_ration_interval_data", return_value=None)
+    patch_for_reset_milk_production_reduction = mocker.patch.object(
+        AnimalManager, "reset_milk_production_reduction", return_value=None
+    )
+    patch_for_calc_nutrient_rqmts = mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
+    patch_for_calc_and_update_ration = mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
+    patch_for_report_ration_interval_data = mocker.patch.object(
+        AnimalModuleReporter, "report_ration_interval_data", return_value=None
+    )
 
     pen = mocker.MagicMock()
     pen.animal_combination.name = "NOT_LAC_COW"
@@ -2723,7 +2721,7 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     mock_cow.__class__.__name__ = "Cow"
     mock_cow.update_milk_production_history = mocker.MagicMock()
 
-    pen.animals_in_pen = {'0': mock_calf, '1': mock_heiferI, '2': mock_heiferII, '3': mock_heiferIII, '4': mock_cow}
+    pen.animals_in_pen = {"0": mock_calf, "1": mock_heiferI, "2": mock_heiferII, "3": mock_heiferIII, "4": mock_cow}
 
     mock_feed = mocker.MagicMock()
     mock_current_temperature = mocker.MagicMock()
@@ -2732,13 +2730,9 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
 
     patch_for_reset_milk_production_reduction.assert_called_once()
     patch_for_calc_nutrient_rqmts.assert_called_once()
-    patch_for_calc_nutrient_rqmts.assert_called_once_with([mock_calf],
-                                                          [mock_heiferI],
-                                                          [mock_heiferII],
-                                                          [mock_heiferIII],
-                                                          [mock_cow],
-                                                          mock_feed,
-                                                          mock_current_temperature)
+    patch_for_calc_nutrient_rqmts.assert_called_once_with(
+        [mock_calf], [mock_heiferI], [mock_heiferII], [mock_heiferIII], [mock_cow], mock_feed, mock_current_temperature
+    )
     patch_for_calc_and_update_ration.assert_called_once()
     patch_for_report_ration_interval_data.assert_called_once()
     pen.calc_avg_growth.assert_called_once()
@@ -2749,14 +2743,8 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     pen_lac_cow = mocker.MagicMock()
     pen_lac_cow.animal_combination.name = "LAC_COW"
     pen_lac_cow.calc_avg_growth = mocker.MagicMock()
-    pen_lac_cow.animals_in_pen = {'4': mock_cow}
+    pen_lac_cow.animals_in_pen = {"4": mock_cow}
 
     mock_animal_manager.reformulate_ration_single_pen(pen_lac_cow, mock_current_temperature, mock_feed)
-    patch_for_calc_nutrient_rqmts.assert_called_with([],
-                                                     [],
-                                                     [],
-                                                     [],
-                                                     [mock_cow],
-                                                     mock_feed,
-                                                     mock_current_temperature)
+    patch_for_calc_nutrient_rqmts.assert_called_with([], [], [], [], [mock_cow], mock_feed, mock_current_temperature)
     mock_cow.update_milk_production_history.assert_called()
