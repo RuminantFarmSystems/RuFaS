@@ -274,7 +274,6 @@ class GraphGenerator:
         else:
             graph_details["legend"] = list(prepared_data.keys())
 
-        graph_details["legend"] = [s.replace(".", ".\n") for s in graph_details["legend"]]
         return graph_details
 
     def _add_var_units(
@@ -309,25 +308,24 @@ class GraphGenerator:
                 }
             )
             return filtered_pool, logs
-        else:
-            for var_name, details in filtered_pool.items():
-                unit_info = details["info_maps"][0]["units"]
-                if isinstance(unit_info, dict):
-                    unit = unit_info.get(var_name, "not available")
-                    if unit == "not available":
-                        logs.append(
-                            {
-                                "warning": "Missing unit information",
-                                "message": f"Unit for '{var_name}' not found in units dictionary. "
-                                "Using default 'not available'.",
-                                "info_map": info_map,
-                            }
-                        )
-                else:
-                    unit = unit_info
+        for var_name, details in filtered_pool.items():
+            unit_info = details["info_maps"][0]["units"]
+            if isinstance(unit_info, dict):
+                unit = unit_info.get(var_name, "not available")
+                if unit == "not available":
+                    logs.append(
+                        {
+                            "warning": "Missing unit information",
+                            "message": f"Unit for '{var_name}' not found in units dictionary. "
+                            "Using default 'not available'.",
+                            "info_map": info_map,
+                        }
+                    )
+            else:
+                unit = unit_info
 
-                new_var_name = f"{var_name} ({unit})"
-                updated_data[new_var_name] = details
+            new_var_name = f"{var_name} ({unit})"
+            updated_data[new_var_name] = details
 
         return updated_data, logs
 
@@ -605,7 +603,7 @@ class GraphGenerator:
             graph_path = graph_path.with_name(f"{graph_path.stem}({counter}){graph_path.suffix}")
             counter += 1
         try:
-            plt.savefig(graph_path)
+            plt.savefig(graph_path, bbox_inches="tight")
             return graph_path
         except Exception as e:
             raise Exception(f"An error occurred while trying to save the graph: {e}") from e

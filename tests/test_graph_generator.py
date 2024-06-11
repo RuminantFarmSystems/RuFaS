@@ -31,7 +31,7 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
 
             result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
-            mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value)
+            mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value, bbox_inches="tight")
             mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
             assert result == mock_generate_graph_path.return_value
 
