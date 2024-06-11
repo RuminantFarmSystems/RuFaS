@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from typing import Dict, List
+from typing import Dict, List, Any
 from typing import Optional
 from typing import Tuple
 
@@ -88,7 +88,7 @@ class ManureManager:
     """
 
     def __init__(
-        self, pen_list: List[PenManureData], weather: Weather, time: Time, manure_manager_config: Dict
+        self, pen_list: List[PenManureData], weather: Weather, time: Time, manure_manager_config: dict[str, Any]
     ) -> None:
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
@@ -101,7 +101,7 @@ class ManureManager:
             The Weather object used to initialize State variables.
         time : Time
             The Time object used to initialize State variables.
-        manure_manager_config : dict
+        manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.
 
