@@ -198,7 +198,6 @@ class HarvestedCrop:
         """
         moisture_frac = 1 - self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         heat: float = (
-            104 * moisture_frac**2.18 * self.bale_density**0.5
-            + 5.72 * moisture_frac**1.23 * self.bale_density**0.94
+            104 * moisture_frac**2.18 * self.bale_density**0.5 + 5.72 * moisture_frac**1.23 * self.bale_density**0.94
         )
         return heat
