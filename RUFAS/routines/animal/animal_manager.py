@@ -1524,11 +1524,6 @@ class AnimalManager:
 
             self._record_animal_counts()
             self._record_culling_stats()
-            if time.is_last_day_of_simulation:
-                self._record_animal_events(self.cows)
-                self._record_animal_events(self.heiferIIs)
-                self._record_heiferIIs_conception_rate()
-                self._record_cows_conception_rate()
 
             self.calc_p_rqmts()
             self.daily_p_update()
@@ -1555,31 +1550,6 @@ class AnimalManager:
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
-
-    def _record_animal_events(self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
-        """
-        Record the events of the animals.
-
-        Parameters
-        ----------
-        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            A list of animals.
-
-        Returns
-        -------
-        None
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_animal_events.__name__,
-        }
-        for animal in animals:
-            om.add_variable(
-                f"{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}",
-                animal.events,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
 
     def _record_animal_counts(self) -> None:
         """
@@ -1634,129 +1604,6 @@ class AnimalManager:
             "num_cow_parity_4+",
             self.life_cycle_manager.num_cow_for_parity["greater_than_3"],
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
-        )
-
-    def _record_heiferIIs_conception_rate(self) -> None:
-        """
-        Record the conception rate of heiferIIs.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_heiferIIs_conception_rate.__name__,
-        }
-        om.add_variable(
-            "heiferII_total_num_ai_performed",
-            HeiferII.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_total_num_successful_conceptions",
-            HeiferII.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        heiferII_overall_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions"] / HeiferII.stats["num_ai_performed"])
-            if HeiferII.stats["num_ai_performed"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_overall_conception_rate",
-            heiferII_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_ED",
-            HeiferII.stats["num_ai_performed_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_ED",
-            HeiferII.stats["num_successful_conceptions_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        ed_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_ED"] / HeiferII.stats["num_ai_performed_in_ED"])
-            if HeiferII.stats["num_ai_performed_in_ED"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_ED_conception_rate",
-            ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_TAI",
-            HeiferII.stats["num_ai_performed_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_TAI",
-            HeiferII.stats["num_successful_conceptions_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        tai_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_TAI"] / HeiferII.stats["num_ai_performed_in_TAI"])
-            if HeiferII.stats["num_ai_performed_in_TAI"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_TAI_conception_rate",
-            tai_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_SynchED",
-            HeiferII.stats["num_ai_performed_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_SynchED",
-            HeiferII.stats["num_successful_conceptions_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        synch_ed_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_SynchED"] / HeiferII.stats["num_ai_performed_in_SynchED"])
-            if HeiferII.stats["num_ai_performed_in_SynchED"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_SynchED_conception_rate",
-            synch_ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-    def _record_cows_conception_rate(self) -> None:
-        """
-        Record the conception rate of cows.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_cows_conception_rate.__name__,
-        }
-        om.add_variable(
-            "cow_total_num_ai_performed",
-            Cow.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "cow_total_num_successful_conceptions",
-            Cow.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        cow_overall_conception_rate = (
-            (Cow.stats["num_successful_conceptions"] / Cow.stats["num_ai_performed"])
-            if Cow.stats["num_ai_performed"] > 0
-            else 0
-        )
-        om.add_variable(
-            "cow_overall_conception_rate",
-            cow_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
 
     def _record_culling_stats(self) -> None:

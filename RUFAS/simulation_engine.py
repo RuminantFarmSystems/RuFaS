@@ -67,7 +67,8 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time.simulation_day)
+        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time,
+                                                      self.animal_manager.heiferIIs, self.animal_manager.cows)
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()

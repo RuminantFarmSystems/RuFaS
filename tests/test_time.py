@@ -30,9 +30,6 @@ def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture)
     assert time.start_date == datetime.datetime.strptime("1999:2", "%Y:%j")
     assert time.end_date == datetime.datetime.strptime("2000:1", "%Y:%j")
 
-    assert time.leap_year_length == 366
-    assert time.year_length == 365
-
     assert time.current_date == time.start_date
     assert time.simulation_length_days == (time.end_date - time.start_date).days
     assert time.simulation_day == 0
@@ -151,16 +148,6 @@ def test_record_time(mock_config: Dict[str, Any], mocker: MockerFixture) -> None
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         time.record_time()
         assert add_var.call_count == 4
-
-
-def test_is_last_day_of_simulation(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
-    """Tests that Time instances correctly determine if current day is last day of a simulation."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
-    time = Time()
-    for _ in range(364):
-        assert not time.is_last_day_of_simulation
-        time.advance()
-    assert time.is_last_day_of_simulation
 
 
 @pytest.mark.parametrize(
