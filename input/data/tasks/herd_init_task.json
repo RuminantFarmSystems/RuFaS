@@ -1,0 +1,12 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "HERD_INITIALIZATION",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "herd_init",
+      "log_verbosity": "logs",
+      "random_seed": 42
+    }
+  ]
+}
