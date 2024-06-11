@@ -7,7 +7,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.pen_manure_data import PenManureData
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -1841,6 +1842,18 @@ def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
 
     for pen in animal_manager_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
+
+
+def test_collect_pen_manure_data(mocker: MockerFixture, animal_manager_with_mock_pens: AnimalManager) -> None:
+    """Tests collect_pen_manure_data in the AnimalManager."""
+    mock_pen_manure_data = mocker.MagicMock(autospec=PenManureData)
+    for pen in animal_manager_with_mock_pens.all_pens:
+        mocker.patch.object(pen, "get_manure_data", return_value=mock_pen_manure_data)
+    expected = [mock_pen_manure_data for _ in range(len(animal_manager_with_mock_pens.all_pens))]
+
+    actual = animal_manager_with_mock_pens.collect_pen_manure_data()
+
+    assert actual == expected
 
 
 def test_record_pen_history(mocker: MockerFixture) -> None:

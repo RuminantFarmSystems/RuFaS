@@ -7,7 +7,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...shared_structures.animal_combinations import AnimalCombination
 import math
 
 im = InputManager()
