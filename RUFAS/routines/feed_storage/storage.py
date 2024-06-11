@@ -181,7 +181,7 @@ class Storage:
             )
 
             crop.last_time_degraded = copy.deepcopy(time)
-            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, 0.0)
+            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
         om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
@@ -211,13 +211,13 @@ class Storage:
         crop : HarvestedCrop
             The stored crop that has lost dry matter.
         dry_matter_loss : float
-            Amount of dry matter the crop lost on the current day in kg.
+            Amount of dry matter the crop lost on the current day (kg).
         moisture_loss : float
-            Amount of moisture (water) the crop lost on the current day in kg.
+            Amount of moisture (water) the crop lost on the current day (kg).
 
         Notes
         -----
-        The amount of dry matter mass remaining is calculating first, then the remaining amount of fresh mass. After
+        The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After
         these two attributes have been set, the dry matter percentage is recalculated and set.
 
         """
@@ -277,7 +277,7 @@ class Storage:
         Returns
         -------
         float
-            Total amount of the target nutrient in the stored crops in kg.
+            Total amount of the target nutrient in the stored crops (kg).
 
         """
         total_nutrient: float = sum(
@@ -304,7 +304,7 @@ class Storage:
         Returns
         -------
         float
-            The amount of dry matter lost to gas, specific to fermentation in kg.
+            The amount of dry matter lost to gas, specific to fermentation (kg).
 
         References
         ----------

@@ -140,7 +140,7 @@ def test_calculate_moisture_loss_to_effluent(silage: Silage, max_effluent: float
 
 @pytest.mark.parametrize(
     "npn,cp,loss_frac,expected",
-    [(4.0, 25.0, 0.02, 1.63934426), (8.0, 50.0, 0.05, 5.15463917), (0.0, 3.6, 0.01, 0.0)],
+    [(4.0, 25.0, 0.02, 1.63934426), (8.0, 50.0, 0.05, 5.15463917), (0.0, 3.6, 0.01, 0.0), (4.0, 20.0, 0.0, 4.0)],
 )
 def test_calculate_non_protein_nitrogen_after_effluent_loss(
     silage: Silage, npn: float, cp: float, loss_frac: float, expected: float
@@ -151,7 +151,9 @@ def test_calculate_non_protein_nitrogen_after_effluent_loss(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("cp,loss_frac,expected", [(5.6, 0.033, 4.767322), (2.2, 0.04, 1.041667), (0.0, 0.05, 0.0)])
+@pytest.mark.parametrize(
+    "cp,loss_frac,expected", [(5.6, 0.033, 4.767322), (2.2, 0.04, 1.041667), (0.0, 0.05, 0.0), (8.7, 0.0, 8.7)]
+)
 def test_calculate_crude_protein_after_effluent_loss(
     silage: Silage, cp: float, loss_frac: float, expected: float
 ) -> None:
