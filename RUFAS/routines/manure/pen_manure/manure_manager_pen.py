@@ -107,14 +107,14 @@ class ManureManagerPen:
     @property
     def barn_area_from_pen_type(self) -> float:
         """
-        Get the barn area based on the pen type and whether there are cows in the pen.
+        Get the barn area based on the pen type and whether there are lactating cows in the pen.
 
         Notes
         -----
         The barn area is looked up from the following table:
 
         +---------------------------+-------------------+-------------------+
-        | Pen Type                  | Has Cows          | No Cows           |
+        | Pen Type                  | Has Lac Cows      | No Lac Cows       |
         +===========================+===================+===================+
         | Freestall                 | 3.5               | 2.5               |
         +---------------------------+-------------------+-------------------+
@@ -137,11 +137,11 @@ class ManureManagerPen:
             "compost bedded pack barn", or "open lot".
         """
 
-        BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
-        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
-        tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
-        bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
-        open_lot = BarnArea(has_cows=5.0, no_cows=3.0)
+        BarnArea = NamedTuple("BarnArea", [("has_lac_cows", float), ("no_lac_cows", float)])
+        freestall = BarnArea(has_lac_cows=3.5, no_lac_cows=2.5)
+        tiestall = BarnArea(has_lac_cows=1.2, no_lac_cows=1.0)
+        bedded_pack = BarnArea(has_lac_cows=5.0, no_lac_cows=3.0)
+        open_lot = BarnArea(has_lac_cows=5.0, no_lac_cows=3.0)
 
         barn_area_by_pen_type = {
             "freestall": freestall,
@@ -155,6 +155,6 @@ class ManureManagerPen:
 
         barn_area = barn_area_by_pen_type[self.pen_type]
 
-        if "Cow" in self.classes_in_pen:
-            return barn_area.has_cows * self.num_stalls
-        return barn_area.no_cows * self.num_stalls
+        if "LacCow" in self.classes_in_pen:
+            return barn_area.has_lac_cows * self.num_stalls
+        return barn_area.no_lac_cows * self.num_stalls
