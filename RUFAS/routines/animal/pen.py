@@ -325,6 +325,21 @@ class Pen:
         """
         return len(self.animals_in_pen) > 0
 
+    @property
+    def needs_ration_formulation(self) -> bool:
+        """
+        Returns whether pen needs a ration formulated.
+
+        This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
+         and on subsequent days is populated.
+
+        Returns
+        -------
+        bool
+            True if pen needs ration formulation.
+        """
+        return not self.ration and self.is_populated
+
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements
@@ -494,7 +509,7 @@ class Pen:
         self.dry_total = self._copy_manure_template()
         self.lactating_total = self._copy_manure_template()
 
-    def calc_avg_growth(self):
+    def calc_avg_growth(self) -> None:
         """
         Calculates the average growth of the animals in the pen.
         """
@@ -577,13 +592,15 @@ class Pen:
         self.animals_in_pen = {}
         self.avg_p_animal = 0
 
-    def subset_class_feeds(self, feed):
+    def subset_class_feeds(self, feed) -> None:
         """
         Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
 
-        Args:
-            feed: an object of the Feed class
+        Parameters
+        ----------
+        feed : Feed
+            An object of the Feed class.
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
