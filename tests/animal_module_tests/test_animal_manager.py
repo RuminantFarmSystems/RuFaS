@@ -2552,11 +2552,12 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_reformulate_ration_single_pen = mocker.patch.object(AnimalManager, "reformulate_ration_single_pen",
                                                                   return_value=None)
     mock_manure_excretions_output_data = {}
-    patch_for_report_animal_module_manure = mocker.patch.object(AnimalModuleReporter, "report_animal_module_manure",
-                                                                return_value=None)
-    patch_for_report_daily_reports = mocker.patch.object(AnimalModuleReporter,
-                                                         "report_daily_reports",
-                                                         return_value=None)
+    patch_for_report_animal_module_manure = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_module_manure", return_value=None
+    )
+    patch_for_report_daily_reports = mocker.patch.object(
+        AnimalModuleReporter, "report_daily_reports", return_value=None
+    )
     sum_daily_milk = 1000.0
     patch_for_sum_daily_milk = mocker.patch.object(AnimalManager, "sum_daily_milk", return_value=sum_daily_milk)
 
@@ -2735,6 +2736,7 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     pen_lac_cow.animals_in_pen = {"4": mock_cow, "5": mock_cow}
 
     mock_animal_manager.reformulate_ration_single_pen(pen_lac_cow, mock_current_temperature, mock_feed)
-    patch_for_calc_nutrient_rqmts.assert_called_with([], [], [], [], [mock_cow, mock_cow], mock_feed,
-                                                     mock_current_temperature)
+    patch_for_calc_nutrient_rqmts.assert_called_with(
+        [], [], [], [], [mock_cow, mock_cow], mock_feed, mock_current_temperature
+    )
     assert mock_cow.update_milk_production_history.call_count == 2
