@@ -144,7 +144,7 @@ class ManureManager:
                 configuration_name=mm_pen.manure_handler,
                 weather=self.weather,
                 time=self.time,
-                manure_handler_config=manure_handler_config,  # type: ignore
+                manure_handler_config=manure_handler_config,
             )
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
@@ -180,7 +180,7 @@ class ManureManager:
                 manure_treatment_type_name=mm_pen.manure_treatment,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_treatment_config=custom_manure_treatment_config,  # type: ignore
+                custom_manure_treatment_config=custom_manure_treatment_config,
             )
 
     def daily_update(self, pen_list: List[PenManureData], simulation_day: int) -> None:
@@ -520,6 +520,7 @@ class ManureManager:
     ) -> Tuple[
         Optional[ManureTreatmentDailyOutput],
         Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput,
         ManureTreatmentDailyOutput,
         ManureTreatmentDailyOutput,
     ]:
