@@ -1,9 +1,9 @@
 {
   "herd_information": {
-    "calf_num": 0,
-    "heiferI_num": 0,
-    "heiferII_num": 0,
-    "heiferIII_num_springers": 0,
+    "calf_num": 8,
+    "heiferI_num": 44,
+    "heiferII_num": 38,
+    "heiferIII_num_springers": 5,
     "cow_num": 100,
     "replace_num": 500,
     "herd_num": 100,

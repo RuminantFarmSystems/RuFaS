@@ -991,16 +991,6 @@ class AnimalManager:
             else:
                 pen.reset_manure()
 
-    def calc_avg_growth(self) -> None:
-        """
-        Calls each pen's method to calculate the average growth of animals in
-        the pen. This is part of the routines that happen every
-        ration interval.
-        """
-
-        for pen in self.all_pens:
-            pen.calc_avg_growth()
-
     def sum_daily_milk(self, cows: List[Cow]) -> float:
         """
         sums the daily milk production across all cows
