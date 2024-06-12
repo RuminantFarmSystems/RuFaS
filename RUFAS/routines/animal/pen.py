@@ -597,8 +597,10 @@ class Pen:
         Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
 
-        Args:
-            feed: an object of the Feed class
+        Parameters
+        ----------
+        feed : Feed
+            An object of the Feed class.
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]

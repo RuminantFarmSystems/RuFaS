@@ -1163,11 +1163,11 @@ class AnimalManager:
             for key in ration_per_animal:
                 if key == "status":
                     ration_per_pen[key] = ration_per_animal[key]
-                else:  # feeds and price
+                else:
                     ration_per_pen[key] = ration_per_animal[key] * num_animals
 
             pen.ration = ration_per_pen
-            pen.ration_per_animal = ration_per_animal  # Important
+            pen.ration_per_animal = ration_per_animal
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
