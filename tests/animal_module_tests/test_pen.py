@@ -776,3 +776,19 @@ def test_calc_total_manure(
         patch_for_calc_animal_manure_excretion.assert_not_called()
         patch_for_add_animal_manure_excretions.assert_not_called()
         patch_for_update_animal_manure_excretion_data.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "pen_to_test, ration, expected",
+    [
+        (lazy_fixture("pen"), {}, False),
+        (lazy_fixture("pen"), {"something": 1, "something2": "value"}, False),
+        (lazy_fixture("pen_with_animals"), {}, True),
+        (lazy_fixture("pen_with_animals"), {"something": 1, "something2": "value"}, False),
+    ],
+)
+def test_needs_ration_formulation(
+    pen_to_test: Pen, ration: Dict[str, float | str], expected: bool
+) -> None:
+    pen_to_test.ration = ration
+    assert pen_to_test.needs_ration_formulation == expected
