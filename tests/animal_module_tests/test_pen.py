@@ -787,9 +787,7 @@ def test_calc_total_manure(
         (lazy_fixture("pen_with_animals"), {"something": 1, "something2": "value"}, False),
     ],
 )
-def test_needs_ration_formulation(
-    pen_to_test: Pen, ration: Dict[str, float | str], expected: bool
-) -> None:
+def test_needs_ration_formulation(pen_to_test: Pen, ration: Dict[str, float | str], expected: bool) -> None:
     """Unit test for needs_ration_formulation property in file pen.py."""
     pen_to_test.ration = ration
     assert pen_to_test.needs_ration_formulation == expected

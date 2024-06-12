@@ -2549,8 +2549,9 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, "allocate_animals_to_pens", return_value=None
     )
     mock_pen.calc_avg_growth = mocker.MagicMock()
-    patch_for_reformulate_ration_single_pen = mocker.patch.object(AnimalManager, "reformulate_ration_single_pen",
-                                                                  return_value=None)
+    patch_for_reformulate_ration_single_pen = mocker.patch.object(
+        AnimalManager, "reformulate_ration_single_pen", return_value=None
+    )
     mock_manure_excretions_output_data = {}
     patch_for_report_animal_module_manure = mocker.patch.object(
         AnimalModuleReporter, "report_animal_module_manure", return_value=None
