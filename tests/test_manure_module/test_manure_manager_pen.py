@@ -118,7 +118,7 @@ def test_barn_area_from_pen_type(
     mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
     mock_pen.num_stalls = 1
-    mock_pen.classes_in_pen = {"Cow"} if has_cows else {"Calf"}
+    mock_pen.classes_in_pen = {"LacCow"} if has_cows else {"Calf"}
 
     # Act & Assert
     if raises_error:
