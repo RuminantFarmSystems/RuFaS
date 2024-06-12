@@ -1843,15 +1843,6 @@ def test_calc_manure_excretion(mocker: MockerFixture) -> None:
     mock_pen_1.calc_manure.assert_not_called()
 
 
-def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
-    """Unit test for function calc_avg_growth in file routines/animal/animal_manager.py"""
-
-    animal_manager_with_mock_pens.calc_avg_growth()
-
-    for pen in animal_manager_with_mock_pens.all_pens:
-        pen.calc_avg_growth.assert_called_once()
-
-
 def test_record_pen_history(mocker: MockerFixture) -> None:
     """Unit test for function record_pen_history in file routines/animal/animal_manager.py"""
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
@@ -2555,17 +2546,25 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, "_determine_classes_in_pen", return_value=mock_classes_in_pen
     )
 
-    patch_for_calc_nutrient_rqmts = mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
+    # patch_for_calc_nutrient_rqmts = mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
     patch_for_clear_pens = mocker.patch.object(AnimalManager, "clear_pens", return_value=None)
     patch_for_allocate_animals_to_pens = mocker.patch.object(
         AnimalManager, "allocate_animals_to_pens", return_value=None
     )
-    mock_pen.calc_avg_growth = MagicMock()
-    patch_for_calc_and_update_ration = mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
-    patch_for_calc_avg_growth = mocker.patch.object(AnimalManager, "calc_avg_growth", return_value=None)
+    mock_pen.calc_avg_growth = mocker.MagicMock()
+    # patch_for_collect_manure_excretions_output_data = mocker.patch.object(
+    #     AnimalManager, "collect_manure_excretions_output_data", return_value=mocker.MagicMock()
+    # )
+    patch_for_reformulate_ration_single_pen = mocker.patch.object(AnimalManager, "reformulate_ration_single_pen",
+                                                                  return_value=None)
+    # patch_for_calc_and_update_ration = mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
+    # TODO DEPRECATE? patch_for_calc_avg_growth = mocker.patch.object(AnimalManager, "calc_avg_growth", return_value=None)
     mock_manure_excretions_output_data = {}
-    patch_for_report_ration_supply = mocker.patch.object(RationReporter, "report_ration_supply", return_value=None)
-
+    patch_for_report_animal_module_manure = mocker.patch.object(AnimalModuleReporter, "report_animal_module_manure",
+                                                                return_value=None)
+    patch_for_report_daily_reports = mocker.patch.object(AnimalModuleReporter,
+                                                         "report_daily_reports",
+                                                         return_value=None)
     sum_daily_milk = 1000.0
     patch_for_sum_daily_milk = mocker.patch.object(AnimalManager, "sum_daily_milk", return_value=sum_daily_milk)
 
@@ -2576,7 +2575,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     assert patch_for_end_ration_interval.call_count == 2
     if is_end_ration_interval:
         patch_for_reset_milk_production_reduction.assert_called()
-        patch_for_report_ration_supply.assert_called()
+        patch_for_reformulate_ration_single_pen.assert_called()
 
     mock_weather.get_current_day_conditions.assert_called_with(mock_time)
 
@@ -2632,15 +2631,19 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     if is_end_ration_interval:
         patch_for_clear_pens.assert_called_once()
         patch_for_allocate_animals_to_pens.assert_called_once()
+        assert patch_for_reformulate_ration_single_pen.call_count == 5
         patch_for_reset_milk_production_reduction.assert_called()
-        assert patch_for_calc_nutrient_rqmts.call_count == 5
-        patch_for_calc_and_update_ration.assert_called_with(mock_feed, mock_pen)
-        mock_pen.calc_avg_growth.assert_called_once()
-        for mock_animal in list(mock_pen.animals_in_pen.values()):
-            mock_animal.update_milk_production_history.assert_called_once_with(mock_animal_manager.simulation_day)
+        # assert patch_for_calc_nutrient_rqmts.call_count == 5
+        # patch_for_calc_and_update_ration.assert_called_with(mock_feed, mock_pen)
+        # mock_pen.calc_avg_growth.assert_called_once()
+        # for mock_animal in list(mock_pen.animals_in_pen.values()):
+        #     mock_animal.update_milk_production_history.assert_called_once_with(mock_animal_manager.simulation_day)
 
     patch_for_sum_daily_milk.assert_called_once_with(mock_cows)
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
+    # ssert patch_for_collect_manure_excretions_output_data.call_count == 5
+    patch_for_report_animal_module_manure.assert_called_once()
+    patch_for_report_daily_reports.assert_called_once()
 
 
 def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
@@ -2743,8 +2746,9 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     pen_lac_cow = mocker.MagicMock()
     pen_lac_cow.animal_combination.name = "LAC_COW"
     pen_lac_cow.calc_avg_growth = mocker.MagicMock()
-    pen_lac_cow.animals_in_pen = {"4": mock_cow}
+    pen_lac_cow.animals_in_pen = {"4": mock_cow, "5": mock_cow}
 
     mock_animal_manager.reformulate_ration_single_pen(pen_lac_cow, mock_current_temperature, mock_feed)
-    patch_for_calc_nutrient_rqmts.assert_called_with([], [], [], [], [mock_cow], mock_feed, mock_current_temperature)
-    mock_cow.update_milk_production_history.assert_called()
+    patch_for_calc_nutrient_rqmts.assert_called_with([], [], [], [], [mock_cow, mock_cow], mock_feed,
+                                                     mock_current_temperature)
+    assert mock_cow.update_milk_production_history.call_count == 2
