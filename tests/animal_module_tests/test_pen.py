@@ -13,9 +13,10 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.shared_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.animal_combinations import AnimalCombination
+from RUFAS.shared_structures.pen_manure_data import PenManureData
 
 
 @pytest.fixture
@@ -776,3 +777,61 @@ def test_calc_total_manure(
         patch_for_calc_animal_manure_excretion.assert_not_called()
         patch_for_add_animal_manure_excretions.assert_not_called()
         patch_for_update_animal_manure_excretion_data.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "animal_count,combination,expected",
+    [(3, AnimalCombination.LAC_COW, 3), (10, AnimalCombination.CALF, 0), (8, AnimalCombination.GROWING, 0)],
+)
+def test_count_lactating_cows(
+    mocker: MockerFixture, pen: Pen, animal_count: int, combination: AnimalCombination, expected: int
+) -> None:
+    """Tests _count_lactating_cows in Pen."""
+    mocker.patch.object(Cow, "__init__", return_value=None)
+    animals = {key: Cow() for key in range(animal_count)}
+    pen.animals_in_pen = animals
+    pen.animal_combination = combination
+
+    actual = pen._count_lactating_cows()
+
+    assert actual == expected
+
+
+def test_get_manure_data(mocker: MockerFixture, pen: Pen) -> None:
+    """Tests get_manure_data in Pen."""
+    pen.id = 1
+    pen.animals_in_pen = {"1": 1, "2": 2, "3": 3}
+    pen.classes_in_pen = {"heiferIs", "heiferIIs"}
+    pen.animal_combination = AnimalCombination.GROWING
+    pen.housing_type = "barn"
+    pen.pen_type = "freestall"
+    pen.bedding_type = "CBPB"
+    pen.manure_handling = "alley scraper"
+    pen.manure_separator = "vermifiltration"
+    pen.manure_separator_after_digestion = "generic digestion"
+    pen.manure_storage = "anaerobic"
+    mock_manure = mocker.MagicMock(autospec=AnimalManureExcretions)
+    pen.manure = mock_manure
+    pen.num_stalls = 100
+    mocker.patch.object(pen, "_count_lactating_cows", return_value=100)
+
+    expected = PenManureData(
+        id=1,
+        num_animals=3,
+        classes_in_pen={"heiferIs", "heiferIIs"},
+        animal_combination=AnimalCombination.GROWING,
+        housing_type="barn",
+        pen_type="freestall",
+        bedding_type="CBPB",
+        manure_handler="alley scraper",
+        manure_separator="vermifiltration",
+        manure_separator_after_digestion="generic digestion",
+        manure_treatment="anaerobic",
+        manure=mock_manure,
+        num_lactating_cows=100,
+        num_stalls=100,
+    )
+
+    actual = pen.get_manure_data()
+
+    assert actual == expected
