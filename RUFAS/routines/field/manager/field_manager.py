@@ -243,6 +243,7 @@ class FieldManager:
             days=fertilizer_data.get("days"),
             nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
             phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
+            potassium_masses=fertilizer_data.get("potassium_masses"),
             application_depths=fertilizer_data.get("application_depths"),
             surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
             pattern_skip=fertilizer_data.get("pattern_skip"),
