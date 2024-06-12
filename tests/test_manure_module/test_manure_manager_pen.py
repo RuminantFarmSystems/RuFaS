@@ -101,14 +101,14 @@ def test_count_lactating_cows(
         ("dummy", True, None, True),
     ],
 )
-def test_barn_area_from_pen_type(
+def test_exposed_manure_surface_area_from_pen_type(
     pen_type: str,
     has_cows: bool,
     expected_area: float | None,
     raises_error: bool,
     mocker: MockerFixture,
 ):
-    """Unit test for barn_area_from_pen_type property in file manure_manager_pen.py"""
+    """Unit test for exposed_manure_surface_area_from_pen_type property in file manure_manager_pen.py"""
 
     # Arrange
     mocker.patch(
@@ -123,6 +123,6 @@ def test_barn_area_from_pen_type(
     # Act & Assert
     if raises_error:
         with pytest.raises(ValueError):
-            mock_pen.barn_area_from_pen_type
+            mock_pen.exposed_manure_surface_area_from_pen_type
     else:
-        assert mock_pen.barn_area_from_pen_type == expected_area
+        assert mock_pen.exposed_manure_surface_area_from_pen_type == expected_area
