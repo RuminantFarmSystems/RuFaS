@@ -643,15 +643,11 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     patch_for_plan_animal_allocation = mocker.patch.object(
         AnimalModuleReporter, "report_sold_animal_information", return_value=""
     )
-    patch_for_record_animal_events = mocker.patch.object(
-        AnimalModuleReporter, "_record_animal_events"
-    )
+    patch_for_record_animal_events = mocker.patch.object(AnimalModuleReporter, "_record_animal_events")
     patch_for_record_heiferIIs_conception_rate = mocker.patch.object(
         AnimalModuleReporter, "_record_heiferIIs_conception_rate"
     )
-    patch_for_record_cows_conception_rate = mocker.patch.object(
-        AnimalModuleReporter, "_record_cows_conception_rate"
-    )
+    patch_for_record_cows_conception_rate = mocker.patch.object(AnimalModuleReporter, "_record_cows_conception_rate")
 
     # act
     AnimalModuleReporter.report_end_of_simulation(animal_manager, time, animal_manager.heiferIIs, animal_manager.cows)
@@ -661,7 +657,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     patch_for_plan_animal_allocation.assert_called_once_with(animal_manager)
     assert patch_for_record_animal_events.call_args_list == [
         call(animal_manager.cows, time.simulation_day),
-        call(animal_manager.heiferIIs, time.simulation_day)
+        call(animal_manager.heiferIIs, time.simulation_day),
     ]
     patch_for_record_heiferIIs_conception_rate.assert_called_once()
     patch_for_record_cows_conception_rate.assert_called_once()
