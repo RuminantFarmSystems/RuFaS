@@ -116,7 +116,7 @@ def test_pen_manure_init() -> None:
         enteric_methane_g=enteric_methane_g,
     )
     num_animals = 2
-    expected_total_ammoniacal_nitrogen = urine_nitrogen
+    expected_total_ammoniacal_nitrogen = manure_total_ammoniacal_nitrogen
     expected_urine_ammoniacal_nitrogen = urine_nitrogen
 
     # Act
