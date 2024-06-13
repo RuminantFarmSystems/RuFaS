@@ -1951,7 +1951,8 @@ def test_filter_variables_pool_complex(
             call(
                 "Unpacking Pool Error",
                 "Unable to unpack key='DummyClass1.dummy_fun1.dummy_var2' in the data pool, "
-                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a', "
+                "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
                     "function": "filter_variables_pool",
@@ -1964,7 +1965,8 @@ def test_filter_variables_pool_complex(
             call(
                 "Unpacking Pool Error",
                 "Unable to unpack key='DummyClass1.dummy_fun2.dummy_var3' in the data pool, "
-                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a'",
+                "need a valid `variables` entry for this entry.is_data_in_dict=True, selected_variables='a', "
+                "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
                     "function": "filter_variables_pool",
@@ -2928,11 +2930,6 @@ def test_save_current_variable_pool(
     assert output_manager.variables_pool == {}
     assert output_manager.current_pool_size == sys.getsizeof(output_manager.variables_pool.__repr__())
     assert output_manager.saved_pool_chunks_num == 1
-
-    output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
-    output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
 def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> None:
