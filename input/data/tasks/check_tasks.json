@@ -1,0 +1,47 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "default",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/ARL_metadata.json",
+      "output_prefix": "ARL",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/barnyard_metadata.json",
+      "output_prefix": "barnyard",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/multi_crop_metadata.json",
+      "output_prefix": "multi_crop",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/swat_metadata.json",
+      "output_prefix": "default",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/testing_metadata.json",
+      "output_prefix": "testing",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    }
+  ]
+}
