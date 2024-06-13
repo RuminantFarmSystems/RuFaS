@@ -312,7 +312,7 @@ class OutputManager(object):
         self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
-        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=False)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
         self.add_log(
             "save_current_variable_pool",
             f"Saved the current variable pool to {saved_pool_file_path}",
@@ -1087,7 +1087,7 @@ class OutputManager(object):
                     self.add_error(
                         "Unpacking Pool Error",
                         f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
-                        f"{is_data_in_dict=}, {selected_variables=}",
+                        f"{is_data_in_dict=}, {selected_variables=}, see Wiki for proper setup details.",
                         info_map,
                     )
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
