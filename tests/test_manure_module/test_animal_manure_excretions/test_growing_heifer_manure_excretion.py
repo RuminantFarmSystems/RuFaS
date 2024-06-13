@@ -60,7 +60,7 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
     urine_nitrogen = manure_nitrogen - fecal_nitrogen
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
-    
+
     manure_total_ammoniacal_nitrogen = urine_nitrogen
     potassium = (
         dry_matter_intake

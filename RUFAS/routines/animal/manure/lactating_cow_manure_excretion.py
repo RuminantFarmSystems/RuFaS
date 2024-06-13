@@ -202,7 +202,7 @@ def manure_calculations(
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
-    
+
     # Total ammoniacal nitrogen in the manure slurry, kg
     manure_total_ammoniacal_nitrogen = urine_nitrogen
 
