@@ -116,7 +116,6 @@ def test_lactating_cow_manure_calculations(  # noqa
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-    # Total ammoniacal nitrogen in the manure slurry, kg
     manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     potassium = (
