@@ -181,6 +181,11 @@ class Hay(Storage):
         float
             Loss of dry matter that occurred over the specified period of weather conditions in kg.
 
+        Notes
+        -----
+        If the additional dry matter loss coefficient is 0, the equation this method implements will always result in
+        zero, so 0 is returned immediately in this case to avoid unnecessary computation.
+
         References
         ----------
         .. [1] Feed Storage Scienitific Documentation, equation 1.2.8
@@ -188,6 +193,7 @@ class Hay(Storage):
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
             return 0.0
+
         constant_factor = self.additional_dry_matter_loss_coefficient / crop.bale_density * self.bale_size**3
         conditions = [
             weather.rainfall
