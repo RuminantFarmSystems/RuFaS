@@ -32,7 +32,7 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/swat_metadata.json",
-      "output_prefix": "default",
+      "output_prefix": "swat",
       "log_verbosity": "errors",
       "random_seed": 0
     },
