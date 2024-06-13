@@ -835,7 +835,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time) -> None:
+    def _check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -850,7 +850,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time) -> None:
+    def _check_fertilizer_application_schedule(self, time: Time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -873,7 +873,7 @@ class Field:
                 event.day,
             )
 
-    def _check_tillage_schedule(self, time) -> None:
+    def _check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -890,11 +890,11 @@ class Field:
                 event.incorporation_fraction,
                 event.mixing_fraction,
                 event.implement,
-                time.calendar_year,
-                time.day,
+                time.current_calendar_year,
+                time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -972,7 +972,7 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: List[BaseFieldManagementEvent], time
+        all_events: List[BaseFieldManagementEvent], time: Time
     ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
@@ -1009,7 +1009,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -1056,16 +1056,16 @@ class Field:
             crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
-        crop.data.planting_year = time.calendar_year
-        crop.data.planting_day = time.day
+        crop.data.planting_year = time.current_calendar_year
+        crop.data.planting_day = time.current_julian_day
 
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
             crop.data.species,
-            time.calendar_year,
-            time.day,
+            time.current_calendar_year,
+            time.current_julian_day,
         )
 
     def _record_planting(
@@ -1149,7 +1149,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._harvest_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"day": time.day, "year": time.calendar_year},
+            "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
         }
         if len(crops_to_be_harvested) > 1:
             om.add_warning(
@@ -1313,7 +1313,7 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.day)
+        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.current_julian_day)
 
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
         self.soil.soil_temp.daily_soil_temperature_update(
@@ -1351,7 +1351,7 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time) -> None:
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1385,8 +1385,8 @@ class Field:
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
             manure_water=manure_water,
-            year=time.year,
-            day=time.day,
+            year=time.current_simulation_year,
+            day=time.current_julian_day,
             irrigation=current_conditions.irrigation,
         )
         total_water = current_conditions.rainfall + watering_amount + manure_water
