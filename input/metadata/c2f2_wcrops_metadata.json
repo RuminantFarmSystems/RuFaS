@@ -7,6 +7,13 @@
       "type": "json",
       "properties": "config_properties"
     },
+    "purchased_feed_land_use_change_emissions": {
+      "title": "Land Use Change emissions from purchased feeds",
+      "description": "Purchased feeds land use change emission values used in the EEE module.",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
