@@ -121,8 +121,6 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        if days_stored == 0:
-            return 0.0
         days_in_window = min(days_stored, 30)
         fraction_of_total_loss = days_in_window / 30
 
