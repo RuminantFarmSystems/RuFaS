@@ -59,23 +59,23 @@ class ManureManagerPen:
             A PenManureData instance containing all the manure information from a single pen.
 
         """
-        self.id: int = pen.id
-        self.num_animals: int = pen.num_animals
-        self.classes_in_pen: Set[str] = pen.classes_in_pen
-        self.animal_combination: AnimalCombination = pen.animal_combination
+        self.id: int = pen["id"]
+        self.num_animals: int = pen["num_animals"]
+        self.classes_in_pen: Set[str] = pen["classes_in_pen"]
+        self.animal_combination: AnimalCombination = pen["animal_combination"]
 
-        self.housing_type: str = pen.housing_type
-        self.pen_type: str = pen.pen_type
-        self.bedding_type: str = pen.bedding_type
+        self.housing_type: str = pen["housing_type"]
+        self.pen_type: str = pen["pen_type"]
+        self.bedding_type: str = pen["bedding_type"]
 
-        self.manure_handler: str = pen.manure_handler
-        self.manure_separator: str = pen.manure_separator
-        self.manure_separator_after_digestion: str = pen.manure_separator_after_digestion
-        self.manure_treatment: str = pen.manure_treatment
+        self.manure_handler: str = pen["manure_handler"]
+        self.manure_separator: str = pen["manure_separator"]
+        self.manure_separator_after_digestion: str = pen["manure_separator_after_digestion"]
+        self.manure_treatment: str = pen["manure_treatment"]
 
-        self.manure: PenManure = PenManure.get_instance(pen.manure, self.num_animals)
-        self.num_lactating_cows: int = pen.num_lactating_cows
-        self.num_stalls: int = pen.num_stalls
+        self.manure: PenManure = PenManure.get_instance(pen["manure"], self.num_animals)
+        self.num_lactating_cows: int = pen["num_lactating_cows"]
+        self.num_stalls: int = pen["num_stalls"]
 
     @property
     def barn_area_from_pen_type(self) -> float:

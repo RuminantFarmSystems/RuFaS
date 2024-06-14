@@ -1,10 +1,9 @@
-from dataclasses import dataclass
+from typing import TypedDict
 from ..enums import AnimalCombination
 from .animal_manure_excretions import AnimalManureExcretions
 
 
-@dataclass
-class PenManureData:
+class PenManureData(TypedDict):
     """
     Packages manure data for a single pen.
 
