@@ -2,6 +2,7 @@ import math
 from unittest.mock import patch, MagicMock
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -16,20 +17,16 @@ def mock_om() -> OutputManager:
 
 
 @pytest.mark.parametrize(
-    "soil_data, current_day_conditions",
+    "soil_data, mean_temp",
     [
-        (
-            SoilData(previous_day_snow_temperature=-3.5, snow_lag_factor=1.0, field_size=10),
-            CurrentDayConditions(mean_air_temperature=-3),
-        ),
-        (
-            SoilData(previous_day_snow_temperature=-5, snow_lag_factor=1.0, field_size=10),
-            CurrentDayConditions(mean_air_temperature=-10),
-        ),
+        (SoilData(previous_day_snow_temperature=-3.5, snow_lag_factor=1.0, field_size=10), -3.0),
+        (SoilData(previous_day_snow_temperature=-5, snow_lag_factor=1.0, field_size=10), -10.0),
     ],
 )
-def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions):
+def test_calc_snow_temp(mocker: MockerFixture, soil_data: SoilData, mean_temp: float) -> None:
     snow = Snow(soil_data=soil_data)
+    current_day_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    current_day_conditions.mean_air_temperature = mean_temp
 
     if soil_data.previous_day_snow_temperature is None:
         expected_result = current_day_conditions.mean_air_temperature
@@ -44,7 +41,7 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
 
 
 @pytest.mark.parametrize(
-    "soil_data, current_day_conditions, day",
+    "soil_data, mean_temp, max_temp, day",
     [
         (
             SoilData(
@@ -54,7 +51,8 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-3, max_air_temperature=-1),
+            -3.0,
+            -1.0,
             15,
         ),
         (
@@ -65,7 +63,8 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=3, max_air_temperature=5),
+            3.0,
+            5.0,
             25,
         ),
         (
@@ -76,18 +75,24 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=3, max_air_temperature=5),
+            3.0,
+            5.0,
             25,
         ),
     ],
 )
 def test_melt_snow(
+    mocker: MockerFixture,
     soil_data: SoilData,
-    current_day_conditions: CurrentDayConditions,
+    mean_temp: float,
+    max_temp,
     day: int,
     mock_om: OutputManager,
-):
+) -> None:
     snow = Snow(soil_data=soil_data)
+    current_day_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    current_day_conditions.mean_air_temperature = mean_temp
+    current_day_conditions.max_air_temperature = max_temp
 
     melt_factor = 4.5
     snow_coverage_fraction = soil_data.snow_coverage_fraction
@@ -147,7 +152,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
 
 
 @pytest.mark.parametrize(
-    "soil_data, current_day_conditions, day",
+    "soil_data, mean_temp, max_temp, snowfall, day",
     [
         (
             SoilData(
@@ -161,7 +166,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            -5.0,
+            -1.0,
+            0.0,
             15,
         ),
         (
@@ -176,7 +183,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            -5.0,
+            -1.0,
+            1.0,
             25,
         ),
         (
@@ -191,7 +200,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            -5.0,
+            -1.0,
+            0.0,
             15,
         ),
         (
@@ -206,7 +217,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            -5.0,
+            -1.0,
+            0.0,
             15,
         ),
         (
@@ -221,7 +234,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            -5.0,
+            -1.0,
+            1.0,
             15,
         ),
         (
@@ -236,7 +251,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            -5.0,
+            -1.0,
+            1.0,
             15,
         ),
         (
@@ -251,7 +268,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            -5.0,
+            -1.0,
+            0.0,
             15,
         ),
         (
@@ -266,13 +285,21 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            -5.0,
+            -1.0,
+            1.0,
             15,
         ),
     ],
 )
-def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int):
+def test_update_snow(
+    mocker: MockerFixture, soil_data: SoilData, mean_temp: float, max_temp: float, snowfall: float, day: int
+) -> None:
     snow = Snow(soil_data=soil_data)
+    current_day_conditions = mocker.MagicMock(autospec=CurrentDayConditions)
+    current_day_conditions.mean_air_temperature = mean_temp
+    current_day_conditions.max_air_temperature = max_temp
+    current_day_conditions.snowfall = snowfall
 
     if soil_data.snow_content < 0.0:
         with pytest.raises(ValueError) as value_error:
@@ -280,7 +307,6 @@ def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayCond
         assert str(value_error.value) == "Snow Content should not be a negative number."
 
     elif soil_data.snow_content + current_day_conditions.snowfall == 0.0:
-        print("!!!!!")
         snow.update_snow(current_day_conditions=current_day_conditions, day=day)
         assert soil_data.previous_day_snow_temperature is None
         assert soil_data.current_day_snow_temperature is None

@@ -1,6 +1,5 @@
 import math
 from dataclasses import dataclass
-from typing import Optional
 
 from RUFAS.util import Utility
 from RUFAS.general_constants import GeneralConstants
@@ -14,17 +13,17 @@ class CurrentDayConditions:
 
     Attributes
     ----------
-    incoming_light: float, optional, default=None
+    incoming_light: float
         Incoming light radiation energy (MJ/m^2).
-    min_air_temperature: float, optional, default=None
+    min_air_temperature: float
         Minimum air temperature for the day (C).
-    mean_air_temperature: float, optional, default=None
+    mean_air_temperature: float
         Average air temperature for the day (C).
-    max_air_temperature: float, optional, default=None
+    max_air_temperature: float
         Maximum air temperature for the day (C).
-    daylength: float, optional, default=None
+    daylength: float
         Length of time from sunup to sundown on the day (hours).
-    annual_mean_air_temperature: float, optional, default=None
+    annual_mean_air_temperature: float
         Average annual air temperature for the year (C).
     snowfall: float, default=0.0
         Amount of snow that falls on the day (mm).
@@ -42,18 +41,18 @@ class CurrentDayConditions:
 
     """
 
-    incoming_light: Optional[float] = None
-    min_air_temperature: Optional[float] = None
-    mean_air_temperature: Optional[float] = None
-    max_air_temperature: Optional[float] = None
-    daylength: Optional[float] = None
-    annual_mean_air_temperature: Optional[float] = None
+    incoming_light: float
+    min_air_temperature: float
+    mean_air_temperature: float
+    max_air_temperature: float
+    daylength: float
+    annual_mean_air_temperature: float
     snowfall: float = 0.0
     rainfall: float = 0.0
     irrigation: float = 0.0
     precipitation: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
         is_freezing = self.mean_air_temperature < 0.0
         if is_freezing:
