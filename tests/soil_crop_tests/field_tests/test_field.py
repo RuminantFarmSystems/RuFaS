@@ -2156,7 +2156,7 @@ def test_execute_daily_processes(
             min_air_temperature=min_temp,
             max_air_temperature=max_temp,
             annual_mean_air_temperature=annual_mean_temp,
-            daylength=14.0
+            daylength=14.0,
         )
 
         incorp.soil.snow.update_snow = MagicMock()
@@ -2274,7 +2274,7 @@ def test_cycle_water(
             max_air_temperature=max_temp,
             mean_air_temperature=mean_temp,
             daylength=14.0,
-            annual_mean_air_temperature=8.0
+            annual_mean_air_temperature=8.0,
         )
         field_data = FieldData(
             field_size=field_size,
