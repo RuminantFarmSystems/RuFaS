@@ -32,12 +32,12 @@ om = OutputManager()
 class ManureManagerConfigHandler:
     """A class that manages the custom manure manager configs."""
 
-    def __init__(self, manure_manager_config):
+    def __init__(self, manure_manager_config: dict[str, Any]) -> None:
         """Initializes the ManureManagerConfigHandler class.
 
         Parameters
         ----------
-        manure_manager_config : Dict
+        manure_manager_config : dict[str, Any]
             The manure manager config dictionary that contains all the manure manager config information.
 
         """
@@ -278,9 +278,9 @@ class ManureManagerConfigHandler:
         return available_manure_separator_configs
 
     @classmethod
-    def _process_manure_treatment_configs(cls, manure_treatment_configs: list[dict[str, Any]]) -> dict[
-        str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
-    ]:
+    def _process_manure_treatment_configs(
+        cls, manure_treatment_configs: list[dict[str, Any]]
+    ) -> dict[str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
         There is one special case that involves a combination of anaerobic digestion and anaerobic
@@ -299,9 +299,11 @@ class ManureManagerConfigHandler:
         """
         info_map = {"class": cls.__name__, "function": cls._process_manure_treatment_configs.__name__}
         available_manure_treatment_configs: dict[
-            str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]
+            str, Union[ManureTreatmentConfig, tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
         ] = {}
 
+        digester_combination_config: str | None = None
+        lagoon_combination_config: str | None = None
         for config in manure_treatment_configs:
             name = config.pop("name")
             if name in available_manure_treatment_configs:
@@ -309,20 +311,43 @@ class ManureManagerConfigHandler:
                 error_message = f"Manure treatment '{name}' has multiple configurations"
                 om.add_error(error_name, error_message, info_map)
                 raise ValueError(error_message)
-            config["manure_treatment_type"] = ManureTreatmentType(config["manure_treatment_type"])
+            config_type = ManureTreatmentType(config["manure_treatment_type"])
+            config["manure_treatment_type"] = config_type
+            if config_type is ManureTreatmentType.ANAEROBIC_DIGESTION:
+                digester_combination_config = name
+            elif config_type is ManureTreatmentType.ANAEROBIC_LAGOON:
+                lagoon_combination_config = name
             available_manure_treatment_configs[name] = ManureTreatmentConfig(**config)
 
-        # Only do this because we only have one special case
-        if (
-            ManureTreatmentType.ANAEROBIC_LAGOON in manure_treatment_config_by_type
-            and ManureTreatmentType.ANAEROBIC_DIGESTION in manure_treatment_config_by_type
-        ):
-            combo_config = (
-                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION],
-                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_LAGOON],
+        if digester_combination_config is not None and lagoon_combination_config is not None:
+            combo_config: ManureTreatmentConfig = (  # type: ignore[assignment]
+                available_manure_treatment_configs[digester_combination_config],
+                available_manure_treatment_configs[lagoon_combination_config],
             )
-            manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] = (
-                manure_treatment_config_by_type[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR]
-            ) = combo_config
+            available_manure_treatment_configs[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value
+            ] = combo_config
+            available_manure_treatment_configs[
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value
+            ] = combo_config
+            log_title = (
+                f"Manure module configured '{ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value}' and "
+                f"'{ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value}'"
+            )
+            log_message = (
+                f"Will use the '{digester_combination_config}' for the digester config, and "
+                f"'{lagoon_combination_config}' for the lagoon config."
+            )
+            om.add_log(log_title, log_message, info_map)
+        else:
+            warning_title = (
+                "No combination of anaerobic digester and anaerobic lagoon configurations available to the manure "
+                "management input."
+            )
+            warning_message = (
+                f"Manure module unable to configure '{ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value}' and "
+                f"'{ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value}'"
+            )
+            om.add_warning(warning_title, warning_message, info_map)
 
-        return manure_treatment_config_by_type
+        return available_manure_treatment_configs
