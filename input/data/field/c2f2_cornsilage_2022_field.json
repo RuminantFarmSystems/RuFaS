@@ -1,0 +1,20 @@
+
+{
+  "soil_specification": "soil",
+  "crop_specification": "Corn Silage 2022 (cs_alf_wheat_soybean) Crop data",
+  "manure_management_specification": "Corn Silage 2022 (cs_alf_wheat_soybean) Manure schedule",
+  "tillage_management_specification": "Corn Silage 2022 (cs_alf_wheat_soybean) Tillage schedule",
+  "fertilizer_management_specification": "Corn Silage 2022 (cs_alf_wheat_soybean) Fertilizer schedule",
+  "field_size": 5.6,
+  "absolute_latitude": 42.7096,
+  "longitude": 77.0564,
+  "minimum_daylength": 9.0,
+  "seasonal_high_water_table": false,
+  "watering_amount_in_liters": 0.0,
+  "watering_interval": 0,
+  "supplement_manure_nutrient_deficiencies": false,
+  "simulate_water_stress": true,
+  "simulate_temp_stress": true,
+  "simulate_nitrogen_stress": true,
+  "simulate_phosphorus_stress": true
+}

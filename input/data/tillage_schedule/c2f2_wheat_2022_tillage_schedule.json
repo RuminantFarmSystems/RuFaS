@@ -1,0 +1,15 @@
+{
+    "years": [2019, 2020, 2021, 2022],
+    "days": [259, 259, 274, 121],
+    "incorporation_fractions": [0.95],
+    "mixing_fractions": [0.95],
+    "tillage_depths": [150],
+    "implements": ["moldboard-plow"],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}
+
+
+
+
+
