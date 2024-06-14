@@ -1,9 +1,10 @@
 from typing import Dict
-from typing import Optional
 from typing import Tuple
 from typing import Type
 from typing import Union
 
+from ....weather import Weather
+from ....time import Time
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
     AnaerobicDigestion,
 )
@@ -15,9 +16,6 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
     BaseManureTreatment,
 )
 from RUFAS.routines.manure.manure_treatments.composting import Composting
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    DefaultManureTreatmentConfigFactory,
-)
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
     ManureTreatmentConfig,
 )
@@ -41,25 +39,27 @@ class ManureTreatmentFactory:
 
     @staticmethod
     def get_instance(
-        manure_treatment_type_name: str,
-        weather,
-        time,
-        custom_manure_treatment_config: Optional[
-            Union[
-                ManureTreatmentConfig,
-                Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
-            ]
-        ] = None,
+        configuration_name: str,
+        weather: Weather,
+        time: Time,
+        manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> BaseManureTreatment:
         """Returns a manure treatment system instance for the given manure treatment type name.
 
-        Args:
-            manure_treatment_type_name: The name of the manure treatment type.
-            weather: The weather data.
-            time: The time data.
-            custom_manure_treatment_config: The custom manure treatment configuration data.
+        Parameters
+        ----------
+        configuration_name : str
+            The name of the manure treatment configuration.
+        weather : Weather
+            The weather data.
+        time : Time
+            The time data.
+        manure_treatment_config : Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+            The manure treatment configuration data.
 
-        Returns:
+        Returns
+        -------
+        BaseManureTreatment
             A manure treatment system instance for the given manure treatment type name.
 
         """
@@ -76,13 +76,8 @@ class ManureTreatmentFactory:
             ManureTreatmentType.COMPOSTING: Composting,
         }
 
-        manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)
-        manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
+        manure_treatment_class = manure_treatment_class_by_type[manure_treatment_config.manure_treatment_type]
 
-        if custom_manure_treatment_config:
-            manure_treatment_obj = manure_treatment_class(weather, time, custom_manure_treatment_config)
-        else:
-            default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            manure_treatment_obj = manure_treatment_class(weather, time, default_manure_treatment_config)
+        manure_treatment_obj = manure_treatment_class(weather, time, manure_treatment_config)
 
         return manure_treatment_obj
