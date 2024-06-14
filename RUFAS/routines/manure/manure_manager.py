@@ -171,14 +171,14 @@ class ManureManager:
             )
             self.manure_separators_after_digestion[mm_pen.id] = separator_post_digester
 
-            custom_manure_treatment_config = self.manure_manager_config_handler.get_custom_manure_treatment_config(
+            custom_manure_treatment_config = self.manure_manager_config_handler.get_manure_treatment_config(
                 mm_pen.manure_treatment
             )
             self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
                 manure_treatment_type_name=mm_pen.manure_treatment,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_treatment_config=custom_manure_treatment_config,  # type: ignore
+                manure_treatment_config=custom_manure_treatment_config,
             )
 
     def daily_update(self, pen_list: List[Pen], simulation_day: int) -> None:

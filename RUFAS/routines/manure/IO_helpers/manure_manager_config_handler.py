@@ -48,7 +48,7 @@ class ManureManagerConfigHandler:
         self.manure_separator_configs = self._process_manure_separator_configs(
             manure_manager_config["manure_separator_configs"]
         )
-        self.custom_manure_treatment_configs = self._process_manure_treatment_configs(
+        self.manure_treatment_configs = self._process_manure_treatment_configs(
             manure_manager_config["manure_treatment_configs"]
         )
 
@@ -142,23 +142,36 @@ class ManureManagerConfigHandler:
             om.add_error(error_title, error_message, info_map)
             raise KeyError(error_message)
 
-    def get_custom_manure_treatment_config(self, manure_treatment_type_name: str) -> Optional[ManureTreatmentConfig]:
-        """Returns the custom manure treatment config for the given manure treatment type name, or None if no custom
-        config exists.
+    def get_manure_treatment_config(self, manure_treatment_type_name: str) -> ManureTreatmentConfig:
+        """
+        Returns the custom manure treatment config for the given manure treatment type name.
 
         Parameters
         ----------
         manure_treatment_type_name : str
-            The name of the manure treatment type for which to get the custom config.
+            The name of the manure treatment type for which to get the config.
 
         Returns
         -------
-        Optional[ManureTreatmentConfig]
-            The custom manure treatment config for the given manure treatment type name, or None if no custom config
-            exists.
+        ManureTreatmentConfig
+            The manure treatment config for the given manure treatment type name.
+
+        Raises
+        ------
+        KeyError
+            If the specified manure treatment config name is not present in the available manure treatment configs.
 
         """
-        return self.custom_manure_treatment_configs.get(ManureTreatmentType.get_type(manure_treatment_type_name), None)
+        try:
+            return self.manure_treatment_configs[manure_treatment_type_name]
+        except KeyError:
+            info_map = {"class": self.__class__.__name__, "function": self.get_manure_treatment_config.__name__}
+            error_title = "Unknown manure treatment configuration name"
+            error_message = (
+                f"Attempted to use a non-existent manure treatment configuration called '{manure_treatment_type_name}'"
+            )
+            om.add_error(error_title, error_message, info_map)
+            raise KeyError(error_message)
 
     @classmethod
     def _process_bedding_configs(cls, bedding_configs: List[Dict]) -> Dict[str, BeddingConfig]:
@@ -265,9 +278,8 @@ class ManureManagerConfigHandler:
         return available_manure_separator_configs
 
     @classmethod
-    def _process_manure_treatment_configs(cls, manure_treatment_json_configs: List[Dict]) -> Dict[
-        ManureTreatmentType,
-        Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
+    def _process_manure_treatment_configs(cls, manure_treatment_configs: list[dict[str, Any]]) -> dict[
+        str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
     ]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
@@ -276,29 +288,29 @@ class ManureManagerConfigHandler:
 
         Parameters
         ----------
-        manure_treatment_json_configs : List[Dict]
+        manure_treatment_configs : list[dict[str, Any]]
             A list of dictionaries containing the manure treatment config information.
 
         Returns
         -------
-        Dict[ManureTreatmentType, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]
+        dict[str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]
             A dictionary of manure treatment config objects, with the key being the manure treatment type.
 
         """
-        manure_treatment_config_by_type: Dict[
-            ManureTreatmentType,
-            Union[
-                ManureTreatmentConfig,
-                Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
-            ],
+        info_map = {"class": cls.__name__, "function": cls._process_manure_treatment_configs.__name__}
+        available_manure_treatment_configs: dict[
+            str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]
         ] = {}
 
-        for json_manure_treatment_config in manure_treatment_json_configs:
-            manure_treatment_type = ManureTreatmentType.get_type(json_manure_treatment_config["manure_treatment_type"])
-            del json_manure_treatment_config["manure_treatment_type"]
-            manure_treatment_config_by_type[manure_treatment_type] = ManureTreatmentConfig(
-                **json_manure_treatment_config
-            )
+        for config in manure_treatment_configs:
+            name = config.pop("name")
+            if name in available_manure_treatment_configs:
+                error_name = "Duplicate manure separator configurations"
+                error_message = f"Manure treatment '{name}' has multiple configurations"
+                om.add_error(error_name, error_message, info_map)
+                raise ValueError(error_message)
+            config["manure_treatment_type"] = ManureTreatmentType(config["manure_treatment_type"])
+            available_manure_treatment_configs[name] = ManureTreatmentConfig(**config)
 
         # Only do this because we only have one special case
         if (
