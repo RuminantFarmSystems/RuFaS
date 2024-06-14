@@ -34,8 +34,8 @@ from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from ...shared_structures.animal_combinations import AnimalCombination
-from ...shared_structures.pen_manure_data import PenManureData
+from ...enums import AnimalCombination
+from ...data_structures.pen_manure_data import PenManureData
 
 im = InputManager()
 om = OutputManager()

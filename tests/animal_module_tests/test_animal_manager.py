@@ -7,8 +7,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.shared_structures.animal_combinations import AnimalCombination
-from RUFAS.shared_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
+from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .animal_combinations import AnimalCombination
+from ..enums import AnimalCombination
 from .animal_manure_excretions import AnimalManureExcretions
 
 

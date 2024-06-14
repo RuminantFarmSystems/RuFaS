@@ -2,7 +2,7 @@ from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
-from RUFAS.shared_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 def test_animal_manure_excretion_typed_dict() -> None:

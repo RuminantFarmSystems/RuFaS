@@ -16,8 +16,8 @@ from RUFAS.routines.animal.manure.general_manure import (
     get_default_animal_manure_excretions,
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from ...shared_structures.animal_combinations import AnimalCombination
-from ...shared_structures.pen_manure_data import PenManureData
+from ...enums import AnimalCombination
+from ...data_structures.pen_manure_data import PenManureData
 
 om = OutputManager()
 

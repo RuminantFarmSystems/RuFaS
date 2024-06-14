@@ -5,7 +5,7 @@ from typing import Optional
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
-from ....shared_structures.animal_manure_excretions import AnimalManureExcretions
+from ....data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
