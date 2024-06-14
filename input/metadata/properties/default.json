@@ -27,8 +27,6 @@
       "type": "number",
       "minimum": 1000,
       "maximum": 56045,
-      "default": null,
-      "nullable": true,
       "description": "Unique 5-digit code that represents a specific U.S. county."
     },
     "include_detailed_values": {
@@ -45,43 +43,43 @@
         "type": "number",
         "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
         "default": 8,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferI_num": {
         "type": "number",
         "description": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred",
         "default": 44,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferII_num": {
         "type": "number",
         "description": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
         "default": 38,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferIII_num_springers": {
         "type": "number",
         "description": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
         "default": 5,
-        "minimum": 0
+        "minimum": 2
       },
       "cow_num": {
         "type": "number",
         "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
         "default": 100,
-        "minimum": 0
-      },
-      "herd_num": {
-        "type": "number",
-        "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
-        "default": 100,
-        "minimum": 0
+        "minimum": 6
       },
       "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
-        "minimum": 0
+        "minimum": 50
+      },
+      "herd_num": {
+        "type": "number",
+        "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
+        "default": 100,
+        "minimum": 6
       },
       "breed": {
         "type": "string",
