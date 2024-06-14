@@ -412,29 +412,9 @@ class AnimalManager:
         for calf in calves:
             calf.calc_nutrient_rqmts(feed, current_temperature)
 
-        for heiferI in heiferIs:
-            latest_pen = heiferI.pen_history[-1].pen
-            heiferI.set_nutrient_rqmts(
-                current_temperature,
-                self.ANIMAL_GROUPING_SCENARIO,
-                nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
-                metabolizable_energy=self.all_pens[latest_pen].MEdiet,
-                previous_DMI=self.all_pens[latest_pen].dry_matter_intake,
-            )
-
-        for heiferII in heiferIIs:
-            latest_pen = heiferII.pen_history[-1].pen
-            heiferII.set_nutrient_rqmts(
-                current_temperature,
-                self.ANIMAL_GROUPING_SCENARIO,
-                nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
-                metabolizable_energy=self.all_pens[latest_pen].MEdiet,
-                previous_DMI=self.all_pens[latest_pen].dry_matter_intake,
-            )
-
-        for heiferIII in heiferIIIs:
-            latest_pen = heiferIII.pen_history[-1].pen
-            heiferIII.set_nutrient_rqmts(
+        for heifer in heiferIs + heiferIIs + heiferIIIs:
+            latest_pen = heifer.pen_history[-1].pen
+            heifer.set_nutrient_rqmts(
                 current_temperature,
                 self.ANIMAL_GROUPING_SCENARIO,
                 nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
@@ -451,7 +431,7 @@ class AnimalManager:
 
     def reset_milk_production_reduction(self, pen: Pen) -> None:
         """
-        Resets reduction value for milk production to 0.0 for all animals in all pens
+        Resets reduction value for milk production to 0.0 for all animals in the given pen.
 
         The milk_production_reduction attribute is a value generated in ration_driver.py,
             in cases where a ration cannot be formulated such that it meets animal requirements
@@ -1107,7 +1087,7 @@ class AnimalManager:
             animals = self.animals_by_type[animal_type]
             self.phosphorus_concentration_by_animal_class[animal_type] = self._calc_phosphorus_concentration(animals)
 
-    def _calc_and_update_ration(self, feed: Feed, pen: Pen) -> None:
+    def _handle_pen_ration(self, feed: Feed, pen: Pen) -> None:
         """
         Calculate the ration for each pen at the given interval and update the
         ration for each animal in the pen.
@@ -1127,47 +1107,48 @@ class AnimalManager:
         """
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
-        if pen.is_populated:
-            pen.subset_class_feeds(feed)
-            pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+        if not pen.is_populated:
+            return
+        pen.subset_class_feeds(feed)
+        pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-            ration_per_animal: Dict[str, float | str] = {}
-            ration_vals = {}
+        ration_per_animal: Dict[str, float | str] = {}
+        ration_vals = {}
 
-            while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
-                if pen.animal_combination == AnimalCombination.CALF:
-                    ration_per_animal = CalfRationManager.optimize()
-                    ration_vals = {"ME_total": 0}
-                else:
-                    ration_per_animal, ration_vals = RationManager.formulate_ration(
-                        pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
-                    )
+        while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+            if pen.animal_combination == AnimalCombination.CALF:
+                ration_per_animal = CalfRationManager.optimize()
+                ration_vals = {"ME_total": 0}
+            else:
+                ration_per_animal, ration_vals = RationManager.formulate_ration(
+                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
+                )
 
-            # recording ration nutrition information in pen
-            nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
-            pen.ration_nutrient_amount = nutrient_amount
-            pen.ration_nutrient_conc = nutrient_conc
-            pen.MEdiet = ration_vals["ME_total"]
-            pen.dry_matter_intake = nutrient_amount["dm"]
+        # recording ration nutrition information in pen
+        nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
+        pen.ration_nutrient_amount = nutrient_amount
+        pen.ration_nutrient_conc = nutrient_conc
+        pen.MEdiet = ration_vals["ME_total"]
+        pen.dry_matter_intake = nutrient_amount["dm"]
 
-            ration_report = {}
-            ration_report["nutrient_amount"] = nutrient_amount
-            ration_report["nutrient_conc"] = nutrient_conc
+        ration_report = {}
+        ration_report["nutrient_amount"] = nutrient_amount
+        ration_report["nutrient_conc"] = nutrient_conc
 
-            for animal in list(pen.animals_in_pen.values()):
-                animal.set_ration(ration_per_animal, nutrient_amount["dm"])
-                animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
+        for animal in list(pen.animals_in_pen.values()):
+            animal.set_ration(ration_per_animal, nutrient_amount["dm"])
+            animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
 
-            ration_per_pen = {}
-            num_animals = len(pen.animals_in_pen)
-            for key in ration_per_animal:
-                if key == "status":
-                    ration_per_pen[key] = ration_per_animal[key]
-                else:
-                    ration_per_pen[key] = ration_per_animal[key] * num_animals
+        ration_per_pen = {}
+        num_animals = len(pen.animals_in_pen)
+        for key in ration_per_animal:
+            if key == "status":
+                ration_per_pen[key] = ration_per_animal[key]
+            else:
+                ration_per_pen[key] = ration_per_animal[key] * num_animals
 
-            pen.ration = ration_per_pen
-            pen.ration_per_animal = ration_per_animal
+        pen.ration = ration_per_pen
+        pen.ration_per_animal = ration_per_animal
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
@@ -1843,7 +1824,7 @@ class AnimalManager:
         cows = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "Cow"]
         self.reset_milk_production_reduction(pen)
         self.calc_nutrient_rqmts(calves, heiferIs, heiferIIs, heiferIIIs, cows, feed, current_temperature)
-        self._calc_and_update_ration(feed, pen)
+        self._handle_pen_ration(feed, pen)
         AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
         pen.calc_avg_growth()
         if pen.animal_combination.name == "LAC_COW":

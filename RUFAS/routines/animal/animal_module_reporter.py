@@ -211,7 +211,7 @@ class AnimalModuleReporter:
             info_map = {
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-                "data_origin": [("AnimalManager", "_calc_and_update_ration")],
+                "data_origin": [("AnimalManager", "_handle_pen_ration")],
                 "number_animals_in_pen": len(pen.animals_in_pen),
                 "simulation_day": simulation_day,
             }

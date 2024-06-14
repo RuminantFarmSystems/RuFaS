@@ -331,7 +331,7 @@ class Pen:
         Returns whether pen needs a ration formulated.
 
         This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
-         and on subsequent days is populated.
+         but was populated in subsequent days.
 
         Returns
         -------

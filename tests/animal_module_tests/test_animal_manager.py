@@ -1931,10 +1931,8 @@ def test_reset_milk_production_reduction(pens_with_mock_animals: List[MagicMock]
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
-    # call the function once on the list of pens
     for pen in mock_animalmanager.all_pens:
         AnimalManager.reset_milk_production_reduction(mock_animalmanager, pen)
-        # then assert that all animals in all pens are still 100.1
         for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
@@ -2682,6 +2680,7 @@ def test_calc_animal_space_shortage(num_animals: int, max_spaces: int, expected:
 
 
 def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
+    """Tests reformulate_ration_single_pen in file routines/animal/animal_manager.py"""
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     mock_animal_manager = AnimalManager()
     mock_animal_manager.simulation_day = 1
@@ -2690,7 +2689,7 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
         AnimalManager, "reset_milk_production_reduction", return_value=None
     )
     patch_for_calc_nutrient_rqmts = mocker.patch.object(AnimalManager, "calc_nutrient_rqmts", return_value=None)
-    patch_for_calc_and_update_ration = mocker.patch.object(AnimalManager, "_calc_and_update_ration", return_value=None)
+    patch_for_handle_pen_ration = mocker.patch.object(AnimalManager, "_handle_pen_ration", return_value=None)
     patch_for_report_ration_interval_data = mocker.patch.object(
         AnimalModuleReporter, "report_ration_interval_data", return_value=None
     )
@@ -2724,7 +2723,7 @@ def test_reformulate_ration_single_pen(mocker: MockerFixture) -> None:
     patch_for_calc_nutrient_rqmts.assert_called_once_with(
         [mock_calf], [mock_heiferI], [mock_heiferII], [mock_heiferIII], [mock_cow], mock_feed, mock_current_temperature
     )
-    patch_for_calc_and_update_ration.assert_called_once()
+    patch_for_handle_pen_ration.assert_called_once()
     patch_for_report_ration_interval_data.assert_called_once()
     pen.calc_avg_growth.assert_called_once()
 
