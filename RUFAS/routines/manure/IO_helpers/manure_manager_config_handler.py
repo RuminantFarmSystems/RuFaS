@@ -305,10 +305,12 @@ class ManureManagerConfigHandler:
             str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]
         ] = {}
 
+        digester_combination_config: str | None = None
+        lagoon_combination_config: str | None = None
         for config in manure_treatment_configs:
             name = config.pop("name")
             if name in available_manure_treatment_configs:
-                error_name = "Duplicate manure separator configurations"
+                error_name = "Duplicate manure treatment configurations"
                 error_message = f"Manure treatment '{name}' has multiple configurations"
                 om.add_error(error_name, error_message, info_map)
                 raise ValueError(error_message)
@@ -320,7 +322,7 @@ class ManureManagerConfigHandler:
                 lagoon_combination_config = name
             available_manure_treatment_configs[name] = ManureTreatmentConfig(**config)
 
-        if digester_combination_config is None and lagoon_combination_config is None:
+        if digester_combination_config is None or lagoon_combination_config is None:
             warning_title = (
                 "No combination of anaerobic digester and anaerobic lagoon configurations available to the manure "
                 "management input."
