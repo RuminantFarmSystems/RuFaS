@@ -76,7 +76,7 @@ class ManureTreatmentFactory:
 
         treatment_storage_combinations = {
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value,
         }
         if configuration_name in treatment_storage_combinations:
             manure_treatment_class = AnaerobicDigestionAndLagoon

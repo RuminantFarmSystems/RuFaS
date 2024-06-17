@@ -155,9 +155,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
     )
 
     mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_manure_treatment_config.return_value = (
-        mock_manure_treatment_config
-    )
+    mock_manure_manager_config_handler.get_manure_treatment_config.return_value = mock_manure_treatment_config
     mock_manure_treatment = mocker.MagicMock()
     patch_for_manure_treatment_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureTreatmentFactory.get_instance",
