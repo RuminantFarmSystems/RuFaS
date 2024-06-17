@@ -323,9 +323,7 @@ class ManureManagerConfigHandler:
                 available_manure_treatment_configs[digester_combination_config],
                 available_manure_treatment_configs[lagoon_combination_config],
             )
-            available_manure_treatment_configs[
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value
-            ] = combo_config
+            available_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value] = combo_config
             available_manure_treatment_configs[
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value
             ] = combo_config

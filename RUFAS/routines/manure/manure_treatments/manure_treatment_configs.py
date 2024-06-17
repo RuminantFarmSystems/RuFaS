@@ -54,6 +54,7 @@ class ManureTreatmentConfig:
         refers to the presence of a natural crust.
 
     """
+
     manure_treatment_type: ManureTreatmentType
 
     total_solids_removal_efficiency_for_treatment: float = 0.0
