@@ -15,6 +15,7 @@ from RUFAS.routines.manure.manure_separators.manure_separator_classes import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 
 om = OutputManager()
 
@@ -431,6 +432,28 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
         actual_manure_treatment_configs["anaerobic digestion"],
         actual_manure_treatment_configs["anaerobic lagoon"],
     )
+
+
+@pytest.mark.parametrize(
+    "treatment_configs",
+    [
+        [{"name": "lagoon", "manure_treatment_type": "anaerobic lagoon"}],
+        [{"name": "digestion", "manure_treatment_type": "anaerobic digestion"}],
+        [{"name": "slurry storage", "manure_treatment_type": "slurry storage outdoor"}],
+    ]
+)
+def test_process_manure_treatment_configs_warning(
+    mocker: MockerFixture, treatment_configs: list[dict[str, str]]
+) -> None:
+    """Tests that warnings are raised when anaerobic digestion-lagoon combinations cannot be configured."""
+    mocker.patch.object(ManureTreatmentConfig, "__init__", return_value=None)
+    mocker.patch.object(ManureManagerConfigHandler, "__init__", return_value=None)
+    config_handler = ManureManagerConfigHandler()
+    add_warning = mocker.patch.object(om, "add_warning")
+
+    config_handler._process_manure_treatment_configs(treatment_configs)
+
+    add_warning.assert_called_once()
 
 
 def test_get_bedding_config(mocker: MockerFixture) -> None:
