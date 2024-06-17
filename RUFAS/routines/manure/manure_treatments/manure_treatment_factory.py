@@ -69,14 +69,19 @@ class ManureTreatmentFactory:
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
             ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
             ManureTreatmentType.OPEN_LOTS: OpenLots,
             ManureTreatmentType.COMPOSTING: Composting,
         }
 
-        manure_treatment_class = manure_treatment_class_by_type[manure_treatment_config.manure_treatment_type]
+        treatment_storage_combinations = {
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value
+        }
+        if configuration_name in treatment_storage_combinations:
+            manure_treatment_class = AnaerobicDigestionAndLagoon
+        else:
+            manure_treatment_class = manure_treatment_class_by_type[manure_treatment_config.manure_treatment_type]
 
         manure_treatment_obj = manure_treatment_class(weather, time, manure_treatment_config)
 
