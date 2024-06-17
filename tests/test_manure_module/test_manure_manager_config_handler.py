@@ -424,10 +424,12 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
     assert "anaerobic lagoon" in actual_manure_treatment_configs
     assert "anaerobic digestion" in actual_manure_treatment_configs
     assert actual_manure_treatment_configs["anaerobic digestion and lagoon"] == (
-        actual_manure_treatment_configs["anaerobic digestion"], actual_manure_treatment_configs["anaerobic lagoon"]
+        actual_manure_treatment_configs["anaerobic digestion"],
+        actual_manure_treatment_configs["anaerobic lagoon"],
     )
     assert actual_manure_treatment_configs["anaerobic digestion and lagoon with separator"] == (
-        actual_manure_treatment_configs["anaerobic digestion"], actual_manure_treatment_configs["anaerobic lagoon"]
+        actual_manure_treatment_configs["anaerobic digestion"],
+        actual_manure_treatment_configs["anaerobic lagoon"],
     )
 
 

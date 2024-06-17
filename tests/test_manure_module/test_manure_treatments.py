@@ -2500,9 +2500,9 @@ def test_create_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     anaerobic_digestion_and_lagoon._manure_handler_daily_output = mock_manure_handler_daily_output = mocker.MagicMock()
-    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = (
-        mock_current_manure_treatment_daily_input
-    ) = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = mock_current_manure_treatment_daily_input = (
+        mocker.MagicMock()
+    )
     anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
