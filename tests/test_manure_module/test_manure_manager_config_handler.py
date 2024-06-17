@@ -440,7 +440,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
         [{"name": "lagoon", "manure_treatment_type": "anaerobic lagoon"}],
         [{"name": "digestion", "manure_treatment_type": "anaerobic digestion"}],
         [{"name": "slurry storage", "manure_treatment_type": "slurry storage outdoor"}],
-    ]
+    ],
 )
 def test_process_manure_treatment_configs_warning(
     mocker: MockerFixture, treatment_configs: list[dict[str, str]]
