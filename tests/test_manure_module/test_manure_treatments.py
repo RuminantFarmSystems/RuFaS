@@ -13,6 +13,7 @@ from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
     AnaerobicDigestion,
@@ -127,7 +128,7 @@ def test_manure_treatment_daily_output_add() -> None:
 
     # Act and Assert
     with pytest.raises(TypeError) as e:
-        manure_treatment_daily_output + 1
+        manure_treatment_daily_output + 1  # type: ignore[operator]
         # Check error message
         assert "Other must be of type ManureTreatmentDailyOutput" in str(e.value)
 
@@ -426,46 +427,22 @@ def test_manure_treatment_type(
 @pytest.mark.parametrize(
     "manure_treatment_type_name, manure_treatment_type,expected_manure_treatment_class",
     [
-        (
-            "slurry storage underfloor",
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
-            SlurryStorageUnderfloor
-        ),
-        (
-            "slurry storage outdoor",
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            SlurryStorageOutdoor
-        ),
-        (
-            "anaerobic lagoon",
-            ManureTreatmentType.ANAEROBIC_LAGOON,
-            AnaerobicLagoon
-        ),
-        (
-            "anaerobic digestion",
-            ManureTreatmentType.ANAEROBIC_DIGESTION,
-            AnaerobicDigestion
-        ),
+        ("slurry storage underfloor", ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR, SlurryStorageUnderfloor),
+        ("slurry storage outdoor", ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, SlurryStorageOutdoor),
+        ("anaerobic lagoon", ManureTreatmentType.ANAEROBIC_LAGOON, AnaerobicLagoon),
+        ("anaerobic digestion", ManureTreatmentType.ANAEROBIC_DIGESTION, AnaerobicDigestion),
         (
             "anaerobic digestion and lagoon",
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            AnaerobicDigestionAndLagoon
+            AnaerobicDigestionAndLagoon,
         ),
         (
             "anaerobic digestion and lagoon with separator",
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-            AnaerobicDigestionAndLagoon
+            AnaerobicDigestionAndLagoon,
         ),
-        (
-            "compost bedded pack barn",
-            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN,
-            CompostBeddedPackBarn
-        ),
-        (
-            "open lots",
-            ManureTreatmentType.OPEN_LOTS,
-            OpenLots
-        ),
+        ("compost bedded pack barn", ManureTreatmentType.COMPOST_BEDDED_PACK_BARN, CompostBeddedPackBarn),
+        ("open lots", ManureTreatmentType.OPEN_LOTS, OpenLots),
     ],
 )
 def test_manure_treatment_factory_get_instance(
@@ -509,6 +486,7 @@ def test_manure_treatment_factory_get_instance(
 # Test BaseManureTreatment
 # ========================
 
+
 @pytest.mark.parametrize(
     "manure_treatment_class",
     [
@@ -520,9 +498,11 @@ def test_manure_treatment_factory_get_instance(
         Composting,
         CompostBeddedPackBarn,
         OpenLots,
-    ]
+    ],
 )
-def test_initialize_private_attributes_during_update(manure_treatment_class: BaseManureTreatment, mocker: MockFixture) -> None:
+def test_initialize_private_attributes_during_update(
+    manure_treatment_class: type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     # Arrange
     mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
     manure_treatment = manure_treatment_class(
@@ -564,9 +544,11 @@ def test_initialize_private_attributes_during_update(manure_treatment_class: Bas
         AnaerobicLagoon,
         CompostBeddedPackBarn,
         OpenLots,
-    ]
+    ],
 )
-def test_initialize_daily_output_during_update(manure_treatment_class: str, mocker: MockFixture) -> None:
+def test_initialize_daily_output_during_update(
+    manure_treatment_class: type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for _initialize_daily_output_during_update() method of BaseManureTreatment class."""
 
     # Arrange
@@ -642,19 +624,20 @@ def test_initialize_daily_output_during_update(manure_treatment_class: str, mock
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic digestion",
-        "anaerobic lagoon",
-        "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with separator",
-        "compost bedded pack barn",
-        "open lots",
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicDigestion,
+        AnaerobicLagoon,
+        AnaerobicDigestionAndLagoon,
+        CompostBeddedPackBarn,
+        OpenLots,
     ],
 )
-def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_get_current_day_temperature_and_rainfall(
+    manure_treatment_class: Type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for _get_current_day_average_temperature_celsius() and _get_current_day_rainfall()."""
 
     # Arrange
@@ -674,10 +657,11 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
     mock_weather = mocker.MagicMock()
     mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
 
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    manure_treatment = manure_treatment_class(
         weather=mock_weather,
-        time=mock_time,
+        time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
 
     # Act
@@ -690,26 +674,28 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic digestion",
-        "anaerobic lagoon",
-        "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with separator",
-        "compost bedded pack barn",
-        "open lots",
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicDigestion,
+        AnaerobicLagoon,
+        AnaerobicDigestionAndLagoon,
+        CompostBeddedPackBarn,
+        OpenLots,
     ],
 )
-def test_adjust_accumulated_output_not_emptying(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_adjust_accumulated_output_not_emptying(
+    manure_treatment_class: Type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for _adjust_accumulated_output() when not emptying manure pit."""
 
     # Arrange
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
     manure_treatment._sim_day = 50
     manure_treatment.storage_time_period = 150
@@ -730,19 +716,18 @@ def test_adjust_accumulated_output_not_emptying(manure_treatment_type_name: str,
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic digestion",
-        "anaerobic lagoon",
-        "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with separator",
-        "compost bedded pack barn",
-        "open lots",
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicDigestion,
+        AnaerobicLagoon,
+        AnaerobicDigestionAndLagoon,
+        CompostBeddedPackBarn,
+        OpenLots,
     ],
 )
-def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_daily_update(manure_treatment_class: Type[BaseManureTreatment], mocker: MockFixture) -> None:
     """Unit test for daily_update() in base_manure_treatment.py."""
 
     # Arrange
@@ -753,10 +738,11 @@ def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> N
     mock_manure_separator = mocker.MagicMock()
     mock_manure_separator_after_digestion = mocker.MagicMock()
 
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
     patch_for_initialize_private_attributes_during_update = mocker.patch.object(
         manure_treatment, "_initialize_private_attributes_during_update"
@@ -795,20 +781,18 @@ def test_daily_update(manure_treatment_type_name: str, mocker: MockFixture) -> N
 # =====================================================
 
 
-@pytest.mark.parametrize(
-    "slurry_storage_treatment_type_name",
-    [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-    ],
-)
-def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: str, mocker: MockFixture) -> None:
+@pytest.mark.parametrize("slurry_storage_class", [SlurryStorageUnderfloor, SlurryStorageOutdoor])
+def test_slurry_storage_daily_update_helper(
+    slurry_storage_class: Type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for _daily_update_helper() in both slurry storage treatments."""
     # Arrange
-    slurry_storage = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=slurry_storage_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    mock_treatment_config.manure_cover = ManureCoverEnum.CRUST.value
+    slurry_storage = slurry_storage_class(
         weather=mocker.MagicMock(),
-        time=mocker.MagicMock,
+        time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
     mock_accumulated_output: ManureTreatmentDailyOutput = mocker.MagicMock()
     mock_accumulated_output.liquid_manure_nitrogen = 30.0
@@ -874,18 +858,11 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     )
     assert actual_manure_treatment_daily_output.storage_methane == expected_methane_loss[0]
 
-    if slurry_storage_treatment_type_name == "slurry storage underfloor":
-        patch_for_calc_ammonia_emission.assert_called_once_with(
-            num_animals=num_animals,
-            accumulated_manure_volume=final_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-        )
-    elif slurry_storage_treatment_type_name == "slurry storage outdoor":
-        patch_for_calc_ammonia_emission.assert_called_once_with(
-            num_animals=num_animals,
-            accumulated_manure_volume=final_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-        )
+    patch_for_calc_ammonia_emission.assert_called_once_with(
+        num_animals=num_animals,
+        accumulated_manure_volume=final_manure_volume,
+        accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
+    )
     assert (
         slurry_storage._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
         == expected_new_accumulated_liquid_manure_total_ammoniacal_nitrogen
@@ -893,20 +870,17 @@ def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: 
     assert actual_manure_treatment_daily_output.storage_ammonia == expected_ammonia_loss
 
 
-@pytest.mark.parametrize(
-    "slurry_storage_treatment_type_name",
-    [
-        ("slurry storage underfloor"),
-        ("slurry storage outdoor"),
-    ],
-)
-def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name: str, mocker: MockFixture) -> None:
+@pytest.mark.parametrize("slurry_storage_class", [SlurryStorageUnderfloor, SlurryStorageOutdoor])
+def test_slurry_storage_calc_methane_emission(
+    slurry_storage_class: Type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for calc_methane_emission() in both slurry storage treatments."""
     # Arrange
-    slurry_storage = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=slurry_storage_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    slurry_storage = slurry_storage_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
     accumulated_liquid_manure_total_volatile_solids = 40.0
     accumulated_liquid_manure_total_degradable_volatile_solids = 39.6
@@ -929,13 +903,14 @@ def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name
 
     # Act
     # fmt: off
-    actual_methane_loss, _ = slurry_storage.calc_methane_emission(
+    actual_methane_loss_amounts: tuple[float, float] = slurry_storage.calc_methane_emission(  # type: ignore[assignment]
         accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
         accumulated_liquid_manure_total_degradable_volatile_solids=(
             accumulated_liquid_manure_total_degradable_volatile_solids),
         accumulated_liquid_manure_total_non_degradable_volatile_solids=(
             accumulated_liquid_manure_total_non_degradable_volatile_solids),
     )
+    actual_methane_loss = actual_methane_loss_amounts[0]
 
     actual_new_accumulated_liquid_manure_total_volatile_solids = max(
         accumulated_liquid_manure_total_volatile_solids - (actual_methane_loss * 9.25), 0.0
@@ -958,20 +933,17 @@ def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name
     )
 
 
-@pytest.mark.parametrize(
-    "slurry_storage_treatment_type_name",
-    [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-    ],
-)
-def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name: str, mocker: MockFixture) -> None:
+@pytest.mark.parametrize("slurry_storage_class", [SlurryStorageUnderfloor, SlurryStorageOutdoor])
+def test_slurry_storage_calc_ammonia_emission(
+    slurry_storage_class: Type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """Unit test for calc_ammonia_emission() in both slurry storage treatments."""
     # Arrange
-    slurry_storage = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=slurry_storage_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    slurry_storage = slurry_storage_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
 
     num_animals = 100
@@ -984,54 +956,30 @@ def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name
         return_value=temperature_celsius,
     )
     expected_ammonia_loss = 2.0
-    if slurry_storage_treatment_type_name == "slurry storage underfloor":
-        patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
-            "RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor."
-            "GasEmissionsCalculator.storage_ammonia_emission",
-            return_value=expected_ammonia_loss,
-        )
-    elif slurry_storage_treatment_type_name == "slurry storage outdoor":
-        patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
-            "RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor."
-            "GasEmissionsCalculator.storage_ammonia_emission",
-            return_value=expected_ammonia_loss,
-        )
+    patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch.object(
+        GasEmissionsCalculator, "storage_ammonia_emission", return_value=expected_ammonia_loss
+    )
+
     expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
         accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0
     )
 
     # Act
-    if slurry_storage_treatment_type_name == "slurry storage underfloor":
-        actual_ammonia_loss = slurry_storage.calc_ammonia_emission(
-            num_animals=num_animals,
-            accumulated_manure_volume=accumulated_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
-        )
-    elif slurry_storage_treatment_type_name == "slurry storage outdoor":
-        actual_ammonia_loss = slurry_storage.calc_ammonia_emission(
-            num_animals=num_animals,
-            accumulated_manure_volume=accumulated_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
-        )
+    actual_ammonia_loss = slurry_storage.calc_ammonia_emission(
+        num_animals=num_animals,
+        accumulated_manure_volume=accumulated_manure_volume,
+        accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+    )
 
     # Assert
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    if slurry_storage_treatment_type_name == "slurry storage underfloor":
-        patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
-            num_animals=num_animals,
-            manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
-            manure_volume=accumulated_manure_volume,
-            manure_density=ManureConstants.MANURE_DENSITY,
-            temp=temperature_celsius,
-        )
-    elif slurry_storage_treatment_type_name == "slurry storage outdoor":
-        patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
-            num_animals=num_animals,
-            manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
-            manure_volume=accumulated_manure_volume,
-            manure_density=ManureConstants.MANURE_DENSITY,
-            temp=temperature_celsius,
-        )
+    patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
+        num_animals=num_animals,
+        manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+        manure_volume=accumulated_manure_volume,
+        manure_density=ManureConstants.MANURE_DENSITY,
+        temp=temperature_celsius,
+    )
     assert actual_ammonia_loss == expected_ammonia_loss
     actual_new_accumulated_manure_total_ammoniacal_nitrogen = max(
         accumulated_manure_total_ammoniacal_nitrogen - actual_ammonia_loss, 0.0
@@ -1791,18 +1739,20 @@ def test_flushing_volume_property(mocker: MockFixture, daily_output, expected_fl
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic lagoon",
-        "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with separator",
-        "compost bedded pack barn",
-        "open lots",
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicLagoon,
+        AnaerobicDigestionAndLagoon,
+        Composting,
+        CompostBeddedPackBarn,
+        OpenLots,
     ],
 )
-def test_adjust_accumulated_output_empty_manure_pit(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_adjust_accumulated_output_empty_manure_pit(
+    manure_treatment_class: type[BaseManureTreatment], mocker: MockFixture
+) -> None:
     """
     Unit test for _adjust_accumulated_output() to empty the manure pit when sim_day % storage time period = 1.
 
@@ -1810,10 +1760,11 @@ def test_adjust_accumulated_output_empty_manure_pit(manure_treatment_type_name: 
     accumulated output on the first day of every storage time period.
 
     """
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+        manure_treatment_config=mock_treatment_config,
     )
     manure_treatment._sim_day = 51
     manure_treatment.storage_time_period = 50
@@ -2549,9 +2500,9 @@ def test_create_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     anaerobic_digestion_and_lagoon._manure_handler_daily_output = mock_manure_handler_daily_output = mocker.MagicMock()
-    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = mock_current_manure_treatment_daily_input = (
-        mocker.MagicMock()
-    )
+    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = (
+        mock_current_manure_treatment_daily_input
+    ) = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
