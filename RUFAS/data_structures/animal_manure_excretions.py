@@ -11,8 +11,8 @@ class AnimalManureExcretions(TypedDict):
         Concentration of urea in manure (g/L).
     urine: float
         Amount of urine excreted (kg).
-    total_ammoniacal_nitrogen_concentration: float
-        Concentration of total ammoniacal manure_nitrogen in the manure slurry (g/L).
+    manure_total_ammoniacal_nitrogen: float
+        Amount of ammoniacal nitrogen in the manure slurry (kg).
     urine_nitrogen: float
         Amount of nitrogen in urine (kg).
     manure_nitrogen: float
@@ -46,7 +46,7 @@ class AnimalManureExcretions(TypedDict):
 
     urea: float
     urine: float
-    total_ammoniacal_nitrogen_concentration: float
+    manure_total_ammoniacal_nitrogen: float
     urine_nitrogen: float
     manure_nitrogen: float
     manure_mass: float
