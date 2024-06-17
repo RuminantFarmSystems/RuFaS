@@ -51,7 +51,7 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
 
     urea = 9.52
     urine = 2
-    total_ammoniacal_nitrogen_concentration = 0.14
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
     potassium = 0.0
 
     # Act
@@ -76,9 +76,7 @@ def test_calf_manure_excretions(methane_model: str, mocker: MockFixture) -> None
     assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
     assert manure_excretion_values["urea"] == approx(urea)
     assert manure_excretion_values["urine"] == approx(urine)
-    assert manure_excretion_values["total_ammoniacal_nitrogen_concentration"] == approx(
-        total_ammoniacal_nitrogen_concentration
-    )
+    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert manure_excretion_values["urine_nitrogen"] == approx(urine_nitrogen)
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)

@@ -17,7 +17,7 @@ def get_default_animal_manure_excretions() -> AnimalManureExcretions:
     return AnimalManureExcretions(
         urea=0.0,
         urine=0.0,
-        total_ammoniacal_nitrogen_concentration=0.0,
+        manure_total_ammoniacal_nitrogen=0.0,
         urine_nitrogen=0.0,
         manure_nitrogen=0.0,
         manure_mass=0.0,
