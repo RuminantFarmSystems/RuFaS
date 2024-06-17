@@ -225,6 +225,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         ("slurry storage outdoor", False),
         ("anaerobic lagoon", False),
         ("anaerobic digestion", False),
+        ("totally custom manure treatment", False),
         ("anaerobic digestion and lagoon", True),
         ("anaerobic digestion and lagoon with separator", True),
     ],
