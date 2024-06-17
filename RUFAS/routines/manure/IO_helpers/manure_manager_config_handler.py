@@ -1,7 +1,6 @@
 from typing import Any, Dict
 from typing import List
 from typing import Optional
-from typing import Union
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
