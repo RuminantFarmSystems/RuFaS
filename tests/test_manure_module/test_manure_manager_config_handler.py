@@ -15,6 +15,7 @@ from RUFAS.routines.manure.manure_separators.manure_separator_classes import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 
 om = OutputManager()
 
@@ -297,6 +298,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
     """Unit test for the _process_manure_treatment_configs() method in manure_manager_config_handler.py."""
     manure_treatment_json_configs = [
         {
+            "name": "slurry storage underfloor",
             "manure_treatment_type": "slurry storage underfloor",
             "total_solids_removal_efficiency_for_treatment": 0.10,
             "volatile_solids_removal_efficiency_for_treatment": 0.20,
@@ -307,6 +309,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             "storage_time_period": 120,
         },
         {
+            "name": "slurry storage outdoor",
             "manure_treatment_type": "slurry storage outdoor",
             "total_solids_removal_efficiency_for_treatment": 0.10,
             "volatile_solids_removal_efficiency_for_treatment": 0.20,
@@ -318,6 +321,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             "freeboard_input": 0.3048,
         },
         {
+            "name": "anaerobic lagoon",
             "manure_treatment_type": "anaerobic lagoon",
             "total_solids_removal_efficiency_for_treatment": 0.75,
             "volatile_solids_removal_efficiency_for_treatment": 0.85,
@@ -332,6 +336,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             "freeboard_input": 0.3048,
         },
         {
+            "name": "anaerobic digestion",
             "manure_treatment_type": "anaerobic digestion",
             "total_solids_removal_efficiency_for_treatment": 0.45,
             "volatile_solids_removal_efficiency_for_treatment": 0.40,
@@ -349,16 +354,6 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
         },
     ]
 
-    patch_for_manure_treatment_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureTreatmentType.get_type",
-        side_effect=[
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            ManureTreatmentType.ANAEROBIC_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION,
-        ],
-    )
-
     patch_for_manure_treatment_config_init = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureTreatmentConfig.__init__",
         return_value=None,
@@ -371,16 +366,10 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
 
     # Assert
     assert len(actual_manure_treatment_configs) == 6
-    assert patch_for_manure_treatment_type_get_type.call_count == 4
-    assert patch_for_manure_treatment_type_get_type.call_args_list == [
-        mocker.call("slurry storage underfloor"),
-        mocker.call("slurry storage outdoor"),
-        mocker.call("anaerobic lagoon"),
-        mocker.call("anaerobic digestion"),
-    ]
     assert patch_for_manure_treatment_config_init.call_count == 4
     assert patch_for_manure_treatment_config_init.call_args_list == [
         mocker.call(
+            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
             total_solids_removal_efficiency_for_treatment=0.10,
             volatile_solids_removal_efficiency_for_treatment=0.20,
             nitrogen_removal_efficiency_for_treatment=0.10,
@@ -390,6 +379,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             storage_time_period=120,
         ),
         mocker.call(
+            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
             total_solids_removal_efficiency_for_treatment=0.10,
             volatile_solids_removal_efficiency_for_treatment=0.20,
             nitrogen_removal_efficiency_for_treatment=0.10,
@@ -400,6 +390,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             freeboard_input=0.3048,
         ),
         mocker.call(
+            manure_treatment_type=ManureTreatmentType.ANAEROBIC_LAGOON,
             total_solids_removal_efficiency_for_treatment=0.75,
             volatile_solids_removal_efficiency_for_treatment=0.85,
             nitrogen_removal_efficiency_for_treatment=0.65,
@@ -413,6 +404,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             freeboard_input=0.3048,
         ),
         mocker.call(
+            manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
             total_solids_removal_efficiency_for_treatment=0.45,
             volatile_solids_removal_efficiency_for_treatment=0.40,
             nitrogen_removal_efficiency_for_treatment=0.0,
@@ -428,18 +420,40 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             anaerobic_digestion_temperature=37.5,
         ),
     ]
-    assert ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR in actual_manure_treatment_configs
-    assert ManureTreatmentType.SLURRY_STORAGE_OUTDOOR in actual_manure_treatment_configs
-    assert ManureTreatmentType.ANAEROBIC_LAGOON in actual_manure_treatment_configs
-    assert ManureTreatmentType.ANAEROBIC_DIGESTION in actual_manure_treatment_configs
-    assert actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON] == (
-        actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION],
-        actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
+    assert "slurry storage underfloor" in actual_manure_treatment_configs
+    assert "slurry storage outdoor" in actual_manure_treatment_configs
+    assert "anaerobic lagoon" in actual_manure_treatment_configs
+    assert "anaerobic digestion" in actual_manure_treatment_configs
+    assert actual_manure_treatment_configs["anaerobic digestion and lagoon"] == (
+        actual_manure_treatment_configs["anaerobic digestion"],
+        actual_manure_treatment_configs["anaerobic lagoon"],
     )
-    assert actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR] == (
-        actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_DIGESTION],
-        actual_manure_treatment_configs[ManureTreatmentType.ANAEROBIC_LAGOON],
+    assert actual_manure_treatment_configs["anaerobic digestion and lagoon with separator"] == (
+        actual_manure_treatment_configs["anaerobic digestion"],
+        actual_manure_treatment_configs["anaerobic lagoon"],
     )
+
+
+@pytest.mark.parametrize(
+    "treatment_configs",
+    [
+        [{"name": "lagoon", "manure_treatment_type": "anaerobic lagoon"}],
+        [{"name": "digestion", "manure_treatment_type": "anaerobic digestion"}],
+        [{"name": "slurry storage", "manure_treatment_type": "slurry storage outdoor"}],
+    ]
+)
+def test_process_manure_treatment_configs_warning(
+    mocker: MockerFixture, treatment_configs: list[dict[str, str]]
+) -> None:
+    """Tests that warnings are raised when anaerobic digestion-lagoon combinations cannot be configured."""
+    mocker.patch.object(ManureTreatmentConfig, "__init__", return_value=None)
+    mocker.patch.object(ManureManagerConfigHandler, "__init__", return_value=None)
+    config_handler = ManureManagerConfigHandler()
+    add_warning = mocker.patch.object(om, "add_warning")
+
+    config_handler._process_manure_treatment_configs(treatment_configs)
+
+    add_warning.assert_called_once()
 
 
 def test_get_bedding_config(mocker: MockerFixture) -> None:
@@ -614,72 +628,21 @@ def test_get_manure_separator_config_error(mocker: MockerFixture) -> None:
         handler.get_manure_separator_config("not here")
 
 
-def test_get_custom_manure_treatment_config(mocker: MockerFixture) -> None:
+def test_get_manure_treatment_config(mocker: MockerFixture) -> None:
     """Unit test for _get_custom_manure_treatment_config() in manure_manager_config_handler.py."""
-    # Case 1: Custom manure treatment config is provided
+    mocker.patch.object(ManureManagerConfigHandler, "__init__", return_value=None)
+    config_handler = ManureManagerConfigHandler()
+    mock_treatment_config = mocker.MagicMock()
+    config_handler.manure_treatment_configs = {"config": mock_treatment_config}
 
-    # Arrange
-    mock_manure_treatment_type_name = "default"
-    mock_manure_treatment_type = ManureTreatmentType.DEFAULT
-    patch_for_manure_treatment_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureTreatmentType.get_type",
-        return_value=mock_manure_treatment_type,
-    )
-    mock_manure_manager_config = mocker.MagicMock()
-    patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
-        return_value=None,
-    )
+    actual = config_handler.get_manure_treatment_config("config")
 
-    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
+    assert actual == mock_treatment_config
 
-    mock_manure_treatment_config = mocker.MagicMock()
-    mock_custom_treatment_configs = {mock_manure_treatment_type: mock_manure_treatment_config}
-    manure_manager_config_handler.custom_manure_treatment_configs = mock_custom_treatment_configs
-
-    # Act
-    actual_manure_treatment_config = manure_manager_config_handler.get_custom_manure_treatment_config(
-        manure_treatment_type_name=mock_manure_treatment_type_name
-    )
-
-    # Assert
-    patch_for_manure_manager_config_handler_init.assert_called_once_with(
-        manure_manager_config=mock_manure_manager_config
-    )
-    patch_for_manure_treatment_type_get_type.assert_called_once_with(mock_manure_treatment_type_name)
-    assert actual_manure_treatment_config == mock_manure_treatment_config
-
-    # --------------------
-
-    # Case 2: There is no custom treatment config
-
-    mock_manure_treatment_type_name = "default"
-    mock_manure_treatment_type = ManureTreatmentType.DEFAULT
-    patch_for_manure_treatment_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureTreatmentType.get_type",
-        return_value=mock_manure_treatment_type,
-    )
-    mock_manure_manager_config = mocker.MagicMock()
-    patch_for_manure_manager_config_handler_init = mocker.patch(
-        "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" ".ManureManagerConfigHandler.__init__",
-        return_value=None,
-    )
-
-    manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config=mock_manure_manager_config)
-
-    manure_manager_config_handler.custom_manure_treatment_configs = {}
-
-    # Act
-    actual_manure_treatment_config = manure_manager_config_handler.get_custom_manure_treatment_config(
-        manure_treatment_type_name=mock_manure_treatment_type_name
-    )
-
-    # Assert
-    patch_for_manure_manager_config_handler_init.assert_called_once_with(
-        manure_manager_config=mock_manure_manager_config
-    )
-    patch_for_manure_treatment_type_get_type.assert_called_once_with(mock_manure_treatment_type_name)
-    assert actual_manure_treatment_config is None
+    patch_add_error = mocker.patch.object(om, "add_error")
+    with pytest.raises(KeyError, match="Attempted to use a non-existent manure treatment configuration"):
+        config_handler.get_manure_treatment_config("not present")
+    patch_add_error.assert_called_once()
 
 
 def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
@@ -696,14 +659,14 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
         "manure_treatment_configs": mock_manure_treatment_json_configs,
     }
 
-    mock_custom_bedding_configs = mocker.MagicMock()
+    mock_bedding_configs = mocker.MagicMock()
     mock_manure_handler_configs = mocker.MagicMock()
     mock_manure_separator_configs = mocker.MagicMock()
-    mock_custom_manure_treatment_configs = mocker.MagicMock()
+    mock_manure_treatment_configs = mocker.MagicMock()
     patch_for_process_bedding_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
         ".ManureManagerConfigHandler._process_bedding_configs",
-        return_value=mock_custom_bedding_configs,
+        return_value=mock_bedding_configs,
     )
     patch_for_process_manure_handler_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
@@ -718,7 +681,7 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     patch_for_process_manure_treatment_configs = mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler"
         ".ManureManagerConfigHandler._process_manure_treatment_configs",
-        return_value=mock_custom_manure_treatment_configs,
+        return_value=mock_manure_treatment_configs,
     )
 
     # Act
@@ -729,7 +692,7 @@ def test_manure_manager_config_handler_init(mocker: MockerFixture) -> None:
     patch_for_process_manure_handler_configs.assert_called_once_with(mock_manure_handler_json_configs)
     patch_for_process_manure_separator_configs.assert_called_once_with(mock_manure_separator_json_configs)
     patch_for_process_manure_treatment_configs.assert_called_once_with(mock_manure_treatment_json_configs)
-    assert manure_manager_config_handler.bedding_configs == mock_custom_bedding_configs
+    assert manure_manager_config_handler.bedding_configs == mock_bedding_configs
     assert manure_manager_config_handler.manure_handler_configs == mock_manure_handler_configs
     assert manure_manager_config_handler.manure_separator_configs == mock_manure_separator_configs
-    assert manure_manager_config_handler.custom_manure_treatment_configs == mock_custom_manure_treatment_configs
+    assert manure_manager_config_handler.manure_treatment_configs == mock_manure_treatment_configs
