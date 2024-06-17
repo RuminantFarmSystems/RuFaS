@@ -143,7 +143,7 @@ class ManureManagerConfigHandler:
 
     def get_manure_treatment_config(self, manure_treatment_type_name: str) -> ManureTreatmentConfig:
         """
-        Returns the custom manure treatment config for the given manure treatment type name.
+        Returns the manure treatment config for the given manure treatment type name.
 
         Parameters
         ----------
@@ -282,9 +282,6 @@ class ManureManagerConfigHandler:
     ) -> dict[str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
 
-        There is one special case that involves a combination of anaerobic digestion and anaerobic
-        lagoon. In this case, we return a tuple of the two manure treatment configs.
-
         Parameters
         ----------
         manure_treatment_configs : list[dict[str, Any]]
@@ -295,14 +292,20 @@ class ManureManagerConfigHandler:
         dict[str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]
             A dictionary of manure treatment config objects, with the key being the manure treatment type.
 
+        Notes
+        -----
+        There are two cases which require a combination of anaerobic digestion and anaerobic lagoon - anaerobic
+        digestion and lagoon, and anaerobic digestion and lagoon with separation. In these cases, we return a tuple of
+        two manure treatment configs, the first being the config for the digester and the second being the config for
+        the lagoon. If a config is not provided for either the digester or the lagoon, then  the simulation will crash
+        if the user specified the one of the digestion-lagoon combinations to be used.
+
         """
         info_map = {"class": cls.__name__, "function": cls._process_manure_treatment_configs.__name__}
         available_manure_treatment_configs: dict[
-            str, Union[ManureTreatmentConfig, tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+            str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]
         ] = {}
 
-        digester_combination_config: str | None = None
-        lagoon_combination_config: str | None = None
         for config in manure_treatment_configs:
             name = config.pop("name")
             if name in available_manure_treatment_configs:
