@@ -583,12 +583,11 @@ class ManureManager:
             True if the manure treatment is a compound anaerobic manure treatment, False otherwise.
 
         """
-        manure_treatment_type = ManureTreatmentType(manure_treatment_name)
-        compound_anaerobic_manure_treatment_types = [
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-        ]
-        return manure_treatment_type in compound_anaerobic_manure_treatment_types
+        compound_anaerobic_manure_treatment_types = {
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value,
+        }
+        return manure_treatment_name in compound_anaerobic_manure_treatment_types
 
     def _handle_daily_update_for_compound_anaerobic_manure_treatment(
         self,
