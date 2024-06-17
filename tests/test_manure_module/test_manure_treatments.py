@@ -29,9 +29,6 @@ from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
 )
 from RUFAS.routines.manure.manure_treatments.composting import Composting
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    DefaultManureTreatmentConfigFactory,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
     ManureTreatmentConfig,
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
@@ -352,6 +349,7 @@ def test_manure_treatment_config() -> None:
     """Tests ManureTreatmentConfig class."""
     # Act
     manure_treatment_config = ManureTreatmentConfig(
+        manure_treatment_type=ManureTreatmentType.ANAEROBIC_LAGOON,
         total_solids_removal_efficiency_for_treatment=0.1,
         volatile_solids_removal_efficiency_for_treatment=0.2,
         nitrogen_removal_efficiency_for_treatment=0.3,
@@ -370,6 +368,7 @@ def test_manure_treatment_config() -> None:
     )
 
     # Assert
+    assert manure_treatment_config.manure_treatment_type == ManureTreatmentType.ANAEROBIC_LAGOON
     assert manure_treatment_config.total_solids_removal_efficiency_for_treatment == approx(0.1)
     assert manure_treatment_config.volatile_solids_removal_efficiency_for_treatment == approx(0.2)
     assert manure_treatment_config.nitrogen_removal_efficiency_for_treatment == approx(0.3)
@@ -388,138 +387,6 @@ def test_manure_treatment_config() -> None:
 
     assert manure_treatment_config.storage_time_period == 30
     assert manure_treatment_config.freeboard_input == approx(0.65)
-
-
-# Test DefaultManureTreatmentConfigFactory
-# ========================================
-
-
-def test_slurry_storage_underfloor_default_config() -> None:
-    """Tests the default values of the slurry storage underfloor manure treatment config."""
-    # Arrange
-    slurry_storage_underfloor_config = DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG
-
-    # Assert
-    assert slurry_storage_underfloor_config.total_solids_removal_efficiency_for_treatment == approx(0.0)
-    assert slurry_storage_underfloor_config.volatile_solids_removal_efficiency_for_treatment == approx(0.20)
-    assert slurry_storage_underfloor_config.nitrogen_removal_efficiency_for_treatment == approx(0.10)
-    assert slurry_storage_underfloor_config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment == approx(0.45)
-    assert slurry_storage_underfloor_config.phosphorus_removal_efficiency_for_treatment == approx(0.05)
-    assert slurry_storage_underfloor_config.potassium_removal_efficiency_for_treatment == approx(0.05)
-    assert slurry_storage_underfloor_config.storage_time_period == 120
-
-
-def test_slurry_storage_outdoor_default_config() -> None:
-    """Tests the default values of the slurry storage outdoor manure treatment config."""
-    # Act
-    slurry_storage_outdoor_config = DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG
-
-    # Assert
-    assert slurry_storage_outdoor_config.total_solids_removal_efficiency_for_treatment == approx(0.0)
-    assert slurry_storage_outdoor_config.volatile_solids_removal_efficiency_for_treatment == approx(0.20)
-    assert slurry_storage_outdoor_config.nitrogen_removal_efficiency_for_treatment == approx(0.10)
-    assert slurry_storage_outdoor_config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment == approx(0.45)
-    assert slurry_storage_outdoor_config.phosphorus_removal_efficiency_for_treatment == approx(0.05)
-    assert slurry_storage_outdoor_config.potassium_removal_efficiency_for_treatment == approx(0.05)
-    assert slurry_storage_outdoor_config.storage_time_period == 120
-    assert slurry_storage_outdoor_config.freeboard_input == approx(0.3048)
-
-
-def test_anaerobic_digestion_default_config() -> None:
-    """Tests the default values of the anaerobic digestion manure treatment config."""
-    # Act
-    anaerobic_digestion_config = DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG
-
-    # Assert
-    assert anaerobic_digestion_config.total_solids_removal_efficiency_for_treatment == approx(0.45)
-    assert anaerobic_digestion_config.volatile_solids_removal_efficiency_for_treatment == approx(0.40)
-    assert anaerobic_digestion_config.nitrogen_removal_efficiency_for_treatment == approx(0.0)
-    assert anaerobic_digestion_config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment == approx(0.1)
-    assert anaerobic_digestion_config.phosphorus_removal_efficiency_for_treatment == approx(0.0)
-    assert anaerobic_digestion_config.potassium_removal_efficiency_for_treatment == approx(0.0)
-
-    assert anaerobic_digestion_config.hydraulic_retention_time == 25
-    assert anaerobic_digestion_config.sludge_accumulation_period == 1.0
-    assert anaerobic_digestion_config.sludge_accumulation_volume_fraction == approx(0.0)
-    assert anaerobic_digestion_config.top_cover_volume_fraction == approx(0.2)
-
-    assert anaerobic_digestion_config.evaporation_fraction == approx(0.02)
-    assert anaerobic_digestion_config.anaerobic_digestion_temperature_set_point == approx(37.5)
-    assert anaerobic_digestion_config.anaerobic_digestion_temperature_celsius == approx(37.5)
-
-
-def test_anaerobic_lagoon_default_config() -> None:
-    # Act
-    anaerobic_lagoon_config = DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG
-
-    # Assert
-    assert anaerobic_lagoon_config.total_solids_removal_efficiency_for_treatment == approx(0.75)
-    assert anaerobic_lagoon_config.volatile_solids_removal_efficiency_for_treatment == approx(0.85)
-    assert anaerobic_lagoon_config.nitrogen_removal_efficiency_for_treatment == approx(0.65)
-    assert anaerobic_lagoon_config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment == approx(0.7)
-    assert anaerobic_lagoon_config.phosphorus_removal_efficiency_for_treatment == approx(0.6)
-    assert anaerobic_lagoon_config.potassium_removal_efficiency_for_treatment == approx(0.2)
-
-    assert anaerobic_lagoon_config.hydraulic_retention_time == 365
-    assert anaerobic_lagoon_config.sludge_accumulation_period == 10.0
-    assert anaerobic_lagoon_config.sludge_accumulation_volume_fraction == approx(0.0)
-
-    assert anaerobic_lagoon_config.storage_time_period == 365
-    assert anaerobic_lagoon_config.freeboard_input == approx(0.3048)
-
-
-@pytest.mark.parametrize(
-    "manure_treatment_type, expected_manure_treatment_config",
-    [
-        (
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
-        ),
-        (
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG,
-        ),
-        (
-            ManureTreatmentType.ANAEROBIC_DIGESTION,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-        ),
-        (
-            ManureTreatmentType.ANAEROBIC_LAGOON,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-        ),
-        (
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            (
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            ),
-        ),
-        (
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-            (
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            ),
-        ),
-        (
-            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN,
-            DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG,
-        ),
-        (
-            ManureTreatmentType.OPEN_LOTS,
-            DefaultManureTreatmentConfigFactory.OPEN_LOTS_CONFIG,
-        ),
-    ],
-)
-def test_default_manure_treatment_config_factory_get_instance(
-    manure_treatment_type: ManureTreatmentType,
-    expected_manure_treatment_config: ManureTreatmentConfig,
-) -> None:
-    # Act
-    manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-
-    # Assert
-    assert manure_treatment_config == expected_manure_treatment_config
 
 
 # Test ManureTreatmentType
@@ -541,28 +408,15 @@ def test_default_manure_treatment_config_factory_get_instance(
             "anaerobic digestion and lagoon with separator",
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
         ),
-        ("slurry_storage_underfloor", ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR),
-        ("slurry_storage_outdoor", ManureTreatmentType.SLURRY_STORAGE_OUTDOOR),
-        ("anaerobic_digestion", ManureTreatmentType.ANAEROBIC_DIGESTION),
-        ("anaerobic_lagoon", ManureTreatmentType.ANAEROBIC_LAGOON),
-        (
-            "anaerobic_digestion_and_lagoon",
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-        ),
-        (
-            "anaerobic_digestion_and_lagoon_with_separator",
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-        ),
         ("compost bedded pack barn", ManureTreatmentType.COMPOST_BEDDED_PACK_BARN),
         ("open lots", ManureTreatmentType.OPEN_LOTS),
-        ("dummy", ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR),
     ],
 )
-def test_manure_treatment_type_get_type(
+def test_manure_treatment_type(
     manure_treatment_type_name: str, expected_manure_treatment_type: ManureTreatmentType
 ) -> None:
     # Assert
-    assert ManureTreatmentType.get_type(manure_treatment_type_name) == expected_manure_treatment_type
+    assert ManureTreatmentType(manure_treatment_type_name) == expected_manure_treatment_type
 
 
 # Test ManureTreatmentFactory
@@ -570,129 +424,76 @@ def test_manure_treatment_type_get_type(
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name, custom_manure_treatment_config,"
-    "expected_manure_treatment_class,expected_manure_treatment_config",
+    "manure_treatment_type_name, manure_treatment_type,expected_manure_treatment_class",
     [
         (
             "slurry storage underfloor",
-            None,
-            SlurryStorageUnderfloor,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
-        ),
-        (
-            "slurry storage underfloor",
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
-            SlurryStorageUnderfloor,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR,
+            SlurryStorageUnderfloor
         ),
         (
             "slurry storage outdoor",
-            None,
-            SlurryStorageOutdoor,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG,
-        ),
-        (
-            "slurry storage outdoor",
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG,
-            SlurryStorageOutdoor,
-            DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
+            SlurryStorageOutdoor
         ),
         (
             "anaerobic lagoon",
-            None,
-            AnaerobicLagoon,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-        ),
-        (
-            "anaerobic lagoon",
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            AnaerobicLagoon,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
+            ManureTreatmentType.ANAEROBIC_LAGOON,
+            AnaerobicLagoon
         ),
         (
             "anaerobic digestion",
-            None,
-            AnaerobicDigestion,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-        ),
-        (
-            "anaerobic digestion",
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-            AnaerobicDigestion,
-            DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+            ManureTreatmentType.ANAEROBIC_DIGESTION,
+            AnaerobicDigestion
         ),
         (
             "anaerobic digestion and lagoon",
-            None,
-            AnaerobicDigestionAndLagoon,
-            (
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            ),
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
+            AnaerobicDigestionAndLagoon
         ),
         (
-            "anaerobic digestion and lagoon",
-            (
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            ),
-            AnaerobicDigestionAndLagoon,
-            (
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
-                DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG,
-            ),
+            "anaerobic digestion and lagoon with separator",
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
+            AnaerobicDigestionAndLagoon
         ),
         (
             "compost bedded pack barn",
-            None,
-            CompostBeddedPackBarn,
-            DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG,
-        ),
-        (
-            "compost bedded pack barn",
-            DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG,
-            CompostBeddedPackBarn,
-            DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG,
+            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN,
+            CompostBeddedPackBarn
         ),
         (
             "open lots",
-            None,
-            OpenLots,
-            DefaultManureTreatmentConfigFactory.OPEN_LOTS_CONFIG,
-        ),
-        (
-            "open lots",
-            DefaultManureTreatmentConfigFactory.OPEN_LOTS_CONFIG,
-            OpenLots,
-            DefaultManureTreatmentConfigFactory.OPEN_LOTS_CONFIG,
+            ManureTreatmentType.OPEN_LOTS,
+            OpenLots
         ),
     ],
 )
 def test_manure_treatment_factory_get_instance(
     manure_treatment_type_name: str,
-    custom_manure_treatment_config: ManureTreatmentConfig,
+    manure_treatment_type: ManureTreatmentType,
     expected_manure_treatment_class: Type[BaseManureTreatment],
-    expected_manure_treatment_config: ManureTreatmentConfig,
     mocker: MockFixture,
 ) -> None:
     """Unit test for get_instance() method of ManureTreatmentFactory class."""
     # Arrange
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
+    manure_treatment_config = mocker.MagicMock(autospec=ManureTreatmentType)
+    manure_treatment_config.manure_treatment_type = manure_treatment_type
 
     # Act
     manure_treatment = ManureTreatmentFactory.get_instance(
         manure_treatment_type_name,
         mock_weather,
         mock_time,
-        custom_manure_treatment_config,
+        manure_treatment_config,
     )
 
     # Assert
     assert isinstance(manure_treatment, expected_manure_treatment_class)
     assert manure_treatment.weather == mock_weather
     assert manure_treatment.time == mock_time
-    assert manure_treatment.config == expected_manure_treatment_config
+    assert manure_treatment.config == manure_treatment_config
 
     assert manure_treatment._sim_day == -1
     assert manure_treatment._current_pen is None
@@ -708,27 +509,26 @@ def test_manure_treatment_factory_get_instance(
 # Test BaseManureTreatment
 # ========================
 
-
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic digestion",
-        "anaerobic lagoon",
-        "anaerobic digestion and lagoon",
-        "anaerobic digestion and lagoon with separator",
-        "compost bedded pack barn",
-        "open lots",
-    ],
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicLagoon,
+        AnaerobicDigestion,
+        AnaerobicDigestionAndLagoon,
+        Composting,
+        CompostBeddedPackBarn,
+        OpenLots,
+    ]
 )
-def test_initialize_private_attributes_during_update(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_initialize_private_attributes_during_update(manure_treatment_class: BaseManureTreatment, mocker: MockFixture) -> None:
     # Arrange
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        custom_manure_treatment_config=None,
+        manure_treatment_config=mock_treatment_config,
     )
     sim_day = 10
     current_pen = mocker.MagicMock()
@@ -756,17 +556,17 @@ def test_initialize_private_attributes_during_update(manure_treatment_type_name:
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type_name",
+    "manure_treatment_class",
     [
-        "slurry storage underfloor",
-        "slurry storage outdoor",
-        "anaerobic digestion",
-        "anaerobic lagoon",
-        "compost bedded pack barn",
-        "open lots",
-    ],
+        SlurryStorageUnderfloor,
+        SlurryStorageOutdoor,
+        AnaerobicDigestion,
+        AnaerobicLagoon,
+        CompostBeddedPackBarn,
+        OpenLots,
+    ]
 )
-def test_initialize_daily_output_during_update(manure_treatment_type_name: str, mocker: MockFixture) -> None:
+def test_initialize_daily_output_during_update(manure_treatment_class: str, mocker: MockFixture) -> None:
     """Unit test for _initialize_daily_output_during_update() method of BaseManureTreatment class."""
 
     # Arrange
@@ -777,7 +577,8 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str, 
     volatile_solids_removal_efficiency_for_treatment = 0.5
     total_solids_removal_efficiency_for_treatment = 0.6
 
-    custom_manure_treatment_config = ManureTreatmentConfig(
+    manure_treatment_config = ManureTreatmentConfig(
+        manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=(
             total_ammoniacal_nitrogen_removal_efficiency_for_treatment
         ),
@@ -787,11 +588,10 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str, 
         volatile_solids_removal_efficiency_for_treatment=volatile_solids_removal_efficiency_for_treatment,
         total_solids_removal_efficiency_for_treatment=total_solids_removal_efficiency_for_treatment,
     )
-    manure_treatment = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=manure_treatment_type_name,
+    manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
-        custom_manure_treatment_config=custom_manure_treatment_config,
+        manure_treatment_config=manure_treatment_config,
     )
     manure_treatment_daily_input: LiquidManurePortionProtocol = mocker.MagicMock()
     manure_treatment_daily_input.simulation_day = simulation_day = 5
