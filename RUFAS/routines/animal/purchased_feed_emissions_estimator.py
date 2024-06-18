@@ -3,22 +3,22 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
-im = InputManager()
 om = OutputManager()
 
 
 class PurchasedFeedEmissionsEstimator:
     def __init__(self) -> None:
+        self.im = InputManager()
         info_map = {"class": self.__class__.__name__, "function": "__init__"}
 
-        self.FIPS_county_code = im.get_data("config.FIPS_county_code")
+        self.FIPS_county_code = self.im.get_data("config.FIPS_county_code")
 
         om.add_variable(
             "FIPS_county_code", self.FIPS_county_code, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
 
         self.purchased_feed_emissions: dict[str, float] = self._setup_feed_emissions(
-            im.get_data("purchased_feeds_emissions")
+            self.im.get_data("purchased_feeds_emissions")
         )
         om.add_variable(
             "purchased_feed_emissions",
@@ -27,7 +27,7 @@ class PurchasedFeedEmissionsEstimator:
         )
 
         self.purchased_feed_land_use_change_emissions = self._setup_feed_emissions(
-            im.get_data("purchased_feed_land_use_change_emissions")
+            self.im.get_data("purchased_feed_land_use_change_emissions")
         )
         om.add_variable(
             "purchased_feed_land_use_change_emissions",
