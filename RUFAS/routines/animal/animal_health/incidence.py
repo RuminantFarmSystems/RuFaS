@@ -1,3 +1,4 @@
+from RUFAS.routines.animal.animal_health.disease import Disease
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 
@@ -9,19 +10,22 @@ class DiseaseIncidence:
     def __init__(self) -> None:
         pass
 
-    def assess_disease_risk(self, animal_type: AnimalBase) -> None:
+    def assess_disease_risk(self, animal_type: AnimalBase, disease: Disease) -> None:
         """Base function for disease risk determination.
 
         Parameters
         ----------
         animal_type : AnimalBase
             The animal for which the disease risk will be assessed.
+        disease : Disease
+            The disease for which the risk of the animal is being assessed.
 
         """
         # check for risk factors:
         # - what type of animal it is/what life cycle stage it's in, repro status, if lactating
         # - review additional management parameters
         # - different diseases have different disease risk factors reviewed here
+        # - Disease class imported for any disease-specific info to help assess risk.
 
         # if animal doesn't meet all necessary risk factors, return/stop assessment process.
         # else, calculate incidence rate
