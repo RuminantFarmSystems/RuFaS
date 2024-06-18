@@ -34,7 +34,8 @@ from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...enums import AnimalCombination
+from ...data_structures.pen_manure_data import PenManureData
 
 om = OutputManager()
 
@@ -1008,6 +1009,10 @@ class AnimalManager:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
             classes_in_pen = self.all_pens[current_pen_id].classes_in_pen
             animal.update_pen_history(current_pen_id, self.simulation_day, classes_in_pen)
+
+    def collect_pen_manure_data(self) -> list[PenManureData]:
+        """Returns the manure information from all pens in PenManureData."""
+        return [pen.get_manure_data() for pen in self.all_pens]
 
     def record_pen_history(self) -> None:
         """
