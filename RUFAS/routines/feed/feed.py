@@ -10,7 +10,6 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 import math
 
-im = InputManager()
 om = OutputManager()
 
 udrm = UserDefinedRationManager()
@@ -49,7 +48,8 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.nutrient_standard = im.get_data("config.nutrient_standard")
+        self.im = InputManager()
+        self.nutrient_standard = self.im.get_data("config.nutrient_standard")
         self.nutrient_table = "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
 
         self.all_feed_units = self._retrieve_data(data_source="user_feeds", var_names=["rufas_id", "Name", "units"])
@@ -1201,7 +1201,7 @@ class Feed:
 
         result_list = []
         values = []
-        data = im.get_data(data_source)
+        data = self.im.get_data(data_source)
         if not var_names:
             var_names = list(data.keys())
 
