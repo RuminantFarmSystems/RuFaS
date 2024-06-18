@@ -21,6 +21,7 @@ from typing import Dict, List, Tuple
 im = None
 om = OutputManager()
 
+
 def init_IM() -> None:
     global im
     im = InputManager()
