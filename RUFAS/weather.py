@@ -8,7 +8,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -58,7 +57,7 @@ class Weather:
         time starts at 1).
 
         """
-
+        self.im = InputManager()
         years = time.years
         w_start_year = time.start_year_int
         w_start_day = time.start_day
@@ -338,6 +337,7 @@ class Weather:
         southern hemisphere will use incorrect daylength values.
 
         """
+        im = InputManager()
         info_map = {
             "class": Weather.__name__,
             "function": Weather._get_latitude.__name__,
