@@ -12,8 +12,8 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...data_structures.animal_manure_excretions import AnimalManureExcretions
+from ...enums import AnimalCombination
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed import Feed
 
@@ -455,9 +455,9 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
             "total_solids": MeasurementUnits.KILOGRAMS,
             "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
@@ -502,7 +502,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
