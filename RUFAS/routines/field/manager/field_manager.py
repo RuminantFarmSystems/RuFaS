@@ -125,7 +125,7 @@ class FieldManager:
 
     @staticmethod
     def _setup_field(
-            field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
+        field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
     ) -> Field:
         """
 
@@ -216,7 +216,7 @@ class FieldManager:
 
     @staticmethod
     def _setup_fertilizer_schedule(
-            fertilizer_schedule: str,
+        fertilizer_schedule: str,
     ) -> Tuple[Dict, FertilizerSchedule]:
         """
         Sets up the fertilizer schedule and the list of available fertilizer mixes.
