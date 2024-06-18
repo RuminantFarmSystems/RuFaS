@@ -7,29 +7,10 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 )
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-
-
-def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
-    """Unit test for simulate_daily_manure_manager() in manure_manager.py"""
-    # Arrange
-    mock_manure_manager = mocker.MagicMock()
-    mock_manure_manager.daily_update.return_value = None
-    mock_animal_manager = mocker.MagicMock()
-    mock_animal_manager.all_pens = mocker.MagicMock()
-    mock_animal_manager.simulation_day = mocker.MagicMock()
-
-    # Act
-    simulate_daily_manure_manager(mock_manure_manager, mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
-
-    # Assert
-    mock_manure_manager.daily_update.assert_called_once_with(
-        mock_animal_manager.all_pens, mock_animal_manager.simulation_day
-    )
 
 
 def test_manure_manager_init(mocker: MockFixture) -> None:
