@@ -296,8 +296,8 @@ class ManureManagerConfigHandler:
         There are two cases which require a combination of anaerobic digestion and anaerobic lagoon - anaerobic
         digestion and lagoon, and anaerobic digestion and lagoon with separation. In these cases, we return a tuple of
         two manure treatment configs, the first being the config for the digester and the second being the config for
-        the lagoon. If a config is not provided for either the digester or the lagoon, then  the simulation will crash
-        if the user specified the one of the digestion-lagoon combinations to be used.
+        the lagoon. If a config is not provided for either the digester or the lagoon, then the simulation will crash if
+        the user specified one of the digestion-lagoon combinations to be used.
 
         """
         info_map = {"class": cls.__name__, "function": cls._process_manure_treatment_configs.__name__}
