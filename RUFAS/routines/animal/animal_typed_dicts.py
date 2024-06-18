@@ -235,7 +235,7 @@ class InitialHerdSummaryTypedDict(TypedDict):
     cow_avg_CI: float
 
 
-class AvailableFeedsTypedDict(TypedDict):
+class AvailableFeedsTypedDict(TypedDict, total=False):
     feed_id: List[int]
     feed_key: List[str]
     price: List[float]
