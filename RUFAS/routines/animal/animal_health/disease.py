@@ -24,7 +24,7 @@ class Disease:
         start_day : int
             The date in the simulation when the disease is starting.
         """
-        animal.disease_status = 'sick'
+        animal.disease_status = "sick"
         animal.disease_start_day = simulation_day
 
     def _process_disease_day(self, animal: AnimalBase):
@@ -39,4 +39,4 @@ class Disease:
         pass
 
     def end_disease(self, animal: AnimalBase, outcome):
-        animal.disease_status = 'recovered' if outcome == 'recovery' else outcome
+        animal.disease_status = "recovered" if outcome == "recovery" else outcome
