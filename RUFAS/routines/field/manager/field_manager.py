@@ -18,8 +18,12 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
-im = InputManager()
+im = None
 om = OutputManager()
+
+def init_IM() -> None:
+    global im
+    im = InputManager()
 
 
 class FieldManager:
@@ -49,7 +53,7 @@ class FieldManager:
             "class": self.__class__.__name__,
             "function": "__init__",
         }
-
+        init_IM()
         self.fields: List[Field] = []
         fields = im.get_data_keys_by_properties("field_properties")
         if not fields:
@@ -139,6 +143,7 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
+
         field_configuration_data = im.get_data(field_name)
         field_size = field_configuration_data.get("field_size")
         absolute_latitude = field_configuration_data.get("absolute_latitude")

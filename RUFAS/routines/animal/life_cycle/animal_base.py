@@ -6,8 +6,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from typing import Tuple
 
-im = InputManager()
-
 
 class AnimalBase:
     config = {}
@@ -19,6 +17,7 @@ class AnimalBase:
 
     @staticmethod
     def set_config(config):
+        im = InputManager()
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
