@@ -21,7 +21,7 @@ def main() -> None:
     try:
         task_manager = TaskManager()
         task_manager.start(
-            Path("input/metadata/task_manager_metadata.json"),
+            metadata_path=Path(cmd_arguments.path_to_metadata),
             verbosity=LogVerbosity(cmd_arguments.verbose),
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),
@@ -112,6 +112,12 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "-m", "--metadata-depth-limit", help="Overrides the default metadata depth limit in the Input Manager", type=int
+    )
+    parser.add_argument(
+        "-p",
+        "--path-to-metadata",
+        help="Path to the task manager metadata that will determine the tasks run",
+        default="input/metadata/task_manager_metadata.json",
     )
     return parser.parse_args(args)
 
