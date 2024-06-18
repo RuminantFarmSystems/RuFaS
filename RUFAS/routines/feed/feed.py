@@ -7,7 +7,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...enums import AnimalCombination
 import math
 
 om = OutputManager()
