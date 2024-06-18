@@ -29,7 +29,7 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 om = OutputManager()
-#im = InputManager()
+# im = InputManager()
 
 
 class MilkProductionHistory:
