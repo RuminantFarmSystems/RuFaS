@@ -68,7 +68,5 @@ class AnimalHealthReporter:
 
     @classmethod
     def report_income_losses(cls) -> None:
-        """Reports losses in income due to disease to Output Manager.
-
-        """
+        """Reports losses in income due to disease to Output Manager."""
         pass
