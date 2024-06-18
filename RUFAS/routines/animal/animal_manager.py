@@ -36,7 +36,6 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -114,7 +113,8 @@ class AnimalManager:
             Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
-        config_data: Dict[str, Any] = im.get_data("config")
+        self.im = InputManager()
+        config_data: Dict[str, Any] = self.im.get_data("config")
 
         # simulation length, days
         self.sim_length = time.simulation_length

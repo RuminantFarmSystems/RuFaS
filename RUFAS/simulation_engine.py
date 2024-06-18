@@ -18,7 +18,6 @@ from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
 
 om = OutputManager()
-im = InputManager()
 
 
 class SimulationEngine:
@@ -53,7 +52,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
-
+        self.im = InputManager()
         self.time = Time()
         self._initialize_simulation()
 
@@ -160,16 +159,16 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        weather_data = im.get_data("weather")
+        weather_data = self.im.get_data("weather")
         om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
-        feed_class_config = im.get_data("feed")
+        feed_class_config = self.im.get_data("feed")
         self.feed = Feed(feed_class_config)
 
-        manure_class_config = im.get_data("manure_management")
-        animal_class_config = im.get_data("animal")
+        manure_class_config = self.im.get_data("manure_management")
+        animal_class_config = self.im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
