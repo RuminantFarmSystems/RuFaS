@@ -28,6 +28,7 @@ def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
         "RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__",
         return_value=None,
     )
+
     return HerdFactory()
 
 
