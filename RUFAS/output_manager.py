@@ -998,7 +998,7 @@ class OutputManager(object):
                     self.add_error(
                         "Unpacking Pool Error",
                         f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
-                        f"{is_data_in_dict=}, {selected_variables=}",
+                        f"{is_data_in_dict=}, {selected_variables=}, see Wiki for proper setup details.",
                         info_map,
                     )
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)

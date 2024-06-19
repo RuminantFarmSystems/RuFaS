@@ -1,5 +1,24 @@
 from .storage import Storage
 from .enums import CropCategory
+from .harvested_crop import HarvestedCrop
+from ...current_day_conditions import CurrentDayConditions
+from ...general_constants import GeneralConstants
+from ...time import Time
+
+
+"""
+This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
+Documentation equation 1.2.6.
+"""
+FINAL_MOISTURE_FRACTION = 0.12
+
+"""
+These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
+References Feed Storage Scientific Documentation table 1.2.9.
+"""
+PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_021_6
+PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
+UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 
 class Hay(Storage):
@@ -19,25 +38,14 @@ class Hay(Storage):
         Calculates the protein loss in the hay.
     """
 
-    def __init__(self, capacity: float = float("inf")):
+    def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
-
-    @property
-    def bale_density(self) -> float:
-        """
-        Calculate and return the density of the hay bale.
-
-        Returns
-        -------
-        float
-            The density of the hay bale.
-        """
-        pass
+        self.additional_dry_matter_loss_coefficient = 0.0
 
     @property
     def bale_size(self) -> float:
@@ -47,19 +55,152 @@ class Hay(Storage):
         Returns
         -------
         float
-            The diameter of the hay bale in meters.
+            The diameter of the hay bale (meters).
         """
         pass
 
-    def calculate_protein_loss(self):
+    def calculate_dry_matter_loss_to_gas(
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+    ) -> float:
         """
-        Calculates the protein loss in the hay.
+        Calculates the base amount of gaseous dry matter lost in a hayed crop.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which dry matter loss will be calculated.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        if days_stored == 0:
+            return 0.0
+
+        processed_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(
+            crop, crop.last_time_degraded
+        )
+        processed_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
+            crop, crop.last_time_degraded
+        )
+        processed_loss = processed_initial_dry_matter_loss + processed_subsequent_dry_matter_loss
+
+        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
+        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+        current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
+
+        additional_loss = self._calculate_additional_dry_matter_loss(crop, weather_conditions)
+
+        return current_loss - processed_loss + additional_loss
+
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
 
         Returns
         -------
-        None
+        float
+            Gaseous dry matter loss from the hayed crop that occurred in the first 30 days of storage (kg).
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.2.3
+
         """
-        pass
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_in_window = min(days_stored, 30)
+        fraction_of_total_loss = days_in_window / 30
+
+        dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        moisture_fraction = 1 - dry_fraction
+
+        numerator = crop.total_sensible_heat_generated + 2433 * (
+            moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
+        )
+        denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+
+        fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
+        return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
+
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage (kg).
+
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equation 1.2.7
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_past_30_day_window = max(0, days_stored - 30)
+
+        return 0.0001 * days_past_30_day_window
+
+    def _calculate_additional_dry_matter_loss(
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions]
+    ) -> float:
+        """
+        Calculates additional dry matter loss in hayed crops.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        weather_conditions : list[CurrentDayConditions]
+            List of daily weather conditions over which additional dry matter loss will be calculated.
+
+        Returns
+        -------
+        float
+            Loss of dry matter that occurred over the specified period of weather conditions in kg.
+
+        Notes
+        -----
+        If the additional dry matter loss coefficient is 0, the equation this method implements will always result in
+        zero, so 0 is returned immediately in this case to avoid unnecessary computation.
+
+        References
+        ----------
+        .. [1] Feed Storage Scienitific Documentation, equation 1.2.8
+
+        """
+        if self.additional_dry_matter_loss_coefficient == 0.0:
+            return 0.0
+
+        constant_factor = self.additional_dry_matter_loss_coefficient / crop.bale_density * self.bale_size**3
+        conditions = [
+            weather.rainfall
+            * GeneralConstants.MM_TO_CM
+            * max(0.0, (weather.max_air_temperature + weather.min_air_temperature) / 2)
+            for weather in weather_conditions
+        ]
+        additional_loss = sum(conditions)
+        return additional_loss * constant_factor
 
 
 class ProtectedIndoors(Hay):
@@ -75,7 +216,9 @@ class ProtectedWrapped(Hay):
     Represents protected wrapped hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class ProtectedTarped(Hay):
@@ -83,12 +226,23 @@ class ProtectedTarped(Hay):
     Represents protected tarped hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class Unprotected(Hay):
     """
     Represents unprotected hay storage, a subclass of Hay.
+
+    Notes
+    -----
+    The nutrient-specific loss coefficients are listed in table 2.1.1 of the Feed Storage Scientific Documentation.
+
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
+        self.ndf_loss_coefficient = 0.17
+        self.crude_protein_loss_coefficient = 0.4

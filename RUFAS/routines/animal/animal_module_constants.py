@@ -49,12 +49,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
-    URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND: float = 2
-    """The lower bound of the urine urea nitrogen concentration."""
-
-    URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND: float = 12
-    """The upper bound of the urine urea nitrogen concentration."""
-
     DAILY_MILK_VARIATION_MEAN: float = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
 
