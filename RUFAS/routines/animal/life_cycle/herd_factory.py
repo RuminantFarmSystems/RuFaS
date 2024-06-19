@@ -18,7 +18,6 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -63,6 +62,7 @@ class HerdFactory:
             The directory path where the animal data JSON files will be saved if
             save_animals is True.
         """
+        im = InputManager()
         self.init_herd = init_herd
         self.save_animals = save_animals
         self.save_animals_path = save_animals_path
@@ -241,6 +241,7 @@ class HerdFactory:
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
         """Function to initialize an AnimalPopulation object from input data"""
+        im = InputManager()
         herd_data = im.get_data("animal_population")
         calves = list(
             map(
@@ -340,6 +341,7 @@ class HerdFactory:
             "cow": "animal.herd_information.cow_num",
             "replacement": "animal.herd_information.replace_num",
         }
+        im = InputManager()
         animal_num = im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
@@ -357,6 +359,7 @@ class HerdFactory:
         function also optionally saves the generated herd data into a JSON file.
         The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
         """
+        im = InputManager()
         AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
