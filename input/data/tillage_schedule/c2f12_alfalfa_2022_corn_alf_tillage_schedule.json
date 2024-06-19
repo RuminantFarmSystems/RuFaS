@@ -1,0 +1,10 @@
+{
+    "years": [2016, 2016, 2017, 2017, 2018, 2018, 2019],
+    "days": [125, 260, 125, 260, 125, 260, 120],
+    "incorporation_fractions": [0.5],
+    "mixing_fractions": [0.5],
+    "tillage_depths": [25],
+    "implements": ["disk-harrow"],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

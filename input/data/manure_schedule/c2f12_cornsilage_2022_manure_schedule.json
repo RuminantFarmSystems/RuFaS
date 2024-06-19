@@ -1,0 +1,14 @@
+{
+    "years": [2020, 2020],
+    "days": [131, 259],
+    "nitrogen_masses": [29988, 29988],
+    "phosphorus_masses": [5170, 5170],
+    "potassium_masses": [27919, 27919],
+    "coverage_fractions": [0.5, 1.0],
+    "application_depths": [0, 0],
+    "surface_remainder_fractions": [1.0, 1.0],
+    "manure_types": ["liquid", "liquid"],
+    "pattern_repeat": 2,
+    "pattern_skip": 0
+}
+

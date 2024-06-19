@@ -13,7 +13,7 @@
       "path": "input/data/EEE/full_feeds_land_use_change_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
-    },
+   },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
