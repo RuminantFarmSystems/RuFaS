@@ -129,7 +129,7 @@ class AminoAcidCalculator:
         dry_matter_intake_estimate: float,
         milk_true_protein: float,
         milk_production: float,
-        NDF_conc: float 
+        NDF_conc: float,
     ) -> Dict[str, float]:
         """
         This function calculates the total Essential Amino Acid for an animal according to equations on page 8 of the
