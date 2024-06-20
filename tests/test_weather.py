@@ -154,9 +154,9 @@ def test_get_current_day_conditions(
 ) -> None:
     """Tests that CurrentDayConditions instances are correctly created by Weather."""
     mocked_time = MagicMock(Time)
-    setattr(mocked_time, "day", day)
-    setattr(mocked_time, "year", year)
-    setattr(mocked_time, "calendar_year", calendar_year)
+    setattr(mocked_time, "current_julian_day", day)
+    setattr(mocked_time, "current_simulation_year", year)
+    setattr(mocked_time, "current_calendar_year", calendar_year)
     daylength = mocker.patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", return_value=10.0)
 
     actual = mock_weather.get_current_day_conditions(mocked_time)
@@ -182,9 +182,9 @@ def test_get_current_day_conditions_error(
 ) -> None:
     """Tests that error is raised properly when weather does not have data for specified time."""
     mocked_time = MagicMock(Time)
-    setattr(mocked_time, "day", day)
-    setattr(mocked_time, "year", year)
-    setattr(mocked_time, "calendar_year", calendar_year)
+    setattr(mocked_time, "current_julian_day", day)
+    setattr(mocked_time, "current_simulation_year", year)
+    setattr(mocked_time, "current_calendar_year", calendar_year)
     mocker.patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", return_value=10.0)
 
     with pytest.raises(IndexError) as e:
@@ -243,8 +243,8 @@ def test_get_conditions_series(
     expected: list[CurrentDayConditions],
 ) -> None:
     """Tests that series of CurrentDayConditions are created correctly."""
-    setattr(mock_time, "year", 2)
-    setattr(mock_time, "day", 2)
+    setattr(mock_time, "current_simulation_year", 2)
+    setattr(mock_time, "current_julian_day", 2)
     setattr(mock_time, "simulation_day", 5)
     setattr(mock_time, "end_year_int", 2024)
     date_conversion = mocker.patch.object(Utility, "convert_ordinal_date_to_month_date", return_value=date(2023, 1, 2))
