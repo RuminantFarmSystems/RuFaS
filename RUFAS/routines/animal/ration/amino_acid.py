@@ -138,19 +138,19 @@ class AminoAcidCalculator:
         Parameters
         ----------
         lactating : bool
-            Physiological condition
+            If the animal is lactating.
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kilograms).
         frame_weight_gain : float
-            Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day)
+            Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day).
         gravid_uterine_weight_gain : float
-            Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
+            Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d).
         dry_matter_intake_estimate : float
-            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
+            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d).
         milk_true_protein : float
-            True protein contents in milk (%)
+            True protein contents in milk (%).
         milk_production: float
-            Milk yield (kg/d)
+            Milk yield (kg/d).
         NDF_conc:
             Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
 
