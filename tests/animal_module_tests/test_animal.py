@@ -2427,7 +2427,7 @@ def test_make_ration_from_solution() -> None:
     predicted["status"] = "Optimal"
     predicted["objective"] = 0.0
 
-    mock_avail_feeds: AvailableFeedsTypedDict = {}
+    mock_avail_feeds = {}
     mock_avail_feeds["feed_id"] = [100, 200, 300]
     mock_avail_feeds["feed_key"] = ["100", "200", "300"]
     mock_avail_feeds["price"] = [0, 0, 0]
