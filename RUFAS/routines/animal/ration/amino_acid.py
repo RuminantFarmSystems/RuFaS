@@ -19,7 +19,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 9.60,
         "whole_empty_body": 8.20,
         "metabolic_fecal": 5.90,
-        "milk": 3.74
+        "milk": 3.74,
     },
     "histidine": {
         "duodenal_endogenous": 2.90,
@@ -27,7 +27,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 1.75,
         "whole_empty_body": 3.04,
         "metabolic_fecal": 3.54,
-        "milk": 2.92
+        "milk": 2.92,
     },
     "isoleucine": {
         "duodenal_endogenous": 4.09,
@@ -35,7 +35,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 2.96,
         "whole_empty_body": 3.69,
         "metabolic_fecal": 5.39,
-        "milk": 6.18
+        "milk": 6.18,
     },
     "leucine": {
         "duodenal_endogenous": 7.67,
@@ -43,7 +43,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 6.93,
         "whole_empty_body": 8.27,
         "metabolic_fecal": 9.19,
-        "milk": 10.56
+        "milk": 10.56,
     },
     "lysine": {
         "duodenal_endogenous": 6.23,
@@ -51,7 +51,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 5.64,
         "whole_empty_body": 7.90,
         "metabolic_fecal": 7.61,
-        "milk": 8.82
+        "milk": 8.82,
     },
     "methionine": {
         "duodenal_endogenous": 1.26,
@@ -59,7 +59,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 1.40,
         "whole_empty_body": 2.37,
         "metabolic_fecal": 1.73,
-        "milk": 3.03
+        "milk": 3.03,
     },
     "phenylalanine": {
         "duodenal_endogenous": 3.98,
@@ -67,7 +67,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 3.61,
         "whole_empty_body": 4.41,
         "metabolic_fecal": 5.28,
-        "milk": 5.26
+        "milk": 5.26,
     },
     "threonine": {
         "duodenal_endogenous": 5.18,
@@ -75,7 +75,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 4.01,
         "whole_empty_body": 4.84,
         "metabolic_fecal": 7.36,
-        "milk": 4.62
+        "milk": 4.62,
     },
     "thryptophan": {
         "duodenal_endogenous": 1.29,
@@ -83,7 +83,7 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 0.73,
         "whole_empty_body": 1.05,
         "metabolic_fecal": 1.79,
-        "milk": 1.65
+        "milk": 1.65,
     },
     "valine": {
         "duodenal_endogenous": 5.29,
@@ -91,11 +91,20 @@ AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
         "scurf": 4.66,
         "whole_empty_body": 5.15,
         "metabolic_fecal": 7.01,
-        "milk": 6.90
-    }
+        "milk": 6.90,
+    },
 }
-ESSENTIAL_AMINO_ACIDS: List[str] = ["histidine", "isoleucine", "leucine", "lysine", "methionine",
-                                    "phenylalanine", "threonine", "thryptophan", "valine"]
+ESSENTIAL_AMINO_ACIDS: List[str] = [
+    "histidine",
+    "isoleucine",
+    "leucine",
+    "lysine",
+    "methionine",
+    "phenylalanine",
+    "threonine",
+    "thryptophan",
+    "valine",
+]
 
 ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES: Dict[str, float] = {
     "histidine": 0.75,
@@ -106,21 +115,21 @@ ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES: Dict[str, float] = {
     "phenylalanine": 0.60,
     "threonine": 0.64,
     "thryptophan": 0.86,
-    "valine": 0.74
+    "valine": 0.74,
 }
 
 
 class AminoAcidCalculator:
     def calculate_essential_amino_acid_requirements(
-            self,
-            lactating: bool,
-            body_weight: float,
-            frame_weight_gain: float,
-            gravid_uterine_weight_gain: float,
-            dry_matter_intake_estimate: float,
-            milk_true_protein: float,
-            milk_production: float,
-            NDF_conc: float,
+        self,
+        lactating: bool,
+        body_weight: float,
+        frame_weight_gain: float,
+        gravid_uterine_weight_gain: float,
+        dry_matter_intake_estimate: float,
+        milk_true_protein: float,
+        milk_production: float,
+        NDF_conc: float,
     ) -> Dict[str, float]:
         """
         This function calculates the total Essential Amino Acid for an animal according to equations on page 8 of the
@@ -191,22 +200,19 @@ class AminoAcidCalculator:
 
                 total_amino_acid_requirements[amino_acid] = (
                     (
-                            net_AA_scurf +
-                            net_AA_MFP +
-                            net_AA_Growth +
-                            net_AA_Milk
-                    ) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
-                ) + (
-                        net_AA_Gest / target_efficiency_gest
-                ) + net_AA_End_Urine
+                        (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
+                        / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
+                    )
+                    + (net_AA_Gest / target_efficiency_gest)
+                    + net_AA_End_Urine
+                )
             else:
                 total_amino_acid_requirements[amino_acid] = (
-                    (net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
-                ) + (
-                    net_AA_Growth / target_efficiency_growth
-                ) + (
-                    net_AA_Gest / target_efficiency_gest
-                ) + net_AA_End_Urine
+                    ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
+                    + (net_AA_Growth / target_efficiency_growth)
+                    + (net_AA_Gest / target_efficiency_gest)
+                    + net_AA_End_Urine
+                )
 
         return total_amino_acid_requirements
 

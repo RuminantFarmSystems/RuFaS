@@ -602,7 +602,7 @@ class AnimalRequirements:
                 dry_matter_intake_estimate,
                 milk_true_protein,
                 milk_production,
-                NDF_conc
+                NDF_conc,
             )
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight,
