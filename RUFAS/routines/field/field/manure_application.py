@@ -95,17 +95,17 @@ class ManureApplication:
 
         application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
         new_vals = self._determine_weighted_manure_attributes(
-            self.data.grazing_manure_dry_mass,
-            self.data.grazing_manure_moisture_factor,
-            self.data.grazing_manure_field_coverage,
+            self.data.grazing_manure.manure_dry_mass,
+            self.data.grazing_manure.manure_moisture_factor,
+            self.data.grazing_manure.manure_field_coverage,
             dry_matter_mass,
             dry_matter_fraction,
             application_field_coverage,
         )
-        self.data.grazing_manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
-        self.data.grazing_manure_applied_mass = dry_matter_mass
+        self.data.grazing_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass")
+        self.data.grazing_manure.manure_moisture_factor = new_vals.get("new_moisture_factor")
+        self.data.grazing_manure.manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.grazing_manure.manure_applied_mass = dry_matter_mass
 
         self._add_nitrogen_to_soil_layer(
             0,
@@ -276,16 +276,16 @@ class ManureApplication:
         )
 
         new_vals = self._determine_weighted_manure_attributes(
-            self.data.machine_manure_dry_mass,
-            self.data.machine_manure_moisture_factor,
-            self.data.machine_manure_field_coverage,
+            self.data.machine_manure.manure_dry_mass,
+            self.data.machine_manure.manure_moisture_factor,
+            self.data.machine_manure.manure_field_coverage,
             surface_dry_matter_mass,
             dry_matter_fraction,
             field_coverage,
         )
-        self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.machine_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass")
+        self.data.machine_manure.manure_moisture_factor = new_vals.get("new_moisture_factor")
+        self.data.machine_manure.manure_field_coverage = new_vals.get("new_field_coverage")
 
         self._add_nitrogen_to_soil_layer(
             0,
@@ -423,16 +423,16 @@ class ManureApplication:
         adjusted_field_coverage = field_coverage * 0.5
         adjusted_dry_matter_mass = surface_dry_matter_mass * 0.8
         new_vals = self._determine_weighted_manure_attributes(
-            self.data.machine_manure_dry_mass,
-            self.data.machine_manure_moisture_factor,
-            self.data.machine_manure_field_coverage,
+            self.data.machine_manure.manure_dry_mass,
+            self.data.machine_manure.manure_moisture_factor,
+            self.data.machine_manure.manure_field_coverage,
             adjusted_dry_matter_mass,
             dry_matter_fraction,
             adjusted_field_coverage,
         )
-        self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.machine_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass")
+        self.data.machine_manure.manure_moisture_factor = new_vals.get("new_moisture_factor")
+        self.data.machine_manure.manure_field_coverage = new_vals.get("new_field_coverage")
 
         top_layer_mass = surface_retention * surface_dry_matter_mass
         self._add_nitrogen_to_soil_layer(
