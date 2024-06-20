@@ -468,6 +468,7 @@ class AnimalRequirements:
         Dict[str, float]
             dictionary of requirement values, see individual functions for each key value pair
         """
+        essential_amino_acid_requirement: Dict[str, float] = {}
         if AnimalBase.config["nutrient_standard"] == "NRC":
             (
                 net_energy_maintenance,
