@@ -50,7 +50,6 @@ EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 class EmissionsEstimator:
     def __init__(self) -> None:
         self.im = InputManager()
-        pass
 
     def estimate_emissions(self) -> None:
         (
