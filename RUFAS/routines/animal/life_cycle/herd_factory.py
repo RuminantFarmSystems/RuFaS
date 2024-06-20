@@ -173,8 +173,8 @@ class HerdFactory:
         """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
-            _, _, _, culled, new_born = cow.update(0, self.CI)
-            if culled or cow.calves > 4:
+            new_born = cow.update(0, self.CI)
+            if cow.culled or cow.calves > 4:
                 continue
             else:
                 remaining_cows.append(cow)
