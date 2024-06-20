@@ -8,6 +8,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator
 
 om = OutputManager()
 
@@ -592,6 +593,17 @@ class AnimalRequirements:
                 milk_production,
                 NDF_conc,
             )
+            AA_calculator = AminoAcidCalculator()
+            essential_amino_acid_requirement = AA_calculator.calculate_essential_amino_acid_requirements(
+                lactating,
+                body_weight,
+                frame_weight_gain,
+                gravid_uterine_weight_gain,
+                dry_matter_intake_estimate,
+                milk_true_protein,
+                milk_production,
+                NDF_conc
+            )
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight,
                 mature_body_weight,
@@ -635,6 +647,7 @@ class AnimalRequirements:
             "NEpreg_requirement": net_energy_pregnancy,
             "NEl_requirement": net_energy_lactation,
             "MP_requirement": metabolizable_protein_requirement,
+            "EAA_requirement": essential_amino_acid_requirement,
             "Ca_requirement": calcium_requirement,
             "P_requirement": phosphorus_requirement,
             "DMIest_requirement": dry_matter_intake_estimate,
