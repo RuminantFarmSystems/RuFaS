@@ -88,10 +88,10 @@ class ManureApplication:
         in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
 
         """
-        self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
-        self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
-        self.data.grazing_stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
-        self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 0.3375
+        self.data.grazing_manure.water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
+        self.data.grazing_manure.water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
+        self.data.grazing_manure.stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
+        self.data.grazing_manure.stable_organic_phosphorus += total_phosphorus_mass * 0.3375
 
         application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
         new_vals = self._determine_weighted_manure_attributes(
@@ -262,16 +262,16 @@ class ManureApplication:
         )
         stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
-        self.data.machine_water_extractable_inorganic_phosphorus += (
+        self.data.machine_manure.water_extractable_inorganic_phosphorus += (
             total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * surface_remainder_fraction
         )
-        self.data.machine_water_extractable_organic_phosphorus += (
+        self.data.machine_manure.water_extractable_organic_phosphorus += (
             total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * surface_remainder_fraction
         )
-        self.data.machine_stable_inorganic_phosphorus += (
+        self.data.machine_manure.machine_manure.stable_inorganic_phosphorus += (
             total_phosphorus_mass * stable_inorganic_phosphorus_fraction * surface_remainder_fraction
         )
-        self.data.machine_stable_organic_phosphorus += (
+        self.data.machine_manure.stable_organic_phosphorus += (
             total_phosphorus_mass * stable_organic_phosphorus_fraction * surface_remainder_fraction
         )
 
@@ -380,25 +380,25 @@ class ManureApplication:
         stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
 
-        self.data.machine_water_extractable_inorganic_phosphorus += (
+        self.data.machine_manure.water_extractable_inorganic_phosphorus += (
             total_phosphorus_mass
             * water_extractable_inorganic_phosphorus_fraction
             * surface_retention
             * surface_remainder_fraction
         )
-        self.data.machine_water_extractable_organic_phosphorus += (
+        self.data.machine_manure.water_extractable_organic_phosphorus += (
             total_phosphorus_mass
             * water_extractable_organic_phosphorus_fraction
             * surface_retention
             * surface_remainder_fraction
         )
-        self.data.machine_stable_inorganic_phosphorus += (
+        self.data.machine_manure.stable_inorganic_phosphorus += (
             total_phosphorus_mass
             * stable_inorganic_phosphorus_fraction
             * surface_retention
             * surface_remainder_fraction
         )
-        self.data.machine_stable_organic_phosphorus += (
+        self.data.machine_manure.stable_organic_phosphorus += (
             total_phosphorus_mass * stable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
         )
 

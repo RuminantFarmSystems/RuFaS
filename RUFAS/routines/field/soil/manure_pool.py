@@ -13,8 +13,8 @@ class ManurePool:
     manure_field_coverage : float, default 0
         Fraction of the field that is covered by machine- or grazer-applied manure, between [0, 1] (unitless).
     manure_moisture_factor : float, default 0
-        Fraction representing the current moisture level of the machine- or grazer-applied manure on the field, between [0, 0.9]
-        (unitless).
+        Fraction representing the current moisture level of the machine- or grazer-applied manure on the field, between
+        [0, 0.9] (unitless).
     water_extractable_inorganic_phosphorus : float, default 0
         Amount of water extractable inorganic phosphorus on the field that was applied by machine or grazers (kg).
     water_extractable_organic_phosphorus : float, default 0
