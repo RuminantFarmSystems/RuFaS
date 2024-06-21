@@ -254,6 +254,7 @@
   ],
   "manure_treatment_configs": [
     {
+      "name": "slurry storage underfloor",
       "manure_treatment_type": "slurry storage underfloor",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -265,6 +266,7 @@
       "manure_cover": "crust"
     },
     {
+      "name": "slurry storage outdoor",
       "manure_treatment_type": "slurry storage outdoor",
       "total_solids_removal_efficiency_for_treatment": 0.00,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -277,6 +279,7 @@
       "manure_cover": "crust"
     },
     {
+      "name": "anaerobic lagoon",
       "manure_treatment_type": "anaerobic lagoon",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -292,11 +295,12 @@
       "manure_cover": "cover"
     },
     {
+      "name": "anaerobic digestion",
       "manure_treatment_type": "anaerobic digestion",
-      "total_solids_removal_efficiency_for_treatment": 0.45,
-      "volatile_solids_removal_efficiency_for_treatment": 0.40,
+      "total_solids_removal_efficiency_for_treatment": 0.0,
+      "volatile_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
-      "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.1,
+      "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
       "phosphorus_removal_efficiency_for_treatment": 0.0,
       "potassium_removal_efficiency_for_treatment": 0.0,
       "hydraulic_retention_time": 25,
@@ -309,6 +313,7 @@
       "manure_cover": "N/A"
     },
     {
+      "name": "compost bedded pack barn",
       "manure_treatment_type": "compost bedded pack barn",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
@@ -323,6 +328,7 @@
       "freeboard_input": 0.3048
     },
     {
+      "name": "open lots",
       "manure_treatment_type": "open lots",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
@@ -333,6 +339,7 @@
       "storage_time_period": 365
     },
     {
+      "name": "composting",
       "manure_treatment_type": "composting",
       "composting_type": "intensive windrow",
       "storage_time_period": 365

@@ -780,12 +780,12 @@ class GasEmissionsCalculator:
 
     @classmethod
     def methane_volume_via_Chen_equation(
-        cls, manure_total_degradable_volatile_solids: float, hydraulic_retention_time: int
+        cls, manure_total_volatile_solids: float, 
     ) -> float:
         """Calculates CH4 generation volume using the Chen-Hashimoto equation.
 
         Args:
-            manure_total_degradable_volatile_solids: total volatile solids, kg.
+            manure_total_volatile_solids: total volatile solids, kg.
             hydraulic_retention_time: hydraulic retention time, days.
 
         Returns:
@@ -794,16 +794,7 @@ class GasEmissionsCalculator:
         """
         return (
             GasEmissionConstants.METHANE_POTENTIAL_Go
-            * (
-                1
-                - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                / (
-                    hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                    + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                    - 1
-                )
-            )
-            * manure_total_degradable_volatile_solids
+            * manure_total_volatile_solids
             * GeneralConstants.GRAMS_TO_KG
         )
 

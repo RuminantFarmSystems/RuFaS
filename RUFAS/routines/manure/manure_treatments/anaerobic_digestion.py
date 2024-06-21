@@ -75,10 +75,9 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         # MS.3.B.7R
         methane_generation_volume = GasEmissionsCalculator.methane_volume_via_Chen_equation(
-            manure_total_degradable_volatile_solids=(
-                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            ),
-            hydraulic_retention_time=self.config.hydraulic_retention_time,
+            manure_total_volatile_solids=(
+                self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+            )
         )
         biogas_energy_content = GasEmissionsCalculator.biogas_energy_content(methane_volume=methane_generation_volume)
         # MS.3.B.2
@@ -86,21 +85,28 @@ class AnaerobicDigestion(BaseManureTreatment):
         # MS.3.B.3
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
+        new_daily_output.liquid_manure_total_ammoniacal_nitrogen = min(
+            self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * 1.15, 
+            self._current_manure_treatment_daily_input.liquid_manure_nitrogen
+        )
         new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
         new_daily_output.liquid_manure_total_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+            - (self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5)
         )
         new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
         )
         new_daily_output.liquid_manure_total_volatile_solids = (
-            new_daily_output.liquid_manure_total_degradable_volatile_solids
-            + new_daily_output.liquid_manure_total_non_degradable_volatile_solids
+            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5
         )
         new_daily_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids
-            - (new_daily_output.biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+            - (self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5)
+        )
+        new_daily_output.daily_final_manure_volume = (
+            self._current_manure_treatment_daily_input.liquid_manure_daily_volume
+            - (new_daily_output.biogas / 990)
         )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume

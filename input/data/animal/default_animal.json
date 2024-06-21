@@ -1,12 +1,12 @@
 {
   "herd_information": {
-    "calf_num": 8,
-    "heiferI_num": 44,
-    "heiferII_num": 38,
-    "heiferIII_num_springers": 5,
-    "cow_num": 100,
+    "calf_num": 16,
+    "heiferI_num": 88,
+    "heiferII_num": 80,
+    "heiferIII_num_springers": 10,
+    "cow_num": 300,
     "replace_num": 500,
-    "herd_num": 100,
+    "herd_num": 300,
     "breed": "HO"
   },
   "herd_initialization": {
@@ -159,7 +159,7 @@
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
-			"number_of_stalls": 30,
+			"number_of_stalls": 60,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
@@ -171,7 +171,7 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
-			"number_of_stalls": 125,
+			"number_of_stalls": 250,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
@@ -183,7 +183,7 @@
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
-			"number_of_stalls": 60,
+			"number_of_stalls": 120,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
@@ -195,11 +195,23 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
-			"number_of_stalls": 150,
+			"number_of_stalls": 160,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
 			"manure_management_scenario_id": 5
+		},
+		{
+			"id": 4,
+			"pen_name": "",
+			"animal_combination": "LAC_COW",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 10,
+			"number_of_stalls": 160,
+			"housing_type": "open air barn",
+			"pen_type": "freestall",
+			"max_stocking_density": 1.2,
+			"manure_management_scenario_id": 0
 		}
 	]
 }

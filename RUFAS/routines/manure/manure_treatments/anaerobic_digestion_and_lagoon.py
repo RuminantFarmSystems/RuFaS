@@ -84,6 +84,18 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
 
         self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
 
+        self._accumulated_output.liquid_manure_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_solids
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids
+        )
         self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
             self._anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids
         )
