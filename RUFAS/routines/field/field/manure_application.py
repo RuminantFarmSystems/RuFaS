@@ -209,7 +209,7 @@ class ManureApplication:
                 organic_nitrogen_fraction,
                 field_size,
             )
-        self.data.machine_manure_applied_mass = dry_matter_mass
+        self.data.machine_manure.manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(
         self,

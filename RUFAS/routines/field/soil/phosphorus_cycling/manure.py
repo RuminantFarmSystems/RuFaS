@@ -132,8 +132,8 @@ class Manure:
         assimilated_grazing_coverage = assimilated_manure_changes["grazing_manure_coverage"]
 
         # Calculate amounts of phosphorus assimilated into the soil
-        if self.data.machine_manure_dry_mass > 0:
-            machine_assimilation_ratio = assimilated_machine_mass / self.data.machine_manure_dry_mass
+        if self.data.machine_manure.manure_dry_mass > 0:
+            machine_assimilation_ratio = assimilated_machine_mass / self.data.machine_manure.manure_dry_mass
         else:
             machine_assimilation_ratio = 0
         assimilated_machine_stable_organic = self._determine_assimilated_phosphorus_amount(
@@ -152,8 +152,8 @@ class Manure:
             self.data.machine_water_extractable_inorganic_phosphorus,
         )
 
-        if self.data.grazing_manure_dry_mass > 0:
-            grazing_assimilation_ratio = assimilated_grazing_mass / self.data.grazing_manure_dry_mass
+        if self.data.grazing_manure.manure_dry_mass > 0:
+            grazing_assimilation_ratio = assimilated_grazing_mass / self.data.grazing_manure.manure_dry_mass
         else:
             grazing_assimilation_ratio = 0
         assimilated_grazing_stable_organic = self._determine_assimilated_phosphorus_amount(
@@ -173,13 +173,13 @@ class Manure:
         )
 
         # Set machine attributes
-        self.data.machine_manure_dry_mass = max(
+        self.data.machine_manure.manure_dry_mass = max(
             0.0,
-            self.data.machine_manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass,
+            self.data.machine_manure.manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass,
         )
-        self.data.machine_manure_field_coverage = max(
+        self.data.machine_manure.manure_field_coverage = max(
             0.0,
-            self.data.machine_manure_field_coverage - assimilated_machine_coverage - decomposed_machine_coverage,
+            self.data.machine_manure.manure_field_coverage - assimilated_machine_coverage - decomposed_machine_coverage,
         )
         self.data.machine_stable_organic_phosphorus = max(
             0.0,
@@ -278,13 +278,13 @@ class Manure:
             The size of the field (ha).
 
         """
-        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+        if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
             machine_organic_results = self._determine_phosphorus_leached_from_surface(
                 rainfall,
                 runoff,
                 field_size,
-                self.data.machine_manure_dry_mass,
-                self.data.machine_manure_field_coverage,
+                self.data.machine_manure.manure_dry_mass,
+                self.data.machine_manure.manure_field_coverage,
                 self.data.machine_water_extractable_organic_phosphorus,
                 True,
             )
@@ -299,8 +299,8 @@ class Manure:
                 rainfall,
                 runoff,
                 field_size,
-                self.data.machine_manure_dry_mass,
-                self.data.machine_manure_field_coverage,
+                self.data.machine_manure.manure_dry_mass,
+                self.data.machine_manure.manure_field_coverage,
                 self.data.machine_water_extractable_inorganic_phosphorus,
                 False,
             )
@@ -383,12 +383,12 @@ class Manure:
             The temperature factor on the current day (unitless).
 
         """
-        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+        if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
             change_in_machine_manure_moisture = self._determine_moisture_change(
                 rainfall,
                 self.data.machine_manure_moisture_factor,
-                self.data.machine_manure_dry_mass,
-                self.data.machine_manure_applied_mass,
+                self.data.machine_manure.manure_dry_mass,
+                self.data.machine_manure.manure_applied_mass,
                 temperature_factor,
             )
             self.data.machine_manure_moisture_factor += change_in_machine_manure_moisture
@@ -435,15 +435,15 @@ class Manure:
             decomposed_machine_manure_mass_change,
             decomposed_machine_manure_coverage_change,
         ) = (0, 0)
-        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+        if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
             decomposed_machine_manure_mass_change = min(
-                (self.data.machine_manure_dry_mass * manure_dry_matter_decomposition_rate),
-                self.data.machine_manure_dry_mass,
+                (self.data.machine_manure.manure_dry_mass * manure_dry_matter_decomposition_rate),
+                self.data.machine_manure.manure_dry_mass,
             )
             decomposed_machine_manure_coverage_change = min(
-                (decomposed_machine_manure_mass_change / self.data.machine_manure_dry_mass)
-                * self.data.machine_manure_field_coverage,
-                self.data.machine_manure_field_coverage,
+                (decomposed_machine_manure_mass_change / self.data.machine_manure.manure_dry_mass)
+                * self.data.machine_manure.manure_field_coverage,
+                self.data.machine_manure.manure_field_coverage,
             )
 
         (
@@ -453,7 +453,7 @@ class Manure:
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             decomposed_grazing_manure_mass_change = min(
                 (self.data.grazing_manure_dry_mass * manure_dry_matter_decomposition_rate),
-                self.data.machine_manure_dry_mass,
+                self.data.machine_manure.manure_dry_mass,
             )
             decomposed_grazing_manure_coverage_change = min(
                 (decomposed_grazing_manure_mass_change / self.data.grazing_manure_dry_mass)
@@ -493,8 +493,8 @@ class Manure:
 
         """
         assimilated_machine_manure, machine_manure_coverage = 0, 0
-        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-            machine_manure_cover_area = self.data.machine_manure_field_coverage * field_size
+        if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
+            machine_manure_cover_area = self.data.machine_manure.manure_field_coverage * field_size
             assimilated_machine_manure = max(
                 0.0,
                 self._determine_dry_manure_matter_assimilation(
@@ -504,13 +504,13 @@ class Manure:
                     False,
                 ),
             )
-            assimilated_machine_manure = min(self.data.machine_manure_dry_mass, assimilated_machine_manure)
+            assimilated_machine_manure = min(self.data.machine_manure.manure_dry_mass, assimilated_machine_manure)
             machine_manure_coverage = max(
                 0.0,
-                (assimilated_machine_manure / self.data.machine_manure_dry_mass)
-                * self.data.machine_manure_field_coverage,
+                (assimilated_machine_manure / self.data.machine_manure.manure_dry_mass)
+                * self.data.machine_manure.manure_field_coverage,
             )
-            machine_manure_coverage = min(machine_manure_coverage, self.data.machine_manure_field_coverage)
+            machine_manure_coverage = min(machine_manure_coverage, self.data.machine_manure.manure_field_coverage)
 
         assimilated_grazing_manure, grazing_manure_coverage = 0, 0
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
