@@ -311,6 +311,92 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     assert actual == expected
 
 
+@pytest.mark.parametrize(
+    "data_to_pad,expected",
+    [
+        (
+            {
+                "a": {
+                    "values": ["a", "b", "c"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 4}, {"simulation_day": 5}],
+                },
+                "b": {
+                    "values": ["d", "e", "f"],
+                    "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}, {"simulation_day": 6}],
+                },
+            },
+            {
+                "a": {
+                    "values": ["a", "a", "a", "b", "c", None],
+                    "info_maps": [
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
+                        {"simulation_day": 3},
+                        {"simulation_day": 4},
+                        {"simulation_day": 5},
+                        None,
+                    ],
+                },
+                "b": {
+                    "values": [None, None, "d", "e", "e", "f"],
+                    "info_maps": [
+                        None,
+                        None,
+                        {"simulation_day": 3},
+                        {"simulation_day": 4},
+                        {"simulation_day": 5},
+                        {"simulation_day": 6},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a"], "info_maps": [{"simulation_day": 2}]},
+                "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
+            },
+            {
+                "a": {"values": ["a", None, None], "info_maps": [{"simulation_day": 2}, None, None]},
+                "b": {"values": [None, "b", "c"], "info_maps": [None, {"simulation_day": 3}, {"simulation_day": 4}]},
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+            },
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            {
+                "a": {
+                    "values": ["a", "a", "b"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                },
+                "b": {
+                    "values": ["c", "c", "d"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                },
+            },
+        ),
+    ],
+)
+def test_pad_temporal_data(
+    data_to_pad: dict[str, dict[str, list[Any]]], expected: dict[str, dict[str, list[Any]]]
+) -> None:
+    """Tests the utility method pad_temporal_data."""
+    actual = Utility.pad_temporal_data(data_to_pad)
+
+    assert actual == expected
+
+
 def test_deep_merge_dict() -> None:
     x = {
         "a": {"i": {"c": 1, "d": 2}, "j": {"c": 3, "d": 4}},
