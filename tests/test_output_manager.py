@@ -559,20 +559,21 @@ def test_add_log(
 
 
 @pytest.mark.parametrize(
-    "name, value, info_map, first_map, expected_exception",
+    "name, value, info_map, first_map, sim_day, expected_exception",
     [
         # Case 1: Everything correct, no exception should be raised
-        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, None),
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True, True, None),
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
-        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False, None),
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False, False, None),
         # Case 2: 'units' key missing, should raise KeyError
-        ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, KeyError),
+        ("var2", 200, {"class": "TestClass", "function": "test_function"}, True, False, KeyError),
         # Case 3: Value is a dict, should process sub-keys
         (
             "var3",
             {"sub1": 10, "sub2": 20},
             {"class": "TestClass", "function": "test_function", "units": "kg"},
             True,
+            False,
             None,
         ),
     ],
@@ -582,6 +583,7 @@ def test_add_variable(
     value: Any,
     info_map: Dict[str, Any],
     first_map: bool,
+    sim_day: bool,
     expected_exception: Type[BaseException] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -598,10 +600,10 @@ def test_add_variable(
 
     if expected_exception:
         with pytest.raises(expected_exception):
-            output_manager.add_variable(name, value, info_map, first_map)
+            output_manager.add_variable(name, value, info_map, first_map, sim_day)
     else:
         # Act
-        output_manager.add_variable(name, value, info_map, first_map)
+        output_manager.add_variable(name, value, info_map, first_map, sim_day)
         # Assert
         patched_add_to_pool.assert_called_once_with(
             output_manager.variables_pool,
@@ -609,6 +611,7 @@ def test_add_variable(
             value,
             {**info_map, "units": "validated_units"},
             first_map,
+            sim_day,
         )
         if isinstance(value, dict):
             for k in value.keys():
@@ -687,27 +690,32 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag, first_map_only",
+    "dummy_value, exclude_info_maps_flag, first_map_only, time_present, sim_day, record_sim_day, expected_sim_day",
     [
-        ("dummy_value", False, False),
-        (2, False, False),
-        (3.45, False, True),
-        (True, False, True),
-        ({"key": "value"}, False, True),
-        ([1, 2, 3], False, False),
-        ("dummy_value", True, False),
-        (2, True, False),
-        (3.45, True, True),
-        (True, True, True),
-        ({"key": "value"}, True, True),
-        ([1, 2, 3], True, True),
+        ("dummy_value", False, False, True, {}, True, {"simulation_day": 100}),
+        (2, False, False, False, {"simulation_day": 10}, True, {"simulation_day": 10}),
+        (3.45, False, True, False, {}, True, {}),
+        (True, False, True, True, {}, False, {}),
+        ({"key": "value"}, False, True, True, {"simulation_day": 10}, True, {"simulation_day": 10}),
+        ([1, 2, 3], False, False, False, {}, False, {}),
+        ("dummy_value", True, False, False, {}, False, {}),
+        (2, True, False, False, {}, False, {}),
+        (3.45, True, True, False, {}, False, {}),
+        (True, True, True, False, {}, False, {}),
+        ({"key": "value"}, True, True, False, {}, False, {}),
+        ([1, 2, 3], True, True, False, {}, False, {}),
     ],
 )
 def test_add_to_pool(
+    mocker: MockerFixture,
     mock_output_manager: OutputManager,
     dummy_value: Any,
     exclude_info_maps_flag: bool,
     first_map_only: bool,
+    time_present: bool,
+    sim_day: dict[str, int],
+    record_sim_day: bool,
+    expected_sim_day: dict[str, int],
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -718,13 +726,19 @@ def test_add_to_pool(
         "context": "dummy_context",
         "units": MeasurementUnits.ANIMALS.value,
     }
+    info_map.update(sim_day)
     key = "dummy_key"
     pool: Dict[str, Dict[str, Any]] = {}
     assert not mock_output_manager._exclude_info_maps_flag
     mock_output_manager._exclude_info_maps_flag = exclude_info_maps_flag
+    if time_present:
+        mock_output_manager.time = mocker.MagicMock()
+        mock_output_manager.time.simulation_day = 100  # type: ignore[attr-defined]
+    else:
+        mock_output_manager.time = None
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only, record_sim_day)
 
     # Assert
     assert pool[key]["values"][0] == dummy_value
@@ -737,14 +751,14 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value, **expected_sim_day},
         ]
 
     # Arrange
     info_map["more_context"] = "1234567890"
 
     # Act
-    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map, first_map_only, record_sim_day)
 
     # Assert
     assert pool[key]["values"][1] == dummy_value
@@ -757,12 +771,17 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     elif not first_map_only:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
-            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value, **expected_sim_day},
+            {
+                "context": "dummy_context",
+                "more_context": "1234567890",
+                "units": MeasurementUnits.ANIMALS.value,
+                **expected_sim_day,
+            },
         ]
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value, **expected_sim_day},
         ]
 
     # Cleanup
