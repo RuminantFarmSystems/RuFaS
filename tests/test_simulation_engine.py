@@ -143,7 +143,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     simulation_engine = SimulationEngine()
 
     simulation_engine.im = mocker.MagicMock()
-    simulation_engine.im.get_data.side_effect = [{}, {}, {"manure_management_scenarios": {}}, {}]
+    simulation_engine.im.get_data = MagicMock(side_effect=[{}, {}, {"manure_management_scenarios": {}}, {}])
 
     mock_weather = mocker.MagicMock()
     patch_for_weather = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
