@@ -260,6 +260,11 @@ class ManureManagerConfigHandler:
         Dict[ManureSeparatorType, ManureSeparatorConfig | None]
             A dictionary of manure separator config objects, with the key being the manure separator type.
 
+        Raises
+        ------
+        ValueError
+            If there are multiple configurations for one configuration name.
+
         """
         info_map = {"class": cls.__name__, "function": cls._process_manure_separator_configs.__name__}
 
@@ -290,6 +295,11 @@ class ManureManagerConfigHandler:
         -------
         dict[str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]
             A dictionary of manure treatment config objects, with the key being the manure treatment type.
+
+        Raises
+        ------
+        ValueError
+            If there are multiple configurations for one configuration name.
 
         Notes
         -----
