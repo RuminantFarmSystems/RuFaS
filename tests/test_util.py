@@ -356,8 +356,14 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
             },
             {
-                "a": {"values": ["a", None, None], "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}]},
-                "b": {"values": [None, "b", "c"], "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}]},
+                "a": {
+                    "values": ["a", None, None],
+                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                },
+                "b": {
+                    "values": [None, "b", "c"],
+                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                },
             },
         ),
         (
@@ -410,10 +416,7 @@ def test_pad_temporal_data(
 
 def test_pad_temporal_data_errors() -> None:
     """Tests that errors are correctly raised by pad_temporal_data."""
-    data_one = {
-        "a": {"values": ["a", "b"]},
-        "b": {"values": ["c", "d"]}
-    }
+    data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
     with pytest.raises(TypeError, match="no info maps"):
         Utility.pad_temporal_data(data_one)
 
