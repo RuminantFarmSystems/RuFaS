@@ -1041,9 +1041,8 @@ class OutputManager(object):
             results = Utility.pad_temporal_data(results, pad_tail_values=pad_tail_values)
 
         for key in results.keys():
-            results[key]["info_maps"] = (
-                results[key]["info_maps"][slice_start:slice_end] if "info_maps" in results[key] else []
-            )
+            if "info_maps" in results.keys():
+                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
             results[key]["values"] = results[key]["values"][slice_start:slice_end]
 
         return results
