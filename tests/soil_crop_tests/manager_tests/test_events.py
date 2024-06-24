@@ -26,8 +26,8 @@ from RUFAS.routines.EEE.enums import TillageImplement
 def test_occurs_today(year: int, day: int, current_year: int, current_day: int, expected: bool) -> None:
     """Tests that BaseFieldManagementEvent objects can correctly determine whether they run on a given day."""
     mocked_time = MagicMock()
-    setattr(mocked_time, "calendar_year", current_year)
-    setattr(mocked_time, "day", current_day)
+    setattr(mocked_time, "current_calendar_year", current_year)
+    setattr(mocked_time, "current_julian_day", current_day)
     event = BaseFieldManagementEvent(year, day)
 
     actual = event.occurs_today(mocked_time)
