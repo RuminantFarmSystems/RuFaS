@@ -102,7 +102,6 @@ class Utility:
             Value that is used to pad the front of the data values, and optionally the back.
         pad_tail_values : bool, default False
             Whether tail values should be padded with the last known value from a data set, or with the fill value.
-        TODO: add option to choose whether to pad values with last know value or with fill value for whole data sequence
 
         Returns
         -------

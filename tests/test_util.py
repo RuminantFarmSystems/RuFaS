@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
+import math
 
 from RUFAS.util import Utility
 
@@ -312,7 +313,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
 
 
 @pytest.mark.parametrize(
-    "data_to_pad,expected",
+    "data_to_pad,fill_value,tail_pad,expected",
     [
         (
             {
@@ -325,9 +326,11 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}, {"simulation_day": 6}],
                 },
             },
+            math.nan,
+            False,
             {
                 "a": {
-                    "values": ["a", "a", "a", "b", "c", None],
+                    "values": ["a", "a", "a", "b", "c", math.nan],
                     "info_maps": [
                         {"simulation_day": 1},
                         {"simulation_day": 2},
@@ -338,7 +341,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
                 "b": {
-                    "values": [None, None, "d", "e", "e", "f"],
+                    "values": [math.nan, math.nan, "d", "e", "e", "f"],
                     "info_maps": [
                         {"simulation_day": 1},
                         {"simulation_day": 2},
@@ -355,9 +358,11 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "a": {"values": ["a"], "info_maps": [{"simulation_day": 2}]},
                 "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
             },
+            None,
+            True,
             {
                 "a": {
-                    "values": ["a", None, None],
+                    "values": ["a", "a", "a"],
                     "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
                 },
                 "b": {
@@ -371,6 +376,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
                 "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
             },
+            8,
+            False,
             {
                 "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
                 "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
@@ -381,6 +388,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
                 "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
             },
+            "fill",
+            True,
             {
                 "a": {
                     "values": ["a", "a", "b"],
@@ -396,6 +405,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             {
                 "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
             },
+            math.pi,
+            False,
             {
                 "a": {
                     "values": ["a", "a", "b"],
@@ -406,10 +417,10 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     ],
 )
 def test_pad_temporal_data(
-    data_to_pad: dict[str, dict[str, list[Any]]], expected: dict[str, dict[str, list[Any]]]
+    data_to_pad: dict[str, dict[str, list[Any]]], fill_value: Any, tail_pad: bool, expected: dict[str, dict[str, list[Any]]]
 ) -> None:
     """Tests the utility method pad_temporal_data."""
-    actual = Utility.pad_temporal_data(data_to_pad)
+    actual = Utility.pad_temporal_data(data_to_pad, fill_value=fill_value, pad_tail_values=tail_pad)
 
     assert actual == expected
 
@@ -420,14 +431,14 @@ def test_pad_temporal_data_errors() -> None:
     with pytest.raises(TypeError, match="no info maps"):
         Utility.pad_temporal_data(data_one)
 
-    data_two = {
+    data_two: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
     with pytest.raises(ValueError, match="number of values and info maps"):
         Utility.pad_temporal_data(data_two)
 
-    data_three = {
+    data_three: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
