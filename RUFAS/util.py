@@ -111,7 +111,7 @@ class Utility:
             if len(info_maps) != len(value["values"]):
                 raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
             if not all("simulation_day" in info_map.keys() for info_map in info_maps):
-                raise ValueError(f"Variable '{key}' does not have simulation day value in every map.")
+                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
             all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
 
         filtered_simulation_days = sorted(set(all_simulation_days))

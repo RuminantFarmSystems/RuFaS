@@ -386,6 +386,17 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
         ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            {
+                "a": {
+                    "values": ["a", "a", "b"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                }
+            },
+        ),
     ],
 )
 def test_pad_temporal_data(
@@ -395,6 +406,30 @@ def test_pad_temporal_data(
     actual = Utility.pad_temporal_data(data_to_pad)
 
     assert actual == expected
+
+
+def test_pad_temporal_data_errors() -> None:
+    """Tests that errors are correctly raised by pad_temporal_data."""
+    data_one = {
+        "a": {"values": ["a", "b"]},
+        "b": {"values": ["c", "d"]}
+    }
+    with pytest.raises(TypeError, match="no info maps"):
+        Utility.pad_temporal_data(data_one)
+
+    data_two = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="number of values and info maps"):
+        Utility.pad_temporal_data(data_two)
+
+    data_three = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="simulation day value in every info map"):
+        Utility.pad_temporal_data(data_three)
 
 
 def test_deep_merge_dict() -> None:
