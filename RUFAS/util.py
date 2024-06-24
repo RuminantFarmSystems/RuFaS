@@ -84,6 +84,71 @@ class Utility:
         return nested_structure
 
     @staticmethod
+    def pad_temporal_data(data_to_pad: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
+        """
+        Pads data based on the simulation day(s) it was recorded on, relative to when other data was recorded.
+
+        Parameters
+        ----------
+        data_to_pad : dict[str, dict[str, list[Any]]]
+            The data to be padded. The top level key is a variable name, and points to a dictionary that contains the
+            keys "values" and optionally "info_maps".
+
+        Returns
+        -------
+        dict[str, dict[str, list[Any]]]
+            The padded data, so that gaps in the data are filled in with the last know value or None.
+
+        TODO: doesn't work if data has None as original value. Untested if there are multiple different values for one
+        simulation day.
+
+        """
+        all_simulation_days = []
+        for key, value in data_to_pad.items():
+            info_maps = value.get("info_maps")
+            if info_maps is None:
+                raise TypeError(f"Variable '{key}' has no info maps.")
+            if len(info_maps) != len(value["values"]):
+                raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
+            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
+                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
+            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
+
+        filtered_simulation_days = sorted(set(all_simulation_days))
+        first_day = filtered_simulation_days[0]
+        last_day = filtered_simulation_days[-1]
+
+        padded_data: dict[str, dict[str, list[Any]]] = {}
+        for key, data in data_to_pad.items():
+            padded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
+            zipped_data = zip(data["values"], data["info_maps"])
+            indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
+            last_day_of_original_data = max(indexed_data.keys())
+            last_value = None
+            for day in range(first_day, last_day_of_original_data + 1):
+                if day in indexed_data.keys():
+                    last_value = indexed_data[day]
+                    padded_variable_data["values"].append(last_value[0])
+                    padded_variable_data["info_maps"].append(last_value[1])
+                    padded_variable_data["info_maps"][-1]["simulation_day"] = day
+                else:
+                    if last_value is None:
+                        padded_variable_data["values"].append(last_value)
+                        padded_variable_data["info_maps"].append({"simulation_day": day})
+                    else:
+                        padded_variable_data["values"].append(last_value[0])
+                        padded_variable_data["info_maps"].append(last_value[1].copy())
+                        padded_variable_data["info_maps"][-1]["simulation_day"] = day
+
+            for day in range(last_day_of_original_data + 1, last_day + 1):
+                padded_variable_data["values"].append(None)
+                padded_variable_data["info_maps"].append({"simulation_day": day})
+
+            padded_data[key] = padded_variable_data
+
+        return padded_data
+
+    @staticmethod
     def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
         """
         Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
