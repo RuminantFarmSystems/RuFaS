@@ -193,7 +193,6 @@ def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     field_manager.im = mocker.MagicMock()
     field_manager.im.get_data.return_value = animals
 
-
     actual = field_manager._get_manure_supplier(mock_manure_manager)
 
     field_manager.im.get_data.assert_called_once_with("config.simulate_animals")
