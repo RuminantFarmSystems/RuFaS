@@ -68,7 +68,9 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time.simulation_day)
+        AnimalModuleReporter.report_end_of_simulation(
+            self.animal_manager.life_cycle_manager, self.time, self.animal_manager.heiferIIs, self.animal_manager.cows
+        )
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -96,7 +98,7 @@ class SimulationEngine:
         """
         The main loop for simulation.
         """
-        while not self.time.end_simulation():
+        for simulation_year in range(self.time.simulation_length_years):
             self._annual_simulation()
 
     def _daily_simulation(self) -> None:
@@ -133,14 +135,13 @@ class SimulationEngine:
 
         self.annual_mass_balance(self.time)
         self.annual_reset()
-        self.time.advance()
 
     def _annual_simulation(self) -> None:
         """
         Executes the annual simulation routines.
         """
         self._run_pre_annual_routines()
-        while not self.time.end_year():
+        for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
             self._daily_simulation()
 
         self._run_post_annual_routines()
