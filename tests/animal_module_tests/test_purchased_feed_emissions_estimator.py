@@ -2,7 +2,6 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
-from RUFAS.input_manager import InputManager
 
 
 def test_purchased_feed_emissions_estimator(mocker: MockerFixture) -> None:
