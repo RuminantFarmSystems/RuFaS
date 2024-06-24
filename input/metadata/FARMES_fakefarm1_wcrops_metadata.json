@@ -87,7 +87,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/barnyard_100yr.csv",
+      "path": "input/data/weather/farmes_fakefarm_weather_1.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
